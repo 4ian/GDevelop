@@ -7,10 +7,10 @@
 
 #include <iostream>
 #include <wx/fswatcher.h>
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/IDE/ImageFilesWatcher.h"
 
-ImageFilesWatcher::ImageFilesWatcher(const Game & game_) :
+ImageFilesWatcher::ImageFilesWatcher(const gd::Project & game_) :
     wxFileSystemWatcher(),
     game(game_)
 {

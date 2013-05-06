@@ -4,11 +4,10 @@
  */
 
 #include "GDL/ObjInstancesHolder.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
 #include "GDL/profile.h"
 
-void ObjInstancesHolder::AddObject(const ObjSPtr & object)
+void ObjInstancesHolder::AddObject(const RuntimeObjSPtr & object)
 {
     objectsInstances[object->GetName()].push_back(object);
     objectsRawPointersInstances[object->GetName()].push_back(object.get());
@@ -18,28 +17,28 @@ ObjInstancesHolder ObjInstancesHolder::CopyAndCloneAllObjects() const
 {
     ObjInstancesHolder newObjInstancesHolder;
 
-    for (boost::unordered_map<std::string, ObjList>::const_iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+    for (boost::unordered_map<std::string, RuntimeObjList>::const_iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
     {
         for (unsigned int i = 0;i<it->second.size();++i) //We need to really copy the objects
-            newObjInstancesHolder.AddObject( boost::shared_ptr<Object>(it->second[i]->Clone()) );
+            newObjInstancesHolder.AddObject( boost::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
     }
 
     return newObjInstancesHolder;
 }
 
-std::vector<Object*> ObjInstancesHolder::GetObjectsRawPointers(const std::string & name)
+std::vector<RuntimeObject*> ObjInstancesHolder::GetObjectsRawPointers(const std::string & name)
 {
     return objectsRawPointersInstances[name];
 }
 
-void ObjInstancesHolder::ObjectNameHasChanged(Object * object)
+void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
 {
-    boost::shared_ptr<Object> theObject; //We need the object to keep alive.
+    boost::shared_ptr<RuntimeObject> theObject; //We need the object to keep alive.
 
     //Find and erase the object from the object lists.
-    for (boost::unordered_map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+    for (boost::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
     {
-        ObjList & list = it->second;
+        RuntimeObjList & list = it->second;
         for (unsigned int i = 0;i<list.size();++i)
         {
             if ( list[i].get() == object )
@@ -51,9 +50,9 @@ void ObjInstancesHolder::ObjectNameHasChanged(Object * object)
         }
     }
     //Find and erase the object from the object raw pointers lists.
-    for (boost::unordered_map<std::string, std::vector<Object*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+    for (boost::unordered_map<std::string, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
     {
-        std::vector<Object*> & associatedList = it->second;
+        std::vector<RuntimeObject*> & associatedList = it->second;
         associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
     }
 

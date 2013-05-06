@@ -25,7 +25,7 @@ boost::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std
 
     for (unsigned int i = 0;i<shaders.size();++i)
     {
-        std::string file = RessourcesLoader::GetInstance()->LoadPlainText(shaders[i]);
+        std::string file = gd::RessourcesLoader::GetInstance()->LoadPlainText(shaders[i]);
 
         std::istringstream linesStream(file);
 

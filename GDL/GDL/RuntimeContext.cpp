@@ -3,7 +3,7 @@
 #include "GDL/profile.h"
 #include <vector>
 
-std::vector<Object*> RuntimeContext::GetObjectsRawPointers(const std::string & name)
+std::vector<RuntimeObject*> RuntimeContext::GetObjectsRawPointers(const std::string & name)
 {
     return scene->objectsInstances.GetObjectsRawPointers(name);
 }
@@ -15,14 +15,14 @@ RuntimeContext & RuntimeContext::ClearObjectListsMap()
     return *this;
 }
 
-RuntimeContext & RuntimeContext::AddObjectListToMap(const std::string & objectName, std::vector<Object*> & list)
+RuntimeContext & RuntimeContext::AddObjectListToMap(const std::string & objectName, std::vector<RuntimeObject*> & list)
 {
     temporaryMap[objectName] = &list;
 
     return *this;
 }
 
-std::map <std::string, std::vector<Object*> *> RuntimeContext::ReturnObjectListsMap()
+std::map <std::string, std::vector<RuntimeObject*> *> RuntimeContext::ReturnObjectListsMap()
 {
     return temporaryMap;
 }

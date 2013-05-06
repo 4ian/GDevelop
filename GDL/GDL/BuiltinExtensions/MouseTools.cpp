@@ -1,5 +1,7 @@
 #include "GDL/BuiltinExtensions/MouseTools.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/RuntimeLayer.h"
+#include <SFML/Graphics.hpp>
 
 void GD_API CenterCursor( RuntimeScene & scene )
 {
@@ -34,14 +36,14 @@ void GD_API ShowCursor( RuntimeScene & scene )
 double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
     //Get view, and compute mouse position
-    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), view).x;
 }
 
 double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
     //Get view, and compute mouse position
-    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), view).y;
 }
 

@@ -18,13 +18,13 @@
 #include <deque>
 #include "GDCore/Events/Event.h"
 #include "GDL/IDE/BaseProfiler.h"
-class SceneEditorCanvas;
+class CppLayoutPreviewer;
 
 class GD_API ProfileDlg: public wxPanel, public BaseProfiler
 {
 public:
 
-    ProfileDlg(wxWindow* parent, SceneEditorCanvas & associatedSceneEditorCanvas);
+    ProfileDlg(wxWindow* parent, CppLayoutPreviewer & associatedCppLayoutPreviewer);
     virtual ~ProfileDlg();
 
     void ParseProfileEvents();
@@ -89,7 +89,7 @@ private:
     std::deque <unsigned long int> totalTimeData;
     std::deque <unsigned int> objectsCountData;
 
-    SceneEditorCanvas & sceneCanvas;
+    CppLayoutPreviewer & sceneCanvas;
 };
 
 #endif

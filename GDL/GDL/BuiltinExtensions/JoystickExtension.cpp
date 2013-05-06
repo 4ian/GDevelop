@@ -6,77 +6,68 @@
 
 JoystickExtension::JoystickExtension()
 {
-    DECLARE_THE_EXTENSION("BuiltinJoystick",
+    SetExtensionInformation("BuiltinJoystick",
                           _("Joysticks features"),
                           _("Builtin extension allowing to use joysticks"),
                           "Compil Games",
-                          "Freeware")
+                          "Freeware");
     #if defined(GD_IDE_ONLY)
 
-    DECLARE_CONDITION("JoystickButtonDown",
+    AddCondition("JoystickButtonDown",
                    _("A button of a joystick is pressed"),
                    _("Test if a button of a joystick is pressed."),
                    _("The button _PARAM2_ of joystick _PARAM1_ is pressed"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
-                   "res/conditions/joystick.png");
+                   "res/conditions/joystick.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("expression", _("Button"), "",false)
+        .codeExtraInformation.SetFunctionName("JoystickButtonDown").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false);
-        instrInfo.AddParameter("expression", _("Button"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("JoystickButtonDown").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("JoystickAxis",
+    AddCondition("JoystickAxis",
                    _("Value of an axis of a joystick"),
                    _("Test the value of an axis of a joystick."),
                    _("The value of the axis _PARAM2_ of joystick _PARAM1_ is _PARAM4__PARAM3_"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
-                   "res/conditions/joystick.png");
+                   "res/conditions/joystick.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("joyaxis", _("Axis"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false);
-        instrInfo.AddParameter("joyaxis", _("Axis"), "",false);
-        instrInfo.AddParameter("expression", _("Value to test"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-    DECLARE_END_CONDITION()
-
-    DECLARE_ACTION("GetJoystickAxis",
+    AddAction("GetJoystickAxis",
                    _("Get the value of the axis of a joystick"),
                    _("Save in the variable the value of the axis of the joystick ( from -100 to 100 )."),
                    _("Save in _PARAM3_ the value of axis _PARAM2_ of joystick _PARAM1_"),
                    _("Joystick"),
                    "res/actions/joystick24.png",
-                   "res/actions/joystick.png");
+                   "res/actions/joystick.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("joyaxis", _("Axis"), "",false)
+        .AddParameter("scenevar", _("Save result to scene variable"), "",false)
+        .codeExtraInformation.SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false);
-        instrInfo.AddParameter("joyaxis", _("Axis"), "",false);
-        instrInfo.AddParameter("scenevar", _("Save result to scene variable"), "",false);
-
-        instrInfo.cppCallingInformation.SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_EXPRESSION("GetJoystickAxis",
+    AddExpression("GetJoystickAxis",
                    _("Joystick axis"),
                    _("Value of an axis of a joystick"),
                    _("Joystick"),
                    "res/conditions/joystick.png")
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false);
-        instrInfo.AddParameter("joyaxis", _("Axis"), "",false);
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("joyaxis", _("Axis"), "",false)
+        .codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
-    DECLARE_END_EXPRESSION()
     #endif
 }
 

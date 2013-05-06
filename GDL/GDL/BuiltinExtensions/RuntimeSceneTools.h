@@ -5,8 +5,8 @@
 #include <vector>
 #include <map>
 class RuntimeScene;
-class Variable;
-class Object;
+namespace gd { class Variable; }
+class RuntimeObject;
 
 /**
  * Only used internally by GD events generated code.
@@ -51,26 +51,26 @@ void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable );
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName, float positionX, float positionY, const std::string & layer);
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectName, float positionX, float positionY, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer);
-
-/**
- * Only used internally by GD events generated code.
- *
- * \return true ( always )
- */
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName);
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true ( always )
  */
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName);
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectName);
+
+/**
+ * Only used internally by GD events generated code.
+ *
+ * \return true ( always )
+ */
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectName);
 
 /**
  * Only used internally by GD events generated code.
@@ -81,25 +81,25 @@ void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor );
  * Only used internally by GD events generated code.
  * \return Variable with specified name
  */
-Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName);
+gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName);
 
 /**
  * Only used internally by GD events generated code.
  * \return Global variable with specified name
  */
-Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName);
+gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName);
 
 /**
  * Only used internally by GD events generated code.
  * \return Variable with specified name
  */
-Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int variableIndex);
+gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int variableIndex);
 
 /**
  * Only used internally by GD events generated code.
  * \return Global variable with specified name
  */
-Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int variableIndex);
+gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int variableIndex);
 
 /**
  * Only used internally by GD events generated code.

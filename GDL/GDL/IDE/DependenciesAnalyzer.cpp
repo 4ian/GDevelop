@@ -2,8 +2,8 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Layout.h"
-#include "GDL/Game.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/LinkEvent.h"
 #include "GDL/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
@@ -17,18 +17,18 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
         if ( linkEvent != boost::shared_ptr<LinkEvent>() )
         {
             std::string linked = linkEvent->GetTarget();
-            if ( game.HasExternalEventsNamed(linked) )
+            if ( project.HasExternalEventsNamed(linked) )
             {
                 externalEventsDependencies.insert(linked);
 
-                if ( !Analyze(game.GetExternalEvents(linked).GetEvents()) )
+                if ( !Analyze(project.GetExternalEvents(linked).GetEvents()) )
                     return false;
             }
-            else if ( game.HasLayoutNamed(linked) )
+            else if ( project.HasLayoutNamed(linked) )
             {
                 scenesDependencies.insert(linked);
 
-                if ( !Analyze(game.GetLayout(linked).GetEvents()) )
+                if ( !Analyze(project.GetLayout(linked).GetEvents()) )
                     return false;
             }
         }
@@ -36,7 +36,7 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
         {
             const std::vector<std::string> & dependencies = cppCodeEvent->GetDependencies();
             sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
-            sourceFilesDependencies.insert(cppCodeEvent->GetAssociatedGDManagedSourceFile(game));
+            sourceFilesDependencies.insert(cppCodeEvent->GetAssociatedGDManagedSourceFile(project));
         }
     }
 
@@ -56,19 +56,19 @@ DependenciesAnalyzer::~DependenciesAnalyzer()
 std::string DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene(const std::string & externalEventsName)
 {
     std::string sceneName;
-    for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
     {
-        DependenciesAnalyzer analyzer(game);
-        analyzer.Analyze(game.GetLayout(i).GetEvents());
+        DependenciesAnalyzer analyzer(project);
+        analyzer.Analyze(project.GetLayout(i).GetEvents());
         const std::set <std::string > & dependencies = analyzer.GetExternalEventsDependencies();
 
         if ( dependencies.find(externalEventsName) != dependencies.end() &&
-             CheckIfExternalEventsIsLinkedOnlyAtTopLevel(externalEventsName, game.GetLayout(i).GetEvents()) )
+             CheckIfExternalEventsIsLinkedOnlyAtTopLevel(externalEventsName, project.GetLayout(i).GetEvents()) )
         {
             if (!sceneName.empty())
                 return ""; //External events can be compiled only if one scene is including them.
             else
-                sceneName = game.GetLayout(i).GetName();
+                sceneName = project.GetLayout(i).GetName();
         }
     }
 
@@ -84,7 +84,7 @@ bool DependenciesAnalyzer::CheckIfExternalEventsIsLinkedOnlyAtTopLevel(const std
         //at the top level.
         if ( events[i]->CanHaveSubEvents() )
         {
-            DependenciesAnalyzer analyzer(game);
+            DependenciesAnalyzer analyzer(project);
             analyzer.Analyze(events[i]->GetSubEvents());
             const std::set <std::string > & dependencies = analyzer.GetExternalEventsDependencies();
 
@@ -97,14 +97,14 @@ bool DependenciesAnalyzer::CheckIfExternalEventsIsLinkedOnlyAtTopLevel(const std
         if ( linkEvent != boost::shared_ptr<LinkEvent>() )
         {
             std::string linked = linkEvent->GetTarget();
-            if ( game.HasExternalEventsNamed(linked) )
+            if ( project.HasExternalEventsNamed(linked) )
             {
-                if ( !CheckIfExternalEventsIsLinkedOnlyAtTopLevel(externalEventsName, game.GetExternalEvents(linked).GetEvents()) )
+                if ( !CheckIfExternalEventsIsLinkedOnlyAtTopLevel(externalEventsName, project.GetExternalEvents(linked).GetEvents()) )
                     return false;
             }
-            else if ( game.HasLayoutNamed(linked) )
+            else if ( project.HasLayoutNamed(linked) )
             {
-                if ( !CheckIfExternalEventsIsLinkedOnlyAtTopLevel(externalEventsName, game.GetLayout(linked).GetEvents()) )
+                if ( !CheckIfExternalEventsIsLinkedOnlyAtTopLevel(externalEventsName, project.GetLayout(linked).GetEvents()) )
                     return false;
             }
         }

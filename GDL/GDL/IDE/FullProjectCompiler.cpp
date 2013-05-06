@@ -24,26 +24,28 @@
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/DatFile.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/SceneNameMangler.h"
 #include "GDL/Tools/AES.h"
 #include "GDL/CommonTools.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
-#include "GDL/OpenSaveGame.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
-#include "GDL/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/IDE/DependenciesAnalyzer.h"
+#include "GDL/CppPlatform.h"
+#undef _
+#define _(s) wxGetTranslation((s))
 
 using namespace std;
+using namespace gd;
 
 namespace GDpriv
 {
@@ -55,7 +57,7 @@ namespace GDpriv
  * \param game Game associated with the scene
  * \param scene Scene with events to compile
  */
-void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outputFilename)
+void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string & outputFilename)
 {
     std::cout << "Preparing linking task for project " << game.GetName() << "..." << std::endl;
     CodeCompilerTask task;
@@ -68,7 +70,8 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
     //Construct the list of the external shared libraries files to be used
     for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
         if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
         if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") )
@@ -84,7 +87,7 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
     //Add all the object files of the game
     for (unsigned int l= 0;l<game.GetLayoutCount();++l)
     {
-        std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Scene object file) to the linking." << std::endl;
+        std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
         task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
 
         DependenciesAnalyzer analyzer(game);
@@ -93,7 +96,7 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
             vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), *i));
+                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), *i));
 
             if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
             {
@@ -105,7 +108,7 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
         {
             if (game.HasExternalEventsNamed(*i) && analyzer.ExternalEventsCanBeCompiledForAScene(*i) == game.GetLayout(l).GetName())
             {
-                ExternalEvents & externalEvents = game.GetExternalEvents(*i);
+                gd::ExternalEvents & externalEvents = game.GetExternalEvents(*i);
                 std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
                 task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
             }
@@ -186,16 +189,12 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( game.GetResourcesManager().GetResource(allResources[i]).UseFile() )
             resourcesMergingHelper.ExposeResource(game.GetResourcesManager().GetResource(allResources[i]).GetFile());
     }
-    if ( !game.loadingScreen.imageFichier.empty() )
-    {
-        resourcesMergingHelper.ExposeResource( game.loadingScreen.imageFichier );
-    }
 
     //Add scenes resources
     for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j) //Add objects resources
-        	game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.GetLayout(i).GetObjects().size();++j) //Add objects resources
+        	game.GetLayout(i).GetObjects()[j]->ExposeResources(resourcesMergingHelper);
 
         LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesMergingHelper);
     }
@@ -205,24 +204,24 @@ void FullProjectCompiler::LaunchProjectCompilation()
         LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), resourcesMergingHelper);
     }
     //Add global objects resources
-    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j) //Add global objects resources
-        game.GetGlobalObjects()[j]->ExposeResources(resourcesMergingHelper);
+    for (unsigned int j = 0;j<game.GetObjects().size();++j) //Add global objects resources
+        game.GetObjects()[j]->ExposeResources(resourcesMergingHelper);
 
     //Compile all scene events to object files
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)
     {
-        if ( game.GetLayouts()[i]->GetProfiler() ) game.GetLayouts()[i]->GetProfiler()->profilingActivated = false;
+        if ( game.GetLayout(i).GetProfiler() ) game.GetLayout(i).GetProfiler()->profilingActivated = false;
 
         diagnosticManager.OnMessage(gd::ToString(_("Compiling scene ")+game.GetLayout(i).GetName()+_(".")));
         CodeCompilerTask task;
         task.compilerCall.compilationForRuntime = true;
         task.compilerCall.optimize = optimize;
         task.compilerCall.eventsGeneratedCode = true;
-        task.compilerCall.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(game.GetLayouts()[i].get())+"RuntimeEventsSource.cpp");
-        task.compilerCall.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(game.GetLayouts()[i].get())+"RuntimeObjectFile.o");
+        task.compilerCall.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
+        task.compilerCall.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
-        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, game.GetLayouts()[i].get(), resourcesMergingHelper));
-        task.scene = game.GetLayouts()[i].get();
+        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
+        task.scene = &game.GetLayout(i);
 
         CodeCompiler::GetInstance()->AddTask(task);
 
@@ -310,8 +309,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxRemoveFile( tempDir + "/compil.gdg" );
     diagnosticManager.OnPercentUpdate(85);
 
-    OpenSaveLoadingScreen::SaveToFile(game.loadingScreen, string(tempDir + "/loadingscreen"));
-
     //Création du fichier gam.egd
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 3 out of 3" )));
     wxSafeYield();
@@ -388,11 +385,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxSafeYield();
 
     //Copy extensions
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
     for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
             ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )

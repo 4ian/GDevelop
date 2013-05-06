@@ -12,8 +12,8 @@
 #include <wx/textfile.h>
 #include <wx/filename.h>
 #include <fstream>
-#include "GDL/Game.h"
-#include "GDL/SourceFile.h"
+#include "GDL/Project.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/Scene.h"
 #include "GDL/CppCodeEvent.h"
 #include "GDL/CommonTools.h"
@@ -53,7 +53,7 @@ enum
     MARGIN_FOLD
 };
 
-EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game & game_, Scene & scene_) :
+EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::Project & game_, gd::Layout & scene_) :
     editedEvent(event_),
     game(game_),
     scene(scene_)
@@ -308,7 +308,7 @@ void EditCppCodeEvent::OnobjectBtClick(wxCommandEvent& event)
 
 void EditCppCodeEvent::UpdateFunctionPrototype()
 {
-    functionPrototypeTxt->SetLabel(std::string("void Function(")+ (sceneRefCheck->GetValue() ? std::string("RuntimeScene & scene") :std::string("")) + ((sceneRefCheck->GetValue()&&objectsListCheck->GetValue()) ? ", ":"")+ (objectsListCheck->GetValue() ? std::string("std::vector<Object*> objectsList") :"") + ")\n{");
+    functionPrototypeTxt->SetLabel(std::string("void Function(")+ (sceneRefCheck->GetValue() ? std::string("RuntimeScene & scene") :std::string("")) + ((sceneRefCheck->GetValue()&&objectsListCheck->GetValue()) ? ", ":"")+ (objectsListCheck->GetValue() ? std::string("std::vector<RuntimeObject*> objectsList") :"") + ")\n{");
 }
 
 void EditCppCodeEvent::OnobjectsListCheckClick(wxCommandEvent& event)

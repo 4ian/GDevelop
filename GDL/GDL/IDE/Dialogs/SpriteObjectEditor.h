@@ -24,15 +24,15 @@
 namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
 class SpriteObject;
-class Resource;
-class Game;
+namespace gd { class Resource; }
+namespace gd { class Project; }
 class Sprite;
 
 class SpriteObjectEditor: public wxDialog
 {
 public:
 
-    SpriteObjectEditor(wxWindow* parent, Game & game, SpriteObject & object, gd::MainFrameWrapper & mainFrameWrapper_ );
+    SpriteObjectEditor(wxWindow* parent, gd::Project & game, SpriteObject & object, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual ~SpriteObjectEditor();
 
     /**
@@ -220,7 +220,7 @@ private:
     void RefreshPoints();
     void RefreshCollisionMasks();
     void ResetPreview();
-    wxBitmap GetwxBitmapFromImageResource(Resource & resource);
+    wxBitmap GetwxBitmapFromImageResource(gd::Resource & resource);
 
     /**
      * Return a vector containing the sprites which must be modified when editing a point
@@ -233,7 +233,7 @@ private:
 
     DECLARE_EVENT_TABLE()
 
-    Game & game;
+    gd::Project & game;
     SpriteObject & object;
     unsigned int selectedAnimation;
     unsigned int selectedDirection;

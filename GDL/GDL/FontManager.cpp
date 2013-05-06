@@ -49,7 +49,7 @@ const sf::Font * FontManager::GetFont(const string & fontName)
         return fonts[fontName];
 
     //Load an new font
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
+    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
     fonts[fontName] = ressourcesLoader->LoadFont(fontName);
 
     return fonts[fontName];

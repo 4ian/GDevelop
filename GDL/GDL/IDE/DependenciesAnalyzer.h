@@ -7,14 +7,15 @@
 #define DEPENDENCIESANALYZER_H
 #include <set>
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 namespace gd { class BaseEvent; }
-class Game;
+namespace gd { class Project; }
 
 class DependenciesAnalyzer
 {
 public:
-    DependenciesAnalyzer(Game & game_) : game(game_) {};
+    DependenciesAnalyzer(gd::Project & project_) : project(project_) {};
     virtual ~DependenciesAnalyzer();
 
     /**
@@ -54,7 +55,7 @@ private:
      */
     bool CheckIfExternalEventsIsLinkedOnlyAtTopLevel(const std::string & externalEventsName, std::vector< boost::shared_ptr<gd::BaseEvent> > & events);
 
-    Game & game;
+    gd::Project & project;
 };
 
 #endif // DEPENDENCIESANALYZER_H

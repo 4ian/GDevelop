@@ -19,7 +19,7 @@
  *
  * \return true if the sprite are overlapping
  */
-bool GD_API CheckCollision( const SpriteObject* const objet1, const SpriteObject* const objet2);
+bool GD_API CheckCollision( const RuntimeSpriteObject* const objet1, const RuntimeSpriteObject* const objet2);
 
 #endif // COLLISIONS_H_INCLUDED
 

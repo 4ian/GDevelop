@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
-class Object;
+class RuntimeObject;
 class RuntimeScene;
 
 /**
@@ -23,16 +23,16 @@ public:
      * scene->objectsInstances.GetObjectsRawPointers(name)
      * \endcode
      */
-    std::vector<Object*> GetObjectsRawPointers(const std::string & name);
+    std::vector<RuntimeObject*> GetObjectsRawPointers(const std::string & name);
 
     RuntimeContext & ClearObjectListsMap();
-    RuntimeContext & AddObjectListToMap(const std::string & objectName, std::vector<Object*> & list);
-    std::map <std::string, std::vector<Object*> *> ReturnObjectListsMap();
+    RuntimeContext & AddObjectListToMap(const std::string & objectName, std::vector<RuntimeObject*> & list);
+    std::map <std::string, std::vector<RuntimeObject*> *> ReturnObjectListsMap();
 
     RuntimeScene * scene;
 
 private:
-    std::map <std::string, std::vector<Object*> *> temporaryMap;
+    std::map <std::string, std::vector<RuntimeObject*> *> temporaryMap;
 };
 
 #endif // RUNTIMECONTEXT_H

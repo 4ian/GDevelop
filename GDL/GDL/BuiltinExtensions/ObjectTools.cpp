@@ -1,32 +1,32 @@
 #include "ObjectTools.h"
-#include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
 #include "GDL/Polygon.h"
 #include "GDL/PolygonCollision.h"
 #include <cmath>
 
 using namespace std;
 
-double GD_API PickedObjectsCount( const std::string &, std::map <std::string, std::vector<Object*> *> objectsLists )
+double GD_API PickedObjectsCount( const std::string &, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists )
 {
-    vector<Object*> pickedObjects;
-    std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists.begin();
+    vector<RuntimeObject*> pickedObjects;
+    std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists.begin();
     for (;it!=objectsLists.end();++it)
     {
         if ( it->second == NULL ) continue;
 
-        std::vector<Object*> & list = *(it->second);
+        std::vector<RuntimeObject*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) pickedObjects.push_back(list[i]);
     }
 
     return pickedObjects.size();
 }
 
-bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted )
+bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
     const bool sameObjectLists = firstObjName == secondObjName;
 
-    vector<Object*> objects1;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    vector<RuntimeObject*> objects1;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -36,12 +36,12 @@ bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::stri
         }
     }
 
-    vector<Object*> objects2;
+    vector<RuntimeObject*> objects2;
     if ( sameObjectLists )
         objects2 = objects1;
     else
     {
-        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
             if ( it->second != NULL )
             {
@@ -136,7 +136,7 @@ namespace GDpriv
     }
 }
 
-float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float length, string relationalOperator, bool conditionInverted)
+float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, string relationalOperator, bool conditionInverted)
 {
     length *= length;
     const bool sameObjectLists = firstObjName == secondObjName;
@@ -150,8 +150,8 @@ float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std
     else if ( relationalOperator == ">=" ) relationFunction = &GDpriv::GDinternalSuperiorOrEqualToTest;
     else if ( relationalOperator == "!=" ) relationFunction = &GDpriv::GDinternalDifferentFromTest;
 
-    vector<Object*> objects1;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    vector<RuntimeObject*> objects1;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -161,12 +161,12 @@ float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std
         }
     }
 
-    vector<Object*> objects2;
+    vector<RuntimeObject*> objects2;
     if ( sameObjectLists )
         objects2 = objects1;
     else
     {
-        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
             if ( it->second != NULL )
             {
@@ -220,12 +220,12 @@ float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std
     return isTrue;
 }
 
-bool GD_API MovesToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API MovesToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
     const bool sameObjectLists = firstObjName == secondObjName;
 
-    vector<Object*> objects1;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    vector<RuntimeObject*> objects1;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -235,12 +235,12 @@ bool GD_API MovesToward( const std::string & firstObjName, const std::string & s
         }
     }
 
-    vector<Object*> objects2;
+    vector<RuntimeObject*> objects2;
     if ( sameObjectLists )
         objects2 = objects1;
     else
     {
-        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
             if ( it->second != NULL )
             {

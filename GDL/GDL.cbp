@@ -19,6 +19,7 @@
 					<Add option="-g" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -140,6 +141,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -260,6 +262,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -644,10 +647,10 @@
 		<Unit filename="GDL/Arial.hpp" />
 		<Unit filename="GDL/Automatism.cpp" />
 		<Unit filename="GDL/Automatism.h" />
-		<Unit filename="GDL/AutomatismsRuntimeSharedDatas.cpp" />
-		<Unit filename="GDL/AutomatismsRuntimeSharedDatas.h" />
-		<Unit filename="GDL/AutomatismsSharedDatas.cpp" />
-		<Unit filename="GDL/AutomatismsSharedDatas.h" />
+		<Unit filename="GDL/AutomatismsRuntimeSharedData.cpp" />
+		<Unit filename="GDL/AutomatismsRuntimeSharedData.h" />
+		<Unit filename="GDL/AutomatismsSharedData.cpp" />
+		<Unit filename="GDL/AutomatismsSharedData.h" />
 		<Unit filename="GDL/BuiltinExtensions/AdvancedExtension.cpp" />
 		<Unit filename="GDL/BuiltinExtensions/AdvancedExtension.h" />
 		<Unit filename="GDL/BuiltinExtensions/AudioExtension.cpp" />
@@ -719,18 +722,16 @@
 		<Unit filename="GDL/BuiltinExtensions/VariablesExtension.h" />
 		<Unit filename="GDL/BuiltinExtensions/WindowExtension.cpp" />
 		<Unit filename="GDL/BuiltinExtensions/WindowExtension.h" />
-		<Unit filename="GDL/Camera.cpp" />
-		<Unit filename="GDL/Camera.h" />
 		<Unit filename="GDL/CodeExecutionEngine.cpp" />
 		<Unit filename="GDL/CodeExecutionEngine.h" />
 		<Unit filename="GDL/Collisions.cpp" />
 		<Unit filename="GDL/Collisions.h" />
-		<Unit filename="GDL/CommentEvent.cpp" />
-		<Unit filename="GDL/CommentEvent.h" />
 		<Unit filename="GDL/CommonTools.cpp" />
 		<Unit filename="GDL/CommonTools.h" />
 		<Unit filename="GDL/CppCodeEvent.cpp" />
 		<Unit filename="GDL/CppCodeEvent.h" />
+		<Unit filename="GDL/CppPlatform.cpp" />
+		<Unit filename="GDL/CppPlatform.h" />
 		<Unit filename="GDL/DatFile.cpp" />
 		<Unit filename="GDL/DatFile.h" />
 		<Unit filename="GDL/Direction.cpp" />
@@ -740,34 +741,23 @@
 		<Unit filename="GDL/DynamicLibrariesTools.h" />
 		<Unit filename="GDL/EmptyEvent.cpp" />
 		<Unit filename="GDL/EmptyEvent.h" />
+		<Unit filename="GDL/EventsPrecompiledHeader.h" />
 		<Unit filename="GDL/Events/CodeCompilationHelpers.cpp" />
 		<Unit filename="GDL/Events/CodeCompilationHelpers.h" />
-		<Unit filename="GDL/Events/EventsCodeGenerationContext.cpp" />
-		<Unit filename="GDL/Events/EventsCodeGenerationContext.h" />
 		<Unit filename="GDL/Events/EventsCodeGenerator.cpp" />
 		<Unit filename="GDL/Events/EventsCodeGenerator.h" />
-		<Unit filename="GDL/Events/EventsCodeNameMangler.cpp" />
-		<Unit filename="GDL/Events/EventsCodeNameMangler.h" />
-		<Unit filename="GDL/Events/ExpressionsCodeGeneration.cpp" />
-		<Unit filename="GDL/Events/ExpressionsCodeGeneration.h" />
 		<Unit filename="GDL/ExtensionBase.cpp" />
 		<Unit filename="GDL/ExtensionBase.h" />
 		<Unit filename="GDL/ExtensionsLoader.cpp" />
 		<Unit filename="GDL/ExtensionsLoader.h" />
-		<Unit filename="GDL/ExtensionsManager.cpp" />
-		<Unit filename="GDL/ExtensionsManager.h" />
 		<Unit filename="GDL/ExternalEvents.cpp" />
 		<Unit filename="GDL/ExternalEvents.h" />
 		<Unit filename="GDL/ExternalLayout.cpp" />
 		<Unit filename="GDL/ExternalLayout.h" />
 		<Unit filename="GDL/FontManager.cpp" />
 		<Unit filename="GDL/FontManager.h" />
-		<Unit filename="GDL/ForEachEvent.cpp" />
-		<Unit filename="GDL/ForEachEvent.h" />
 		<Unit filename="GDL/Force.cpp" />
 		<Unit filename="GDL/Force.h" />
-		<Unit filename="GDL/Game.cpp" />
-		<Unit filename="GDL/Game.h" />
 		<Unit filename="GDL/IDE/BaseDebugger.cpp" />
 		<Unit filename="GDL/IDE/BaseDebugger.h" />
 		<Unit filename="GDL/IDE/BaseProfiler.cpp" />
@@ -780,20 +770,12 @@
 		<Unit filename="GDL/IDE/CompilerMessagesParser.h" />
 		<Unit filename="GDL/IDE/DependenciesAnalyzer.cpp" />
 		<Unit filename="GDL/IDE/DependenciesAnalyzer.h" />
+		<Unit filename="GDL/IDE/Dialogs/CppLayoutPreviewer.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/CppLayoutPreviewer.h" />
 		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.h" />
-		<Unit filename="GDL/IDE/Dialogs/EditComment.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/EditComment.h" />
 		<Unit filename="GDL/IDE/Dialogs/EditCppCodeEvent.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/EditCppCodeEvent.h" />
-		<Unit filename="GDL/IDE/Dialogs/EditForEachEvent.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/EditForEachEvent.h" />
-		<Unit filename="GDL/IDE/Dialogs/EditLayerDialog.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/EditLayerDialog.h" />
-		<Unit filename="GDL/IDE/Dialogs/EditLink.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/EditLink.h" />
-		<Unit filename="GDL/IDE/Dialogs/EditRepeatEvent.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/EditRepeatEvent.h" />
 		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.h" />
 		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.cpp" />
@@ -802,9 +784,6 @@
 		<Unit filename="GDL/IDE/Dialogs/RenderDialog.h" />
 		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.h" />
-		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas.h" />
-		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas2.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/SpriteObjectEditor.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/SpriteObjectEditor.h" />
 		<Unit filename="GDL/IDE/Dialogs/wxSFMLCanvas.cpp" />
@@ -821,11 +800,8 @@
 		<Unit filename="GDL/ImageManager.h" />
 		<Unit filename="GDL/InitialInstancesContainer.cpp" />
 		<Unit filename="GDL/InitialInstancesContainer.h" />
-		<Unit filename="GDL/InvalidImage.h" />
 		<Unit filename="GDL/Layer.cpp" />
 		<Unit filename="GDL/Layer.h" />
-		<Unit filename="GDL/LinkEvent.cpp" />
-		<Unit filename="GDL/LinkEvent.h" />
 		<Unit filename="GDL/LoadingScreen.cpp" />
 		<Unit filename="GDL/LoadingScreen.h" />
 		<Unit filename="GDL/Log.cpp" />
@@ -839,12 +815,9 @@
 		<Unit filename="GDL/Object.cpp" />
 		<Unit filename="GDL/Object.h" />
 		<Unit filename="GDL/ObjectHelpers.h" />
-		<Unit filename="GDL/OpenSaveGame.cpp" />
-		<Unit filename="GDL/OpenSaveGame.h" />
 		<Unit filename="GDL/OpenSaveLoadingScreen.cpp" />
 		<Unit filename="GDL/OpenSaveLoadingScreen.h" />
-		<Unit filename="GDL/PlatformDefinition/Platform.cpp" />
-		<Unit filename="GDL/PlatformDefinition/Platform.h" />
+		<Unit filename="GDL/PlatformDefinition/ClassWithObjects.cpp" />
 		<Unit filename="GDL/Point.cpp" />
 		<Unit filename="GDL/Point.h" />
 		<Unit filename="GDL/Polygon.cpp" />
@@ -855,16 +828,18 @@
 		<Unit filename="GDL/Position.h" />
 		<Unit filename="GDL/ProfileEvent.cpp" />
 		<Unit filename="GDL/ProfileEvent.h" />
-		<Unit filename="GDL/RepeatEvent.cpp" />
-		<Unit filename="GDL/RepeatEvent.h" />
+		<Unit filename="GDL/Project.cpp" />
+		<Unit filename="GDL/Project.h" />
 		<Unit filename="GDL/ResourcesManager.cpp" />
 		<Unit filename="GDL/ResourcesManager.h" />
 		<Unit filename="GDL/RessourcesLoader.cpp" />
 		<Unit filename="GDL/RessourcesLoader.h" />
 		<Unit filename="GDL/RuntimeContext.cpp" />
 		<Unit filename="GDL/RuntimeContext.h" />
-		<Unit filename="GDL/RuntimeGame.cpp" />
-		<Unit filename="GDL/RuntimeGame.h" />
+		<Unit filename="GDL/RuntimeLayer.cpp" />
+		<Unit filename="GDL/RuntimeLayer.h" />
+		<Unit filename="GDL/RuntimeObject.cpp" />
+		<Unit filename="GDL/RuntimeObject.h" />
 		<Unit filename="GDL/RuntimeScene.cpp" />
 		<Unit filename="GDL/RuntimeScene.h" />
 		<Unit filename="GDL/Scene.cpp" />
@@ -877,17 +852,11 @@
 		<Unit filename="GDL/Sound.h" />
 		<Unit filename="GDL/SoundManager.cpp" />
 		<Unit filename="GDL/SoundManager.h" />
-		<Unit filename="GDL/SourceFile.cpp" />
-		<Unit filename="GDL/SourceFile.h" />
 		<Unit filename="GDL/SourceFileCommonTools.h" />
 		<Unit filename="GDL/Sprite.cpp" />
 		<Unit filename="GDL/Sprite.h" />
-		<Unit filename="GDL/SpriteInitialPositionPanel.cpp" />
-		<Unit filename="GDL/SpriteInitialPositionPanel.h" />
 		<Unit filename="GDL/SpriteObject.cpp" />
 		<Unit filename="GDL/SpriteObject.h" />
-		<Unit filename="GDL/StandardEvent.cpp" />
-		<Unit filename="GDL/StandardEvent.h" />
 		<Unit filename="GDL/Text.cpp" />
 		<Unit filename="GDL/Text.h" />
 		<Unit filename="GDL/Tools/AES.cpp" />
@@ -899,10 +868,6 @@
 		<Unit filename="GDL/VariableList.cpp" />
 		<Unit filename="GDL/VariableList.h" />
 		<Unit filename="GDL/Version.h" />
-		<Unit filename="GDL/VersionWrapper.cpp" />
-		<Unit filename="GDL/VersionWrapper.h" />
-		<Unit filename="GDL/WhileEvent.cpp" />
-		<Unit filename="GDL/WhileEvent.h" />
 		<Unit filename="GDL/XmlFilesHelper.cpp" />
 		<Unit filename="GDL/XmlFilesHelper.h" />
 		<Unit filename="GDL/XmlMacros.h" />
@@ -948,7 +913,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.2.11125" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project output_directory="doc" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

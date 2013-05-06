@@ -6,7 +6,7 @@
 #ifndef AUTOMATISMSRUNTIMESHAREDDATAS_H
 #define AUTOMATISMSRUNTIMESHAREDDATAS_H
 
-class AutomatismsSharedDatas;
+namespace gd { class AutomatismsSharedData; }
 #include <boost/shared_ptr.hpp>
 
 /**
@@ -20,12 +20,12 @@ class AutomatismsSharedDatas;
  *
  * \ingroup GameEngine
  */
-class AutomatismsRuntimeSharedDatas
+class AutomatismsRuntimeSharedData
 {
     public:
-        AutomatismsRuntimeSharedDatas() {};
-        virtual ~AutomatismsRuntimeSharedDatas() {};
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new AutomatismsRuntimeSharedDatas(*this));}
+        AutomatismsRuntimeSharedData() {};
+        virtual ~AutomatismsRuntimeSharedData() {};
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new AutomatismsRuntimeSharedData(*this));}
 
 };
 

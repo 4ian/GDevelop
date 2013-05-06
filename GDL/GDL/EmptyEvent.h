@@ -10,16 +10,6 @@
 
 #include "GDCore/Events/Event.h"
 
-/**
- * \brief Empty event doing nothing.
- */
-class EmptyEvent : public gd::BaseEvent
-{
-    public:
-        EmptyEvent() : BaseEvent() {};
-        virtual ~EmptyEvent() {};
-};
-
 #endif // EMPTYEVENT_H
 
 #endif

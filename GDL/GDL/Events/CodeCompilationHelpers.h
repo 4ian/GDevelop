@@ -17,13 +17,10 @@
 #include "GDL/IDE/CodeCompiler.h"
 namespace gd {class ArbitraryResourceWorker;}
 class CodeExecutionEngine;
-class Scene;
-class ExternalEvents;
-class Game;
-namespace GDpriv
-{
-class SourceFile;
-}
+namespace gd { class Layout; }
+namespace gd { class SourceFile; }
+namespace gd { class ExternalEvents; }
+namespace gd { class Project; }
 
 /**
  * \brief Class containing helper functions for using CodeCompiler
@@ -44,7 +41,7 @@ public:
      * \param game Game associated with the scene
      * \param scene Scene with events to compile
      */
-    static void CreateSceneEventsCompilationTask(Game & game, Scene & scene);
+    static void CreateSceneEventsCompilationTask(gd::Project & game, gd::Layout & scene);
 
     /**
      * Automatically create and submit a task to the code compiler for compiling external source file
@@ -53,7 +50,7 @@ public:
      * \param file Source file to compile
      * \param scene If the task is related to the compilation of a scene, pass the scene as parameter. It will allow to stop the scene compilation if the source file compiled fail.
      */
-    static void CreateExternalSourceFileCompilationTask(Game & game, GDpriv::SourceFile & file, Scene * scene = NULL);
+    static void CreateExternalSourceFileCompilationTask(gd::Project & game, gd::SourceFile & file, gd::Layout * scene = NULL);
 
     /**
      * Automatically create and submit a task to the code compiler for compiling external events
@@ -61,7 +58,7 @@ public:
      * \param game Game owning the source file. ( Used to add the game directory to headers directories list )
      * \param events External events to compile.
      */
-    static void CreateExternalEventsCompilationTask(Game & game, ExternalEvents & events);
+    static void CreateExternalEventsCompilationTask(gd::Project & game, gd::ExternalEvents & events);
 };
 
 /**
@@ -77,10 +74,10 @@ class GD_API EventsCodeCompilerPostWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Game * game;
-    Scene * scene;
+    gd::Project * game;
+    gd::Layout * scene;
 
-    EventsCodeCompilerPostWork(Game * game_, Scene * scene_) : game(game_), scene(scene_) {};
+    EventsCodeCompilerPostWork(gd::Project * game_, gd::Layout * scene_) : game(game_), scene(scene_) {};
     virtual ~EventsCodeCompilerPostWork() {};
 };
 
@@ -97,10 +94,10 @@ class GD_API EventsCodeCompilerLinkingPostWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Game * game;
-    Scene * scene;
+    gd::Project * game;
+    gd::Layout * scene;
 
-    EventsCodeCompilerLinkingPostWork(Game * game_, Scene * scene_) : game(game_), scene(scene_) {};
+    EventsCodeCompilerLinkingPostWork(gd::Project * game_, gd::Layout * scene_) : game(game_), scene(scene_) {};
     virtual ~EventsCodeCompilerLinkingPostWork() {};
 };
 
@@ -118,10 +115,10 @@ class GD_API EventsCodeCompilerPreWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Game * game;
-    Scene * scene;
+    gd::Project * game;
+    gd::Layout * scene;
 
-    EventsCodeCompilerPreWork(Game * game_, Scene * scene_) : game(game_), scene(scene_) {};
+    EventsCodeCompilerPreWork(gd::Project * game_, gd::Layout * scene_) : game(game_), scene(scene_) {};
     virtual ~EventsCodeCompilerPreWork() {};
 };
 
@@ -138,11 +135,11 @@ class GD_API EventsCodeCompilerRuntimePreWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Game * game;
-    Scene * scene;
+    gd::Project * game;
+    gd::Layout * scene;
     gd::ArbitraryResourceWorker & resourceWorker;
 
-    EventsCodeCompilerRuntimePreWork(Game * game_, Scene * scene_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), scene(scene_), resourceWorker(resourceWorker_) {};
+    EventsCodeCompilerRuntimePreWork(gd::Project * game_, gd::Layout * scene_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), scene(scene_), resourceWorker(resourceWorker_) {};
     virtual ~EventsCodeCompilerRuntimePreWork() {};
 };
 
@@ -159,10 +156,10 @@ class GD_API ExternalEventsCodeCompilerPreWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Game * game;
-    ExternalEvents * externalEvents;
+    gd::Project * game;
+    gd::ExternalEvents * externalEvents;
 
-    ExternalEventsCodeCompilerPreWork(Game * game_, ExternalEvents * events_) : game(game_), externalEvents(events_) {};
+    ExternalEventsCodeCompilerPreWork(gd::Project * game_, gd::ExternalEvents * events_) : game(game_), externalEvents(events_) {};
     virtual ~ExternalEventsCodeCompilerPreWork() {};
 };
 
@@ -180,10 +177,10 @@ class GD_API ExternalEventsCodeCompilerPostWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Game * game;
-    ExternalEvents * externalEvents;
+    gd::Project * game;
+    gd::ExternalEvents * externalEvents;
 
-    ExternalEventsCodeCompilerPostWork(Game * game_, ExternalEvents * events_) : game(game_), externalEvents(events_) {};
+    ExternalEventsCodeCompilerPostWork(gd::Project * game_, gd::ExternalEvents * events_) : game(game_), externalEvents(events_) {};
     virtual ~ExternalEventsCodeCompilerPostWork() {};
 };
 
@@ -200,11 +197,11 @@ class GD_API ExternalEventsCodeCompilerRuntimePreWork : public CodeCompilerExtra
 public:
     virtual bool Execute();
 
-    Game * game;
-    ExternalEvents * externalEvents;
+    gd::Project * game;
+    gd::ExternalEvents * externalEvents;
     gd::ArbitraryResourceWorker & resourceWorker;
 
-    ExternalEventsCodeCompilerRuntimePreWork(Game * game_, ExternalEvents * events_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), externalEvents(events_), resourceWorker(resourceWorker_) {};
+    ExternalEventsCodeCompilerRuntimePreWork(gd::Project * game_, gd::ExternalEvents * events_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), externalEvents(events_), resourceWorker(resourceWorker_) {};
     virtual ~ExternalEventsCodeCompilerRuntimePreWork() {};
 };
 
@@ -221,9 +218,9 @@ class GD_API SourceFileCodeCompilerPostWork : public CodeCompilerExtraWork
 public:
     virtual bool Execute();
 
-    Scene * scene;
+    gd::Layout * scene;
 
-    SourceFileCodeCompilerPostWork(Scene * scene_) : scene(scene_) {};
+    SourceFileCodeCompilerPostWork(gd::Layout * scene_) : scene(scene_) {};
     virtual ~SourceFileCodeCompilerPostWork() {};
 };
 

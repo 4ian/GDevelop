@@ -7,7 +7,7 @@
 //for ease the writing
 
 #include <vector>
-#include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
 
 /**
  * Returns a vector containing only the objects of type T.
@@ -16,7 +16,7 @@
  * \return A vector containing only the objects of type T.
  */
 template<typename T>
-std::vector<T*> GetSpecificObjects( const std::vector<Object*> & objectsList )
+std::vector<T*> GetSpecificObjects( const std::vector<RuntimeObject*> & objectsList )
 {
     std::vector<T*> specializedObjects;
     specializedObjects.reserve(objectsList.size());

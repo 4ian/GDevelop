@@ -8,11 +8,14 @@
 #include "GDL/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
-#include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
+#include "GDL/ImageManager.h"
+#include "GDL/CppPlatform.h"
 #include "GDL/ObjectHelpers.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/profile.h"
 #include "GDL/CommonTools.h"
+#include "GDL/Variable.h"
 #include "GDL/Text.h"
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
@@ -46,9 +49,9 @@ void GD_API StopGame( RuntimeScene & scene )
 
 void GD_API ChangeScene( RuntimeScene & scene, std::string newSceneName )
 {
-    for ( unsigned int i = 0;i < scene.game->GetLayouts().size() ; ++i )
+    for ( unsigned int i = 0;i < scene.game->GetLayoutCount(); ++i )
     {
-        if ( scene.game->GetLayouts()[i]->GetName() == newSceneName )
+        if ( scene.game->GetLayout(i).GetName() == newSceneName )
         {
             scene.GotoSceneWhenEventsAreFinished(i);
             return;
@@ -65,7 +68,7 @@ bool GD_API SceneJustBegins(RuntimeScene & scene )
 
 void GD_API MoveObjects( RuntimeScene & scene )
 {
-    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
@@ -78,25 +81,24 @@ void GD_API MoveObjects( RuntimeScene & scene )
     return;
 }
 
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-    ObjSPtr newObject = boost::shared_ptr<Object> ();
+    RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
-    if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
-        newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
-    else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
-        newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
-    else
-        return;
+    if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
+        newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
+    else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
+        newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-    //Ajout à la liste d'objet et configuration de sa position
+    if ( newObject == boost::shared_ptr<RuntimeObject> () )
+        return; //Unable to create the object
+
+    //Set up the object
     newObject->SetX( positionX );
     newObject->SetY( positionY );
-    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
-
     newObject->SetLayer( layer );
 
     //Add object to scene and let it be concerned by futures actions
@@ -105,20 +107,20 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
         pickedObjectLists[objectWanted]->push_back( newObject.get() );
 }
 
-void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
     if ( pickedObjectLists[objectWanted] == NULL ) return; //Bail out if the object is not present in the specified group
 
     CreateObjectOnScene(scene, pickedObjectLists, 0, objectWanted, positionX, positionY, layer);
 }
 
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int, const std::string &)
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int, const std::string &)
 {
-    for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
-            std::vector<Object*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
+            std::vector<RuntimeObject*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
 
             for (unsigned int j = 0;j<objectsOnScene.size();++j)
             {
@@ -131,11 +133,11 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName)
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectName)
 {
     //Create a list with all objects
-    std::vector<Object*> allObjects;
-    for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    std::vector<RuntimeObject*> allObjects;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(allObjects));
@@ -144,9 +146,9 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
     if ( !allObjects.empty() )
     {
         unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
-        Object * theChosenOne = allObjects[id];
+        RuntimeObject * theChosenOne = allObjects[id];
 
-        for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
         {
             if ( it->second != NULL ) it->second->clear();
         }
@@ -157,22 +159,22 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
     return true;
 }
 
-Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName)
+gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName)
 {
     return scene.GetVariables().ObtainVariable(variableName);
 }
 
-Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
+gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
 {
     return scene.game->GetVariables().ObtainVariable(variableName);
 }
 
-Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int index)
+gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int index)
 {
     return scene.GetVariables().GetVariable(index);
 }
 
-Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int index)
+gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int index)
 {
     return scene.game->GetVariables().GetVariable(index);
 }
@@ -230,7 +232,7 @@ const std::string & GD_API IndexGetGlobalVariableString( const RuntimeScene & sc
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 {
     //Retrieve the image
-    boost::shared_ptr<SFMLTextureWrapper> image = scene.game->imageManager->GetSFMLTexture(imageName);
+    boost::shared_ptr<SFMLTextureWrapper> image = scene.game->GetImageManager()->GetSFMLTexture(imageName);
     if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
         return;
 

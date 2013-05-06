@@ -12,85 +12,47 @@
 #include <wx/dcmemory.h>
 #include <wx/log.h>
 #include "GDL/RuntimeScene.h"
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/Events/Serialization.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/Dialogs/EditCppCodeEvent.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDL/IDE/CodeCompiler.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/XmlMacros.h"
+#include "GDL/CommonTools.h"
 
-std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
-{
-    //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
-    //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
+using namespace std;
 
-    //Generate the code to call the associated source file
-    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") + ((passSceneAsParameter && passObjectListAsParameter) ? ", ":"") + (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ");";
-    codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
-
-    std::string outputCode;
-    outputCode += "{";
-
-    //Prepare objects list if needed
-    if ( passObjectListAsParameter )
-    {
-        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
-        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
-
-        std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.GetObjectGroups().end() )
-            realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.GetObjectGroups().end() )
-            realObjects = (*sceneGroup).GetAllObjectsNames();
-        else
-            realObjects.push_back(objectToPassAsParameter);
-
-        if ( realObjects.empty() ) return "";
-
-        outputCode += "std::vector<Object*> functionObjects;";
-        for (unsigned int i = 0;i<realObjects.size();++i)
-        {
-            parentContext.ObjectsListNeeded(realObjects[i]);
-            outputCode += "functionObjects.insert("+ string(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
-        }
-    }
-
-    std::string functionCall = functionToCall+"("+ (passSceneAsParameter ? "*runtimeContext->scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+(passObjectListAsParameter ? "functionObjects" :"") + ");";
-    outputCode += ""+functionCall+"\n";
-
-    outputCode += "}";
-    return outputCode;
-}
-
-void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(Game & parentGame) const
+void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & parentGame) const
 {
     std::string outputFile(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(this)+"SourceFile.cpp");
 
-    vector< boost::shared_ptr<GDpriv::SourceFile> >::const_iterator sourceFileIter =
-        find_if(parentGame.externalSourceFiles.begin(), parentGame.externalSourceFiles.end(), bind2nd(GDpriv::ExternalSourceFileHasName(), associatedGDManagedSourceFile));
+    vector< boost::shared_ptr<gd::SourceFile> >::const_iterator sourceFileIter =
+        find_if(parentGame.externalSourceFiles.begin(), parentGame.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), associatedGDManagedSourceFile));
 
-    boost::shared_ptr<GDpriv::SourceFile> sourceFile;
+    boost::shared_ptr<gd::SourceFile> sourceFile;
     if ( sourceFileIter != parentGame.externalSourceFiles.end() ) sourceFile = *sourceFileIter;
 
     //First check if the associated source file exists in the GD project.
-    if ( sourceFile == boost::shared_ptr<GDpriv::SourceFile>() )
+    if ( sourceFile == boost::shared_ptr<gd::SourceFile>() )
     {
         //If there is no associated source file existing, then create a new one
-        boost::shared_ptr<GDpriv::SourceFile> associatedSourceFile(new GDpriv::SourceFile);
+        boost::shared_ptr<gd::SourceFile> associatedSourceFile(new gd::SourceFile);
         associatedSourceFile->SetGDManaged(true);
 
         parentGame.externalSourceFiles.push_back(associatedSourceFile);
         sourceFile = parentGame.externalSourceFiles.back();
     }
 
-    if (sourceFile == boost::shared_ptr<GDpriv::SourceFile>() )
+    if (sourceFile == boost::shared_ptr<gd::SourceFile>() )
     {
         wxLogError(_("Unable to create a virtual source file for a C++ Code event.\nPlease report this error to Game Develop developer."));
         return;
@@ -120,7 +82,7 @@ void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(Game & parentGame) const
 
 std::string CppCodeEvent::GenerateAssociatedFileCode() const
 {
-    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ")";
+    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<RuntimeObject*> objectsList" :"") + ")";
     std::string output;
     if (passSceneAsParameter ) output += "#include \"GDL/RuntimeScene.h\"\n";
     if (passObjectListAsParameter ) output += "#include \"GDL/Object.h\"\n";
@@ -137,13 +99,13 @@ std::string CppCodeEvent::GenerateAssociatedFileCode() const
 /**
  * Render the event in the bitmap
  */
-void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     const int titleTextHeight = 20;
 
     //Draw header rectangle
-    wxRect headerRect(x, y, width, GetRenderedHeight(width));
+    wxRect headerRect(x, y, width, GetRenderedHeight(width, platform));
     renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //Header
@@ -157,12 +119,12 @@ void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
         dc.SetBrush(renderingHelper->GetActionsRectangleFillBrush());
         dc.SetPen(renderingHelper->GetActionsRectangleOutlinePen());
 
-        dc.DrawRectangle(wxRect(x + 4, y + 3 + titleTextHeight + 2, width-8, GetRenderedHeight(width)-(3 + titleTextHeight + 5)));
-        dc.DrawLabel( inlineCode, wxNullBitmap, wxRect(x + 4, y + 3 + titleTextHeight + 4, width-2, GetRenderedHeight(width)));
+        dc.DrawRectangle(wxRect(x + 4, y + 3 + titleTextHeight + 2, width-8, GetRenderedHeight(width, platform)-(3 + titleTextHeight + 5)));
+        dc.DrawLabel( inlineCode, wxNullBitmap, wxRect(x + 4, y + 3 + titleTextHeight + 4, width-2, GetRenderedHeight(width, platform)));
     }
 }
 
-unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width) const
+unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {
@@ -182,7 +144,7 @@ unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditCppCodeEvent dialog(parent_, *this, game_, scene_);
     int returned = dialog.ShowModal();
@@ -241,7 +203,7 @@ void CppCodeEvent::SaveToXml(TiXmlElement * elem) const
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("lastChangeTimeStamp", lastChangeTimeStamp);
 }
 
-void CppCodeEvent::LoadFromXml(const TiXmlElement * elem)
+void CppCodeEvent::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("FunctionNameAutogenerated", functionNameAutogenerated);

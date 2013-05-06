@@ -29,7 +29,7 @@ public:
     virtual void OnLayoutAdded(gd::Project & project, gd::Layout & layout) const;
     virtual void OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const;
     virtual void OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const;
-    virtual void OnVariablesModified(gd::Project & project, gd::Layout * layout) const;
+    virtual void OnVariablesModified(gd::Project & project, gd::Layout * layout = NULL) const;
     virtual void OnObjectEdited(gd::Project & project, gd::Layout * layout, gd::Object & object) const;
     virtual void OnObjectAdded(gd::Project & project, gd::Layout * layout, gd::Object & object) const;
     virtual void OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & oldName) const;

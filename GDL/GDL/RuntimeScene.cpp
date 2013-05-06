@@ -13,23 +13,24 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDL/RuntimeScene.h"
+#include "GDL/RuntimeLayer.h"
 #include "GDL/Scene.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/ImageManager.h"
 #include "GDL/SoundManager.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
 #include "GDL/profile.h"
 #include "GDL/Position.h"
 #include "GDL/FontManager.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/AutomatismsSharedData.h"
+#include "GDL/AutomatismsRuntimeSharedData.h"
 #include "GDL/RuntimeContext.h"
-#include "GDL/ExtensionBase.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/Text.h"
 #include "GDL/ManualTimer.h"
+#include "GDL/CppPlatform.h"
 
 #include "GDL/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
@@ -38,12 +39,17 @@
 #include "GDL/IDE/BaseDebugger.h"
 #include "GDL/BuiltinExtensions/ProfileTools.h"
 #endif
+#include "GDL/ExtensionBase.h"
 #undef GetObject //Disable an annoying macro
+#undef _
+#define _(s) wxGetTranslation((s))
+
+RuntimeLayer RuntimeScene::badRuntimeLayer;
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
 
-RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
+RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, gd::Project * game_) :
     renderWindow(renderWindow_),
     game(game_),
     #if defined(GD_IDE_ONLY)
@@ -58,18 +64,20 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     timeFromStart(0),
     pauseTime(0),
     specialAction(-1),
-    windowHasFocus(true)
+    windowHasFocus(true),
+    codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
 }
 
 RuntimeScene::~RuntimeScene()
 {
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (unsigned int i = 0;i<game->GetUsedPlatformExtensions().size();++i)
     {
-        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
-            extensions[i]->SceneUnloaded(*this);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != boost::shared_ptr<ExtensionBase>() )
+            extension->SceneUnloaded(*this);
     }
 
     objectsInstances.Clear(); //Force destroy objects NOW as they can have pointers to some
@@ -92,7 +100,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timers = scene.timers;
     pauseTime = scene.pauseTime;
 
-    GetCodeExecutionEngine() = scene.GetCodeExecutionEngine();
+    SetCodeExecutionEngine(scene.GetCodeExecutionEngine());
 
     firstLoop = scene.firstLoop;
     isFullScreen = scene.isFullScreen;
@@ -105,7 +113,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     windowHasFocus = scene.windowHasFocus;
 
     automatismsSharedDatas.clear();
-    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
+    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = scene.automatismsSharedDatas.begin();
          it != scene.automatismsSharedDatas.end();++it)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();
@@ -310,7 +318,7 @@ void RuntimeScene::Render()
     renderWindow->clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     OrderObjectsByZOrder( allObjects );
 
     //To allow using OpenGL to draw :
@@ -319,22 +327,22 @@ void RuntimeScene::Render()
     renderWindow->setActive();
 
     //Draw layer by layer
-    for (unsigned int layerIndex =0;layerIndex<GetLayersCount();++layerIndex)
+    for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
-        if ( GetLayer(layerIndex).GetVisibility() )
+        if ( layers[layerIndex].GetVisibility() )
         {
-            for (unsigned int cameraIndex = 0;cameraIndex < GetLayer(layerIndex).GetCameraCount();++cameraIndex)
+            for (unsigned int cameraIndex = 0;cameraIndex < layers[layerIndex].GetCameraCount();++cameraIndex)
             {
-                Camera & camera = GetLayer(layerIndex).GetCamera(cameraIndex);
+                RuntimeCamera & camera = layers[layerIndex].GetCamera(cameraIndex);
 
                 //Prepare OpenGL rendering
                 renderWindow->popGLStates();
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                gluPerspective(GetOpenGLFOV(), camera.GetSize().x/camera.GetSize().y, GetOpenGLZNear(), GetOpenGLZFar());
+                gluPerspective(GetOpenGLFOV(), camera.GetWidth()/camera.GetHeight(), GetOpenGLZNear(), GetOpenGLZFar());
 
-                const sf::FloatRect & viewport = camera.GetViewport();
+                const sf::FloatRect & viewport = camera.GetSFMLView().getViewport();
                 glViewport(viewport.left*renderWindow->getSize().x,
                            renderWindow->getSize().y-(viewport.top+viewport.height)*renderWindow->getSize().y, //Y start from bottom
                            viewport.width*renderWindow->getSize().x,
@@ -349,12 +357,12 @@ void RuntimeScene::Render()
                 for (unsigned int id = 0;id < allObjects.size();++id)
                 {
                     //Affichage de l'objet si il appartient au calque
-                    if ( allObjects[id]->GetLayer() == GetLayer(layerIndex).GetName() )
+                    if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
                         allObjects[id]->Draw( *renderWindow );
                 }
 
                 //Texts
-                DisplayLegacyTexts(GetLayer(layerIndex).GetName());
+                DisplayLegacyTexts(layers[layerIndex].GetName());
             }
         }
     }
@@ -398,10 +406,7 @@ bool RuntimeScene::UpdateTime()
     return true;
 }
 
-////////////////////////////////////////////////////////////
-/// Met à jour un tableau contenant l'ordre d'affichage des objets
-////////////////////////////////////////////////////////////
-bool RuntimeScene::OrderObjectsByZOrder( ObjList & objList )
+bool RuntimeScene::OrderObjectsByZOrder( RuntimeObjList & objList )
 {
     if ( StandardSortMethod() )
         std::sort( objList.begin(), objList.end(), SortByZOrder() );
@@ -426,12 +431,23 @@ bool RuntimeScene::DisplayLegacyTexts(string layer)
     return true;
 }
 
+RuntimeLayer & RuntimeScene::GetRuntimeLayer(const std::string & name)
+{
+    for (unsigned int i = 0;i<layers.size();++i)
+    {
+        if ( layers[i].GetName() == name )
+            return layers[i];
+    }
+
+    return badRuntimeLayer;
+}
+
 /**
  * Delete objects, updates time and launch automatisms
  */
 void RuntimeScene::ManageObjectsAfterEvents()
 {
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
     	if ( allObjects[id]->GetName().empty() )
@@ -459,7 +475,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
  */
 void RuntimeScene::ManageObjectsBeforeEvents()
 {
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
         allObjects[id]->DoAutomatismsPreEvents(*this);
 
@@ -470,29 +486,40 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
-void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const InitialPosition *, boost::shared_ptr<Object> > * optionalMap)
+/**
+ * \brief Internal Tool class used by RuntimeScene::CreateObjectsFrom
+ */
+class ObjectsFromInitialInstanceCreator : public gd::InitialInstanceFunctor
 {
-    for (std::list<InitialPosition>::const_iterator it = container.initialInstances.begin(), end = container.initialInstances.end(); it != end; ++it)
+public:
+    ObjectsFromInitialInstanceCreator(gd::Project & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap_) :
+        game(game_),
+        scene(scene_),
+        xOffset(xOffset_),
+        yOffset(yOffset_),
+        optionalMap(optionalMap_)
+    {};
+    virtual ~ObjectsFromInitialInstanceCreator() {};
+
+    virtual void operator()(gd::InitialInstance & initialInstance)
     {
-        const InitialPosition & initialInstance = *it;
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
 
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
-        ObjSPtr newObject = boost::shared_ptr<Object> ();
+        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
+            newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
+        else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
+            newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-        if ( sceneObject != GetInitialObjects().end() ) //We check first scene's objects' list.
-            newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
-        else if ( globalObject != game->GetGlobalObjects().end() ) //Then the global object list
-            newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
-
-        if ( newObject != boost::shared_ptr<Object> () )
+        if ( newObject != boost::shared_ptr<RuntimeObject> () )
         {
             newObject->SetX( initialInstance.GetX() + xOffset );
             newObject->SetY( initialInstance.GetY() + yOffset );
             newObject->SetZOrder( initialInstance.GetZOrder() );
             newObject->SetLayer( initialInstance.GetLayer() );
-            newObject->InitializeFromInitialPosition(initialInstance);
+            newObject->ExtraInitializationFromInitialInstance(initialInstance);
             newObject->SetAngle( initialInstance.GetAngle() );
 
             if ( initialInstance.HasCustomSize() )
@@ -502,31 +529,47 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
             }
 
             //Substitute initial variables specific to that object instance.
-            const std::vector<Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
+            const std::vector<gd::Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
             for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
             {
                 newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
             }
 
-            newObject->LoadRuntimeResources(*this, *game->imageManager);
-
-            objectsInstances.AddObject(newObject);
+            scene.objectsInstances.AddObject(newObject);
         }
         else
             std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
 
         if ( optionalMap ) (*optionalMap)[&initialInstance] = newObject;
     }
+
+private:
+    gd::Project & game;
+    RuntimeScene & scene;
+    float xOffset;
+    float yOffset;
+    std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap;
+};
+
+void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap)
+{
+    ObjectsFromInitialInstanceCreator func(*game, *this, xOffset, yOffset, optionalMap);
+    const_cast<gd::InitialInstancesContainer&>(container).IterateOverInstances(func);
 }
 
-bool RuntimeScene::LoadFromScene( const Scene & scene )
+bool RuntimeScene::LoadFromScene( const gd::Layout & scene )
 {
     return LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
 }
 
-bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const InitialInstancesContainer & instances )
+bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances )
 {
-    MessageLoading( "Loading scene", 10 );
+    std::cout << "Loading RuntimeScene from a scene.";
+    if (!game)
+    {
+        std::cout << "..No valid gd::Project associated to the RuntimeScene. Aborting loading." << std::endl;
+        return false;
+    }
 
     //Copy inherited scene
     Scene::operator=(scene);
@@ -543,58 +586,57 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     timeFromStart = 0;
     specialAction = -1;
 
-    SetCodeExecutionEngine(scene.GetCodeExecutionEngine());
+    std::cout << ".";
     GetCodeExecutionEngine()->runtimeContext.scene = this;
 
     //Initialize variables
     variables = scene.GetVariables();
 
     //Initialize layers
+    std::cout << ".";
+    layers.clear();
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
-    for (unsigned int i = 0;i<GetLayersCount();++i)
-    {
-        for (unsigned int j = 0;j<GetLayer(i).GetCameraCount();++j)
-            GetLayer(i).GetCamera(j).InitializeSFMLView(defaultView);
+    for (unsigned int i = 0;i<GetLayersCount();++i) {
+        layers.push_back(RuntimeLayer(GetLayer(i), defaultView));
     }
 
-    //Load resources of initial objects
-    MessageLoading( "Loading objects resources", 30 );
-    for (unsigned int i = 0; i < GetInitialObjects().size();++i)
-        GetInitialObjects()[i]->LoadResources(*this, *game->imageManager);
-
-    //Load resources of global objects
-    //TODO : Make this only one time during game
-    for (unsigned int i = 0; i < game->GetGlobalObjects().size();++i)
-        game->GetGlobalObjects()[i]->LoadResources(*this, *game->imageManager);
-
     //Create object instances which are originally positioned on scene
-    MessageLoading( "Adding objects to their initial position", 66 );
+    std::cout << ".";
     CreateObjectsFrom(instances);
 
     //Automatisms data
+    std::cout << ".";
     automatismsSharedDatas.clear();
-    for(std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+    for(std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
         it != scene.automatismsInitialSharedDatas.end();
         ++it)
     {
-        automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
+        boost::shared_ptr<AutomatismsRuntimeSharedData> data = it->second->CreateRuntimeSharedDatas();
+
+        if ( data )
+            automatismsSharedDatas[it->first] = data;
+        else
+            std::cout << "ERROR: Unable to create shared data for automatism \"" << it->second->GetName() <<"\".";
     }
 
+    std::cout << ".";
     //Extensions specific initialization
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (unsigned int i = 0;i<game->GetUsedPlatformExtensions().size();++i)
     {
-        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != boost::shared_ptr<ExtensionBase>() )
         {
-            extensions[i]->SceneLoaded(*this);
-            if ( extensions[i]->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extensions[i].get());
+            extension->SceneLoaded(*this);
+            if ( extension->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extension.get());
         }
     }
 
+    std::cout << ".";
     if ( StopSoundsOnStartup() ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
     if ( renderWindow ) renderWindow->setTitle(GetWindowDefaultTitle());
 
-    MessageLoading( "Loading finished", 100 );
+    std::cout << " Done." << std::endl;
 
     return true;
 }

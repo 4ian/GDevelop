@@ -10,42 +10,41 @@
 #endif
 #include "GDL/BuiltinExtensions/CommonInstructionsExtension.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
-#include "GDL/StandardEvent.h"
-#include "GDL/CommentEvent.h"
-#include "GDL/ForEachEvent.h"
-#include "GDL/WhileEvent.h"
-#include "GDL/RepeatEvent.h"
+#include "GDL/IDE/DependenciesAnalyzer.h"
+#include "GDCore/Events/Builtin/StandardEvent.h"
+#include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/WhileEvent.h"
+#include "GDCore/Events/Builtin/RepeatEvent.h"
+#include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDL/CppCodeEvent.h"
-#include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDL/ExtensionBase.h"
 
 using namespace std;
 
 CommonInstructionsExtension::CommonInstructionsExtension()
 {
-    DECLARE_THE_EXTENSION("BuiltinCommonInstructions",
+    SetExtensionInformation("BuiltinCommonInstructions",
                           _("Standard events"),
                           _("Builtin extension providing standard events."),
                           "Compil Games",
-                          "Freeware")
+                          "Freeware");
 
     #if defined(GD_IDE_ONLY)
-    DECLARE_CONDITION("Or",
-                   _("Or"),
-                   _("Return true if one of the sub conditions is true"),
-                   _("If one of these conditions is true :"),
-                   _("Advanced"),
-                   "res/conditions/or24.png",
-                   "res/conditions/or.png");
-
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+    {
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 //Conditions code
                 std::string conditionsCode;
@@ -57,21 +56,21 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 {
                     //Each condition inherits the context from the "Or" condition:
                     //For example, two sub conditions using an object called "MyObject" will both have to declare a "MyObject" object list.
-                    EventsCodeGenerationContext context;
+                    gd::EventsCodeGenerationContext context;
                     context.InheritsFrom(parentContext);
 
-                    string conditionCode = codeGenerator.GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+                    string conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
                     conditionsCode += "{\n";
 
                     //Create new objects lists and generate condition
-                    conditionsCode += context.GenerateObjectsDeclarationCode();
+                    conditionsCode += codeGenerator.GenerateObjectsDeclarationCode(context);
                     if ( !conditions[cId].GetType().empty() ) conditionsCode += conditionCode;
 
                     //If the condition is true : merge all objects picked in the final object lists.
                     conditionsCode += "if( condition"+ToString(cId)+"IsTrue ) {\n";
                     conditionsCode += "    conditionTrue = true;\n";
-                    std::set<std::string> objectsListsToBeDeclared = context.GetObjectsToBeDeclared();
+                    std::set<std::string> objectsListsToBeDeclared = context.GetAllObjectsToBeDeclared();
                     for ( set<string>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
                     {
                         emptyListsNeeded.insert(*it);
@@ -95,7 +94,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     parentContext.EmptyObjectsListNeeded(*it);
                     //We need to duplicate the object lists : The "final" ones will be filled with objects by conditions,
                     //but they will have no incidence on further conditions, as conditions use "normal" ones.
-                    declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+"final;\n";
+                    declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+"final;\n";
                 }
                 for (unsigned int i = 0;i<conditions.size();++i)
                     declarationsCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
@@ -114,27 +113,27 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return code;
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-        instrInfo.SetCanHaveSubInstructions();
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("And",
-                   _("And"),
-                   _("Return true if all sub conditions are true"),
-                   _("If all of these conditions are true :"),
+        AddCondition("Or",
+                   _("Or"),
+                   _("Return true if one of the sub conditions is true"),
+                   _("If one of these conditions is true :"),
                    _("Advanced"),
-                   "res/conditions/and24.png",
-                   "res/conditions/and.png");
+                   "res/conditions/or24.png",
+                   "res/conditions/or.png")
+            .SetCanHaveSubInstructions()
+            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+    }
 
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+    {
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 string outputCode;
 
-                outputCode += codeGenerator.GenerateConditionsListCode(game, scene, instruction.GetSubInstructions(), parentContext);
+                outputCode += codeGenerator.GenerateConditionsListCode(instruction.GetSubInstructions(), parentContext);
 
                 std::string ifPredicat = "true";
                 for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
@@ -145,24 +144,23 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return outputCode;
             };
         };
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-        instrInfo.SetCanHaveSubInstructions();
-
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("Not",
-                   _("No"),
-                   _("Return the contrary of the result of the sub conditions"),
-                   _("Invert the logical result of these conditions :"),
+        AddCondition("And",
+                   _("And"),
+                   _("Return true if all sub conditions are true"),
+                   _("If all of these conditions are true :"),
                    _("Advanced"),
-                   "res/conditions/not24.png",
-                   "res/conditions/not.png");
+                   "res/conditions/and24.png",
+                   "res/conditions/and.png")
+            .SetCanHaveSubInstructions()
+            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+    }
 
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+    {
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
                 string outputCode;
@@ -172,7 +170,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 for (unsigned int cId =0;cId < conditions.size();++cId)
                 {
-                    string conditionCode = codeGenerator.GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
+                    string conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
 
                     if ( !conditions[cId].GetType().empty() )
                     {
@@ -196,75 +194,454 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return outputCode;
             };
         };
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-        instrInfo.SetCanHaveSubInstructions();
+        AddCondition("Not",
+                   _("No"),
+                   _("Return the contrary of the result of the sub conditions"),
+                   _("Invert the logical result of these conditions :"),
+                   _("Advanced"),
+                   "res/conditions/not24.png",
+                   "res/conditions/not.png")
+            .SetCanHaveSubInstructions()
+            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+    }
 
-    DECLARE_END_CONDITION()
 
-    DECLARE_EVENT("Standard",
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                std::string outputCode;
+                gd::StandardEvent & event = dynamic_cast<gd::StandardEvent&>(event_);
+
+                outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+
+                std::string ifPredicat;
+                for (unsigned int i = 0;i<event.GetConditions().size();++i)
+                {
+                    if (i!=0) ifPredicat += " && ";
+                    ifPredicat += "condition"+ToString(i)+"IsTrue";
+                }
+
+                if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
+                outputCode += "{\n";
+                outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                if ( event.HasSubEvents() ) //Sub events
+                {
+                    outputCode += "\n{\n";
+                    outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+                    outputCode += "}\n";
+                }
+
+                outputCode += "}\n";
+
+                return outputCode;
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        AddEvent("Standard",
                   _("Standard event"),
-                  "Évènement standard : Actions qui sont lancées si des conditions sont vérifiées",
+                  _("Standard event: Actions are run if conditions are fulfilled."),
                   "",
                   "res/eventaddicon.png",
-                  StandardEvent)
+                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent),
+                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
 
-    DECLARE_END_EVENT()
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
 
-    DECLARE_EVENT("Link",
+                //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
+                //We must generate code to call these external events.
+                std::string outputCode;
+
+                std::string functionCall = EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(runtimeContext);";
+                std::string functionDeclaration = "void "+EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(RuntimeContext * context);";
+                outputCode += functionCall+"\n";
+                codeGenerator.AddGlobalDeclaration(functionDeclaration);
+
+                return outputCode;
+            }
+
+            virtual void Preprocess(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
+                                    std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+            {
+                gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
+                gd::Project & project = codeGenerator.GetProject();
+                const gd::Layout & scene = codeGenerator.GetLayout();
+
+                //Finding what to link to.
+                const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
+                gd::ExternalEvents * linkedExternalEvents = NULL;
+                if ( project.HasExternalEventsNamed(event.GetTarget()) )
+                {
+                    linkedExternalEvents = &project.GetExternalEvents(event.GetTarget());
+                    eventsToInclude = &project.GetExternalEvents(event.GetTarget()).GetEvents();
+                }
+                else if ( project.HasLayoutNamed(event.GetTarget()) ) eventsToInclude = &project.GetLayout(event.GetTarget()).GetEvents();
+
+                //Check if the link refers to external events compiled separately
+                DependenciesAnalyzer analyzer(project);
+                if (linkedExternalEvents != NULL &&
+                    analyzer.ExternalEventsCanBeCompiledForAScene(linkedExternalEvents->GetName()) == scene.GetName()) //Check if the link refers to events
+                {                                                                                                      //compiled separately.
+                    //There is nothing more to do for now: The code calling the external events will be generated in CodeGen::Generate.
+                    return;
+                }
+
+                //If the link does not refers to separately compiled external events,
+                //just replace it by the linked events.
+                event.ReplaceLinkByLinkedEvents(codeGenerator.GetProject(), eventList, indexOfTheEventInThisList);
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        AddEvent("Link",
                   _("Link"),
-                  "Lien vers des évènements d'une autre scène",
+                  _("Link to some external events"),
                   "",
                   "res/lienaddicon.png",
-                  LinkEvent)
+                  boost::shared_ptr<gd::BaseEvent>(new gd::LinkEvent),
+                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
 
-    DECLARE_END_EVENT()
-
-    DECLARE_EVENT("Comment",
+    {
+        AddEvent("Comment",
                   _("Comment"),
-                  "Un évènement permettant d'ajouter un commentaire dans la liste des évènements",
+                  _("Event displaying a text in the events editor"),
                   "",
                   "res/comment.png",
-                  CommentEvent)
+                  boost::shared_ptr<gd::BaseEvent>(new gd::CommentEvent));
+    }
 
-    DECLARE_END_EVENT()
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+            {
+                std::string outputCode;
+                gd::WhileEvent & event = dynamic_cast<gd::WhileEvent&>(event_);
 
-    DECLARE_EVENT("While",
+                //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+                gd::EventsCodeGenerationContext context;
+                context.InheritsFrom(parentContext);
+                if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+
+                //Prepare codes
+                std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(), context);
+                std::string whileIfPredicat = "true"; for (unsigned int i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+ToString(i)+"IsTrue";
+                std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+                std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                std::string ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
+
+                //Write final code
+                outputCode += "bool stopDoWhile = false;";
+                if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "unsigned int loopCount = 0;";
+                outputCode += "do";
+                outputCode += "{\n";
+                outputCode += codeGenerator.GenerateObjectsDeclarationCode(context);
+                outputCode +=  whileConditionsStr;
+                outputCode += "if ("+whileIfPredicat+")\n";
+                outputCode += "{\n";
+                if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() )
+                {
+                    outputCode += "if (loopCount == 100000) { if ( WarnAboutInfiniteLoop(*runtimeContext->scene) ) break; }\n";
+                    outputCode += "loopCount++;\n\n";
+                }
+                outputCode += conditionsCode;
+                outputCode += "if (" +ifPredicat+ ")\n";
+                outputCode += "{\n";
+                outputCode += actionsCode;
+                outputCode += "\n{ //Subevents: \n";
+                outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+                outputCode += "} //Subevents end.\n";
+                outputCode += "}\n";
+                outputCode += "} else stopDoWhile = true; \n";
+
+                outputCode += "} while ( !stopDoWhile );\n";
+
+                return outputCode;
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        AddEvent("While",
                   _("While"),
-                  "Répète des conditions et actions tant que certaines conditions ne sont pas vérifiées",
+                  _("The event is repeated while the conditions are true"),
                   "",
                   "res/while.png",
-                  WhileEvent)
+                  boost::shared_ptr<gd::BaseEvent>(new gd::WhileEvent),
+                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
 
-    DECLARE_END_EVENT()
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+            {
+                std::string outputCode;
+                gd::RepeatEvent & event = dynamic_cast<gd::RepeatEvent&>(event_);
 
-    DECLARE_EVENT("Repeat",
+                const gd::Layout & scene = codeGenerator.GetLayout();
+
+                std::string repeatNumberExpression = event.GetRepeatExpression();
+
+                //Prepare expression containing how many times event must be repeated
+                std::string repeatCountCode;
+                gd::CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, codeGenerator, parentContext);
+                gd::ExpressionParser parser(repeatNumberExpression);
+                if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
+
+                //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+                gd::EventsCodeGenerationContext context;
+                context.InheritsFrom(parentContext);
+
+                //Prepare conditions/actions codes
+                std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+                std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                std::string ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
+
+                //Prepare object declaration and sub events
+                std::string subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+                std::string objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
+
+                //Write final code
+                outputCode += "int repeatCount = "+repeatCountCode+";\n";
+                outputCode += "for(unsigned int repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
+                outputCode += "{\n";
+                outputCode += objectDeclaration;
+                outputCode += conditionsCode;
+                outputCode += "if (" +ifPredicat+ ")\n";
+                outputCode += "{\n";
+                outputCode += actionsCode;
+                if ( event.HasSubEvents() )
+                {
+                    outputCode += "\n{ //Subevents: \n";
+                    outputCode += subevents;
+                    outputCode += "} //Subevents end.\n";
+                }
+                outputCode += "}\n";
+
+                outputCode += "}\n";
+
+                return outputCode;
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        AddEvent("Repeat",
                   _("Repeat"),
-                  "Répète un certain nombre de fois des conditions et actions",
+                  _("Event repeated a number of times"),
                   "",
                   "res/repeat.png",
-                  RepeatEvent)
+                  boost::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent),
+                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
 
-    DECLARE_END_EVENT()
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+            {
+                std::string outputCode;
+                gd::ForEachEvent & event = dynamic_cast<gd::ForEachEvent&>(event_);
 
-    DECLARE_EVENT("ForEach",
+                const gd::Project & game = codeGenerator.GetProject();
+                const gd::Layout & scene = codeGenerator.GetLayout();
+
+                std::string objectToPick = event.GetObjectToPick();
+
+                vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPick));
+                vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPick));
+
+                std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
+                if ( globalGroup != game.GetObjectGroups().end() )
+                    realObjects = (*globalGroup).GetAllObjectsNames();
+                else if ( sceneGroup != scene.GetObjectGroups().end() )
+                    realObjects = (*sceneGroup).GetAllObjectsNames();
+                else
+                    realObjects.push_back(objectToPick);
+
+                if ( realObjects.empty() ) return "";
+
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                    parentContext.ObjectsListNeeded(realObjects[i]);
+
+                //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+                gd::EventsCodeGenerationContext context;
+                context.InheritsFrom(parentContext);
+
+                //Prepare conditions/actions codes
+                std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+                std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                std::string ifPredicat = "true";
+                for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
+
+                //Prepare object declaration and sub events
+                std::string subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+
+                std::string objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
+
+                if ( realObjects.size() != 1) //(We write a slighty more simple ( and optimized ) output code when only one object list is used.)
+                {
+                    outputCode += "unsigned int forEachTotalCount = 0;";
+                    outputCode += "std::vector<RuntimeObject*> forEachObjects;";
+                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    {
+                        outputCode += "unsigned int forEachCount"+ToString(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+ToString(i)+";";
+                        outputCode += "forEachObjects.insert("+ string(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
+                    }
+                }
+
+                //Write final code :
+
+                //For loop declaration
+                if ( realObjects.size() == 1 ) //We write a slighty more simple ( and optimized ) output code when only one object list is used.
+                    outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+ManObjListName(realObjects[0])+".size();++forEachIndex)\n";
+                else
+                    outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
+
+                outputCode += "{\n";
+
+                //Clear all concerned objects lists and keep only one object
+                if ( realObjects.size() == 1 )
+                {
+                    outputCode += "std::vector<RuntimeObject*> temporaryForEachList; temporaryForEachList.push_back("+ManObjListName(realObjects[0])+"[forEachIndex]);";
+                    outputCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[0])+" = temporaryForEachList;\n";
+                }
+                else
+                {
+                    //Declare all lists of concerned objects empty
+                    for (unsigned int j = 0;j<realObjects.size();++j)
+                        outputCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[j])+";\n";
+
+                    for (unsigned int i = 0;i<realObjects.size();++i) //Pick then only one object
+                    {
+                        std::string count;
+                        for (unsigned int j = 0;j<=i;++j)
+                        {
+                            if (j!=0) count+= "+";
+                            count += "forEachCount"+ToString(j);
+                        }
+
+                        if ( i != 0 ) outputCode += "else ";
+                        outputCode += "if (forEachIndex < "+count+") {\n";
+                        outputCode += "    "+ManObjListName(realObjects[i])+".push_back(forEachObjects[forEachIndex]);\n";
+                        outputCode += "}\n";
+                    }
+                }
+
+                outputCode += "{"; //This scope is used as the for loop modified the objects list.
+                outputCode += objectDeclaration;
+
+                outputCode += conditionsCode;
+                outputCode += "if (" +ifPredicat+ ")\n";
+                outputCode += "{\n";
+                outputCode += actionsCode;
+                if ( event.HasSubEvents() )
+                {
+                    outputCode += "\n{ //Subevents: \n";
+                    outputCode += subevents;
+                    outputCode += "} //Subevents end.\n";
+                }
+                outputCode += "}\n";
+
+                outputCode += "}";
+
+                outputCode += "}\n"; //End of for loop
+
+                return outputCode;
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        AddEvent("ForEach",
                   _("For each object"),
-                  "Répète des conditions et actions en prenant à chaque fois un objet ayant le nom indiqué",
+                  _("Repeat the event for each specified object."),
                   "",
                   "res/foreach.png",
-                  ForEachEvent)
+                  boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent),
+                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
 
-    DECLARE_END_EVENT()
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+            {
+                CppCodeEvent & event = dynamic_cast<CppCodeEvent&>(event_);
 
-    DECLARE_EVENT("CppCode",
+                const gd::Project & project = codeGenerator.GetProject();
+                const gd::Layout & scene = codeGenerator.GetLayout();
+
+                //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
+                //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
+
+                //Generate the code to call the associated source file
+                std::string functionPrototype = "void "+event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "RuntimeScene & scene" :"")
+                                                + ((event.GetPassSceneAsParameter() && event.GetPassObjectListAsParameter()) ? ", ":"")
+                                                + (event.GetPassObjectListAsParameter() ? "std::vector<RuntimeObject*> objectsList" :"") + ");";
+                codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
+
+                std::string outputCode;
+                outputCode += "{";
+
+                //Prepare objects list if needed
+                if ( event.GetPassObjectListAsParameter() )
+                {
+                    std::string objectToPassAsParameter = event.GetObjectToPassAsParameter();
+
+                    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(),
+                                                                                    project.GetObjectGroups().end(),
+                                                                                    bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
+                    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(),
+                                                                                   scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(),
+                                                                                                                          objectToPassAsParameter));
+
+                    std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
+                    if ( globalGroup != project.GetObjectGroups().end() )
+                        realObjects = (*globalGroup).GetAllObjectsNames();
+                    else if ( sceneGroup != scene.GetObjectGroups().end() )
+                        realObjects = (*sceneGroup).GetAllObjectsNames();
+                    else
+                        realObjects.push_back(objectToPassAsParameter);
+
+                    if ( realObjects.empty() ) return "";
+
+                    outputCode += "std::vector<RuntimeObject*> functionObjects;";
+                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    {
+                        parentContext.ObjectsListNeeded(realObjects[i]);
+                        outputCode += "functionObjects.insert("+ string(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
+                    }
+                }
+
+                std::string functionCall = event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "*runtimeContext->scene" :"")
+                                           +((event.GetPassSceneAsParameter() && event.GetPassObjectListAsParameter()) ? ", ":"")
+                                           +(event.GetPassObjectListAsParameter() ? "functionObjects" :"") + ");";
+                outputCode += ""+functionCall+"\n";
+
+                outputCode += "}";
+                return outputCode;
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        AddEvent("CppCode",
                   _("C++ code ( Experimental )"),
-                  "Execute du code C++",
+                  _("Execute C++ code"),
                   "",
                   "res/source_cpp16.png",
-                  CppCodeEvent)
-
-    DECLARE_END_EVENT()
+                  boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent),
+                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
 
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-graphics-2.dll"));

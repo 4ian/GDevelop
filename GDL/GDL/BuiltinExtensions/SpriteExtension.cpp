@@ -8,596 +8,474 @@
 
 SpriteExtension::SpriteExtension()
 {
-    DECLARE_THE_EXTENSION("Sprite",
+    SetExtensionInformation("Sprite",
                           _("Sprite"),
                           _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
                           "Compil Games",
-                          "Freeware")
+                          "Freeware");
 
     //Declaration of all objects available
-    DECLARE_OBJECT("Sprite",
+    {
+        gd::ObjectMetadata & obj = AddObject("Sprite",
                    _("Sprite"),
                    _("Animated object which can be used most element of a game"),
                    "CppPlatform/Extensions/spriteicon.png",
                    &CreateSpriteObject,
                    &DestroySpriteObject,
-                   "SpriteObject");
+                   "RuntimeSpriteObject");
+
+        AddRuntimeObject(obj, &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
+
         #if defined(GD_IDE_ONLY)
+        obj.SetIncludeFile("GDL/SpriteObject.h");
 
-        objInfos.SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_OBJECT_ACTION("Opacity",
+        obj.AddAction("Opacity",
                        _("Change object's opacity"),
                        _("Change the opacity of an object."),
                        _("Do _PARAM2__PARAM1_ to the opacity of _PARAM0_"),
                        _("Visibility"),
                        "res/actions/opacity24.png",
-                       "res/actions/opacity.png");
+                       "res/actions/opacity.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeAnimation",
+        obj.AddAction("ChangeAnimation",
                        _("Change the animation"),
                        _("Modify the current animation of the object."),
                        _("Do _PARAM2__PARAM1_ to the number of current animation of _PARAM0_"),
                        _("Animations and images"),
                        "res/actions/animation24.png",
-                       "res/actions/animation.png");
+                       "res/actions/animation.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeDirection",
+        obj.AddAction("ChangeDirection",
                        _("Change the direction"),
                        _("Change the direction of the object.\nIf the object is set to automatically rotate, the direction is its angle.\nIf the object is in 8 directions mode, the valid directions are 0..7"),
                        _("Do _PARAM2__PARAM1_ to the direction of _PARAM0_"),
                        _("Direction"),
                        "res/actions/direction24.png",
-                       "res/actions/direction.png");
+                       "res/actions/direction.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeSprite",
+        obj.AddAction("ChangeSprite",
                        _("Current frame"),
                        _("Modify the current frame of the object"),
                        _("Do _PARAM2__PARAM1_ to animation frame of _PARAM0_"),
                        _("Animations and images"),
                        "res/actions/sprite24.png",
-                       "res/actions/sprite.png");
+                       "res/actions/sprite.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("PauseAnimation",
+        obj.AddAction("PauseAnimation",
                        _("Pause the animation"),
                        _("Pause the current animation of the object"),
                        _("Pause the current animation of _PARAM0_"),
                        _("Animations and images"),
                        "res/actions/animation24.png",
-                       "res/actions/animation.png");
+                       "res/actions/animation.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("PlayAnimation",
+        obj.AddAction("PlayAnimation",
                        _("Play the animation"),
                        _("Play the current animation of the object"),
                        _("Play the current animation of _PARAM0_"),
                        _("Animations and images"),
                        "res/actions/animation24.png",
-                       "res/actions/animation.png");
+                       "res/actions/animation.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("TourneVersPos",
+        obj.AddAction("TourneVersPos",
                        _("Rotate an object toward a position"),
                        _("Rotate an object towards a position."),
                        _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_"),
                        _("Direction"),
                        "res/actions/direction24.png",
-                       "res/actions/direction.png");
+                       "res/actions/direction.png")
 
-            instrInfo.AddParameter("object", _("Object to be rotated"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("X position"), "",false);
-            instrInfo.AddParameter("expression", _("Y position"), "",false);
-
-
-            instrInfo.cppCallingInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDL/SpriteObject.h");
+            .AddParameter("object", _("Object to be rotated"), "Sprite", false)
+            .AddParameter("expression", _("X position"), "",false)
+            .AddParameter("expression", _("Y position"), "",false)
+            .codeExtraInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDL/SpriteObject.h");
 
 
-        DECLARE_END_OBJECT_ACTION()
 
-        DECLARE_OBJECT_ACTION("ChangeScale",
+        obj.AddAction("ChangeScale",
                        _("Modify the scale of an object"),
                        _("Modify the scale of the specified object."),
                        _("Do _PARAM2__PARAM1_ to the scale of _PARAM0_"),
                        _("Size"),
                        "res/actions/scale24.png",
-                       "res/actions/scale.png");
+                       "res/actions/scale.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeScaleWidth",
+        obj.AddAction("ChangeScaleWidth",
                        _("Modify the scale on X axis"),
                        _("Modify the scale of the width of an object."),
                        _("Do _PARAM2__PARAM1_ to the width's scale of _PARAM0_"),
                        _("Size"),
                        "res/actions/scale24.png",
-                       "res/actions/scale.png");
+                       "res/actions/scale.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeScaleHeight",
+        obj.AddAction("ChangeScaleHeight",
                        _("Modify the scale on Y axis"),
                        _("Modify the scale of the height of an object."),
                        _("Do _PARAM2__PARAM1_ to the height's scale of _PARAM0_"),
                        _("Size"),
                        "res/actions/scale24.png",
-                       "res/actions/scale.png");
+                       "res/actions/scale.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value"), "",false);
-            instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value"), "",false)
+            .AddParameter("operator", _("Modification's sign"), "",false)
+            .codeExtraInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_CONDITION("Animation",
+        obj.AddCondition("Animation",
                        _("Current animation"),
                        _("Test the number of the current animation of the object."),
                        _("The number of the current animation of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Animations and images"),
                        "res/conditions/animation24.png",
-                       "res/conditions/animation.png");
+                       "res/conditions/animation.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Number to test"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Number to test"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("Direction",
+        obj.AddCondition("Direction",
                        _("Current direction"),
                        _("Test the direction of the object"),
                        _("The direction of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Direction"),
                        "res/conditions/direction24.png",
-                       "res/conditions/direction.png");
+                       "res/conditions/direction.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Direction to test"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Direction to test"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("Sprite",
+        obj.AddCondition("Sprite",
                        _("Current frame"),
                        _("Test the number of the current animation frame."),
                        _("The animation frame of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Animations and images"),
                        "res/conditions/sprite24.png",
-                       "res/conditions/sprite.png");
+                       "res/conditions/sprite.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Animation frame to test"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Animation frame to test"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("AnimStopped",
+        obj.AddCondition("AnimStopped",
                        _("Animation is paused"),
                        _("Test if the animation of an object is paused"),
                        _("The animation of _PARAM0_ is paused"),
                        _("Animations and images"),
                        "res/conditions/animation24.png",
-                       "res/conditions/animation.png");
+                       "res/conditions/animation.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("AnimationEnded",
+        obj.AddCondition("AnimationEnded",
                        _("Animation finished"),
                        _("Check if the animation being played by the Sprite object is finished."),
                        _("The animation of _PARAM0_ is finished"),
                        _("Animations and images"),
                        "res/conditions/animation24.png",
-                       "res/conditions/animation.png");
+                       "res/conditions/animation.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("ScaleWidth",
+        obj.AddCondition("ScaleWidth",
                        _("Scale of the width of an object"),
                        _("Test the scale of the width of an object."),
                        _("The width's scale of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Size"),
                        "res/conditions/scaleWidth24.png",
-                       "res/conditions/scaleWidth.png");
+                       "res/conditions/scaleWidth.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value to test"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value to test"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("ScaleHeight",
+        obj.AddCondition("ScaleHeight",
                        _("Scale of the height of an object"),
                        _("Test the scale of the height of an object."),
                        _("The height's scale of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Size"),
                        "res/conditions/scaleHeight24.png",
-                       "res/conditions/scaleHeight.png");
+                       "res/conditions/scaleHeight.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value to test"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value to test"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("Opacity",
+        obj.AddCondition("Opacity",
                        _("Opacity"),
                        _("Test the opacity of an object"),
                        _("The opacity of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Visibility"),
                        "res/conditions/opacity24.png",
-                       "res/conditions/opacity.png");
+                       "res/conditions/opacity.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value to test"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value to test"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_CONDITION("BlendMode",
+        obj.AddCondition("BlendMode",
                        _("Blend mode"),
                        _("Compare the number of the blend mode currently used by an object"),
                        _("The number of the current blend mode of _PARAM0_ is _PARAM2__PARAM1_"),
                        _("Effects"),
                        "res/conditions/opacity24.png",
-                       "res/conditions/opacity.png");
+                       "res/conditions/opacity.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false);
-            instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
+            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_CONDITION()
-
-        DECLARE_OBJECT_ACTION("CopyImageOnImageOfSprite",
+        obj.AddAction("CopyImageOnImageOfSprite",
                        _("Copy an image on the current one of an object"),
                        _("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
                        _("Copy image _PARAM2_ on the current of _PARAM0_ at _PARAM3_;_PARAM4_"),
                        _("Effects"),
                        "res/copy24.png",
-                       "res/copyicon.png");
+                       "res/copyicon.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddCodeOnlyParameter("currentScene", "");
-            instrInfo.AddParameter("string", _("Name of the source image"), "",false);
-            instrInfo.AddParameter("expression", _("X position"), "",false);
-            instrInfo.AddParameter("expression", _("Y position"), "",false);
-            instrInfo.AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false);
-
-
-            instrInfo.cppCallingInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDL/SpriteObject.h");
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("string", _("Name of the source image"), "",false)
+            .AddParameter("expression", _("X position"), "",false)
+            .AddParameter("expression", _("Y position"), "",false)
+            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
+            .codeExtraInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDL/SpriteObject.h");
 
 
-        DECLARE_END_OBJECT_ACTION()
 
-        DECLARE_OBJECT_ACTION("CreateMaskFromColorOnActualImage", //Actual is indeed a mistake : Current should have been chosen.
+        obj.AddAction("CreateMaskFromColorOnActualImage", //Actual is indeed a mistake : Current should have been chosen.
                        _("Make a color of the image of an object transparent"),
                        _("Make a color of the image of an object transparent."),
                        _("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
                        _("Effects"),
                        "res/actions/opacity24.png",
-                       "res/actions/opacity.png");
+                       "res/actions/opacity.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("color", _("Color to make transparent"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("color", _("Color to make transparent"), "",false)
+            .codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeColor",
+        obj.AddAction("ChangeColor",
                        _("Change the global color"),
                        _("Change the global color of an object. The default color is white."),
                        _("Change color of _PARAM0_ to _PARAM1_"),
                        _("Effects"),
                        "res/actions/color24.png",
-                       "res/actions/color.png");
+                       "res/actions/color.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("color", _("Color"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("color", _("Color"), "",false)
+            .codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
 
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("ChangeBlendMode",
+        obj.AddAction("ChangeBlendMode",
                        _("Change Blend mode"),
                        _("Change the number of the blend mode of an object.\nThe default blend mode is 0 ( Alpha )."),
                        _("Change Blend mode of _PARAM0_ to _PARAM1_"),
                        _("Effects"),
                        "res/actions/color24.png",
-                       "res/actions/color.png");
+                       "res/actions/color.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
+            .codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("FlipX",
+        obj.AddAction("FlipX",
                        _("Flip the object horizontally"),
                        _("Flip the object horizontally"),
                        _("Flip horizontally _PARAM0_ : _PARAM1_"),
                        _("Effects"),
                        "res/actions/flipX24.png",
-                       "res/actions/flipX.png");
+                       "res/actions/flipX.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("yesorno", _("Activate flipping"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("yesorno", _("Activate flipping"), "",false)
+            .codeExtraInformation.SetFunctionName("FlipX").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("FlipX").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("FlipY",
+        obj.AddAction("FlipY",
                        _("Flip the object vertically"),
                        _("Flip the object vertically"),
                        _("Flip vertically _PARAM0_ : _PARAM1_"),
                        _("Effects"),
                        "res/actions/flipY24.png",
-                       "res/actions/flipY.png");
+                       "res/actions/flipY.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("yesorno", _("Activate flipping"), "",false);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("yesorno", _("Activate flipping"), "",false)
+            .codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_ACTION("TourneVers",
+        obj.AddAction("TourneVers",
                        _("Rotate an object toward another"),
                        _("Rotate an object towards another."),
                        _("Rotate _PARAM0_ towards _PARAM1_"),
                        _("Direction"),
                        "res/actions/direction24.png",
-                       "res/actions/direction.png");
+                       "res/actions/direction.png")
 
-            instrInfo.AddParameter("object", _("Object to be rotated"), "Sprite", false);
-            instrInfo.AddParameter("object", _("Rotate toward this object"), "", false);
-            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
+            .AddParameter("object", _("Object to be rotated"), "Sprite", false)
+            .AddParameter("object", _("Rotate toward this object"))
+            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
+            .codeExtraInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
-        DECLARE_END_OBJECT_ACTION()
-
-        DECLARE_OBJECT_CONDITION("SourisSurObjet",
+        obj.AddCondition("SourisSurObjet",
                        _("The cursor is on an object"),
                        _("Test if the cursor is over a Sprite object. The test is accurate by default (check that the cursor is not on a transparent pixel)."),
                        _("The cursor is on _PARAM0_"),
                        _("Mouse"),
                        "res/conditions/surObjet24.png",
-                       "res/conditions/surObjet.png");
+                       "res/conditions/surObjet.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddCodeOnlyParameter("currentScene", "");
-            instrInfo.AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes");
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes")
+            .codeExtraInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
+        obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
+            .SetHidden()
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("", _("Name of the point"), "", true)
+            .codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
 
-        DECLARE_END_OBJECT_CONDITION()
+        obj.AddExpression("Y", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
+            .SetHidden()
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("", _("Name of the point"), "", true)
+            .codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
 
-        DECLARE_OBJECT_EXPRESSION("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
+        obj.AddExpression("PointX", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("", _("Name of the point"), "", true);
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("", _("Name of the point"), "",false)
+            .codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
-            instrInfo.SetHidden();
+        obj.AddExpression("PointY", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
 
-        DECLARE_END_OBJECT_EXPRESSION()
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("", _("Name of the point"), "",false)
+            .codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
 
-        DECLARE_OBJECT_EXPRESSION("Y", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
+        obj.AddExpression("Direc", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
+            .SetHidden()
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("", _("Name of the point"), "", true);
+        obj.AddExpression("Direction", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
-            instrInfo.SetHidden();
+        obj.AddExpression("Anim", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
+            .SetHidden()
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
-        DECLARE_END_OBJECT_EXPRESSION()
+        obj.AddExpression("Animation", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
-        DECLARE_OBJECT_EXPRESSION("PointX", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
+        obj.AddExpression("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("", _("Name of the point"), "",false);
+        obj.AddExpression("ScaleX", _("Scale of the width of an object"), _("Scale of the width of an object"), _("Size"), "res/actions/scaleWidth.png")
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDL/SpriteObject.h");
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("PointY", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
-
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-            instrInfo.AddParameter("", _("Name of the point"), "",false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
-
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("Direc", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
-            instrInfo.SetHidden();
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("Direction", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("Anim", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
-            instrInfo.SetHidden();
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("Animation", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDL/SpriteObject.h");
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("ScaleX", _("Scale of the width of an object"), _("Scale of the width of an object"), _("Size"), "res/actions/scaleWidth.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDL/SpriteObject.h");
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("ScaleY", _("Scale of the height of an object"), _("Scale of the height of an object"), _("Size"), "res/actions/scaleHeight.png")
-            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
-
-            instrInfo.cppCallingInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDL/SpriteObject.h");
-        DECLARE_END_OBJECT_EXPRESSION()
+        obj.AddExpression("ScaleY", _("Scale of the height of an object"), _("Scale of the height of an object"), _("Size"), "res/actions/scaleHeight.png")
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDL/SpriteObject.h");
         #endif
 
-    DECLARE_END_OBJECT()
+    }
 
     #if defined(GD_IDE_ONLY)
-
     //Declaration of all conditions available
-
-    DECLARE_CONDITION("EstTourne",
+    AddCondition("EstTourne",
                       _("An object is turned toward another"),
                       _("Test if an object is turned toward another"),
                       _("_PARAM0_ is rotated towards _PARAM1_"),
                       _("Direction"),
                       "res/conditions/estTourne24.png",
-                      "res/conditions/estTourne.png");
+                      "res/conditions/estTourne.png")
+        .AddParameter("object", _("Name of the object"), "Sprite", false)
+        .AddParameter("object", _("Name of the second object"))
+        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddParameter("expression", _("Angle of tolerance (0: minimum tolerance)"), "",false)
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .codeExtraInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
-        instrInfo.AddParameter("object", _("Name of the object"), "Sprite", false);
-        instrInfo.AddParameter("object", _("Name of the second object"), "", false);
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
-        instrInfo.AddParameter("expression", _("Angle of tolerance (0: minimum tolerance)"), "",false);
-        instrInfo.AddCodeOnlyParameter("conditionInverted", "");
-
-        instrInfo.cppCallingInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
-
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("Collision",
+    AddCondition("Collision",
                       _("Collision ( Pixel perfect )"),
                       _("The condition is true if there is a collision between the two objects.\nThe test is pixel-perfect."),
                       _("_PARAM0_ is in collision with _PARAM1_"),
                       _("Collision"),
                       "res/conditions/collision24.png",
-                      "res/conditions/collision.png");
-
-        instrInfo.AddParameter("object", _("Object 1"), "Sprite", false);
-        instrInfo.AddParameter("object", _("Object 2"), "Sprite", false);
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
-        instrInfo.AddCodeOnlyParameter("conditionInverted", "");
-
-        instrInfo.cppCallingInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
-
-    DECLARE_END_CONDITION()
-
+                      "res/conditions/collision.png")
+        .AddParameter("object", _("Object 1"), "Sprite", false)
+        .AddParameter("object", _("Object 2"), "Sprite", false)
+        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .codeExtraInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
     #endif
 }
 

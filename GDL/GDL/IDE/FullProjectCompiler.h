@@ -7,7 +7,7 @@
 #ifndef FULLPROJECTCOMPILER_H
 #define FULLPROJECTCOMPILER_H
 #include <string>
-class Game;
+namespace gd { class Project; }
 
 namespace GDpriv
 {
@@ -20,7 +20,7 @@ class FullProjectCompilerDiagnosticManager; //Definition below
 class GD_API FullProjectCompiler
 {
 public:
-    FullProjectCompiler(Game & game_, FullProjectCompilerDiagnosticManager & diagnosticManager_, std::string outDir_) :
+    FullProjectCompiler(gd::Project & game_, FullProjectCompilerDiagnosticManager & diagnosticManager_, std::string outDir_) :
         gameToCompile(game_),
         diagnosticManager(diagnosticManager_),
         outDir(outDir_),
@@ -45,7 +45,7 @@ public:
 
 private:
 
-    Game & gameToCompile;
+    gd::Project & gameToCompile;
     FullProjectCompilerDiagnosticManager & diagnosticManager;
     std::string outDir;
     std::string forcedTempDir;

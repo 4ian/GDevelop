@@ -290,6 +290,7 @@ string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & projec
     //Prepare the global context ( Used to get needed header files )
     gd::EventsCodeGenerationContext context;
     EventsCodeGenerator codeGenerator(project, scene);
+    codeGenerator.PreprocessEventList(scene.GetEvents());
     codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
     //Generate whole events code
@@ -334,6 +335,7 @@ std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(gd::Project 
     //Prepare the global context ( Used to get needed header files )
     gd::EventsCodeGenerationContext context;
     EventsCodeGenerator codeGenerator(project, associatedScene);
+    codeGenerator.PreprocessEventList(events.GetEvents());
     codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
     //Generate whole events code
@@ -362,7 +364,7 @@ std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(gd::Project 
     return output;
 }
 
-EventsCodeGenerator::EventsCodeGenerator(const gd::Project & project, const gd::Layout & layout) :
+EventsCodeGenerator::EventsCodeGenerator(gd::Project & project, const gd::Layout & layout) :
     gd::EventsCodeGenerator(project, layout, CppPlatform::Get())
 {
 }
@@ -371,18 +373,15 @@ EventsCodeGenerator::~EventsCodeGenerator()
 {
 }
 
-/**
- * Call preprocession method of each event
- */
-void EventsCodeGenerator::PreprocessEventList( gd::Project & project, gd::Layout & scene, vector < gd::BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & listEvent )
 {
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
 
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
-        listEvent[i]->Preprocess(project, scene, listEvent, i);
+        listEvent[i]->Preprocess(*this, listEvent, i);
         if ( listEvent[i]->CanHaveSubEvents() )
-            PreprocessEventList( project, scene, listEvent[i]->GetSubEvents());
+            PreprocessEventList( listEvent[i]->GetSubEvents());
 
         if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && listEvent[i]->IsExecutable() )
         {

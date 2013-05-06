@@ -137,7 +137,6 @@ TimeExtension::TimeExtension()
 
 
     AddExpression("TimerElapsedTime", _("Timer value"), _("Value of a timer"), _("Time"), "res/actions/time.png")
-        .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
         .codeExtraInformation.SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");

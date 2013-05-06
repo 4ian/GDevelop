@@ -10,18 +10,20 @@
 #endif
 #include "GDL/BuiltinExtensions/CommonInstructionsExtension.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
-#include "GDL/StandardEvent.h"
-#include "GDL/CommentEvent.h"
-#include "GDL/ForEachEvent.h"
-#include "GDL/WhileEvent.h"
-#include "GDL/RepeatEvent.h"
+#include "GDL/IDE/DependenciesAnalyzer.h"
+#include "GDCore/Events/Builtin/StandardEvent.h"
+#include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/WhileEvent.h"
+#include "GDCore/Events/Builtin/RepeatEvent.h"
+#include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDL/CppCodeEvent.h"
-#include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
@@ -68,7 +70,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     //If the condition is true : merge all objects picked in the final object lists.
                     conditionsCode += "if( condition"+ToString(cId)+"IsTrue ) {\n";
                     conditionsCode += "    conditionTrue = true;\n";
-                    std::set<std::string> objectsListsToBeDeclared = context.GetObjectsToBeDeclared();
+                    std::set<std::string> objectsListsToBeDeclared = context.GetAllObjectsToBeDeclared();
                     for ( set<string>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
                     {
                         emptyListsNeeded.insert(*it);
@@ -212,7 +214,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string outputCode;
-                StandardEvent & event = dynamic_cast<StandardEvent&>(event_);
+                gd::StandardEvent & event = dynamic_cast<gd::StandardEvent&>(event_);
 
                 outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
 
@@ -245,7 +247,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Standard event: Actions are run if conditions are fulfilled."),
                   "",
                   "res/eventaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new StandardEvent),
+                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent),
                   boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
@@ -254,7 +256,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         {
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                LinkEvent & event = dynamic_cast<LinkEvent&>(event_);
+                gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
 
                 //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
                 //We must generate code to call these external events.
@@ -267,6 +269,37 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 return outputCode;
             }
+
+            virtual void Preprocess(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
+                                    std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+            {
+                gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
+                gd::Project & project = codeGenerator.GetProject();
+                const gd::Layout & scene = codeGenerator.GetLayout();
+
+                //Finding what to link to.
+                const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
+                gd::ExternalEvents * linkedExternalEvents = NULL;
+                if ( project.HasExternalEventsNamed(event.GetTarget()) )
+                {
+                    linkedExternalEvents = &project.GetExternalEvents(event.GetTarget());
+                    eventsToInclude = &project.GetExternalEvents(event.GetTarget()).GetEvents();
+                }
+                else if ( project.HasLayoutNamed(event.GetTarget()) ) eventsToInclude = &project.GetLayout(event.GetTarget()).GetEvents();
+
+                //Check if the link refers to external events compiled separately
+                DependenciesAnalyzer analyzer(project);
+                if (linkedExternalEvents != NULL &&
+                    analyzer.ExternalEventsCanBeCompiledForAScene(linkedExternalEvents->GetName()) == scene.GetName()) //Check if the link refers to events
+                {                                                                                                      //compiled separately.
+                    //There is nothing more to do for now: The code calling the external events will be generated in CodeGen::Generate.
+                    return;
+                }
+
+                //If the link does not refers to separately compiled external events,
+                //just replace it by the linked events.
+                event.ReplaceLinkByLinkedEvents(codeGenerator.GetProject(), eventList, indexOfTheEventInThisList);
+            }
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
@@ -275,7 +308,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Link to some external events"),
                   "",
                   "res/lienaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new LinkEvent),
+                  boost::shared_ptr<gd::BaseEvent>(new gd::LinkEvent),
                   boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
@@ -285,7 +318,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Event displaying a text in the events editor"),
                   "",
                   "res/comment.png",
-                  boost::shared_ptr<gd::BaseEvent>(new CommentEvent));
+                  boost::shared_ptr<gd::BaseEvent>(new gd::CommentEvent));
     }
 
     {
@@ -294,7 +327,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 std::string outputCode;
-                WhileEvent & event = dynamic_cast<WhileEvent&>(event_);
+                gd::WhileEvent & event = dynamic_cast<gd::WhileEvent&>(event_);
 
                 //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
                 gd::EventsCodeGenerationContext context;
@@ -344,7 +377,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("The event is repeated while the conditions are true"),
                   "",
                   "res/while.png",
-                  boost::shared_ptr<gd::BaseEvent>(new WhileEvent),
+                  boost::shared_ptr<gd::BaseEvent>(new gd::WhileEvent),
                   boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
@@ -354,7 +387,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 std::string outputCode;
-                RepeatEvent & event = dynamic_cast<RepeatEvent&>(event_);
+                gd::RepeatEvent & event = dynamic_cast<gd::RepeatEvent&>(event_);
 
                 const gd::Layout & scene = codeGenerator.GetLayout();
 
@@ -408,7 +441,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Event repeated a number of times"),
                   "",
                   "res/repeat.png",
-                  boost::shared_ptr<gd::BaseEvent>(new RepeatEvent),
+                  boost::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent),
                   boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
@@ -418,7 +451,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 std::string outputCode;
-                ForEachEvent & event = dynamic_cast<ForEachEvent&>(event_);
+                gd::ForEachEvent & event = dynamic_cast<gd::ForEachEvent&>(event_);
 
                 const gd::Project & game = codeGenerator.GetProject();
                 const gd::Layout & scene = codeGenerator.GetLayout();
@@ -534,7 +567,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Repeat the event for each specified object."),
                   "",
                   "res/foreach.png",
-                  boost::shared_ptr<gd::BaseEvent>(new ForEachEvent),
+                  boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent),
                   boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 

@@ -34,7 +34,6 @@ public:
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}
 
-    virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
     void EnsureAssociatedSourceFileIsUpToDate(gd::Project & parentGame) const;
 
     const std::vector<std::string> & GetIncludeFiles() const { return includeFiles; };

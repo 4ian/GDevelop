@@ -275,7 +275,6 @@ bool EventsCodeCompilerPreWork::Execute()
     //Generate the code
     cout << "Generating C++ code...\n";
     if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
     std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
@@ -316,7 +315,6 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
 
     //Generate the code
     cout << "Generating C++ code...\n";
-    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
     std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
@@ -418,7 +416,6 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
     //Generate the code
     cout << "Generating C++ code...\n";
     if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
 
     std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, false /*Compilation for edittime*/);
@@ -494,7 +491,6 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     //Generate the code
     cout << "Generating C++ code...\n";
     if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
 
     std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, true /*Compilation for runtime*/);

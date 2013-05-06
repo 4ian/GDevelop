@@ -12,11 +12,13 @@
 #include <wx/dcmemory.h>
 #include <wx/log.h>
 #include "GDL/RuntimeScene.h"
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/Events/Serialization.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/Dialogs/EditCppCodeEvent.h"
@@ -25,10 +27,9 @@
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/XmlMacros.h"
+#include "GDL/CommonTools.h"
 
-std::string CppCodeEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
-{
-}
+using namespace std;
 
 void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & parentGame) const
 {

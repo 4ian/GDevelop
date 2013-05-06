@@ -44,7 +44,7 @@ public:
     /**
      * \brief GD C++ Platform has a specific processing function so as to handle profiling.
      */
-    static void PreprocessEventList( gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & listEvent );
+    void PreprocessEventList( std::vector < gd::BaseEventSPtr > & listEvent );
 
 protected:
     virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
@@ -99,7 +99,7 @@ protected:
     /**
      * \brief Construct a code generator for the specified project and layout.
      */
-    EventsCodeGenerator(const gd::Project & project, const gd::Layout & layout);
+    EventsCodeGenerator(gd::Project & project, const gd::Layout & layout);
     virtual ~EventsCodeGenerator();
 };
 

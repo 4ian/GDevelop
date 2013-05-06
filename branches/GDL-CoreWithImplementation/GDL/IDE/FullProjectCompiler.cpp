@@ -34,7 +34,6 @@
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
-#include "GDL/OpenSaveGame.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDL/IDE/ExecutableIconChanger.h"

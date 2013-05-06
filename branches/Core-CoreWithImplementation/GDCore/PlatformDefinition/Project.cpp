@@ -993,7 +993,7 @@ bool Project::SaveToFile(const std::string & filename)
     //Wrie XML to file
     if ( !doc.SaveFile( filename.c_str() ) )
     {
-        wxLogError( _( "Unable to save file to ")+filename+_("\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        wxLogError( _( "Unable to save file ")+filename+_("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
         return false;
     }
 
@@ -1040,6 +1040,19 @@ std::string Project::GetBadObjectNameWarning()
 }
 #endif
 
+Project::Project(const Project & other)
+{
+    Init(other);
+}
+
+Project& Project::operator=(const Project & other)
+{
+    if ( this != &other )
+        Init(other);
+
+    return *this;
+}
+
 void Project::Init(const gd::Project & game)
 {
     //Some properties
@@ -1056,6 +1069,12 @@ void Project::Init(const gd::Project & game)
     extensionsUsed = game.GetUsedPlatformExtensions();
     #endif
 
+    GDMajorVersion = game.GDMajorVersion;
+    GDMinorVersion = game.GDMinorVersion;
+
+    platforms = game.platforms;
+    currentPlatform = game.currentPlatform;
+
     //Resources
     resourcesManager = game.resourcesManager;
     imageManager = boost::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
@@ -1067,7 +1086,7 @@ void Project::Init(const gd::Project & game)
 
     scenes.clear();
     for (unsigned int i =0;i<game.scenes.size();++i)
-    	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
+    	scenes.push_back( boost::shared_ptr<gd::Layout>(new gd::Layout(*game.scenes[i])) );
 
     #if defined(GD_IDE_ONLY)
     externalEvents.clear();

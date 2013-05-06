@@ -108,8 +108,6 @@ public:
 
     /** \name Code generation
      * Members functions used to generate code from the event
-     *
-     * \todo For now, these methods are specially designed to work with Game Develop C++ Platform code generation
      */
     ///@{
 
@@ -122,10 +120,24 @@ public:
     std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
-     * Called before events are compiled
+     * Called before events are compiled : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to preprocess the event ( gd::EventMetadata::codeGeneration member )
+     *
+     * This is only done if the event MustBePreprocessed() return true.
+     *
+     * \see gd::EventMetadata
+     * \see gd::BaseEvent::MustBePreprocessed
      */
-    virtual void Preprocess(gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
+    /**
+     * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::codeGeneration associated to the event will be called
+     * to preprocess the event.
+     *
+     * \see gd::BaseEvent::Preprocess
+     * \see gd::EventMetadata
+     */
+    virtual bool MustBePreprocessed() { return false;}
     ///@}
 
     /** \name Serialization

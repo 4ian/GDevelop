@@ -4,7 +4,9 @@
  */
 #ifndef GDCORE_EVENTS_SERIALIZATION_H
 #define GDCORE_EVENTS_SERIALIZATION_H
+#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/Instruction.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 class TiXmlElement;
@@ -32,6 +34,27 @@ public:
      * \param events The TiXmlElement in which the events must be saved.
      */
     static void SaveEventsToXml(const std::vector < boost::shared_ptr<gd::BaseEvent> > & list, TiXmlElement * events);
+
+    /**
+     * \brief Load a list of conditions from a TiXmlElement
+     */
+    static void OpenConditions(std::vector < gd::Instruction > & list, const TiXmlElement * elem);
+
+    /**
+     * \brief Load a list of actions from a TiXmlElement
+     */
+    static void OpenActions(std::vector < gd::Instruction > & list, const TiXmlElement * elem);
+
+    /**
+     * \brief Save a list of conditions to a TiXmlElement
+     */
+    static void SaveConditions(const std::vector < gd::Instruction > & list, TiXmlElement * elem);
+
+    /**
+     * \brief Save a list of actions to a TiXmlElement
+     */
+    static void SaveActions(const std::vector < gd::Instruction > & list, TiXmlElement * elem);
+
 };
 
 }

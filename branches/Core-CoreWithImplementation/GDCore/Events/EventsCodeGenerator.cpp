@@ -188,12 +188,10 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
 
     if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
     {
-        conditionCode += GenerateScopeBegin();
         conditionCode += GenerateReferenceToBoolean("conditionTrue", returnBoolean);
         conditionCode += instrInfos.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(condition, *this, context);
-        conditionCode += GenerateScopeEnd();
 
-        return conditionCode;
+        return GenerateScopeBegin(context, returnBoolean)+conditionCode+GenerateScopeEnd(context, returnBoolean);
     }
 
     //Insert code only parameters and be sure there is no lack of parameter.
@@ -333,9 +331,9 @@ string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction 
                 outputCode += "condition"+ToString(i)+"IsTrue";
                 if (i == cId-1) outputCode += ") ";
             }
-            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeBegin();
+            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeBegin(context);
             outputCode += conditionCode;
-            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeEnd();
+            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeEnd(context);
         }
     }
 
@@ -472,9 +470,9 @@ string EventsCodeGenerator::GenerateActionsListCode(vector < gd::Instruction > &
 
         string actionCode = GenerateActionCode(actions[aId], context);
 
-        if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeBegin();
+        if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeBegin(context);
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
-        if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeEnd();
+        if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeEnd(context);
     }
 
     return outputCode;
@@ -736,9 +734,11 @@ string EventsCodeGenerator::GenerateEventsListCode(vector < gd::BaseEventSPtr > 
         context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
 
         string eventCoreCode = events[eId]->GenerateEventCode(*this, context);
+        string scopeBegin = GenerateScopeBegin(context);
+        string scopeEnd = GenerateScopeEnd(context);
         string declarationsCode = GenerateObjectsDeclarationCode(context);
 
-        output += "\n"+ GenerateScopeBegin() +"\n" + declarationsCode + "\n" + eventCoreCode + "\n"+ GenerateScopeEnd() +"\n";
+        output += "\n"+ scopeBegin +"\n" + declarationsCode + "\n" + eventCoreCode + "\n"+ scopeEnd +"\n";
     }
 
     return output;
@@ -822,15 +822,15 @@ void EventsCodeGenerator::DeleteUselessEvents(vector < gd::BaseEventSPtr > & eve
 }
 
 /**
- * Call preprocession method of each event
+ * Call preprocessing method of each event
  */
-void EventsCodeGenerator::PreprocessEventList( gd::Project & project, gd::Layout & scene, vector < gd::BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & listEvent )
 {
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
-        listEvent[i]->Preprocess(project, scene, listEvent, i);
+        listEvent[i]->Preprocess(*this, listEvent, i);
         if ( listEvent[i]->CanHaveSubEvents() )
-            PreprocessEventList( project, scene, listEvent[i]->GetSubEvents());
+            PreprocessEventList( listEvent[i]->GetSubEvents());
     }
 }
 

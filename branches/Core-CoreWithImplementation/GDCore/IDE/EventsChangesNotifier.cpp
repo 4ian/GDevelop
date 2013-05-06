@@ -5,7 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/weak_ptr.hpp>
 #include "GDCore/Events/Event.h"
-#include "GDCore/Events/LinkEvent.h"
+#include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Platform.h"

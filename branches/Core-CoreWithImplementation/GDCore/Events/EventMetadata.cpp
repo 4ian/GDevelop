@@ -26,5 +26,10 @@ std::string EventMetadata::CodeGenerator::Generate(gd::BaseEvent & event, gd::Ev
     return "";
 }
 
+void EventMetadata::CodeGenerator::Preprocess(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+                                              std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+{
+}
+
 }
 #endif

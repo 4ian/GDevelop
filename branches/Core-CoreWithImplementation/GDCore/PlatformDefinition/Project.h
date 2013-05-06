@@ -41,7 +41,9 @@ class GD_CORE_API Project : public ClassWithObjects
 {
 public:
     Project();
+    Project(const Project&);
     virtual ~Project();
+    Project& operator=(const Project & rhs);
 
     /** \name Common properties
      * Some properties for the project
@@ -327,13 +329,11 @@ public:
 
     /**
      * Save the project to a file.
-     * \warning This tool method do not need to ( and must not ) be redefined: See Project::SaveToXml method instead.
      */
     bool SaveToFile(const std::string & filename);
 
     /**
      * Load the project from a file.
-     * \warning This tool method do not need to ( and must not ) be redefined: See Project::LoadFromXml method instead.
      */
     bool LoadFromFile(const std::string & filename);
 

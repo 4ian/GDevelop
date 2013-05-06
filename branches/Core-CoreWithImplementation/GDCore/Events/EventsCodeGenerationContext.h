@@ -61,20 +61,30 @@ public:
     void EmptyObjectsListNeeded(const std::string & objectName);
 
     /**
-     * Generate code for getting needed object lists from scene.
-     * Usually used by an event.
-     */
-    std::string GenerateObjectsDeclarationCode();
-
-    /**
      * Return true if an object list has already been declared ( or is going to be declared ).
      */
-    bool ObjectAlreadyDeclared(const std::string & objectName) { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end() || objectsListsToBeDeclared.find(objectName) != objectsListsToBeDeclared.end() || emptyObjectsListsToBeDeclared.find(objectName) != emptyObjectsListsToBeDeclared.end()); };
+    bool ObjectAlreadyDeclared(const std::string & objectName) { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end()); };
+
+    /**
+     * Consider that \a objectName is now declared in the context.
+     */
+    void SetObjectDeclared(const std::string & objectName ) { alreadyDeclaredObjectsLists.insert(objectName); }
+
+    /**
+     * Return all the objects lists which will be declared by the current context
+     * ( the non empty as well as the empty objects lists )
+     */
+    std::set<std::string> GetAllObjectsToBeDeclared();
 
     /**
      * Return the objects lists which will be declared by the current context
      */
-    std::set<std::string> GetObjectsToBeDeclared();
+    const std::set<std::string> & GetObjectsListsToBeDeclared() { return objectsListsToBeDeclared; };
+
+    /**
+     * Return the objects lists which will be declared, but no filled, by the current context
+     */
+    const std::set<std::string> & GetObjectsListsToBeDeclaredEmpty() { return emptyObjectsListsToBeDeclared; };
 
 private:
     std::set<std::string> alreadyDeclaredObjectsLists;

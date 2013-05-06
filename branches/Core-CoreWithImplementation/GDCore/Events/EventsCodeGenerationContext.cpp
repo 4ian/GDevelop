@@ -34,7 +34,7 @@ void EventsCodeGenerationContext::EmptyObjectsListNeeded(const std::string & obj
         emptyObjectsListsToBeDeclared.insert(objectName);
 }
 
-std::set<std::string> EventsCodeGenerationContext::GetObjectsToBeDeclared()
+std::set<std::string> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
 {
     std::set <std::string> allObjectListsToBeDeclared(objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
     allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(), emptyObjectsListsToBeDeclared.end());

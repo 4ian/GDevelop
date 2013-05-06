@@ -250,6 +250,18 @@
 		<Unit filename="GDCore/DocMainPage.h" />
 		<Unit filename="GDCore/Events/AutomatismMetadata.cpp" />
 		<Unit filename="GDCore/Events/AutomatismMetadata.h" />
+		<Unit filename="GDCore/Events/Builtin/CommentEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/CommentEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/ForEachEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/ForEachEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/LinkEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/LinkEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/RepeatEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/RepeatEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/StandardEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/StandardEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/WhileEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/WhileEvent.h" />
 		<Unit filename="GDCore/Events/Event.cpp" />
 		<Unit filename="GDCore/Events/Event.h" />
 		<Unit filename="GDCore/Events/EventMetadata.cpp" />
@@ -271,8 +283,6 @@
 		<Unit filename="GDCore/Events/Instruction.h" />
 		<Unit filename="GDCore/Events/InstructionMetadata.cpp" />
 		<Unit filename="GDCore/Events/InstructionMetadata.h" />
-		<Unit filename="GDCore/Events/LinkEvent.cpp" />
-		<Unit filename="GDCore/Events/LinkEvent.h" />
 		<Unit filename="GDCore/Events/ObjectMetadata.cpp" />
 		<Unit filename="GDCore/Events/ObjectMetadata.h" />
 		<Unit filename="GDCore/Events/Serialization.cpp" />
@@ -301,10 +311,18 @@
 		<Unit filename="GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseVariableDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseVariableDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditComment.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditComment.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditExpressionDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditExpressionDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditForEachEvent.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditForEachEvent.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditLayerDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditLayerDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLink.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLink.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditRepeatEvent.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditRepeatEvent.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditStrExpressionDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/GridSetupDialog.cpp" />
@@ -366,6 +384,8 @@
 		<Unit filename="GDCore/IDE/ResourcesMergingHelper.h" />
 		<Unit filename="GDCore/IDE/ResourcesUnmergingHelper.cpp" />
 		<Unit filename="GDCore/IDE/ResourcesUnmergingHelper.h" />
+		<Unit filename="GDCore/IDE/SceneNameMangler.cpp" />
+		<Unit filename="GDCore/IDE/SceneNameMangler.h" />
 		<Unit filename="GDCore/IDE/TextFormatting.h" />
 		<Unit filename="GDCore/IDE/wxTools/AuiTabArt.cpp" />
 		<Unit filename="GDCore/IDE/wxTools/AuiTabArt.h" />
@@ -442,8 +462,12 @@
 		<Unit filename="wxsmith/ChooseObjectDialog.wxs" />
 		<Unit filename="wxsmith/ChooseObjectTypeDialog.wxs" />
 		<Unit filename="wxsmith/ChooseVariableDialog.wxs" />
+		<Unit filename="wxsmith/EditComment.wxs" />
 		<Unit filename="wxsmith/EditExpressionDialog.wxs" />
+		<Unit filename="wxsmith/EditForEachEvent.wxs" />
 		<Unit filename="wxsmith/EditLayerDialog.wxs" />
+		<Unit filename="wxsmith/EditLink.wxs" />
+		<Unit filename="wxsmith/EditRepeatEvent.wxs" />
 		<Unit filename="wxsmith/EditStrExpressionDialog.wxs" />
 		<Unit filename="wxsmith/GridSetupDialog.wxs" />
 		<Unit filename="wxsmith/InstancesAdvancedPasteDialog.wxs" />
@@ -483,6 +507,10 @@
 					<wxDialog wxs="wxsmith/InstancesAdvancedPasteDialog.wxs" src="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.cpp" hdr="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.h" fwddecl="0" i18n="1" name="InstancesAdvancedPasteDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.h" fwddecl="0" i18n="1" name="ChooseAutomatismTypeDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore\IDE\Dialogs\EditLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDCore\IDE\Dialogs\EditLink.cpp" hdr="GDCore\IDE\Dialogs\EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
+					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCore\IDE\Dialogs\EditComment.cpp" hdr="GDCore\IDE\Dialogs\EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
+					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCore\IDE\Dialogs\EditForEachEvent.cpp" hdr="GDCore\IDE\Dialogs\EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCore\IDE\Dialogs\EditRepeatEvent.cpp" hdr="GDCore\IDE\Dialogs\EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

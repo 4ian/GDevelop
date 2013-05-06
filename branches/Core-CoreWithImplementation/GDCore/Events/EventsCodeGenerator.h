@@ -31,13 +31,19 @@ class GD_CORE_API EventsCodeGenerator
     friend class CallbacksForGeneratingExpressionCode;
 public:
     static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
-    static void PreprocessEventList( gd::Project & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & listEvent );
 
     /**
      * \brief Construct a code generator for the specified platform/project/layout.
      */
-    EventsCodeGenerator(const gd::Project & project_, const gd::Layout & layout, const gd::Platform & platform_) : project(project_), scene(layout), platform(platform_), errorOccurred(false), compilationForRuntime(false) {};
+    EventsCodeGenerator(gd::Project & project_, const gd::Layout & layout, const gd::Platform & platform_) : project(project_), scene(layout), platform(platform_), errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};
+
+    /**
+     * \brief Preprocess an events list ( Replacing for example links with the linked event ).
+     *
+     * This should be called before any code generation.
+     */
+    void PreprocessEventList( std::vector < gd::BaseEventSPtr > & listEvent );
 
     /**
      * Generate code for executing an event list
@@ -138,7 +144,7 @@ public:
      *
      * \param context The context to be used.
      */
-    std::string GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context);
+    virtual std::string GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context);
 
     /**
      * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).
@@ -212,7 +218,7 @@ public:
     /**
      * Get the project the code is being generated for
      */
-    const gd::Project & GetProject() const { return project; }
+    gd::Project & GetProject() const { return project; }
 
     /**
      * Get the layout the code is being generated for
@@ -259,8 +265,19 @@ protected:
                                                                       std::string parametersStr,
                                                                       std::string defaultOutput);
 
-    virtual std::string GenerateScopeBegin() const { return "{\n"; };
-    virtual std::string GenerateScopeEnd() const { return "}\n"; };
+    /**
+     * \brief Called when a new scope must be entered.
+     * \param context The context : Internal events of the scope have been generated, but GenerateObjectsDeclarationCode was not called.
+     * \param extraVariable An optional supplementary variable that should be inherited from the parent scope.
+     */
+    virtual std::string GenerateScopeBegin(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") const { return "{\n"; };
+
+    /**
+     * \brief Called when a new must be ended.
+     * \param context The context : Internal events of the scope have been generated, but GenerateObjectsDeclarationCode was not called.
+     * \param extraVariable An optional supplementary variable that should be inherited from the parent scope.
+     */
+    virtual std::string GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") const { return "}\n"; };
     virtual std::string GenerateNegatedPredicat(const std::string & predicat) const { return "!("+predicat+")"; };
     virtual std::string GenerateReferenceToBoolean(const std::string & referenceName, const std::string & referencedBoolean) { return "bool & "+referenceName+" = "+referencedBoolean+";\n";}
     virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "bool "+boolName+" = false;\n";}
@@ -296,7 +313,7 @@ protected:
     std::string GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, const std::string & getterStartString, unsigned int startFromArgument = 0);
     std::string GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
 
-    const gd::Project & project;
+    gd::Project & project;
     const gd::Layout & scene;
     const gd::Platform & platform;
 

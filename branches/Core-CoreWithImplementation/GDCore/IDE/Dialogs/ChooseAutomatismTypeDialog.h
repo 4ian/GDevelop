@@ -22,6 +22,7 @@ namespace gd {
 
 /**
  * \brief Dialog displaying all the automatisms types available in a project, allowing the user to choose one.
+ * \ingroup IDEDialogs
  */
 class GD_CORE_API ChooseAutomatismTypeDialog: public wxDialog
 {

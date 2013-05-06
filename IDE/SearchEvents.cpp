@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 #include "GDCore/Events/Event.h"
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "EventsEditor.h"

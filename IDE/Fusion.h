@@ -11,8 +11,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Game.h"
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include <string>
 #include <vector>
 
@@ -20,55 +19,55 @@ using namespace std;
 
 class Fusion: public wxDialog
 {
-	public:
+public:
 
-		Fusion(wxWindow* parent, Game & game_);
-		virtual ~Fusion();
+    Fusion(wxWindow* parent, gd::Project & game_);
+    virtual ~Fusion();
 
-		//(*Declarations(Fusion)
-		wxStaticText* StaticText2;
-		wxButton* FermerBt;
-		wxCheckBox* groupsCheck;
-		wxCheckBox* ScenesCheck;
-		wxStaticBitmap* StaticBitmap1;
-		wxButton* FusionBt;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
-		wxStaticLine* StaticLine2;
-		wxCheckBox* externalEventsCheck;
-		wxCheckBox* objectsCheck;
-		wxStaticLine* StaticLine1;
-		wxCheckBox* ImageCheck;
-		//*)
+    //(*Declarations(Fusion)
+    wxStaticText* StaticText2;
+    wxButton* FermerBt;
+    wxCheckBox* groupsCheck;
+    wxCheckBox* ScenesCheck;
+    wxStaticBitmap* StaticBitmap1;
+    wxButton* FusionBt;
+    wxPanel* Panel1;
+    wxStaticText* StaticText1;
+    wxStaticLine* StaticLine2;
+    wxCheckBox* externalEventsCheck;
+    wxCheckBox* objectsCheck;
+    wxStaticLine* StaticLine1;
+    wxCheckBox* ImageCheck;
+    //*)
 
-	protected:
+protected:
 
-		//(*Identifiers(Fusion)
-		static const long ID_STATICBITMAP1;
-		static const long ID_STATICTEXT1;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE1;
-		static const long ID_CHECKBOX1;
-		static const long ID_CHECKBOX2;
-		static const long ID_CHECKBOX3;
-		static const long ID_CHECKBOX4;
-		static const long ID_CHECKBOX5;
-		static const long ID_STATICLINE2;
-		static const long ID_STATICTEXT2;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		//*)
+    //(*Identifiers(Fusion)
+    static const long ID_STATICBITMAP1;
+    static const long ID_STATICTEXT1;
+    static const long ID_PANEL1;
+    static const long ID_STATICLINE1;
+    static const long ID_CHECKBOX1;
+    static const long ID_CHECKBOX2;
+    static const long ID_CHECKBOX3;
+    static const long ID_CHECKBOX4;
+    static const long ID_CHECKBOX5;
+    static const long ID_STATICLINE2;
+    static const long ID_STATICTEXT2;
+    static const long ID_BUTTON1;
+    static const long ID_BUTTON2;
+    //*)
 
-	private:
+private:
 
-		//(*Handlers(Fusion)
-		void OnFermerBtClick(wxCommandEvent& event);
-		void OnFusionBtClick(wxCommandEvent& event);
-		//*)
+    //(*Handlers(Fusion)
+    void OnFermerBtClick(wxCommandEvent& event);
+    void OnFusionBtClick(wxCommandEvent& event);
+    //*)
 
-		DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 
-		Game & game;
+    gd::Project & game;
 };
 
 #endif

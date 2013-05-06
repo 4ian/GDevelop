@@ -12,7 +12,8 @@
 #include <wx/log.h>
 #include <wx/ribbon/bar.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDL/Game.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "EventsEditor.h"
 
@@ -27,7 +28,7 @@ BEGIN_EVENT_TABLE(ExternalEventsEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ExternalEventsEditor::ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+ExternalEventsEditor::ExternalEventsEditor(wxWindow* parent, gd::Project & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 events(events_),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_)
@@ -70,7 +71,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalEventsEditor::OnparentSceneComboBoxDropDown);
 
 	eventsEditor->SetExternalEvents(&events);
-	if ( !events.GetAssociatedScene().empty() ) parentSceneComboBox->SetValue(events.GetAssociatedScene());
+	if ( !events.GetAssociatedLayout().empty() ) parentSceneComboBox->SetValue(events.GetAssociatedLayout());
 }
 
 ExternalEventsEditor::~ExternalEventsEditor()
@@ -90,23 +91,20 @@ void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
  */
 void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 {
-    vector< boost::shared_ptr<Scene> >::iterator sceneFound =
-        find_if(game.GetLayouts().begin(), game.GetLayouts().end(), bind2nd(SceneHasName(), string(parentSceneComboBox->GetValue().mb_str())));
+    std::string name = gd::ToString(parentSceneComboBox->GetValue()) ;
 
-    Scene * scene = NULL;
+    gd::Layout * scene = game.HasLayoutNamed(name) ? &game.GetLayout(name) : NULL;
 
-    if ( sceneFound != game.GetLayouts().end() )
-        scene = (*sceneFound).get();
-    else if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
+    if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
         scene = &emptyScene;
-    else
+    else if ( scene == NULL)
     {
         wxLogWarning(_("Scene not found."));
         return;
     }
 
     //Save the scene chosen
-    events.SetAssociatedScene(scene->GetName());
+    events.SetAssociatedLayout(scene->GetName());
 
     //Need to recreate an events editor.
     delete eventsEditor;

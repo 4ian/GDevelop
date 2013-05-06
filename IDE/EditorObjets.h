@@ -10,11 +10,11 @@
 #include <wx/panel.h>
 #include "EditorObjectList.h"
 //*)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include <wx/aui/aui.h>
 #include <wx/imaglist.h>
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -28,7 +28,7 @@ class EditorObjets: public wxPanel, public gd::LayoutEditorCanvasAssociatedEdito
 {
 public:
 
-    EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    EditorObjets(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~EditorObjets();
 
     /**
@@ -83,8 +83,8 @@ private:
     wxImageList* globalNotebookImageList;
     wxImageList* notebookImageList;
 
-    Game & game;
-    Scene & scene;
+    gd::Project & game;
+    gd::Layout & scene;
 
     gd::MainFrameWrapper & mainFrameWrapper;
 

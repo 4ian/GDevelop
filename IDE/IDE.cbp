@@ -418,6 +418,7 @@
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="../GDL" />
+			<Add directory="../Core" />
 		</ResourceCompiler>
 		<Unit filename="BugReport.cpp">
 			<Option weight="60" />
@@ -639,8 +640,6 @@
 		<Unit filename="MainOutils.cpp">
 			<Option virtualFolder="Editeur principal/Outils/" />
 		</Unit>
-		<Unit filename="PlatformManager.cpp" />
-		<Unit filename="PlatformManager.h" />
 		<Unit filename="Preferences.cpp">
 			<Option virtualFolder="Editeur principal/" />
 		</Unit>

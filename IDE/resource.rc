@@ -1,6 +1,6 @@
 aaaa ICON "icon.ico"
 
-#include "GDL/Version.h"
+#include "GDCore/Tools/Version.h"
 #include "wx/msw/wx.rc"
 
 #ifndef DEBUG
@@ -10,8 +10,8 @@ aaaa ICON "icon.ico"
 #endif
 
 1 VERSIONINFO
-FILEVERSION    	RC_FILEVERSION
-PRODUCTVERSION 	RC_FILEVERSION
+FILEVERSION    	GDCore_RC_FILEVERSION
+PRODUCTVERSION 	GDCore_RC_FILEVERSION
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -19,14 +19,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Florian Rival"
             VALUE "FileDescription",  "Game Develop Integrated Development Environment"
-            VALUE "FileVersion",      RC_FILEVERSION_STRING
+            VALUE "FileVersion",      GDCore_RC_FILEVERSION_STRING
             VALUE "InternalName",     "Game Develop IDE"
             VALUE "LegalCopyright",   "2008-2013 Florian Rival"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "GDIDE.exe"
             VALUE "ProductName",      "Game Develop"
-            VALUE "ProductVersion",   RC_FILEVERSION_STRING
+            VALUE "ProductVersion",   GDCore_RC_FILEVERSION_STRING
         END
     END
 

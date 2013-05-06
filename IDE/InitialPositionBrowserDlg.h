@@ -11,12 +11,12 @@
 #include <wx/panel.h>
 //*)
 #include <vector>
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class LayoutEditorCanvas; }
 
 /**
- * \brief Panel displaying a list of the instances of a InitialInstancesContainer.
+ * \brief Panel displaying a list of the instances of a gd::InitialInstancesContainer.
  *
  * Usually used to display the objects of a layout.
  */

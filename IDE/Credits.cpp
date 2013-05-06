@@ -13,7 +13,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/mimetype.h> // mimetype support
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -195,8 +195,8 @@ Credits::Credits(wxWindow* parent)
 	florianRival->SetLabel("Florian \"4ian\" Rival");
 
     //Format Game Develop version
-    string nbversion = GDLVersionWrapper::FullString();
-    string status = GDLVersionWrapper::Status();
+    string nbversion = gd::VersionWrapper::FullString();
+    string status = gd::VersionWrapper::Status();
     string version ="Game Develop "+nbversion+" "+status+"";
 	StaticText1->SetLabel(version);
 	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: ( No special order)")+"</h5>\n"

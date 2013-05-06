@@ -20,10 +20,10 @@
 #include <wx/aui/aui.h>
 #include <wx/config.h>
 
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
-#include "GDL/Object.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Clipboard.h"
 #include <algorithm>
 #include <numeric>
@@ -54,7 +54,7 @@ BEGIN_EVENT_TABLE( EditorObjets, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) :
+EditorObjets::EditorObjets(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
 scene(scene_),
 mainFrameWrapper(mainFrameWrapper_)

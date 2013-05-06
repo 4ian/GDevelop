@@ -13,8 +13,8 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 
@@ -36,7 +36,7 @@ BEGIN_EVENT_TABLE(ChoiceJoyAxis,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_) :
+ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, gd::Project & game_, gd::Layout & scene_) :
 joyaxis(joyaxis_),
 game(game_),
 scene(scene_)

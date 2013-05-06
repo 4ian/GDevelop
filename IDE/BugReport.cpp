@@ -16,7 +16,7 @@
 //*)
 #include <wx/textfile.h>
 #include "GDCore/CommonTools.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -205,7 +205,7 @@ BugReport::BugReport( wxWindow* parent )
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnCloseNoOpenBtClick);
     //*)
 
-    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(GDLVersionWrapper::Major())+gd::ToString(GDLVersionWrapper::Minor())+gd::ToString(GDLVersionWrapper::Build()));
+    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(gd::VersionWrapper::Major())+gd::ToString(gd::VersionWrapper::Minor())+gd::ToString(gd::VersionWrapper::Build()));
 }
 
 BugReport::~BugReport()
@@ -242,7 +242,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
 
     ReportFile.AddLine( "Données de Game Develop  :" );
     ReportFile.AddLine( "--------------------------" );
-    wxString version = GDLVersionWrapper::FullString();
+    wxString version = gd::VersionWrapper::FullString();
     ReportFile.AddLine( "Version " + version );
     ReportFile.AddLine( "Système d'exploitation : " + wxGetOsDescription() );
     ReportFile.AddLine( "" );

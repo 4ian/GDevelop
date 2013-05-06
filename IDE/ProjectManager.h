@@ -19,8 +19,8 @@
 namespace gd { class Project; }
 namespace gd { class Layout; }
 class MainFrame;
-class Game;
-class RuntimeGame;
+namespace gd { class Project; }
+namespace gd { class Project; }
 class gdTreeItemProjectData;
 
 class ProjectManager: public wxPanel
@@ -33,7 +33,7 @@ class ProjectManager: public wxPanel
         /**
          * Open a source file. Game can be NULL.
          */
-		void EditSourceFile(Game * game, std::string filename, size_t line = std::string::npos);
+		void EditSourceFile(gd::Project * game, std::string filename, size_t line = std::string::npos);
 
         /**
          * Open a \a layout from a \a project.
@@ -203,7 +203,7 @@ class ProjectManager: public wxPanel
 		void OnprojectsTreeKeyDown(wxTreeEvent& event);
 		//*)
 
-		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemProjectData *& data);
+		bool GetGameOfSelectedItem(gd::Project *& game, gdTreeItemProjectData *& data);
 
 		void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
 		void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);

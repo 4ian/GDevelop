@@ -17,7 +17,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Game.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/Events/Event.h"
 #include <string>
 #include <vector>

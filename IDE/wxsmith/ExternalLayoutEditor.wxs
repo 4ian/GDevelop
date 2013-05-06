@@ -73,8 +73,8 @@
 											<style>wxSB_HORIZONTAL</style>
 											<handler function="OnscrollBar1Scroll" entry="EVT_COMMAND_SCROLL" />
 										</object>
-										<object class="Custom" name="ID_CUSTOM1" subclass="SceneEditorCanvas" variable="layoutEditorCanvas" member="yes">
-											<creating_code>layoutEditorCanvas = new SceneEditorCanvas(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);</creating_code>
+										<object class="Custom" name="ID_CUSTOM1" subclass="CppLayoutPreviewer" variable="layoutEditorCanvas" member="yes">
+											<creating_code>layoutEditorCanvas = new CppLayoutPreviewer(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);</creating_code>
 											<style>wxWANTS__CHARS | wxBORDER__SIMPLE</style>
 											<pos>0,0</pos>
 											<size>800,600</size>

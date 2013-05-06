@@ -5,10 +5,6 @@
 
 //This file was created 2008-03-01
 
-#ifdef __WXMSW__
-#include <wx/msw/winundef.h>
-#endif
-
 //(*AppHeaders
 #include <wx/image.h>
 //*)
@@ -30,10 +26,18 @@
 #include <string>
 #include <unistd.h>
 #include <stdexcept>
+#include <fstream>
+#include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
-
-#include "GDL/CodeExecutionEngine.h"
-
+#include <SFML/Graphics.hpp>
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/IDE/PlatformLoader.h"
+#include "GDCore/Tools/VersionWrapper.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
 #include "CheckMAJ.h"
@@ -44,25 +48,10 @@
 #include "CompilationChecker.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
-#include "PlatformManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
 
-#include "GDL/Game.h"
-#include "GDL/Log.h"
-#include "GDL/OpenSaveGame.h"
-#include "GDL/SoundManager.h"
-#include "GDL/FontManager.h"
-#include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionsLoader.h"
-#include "GDL/VersionWrapper.h"
-#include "GDCore/Tools/Locale/LocaleManager.h"
-#include "GDL/IDE/CodeCompiler.h"
-
-#include <fstream>
-#include <boost/shared_ptr.hpp>
+using namespace gd;
 
 IMPLEMENT_APP(Game_Develop_EditorApp)
 
@@ -131,7 +120,7 @@ bool Game_Develop_EditorApp::OnInit()
         ;
     else if ( parser.Found( wxT("version") ) )
     {
-        cout << GDLVersionWrapper::FullString() << endl;
+        cout << gd::VersionWrapper::FullString() << endl;
         return false;
     }
     else if ( parser.Found( wxT("help") ) )
@@ -226,13 +215,6 @@ bool Game_Develop_EditorApp::OnInit()
     #endif
 
     cout << "* Single instance checked" << endl;
-    //Safety check for gdl.dll
-    bool sameGDLdllAsDuringCompilation = CompilationChecker::EnsureCorrectGDLVersion();
-    if ( !sameGDLdllAsDuringCompilation )
-    {
-        wxLogError(_("The version of GDL.dll ( or GDL.so ) seems to be incorrect. Try to reinstall Game Develop.\nIf the problem is still present, check for new version of Game Develop : http://www.compilgames.net\nIf there isn't any new version available, contact the author."));
-    }
-    cout << "* GDL checked" << endl;
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
@@ -268,32 +250,15 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Les log
     cout << "* Displaying Game Develop version information :" << endl;
-    //GDLogBanner();
+    cout << "Game Develop " << gd::VersionWrapper::FullString() << ", built "
+         << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << endl;
 
     cout << "* Creating a useless SFML texture" << endl;
     sf::RenderWindow window;
     sf::Window window2;
 
-    //Code engine stuff
-    cout << "* Loading required dynamic libraries..." << endl;
-    CodeExecutionEngine::LoadDynamicLibraries();
-
-    //Events compiler setup
-    cout << "* Setting up events compiler..." << endl;
-    CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
-    wxString eventsCompilerTempDir;
-    if ( Config->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
-        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(eventsCompilerTempDir));
-    else
-        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
-    int eventsCompilerMaxThread = 0;
-    if ( Config->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) && eventsCompilerMaxThread >= 0 )
-        CodeCompiler::GetInstance()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
-    else
-        CodeCompiler::GetInstance()->AllowMultithread(false);
-
-    //Load extensions
-    cout << "* Loading extensions:" << endl;
+    //Load platforms and extensions
+    cout << "* Loading platforms and extensions:" << endl;
     bool loadExtensions = true;
 
     #if defined(RELEASE)
@@ -314,15 +279,13 @@ bool Game_Develop_EditorApp::OnInit()
     }
     #endif
 
-    GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
-    extensionsLoader->SetExtensionsDir("./CppPlatform/Extensions/");
-    if ( loadExtensions ) extensionsLoader->LoadAllStaticExtensionsAvailable();
+    if ( loadExtensions ) gd::PlatformLoader::LoadAllPlatformsInManager(".");
 
     #if defined(RELEASE)
     wxSetAssertHandler(NULL); //Don't want to have annoying assert dialogs in release
     #endif
 
-    cout << "* Extensions loading ended." << endl;
+    cout << "* Platform and extensions loading ended." << endl;
     wxFileSystem::AddHandler( new wxZipFSHandler );
 
     //Creating main window
@@ -350,18 +313,13 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Set help provider
     {
-        gd::HelpFileAccess::GetInstance()->SetHelpProvider(HelpProvider::GetInstance());
-        HelpProvider::GetInstance()->SetParentWindow(mainEditor);
+        gd::HelpFileAccess::GetInstance()->SetHelpProvider(::HelpProvider::GetInstance());
+        ::HelpProvider::GetInstance()->SetParentWindow(mainEditor);
     }
     cout << "* Help provider set" << endl;
 
     cout << "* Loading events editor configuration" << endl;
     gd::ActionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
-
-    cout << "* Loading events code compiler configuration" << endl;
-    bool deleteTemporaries;
-    if ( Config->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
-        CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
 
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;
@@ -373,7 +331,7 @@ bool Game_Develop_EditorApp::OnInit()
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
 
-    PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
+    gd::PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
 
     cout << "* Initialization ended." << endl;
 
@@ -413,7 +371,7 @@ int Game_Develop_EditorApp::OnExit()
     cout << "." << endl;
 
     cout << "* Closing the platforms..." << endl;
-    PlatformManager::GetInstance()->DestroySingleton();
+    gd::PlatformManager::DestroySingleton();
 
     cout << "* Deleting single instance checker..." << endl;
     #if defined(LINUX) || defined(MAC)

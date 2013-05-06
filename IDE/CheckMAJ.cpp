@@ -16,8 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include "SFML/Network.hpp"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Tools/VersionWrapper.h"
 
 using namespace std;
 
@@ -75,10 +75,10 @@ void CheckMAJ::DownloadInformation()
     newRevision = 0;
     elem->QueryIntAttribute( "Revision", &newRevision );
 
-    if ( newMajor > GDLVersionWrapper::Major() ||
-         (newMajor == GDLVersionWrapper::Major() && newMinor > GDLVersionWrapper::Minor()) ||
-         (newMajor == GDLVersionWrapper::Major() && newMinor == GDLVersionWrapper::Minor() && newBuild > GDLVersionWrapper::Build()) ||
-         (newMajor == GDLVersionWrapper::Major() && newMinor == GDLVersionWrapper::Minor() && newBuild == GDLVersionWrapper::Build() && newRevision > GDLVersionWrapper::Revision() ) )
+    if ( newMajor > gd::VersionWrapper::Major() ||
+         (newMajor == gd::VersionWrapper::Major() && newMinor > gd::VersionWrapper::Minor()) ||
+         (newMajor == gd::VersionWrapper::Major() && newMinor == gd::VersionWrapper::Minor() && newBuild > gd::VersionWrapper::Build()) ||
+         (newMajor == gd::VersionWrapper::Major() && newMinor == gd::VersionWrapper::Minor() && newBuild == gd::VersionWrapper::Build() && newRevision > gd::VersionWrapper::Revision() ) )
     {
         newVersionAvailable = true;
     }

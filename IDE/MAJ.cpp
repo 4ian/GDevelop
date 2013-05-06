@@ -15,12 +15,12 @@
 #include <wx/url.h>
 #include <wx/progdlg.h>
 #include <wx/wfstream.h>
-#include "GDL/CommonTools.h"
-#include "GDL/VersionWrapper.h"
-#include "CheckMAJ.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Tools/VersionWrapper.h"
+#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "CheckMAJ.h"
 
 //(*IdInit(MAJ)
 const long MAJ::ID_STATICTEXT2 = wxNewId();
@@ -123,7 +123,7 @@ parent(parent_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MAJ::OnFermerBtClick);
 	//*)
 
-	versionTxt->SetLabel( GDLVersionWrapper::FullString() );
+	versionTxt->SetLabel( gd::VersionWrapper::FullString() );
 
 	if ( wasAutomaticallyOpened )
     {
@@ -145,7 +145,7 @@ void MAJ::CheckForUpdate()
     CheckMAJ checker;
     checker.DownloadInformation();
 
-    versionMAJTxt->SetLabel(ToString(checker.newMajor)+"."+ToString(checker.newMinor)+"."+ToString(checker.newBuild)+"."+ToString(checker.newRevision));
+    versionMAJTxt->SetLabel(gd::ToString(checker.newMajor)+"."+gd::ToString(checker.newMinor)+"."+gd::ToString(checker.newBuild)+"."+gd::ToString(checker.newRevision));
 
     wxString info = _("No informations about the new version.");
     if ( !checker.info.empty() ) info = checker.info;

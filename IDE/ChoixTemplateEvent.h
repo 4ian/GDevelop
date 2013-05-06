@@ -14,99 +14,102 @@
 //*)
 #include "GDL/tinyxml/tinyxml.h"
 #include "TemplateEvents.h"
+namespace gd { class Project; }
 
 class ChoixTemplateEvent: public wxDialog
 {
-	public:
+public:
 
-		ChoixTemplateEvent(wxWindow* parent);
-		virtual ~ChoixTemplateEvent();
+    ChoixTemplateEvent(wxWindow* parent, gd::Project & project);
+    virtual ~ChoixTemplateEvent();
 
-		void Refresh();
-		void RefreshTree();
+    void Refresh();
+    void RefreshTree();
 
-		vector < TemplateEvents > templatesList;
-		TemplateEvents finalTemplate;
+    vector < TemplateEvents > templatesList;
+    TemplateEvents finalTemplate;
 
-		//(*Declarations(ChoixTemplateEvent)
-		wxTextCtrl* Param3Edit;
-		wxStaticText* DesTxt;
-		wxTextCtrl* Param2Edit;
-		wxStaticText* StaticText2;
-		wxTextCtrl* Param8Edit;
-		wxTextCtrl* Param4Edit;
-		wxStaticBitmap* StaticBitmap1;
-		wxTreeCtrl* TemplateTree;
-		wxStaticText* Txt6;
-		wxStaticText* Txt3;
-		wxStaticText* Txt2;
-		wxTextCtrl* Param5Edit;
-		wxButton* InsererBt;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
-		wxStaticLine* StaticLine2;
-		wxFlexGridSizer* controlsSizer;
-		wxTextCtrl* Param1Edit;
-		wxStaticText* Txt4;
-		wxStaticText* Txt7;
-		wxTextCtrl* Param6Edit;
-		wxStaticLine* StaticLine1;
-		wxButton* AnnulerBt;
-		wxStaticText* Txt8;
-		wxStaticText* Txt5;
-		wxStaticText* Txt1;
-		wxTextCtrl* Param7Edit;
-		wxButton* AideBt;
-		//*)
-		vector < wxStaticText* > descriptionsTxt;
-		vector < wxTextCtrl* > parametersEdit;
+    //(*Declarations(ChoixTemplateEvent)
+    wxTextCtrl* Param3Edit;
+    wxStaticText* DesTxt;
+    wxTextCtrl* Param2Edit;
+    wxStaticText* StaticText2;
+    wxTextCtrl* Param8Edit;
+    wxTextCtrl* Param4Edit;
+    wxStaticBitmap* StaticBitmap1;
+    wxTreeCtrl* TemplateTree;
+    wxStaticText* Txt6;
+    wxStaticText* Txt3;
+    wxStaticText* Txt2;
+    wxTextCtrl* Param5Edit;
+    wxButton* InsererBt;
+    wxPanel* Panel1;
+    wxStaticText* StaticText1;
+    wxStaticLine* StaticLine2;
+    wxFlexGridSizer* controlsSizer;
+    wxTextCtrl* Param1Edit;
+    wxStaticText* Txt4;
+    wxStaticText* Txt7;
+    wxTextCtrl* Param6Edit;
+    wxStaticLine* StaticLine1;
+    wxButton* AnnulerBt;
+    wxStaticText* Txt8;
+    wxStaticText* Txt5;
+    wxStaticText* Txt1;
+    wxTextCtrl* Param7Edit;
+    wxButton* AideBt;
+    //*)
+    vector < wxStaticText* > descriptionsTxt;
+    vector < wxTextCtrl* > parametersEdit;
 
-	protected:
+protected:
 
-		//(*Identifiers(ChoixTemplateEvent)
-		static const long ID_TREECTRL1;
-		static const long ID_STATICBITMAP1;
-		static const long ID_STATICTEXT1;
-		static const long ID_PANEL1;
-		static const long ID_STATICTEXT2;
-		static const long ID_STATICLINE1;
-		static const long ID_STATICTEXT3;
-		static const long ID_STATICTEXT4;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICTEXT5;
-		static const long ID_TEXTCTRL2;
-		static const long ID_STATICTEXT6;
-		static const long ID_TEXTCTRL3;
-		static const long ID_STATICTEXT8;
-		static const long ID_TEXTCTRL4;
-		static const long ID_STATICTEXT7;
-		static const long ID_TEXTCTRL5;
-		static const long ID_STATICTEXT9;
-		static const long ID_TEXTCTRL6;
-		static const long ID_STATICTEXT10;
-		static const long ID_TEXTCTRL7;
-		static const long ID_STATICTEXT11;
-		static const long ID_TEXTCTRL8;
-		static const long ID_STATICLINE2;
-		static const long ID_BUTTON2;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON3;
-		//*)
+    //(*Identifiers(ChoixTemplateEvent)
+    static const long ID_TREECTRL1;
+    static const long ID_STATICBITMAP1;
+    static const long ID_STATICTEXT1;
+    static const long ID_PANEL1;
+    static const long ID_STATICTEXT2;
+    static const long ID_STATICLINE1;
+    static const long ID_STATICTEXT3;
+    static const long ID_STATICTEXT4;
+    static const long ID_TEXTCTRL1;
+    static const long ID_STATICTEXT5;
+    static const long ID_TEXTCTRL2;
+    static const long ID_STATICTEXT6;
+    static const long ID_TEXTCTRL3;
+    static const long ID_STATICTEXT8;
+    static const long ID_TEXTCTRL4;
+    static const long ID_STATICTEXT7;
+    static const long ID_TEXTCTRL5;
+    static const long ID_STATICTEXT9;
+    static const long ID_TEXTCTRL6;
+    static const long ID_STATICTEXT10;
+    static const long ID_TEXTCTRL7;
+    static const long ID_STATICTEXT11;
+    static const long ID_TEXTCTRL8;
+    static const long ID_STATICLINE2;
+    static const long ID_BUTTON2;
+    static const long ID_BUTTON1;
+    static const long ID_BUTTON3;
+    //*)
 
-	private:
+private:
 
-		//(*Handlers(ChoixTemplateEvent)
-		void OnInsererBtClick(wxCommandEvent& event);
-		void OnAnnulerBtClick(wxCommandEvent& event);
-		void OnTemplateTreeSelectionChanged(wxTreeEvent& event);
-		void OnAideBtClick(wxCommandEvent& event);
-		//*)
-		wxTreeItemId item;
+    //(*Handlers(ChoixTemplateEvent)
+    void OnInsererBtClick(wxCommandEvent& event);
+    void OnAnnulerBtClick(wxCommandEvent& event);
+    void OnTemplateTreeSelectionChanged(wxTreeEvent& event);
+    void OnAideBtClick(wxCommandEvent& event);
+    //*)
+    wxTreeItemId item;
 
-		string ConvertParam( string parameter, const string & toReplace, const string & replaceBy );
-        void ProcessEvents(vector < gd::BaseEventSPtr > & events );
+    string ConvertParam( string parameter, const string & toReplace, const string & replaceBy );
+    void ProcessEvents(vector < gd::BaseEventSPtr > & events );
 
-		DECLARE_EVENT_TABLE()
+    gd::Project & project;
+
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

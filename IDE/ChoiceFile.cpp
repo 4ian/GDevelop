@@ -13,11 +13,11 @@
 //*)
 #include <wx/filedlg.h>
 #include <wx/filename.h>
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
-#include "GDL/Game.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-class Scene;
+namespace gd { class Layout; }
 
 //(*IdInit(ChoiceFile)
 const long ChoiceFile::ID_STATICTEXT1 = wxNewId();
@@ -37,7 +37,7 @@ BEGIN_EVENT_TABLE(ChoiceFile,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceFile::ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_) :
+ChoiceFile::ChoiceFile(wxWindow* parent, string file_, gd::Project & game_, gd::Layout & scene_) :
 file(file_),
 game(game_),
 scene(scene_)
@@ -121,7 +121,7 @@ void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 
 void ChoiceFile::OnokBtClick(wxCommandEvent& event)
 {
-    file = ToString(fileEdit->GetValue());
+    file = gd::ToString(fileEdit->GetValue());
     EndModal(1);
 }
 

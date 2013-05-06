@@ -22,9 +22,9 @@
 #include <wx/ribbon/toolbar.h>
 #include <wx/srchctrl.h>
 namespace gd {class ClassWithObjects;}
-#include "GDL/Object.h"
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 

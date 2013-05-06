@@ -11,14 +11,17 @@
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include "GDL/ExternalLayout.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+#include "GDCore/PlatformDefinition/ExternalLayout.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"
 #include "LayoutEditorPropertiesPnl.h"
 #include "../EditorObjets.h"
 #include "../MainFrame.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/CommonTools.h"
+
+using namespace gd;
 
 //(*IdInit(ExternalLayoutEditor)
 const long ExternalLayoutEditor::ID_STATICTEXT1 = wxNewId();
@@ -39,7 +42,7 @@ BEGIN_EVENT_TABLE(ExternalLayoutEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, RuntimeGame & project_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, gd::Project & project_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 layoutEditorCanvas(NULL),
 externalLayout(externalLayout_),
 project(project_),
@@ -48,14 +51,14 @@ mainFrameWrapper(mainFrameWrapper_)
     //TODO
     try
     {
-        InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+        gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
     }
     catch(...)
     {
         std::cout << "ERROR: ExternalLayoutEditor is not ready for arbitrary Platform. GD will crash";
     }
 
-    InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+    gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
 	//(*Initialize(ExternalLayoutEditor)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -98,7 +101,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
 	scrollBar1 = new wxScrollBar(layoutPanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	layoutEditorCanvas = new SceneEditorCanvas(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+	layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
 	FlexGridSizer3->Add(layoutPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	helpPanel = new wxPanel(corePanel, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	helpPanel->SetBackgroundColour(wxColour(255,255,255));
@@ -136,11 +139,11 @@ mainFrameWrapper(mainFrameWrapper_)
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
-    vector< boost::shared_ptr<Scene> >::iterator layoutFound =
-        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(SceneHasName(), externalLayout.GetAssociatedSettings().associatedLayout));
+    std::string name = externalLayout.GetAssociatedSettings().associatedLayout;
+    gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
-    if ( layoutFound != project.GetLayouts().end() )
-        SetupForScene(*(*layoutFound));
+    if ( scene != NULL )
+        SetupForScene(*scene);
     else
         SetupForScene(emptyLayout);
 }
@@ -151,7 +154,7 @@ ExternalLayoutEditor::~ExternalLayoutEditor()
 	//*)
 
     //Save the configuration
-    if ( &layoutEditorCanvas->GetEditedScene() != &emptyLayout ) wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
+    if ( &layoutEditorCanvas->GetLayout() != &emptyLayout ) wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
 	m_mgr.UnInit();
 }
 
@@ -196,7 +199,7 @@ void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
     layoutEditorCanvas->ConnectEvents();
 }
 
-void ExternalLayoutEditor::SetupForScene(Scene & layout)
+void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 {
     if ( &layout == &emptyLayout )
     {
@@ -210,7 +213,7 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
 
         try
         {
-            InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+            gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
             //Check if external editors already have been created
             bool creatingEditorsForFirsttime = (objectsEditor == boost::shared_ptr<EditorObjets>() ||
@@ -219,7 +222,7 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
 
             //(Re)create layout canvas
             if ( layoutEditorCanvas ) delete layoutEditorCanvas;
-            layoutEditorCanvas = new SceneEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+            layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
             layoutEditorCanvas->SetParentAuiManager( &m_mgr );
             layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
@@ -260,7 +263,6 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
             }
 
             m_mgr.Update();
-            layoutEditorCanvas->RefreshFromLayout();
             ForceRefreshRibbonAndConnect();
         }
         catch(...)
@@ -276,22 +278,18 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 {
-    vector< boost::shared_ptr<Scene> >::iterator layoutFound =
-        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(SceneHasName(), ToString(parentSceneComboBox->GetValue())));
+    std::string name = ToString(parentSceneComboBox->GetValue()) ;
+    gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
-    Scene * layout = NULL;
-
-    if ( layoutFound != project.GetLayouts().end() )
-        layout = (*layoutFound).get();
-    else if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No layout"
-        layout = &emptyLayout;
-    else
+    if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
+        scene = &emptyLayout;
+    else if ( scene == NULL)
     {
         wxLogWarning(_("Scene not found."));
         return;
     }
 
-    SetupForScene(*layout);
+    SetupForScene(*scene);
 }
 
 /**
@@ -308,6 +306,6 @@ void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 
 gd::Layout & ExternalLayoutEditor::GetAssociatedLayout()
 {
-    return layoutEditorCanvas->GetEditedScene();
+    return layoutEditorCanvas->GetLayout();
 }
 

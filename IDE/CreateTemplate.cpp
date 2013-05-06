@@ -10,16 +10,16 @@
 //*)
 #include <wx/log.h>
 #include <wx/filedlg.h>
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Events/Serialization.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCore/TinyXml/tinyxml.h"
 #include <string>
 #include <vector>
 
-#include "GDL/Game.h"
-#include "GDL/OpenSaveGame.h"
-#include "GDL/CommonTools.h"
-
 using namespace std;
+using namespace gd;
 
 //(*IdInit(CreateTemplate)
 const long CreateTemplate::ID_STATICBITMAP3 = wxNewId();
@@ -254,7 +254,7 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
     TiXmlElement * elemEvents = new TiXmlElement( "Events" );
     root->LinkEndChild( elemEvents );
 
-    OpenSaveGame::SaveEvents(events, elemEvents);
+    gd::EventsListSerialization::SaveEventsToXml(events, elemEvents);
 
     wxFileDialog dialog( this, _( "Choose where save the template" ), "Templates", "", "Template (*.mgd)|*.mgd", wxFD_SAVE );
     ;

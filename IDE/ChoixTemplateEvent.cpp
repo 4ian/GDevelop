@@ -14,13 +14,15 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/CommonTools.h"
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/CommonTools.h"
 #include "TemplateEvents.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/Events/Serialization.h"
 
 #define MSG(x) wxLogWarning(_(x));
+
+using namespace gd;
 
 //(*IdInit(ChoixTemplateEvent)
 const long ChoixTemplateEvent::ID_TREECTRL1 = wxNewId();
@@ -57,7 +59,8 @@ BEGIN_EVENT_TABLE( ChoixTemplateEvent, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
+ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent, gd::Project & project_ ) :
+    project(project_)
 {
     //(*Initialize(ChoixTemplateEvent)
     wxFlexGridSizer* FlexGridSizer4;
@@ -213,7 +216,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
                     while ( paramNb < parametersEdit.size() )
                     {
                         string str = allConditionsVectors[k]->at(l).GetParameter(m).GetPlainString();
-                        allConditionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+ToString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
+                        allConditionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+gd::ToString(paramNb+1)+"_", gd::ToString( parametersEdit[paramNb]->GetValue() ) ) );
                         paramNb++;
                     }
             	}
@@ -231,7 +234,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
                     while ( paramNb < parametersEdit.size() )
                     {
                         string str = allActionsVectors[k]->at(l).GetParameter(m).GetPlainString();
-                        allActionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+ToString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
+                        allActionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+gd::ToString(paramNb+1)+"_", gd::ToString( parametersEdit[paramNb]->GetValue() ) ) );
                         paramNb++;
                     }
             	}
@@ -294,7 +297,7 @@ void ChoixTemplateEvent::Refresh()
         }
 
         if ( elem->FirstChildElement( "Events" ) != NULL )
-            OpenSaveGame::OpenEvents(newTemplate.events, elem->FirstChildElement( "Events" ));
+            gd::EventsListSerialization::LoadEventsFromXml(project, newTemplate.events, elem->FirstChildElement( "Events" ));
         else
             wxLogWarning( _( "The events of the template are missing." ) );
 

@@ -20,19 +20,20 @@
 #include <wx/dirdlg.h>
 #include <wx/log.h>
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
-#include "GDL/Events/CodeCompilationHelpers.h"
 #include "LogFileManager.h"
 #include <wx/listctrl.h>
+#include "GDL/IDE/CodeCompiler.h"
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(Preferences)
 const long Preferences::ID_STATICBITMAP3 = wxNewId();
@@ -761,7 +762,7 @@ changesNeedRestart(false)
         pConfig->Read( _T( "/Autosave/Time" ), &time );
         pConfig->Read( _T( "/Autosave/Activated" ), &activated );
 
-        autosaveTimeEdit->ChangeValue( ToString(static_cast<float>(time)/60.0f/1000.0f) );
+        autosaveTimeEdit->ChangeValue( gd::ToString(static_cast<float>(time)/60.0f/1000.0f) );
         autosaveActivatedCheck->SetValue(activated);
     }
 
@@ -792,7 +793,7 @@ changesNeedRestart(false)
         if ( avertOnSave ) avertOnSaveCheck->SetValue(true);
     }
 
-	conditionsColumnWidthEdit->SetValue(ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
+	conditionsColumnWidthEdit->SetValue(gd::ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 	hideContextPanelsLabels->SetValue(pConfig->ReadBool("EventsEditor/HideContextPanelsLabels", false));
 
 	wxFont eventsEditorFont;
@@ -961,7 +962,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     }
 
     gd::ActionSentenceFormatter::GetInstance()->SaveTypesFormattingToConfig();
-	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(ToString(conditionsColumnWidthEdit->GetValue())));
+	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(gd::ToString(conditionsColumnWidthEdit->GetValue())));
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());
 

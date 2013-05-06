@@ -9,7 +9,7 @@
 #include <wx/string.h>
 //*)
 #include "GDCore/IDE/wxTools/SkinHelper.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
@@ -115,7 +115,6 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
         }
 
         instancesHelper.OnPropertyChanged(selectedInitialInstances, event);
-        layoutEditorCanvas->RefreshFromLayout();
     }
 }
 

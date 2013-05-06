@@ -16,6 +16,7 @@
 #include <vector>
 #include <algorithm>
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -342,7 +343,7 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
         if ( dialog.ShowModal() == 1 )
             *i = dialog.group;
 
-        project.GetChangesNotifier().OnObjectGroupEdited(project, EditingLayoutGroups() ? &layout : NULL, i->GetName());
+        project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupEdited(project, EditingLayoutGroups() ? &layout : NULL, i->GetName());
         return;
     }
 }
@@ -372,7 +373,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( NewGroup );
     ObjetsGroupsList->AppendItem( rootId, name );
 
-    project.GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(name));
+    project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(name));
     wxLogStatus( _( "The group was correctly added." ) );
 }
 
@@ -413,10 +414,10 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
             if ( answer == wxYES )
             {
-                gd::EventsRefactorer::RemoveObjectInEvents(project, layout, layout.GetEvents(), groupName);
+                gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), groupName);
             }
 
-            project.GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, groupName);
+            project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, groupName);
             ObjetsGroupsList->Delete( itemSelected );
         }
     }
@@ -523,9 +524,9 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         {
             i->SetName( newName );
 
-            gd::EventsRefactorer::RenameObjectInEvents(project, layout, layout.GetEvents(), renamedGroupOldName, newName);
+            gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), renamedGroupOldName, newName);
 
-            project.GetChangesNotifier().OnObjectGroupRenamed(project, EditingLayoutGroups() ? &layout : NULL, newName, renamedGroupOldName);
+            project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupRenamed(project, EditingLayoutGroups() ? &layout : NULL, newName, renamedGroupOldName);
             return;
         }
     }
@@ -590,7 +591,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     clipboard->SetObjectGroup(*i);
     objectsGroups->erase( i );
 
-    project.GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(ObjetsGroupsList->GetItemText( itemSelected )));
+    project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(ObjetsGroupsList->GetItemText( itemSelected )));
     ObjetsGroupsList->Delete( itemSelected );
 }
 
@@ -615,6 +616,6 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( groupPasted );
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
-    project.GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL,  groupPasted.GetName());
+    project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL,  groupPasted.GetName());
 }
 

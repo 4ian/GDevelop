@@ -25,14 +25,14 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
-#include "GDL/CommonTools.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionBase.h"
-#include "GDL/ExternalEvents.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDL/IDE/Dialogs/CppLayoutPreviewer.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/CommonTools.h"
 #include "LogFileManager.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
@@ -47,6 +47,7 @@
 #include <SFML/System.hpp>
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(EventsEditor)
 const long EventsEditor::ID_TEXTCTRL1 = wxNewId();
@@ -105,7 +106,7 @@ BEGIN_EVENT_TABLE(EventsEditor,wxPanel)
 END_EVENT_TABLE()
 
 
-EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
     game(game_),
     scene(scene_),
     externalEvents(NULL),
@@ -286,8 +287,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
         gd::EventsRenderingHelper::GetInstance()->SetFont(eventsEditorFont);
 
     //Adding events types
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Insert extension specific events types
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -299,9 +299,11 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
             continue;
 
         //Add each event type provided
-	    std::map<std::string, EventInfos > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
-        for(std::map<string, EventInfos>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
+	    std::map<std::string, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
+        for(std::map<string, gd::EventMetadata>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
         {
+            if (it->second.fullname.empty()) continue;
+
             //Find an identifier for the menu item
             long id = wxID_ANY;
             for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
@@ -318,7 +320,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
             }
 
             wxMenuItem * menuItem = new wxMenuItem(&eventTypesMenu, id, it->second.fullname, it->second.description);
-            menuItem->SetBitmap(it->second.smallicon);
+            menuItem->SetBitmap(it->second.GetBitmapIcon());
             eventTypesMenu.Append(menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected);
             mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected, NULL, this);
@@ -515,7 +517,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
         gd::EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
         unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
-        unsigned int height = events[i]->GetRenderedHeight(width);
+        unsigned int height = events[i]->GetRenderedHeight(width, game.GetCurrentPlatform());
 
         if( !(y+static_cast<int>(height) < 0 || y > eventsPanel->GetSize().y) ) //Render only if needed
         {
@@ -572,7 +574,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
 
             //Event rendering
-            events[i]->Render(dc, x, y, width, itemsAreas, selection);
+            events[i]->Render(dc, x, y, width, itemsAreas, selection, game.GetCurrentPlatform());
 
             if ( drawDragTarget )
             {
@@ -1096,9 +1098,9 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
     if ( !noNeedForSceneRecompilation )
     {
         if ( externalEvents != NULL )
-            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game.GetCurrentPlatform(), game, *externalEvents);
         else
-            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game.GetCurrentPlatform(), game, scene);
     }
 }
 
@@ -1208,7 +1210,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
  */
 void EventsEditor::AddEvent(EventItem & previousEventItem)
 {
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         //Edit the event
@@ -1261,7 +1263,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
     EventItem previousEventItem;
     if ( !eventsSelected.empty() && eventsSelected[0].event != boost::shared_ptr<gd::BaseEvent>() ) previousEventItem = eventsSelected[0];
 
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Comment");
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Comment");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
@@ -1289,7 +1291,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
  */
 void EventsEditor::AddSubEvent(EventItem & parentEventItem)
 {
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
@@ -1333,8 +1335,8 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previ
     }
 
     //Create event
-    if ( !ExtensionsManager::GetInstance()->HasEventType(eventType) ) return;
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent(eventType);
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent(eventType);
+    if ( !eventToAdd ) return;
     if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
 
     //Adding event
@@ -1612,7 +1614,7 @@ void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
         return;
     }
 
-    ChoixTemplateEvent dialog( this );
+    ChoixTemplateEvent dialog( this, game );
     if ( dialog.ShowModal() != 1 ) return;
 
     //Insert new events
@@ -1635,7 +1637,7 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
-    SceneEditorCanvas * sceneCanvas = dynamic_cast<SceneEditorCanvas*>(layoutCanvas);
+    CppLayoutPreviewer * sceneCanvas = dynamic_cast<CppLayoutPreviewer*>(layoutCanvas);
 
     if (sceneCanvas && sceneCanvas->GetProfileDialog() != boost::shared_ptr<ProfileDlg>())
     {

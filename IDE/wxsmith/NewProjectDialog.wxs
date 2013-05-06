@@ -12,7 +12,7 @@
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-					<label>Choose a template:</label>
+					<label>Choose a platform and a template:</label>
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
@@ -22,7 +22,6 @@
 				<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 					<object class="sizeritem">
 						<object class="wxListCtrl" name="ID_LISTCTRL1" variable="platformList" member="yes">
-							<hidden>1</hidden>
 							<style>wxLC_REPORT|wxLC_NO_HEADER</style>
 							<handler function="OnplatformListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
 						</object>

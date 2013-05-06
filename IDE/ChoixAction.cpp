@@ -26,6 +26,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -37,13 +38,10 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
-#include "GDL/Game.h"
-#include "GDL/Object.h"
-#include "GDL/ObjectHelpers.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionBase.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "ChoixClavier.h"
 #include "SigneModification.h"
@@ -54,6 +52,8 @@
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
 #endif
+
+using namespace gd;
 
 //(*IdInit(ChoixAction)
 const long ChoixAction::ID_TREECTRL1 = wxNewId();
@@ -89,7 +89,7 @@ BEGIN_EVENT_TABLE(ChoixAction,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoixAction::ChoixAction(wxWindow* parent, Game & game_, Scene & scene_) :
+ChoixAction::ChoixAction(wxWindow* parent, gd::Project & game_, gd::Layout & scene_) :
 game(game_),
 scene(scene_)
 {
@@ -281,7 +281,7 @@ void ChoixAction::RefreshList()
     bool searching = search.empty() ? false : true;
 
     //Insert extension objects actions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -332,9 +332,9 @@ void ChoixAction::RefreshList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -373,9 +373,9 @@ void ChoixAction::RefreshList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -407,9 +407,9 @@ void ChoixAction::RefreshList()
 
             //Add action item
             int IDimage = 0;
-            if ( it->second.smallicon.IsOk() )
+            if ( it->second.GetSmallBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.smallicon);
+                imageList->Add(it->second.GetSmallBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
@@ -440,7 +440,7 @@ void ChoixAction::RefreshObjectActionsList()
     std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects actions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -488,9 +488,9 @@ void ChoixAction::RefreshObjectActionsList()
 
             //Add action item, if it is not hidden
             int IDimage = 0;
-            if ( it->second.smallicon.IsOk() )
+            if ( it->second.GetSmallBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.smallicon);
+                imageList->Add(it->second.GetSmallBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
@@ -536,9 +536,9 @@ void ChoixAction::RefreshObjectActionsList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -593,14 +593,14 @@ void ChoixAction::RefreshFromAction()
 {
     if ( Type.empty() ) return;
 
-    const gd::InstructionMetadata & instructionMetadata = ExtensionsManager::GetInstance()->GetActionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), Type);
 
     //Display action main properties
     NomActionTxt->SetLabel( instructionMetadata.GetFullName() );
     NomActionTxt->Wrap( 450 );
-    ActionTextTxt->SetLabel( instructionMetadata.description );
+    ActionTextTxt->SetLabel( instructionMetadata.GetDescription() );
     ActionTextTxt->Wrap( 450 );
-    if ( instructionMetadata.icon.IsOk() ) ActionImg->SetBitmap( instructionMetadata.icon );
+    if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknown24);
 
     //Update controls count
@@ -715,8 +715,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = ToInt(num);
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), Type);
 
     if ( i < ParaEdit.size() && i < instructionMetadata.parameters.size())
     {
@@ -881,14 +880,14 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             if ( ParaEdit.empty() ) return;
 
             std::string objectWanted = ToString(ParaEdit[0]->GetValue());
-            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-            ObjSPtr object = boost::shared_ptr<Object> ();
+            ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
-            if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+            if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
                 object = *sceneObject;
-            else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
+            else if ( globalObject != game.GetObjects().end() ) //Then the global object list
                 object = *globalObject;
             else
                 return;
@@ -946,8 +945,7 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 {
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), Type);
 
     if ( Type == "" )
         return;
@@ -972,12 +970,12 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             gd::ExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
+            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
 

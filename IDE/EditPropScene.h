@@ -20,7 +20,7 @@
 #include <wx/dialog.h>
 //*)
 namespace gd { class Layout; }
-class Scene;
+namespace gd { class Layout; }
 
 class EditPropScene: public wxDialog
 {

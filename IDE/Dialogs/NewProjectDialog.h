@@ -24,19 +24,6 @@ public:
     NewProjectDialog(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
     virtual ~NewProjectDialog();
 
-    //(*Declarations(NewProjectDialog)
-    wxStaticText* StaticText2;
-    wxListCtrl* platformList;
-    wxStaticText* StaticText1;
-    wxButton* cancelBt;
-    wxTextCtrl* projectFileEdit;
-    wxStaticLine* StaticLine1;
-    wxListCtrl* templateList;
-    wxButton* browseBt;
-    wxButton* createProjectBt;
-    wxHyperlinkCtrl* examplesBt;
-    //*)
-
     /**
      * Return the file of the chosen template. If empty, the user choose an empty project.
      * Be sure to check that the call to ShowModal() returned 1 and not 0 ( in this case, the user canceled ).
@@ -60,6 +47,19 @@ public:
     bool UserWantToBrowseExamples() const { return userWantToBrowseExamples; }
 
 protected:
+
+    //(*Declarations(NewProjectDialog)
+    wxStaticText* StaticText2;
+    wxListCtrl* platformList;
+    wxStaticText* StaticText1;
+    wxButton* cancelBt;
+    wxTextCtrl* projectFileEdit;
+    wxStaticLine* StaticLine1;
+    wxListCtrl* templateList;
+    wxButton* browseBt;
+    wxButton* createProjectBt;
+    wxHyperlinkCtrl* examplesBt;
+    //*)
 
     //(*Identifiers(NewProjectDialog)
     static const long ID_STATICTEXT1;

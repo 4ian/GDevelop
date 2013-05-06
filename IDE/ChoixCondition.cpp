@@ -22,13 +22,10 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include "GDCore/PlatformDefinition/Layout.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
-#include "GDL/Game.h"
-#include "GDL/Object.h"
-#include "GDL/ObjectHelpers.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionBase.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
@@ -43,6 +40,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "TrueOrFalse.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
@@ -59,6 +57,7 @@
 #endif
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(ChoixCondition)
 const long ChoixCondition::ID_TREECTRL1 = wxNewId();
@@ -95,7 +94,7 @@ BEGIN_EVENT_TABLE( ChoixCondition, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, Scene & scene_) :
+ChoixCondition::ChoixCondition( wxWindow* parent, gd::Project & game_, gd::Layout & scene_) :
 game(game_),
 scene(scene_),
 conditionInverted(false)
@@ -297,7 +296,7 @@ void ChoixCondition::RefreshList()
     bool searching = search.empty() ? false : true;
 
     //Insert extension objects conditions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -333,8 +332,8 @@ void ChoixCondition::RefreshList()
             {
                 //Verify if the condition match the search
                 if ( searching &&
-                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                    boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
 
                 if ( it->second.IsHidden() ) continue;
@@ -342,17 +341,17 @@ void ChoixCondition::RefreshList()
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ConditionsTree->GetFirstChild(objectTypeItem, cookie);
-                while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = ConditionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(objectTypeItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
                 //Add condition item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -391,14 +390,14 @@ void ChoixCondition::RefreshList()
 
                 //Add condition item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-                ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                ConditionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
 
@@ -408,8 +407,8 @@ void ChoixCondition::RefreshList()
         {
             //Verify if the condition match the search
             if ( searching &&
-                boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
 
             if ( it->second.IsHidden() ) continue;
@@ -417,22 +416,22 @@ void ChoixCondition::RefreshList()
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = ConditionsTree->GetFirstChild(extensionItem, cookie);
-            while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.group )
+            while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.GetGroup() )
             {
                 groupItem = ConditionsTree->GetNextSibling(groupItem);
             }
-            if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(extensionItem, it->second.group, 0);
+            if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(extensionItem, it->second.GetGroup(), 0);
 
             //Add condition item
             int IDimage = 0;
-            if ( it->second.smallicon.IsOk() )
+            if ( it->second.GetSmallBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.smallicon);
+                imageList->Add(it->second.GetSmallBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
             gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-            ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            ConditionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
         }
 
 	    if ( !ConditionsTree->HasChildren(extensionItem) ) ConditionsTree->Delete(extensionItem);
@@ -458,7 +457,7 @@ void ChoixCondition::RefreshObjectConditionsList()
     std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects conditions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -506,14 +505,14 @@ void ChoixCondition::RefreshObjectConditionsList()
 
             //Add condition item
             int IDimage = 0;
-            if ( it->second.smallicon.IsOk() )
+            if ( it->second.GetSmallBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.smallicon);
+                imageList->Add(it->second.GetSmallBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
             gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-            objectConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            objectConditionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
         }
 
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
@@ -537,8 +536,8 @@ void ChoixCondition::RefreshObjectConditionsList()
             {
                 //Verify if the condition match the search
                 if ( searching &&
-                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                    boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
 
                 if ( it->second.IsHidden() ) continue;
@@ -546,22 +545,22 @@ void ChoixCondition::RefreshObjectConditionsList()
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = objectConditionsTree->GetFirstChild(automatismTypeItem, cookie);
-                while ( groupItem.IsOk() && objectConditionsTree->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && objectConditionsTree->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = objectConditionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
 
                 //Add condition item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-                objectConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                objectConditionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
 
@@ -610,13 +609,13 @@ void ChoixCondition::RefreshFromCondition()
     if ( Type.empty() ) return;
 
     //Display action main properties
-    const gd::InstructionMetadata & instructionMetadata =  ExtensionsManager::GetInstance()->GetConditionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
 
-    NomConditionTxt->SetLabel( instructionMetadata.fullname );
+    NomConditionTxt->SetLabel( instructionMetadata.GetFullName() );
     NomConditionTxt->Wrap( 450 );
-    ConditionTextTxt->SetLabel( instructionMetadata.description );
+    ConditionTextTxt->SetLabel( instructionMetadata.GetDescription() );
     ConditionTextTxt->Wrap( 450 );
-    if ( instructionMetadata.icon.IsOk() ) ConditionImg->SetBitmap( instructionMetadata.icon );
+    if ( instructionMetadata.GetBitmapIcon().IsOk() ) ConditionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ConditionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknown24);
 
     //Update controls count
@@ -758,8 +757,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = atoi( num.c_str() );
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetConditionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
 
     if ( i < MaxPara && i < instructionMetadata.parameters.size())
     {
@@ -884,14 +882,14 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( ParaEdit.empty() ) return;
 
             string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
-            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-            ObjSPtr object = boost::shared_ptr<Object> ();
+            ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
-            if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+            if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
                 object = *sceneObject;
-            else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
+            else if ( globalObject != game.GetObjects().end() ) //Then the global object list
                 object = *globalObject;
             else
                 return;
@@ -925,8 +923,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 {
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetConditionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
 
     if ( Type == "" )
         return;
@@ -951,12 +948,12 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             gd::ExpressionParser expressionParser(ToString(ParaEdit[i]->GetValue()));
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
+            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
 

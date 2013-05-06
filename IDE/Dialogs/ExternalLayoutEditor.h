@@ -14,22 +14,22 @@
 #include <wx/combobox.h>
 //*)
 #include <wx/aui/aui.h>
-class SceneEditorCanvas;
-class RuntimeGame;
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+namespace gd { class Project; }
+namespace gd { class ExternalLayout; }
+namespace gd { class LayersEditorPanel; }
+namespace gd { class LayoutEditorCanvas; }
 class EditorObjets;
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
-namespace gd { class ExternalLayout; }
-namespace gd { class LayersEditorPanel; }
-#include "GDL/Scene.h"
-#include "GDL/RuntimeGame.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 class ExternalLayoutEditor: public wxPanel
 {
 public:
 
-    ExternalLayoutEditor(wxWindow* parent, RuntimeGame & game_, gd::ExternalLayout & externalLayout, const gd::MainFrameWrapper & mainFrameWrapper_);
+    ExternalLayoutEditor(wxWindow* parent, gd::Project & game_, gd::ExternalLayout & externalLayout, const gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~ExternalLayoutEditor();
 
     /**
@@ -79,7 +79,7 @@ private:
     void OnparentSceneComboBoxSelected(wxCommandEvent& event);
     //*)
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
-    void SetupForScene(Scene & scene);
+    void SetupForScene(gd::Layout & scene);
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;
@@ -91,7 +91,7 @@ private:
     wxPanel* contextPanel;
     wxPanel* corePanel;
     wxComboBox* parentSceneComboBox;
-    SceneEditorCanvas* layoutEditorCanvas;
+    gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* layoutPanel;
     //*)
     boost::shared_ptr<EditorObjets> objectsEditor;
@@ -99,7 +99,7 @@ private:
     boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
     boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 
-    RuntimeGame & project;
+    gd::Project & project;
     gd::ExternalLayout & externalLayout;
     gd::MainFrameWrapper mainFrameWrapper;
     Scene emptyLayout;

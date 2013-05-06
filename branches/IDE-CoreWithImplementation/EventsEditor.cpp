@@ -302,6 +302,8 @@ EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & s
 	    std::map<std::string, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
         for(std::map<string, gd::EventMetadata>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
         {
+            if (it->second.fullname.empty()) continue;
+
             //Find an identifier for the menu item
             long id = wxID_ANY;
             for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();

@@ -13,7 +13,7 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -231,7 +231,6 @@ void LayersEditorPanel::OnAddSelected(wxCommandEvent& event)
     layout.InsertNewLayer(ToString(name), layout.GetLayersCount()-1);
 
     Refresh();
-    if ( layoutCanvas ) layoutCanvas->RefreshFromLayout();
 }
 
 /** Delete a layer
@@ -272,7 +271,6 @@ void LayersEditorPanel::OnDelSelected(wxCommandEvent& event)
             if ( layoutCanvas )
             {
                 layoutCanvas->SetCurrentLayer("");
-                layoutCanvas->RefreshFromLayout();
             }
             Refresh();
     	    return;
@@ -296,7 +294,6 @@ void LayersEditorPanel::OnUpSelected(wxCommandEvent& event)
     	        layout.SwapLayers(i,i+1);
 
                 Refresh();
-                if ( layoutCanvas ) layoutCanvas->RefreshFromLayout();
 
                 //On reslectionne le calque
                 layersList->SetItemState(layout.GetLayersCount()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -323,7 +320,6 @@ void LayersEditorPanel::OnDownSelected(wxCommandEvent& event)
     	        layout.SwapLayers(i,i-1);
 
                 Refresh();
-                if ( layoutCanvas ) layoutCanvas->RefreshFromLayout();
 
                 //On reslectionne le calque
                 layersList->SetItemState(layout.GetLayersCount()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -387,7 +383,6 @@ void LayersEditorPanel::OnlayersListItemActivated(wxListEvent& event)
         selectedLayer->SetVisibility(!selectedLayer->GetVisibility());
         Refresh();
 
-        if ( layoutCanvas ) layoutCanvas->RefreshFromLayout();
         return;
     }
     else
@@ -413,7 +408,6 @@ void LayersEditorPanel::EditSelectedLayer()
     }
 
     Refresh();
-    if ( layoutCanvas ) layoutCanvas->RefreshFromLayout();
 }
 void LayersEditorPanel::OnEditSelected1(wxCommandEvent& event)
 {

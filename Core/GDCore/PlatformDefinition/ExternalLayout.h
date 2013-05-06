@@ -7,11 +7,17 @@
 #define GDCORE_EXTERNALLAYOUT_H
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-namespace gd { class LayoutEditorCanvasOptions; }
+#include <boost/shared_ptr.hpp>
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
+#endif
 
 namespace gd
 {
 
+/**
+ * \brief An external layout allows to create layouts of objects that can be then inserted on a layout.
+ */
 class GD_CORE_API ExternalLayout
 {
 public:
@@ -19,48 +25,73 @@ public:
     virtual ~ExternalLayout() {};
 
     /**
-     * Must return a pointer to a copy of the layout.
-     *
-     * \note A such method is useful when the IDE must store a copy of a ExternalLayout derived class ( e.g. for Clipboard ) so as to avoid slicing
-     *
-     * Typical implementation example:
-     * \code
-     * return new MyExternalLayoutClass(*this);
-     * \endcode
+     * \brief Return a pointer to a new ExternalLayout constructed from this one.
      */
-    virtual ExternalLayout * Clone() const =0;
+    ExternalLayout * Clone() const { return new ExternalLayout(*this); };
 
     /**
-     * Must return the name of the external layout.
+     * \brief Return the name of the external layout.
      */
-    virtual const std::string & GetName() const =0;
+    const std::string & GetName() const {return name;}
 
     /**
-     * Must change the name of the external layout.
+     * \brief Change the name of the external layout.
      */
-    virtual void SetName(const std::string & name_) =0;
+    void SetName(const std::string & name_) {name = name_;}
 
     /**
-     * Must return the container storing initial instances.
+     * \brief Return the container storing initial instances.
      */
-    virtual const InitialInstancesContainer & GetInitialInstances() const =0;
+    const gd::InitialInstancesContainer & GetInitialInstances() const { return instances; }
 
     /**
-     * Must return the container storing initial instances.
+     * \brief Return the container storing initial instances.
      */
-    virtual InitialInstancesContainer & GetInitialInstances() =0;
+    gd::InitialInstancesContainer & GetInitialInstances() { return instances; }
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Get the user settings for the IDE.
+     */
+    const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const {return editionSettings;}
 
     /**
-     * Must return a reference to the LayoutEditorCanvasOptions object associated
-     * to the external layout. ( In most implementation, it will be a member of the external layout )
+     * \brief Get the user settings for the IDE.
      */
-    virtual const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const =0;
+    gd::LayoutEditorCanvasOptions & GetAssociatedSettings() {return editionSettings;}
+    #endif
+
+    /** \name Serialization
+     */
+    ///@{
 
     /**
-     * Must return a reference to the LayoutEditorCanvasOptions object associated
-     * to the external layout. ( In most implementation, it will be a member of the external layout )
+     * \brief Load the object from XML
      */
-    virtual gd::LayoutEditorCanvasOptions & GetAssociatedSettings() =0;
+    void LoadFromXml(const TiXmlElement * element);
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Save the object to XML
+     */
+    void SaveToXml(TiXmlElement * element) const;
+    #endif
+    ///@}
+
+private:
+
+    std::string name;
+    gd::InitialInstancesContainer instances;
+    #if defined(GD_IDE_ONLY)
+    gd::LayoutEditorCanvasOptions editionSettings;
+    #endif
+};
+
+/**
+ * \brief Functor testing ExternalLayout' name
+ */
+struct ExternalLayoutHasName : public std::binary_function<boost::shared_ptr<gd::ExternalLayout>, std::string, bool> {
+    bool operator()(const boost::shared_ptr<gd::ExternalLayout> & externalLayout, std::string name) const { return externalLayout->GetName() == name; }
 };
 
 }

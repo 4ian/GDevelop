@@ -52,8 +52,8 @@ public:
     void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) {};
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) {};
-    bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
-    bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
+    bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
+    bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
 
 private :
     const gd::Project & project;

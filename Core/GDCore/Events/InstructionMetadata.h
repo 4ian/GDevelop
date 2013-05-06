@@ -9,10 +9,10 @@
 #include "GDCore/Events/Instruction.h"
 #include <boost/shared_ptr.hpp>
 #include <wx/bitmap.h>
-class Game;
-class Scene;
-class EventsCodeGenerator;
-class EventsCodeGenerationContext;
+namespace gd { class Project; }
+namespace gd { class Layout; }
+namespace gd { class EventsCodeGenerator; }
+namespace gd { class EventsCodeGenerationContext; }
 
 namespace gd
 {
@@ -36,13 +36,6 @@ public:
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
     std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
-
-    /**
-     * Set the default value used in editor or if an optional parameter is empty during code generation.
-     */
-    ParameterMetadata & SetDefaultValue(std::string defaultValue_) {
-        defaultValue = defaultValue_;
-        return *this; };
 };
 
 /**
@@ -54,7 +47,14 @@ class GD_CORE_API InstructionMetadata
 {
 public:
 
-    InstructionMetadata(std::string extensionNamespace);
+    InstructionMetadata(const std::string & extensionNamespace,
+                        const std::string & name,
+                        const std::string & fullname,
+                        const std::string & description,
+                        const std::string & sentence,
+                        const std::string & group,
+                        const std::string & icon,
+                        const std::string & smallicon);
     virtual ~InstructionMetadata() {};
 
     const std::string & GetFullName() const { return fullname; }
@@ -63,15 +63,7 @@ public:
     const std::string & GetGroup() const { return group; }
     const wxBitmap & GetBitmapIcon() const { return icon; }
     const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }
-
-    std::string fullname;
-    std::string description;
-    std::string sentence;
-    std::string group;
-    wxBitmap icon;
-    wxBitmap smallicon;
-    bool canHaveSubInstructions;
-    std::vector < ParameterMetadata > parameters;
+    bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
     /**
      * Notify that the instruction can have sub instructions.
@@ -105,50 +97,60 @@ public:
      * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
      * \param parameterIsOptional true if the parameter must be optional, false otherwise.
      */
-    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    InstructionMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * Add a parameter not displayed in editor.
      * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
      */
-    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    InstructionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
+    /**
+     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     *
+     * \see AddParameter
+     */
+    InstructionMetadata & SetDefaultValue(std::string defaultValue_)
+    {
+        if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
+        return *this;
+    };
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
      */
-    class CppCallingInformation
+    class ExtraInformation
     {
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
-        CppCallingInformation() : accessType(Reference), doNotEncloseInstructionCodeWithinBrackets(false) {};
+        ExtraInformation() : accessType(Reference), doNotEncloseInstructionCodeWithinBrackets(false) {};
 
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
-            cppCallingName = cppCallingName_;
+            functionCallName = cppCallingName_;
             return *this;
         }
 
         /**
          * Declare if the instruction ( condition or action ) being declared is manipulating something in a standard way.
          */
-        CppCallingInformation & SetManipulatedType(const std::string & type_)
+        ExtraInformation & SetManipulatedType(const std::string & type_)
         {
             type = type_;
             return *this;
         }
 
         /**
-         * If InstructionMetadata::CppCallingInformation::SetManipulatedType was called with "number" or "string", this function will tell the code generator
+         * If InstructionMetadata::ExtraInformation::SetManipulatedType was called with "number" or "string", this function will tell the code generator
          * the name of the getter function used to retrieve the data value.
          *
          * Usage example:
          * \code
-         *  DECLARE_OBJECT_ACTION("String",
+         *  obj.AddAction("String",
          *                 _("Change the string"),
          *                 _("Change the string of a text"),
          *                 _("Do _PARAM2__PARAM1_ to the string of _PARAM0_"),
@@ -156,16 +158,16 @@ public:
          *                 "CppPlatform/Extensions/text24.png",
          *                 "CppPlatform/Extensions/text.png");
          *
-         *      instrInfo.AddParameter("object", _("Object"), "Text", false);
-         *      instrInfo.AddParameter("string", _("String"), "", false);
-         *      instrInfo.AddParameter("operator", _("Modification operator"), "", false);
+         *      .AddParameter("object", _("Object"), "Text", false);
+         *      .AddParameter("string", _("String"))
+         *      .AddParameter("operator", _("Modification operator"))
          *
-         *      instrInfo.cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+         *      .codeExtraInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
          *
          *  DECLARE_END_OBJECT_ACTION()
          * \endcode
          */
-        CppCallingInformation & SetAssociatedGetter(const std::string & getter)
+        ExtraInformation & SetAssociatedGetter(const std::string & getter)
         {
             optionalAssociatedInstruction = getter;
             accessType = MutatorAndOrAccessor;
@@ -175,7 +177,7 @@ public:
         /**
          * Set that the function is located in a specific include file
          */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
@@ -184,7 +186,7 @@ public:
         /**
          * Set that the instruction should not be enclose within brackets ( { } )
          */
-        CppCallingInformation & DoNotEncloseInstructionCodeWithinBrackets(bool disableBrackets = true)
+        ExtraInformation & DoNotEncloseInstructionCodeWithinBrackets(bool disableBrackets = true)
         {
             doNotEncloseInstructionCodeWithinBrackets = disableBrackets;
             return *this;
@@ -195,16 +197,16 @@ public:
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
         }
 
-        std::string cppCallingName;
+        std::string functionCallName;
         std::string type;
         AccessType accessType;
         std::string optionalAssociatedInstruction;
@@ -212,13 +214,22 @@ public:
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation; ///< Information about how generate C++ code for the instruction
+    ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 
     /** Don't use this constructor. Only here to fulfill std::map requirements
      */
     InstructionMetadata() {};
 
+    std::vector < ParameterMetadata > parameters;
 private:
+
+    std::string fullname;
+    std::string description;
+    std::string sentence;
+    std::string group;
+    wxBitmap icon;
+    wxBitmap smallicon;
+    bool canHaveSubInstructions;
     std::string extensionNamespace;
     bool hidden;
 };

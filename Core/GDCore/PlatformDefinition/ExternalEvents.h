@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 namespace gd { class BaseEvent; }
+namespace gd { class Project; }
 class TiXmlElement;
 
 namespace gd
@@ -22,8 +23,10 @@ namespace gd
 class ExternalEvents
 {
 public:
-    ExternalEvents() {};
+    ExternalEvents();
+    ExternalEvents(const ExternalEvents&);
     virtual ~ExternalEvents() {};
+    ExternalEvents& operator=(const ExternalEvents & rhs);
 
     /**
      * Must return a pointer to a copy of the layout.
@@ -35,56 +38,84 @@ public:
      * return new MyExternalEventsClass(*this);
      * \endcode
      */
-    virtual ExternalEvents * Clone() const =0;
+    virtual ExternalEvents * Clone() const { return new ExternalEvents(*this); };
 
     /**
-     * Must return the name of the external events sheet.
+     * \brief Get external events name
      */
-    virtual const std::string & GetName() const = 0;
+    virtual const std::string & GetName() const {return name;};
 
     /**
-     * Must change the name of the external events sheet.
+     * \brief Change external events name
      */
-    virtual void SetName(const std::string & name_) = 0;
+    virtual void SetName(const std::string & name_) {name = name_;};
 
     /**
-     * Get the scene associated with external events.
+     * \brief Get the layout associated with external events.
+     *
+     * This is used in the IDE to remember the layout used to edit the external events.
      */
-    virtual const std::string & GetAssociatedScene() const = 0;
+    virtual const std::string & GetAssociatedLayout() const {return associatedScene;};
 
     /**
-     * Set the scene associated with external events.
-     * Useful to display objects, variables available during edition in the IDE for example.
+     * \brief Set the layout associated with external events.
      */
-    virtual void SetAssociatedScene(const std::string & name_) = 0;
+    virtual void SetAssociatedLayout(const std::string & name_) {associatedScene = name_;};
 
     /**
-     * Must return a reference to the list of events associated to the ExternalEvents class.
+     * Get the latest time of the build.
+     * Used when the IDE found that the external events can be compiled separately from scene's events.
+     *
+     * \todo This is specific to GD C++ Platform
      */
-    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const =0;
+    time_t GetLastChangeTimeStamp() const { return lastChangeTimeStamp; };
 
     /**
-     * Must return a reference to the list of events associated to the ExternalEvents class.
+     * Change the latest time of the build of the external events.
+     *
+     * \todo This is specific to GD C++ Platform
      */
-    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() =0;
-
-    /** \name Saving and loading
-     * Members functions related to saving and loading the object.
-     */
-    ///@{
+    void SetLastChangeTimeStamp(time_t newTimeStamp) { lastChangeTimeStamp = newTimeStamp; };
 
     /**
-     * Called to save the layout to a TiXmlElement.
+     * \brief Get the events.
      */
-    virtual void SaveToXml(TiXmlElement * element) const =0;
+    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
 
     /**
-     * Called to load the layout from a TiXmlElement.
+     * \brief Get the events.
      */
-    virtual void LoadFromXml(const TiXmlElement * element) =0;
-    ///@}
+    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
+
+    /**
+     * \brief Load the object from xml
+     */
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * element);
+
+    /**
+     * \brief Save the object to xml
+     */
+    virtual void SaveToXml(TiXmlElement * element) const;
 
 private:
+
+    std::string name;
+    std::string associatedScene;
+    time_t lastChangeTimeStamp; ///< Time of the last build
+    std::vector < boost::shared_ptr<BaseEvent> > events; ///< List of events
+
+    /**
+     * Initialize from another ExternalEvents. Used by copy-ctor and assign-op.
+     * Don't forget to update me if members were changed !
+     */
+    void Init(const ExternalEvents & externalEvents);
+};
+
+/**
+ * \brief Functor testing ExternalEvents' name
+ */
+struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<gd::ExternalEvents>, std::string, bool> {
+    bool operator()(const boost::shared_ptr<gd::ExternalEvents> & externalEvents, std::string name) const { return externalEvents->GetName() == name; }
 };
 
 }

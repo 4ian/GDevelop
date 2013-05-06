@@ -18,9 +18,9 @@ namespace gd
 {
 
 /**
- * \brief Allow implementations to do specific work when some changes have been made in the IDE.
+ * \brief Allows implementations to do specific work when some changes have been made in the IDE.
  *
- * \see gd::ClassWithObjects
+ * For example, the C++ Platform triggers events recompilation when some changes are made.
  *
  * \ingroup IDE
  */
@@ -36,14 +36,14 @@ public:
     ///@{
 
     /**
-     * Called when a layout was added to a project
+     * \brief Called when a layout was added to a project
      * \param project Related project
      * \param layout Layout
      */
     virtual void OnLayoutAdded(gd::Project & project, gd::Layout & layout) const {};
 
     /**
-     * Called when a layout was renamed
+     * \brief Called when a layout was renamed
      * \param project Related project
      * \param layout Layout
      * \param oldName Old name of the layout
@@ -51,14 +51,14 @@ public:
     virtual void OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const {};
 
     /**
-     * Called when a layout was removed from a project
+     * \brief Called when a layout was removed from a project
      * \param project Related project
      * \param deletedLayout Name of the removed layout
      */
     virtual void OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const {};
 
     /**
-     * Called when (layout or global) variables were modified
+     * \brief Called when (layout or global) variables were modified
      * \param project Related project
      * \param layout Layout owning the variables, if applicable
      */
@@ -72,14 +72,14 @@ public:
     ///@{
 
     /**
-     * Called when an external layout was added to a project
+     * \brief Called when an external layout was added to a project
      * \param project Related project
      * \param layout External layout
      */
     virtual void OnExternalLayoutAdded(gd::Project & project, gd::ExternalLayout & layout) const {};
 
     /**
-     * Called when an external layout was renamed
+     * \brief Called when an external layout was renamed
      * \param project Related project
      * \param layout External layout
      * \param oldName Old name of the external layout
@@ -87,7 +87,7 @@ public:
     virtual void OnExternalLayoutRenamed(gd::Project & project, gd::ExternalLayout & layout, const std::string & oldName) const {};
 
     /**
-     * Called when an external layout was removed from a project
+     * \brief Called when an external layout was removed from a project
      * \param project Related project
      * \param deletedLayout Name of the removed external layout
      */
@@ -101,14 +101,14 @@ public:
     ///@{
 
     /**
-     * Called when external events were added to a project
+     * \brief Called when external events were added to a project
      * \param project Related project
      * \param events External events
      */
     virtual void OnExternalEventsAdded(gd::Project & project, gd::ExternalEvents & events) const {};
 
     /**
-     * Called when external events were renamed
+     * \brief Called when external events were renamed
      * \param project Related project
      * \param events External events
      * \param oldName Old name of the external events
@@ -116,7 +116,7 @@ public:
     virtual void OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const std::string & oldName) const {};
 
     /**
-     * Called when external events were removed from a project
+     * \brief Called when external events were removed from a project
      * \param project Related project
      * \param deletedLayout Name of the removed external events
      */
@@ -130,7 +130,7 @@ public:
     ///@{
 
     /**
-     * Called when the events of a layout have been modified.
+     * \brief Called when the events of a layout have been modified.
      * \param project Related project
      * \param layout Layout
      * \param indirectChange true if the changes have been made "indirectly" by modifying for example some external events used by a layout
@@ -139,7 +139,7 @@ public:
     virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const {};
 
     /**
-     * Called when some external events have been modified.
+     * \brief Called when some external events have been modified.
      * \param project Related project
      * \param events External events
      * \param indirectChange true if the changes have been made "indirectly" by modifying for example some external events used by a layout
@@ -154,7 +154,7 @@ public:
     ///@{
 
     /**
-     * Called when an object has been edited
+     * \brief Called when an object has been edited
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Object
@@ -162,7 +162,7 @@ public:
     virtual void OnObjectEdited(gd::Project & project, gd::Layout * layout, gd::Object & object) const {};
 
     /**
-     * Called when an object has been edited
+     * \brief Called when an object has been edited
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Object
@@ -170,7 +170,7 @@ public:
     virtual void OnObjectAdded(gd::Project & project, gd::Layout * layout, gd::Object & object) const {};
 
     /**
-     * Called when an object has been renamed
+     * \brief Called when an object has been renamed
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Object
@@ -179,7 +179,7 @@ public:
     virtual void OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & oldName) const {};
 
     /**
-     * Called when one or more objects have been deleted
+     * \brief Called when one or more objects have been deleted
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param objectName The name of the object removed
@@ -187,7 +187,7 @@ public:
     virtual void OnObjectsDeleted(gd::Project & project, gd::Layout * layout, const std::vector<std::string> & deletedObjects) const {};
 
     /**
-     * Called when an object's variables have been changed
+     * \brief Called when an object's variables have been changed
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Object
@@ -195,7 +195,7 @@ public:
     virtual void OnObjectVariablesChanged(gd::Project & project, gd::Layout * layout, gd::Object & object) const {};
 
     /**
-     * Called when an automatism have been edited
+     * \brief Called when an automatism have been edited
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -204,7 +204,7 @@ public:
     virtual void OnAutomatismEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const {};
 
     /**
-     * Called when an automatism have been added
+     * \brief Called when an automatism have been added
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -213,7 +213,7 @@ public:
     virtual void OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const {};
 
     /**
-     * Called when an automatism have been renamed
+     * \brief Called when an automatism have been renamed
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -223,7 +223,7 @@ public:
     virtual void OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const {};
 
     /**
-     * Called when an automatism have been deleted
+     * \brief Called when an automatism have been deleted
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -232,7 +232,7 @@ public:
     virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const {};
 
     /**
-     * Called when a group have been added
+     * \brief Called when a group have been added
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param groupName The name of the group added
@@ -240,7 +240,7 @@ public:
     virtual void OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const std::string & groupName) const {};
 
     /**
-     * Called when a group has been edited
+     * \brief Called when a group has been edited
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param groupName The name of the group modified
@@ -248,7 +248,7 @@ public:
     virtual void OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const std::string & groupName) const {};
 
     /**
-     * Called when a group have been renamed
+     * \brief Called when a group have been renamed
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param groupName The name of the group modified
@@ -257,7 +257,7 @@ public:
     virtual void OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const std::string & groupName, const std::string & oldName) const {};
 
     /**
-     * Called when a group have been deleted
+     * \brief Called when a group have been deleted
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param groupName The name of the group removed
@@ -265,7 +265,7 @@ public:
     virtual void OnObjectGroupDeleted(gd::Project & project, gd::Layout * layout, const std::string & groupName) const {};
 
     /**
-     * Called when a resource have been added/removed/modified
+     * \brief Called when a resource have been added/removed/modified
      * \param project Related project
      * \param automatismName The name of the resource which have been modified
      */

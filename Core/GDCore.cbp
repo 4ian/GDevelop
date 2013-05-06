@@ -53,8 +53,14 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-system-d" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../ExtLibs/SFML/build-mingw-debug/lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -104,8 +110,14 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -155,8 +167,14 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
@@ -181,6 +199,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -203,6 +226,11 @@
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 				</Linker>
 			</Target>
 		</Build>
@@ -212,27 +240,53 @@
 			<Add option="-DGD_IDE_ONLY" />
 			<Add directory="../Core" />
 			<Add directory="../ExtLibs/boost" />
+			<Add directory="../ExtLibs/SFML/include" />
 		</Compiler>
+		<ResourceCompiler>
+			<Add directory="../Core" />
+		</ResourceCompiler>
 		<Unit filename="GDCore/CommonTools.cpp" />
 		<Unit filename="GDCore/CommonTools.h" />
 		<Unit filename="GDCore/DocMainPage.h" />
 		<Unit filename="GDCore/Events/AutomatismMetadata.cpp" />
 		<Unit filename="GDCore/Events/AutomatismMetadata.h" />
+		<Unit filename="GDCore/Events/Builtin/CommentEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/CommentEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/ForEachEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/ForEachEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/LinkEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/LinkEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/RepeatEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/RepeatEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/StandardEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/StandardEvent.h" />
+		<Unit filename="GDCore/Events/Builtin/WhileEvent.cpp" />
+		<Unit filename="GDCore/Events/Builtin/WhileEvent.h" />
 		<Unit filename="GDCore/Events/Event.cpp" />
 		<Unit filename="GDCore/Events/Event.h" />
+		<Unit filename="GDCore/Events/EventMetadata.cpp" />
+		<Unit filename="GDCore/Events/EventMetadata.h" />
+		<Unit filename="GDCore/Events/EventsCodeGenerationContext.cpp" />
+		<Unit filename="GDCore/Events/EventsCodeGenerationContext.h" />
+		<Unit filename="GDCore/Events/EventsCodeGenerator.cpp" />
+		<Unit filename="GDCore/Events/EventsCodeGenerator.h" />
+		<Unit filename="GDCore/Events/EventsCodeNameMangler.cpp" />
+		<Unit filename="GDCore/Events/EventsCodeNameMangler.h" />
 		<Unit filename="GDCore/Events/Expression.h" />
 		<Unit filename="GDCore/Events/ExpressionMetadata.cpp" />
 		<Unit filename="GDCore/Events/ExpressionMetadata.h" />
 		<Unit filename="GDCore/Events/ExpressionParser.cpp" />
 		<Unit filename="GDCore/Events/ExpressionParser.h" />
+		<Unit filename="GDCore/Events/ExpressionsCodeGeneration.cpp" />
+		<Unit filename="GDCore/Events/ExpressionsCodeGeneration.h" />
 		<Unit filename="GDCore/Events/Instruction.cpp" />
 		<Unit filename="GDCore/Events/Instruction.h" />
 		<Unit filename="GDCore/Events/InstructionMetadata.cpp" />
 		<Unit filename="GDCore/Events/InstructionMetadata.h" />
-		<Unit filename="GDCore/Events/LinkEvent.cpp" />
-		<Unit filename="GDCore/Events/LinkEvent.h" />
 		<Unit filename="GDCore/Events/ObjectMetadata.cpp" />
 		<Unit filename="GDCore/Events/ObjectMetadata.h" />
+		<Unit filename="GDCore/Events/Serialization.cpp" />
+		<Unit filename="GDCore/Events/Serialization.h" />
 		<Unit filename="GDCore/IDE/ActionSentenceFormatter.cpp" />
 		<Unit filename="GDCore/IDE/ActionSentenceFormatter.h" />
 		<Unit filename="GDCore/IDE/ArbitraryResourceWorker.cpp" />
@@ -257,8 +311,18 @@
 		<Unit filename="GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseVariableDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseVariableDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditComment.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditComment.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditExpressionDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditExpressionDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditForEachEvent.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditForEachEvent.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLayerDialog.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLayerDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLink.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLink.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditRepeatEvent.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditRepeatEvent.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditStrExpressionDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/GridSetupDialog.cpp" />
@@ -269,14 +333,15 @@
 		<Unit filename="GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/LayersEditorPanel.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/LayersEditorPanel.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasTextDnd.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasTextDnd.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.h" />
 		<Unit filename="GDCore/IDE/Dialogs/MainFrameWrapper.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/MainFrameWrapper.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ObjectListDialogsHelper.cpp" />
@@ -301,8 +366,16 @@
 		<Unit filename="GDCore/IDE/EventsVariablesFinder.h" />
 		<Unit filename="GDCore/IDE/ExpressionsCorrectnessTesting.cpp" />
 		<Unit filename="GDCore/IDE/ExpressionsCorrectnessTesting.h" />
+		<Unit filename="GDCore/IDE/ExtensionsLoader.cpp" />
+		<Unit filename="GDCore/IDE/ExtensionsLoader.h" />
 		<Unit filename="GDCore/IDE/ImagesUsedInventorizer.cpp" />
 		<Unit filename="GDCore/IDE/ImagesUsedInventorizer.h" />
+		<Unit filename="GDCore/IDE/MetadataProvider.cpp" />
+		<Unit filename="GDCore/IDE/MetadataProvider.h" />
+		<Unit filename="GDCore/IDE/PlatformLoader.cpp" />
+		<Unit filename="GDCore/IDE/PlatformLoader.h" />
+		<Unit filename="GDCore/IDE/PlatformManager.cpp" />
+		<Unit filename="GDCore/IDE/PlatformManager.h" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.cpp" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.h" />
 		<Unit filename="GDCore/IDE/ResourcesAbsolutePathChecker.cpp" />
@@ -311,6 +384,8 @@
 		<Unit filename="GDCore/IDE/ResourcesMergingHelper.h" />
 		<Unit filename="GDCore/IDE/ResourcesUnmergingHelper.cpp" />
 		<Unit filename="GDCore/IDE/ResourcesUnmergingHelper.h" />
+		<Unit filename="GDCore/IDE/SceneNameMangler.cpp" />
+		<Unit filename="GDCore/IDE/SceneNameMangler.h" />
 		<Unit filename="GDCore/IDE/TextFormatting.h" />
 		<Unit filename="GDCore/IDE/wxTools/AuiTabArt.cpp" />
 		<Unit filename="GDCore/IDE/wxTools/AuiTabArt.h" />
@@ -323,6 +398,8 @@
 		<Unit filename="GDCore/IDE/wxTools/TreeItemStringData.h" />
 		<Unit filename="GDCore/PlatformDefinition/Automatism.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Automatism.h" />
+		<Unit filename="GDCore/PlatformDefinition/AutomatismsSharedData.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/AutomatismsSharedData.h" />
 		<Unit filename="GDCore/PlatformDefinition/ChangesNotifier.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ChangesNotifier.h" />
 		<Unit filename="GDCore/PlatformDefinition/ClassWithObjects.cpp" />
@@ -331,16 +408,18 @@
 		<Unit filename="GDCore/PlatformDefinition/ExternalEvents.h" />
 		<Unit filename="GDCore/PlatformDefinition/ExternalLayout.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ExternalLayout.h" />
+		<Unit filename="GDCore/PlatformDefinition/ImageManager.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/ImageManager.h" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstance.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstance.h" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstancesContainer.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstancesContainer.h" />
-		<Unit filename="GDCore/PlatformDefinition/InstructionsMetadataHolder.cpp" />
-		<Unit filename="GDCore/PlatformDefinition/InstructionsMetadataHolder.h" />
 		<Unit filename="GDCore/PlatformDefinition/Layer.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Layer.h" />
 		<Unit filename="GDCore/PlatformDefinition/Layout.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Layout.h" />
+		<Unit filename="GDCore/PlatformDefinition/LayoutEditorPreviewer.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/LayoutEditorPreviewer.h" />
 		<Unit filename="GDCore/PlatformDefinition/Object.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Object.h" />
 		<Unit filename="GDCore/PlatformDefinition/ObjectGroup.cpp" />
@@ -353,6 +432,10 @@
 		<Unit filename="GDCore/PlatformDefinition/Project.h" />
 		<Unit filename="GDCore/PlatformDefinition/ResourcesManager.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ResourcesManager.h" />
+		<Unit filename="GDCore/PlatformDefinition/RessourcesLoader.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/RessourcesLoader.h" />
+		<Unit filename="GDCore/PlatformDefinition/SourceFile.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/SourceFile.h" />
 		<Unit filename="GDCore/PlatformDefinition/Variable.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Variable.h" />
 		<Unit filename="GDCore/PlatformDefinition/VariablesContainer.cpp" />
@@ -363,10 +446,15 @@
 		<Unit filename="GDCore/TinyXml/tinyxml.h" />
 		<Unit filename="GDCore/TinyXml/tinyxmlerror.cpp" />
 		<Unit filename="GDCore/TinyXml/tinyxmlparser.cpp" />
+		<Unit filename="GDCore/Tools/DynamicLibrariesTools.cpp" />
+		<Unit filename="GDCore/Tools/DynamicLibrariesTools.h" />
 		<Unit filename="GDCore/Tools/HelpFileAccess.cpp" />
 		<Unit filename="GDCore/Tools/HelpFileAccess.h" />
 		<Unit filename="GDCore/Tools/Locale/LocaleManager.cpp" />
 		<Unit filename="GDCore/Tools/Locale/LocaleManager.h" />
+		<Unit filename="GDCore/Tools/Version.h" />
+		<Unit filename="GDCore/Tools/VersionWrapper.cpp" />
+		<Unit filename="GDCore/Tools/VersionWrapper.h" />
 		<Unit filename="wxsmith/AdvancedEntryDialog.wxs" />
 		<Unit filename="wxsmith/ChooseAutomatismDialog.wxs" />
 		<Unit filename="wxsmith/ChooseAutomatismTypeDialog.wxs" />
@@ -374,7 +462,12 @@
 		<Unit filename="wxsmith/ChooseObjectDialog.wxs" />
 		<Unit filename="wxsmith/ChooseObjectTypeDialog.wxs" />
 		<Unit filename="wxsmith/ChooseVariableDialog.wxs" />
+		<Unit filename="wxsmith/EditComment.wxs" />
 		<Unit filename="wxsmith/EditExpressionDialog.wxs" />
+		<Unit filename="wxsmith/EditForEachEvent.wxs" />
+		<Unit filename="wxsmith/EditLayerDialog.wxs" />
+		<Unit filename="wxsmith/EditLink.wxs" />
+		<Unit filename="wxsmith/EditRepeatEvent.wxs" />
 		<Unit filename="wxsmith/EditStrExpressionDialog.wxs" />
 		<Unit filename="wxsmith/GridSetupDialog.wxs" />
 		<Unit filename="wxsmith/InstancesAdvancedPasteDialog.wxs" />
@@ -392,8 +485,8 @@
 				<doxyfile_project output_directory="doc" />
 				<doxyfile_build />
 				<doxyfile_warnings />
-				<doxyfile_output html_help="1" />
-				<doxyfile_dot class_diagrams="1" />
+				<doxyfile_output />
+				<doxyfile_dot have_dot="1" />
 				<general />
 			</DoxyBlocks>
 			<wxsmith version="1">
@@ -413,8 +506,19 @@
 					<wxPanel wxs="wxsmith/LayersEditorPanel.wxs" src="GDCore\IDE\Dialogs\LayersEditorPanel.cpp" hdr="GDCore\IDE\Dialogs\LayersEditorPanel.h" fwddecl="0" i18n="1" name="LayersEditorPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/InstancesAdvancedPasteDialog.wxs" src="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.cpp" hdr="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.h" fwddecl="0" i18n="1" name="InstancesAdvancedPasteDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.h" fwddecl="0" i18n="1" name="ChooseAutomatismTypeDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore\IDE\Dialogs\EditLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDCore\IDE\Dialogs\EditLink.cpp" hdr="GDCore\IDE\Dialogs\EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
+					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCore\IDE\Dialogs\EditComment.cpp" hdr="GDCore\IDE\Dialogs\EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
+					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCore\IDE\Dialogs\EditForEachEvent.cpp" hdr="GDCore\IDE\Dialogs\EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCore\IDE\Dialogs\EditRepeatEvent.cpp" hdr="GDCore\IDE\Dialogs\EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
 				</resources>
 			</wxsmith>
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDCore\Tools\Version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

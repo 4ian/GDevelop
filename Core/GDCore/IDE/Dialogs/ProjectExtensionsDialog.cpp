@@ -206,7 +206,7 @@ void ProjectExtensionsDialog::UpdateList()
 {
     ExtensionsList->Clear();
 
-    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Create the list of available extensions
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
@@ -245,7 +245,7 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
     wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
     if (associatedData == NULL) return;
 
-    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetCurrentPlatform().GetAllPlatformExtensions();
 
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
     {

@@ -10,7 +10,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 
 using namespace std;
@@ -147,28 +147,28 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
                                +"."+parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
     };
 
-    virtual bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
+    virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         std::string newExpression;
 
         CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
         gd::ExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseMathExpression(project, layout, callbacks) )
+        if ( !parser.ParseMathExpression(platform, project, layout, callbacks) )
             return false;
 
         expression = gd::Expression(newExpression);
         return true;
     }
 
-    virtual bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
+    virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         std::string newExpression;
 
         CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
         gd::ExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseStringExpression(project, layout, callbacks) )
+        if ( !parser.ParseStringExpression(platform, project, layout, callbacks) )
             return false;
 
         expression = gd::Expression(newExpression);
@@ -234,24 +234,24 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
+    virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         CallbacksForRemovingObject callbacks(name);
 
         gd::ExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseMathExpression(project, layout, callbacks) )
+        if ( !parser.ParseMathExpression(platform, project, layout, callbacks) )
             return false;
 
         if(callbacks.objectPresent) objectPresent = true;
         return true;
     }
 
-    virtual bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
+    virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         CallbacksForRemovingObject callbacks(name);
 
         gd::ExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseStringExpression(project, layout, callbacks) )
+        if ( !parser.ParseStringExpression(platform, project, layout, callbacks) )
             return false;
 
         if(callbacks.objectPresent) objectPresent = true;
@@ -263,13 +263,13 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
         std::string name;
 };
 
-bool EventsRefactorer::RenameObjectInActions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string oldName, std::string newName)
 {
     bool somethingModified = false;
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
-        gd::InstructionMetadata instrInfos = project.GetPlatform().GetInstructionsMetadataHolder().GetActionMetadata(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -284,7 +284,7 @@ bool EventsRefactorer::RenameObjectInActions(gd::Project & project, gd::Layout &
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
                 gd::ExpressionParser parser(oldExpression);
-                if ( parser.ParseMathExpression(project, layout, callbacks) && newExpression != oldExpression )
+                if ( parser.ParseMathExpression(platform, project, layout, callbacks) && newExpression != oldExpression )
                 {
                     somethingModified = true;
                     actions[aId].SetParameter(pNb, gd::Expression(newExpression));
@@ -299,7 +299,7 @@ bool EventsRefactorer::RenameObjectInActions(gd::Project & project, gd::Layout &
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
                 gd::ExpressionParser parser(oldExpression);
-                if ( parser.ParseStringExpression(project, layout, callbacks) && newExpression != oldExpression )
+                if ( parser.ParseStringExpression(platform, project, layout, callbacks) && newExpression != oldExpression )
                 {
                     somethingModified = true;
                     actions[aId].SetParameter(pNb, gd::Expression(newExpression));
@@ -308,19 +308,19 @@ bool EventsRefactorer::RenameObjectInActions(gd::Project & project, gd::Layout &
         }
 
         if ( !actions[aId].GetSubInstructions().empty() )
-            somethingModified = RenameObjectInActions(project, layout, actions[aId].GetSubInstructions(), oldName, newName) || somethingModified;
+            somethingModified = RenameObjectInActions(platform, project, layout, actions[aId].GetSubInstructions(), oldName, newName) || somethingModified;
     }
 
     return somethingModified;
 }
 
-bool EventsRefactorer::RenameObjectInConditions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string oldName, std::string newName)
 {
     bool somethingModified = false;
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        gd::InstructionMetadata instrInfos = project.GetPlatform().GetInstructionsMetadataHolder().GetConditionMetadata(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -335,7 +335,7 @@ bool EventsRefactorer::RenameObjectInConditions(gd::Project & project, gd::Layou
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
                 gd::ExpressionParser parser(oldExpression);
-                if ( parser.ParseMathExpression(project, layout, callbacks) )
+                if ( parser.ParseMathExpression(platform, project, layout, callbacks) )
                 {
                     somethingModified = true;
                     conditions[cId].SetParameter(pNb, gd::Expression(newExpression));
@@ -350,7 +350,7 @@ bool EventsRefactorer::RenameObjectInConditions(gd::Project & project, gd::Layou
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
                 gd::ExpressionParser parser(oldExpression);
-                if ( parser.ParseMathExpression(project, layout, callbacks) )
+                if ( parser.ParseMathExpression(platform, project, layout, callbacks) )
                 {
                     somethingModified = true;
                     conditions[cId].SetParameter(pNb, gd::Expression(newExpression));
@@ -359,20 +359,20 @@ bool EventsRefactorer::RenameObjectInConditions(gd::Project & project, gd::Layou
         }
 
         if ( !conditions[cId].GetSubInstructions().empty() )
-            somethingModified = RenameObjectInConditions(project, layout, conditions[cId].GetSubInstructions(), oldName, newName) || somethingModified;
+            somethingModified = RenameObjectInConditions(platform, project, layout, conditions[cId].GetSubInstructions(), oldName, newName) || somethingModified;
     }
 
     return somethingModified;
 }
 
-void EventsRefactorer::RenameObjectInEvents(gd::Project & project, gd::Layout & layout, vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName)
+void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
         vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
-            bool somethingModified = RenameObjectInConditions(project, layout, *conditionsVectors[j], oldName, newName);
+            bool somethingModified = RenameObjectInConditions(platform, project, layout, *conditionsVectors[j], oldName, newName);
             #if defined(GD_IDE_ONLY)
             if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
             #endif
@@ -381,17 +381,17 @@ void EventsRefactorer::RenameObjectInEvents(gd::Project & project, gd::Layout & 
         vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
-            bool somethingModified = RenameObjectInActions(project, layout, *actionsVectors[j], oldName, newName);
+            bool somethingModified = RenameObjectInActions(platform, project, layout, *actionsVectors[j], oldName, newName);
             #if defined(GD_IDE_ONLY)
             if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
             #endif
         }
 
-        if ( events[i]->CanHaveSubEvents() ) RenameObjectInEvents(project, layout, events[i]->GetSubEvents(), oldName, newName);
+        if ( events[i]->CanHaveSubEvents() ) RenameObjectInEvents(platform, project, layout, events[i]->GetSubEvents(), oldName, newName);
     }
 }
 
-bool EventsRefactorer::RemoveObjectInActions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string name)
+bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string name)
 {
     bool somethingModified = false;
 
@@ -399,7 +399,7 @@ bool EventsRefactorer::RemoveObjectInActions(gd::Project & project, gd::Layout &
     {
         bool deleteMe = false;
 
-        gd::InstructionMetadata instrInfos = project.GetPlatform().GetInstructionsMetadataHolder().GetActionMetadata(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -414,7 +414,7 @@ bool EventsRefactorer::RemoveObjectInActions(gd::Project & project, gd::Layout &
                 CallbacksForRemovingObject callbacks(name);
 
                 gd::ExpressionParser parser(actions[aId].GetParameter(pNb).GetPlainString());
-                if ( parser.ParseMathExpression(project, layout, callbacks) && callbacks.objectPresent )
+                if ( parser.ParseMathExpression(platform, project, layout, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
                     break;
@@ -426,7 +426,7 @@ bool EventsRefactorer::RemoveObjectInActions(gd::Project & project, gd::Layout &
                 CallbacksForRemovingObject callbacks(name);
 
                 gd::ExpressionParser parser(actions[aId].GetParameter(pNb).GetPlainString());
-                if ( parser.ParseStringExpression(project, layout, callbacks) && callbacks.objectPresent )
+                if ( parser.ParseStringExpression(platform, project, layout, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
                     break;
@@ -441,13 +441,13 @@ bool EventsRefactorer::RemoveObjectInActions(gd::Project & project, gd::Layout &
             actions.erase(actions.begin()+aId);
             aId--;
         }
-        else if ( !actions[aId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInActions(project, layout, actions[aId].GetSubInstructions(), name) || somethingModified;
+        else if ( !actions[aId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInActions(platform, project, layout, actions[aId].GetSubInstructions(), name) || somethingModified;
     }
 
     return somethingModified;
 }
 
-bool EventsRefactorer::RemoveObjectInConditions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string name)
+bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string name)
 {
     bool somethingModified = false;
 
@@ -455,7 +455,7 @@ bool EventsRefactorer::RemoveObjectInConditions(gd::Project & project, gd::Layou
     {
         bool deleteMe = false;
 
-        gd::InstructionMetadata instrInfos = project.GetPlatform().GetInstructionsMetadataHolder().GetConditionMetadata(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -469,7 +469,7 @@ bool EventsRefactorer::RemoveObjectInConditions(gd::Project & project, gd::Layou
                 CallbacksForRemovingObject callbacks(name);
 
                 gd::ExpressionParser parser(conditions[cId].GetParameter(pNb).GetPlainString());
-                if ( parser.ParseMathExpression(project, layout, callbacks) && callbacks.objectPresent )
+                if ( parser.ParseMathExpression(platform, project, layout, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
                     break;
@@ -481,7 +481,7 @@ bool EventsRefactorer::RemoveObjectInConditions(gd::Project & project, gd::Layou
                 CallbacksForRemovingObject callbacks(name);
 
                 gd::ExpressionParser parser(conditions[cId].GetParameter(pNb).GetPlainString());
-                if ( parser.ParseStringExpression(project, layout, callbacks) && callbacks.objectPresent )
+                if ( parser.ParseStringExpression(platform, project, layout, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
                     break;
@@ -495,20 +495,20 @@ bool EventsRefactorer::RemoveObjectInConditions(gd::Project & project, gd::Layou
             conditions.erase(conditions.begin()+cId);
             cId--;
         }
-        else if ( !conditions[cId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInConditions(project, layout, conditions[cId].GetSubInstructions(), name) || somethingModified;
+        else if ( !conditions[cId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInConditions(platform, project, layout, conditions[cId].GetSubInstructions(), name) || somethingModified;
     }
 
     return somethingModified;
 }
 
-void EventsRefactorer::RemoveObjectInEvents(gd::Project & project, gd::Layout & layout, vector < gd::BaseEventSPtr > & events, std::string name)
+void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::BaseEventSPtr > & events, std::string name)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
         vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
-            bool conditionsModified = RemoveObjectInConditions(project, layout, *conditionsVectors[j], name);
+            bool conditionsModified = RemoveObjectInConditions(platform, project, layout, *conditionsVectors[j], name);
             #if defined(GD_IDE_ONLY)
             if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
             #endif
@@ -517,13 +517,13 @@ void EventsRefactorer::RemoveObjectInEvents(gd::Project & project, gd::Layout & 
         vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
-            bool actionsModified = RemoveObjectInActions(project, layout, *actionsVectors[j], name);
+            bool actionsModified = RemoveObjectInActions(platform, project, layout, *actionsVectors[j], name);
             #if defined(GD_IDE_ONLY)
             if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
             #endif
         }
 
-        if ( events[i]->CanHaveSubEvents() ) RemoveObjectInEvents(project, layout, events[i]->GetSubEvents(), name);
+        if ( events[i]->CanHaveSubEvents() ) RemoveObjectInEvents(platform, project, layout, events[i]->GetSubEvents(), name);
     }
 }
 

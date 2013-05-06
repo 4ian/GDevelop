@@ -136,7 +136,7 @@ void ChooseAutomatismTypeDialog::RefreshList()
     automatismsList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     //Insert extension objects
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if this extension is enabled
@@ -193,7 +193,7 @@ void ChooseAutomatismTypeDialog::OnokBtClick(wxCommandEvent& event)
     if (selectedAutomatismType.empty()) return;
 
     //We need to find the extension the selected object type belongs to so as to activate it if necessary
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
     boost::shared_ptr<PlatformExtension> extension = boost::shared_ptr<PlatformExtension>();
 
 	for (unsigned int i = 0;i<extensions.size();++i)

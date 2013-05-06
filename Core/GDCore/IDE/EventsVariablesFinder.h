@@ -9,6 +9,7 @@
 #include <set>
 #include "GDCore/Events/Event.h"
 namespace gd { class Instruction; }
+namespace gd { class Platform; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 
@@ -28,7 +29,7 @@ public:
      * \param project The project to be scanned
      * \return A std::set containing the names of all global variables used
      */
-    static std::set < std::string > FindAllGlobalVariables(const gd::Project & project);
+    static std::set < std::string > FindAllGlobalVariables(const gd::Platform & platform, const gd::Project & project);
 
     /**
      * Construct a list containing the name of all layout variables used in the layout.
@@ -36,7 +37,7 @@ public:
      * \param layout The layout to be scanned
      * \return A std::set containing the names of all layout variables used
      */
-    static std::set < std::string > FindAllLayoutVariables(const gd::Project & project, const gd::Layout & layout);
+    static std::set < std::string > FindAllLayoutVariables(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout);
 
 private:
 
@@ -49,7 +50,7 @@ private:
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInInstructions(const gd::Project & project, const gd::Layout & layout, const std::vector < gd::Instruction > & instructions, bool instructionsAreConditions, const std::string & parameterType);
+    static std::set < std::string > FindArgumentsInInstructions(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const std::vector < gd::Instruction > & instructions, bool instructionsAreConditions, const std::string & parameterType);
 
     /**
      * Construct a list of the value of the arguments for parameters of type @ parameterType
@@ -60,7 +61,7 @@ private:
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInEvents(const gd::Project & project, const gd::Layout & layout, const std::vector < gd::BaseEventSPtr > & events, const std::string & parameterType);
+    static std::set < std::string > FindArgumentsInEvents(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const std::vector < gd::BaseEventSPtr > & events, const std::string & parameterType);
 
     EventsVariablesFinder() {};
     virtual ~EventsVariablesFinder() {};

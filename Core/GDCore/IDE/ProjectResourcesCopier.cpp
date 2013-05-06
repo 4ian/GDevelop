@@ -20,12 +20,14 @@ using namespace std;
 namespace gd
 {
 
-bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, std::string destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog)
+bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, std::string destinationDirectory, bool updateOriginalProject,
+                                                wxProgressDialog * optionalProgressDialog, bool askAboutAbsoluteFilenames)
 {
     //Check if there are some resources with absolute filenames
     gd::ResourcesAbsolutePathChecker absolutePathChecker;
     originalProject.ExposeResources(absolutePathChecker);
     bool copyAlsoResourcesWithAbsolutePath = ( absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
+                                               askAboutAbsoluteFilenames &&
                                                wxMessageBox(_("Some resources are using absolute filenames.\nDo you want them to be copied in the new folder of the project? If you choose No, they won't be modified."),
                                                             _("Some resources are using absolute filenames."),
                                                             wxYES_NO | wxICON_QUESTION) == wxYES );
@@ -42,7 +44,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     }
     else
     {
-        boost::shared_ptr<gd::Project> project = boost::shared_ptr<gd::Project>(originalProject.Clone());
+        boost::shared_ptr<gd::Project> project(new gd::Project(originalProject));
         project->ExposeResources(resourcesMergingHelper);
     }
 

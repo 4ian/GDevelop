@@ -12,17 +12,17 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include "GDCore/Events/Instruction.h"
-class Game;
 namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
+namespace gd { class Layout; }
+namespace gd { class EventsCodeGenerator; }
+namespace gd { class EventsCodeGenerationContext; }
+namespace gd { class Platform; }
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class Scene;
 namespace gd { class Instruction; }
 class TiXmlElement;
-class Game;
-class EventsCodeGenerator;
-class EventsCodeGenerationContext;
 class wxDC;
 
 namespace gd
@@ -42,7 +42,7 @@ class GD_CORE_API BaseEvent
 {
 public:
     BaseEvent();
-    virtual ~BaseEvent();
+    virtual ~BaseEvent() {};
 
     /**
      * Must return a pointer to a copy of the event.
@@ -81,6 +81,12 @@ public:
     virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return badSubEvents;};
 
     /**
+     * \brief Return true if the events has sub events.
+     * \warning This is only applicable when CanHaveSubEvents() return true.
+     */
+    bool HasSubEvents() const { return !GetSubEvents().empty(); }
+
+    /**
      * Event must be able to return all conditions std::vector they have.
      * Used to preprocess the conditions.
      */
@@ -102,48 +108,36 @@ public:
 
     /** \name Code generation
      * Members functions used to generate code from the event
-     *
-     * \todo For now, these methods are specially designed to work with Game Develop C++ Platform code generation
      */
     ///@{
 
     /**
-     * Generate event's code.
-     * Implementation example :
-     * \code
-        std::string outputCode;
-
-        outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
-
-        std::string ifPredicat;
-        for (unsigned int i = 0;i<conditions.size();++i)
-        {
-            if (i!=0) ifPredicat += " && ";
-            ifPredicat += "condition"+ToString(i)+"IsTrue";
-        }
-
-        if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
-        outputCode += "{\n";
-        outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
-        if ( !events.empty() ) //Sub events
-        {
-            outputCode += "\n{\n";
-            outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
-            outputCode += "}\n";
-        }
-
-        outputCode += "}\n";
-
-        return outputCode;
-     * \endcode
+     * Generate the code event : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to generate the code event ( gd::EventMetadata::codeGeneration member )
+     *
+     * \see gd::EventMetadata
      */
-    virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
+    std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
-     * Called before events are compiled
+     * Called before events are compiled : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to preprocess the event ( gd::EventMetadata::codeGeneration member )
+     *
+     * This is only done if the event MustBePreprocessed() return true.
+     *
+     * \see gd::EventMetadata
+     * \see gd::BaseEvent::MustBePreprocessed
      */
-    virtual void Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
+    /**
+     * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::codeGeneration associated to the event will be called
+     * to preprocess the event.
+     *
+     * \see gd::BaseEvent::Preprocess
+     * \see gd::EventMetadata
+     */
+    virtual bool MustBePreprocessed() { return false;}
     ///@}
 
     /** \name Serialization
@@ -158,7 +152,7 @@ public:
     /**
      * Load event from XML
      */
-    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem) {}
 
     ///@}
 
@@ -210,14 +204,14 @@ public:
      * \see EventsEditorSelection
      * \see EventsEditorItemsAreas
      */
-    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection) {return;}
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform) {return;}
 
     /**
      * Must return the height of the event when rendered.
      *
      * \note The height of the drawing must be the same as the height of the drawing made by BaseEvent::Render
      */
-    virtual unsigned int GetRenderedHeight(unsigned int width) const {return 0;};
+    virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const {return 0;};
 
     /**
      * Used by EditEvent to describe what sort of changes have been made to the event.
@@ -233,7 +227,7 @@ public:
     /**
      * Called when the user want to edit the event.
      */
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
 
     ///@}
 
@@ -270,6 +264,17 @@ BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(gd::BaseEventSPtr event)
  * \ingroup Events
  */
 std::vector < gd::BaseEventSPtr > GD_CORE_API CloneVectorOfEvents(const std::vector < gd::BaseEventSPtr > & events);
+
+/**
+ * \brief Empty event doing nothing.
+ * \see gd::BaseEvent
+ */
+class EmptyEvent : public BaseEvent
+{
+    public:
+        EmptyEvent() : BaseEvent() {};
+        virtual ~EmptyEvent() {};
+};
 
 }
 

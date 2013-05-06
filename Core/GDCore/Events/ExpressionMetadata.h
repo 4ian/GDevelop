@@ -7,8 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/bitmap.h>
 class wxString;
-class Game;
-class Scene;
+namespace gd { class Layout; }
 
 namespace gd
 {
@@ -20,9 +19,14 @@ namespace gd
  */
 class GD_CORE_API ExpressionMetadata
 {
-    public:
+public:
 
-    ExpressionMetadata(std::string extensionNamespace);
+    ExpressionMetadata(const std::string & extensionNamespace,
+                        const std::string & name,
+                        const std::string & fullname,
+                        const std::string & description,
+                        const std::string & group,
+                        const std::string & smallicon);
     virtual ~ExpressionMetadata() {};
 
     /**
@@ -30,42 +34,48 @@ class GD_CORE_API ExpressionMetadata
      */
     ExpressionMetadata & SetHidden();
 
-    std::string fullname;
-    std::string description;
-    std::string group;
-    bool shown;
-    wxBitmap smallicon;
     std::vector < gd::ParameterMetadata > parameters;
 
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
-    gd::ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    gd::ExpressionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    gd::ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::ExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     *
+     * \see AddParameter
+     */
+    ExpressionMetadata & SetDefaultValue(std::string defaultValue_)
+    {
+        if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
+        return *this;
+    };
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
      */
-    class CppCallingInformation
+    class ExtraInformation
     {
     public:
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
-            cppCallingName = cppCallingName_;
+            functionCallName = cppCallingName_;
             return *this;
         }
 
         /**
          * Set that the function is located in a specific include file
          */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
@@ -76,27 +86,38 @@ class GD_CORE_API ExpressionMetadata
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
         }
 
-        std::string cppCallingName;
+        std::string functionCallName;
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation;
+    ExtraInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fullfil std::map requirements
      */
     ExpressionMetadata() {};
 
-    private:
-        std::string extensionNamespace;
+    bool IsShown() const { return shown; }
+    const std::string & GetFullName() const { return fullname; }
+    const std::string & GetDescription() const { return description; }
+    const std::string & GetGroup() const { return group; }
+    const wxBitmap & GetBitmapIcon() const { return smallicon; }
+
+private:
+    std::string fullname;
+    std::string description;
+    std::string group;
+    bool shown;
+    wxBitmap smallicon;
+    std::string extensionNamespace;
 };
 
 /**
@@ -104,9 +125,14 @@ class GD_CORE_API ExpressionMetadata
  */
 class GD_CORE_API StrExpressionMetadata
 {
-    public:
+public:
 
-    StrExpressionMetadata(std::string extensionNamespace);
+    StrExpressionMetadata(const std::string & extensionNamespace,
+                        const std::string & name,
+                        const std::string & fullname,
+                        const std::string & description,
+                        const std::string & group,
+                        const std::string & smallicon);
     virtual ~StrExpressionMetadata() {};
 
     /**
@@ -114,42 +140,48 @@ class GD_CORE_API StrExpressionMetadata
      */
     StrExpressionMetadata & SetHidden();
 
-    std::string fullname;
-    std::string description;
-    std::string group;
-    bool shown;
-    wxBitmap smallicon;
     std::vector < gd::ParameterMetadata > parameters;
 
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
-    gd::ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    gd::StrExpressionMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    gd::ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::StrExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     *
+     * \see AddParameter
+     */
+    StrExpressionMetadata & SetDefaultValue(std::string defaultValue_)
+    {
+        if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
+        return *this;
+    };
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
      */
-    class CppCallingInformation
+    class ExtraInformation
     {
     public:
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
-            cppCallingName = cppCallingName_;
+            functionCallName = cppCallingName_;
             return *this;
         }
 
         /**
          * Set that the function is located in a specific include file
          */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
@@ -160,27 +192,38 @@ class GD_CORE_API StrExpressionMetadata
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
         };
 
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
         }
 
-        std::string cppCallingName;
+        std::string functionCallName;
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation;
+    ExtraInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fulfill std::map requirements
      */
     StrExpressionMetadata() {};
 
-    private:
-        std::string extensionNamespace;
+    bool IsShown() const { return shown; }
+    const std::string & GetFullName() const { return fullname; }
+    const std::string & GetDescription() const { return description; }
+    const std::string & GetGroup() const { return group; }
+    const wxBitmap & GetBitmapIcon() const { return smallicon; }
+
+private:
+    std::string fullname;
+    std::string description;
+    std::string group;
+    bool shown;
+    wxBitmap smallicon;
+    std::string extensionNamespace;
 };
 
 }

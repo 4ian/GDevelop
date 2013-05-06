@@ -2,15 +2,14 @@
  *  Game Develop
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
-#include "GDCore/Events/LinkEvent.h"
+
+#include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
 
 namespace gd
 {
 
-LinkEvent::~LinkEvent()
+AutomatismsSharedData::~AutomatismsSharedData()
 {
-}
+};
 
 }
-
-

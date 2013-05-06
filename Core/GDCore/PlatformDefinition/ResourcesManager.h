@@ -27,49 +27,41 @@ class GD_CORE_API Resource
 public:
     Resource() {};
     ~Resource() {};
+    virtual Resource* Clone() const { return new Resource(*this);}
+
+    /** \brief Change the name of the resource with the name passed as parameter.
+     */
+    virtual void SetName(const std::string & name_) { name = name_;}
+
+    /** \brief Return the name of the resource.
+     */
+    virtual const std::string & GetName() const {return name;}
+
+    /** \brief Change the kind of the resource
+     */
+    virtual void SetKind(const std::string & newKind) { kind = newKind; }
+
+    /** \brief Return the name of the object.
+     */
+    virtual const std::string & GetKind() const {return kind;}
+
+    /** \brief Change if the resource is user added or not
+     */
+    virtual void SetUserAdded(bool isUserAdded) {userAdded = isUserAdded;}
+
+    /** \brief Return true if the resource was added by the user
+     */
+    virtual bool IsUserAdded() const {return userAdded;}
 
     /**
-     * Must return a pointer to a copy of the resource. A such method is needed to do polymorphic copies.
-     * Just redefine this method in your derived object class like this:
-     * \code
-     * return new MyObject(*this);
-     * \endcode
-     */
-    virtual Resource* Clone() const =0;
-
-    /** Must change the name of the resource with the name passed as parameter.
-     */
-    virtual void SetName(const std::string & name) =0;
-
-    /** Must return the name of the resource.
-     */
-    virtual const std::string & GetName() const =0;
-
-    /** Must change the kind of the resource
-     */
-    virtual void SetKind(const std::string & newKind) =0;
-
-    /** Must return the name of the object.
-     */
-    virtual const std::string & GetKind() const =0;
-
-    /** Must change if the resource is user added or not
-     */
-    virtual void SetUserAdded(bool isUserAdded) =0;
-
-    /** Must return true if the resource was added by the user
-     */
-    virtual bool IsUserAdded() const =0;
-
-    /**
-     * Must return true if the resource use a file.
+     * \brief Return true if the resource use a file.
      *
      * \see GetFile
      */
     virtual bool UseFile() { return false; }
 
     /**
-     * Must return, if applicable, a reference to the string containing the file used by the resource.
+     * \brief Return, if applicable, a reference to the string containing the file used by the resource.
      * The file is relative to the project directory.
      *
      * \see UseFile
@@ -77,7 +69,7 @@ public:
     virtual std::string & GetFile() {return badStr;};
 
     /**
-     * Must return, if applicable, a reference to the string containing the file used by the resource.
+     * \brief Return, if applicable, a reference to the string containing the file used by the resource.
      * The file is relative to the project directory.
      *
      * \see UseFile
@@ -85,58 +77,141 @@ public:
     virtual const std::string & GetFile() const {return badStr;};
 
     /**
-     * Return, if applicable, a string containing the absolute filename of the resource.
+     * \brief Return, if applicable, a string containing the absolute filename of the resource.
      */
     std::string GetAbsoluteFile(const gd::Project & game) const;
 
     /**
-     * Called when a property must be edited ( i.e: it was double clicked )
+     * \brief Called when a property must be edited ( i.e: it was double clicked )
      *
      * \return true if the resource was changed
      */
     virtual bool EditProperty(gd::Project & project, const std::string & property) { return true; };
 
     /**
-     * Called when a property must be changed ( i.e: its value was changed in the property grid )
+     * \brief Called when a property must be changed ( i.e: its value was changed in the property grid )
      *
      * \return true if the resource was changed
      */
     virtual bool ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue) { return true; };
 
     /**
-     * Return a description of the main property provided by the resource ( Example : "Image file" )
+     * \brief Must return a description of the main property provided by the resource ( Example : "Image file" )
      */
     virtual void GetPropertyInformation(gd::Project & project, const std::string & property, wxString & userFriendlyName, wxString & description) const { return; };
 
     /**
-     * Called when a property must be changed ( i.e: its value was changed in the property grid )
+     * \brief Called when a property must be changed ( i.e: its value was changed in the property grid )
      *
      * \return the value of the property
      */
     virtual std::string GetProperty(gd::Project & project, const std::string & property) { return ""; };
 
     /**
-     * Return a description of the main property provided by the resource ( Example : "Image file" )
+     * \brief Return a description of the main property provided by the resource ( Example : "Image file" )
      */
     virtual std::vector<std::string> GetAllProperties(gd::Project & project) const { std::vector<std::string> noProperties; return noProperties; };
 
     /**
-     * Called when the resource must be rendered in a preview panel.
+     * \brief Called when the resource must be rendered in a preview panel.
      */
     virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game) {};
 
     /**
-     * Load an xml element.
+     * \brief Load from an xml element.
      */
     virtual void LoadFromXml(const TiXmlElement * elem) {};
 
     /**
-     * Save to an xml element.
+     * \brief Save to an xml element.
      */
     virtual void SaveToXml(TiXmlElement * elem) const {};
 
 private:
+    std::string kind;
+    std::string name;
+    bool userAdded; ///< True if the resource was added by the user, and not automatically by Game Develop.
+
     static std::string badStr;
+};
+
+/**
+ * \brief Describe an image/texture used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API ImageResource : public Resource
+{
+public:
+    ImageResource() : Resource(), smooth(true), alwaysLoaded(false) { SetKind("image"); };
+    ~ImageResource() {};
+    virtual ImageResource* Clone() const { return new ImageResource(*this);}
+
+    /**
+     * Return the file used by the resource.
+     */
+    virtual std::string & GetFile() {return file;};
+
+    /**
+     * Return the file used by the resource.
+     */
+    virtual const std::string & GetFile() const {return file;};
+
+    #if defined(GD_IDE_ONLY)
+    virtual bool UseFile() { return true; }
+
+    /**
+     * Called when the resource must be rendered in a preview panel.
+     */
+    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game);
+
+    /**
+     * Called when a property must be edited ( i.e: it was double clicked )
+     *
+     * \return true if the resource was changed
+     */
+    virtual bool EditProperty(gd::Project & project, const std::string & property);
+
+    /**
+     * Called when a property must be changed ( i.e: its value was changed in the property grid )
+     *
+     * \return true if the resource was changed
+     */
+    virtual bool ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue);
+
+    /**
+     * Called when a property must be changed ( i.e: its value was changed in the property grid )
+     *
+     * \return the value of the property
+     */
+    virtual std::string GetProperty(gd::Project & project, const std::string & property);
+
+    /**
+     * Return a description of the main property provided by the resource ( Example : "Image file" )
+     */
+    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, wxString & userFriendlyName, wxString & description) const;
+
+    /**
+     * Return a vector containing the name of all the properties of the resource
+     */
+    virtual std::vector<std::string> GetAllProperties(gd::Project & project) const;
+
+    /**
+     * Save to an xml element.
+     */
+    virtual void SaveToXml(TiXmlElement * elem) const;
+    #endif
+
+    /**
+     * Load from an xml element.
+     */
+    virtual void LoadFromXml(const TiXmlElement * elem);
+
+    bool smooth; ///< True if smoothing filter is applied
+    bool alwaysLoaded; ///< True if the image must always be loaded in memory.
+private:
+    std::string file;
 };
 
 /**
@@ -148,186 +223,212 @@ private:
 class GD_CORE_API ResourcesManager
 {
 public:
-    ResourcesManager() {};
-    virtual ~ResourcesManager() {};
+    ResourcesManager();
+    virtual ~ResourcesManager();
+    ResourcesManager(const ResourcesManager&);
+    ResourcesManager& operator=(const ResourcesManager & rhs);
 
     /**
-     * Add a resource created from a file.
-     * The resource manager is responsible for internally creating the resource.
+     * \brief Return true if a resource exists.
      */
-    virtual bool AddResource(const std::string & name, const std::string & filename) =0;
+    bool HasResource(const std::string & name) const;
 
     /**
-     * Add an already constructed resource.
+     * \brief Return a reference to a resource.
      */
-    virtual bool AddResource(const gd::Resource & resource) =0;
+    Resource & GetResource(const std::string & name);
 
     /**
-     * Remove a resource
+     * \brief Return a reference to a resource.
      */
-    virtual void RemoveResource(const std::string & name) =0;
+    const Resource & GetResource(const std::string & name) const;
 
     /**
-     * Rename a resource
+     * \brief Create a new resource but does not add it to the list
      */
-    virtual void RenameResource(const std::string & oldName, const std::string & newName) =0;
+    boost::shared_ptr<Resource> CreateResource(const std::string & kind);
 
     /**
-     * Return true if a resource exists.
+     * \brief Get a list containing the name of all of the resources.
      */
-    virtual bool HasResource(const std::string & name) const =0;
+    std::vector<std::string> GetAllResourcesList();
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Return a (smart) pointer to a resource.
+     */
+    boost::shared_ptr<gd::Resource> GetResourceSPtr(const std::string & name);
 
     /**
-     * Return a reference to a resource.
+     * \brief Add an already constructed resource
      */
-    virtual Resource & GetResource(const std::string & name) =0;
+    bool AddResource(const gd::Resource & resource);
 
     /**
-     * Return a reference to a resource.
+     * \brief Add a resource created from a file.
      */
-    virtual const Resource & GetResource(const std::string & name) const =0;
+    bool AddResource(const std::string & name, const std::string & filename);
 
     /**
-     * Get a list containing the name of all of the resources.
+     * \brief Remove a resource
      */
-    virtual std::vector<std::string> GetAllResourcesList() =0;
+    void RemoveResource(const std::string & name);
 
     /**
-     * Move a resource up in the list
+     * \brief Rename a resource
      */
-    virtual bool MoveResourceUpInList(const std::string & name) =0;
+    void RenameResource(const std::string & oldName, const std::string & newName);
 
     /**
-     * Move a resource down in the list
+     * \brief Move a resource up in the list
      */
-    virtual bool MoveResourceDownInList(const std::string & name) =0;
-
-    /** \name Folders management
-     * Members functions related to folders management.
-     */
-    ///@{
-    /**
-     * Return true if the folder exists.
-     */
-    virtual bool HasFolder(const std::string & name) const =0;
+    bool MoveResourceUpInList(const std::string & name);
 
     /**
-     * Return a reference to a folder
+     * \brief Move a resource down in the list
      */
-    virtual const ResourceFolder & GetFolder(const std::string & name) const =0;
+    bool MoveResourceDownInList(const std::string & name);
 
     /**
-     * Return a reference to a folder
+     * \brief Return true if the folder exists.
      */
-    virtual ResourceFolder & GetFolder(const std::string & name) =0;
+    bool HasFolder(const std::string & name) const;
 
     /**
-     * Remove a folder.
+     * \brief Return a reference to a folder
      */
-    virtual void RemoveFolder(const std::string & name) =0;
+    const ResourceFolder & GetFolder(const std::string & name) const;
 
     /**
-     * Create a new empty folder.
+     * \brief Return a reference to a folder
      */
-    virtual void CreateFolder(const std::string & name) =0;
+    ResourceFolder & GetFolder(const std::string & name);
 
     /**
-     * Move a folder up in the list
+     * \brief Remove a folder.
      */
-    virtual bool MoveFolderUpInList(const std::string & name) =0;
+    void RemoveFolder(const std::string & name);
 
     /**
-     * Move a folder down in the list
+     * \brief Create a new empty folder.
      */
-    virtual bool MoveFolderDownInList(const std::string & name) =0;
+    void CreateFolder(const std::string & name);
 
     /**
-     * Get a list containing the name of all of the folders.
+     * \brief Move a folder up in the list
      */
-    virtual std::vector<std::string> GetAllFolderList() =0;
-    ///@}
+    bool MoveFolderUpInList(const std::string & name);
 
     /**
-     * Load from an xml element.
+     * \brief Move a folder down in the list
      */
-    virtual void LoadFromXml(const TiXmlElement * elem) {};
+    bool MoveFolderDownInList(const std::string & name);
 
     /**
-     * Save to an xml element.
+     * \brief Get a list containing the name of all of the folders.
      */
-    virtual void SaveToXml(TiXmlElement * elem) const {};
+    std::vector<std::string> GetAllFolderList();
+
+    /**
+     * \brief Save to an xml element.
+     */
+    void SaveToXml(TiXmlElement * elem) const;
+    #endif
+
+    /**
+     * \brief Load from an xml element.
+     */
+    void LoadFromXml(const TiXmlElement * elem);
+
+private:
+    void Init(const ResourcesManager & other);
+
+    std::vector< boost::shared_ptr<Resource> > resources;
+    #if defined(GD_IDE_ONLY)
+    std::vector< ResourceFolder > folders;
+    #endif
+
+    #if defined(GD_IDE_ONLY)
+    static ResourceFolder badFolder;
+    #endif
+    static Resource badResource;
 };
 
+#if defined(GD_IDE_ONLY)
 class GD_CORE_API ResourceFolder
 {
 public:
     ResourceFolder() {};
     virtual ~ResourceFolder() {};
+    ResourceFolder(const ResourceFolder&);
+    ResourceFolder& operator=(const ResourceFolder & rhs);
 
-    /** Must change the name of the resource with the name passed as parameter.
+    /** Change the name of the folder with the name passed as parameter.
      */
-    virtual void SetName(const std::string & name) =0;
+    virtual void SetName(const std::string & name_) { name = name_;}
 
-    /** Must return the name of the resource.
+    /** Return the name of the folder.
      */
-    virtual const std::string & GetName() const =0;
+    virtual const std::string & GetName() const {return name;}
 
     /**
      * Add a resource from an already existing resource.
-     *
-     * \param name The name of the resource to add
-     * \param parentManager The resource manager containg the resource to add
      */
-    virtual void AddResource(const std::string & name, ResourcesManager & parentManager) =0;
+    virtual void AddResource(const std::string & name, gd::ResourcesManager & parentManager);
 
     /**
      * Remove a resource
      */
-    virtual void RemoveResource(const std::string & name) =0;
+    virtual void RemoveResource(const std::string & name);
 
     /**
      * Return true if a resource is in the folder.
      */
-    virtual bool HasResource(const std::string & name) const =0;
+    virtual bool HasResource(const std::string & name) const;
 
     /**
      * Return a reference to a resource.
      */
-    virtual Resource & GetResource(const std::string & name) =0;
+    virtual Resource & GetResource(const std::string & name);
 
     /**
      * Return a reference to a resource.
      */
-    virtual const Resource & GetResource(const std::string & name) const =0;
+    virtual const Resource & GetResource(const std::string & name) const;
 
     /**
-     * Get a list containing the name of all of the contained inside the folder.
+     * Get a list containing the name of all of the resources.
      */
-    virtual std::vector<std::string> GetAllResourcesList() =0;
+    virtual std::vector<std::string> GetAllResourcesList();
 
     /**
      * Move a resource up in the list
      */
-    virtual bool MoveResourceUpInList(const std::string & name) =0;
+    virtual bool MoveResourceUpInList(const std::string & name);
 
     /**
      * Move a resource down in the list
      */
-    virtual bool MoveResourceDownInList(const std::string & name) =0;
+    virtual bool MoveResourceDownInList(const std::string & name);
 
     /**
      * Load an xml element.
-     *
-     * \param elem The tinyxml root element
-     * \param parentManager The resource manager containing the resources of the project
      */
-    virtual void LoadFromXml(const TiXmlElement * elem, ResourcesManager & parentManager) =0;
+    virtual void LoadFromXml(const TiXmlElement * elem, gd::ResourcesManager & parentManager);
 
     /**
      * Save to an xml element.
      */
-    virtual void SaveToXml(TiXmlElement * elem) const =0;
+    virtual void SaveToXml(TiXmlElement * elem) const;
+
+private:
+    std::string name;
+    std::vector< boost::shared_ptr<Resource> > resources;
+
+    void Init(const ResourceFolder & other);
+    static Resource badResource;
 };
+#endif
 
 }
 

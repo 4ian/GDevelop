@@ -5,7 +5,11 @@
 #ifndef GDCORE_CLASSWITHOBJECTS_H
 #define GDCORE_CLASSWITHOBJECTS_H
 #include <string>
+#include <vector>
+#include <boost/shared_ptr.hpp>
 namespace gd { class Object; }
+namespace gd { class Project; }
+class TiXmlElement;
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -14,7 +18,7 @@ namespace gd
 /**
  * \brief Used as a base class for classes that will own objects (see gd::Object).
  *
- * For example, gd::Project inherits from this class as it have global objects.
+ * For example, gd::Project inherits from this class as it have global objects.<br>
  * gd::Layout also inherits from this class as each layout has specific objects.
  *
  * \see gd::Project
@@ -23,10 +27,13 @@ namespace gd
  *
  * \ingroup PlatformDefinition
  */
-class ClassWithObjects
+class GD_CORE_API ClassWithObjects
 {
 public:
-    ClassWithObjects() {};
+    /**
+     * \brief Default constructor creating a container without any objects.
+     */
+    ClassWithObjects();
     virtual ~ClassWithObjects() {};
 
     /** \name Objects management
@@ -35,63 +42,97 @@ public:
     ///@{
 
     /**
-     * Must return true if object called "name" exists.
+     * \brief Return true if object called \a name exists.
      */
-    virtual bool HasObjectNamed(const std::string & name) const =0;
+    bool HasObjectNamed(const std::string & name) const;
 
     /**
-     * Must return a reference to the object called "name".
+     * \brief Return a reference to the object called \a name.
      */
-    virtual Object & GetObject(const std::string & name) =0;
+    Object & GetObject(const std::string & name);
 
     /**
-     * Must return a reference to the object called "name".
+     * \brief Return a reference to the object called \a name.
      */
-    virtual const Object & GetObject(const std::string & name) const =0;
+    const gd::Object & GetObject(const std::string & name) const;
 
     /**
-     * Must return a reference to the object at position "index" in the objects list
+     * \brief Return a reference to the object at position \a index in the objects list
      */
-    virtual Object & GetObject(unsigned int index) =0;
+    Object & GetObject(unsigned int index);
 
     /**
-     * Must return a reference to the object at position "index" in the objects list
+     * \brief Return a reference to the object at position \a index in the objects list.
      */
-    virtual const Object & GetObject (unsigned int index) const =0;
+    const gd::Object & GetObject (unsigned int index) const;
 
     /**
-     * Must return the position of the object called "name" in the objects list
+     * \brief Return the position of the object called \a name in the objects list.
+     *
+     * \warning This has nothing to do with an object position on a layout. Objects put on layouts
+     * are represented thanks to the gd::InitialInstance class.
      */
-    virtual unsigned int GetObjectPosition(const std::string & name) const =0;
+    unsigned int GetObjectPosition(const std::string & name) const;
 
     /**
-     * Must return the number of object.
+     * \brief Return the number of object.
      */
-    virtual unsigned int GetObjectsCount() const =0;
+    unsigned int GetObjectsCount() const;
 
     /**
-     * Must add a new empty object of type \a objectType called \a name at the specified position in the layout list.
+     * \brief Add a new empty object of type \a objectType called \a name at the specified position in the layout list.<br>
+     *
+     * \note The object is created using the project's current platform.
      */
-    virtual void InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position) =0;
+    void InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
 
     /**
-     * Must add a new object constructed from the layout passed as parameter.
+     * \brief Must add a new object constructed from the layout passed as parameter.
      * \note No pointer or reference must be kept on the object passed as parameter.
      * \param object The object that must be copied and inserted into the project
-     * \param position Insertion position. Even if the position is invalid, the object must be inserted at the end of the objects list.
+     * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
      */
-    virtual void InsertObject(const Object & object, unsigned int position) =0;
+    void InsertObject(const gd::Object & object, unsigned int position);
 
     /**
-     * Must delete the object named "name".
+     * \brief Delete an object.
+     * \param name The name of the object to be deleted.
      */
-    virtual void RemoveObject(const std::string & name) =0;
+    void RemoveObject(const std::string & name);
 
     /**
-     * Must swap the position of the specified objects.
+     * \brief Swap the position of the specified objects.
      */
-    virtual void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex) =0;
+    void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
+
+    /**
+     * Provide a raw access to the vector containing the objects
+     */
+    std::vector < boost::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
+
+    /**
+     * Provide a raw access to the vector containing the objects
+     */
+    const std::vector < boost::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
     ///@}
+
+    /** \name Saving and loading
+     * Members functions related to saving and loading the project.
+     */
+    ///@{
+    /**
+     * \brief Save the objects to xml
+     */
+    void SaveObjectsToXml(TiXmlElement * element) const;
+
+    /**
+     * \brief Load the objects from xml
+     */
+    void LoadObjectsFromXml(gd::Project & project, const TiXmlElement * element);
+    ///@}
+
+protected:
+    std::vector < boost::shared_ptr<gd::Object> > initialObjects; ///< Objects contained.
 };
 
 }

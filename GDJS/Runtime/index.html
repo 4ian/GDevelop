@@ -13,6 +13,9 @@
 	<script src="jquery.js"></script>
 	<script src="jshashtable.js"></script>
 	<script src="gd.js"></script>
+	<script src="runtimegame.js"></script>
+	<script src="variable.js"></script>
+	<script src="variablescontainer.js"></script>
 	<script src="runtimescene.js"></script>
 	<script src="runtimeobject.js"></script>
 	<script src="spriteruntimeobject.js"></script>
@@ -30,15 +33,16 @@
 	
     var launch = function(project) {
     
+        var game = gdjs.runtimeGame($(project).find("Project"));
+    
+        //Create a renderer
         var winWidth = $(project).find("Project").find("Info").find("WindowW").attr("value");
         var winHeight = $(project).find("Project").find("Info").find("WindowH").attr("value");
-    
-        // create a renderer instance
         var renderer = PIXI.autoDetectRenderer(winWidth, winHeight);
         document.body.appendChild(renderer.view); // add the renderer view element to the DOM
     
-        // create an new instance of a pixi stage
-        var currentScene = gdjs.runtimeScene(renderer);
+        //Create the scene to be played
+        var currentScene = gdjs.runtimeScene(game, renderer);
         currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
         
         var obj = gdjs.spriteRuntimeObject(currentScene, null)

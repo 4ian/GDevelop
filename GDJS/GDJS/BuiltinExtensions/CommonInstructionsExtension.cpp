@@ -36,7 +36,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["LinkEvent"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::Link"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -72,6 +72,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["StandardEvent"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::StandardEvent"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 }

@@ -168,6 +168,10 @@
 			<Add directory="../ExtLibs/boost" />
 			<Add directory="../ExtLibs/SFML/include" />
 		</Compiler>
+		<Unit filename="GDJS/BuiltinExtensions/AdvancedExtension.cpp" />
+		<Unit filename="GDJS/BuiltinExtensions/AdvancedExtension.h" />
+		<Unit filename="GDJS/BuiltinExtensions/BaseObjectExtension.cpp" />
+		<Unit filename="GDJS/BuiltinExtensions/BaseObjectExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/CommonInstructionsExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/CommonInstructionsExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/SpriteExtension.cpp" />

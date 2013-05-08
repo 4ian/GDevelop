@@ -9,7 +9,8 @@
  */
 gdjs.runtimeObject = function(runtimeScene, objectXml)
 {
-    var that;
+    var that = {};
+    var my = {};
     
     that = {};
     that.name = $(objectXml).attr("nom") || "";
@@ -20,6 +21,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.zOrder = 0;
     that.hidden = false;
     that.layer = "";
+    my.variables = gdjs.variablesContainer();
     
     //Common members functions related to the object and its runtimeScene :
     
@@ -92,6 +94,10 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     
     that.isOnLayer = function(layer) {
         return that.layer === layer;
+    }
+    
+    that.getVariables = function() {
+        return my.variables;
     }
     
     return that;

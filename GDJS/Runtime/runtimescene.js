@@ -7,7 +7,7 @@
  * @class runtimeScene 
  * @param PixiRenderer The PIXI.Renderer to be used
  */
-gdjs.runtimeScene = function(pixiRenderer)
+gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
 {
     var that = {};
     var my = {};
@@ -17,6 +17,8 @@ gdjs.runtimeScene = function(pixiRenderer)
     my.objects = new Hashtable();
     my.pixiStage = new PIXI.Stage();
     my.latestFrameDate = new Date;
+    my.variables = gdjs.variablesContainer();
+    my.runtimeGame = runtimeGame;
     
     /**
      * Load the runtime scene from the given scene.
@@ -126,6 +128,21 @@ gdjs.runtimeScene = function(pixiRenderer)
     that.getPIXIStage = function()
     {
         return my.pixiStage;
+    }
+    
+    /**
+     * Get the runtimeGame associated to the RuntimeScene.
+     */
+    that.getGame = function()
+    {
+        return my.runtimeGame;
+    }
+    
+    /**
+     * Get the variables of the runtimeScene.
+     */
+    that.getVariables = function() {
+        return my.variables;
     }
     
     return that;

@@ -7,4 +7,4 @@ xcopy ..\Runtime\* %destDir%\Runtime\* /S /E  /D /Y
 
 set destDir="C:\Users\Florian\AppData\Local\Temp\GDTemporaries\JSPreview"
 
-xcopy ..\Runtime\* %destDir%\Runtime\* /S /E  /D /Y
+xcopy ..\Runtime\* %destDir%\* /S /E  /D /Y

@@ -65,9 +65,9 @@ boost::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(gd::
 JsPlatform::JsPlatform() :
     gd::Platform()
 {
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
 };
 

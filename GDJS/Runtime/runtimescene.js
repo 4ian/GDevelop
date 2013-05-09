@@ -19,6 +19,9 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.latestFrameDate = new Date;
     my.variables = gdjs.variablesContainer();
     my.runtimeGame = runtimeGame;
+    my.lastId = 0;
+    my.eventsObjectsMap = new Hashtable();
+    my.initialObjectsXml; 
     
     /**
      * Load the runtime scene from the given scene.
@@ -34,6 +37,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         my.pixiStage.setBackgroundColor("0x"+bgColor);
         
         //Load objects
+        my.initialObjectsXml = $(sceneXml).find("Objets");
         $(sceneXml).find("Objets").find("Objet").each( function() { 
             var objectName = $(this).attr("nom");
             
@@ -122,6 +126,29 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         return my.instances.get(name);
     }
     
+    that.markObjectForDeletion = function(obj)
+    {
+        if ( my.instances.containsKey(obj.getName()) ) {
+            
+            var objId = obj.getUniqueId();
+            var allInstances = my.instances.get(obj.getName());
+            for(var i = 0, len = allInstances.length;i<len;++i) {
+                if (allInstances[i].getUniqueId() == objId) {
+                    allInstances.remove(i);
+                    return;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Create an identifier for a new object
+     */
+    that.createNewUniqueId = function() {
+        my.lastId++;
+        return my.lastId;
+    }
+    
     /**
      * Get the PIXI.Stage associated to the RuntimeScene.
      */
@@ -145,5 +172,64 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         return my.variables;
     }
     
+    that.clearEventsObjectsMap = function() {
+        my.eventsObjectsMap.clear();
+        
+        return that;
+    }
+    
+    that.addObjectsToEventsMap = function(name, objectList) {
+        my.eventsObjectsMap.put(name, objectList);
+        return that;
+    }
+    
+    that.getEventsObjectsMap = function() {
+        return my.eventsObjectsMap;
+    }
+    
+    /**
+     * Get the XML structure representing all the initial objects of the scene.
+     */
+    that.getInitialObjectsXml = function() {
+        return my.initialObjectsXml;
+    }
+    
     return that;
+}
+
+/**
+ * Allows events to create a new object on a scene.
+ */
+gdjs.createObjectOnScene = function(runtimeScene, objectsLists, useless, objectName, x, y, layer) {
+    
+    var obj = null;
+    $(runtimeScene.getGame().getInitialObjectsXml()).find("Objet").each( function() { 
+        if ( $(this).attr("nom") === objectName ) {
+            obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
+            return false;
+        }
+    });
+    $(runtimeScene.getInitialObjectsXml()).find("Objet").each( function() { 
+        if ( $(this).attr("nom") === objectName ) {
+            obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
+            return false;
+        }
+    });
+    
+    if ( obj != null ) {
+        obj.setPosition(x,y);
+        obj.setLayer(layer);
+        runtimeScene.addObject(obj);
+        
+        //Let the new object be picked by next actions/conditions.
+        if ( objectsLists.containsKey(objectName) ) {
+            objectsLists.get(objectName).push(obj);
+        }
+    }   
+}
+
+gdjs.pickedObjectsCount = function(objectName, objectsLists) {
+    if ( objectsLists.containsKey(objectName) ) {
+        return objectsLists.get(objectName).length;
+    }
 }

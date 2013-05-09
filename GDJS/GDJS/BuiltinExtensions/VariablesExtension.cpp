@@ -40,7 +40,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "0";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
                     return "conditionTrue = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
@@ -66,7 +66,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "\"\"";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
                     return "conditionTrue = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
@@ -85,7 +85,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 return "conditionTrue = runtimeScene.getVariables().hasVariable(\""+var+"\");";
             };
         };
@@ -105,7 +105,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "0";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
@@ -132,7 +132,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "\"\"";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
@@ -159,7 +159,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "0";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
                     return "conditionTrue = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
@@ -185,7 +185,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "\"\"";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
                     return "conditionTrue = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
@@ -204,7 +204,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 return "conditionTrue = runtimeScene.getGame().getVariables().hasVariable(\""+var+"\");";
             };
         };
@@ -224,7 +224,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "0";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getGame().getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
@@ -251,7 +251,7 @@ VariablesExtension::VariablesExtension()
                     expressionCode = "\"\"";
 
                 std::string op = instruction.GetParameters()[3].GetPlainString();
-                std::string var = codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getGame().getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
@@ -272,7 +272,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string var = codeGenerator.ConvertToCppString(parameters[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
                 return "runtimeScene.getVariables().get(\""+var+"\").getValue()";
             };
         };
@@ -288,7 +288,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string var = codeGenerator.ConvertToCppString(parameters[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
                 return "runtimeScene.getVariables().get(\""+var+"\").getValue()";
             };
         };
@@ -302,7 +302,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string var = codeGenerator.ConvertToCppString(parameters[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
                 return "runtimeScene.getGame().getVariables().get(\""+var+"\").getValue()";
             };
         };
@@ -318,7 +318,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string var = codeGenerator.ConvertToCppString(parameters[1].GetPlainString());
+                std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
                 return "runtimeScene.getGame().getVariables().get(\""+var+"\").getValue()";
             };
         };

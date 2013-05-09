@@ -69,5 +69,24 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         return that.opacity;
     }
     
+    that.hide = function(enable) {
+        my.hidden = enable;
+        my.bunny.visible = !enable;
+    }
+    
+    that.getWidth = function() {
+        return my.bunny.width;
+    }
+    
+    that.getHeight = function() {
+        return my.bunny.height;
+    }
+    
+    
+    that.deleteFromScene = function(runtimeScene) {
+        runtimeScene.markObjectForDeletion(that);
+        runtimeScene.getPIXIStage().removeChild(my.bunny);
+    }
+    
     return that;
 }

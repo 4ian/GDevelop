@@ -15,46 +15,75 @@ BaseObjectExtension::BaseObjectExtension()
                           _("Base object"),
                           "Compil Games",
                           "Freeware");
+    CloneExtension("Game Develop C++ platform", "BuiltinObject");
 
     std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
     std::map<std::string, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
+    std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
+    std::map<std::string, gd::StrExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
 
-    objectActions["MettreX"].codeExtraInformation.
-        SetFunctionName("setX").SetAssociatedGetter("getX").SetIncludeFile("runtimeobject.js");
-    objectActions["MettreY"].codeExtraInformation.
-        SetFunctionName("setY").SetAssociatedGetter("getY").SetIncludeFile("runtimeobject.js");
-    objectConditions["PosX"].codeExtraInformation.
-        SetFunctionName("getX").SetIncludeFile("runtimeobject.js");
-    objectConditions["PosY"].codeExtraInformation.
-        SetFunctionName("getY").SetIncludeFile("runtimeobject.js");
-    /*objectConditions["MettreXY"].codeExtraInformation.
-        SetFunctionName("changeXY").SetIncludeFile("runtimeobject.js");*/ //TODO
-    objectActions["ChangeLayer"].codeExtraInformation.
-        SetFunctionName("setLayer").SetIncludeFile("runtimeobject.js");
-    objectConditions["Layer"].codeExtraInformation.
-        SetFunctionName("isOnLayer").SetIncludeFile("runtimeobject.js");
-    objectActions["ChangePlan"].codeExtraInformation.
-        SetFunctionName("setZOrder").SetAssociatedGetter("getZOrder").SetIncludeFile("runtimeobject.js");
-    objectConditions["Plan"].codeExtraInformation.
-        SetFunctionName("getZOrder").SetIncludeFile("runtimeobject.js");
+    objectActions["MettreX"].codeExtraInformation
+        .SetFunctionName("setX").SetAssociatedGetter("getX").SetIncludeFile("runtimeobject.js");
+    objectActions["MettreY"].codeExtraInformation
+        .SetFunctionName("setY").SetAssociatedGetter("getY").SetIncludeFile("runtimeobject.js");
+    objectConditions["PosX"].codeExtraInformation
+        .SetFunctionName("getX").SetIncludeFile("runtimeobject.js");
+    objectConditions["PosY"].codeExtraInformation
+        .SetFunctionName("getY").SetIncludeFile("runtimeobject.js");
+    /*objectConditions["MettreXY"].codeExtraInformation
+        .SetFunctionName("changeXY").SetIncludeFile("runtimeobject.js");*/ //TODO
+    objectActions["ChangeLayer"].codeExtraInformation
+        .SetFunctionName("setLayer").SetIncludeFile("runtimeobject.js");
+    objectConditions["Layer"].codeExtraInformation
+        .SetFunctionName("isOnLayer").SetIncludeFile("runtimeobject.js");
+    objectActions["ChangePlan"].codeExtraInformation
+        .SetFunctionName("setZOrder").SetAssociatedGetter("getZOrder").SetIncludeFile("runtimeobject.js");
+    objectConditions["Plan"].codeExtraInformation
+        .SetFunctionName("getZOrder").SetIncludeFile("runtimeobject.js");
+    objectActions["Cache"].codeExtraInformation
+        .SetFunctionName("hide").SetIncludeFile("runtimeobject.js");
+    objectActions["Montre"].codeExtraInformation
+        .SetFunctionName("hide").SetIncludeFile("runtimeobject.js");
+    objectConditions["Visible"].codeExtraInformation
+        .SetFunctionName("isVisible").SetIncludeFile("runtimeobject.js");
+    objectConditions["Invisible"].codeExtraInformation
+        .SetFunctionName("isHidden").SetIncludeFile("runtimeobject.js");
+    objectActions["Delete"].codeExtraInformation
+        .SetFunctionName("deleteFromScene");
+    objectActions["MettreAutourPos"].codeExtraInformation
+        .SetFunctionName("putAround");
+    objectConditions["VarObjet"].codeExtraInformation
+        .SetFunctionName("getVariableValue").SetIncludeFile("runtimeobject.js");
+    objectConditions["VarObjetTxt"].codeExtraInformation
+        .SetFunctionName("getVariableValue").SetIncludeFile("runtimeobject.js");
+    objectConditions["VarObjetDef"].codeExtraInformation
+        .SetFunctionName("hasVariable").SetIncludeFile("runtimeobject.js");
+    objectActions["ModVarObjet"].codeExtraInformation
+        .SetFunctionName("setVariableValue").SetAssociatedGetter("getVariableValue").SetIncludeFile("runtimeobject.js");
+    objectActions["ModVarObjetTxt"].codeExtraInformation
+        .SetFunctionName("setVariableValue").SetAssociatedGetter("getVariableValue").SetIncludeFile("runtimeobject.js");
 
+    objectExpressions["X"].codeExtraInformation.SetFunctionName("getX");
+    objectExpressions["Y"].codeExtraInformation.SetFunctionName("getY");
+    objectExpressions["ZOrder"].codeExtraInformation.SetFunctionName("getZOrder");
+    objectExpressions["Plan"].codeExtraInformation.SetFunctionName("getZOrder");
+    objectExpressions["Width"].codeExtraInformation.SetFunctionName("getWidth");
+    objectExpressions["Height"].codeExtraInformation.SetFunctionName("getHeight");
+    objectExpressions["Largeur"].codeExtraInformation.SetFunctionName("getWidth"); //Deprecated
+    objectExpressions["Hauteur"].codeExtraInformation.SetFunctionName("getHeight"); //Deprecated
+    objectExpressions["Variable"].codeExtraInformation.SetFunctionName("getVariableValue");
+    objectStrExpressions["VariableString"].codeExtraInformation.SetFunctionName("getVariableValue");
+
+    GetAllActions()["Create"].codeExtraInformation
+        .SetFunctionName("gdjs.createObjectOnScene");
+    GetAllActions()["CreateByName"].codeExtraInformation
+        .SetFunctionName("gdjs.createObjectOnScene");
+    GetAllExpressions()["Count"].codeExtraInformation
+        .SetFunctionName("gdjs.pickedObjectsCount");
+    GetAllConditions()["NbObjet"].codeExtraInformation
+        .SetFunctionName("gdjs.pickedObjectsCount");
 
 /*
-
-        obj.AddAction("MettreAutourPos",
-                       _("Put an object around a position"),
-                       _("Position an object around a position, with specified angle and distance."),
-                       _("Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_° and _PARAM3_ pixels distance."),
-                       _("Position"),
-                       "res/actions/positionAutour24.png",
-                       "res/actions/positionAutour.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("X position"))
-            .AddParameter("expression", _("Y position"))
-            .AddParameter("expression", _("Distance"))
-            .AddParameter("expression", _("Angle, in degrees"))
-            .codeExtraInformation.SetFunctionName("PutAroundAPosition");
 
 
         obj.AddAction("AddForceXY",
@@ -130,20 +159,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("object", _("Object"))
             .codeExtraInformation.SetFunctionName("ClearForce");
 
-
-        obj.AddAction("Delete",
-                       _("Delete an object"),
-                       _("Delete the specified object."),
-                       _("Delete object _PARAM0_"),
-                       _("Objects"),
-                       "res/actions/delete24.png",
-                       "res/actions/delete.png")
-
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("currentScene","")
-            .codeExtraInformation.SetFunctionName("DeleteFromScene");
-
-
         obj.AddAction("Duplicate",
                        _("Duplicate an object"),
                        _("Create a copy of an object"),
@@ -157,83 +172,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
             .codeExtraInformation.SetFunctionName("Duplicate");
 
-
-        obj.AddAction("ModVarObjet",
-                       _("Modify a variable of an object"),
-                       _("Modify the value of a variable of an object"),
-                       _("Do _PARAM3__PARAM2_ to variable _PARAM1_ of _PARAM0_"),
-                       _("Variables"),
-                       "res/actions/var24.png",
-                       "res/actions/var.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("expression", _("Value"))
-            .AddParameter("operator", _("Modification's sign"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
-
-
-        obj.AddAction("ModVarObjetTxt",
-                       _("Modify the text of a variable of an object"),
-                       _("Modify the text of a variable of an object"),
-                       _("Do _PARAM3__PARAM2_ to the text of variable _PARAM1_ of _PARAM0_"),
-                       _("Variables"),
-                       "res/actions/var24.png",
-                       "res/actions/var.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("string", _("Text"))
-            .AddParameter("operator", _("Modification's sign"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
-
-
-
-        obj.AddAction("Cache",
-                       _("Hide an object"),
-                       _("Hide the specified object."),
-                       _("Hide the object _PARAM0_"),
-                       _("Visibility"),
-                       "res/actions/visibilite24.png",
-                       "res/actions/visibilite.png")
-
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("SetHidden");
-
-
-        obj.AddAction("Montre",
-                       _("Show an object"),
-                       _("Show the specified object"),
-                       _("Show object _PARAM0_"),
-                       _("Visibility"),
-                       "res/actions/visibilite24.png",
-                       "res/actions/visibilite.png")
-
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("inlineCode", "false")
-            .codeExtraInformation.SetFunctionName("SetHidden");
-
-        obj.AddCondition("Visible",
-                       _("Visibility of an object"),
-                       _("Test if an object is not hidden."),
-                       _("The object _PARAM0_ is visible"),
-                       _("Visibility"),
-                       "res/conditions/visibilite24.png",
-                       "res/conditions/visibilite.png")
-
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("IsVisible");
-
-        obj.AddCondition("Invisible",
-                       _("Invisibility of an object"),
-                       _("Test if an object is hidden."),
-                       _("_PARAM0_ is hidden"),
-                       _("Visibility"),
-                       "res/conditions/visibilite24.png",
-                       "res/conditions/visibilite.png")
-
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("IsHidden");
 
         obj.AddCondition("Arret",
                        _("An object is stopped"),
@@ -271,46 +209,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Angle, in degrees"))
             .AddParameter("expression", _("Tolerance"))
             .codeExtraInformation.SetFunctionName("TestAngleOfDisplacement");
-
-        obj.AddCondition("VarObjet",
-                       _("Object's variable"),
-                       _("Test the value of a variable of an object."),
-                       _("Variable _PARAM1_ of _PARAM0_ is _PARAM3__PARAM2_"),
-                       _("Variables"),
-                       "res/conditions/var24.png",
-                       "res/conditions/var.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("expression", _("Value to test"))
-            .AddParameter("relationalOperator", _("Sign of the test"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
-
-        obj.AddCondition("VarObjetTxt",
-                       _("Text of variable of an object"),
-                       _("Test the text of variable of an object."),
-                       _("The text of variable _PARAM1_ of _PARAM0_ is _PARAM3__PARAM2_"),
-                       _("Variables"),
-                       "res/conditions/var24.png",
-                       "res/conditions/var.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("string", _("Text to test"))
-            .AddParameter("relationalOperator", _("Sign of the test"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
-
-        obj.AddCondition("VarObjetDef",
-                       _("Variable defined"),
-                       _("Test "),
-                       _("Variable _PARAM1 of _PARAM0_ is defined"),
-                       _("Variables"),
-                       "res/conditions/var24.png",
-                       "res/conditions/var.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().HasVariableNamed");
 
         obj.AddCondition("AutomatismActivated",
                        _("Automatism activated"),
@@ -432,15 +330,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
             .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
-
-        obj.AddExpression("X", _("X position"), _("X position of the object"), _("Position"), "res/actions/position.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("GetX");
-
-        obj.AddExpression("Y", _("Y position"), _("Y position of the object"), _("Position"), "res/actions/position.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("GetY");
-
         obj.AddExpression("ForceX", _("Average X coordinates of forces"), _("Average X coordinates of forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
             .codeExtraInformation.SetFunctionName("TotalForceX");
@@ -469,37 +358,6 @@ BaseObjectExtension::BaseObjectExtension()
             .SetHidden()
             .codeExtraInformation.SetFunctionName("TotalForceLength");
 
-
-        obj.AddExpression("Width", _("Object's width"), _("Object's width"), _("Size"), "res/actions/scaleWidth.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("GetWidth");
-
-        obj.AddExpression("Largeur", _("Object's width"), _("Object's width"), _("Size"), "res/actions/scaleWidth.png")
-            .AddParameter("object", _("Object"))
-
-            .SetHidden()
-            .codeExtraInformation.SetFunctionName("GetWidth");
-
-        obj.AddExpression("Height", _("Object's height"), _("Object's height"), _("Size"), "res/actions/scaleHeight.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("GetHeight");
-
-        obj.AddExpression("Hauteur", _("Object's height"), _("Object's height"), _("Size"), "res/actions/scaleHeight.png")
-            .AddParameter("object", _("Object"))
-
-            .SetHidden()
-            .codeExtraInformation.SetFunctionName("GetHeight");
-
-        obj.AddExpression("ZOrder", _("Z order of an object"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("GetZOrder");
-
-        obj.AddExpression("Plan", _("Z order of an object"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
-            .AddParameter("object", _("Object"))
-
-            .SetHidden()
-            .codeExtraInformation.SetFunctionName("GetZOrder");
-
         obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Object"))
@@ -511,35 +369,8 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("object", _("Object"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("GetSqDistanceWithObject");
-
-        obj.AddExpression("Variable", _("Object's variable"), _("Object's variable"), _("Variables"), "res/actions/var.png")
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().GetVariableValue");
-
-        obj.AddStrExpression("VariableString", _("Object's variable"), _("Text of variable of an object"), _("Variables"), "res/actions/var.png")
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().GetVariableString");
-
 */
 /*
-
-    AddAction("Create",
-                   _("Create an object"),
-                   _("Create an object at specified position"),
-                   _("Create object _PARAM3_ at position _PARAM4_;_PARAM5_"),
-                   _("Objects"),
-                   "res/actions/create24.png",
-                   "res/actions/create.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "3")
-        .AddCodeOnlyParameter("inlineCode", "0") //Useless parameter
-        .AddParameter("object", _("Object to create"))
-        .AddParameter("expression", _("X position"))
-        .AddParameter("expression", _("Y position"))
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .codeExtraInformation.SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("CreateByName",
                    _("Create an object from its name"),
@@ -658,21 +489,6 @@ BaseObjectExtension::BaseObjectExtension()
 
 
 
-    AddCondition("NbObjet",
-                   _("Number of objects"),
-                   _("Test the number of concerned objects."),
-                   _("The number of _PARAM0_ is _PARAM3__PARAM2_"),
-                   _("Objects"),
-                   "res/conditions/nbObjet24.png",
-                   "res/conditions/nbObjet.png")
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddParameter("expression", _("Value to test"))
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
-
     AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
                    _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
@@ -686,14 +502,5 @@ BaseObjectExtension::BaseObjectExtension()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
-
-    AddExpression("Count", _("Number of objects"), _("Count the number of specified objects currently concerned"), _("Objects"), "res/conditions/nbObjet.png")
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
 */
 }

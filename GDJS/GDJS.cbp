@@ -176,6 +176,8 @@
 		<Unit filename="GDJS/BuiltinExtensions/CommonInstructionsExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/SpriteExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/SpriteExtension.h" />
+		<Unit filename="GDJS/BuiltinExtensions/VariablesExtension.cpp" />
+		<Unit filename="GDJS/BuiltinExtensions/VariablesExtension.h" />
 		<Unit filename="GDJS/EventsCodeGenerator.cpp" />
 		<Unit filename="GDJS/EventsCodeGenerator.h" />
 		<Unit filename="GDJS/Exporter.cpp" />

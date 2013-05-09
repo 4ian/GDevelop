@@ -12,6 +12,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/CommonTools.h"
 #include "GDJS/JsPlatform.h"
 #include "GDJS/EventsCodeGenerator.h"
 
@@ -283,7 +284,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
     {
         if ( !context.ObjectAlreadyDeclared(*it) )
         {
-            declarationsCode += "var "+ManObjListName(*it) +" = runtimeScene.getObjects(\""+ConvertToCppString(*it)+"\").slice(0);\n";
+            declarationsCode += "var "+ManObjListName(*it) +" = runtimeScene.getObjects(\""+ConvertToString(*it)+"\").slice(0);\n";
             context.SetObjectDeclared(*it);
         }
         else
@@ -313,6 +314,13 @@ std::string EventsCodeGenerator::GenerateScopeBegin(gd::EventsCodeGenerationCont
 {
     //Generate a list of variables declared in the parent scope
     std::string scopeInheritedVariables = extraVariable;
+    for ( set<string>::iterator it = context.GetObjectsListsAlreadyDeclared().begin() ; it != context.GetObjectsListsAlreadyDeclared().end(); ++it )
+    {
+        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
+
+        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
+        scopeInheritedVariables += ManObjListName(*it);
+    }
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
         if ( !context.ObjectAlreadyDeclared(*it) ) continue;
@@ -328,12 +336,19 @@ std::string EventsCodeGenerator::GenerateScopeBegin(gd::EventsCodeGenerationCont
         scopeInheritedVariables += ManObjListName(*it);
     }
 
-    return "( function("+scopeInheritedVariables+") {\n";
+    return "{( function("+scopeInheritedVariables+") {\n";
 };
 std::string EventsCodeGenerator::GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable) const
 {
     //Generate a list of variables declared in the parent scope
     std::string scopeInheritedVariables = extraVariable;
+    for ( set<string>::iterator it = context.GetObjectsListsAlreadyDeclared().begin() ; it != context.GetObjectsListsAlreadyDeclared().end(); ++it )
+    {
+        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
+
+        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
+        scopeInheritedVariables += ManObjListName(*it);
+    }
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
         if ( !context.ObjectAlreadyDeclared(*it) ) continue;
@@ -349,8 +364,104 @@ std::string EventsCodeGenerator::GenerateScopeEnd(gd::EventsCodeGenerationContex
         scopeInheritedVariables += ManObjListName(*it);
     }
 
-    return "})("+scopeInheritedVariables+");\n";
+    return "})("+scopeInheritedVariables+");}\n";
 };
+
+std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+                                                        gd::EventsCodeGenerationContext & context,
+                                                        const std::vector < gd::Expression > & othersParameters,
+                                                        std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+{
+    std::string argOutput;
+
+    //Code only parameter type
+    if ( metadata.type == "currentScene" )
+    {
+        argOutput = "runtimeScene";
+    }
+    //Code only parameter type
+    else if ( metadata.type == "mapOfObjectListsOfParameter" )
+    {
+        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
+        if ( i < othersParameters.size() )
+        {
+            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+
+            argOutput += "runtimeScene.clearEventsObjectsMap()";
+            for (unsigned int i = 0;i<realObjects.size();++i)
+            {
+                context.ObjectsListNeeded(realObjects[i]);
+                argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+            }
+            argOutput += ".getEventsObjectsMap()";
+        }
+        else
+        {
+            return "runtimeScene.clearEventsObjectsMap().getEventsObjectsMap()";
+            ReportError();
+            cout << "Error: Could not get objects for a parameter" << endl;
+        }
+    }
+    //Code only parameter type
+    else if ( metadata.type == "mapOfObjectListsOfParameterWithoutPicking" )
+    {
+        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
+        if ( i < othersParameters.size() )
+        {
+            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+
+            argOutput += "runtimeScene.clearEventsObjectsMap()";
+            for (unsigned int i = 0;i<realObjects.size();++i)
+            {
+                context.EmptyObjectsListNeeded(realObjects[i]);
+                argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+            }
+            argOutput += ".getEventsObjectsMap()";
+        }
+        else
+        {
+            argOutput += "runtimeScene.clearEventsObjectsMap().getEventsObjectsMap()";
+            ReportError();
+            cout << "Error: Could not get objects for a parameter" << endl;
+        }
+    }
+    //Code only parameter type
+    else if ( metadata.type == "ptrToObjectOfParameter")
+    {
+        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
+        if ( i < othersParameters.size() )
+        {
+            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+
+            if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
+            {
+                //If object currently used by instruction is available, use it directly.
+                argOutput = ManObjListName(context.GetCurrentObject())+"[i]";
+            }
+            else
+            {
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                {
+                    context.ObjectsListNeeded(realObjects[i]);
+                    argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
+                }
+                argOutput += "null";
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                    argOutput += ")";
+            }
+        }
+        else
+        {
+            ReportError();
+            cout << "Error: Could not get objects for a parameter" << endl;
+            return "null";
+        }
+    }
+    else
+        return gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, othersParameters, supplementaryParametersTypes);
+
+    return argOutput;
+}
 
 EventsCodeGenerator::EventsCodeGenerator(gd::Project & project, const gd::Layout & layout) :
     gd::EventsCodeGenerator(project, layout, JsPlatform::Get())

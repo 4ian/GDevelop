@@ -30,6 +30,12 @@ public:
                                                        bool compilationForRuntime = false);
 
 protected:
+
+    virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+                                               gd::EventsCodeGenerationContext & context,
+                                               const std::vector < gd::Expression > & othersParameters,
+                                               std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
+
     virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                           const gd::ObjectMetadata & objMetadata,
                                                           std::string functionCallName,
@@ -83,7 +89,7 @@ protected:
     virtual std::string GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") const;
     virtual std::string GenerateNegatedPredicat(const std::string & predicat) const { return "!("+predicat+")"; };
     virtual std::string GenerateReferenceToBoolean(const std::string & referenceName, const std::string & referencedBoolean) { return "var "+referenceName+" = "+referencedBoolean+";\n";}
-    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "var "+boolName+" = false;\n";}
+    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "var "+boolName+" = Object(false);\n";}
 
     virtual std::string GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context);
 

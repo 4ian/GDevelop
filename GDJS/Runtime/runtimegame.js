@@ -26,5 +26,12 @@ gdjs.runtimeGame = function(xml)
         return my.xml;
     }
     
+    /**
+     * Get the XML structure representing all the initial objects of the game.
+     */
+    that.getInitialObjectsXml = function() {
+        return $(my.xml).find("Objets");
+    }
+    
     return that;
 }

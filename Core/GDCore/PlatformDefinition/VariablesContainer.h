@@ -29,35 +29,6 @@ public:
     VariablesContainer();
     virtual ~VariablesContainer() {};
 
-    /**
-     * Must return a pointer to a copy of the container.
-     * A such method is needed as the IDE may want to store copies of some variables container and so need a way to do polymorphic copies.
-     *
-     * Typical implementation example:
-     * \code
-     * return new MyContainer(*this);
-     * \endcode
-     */
-    virtual VariablesContainer * Clone() const { return new gd::VariablesContainer(*this); };
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Must construct the class from the source
-     * A such method is needed as the IDE may want to store copies of some variables container and so need a way to do polymorphic copies.
-     *
-     * Typical implementation example:
-     * \code
-     * try
-     * {
-     *     const MyContainer & castedSource = dynamic_cast<const MyContainer&>(source);
-     *     operator=(castedSource);
-     * }
-     * catch(...) { std::cout << "WARNING: Tried to create a MyContainer object from an object which is not a MyContainer"; }
-     * \endcode
-     */
-    virtual void Create(const VariablesContainer & source);
-    #endif
-
     /** \name Variables management
      * Members functions related to variables management.
      */

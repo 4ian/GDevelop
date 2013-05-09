@@ -77,11 +77,11 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //TODO : A bit of hack here..
-    //Special case : Function without name is a litteral string.
+    //Special case : Function without name is a string.
     if ( functionName.empty() )
     {
         if ( parameters.empty() ) return;
-        plainExpression += "std::string(\""+codeGenerator.ConvertToCppString(parameters[0].GetPlainString())+"\")";
+        plainExpression += codeGenerator.ConvertToStringExplicit(codeGenerator.ConvertToString(parameters[0].GetPlainString()));
 
         return;
     }

@@ -58,7 +58,7 @@ END_EVENT_TABLE()
 
 ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContainer & variablesContainer_, bool editingOnly_) :
     variablesContainer(variablesContainer_),
-    temporaryContainer(variablesContainer_.Clone()),
+    temporaryContainer(new gd::VariablesContainer(variablesContainer_)),
     editingOnly(editingOnly_),
     associatedProject(NULL),
     associatedLayout(NULL)
@@ -208,7 +208,7 @@ void ChooseVariableDialog::Refresh()
  */
 void ChooseVariableDialog::OnokBtClick(wxCommandEvent& event)
 {
-    variablesContainer.Create(*temporaryContainer);
+    variablesContainer = *temporaryContainer;
     EndModal(1);
 }
 

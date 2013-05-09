@@ -331,9 +331,9 @@ string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction 
                 outputCode += "condition"+ToString(i)+"IsTrue";
                 if (i == cId-1) outputCode += ") ";
             }
-            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeBegin(context);
+            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeBegin(context, "condition"+ToString(cId)+"IsTrue");
             outputCode += conditionCode;
-            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeEnd(context);
+            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += GenerateScopeEnd(context, "condition"+ToString(cId)+"IsTrue");
         }
     }
 
@@ -478,8 +478,117 @@ string EventsCodeGenerator::GenerateActionsListCode(vector < gd::Instruction > &
     return outputCode;
 }
 
-/**
- */
+std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+                                                        gd::EventsCodeGenerationContext & context,
+                                                        const std::vector < gd::Expression > & othersParameters,
+                                                        std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+{
+    std::string argOutput;
+
+    if ( metadata.type == "expression" || metadata.type == "camera" )
+    {
+        CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
+
+        gd::ExpressionParser parser(parameter);
+        if ( !parser.ParseMathExpression(platform, project, scene, callbacks) )
+        {
+            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+
+            argOutput = "0";
+        }
+
+        if (argOutput.empty()) argOutput = "0";
+    }
+    else if ( metadata.type == "string" || metadata.type == "layer" || metadata.type == "color" || metadata.type == "file" || metadata.type == "joyaxis" )
+    {
+        CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
+
+        gd::ExpressionParser parser(parameter);
+        if ( !parser.ParseStringExpression(platform, project, scene, callbacks) )
+        {
+            cout << "Error in text expression" << parser.firstErrorStr << endl;
+
+            argOutput = "\"\"";
+        }
+
+        if (argOutput.empty()) argOutput = "\"\"";
+    }
+    else if ( metadata.type == "relationalOperator" )
+    {
+        argOutput += parameter == "=" ? "==" :parameter;
+        if ( argOutput != "==" && argOutput != "<" && argOutput != ">" && argOutput != "<=" && argOutput != ">=" && argOutput != "!=")
+        {
+            cout << "Warning: Bad relational operator: Set to == by default." << endl;
+            argOutput = "==";
+        }
+
+        argOutput = "\""+argOutput+"\"";
+    }
+    else if ( metadata.type == "operator" )
+    {
+        argOutput += parameter;
+        if ( argOutput != "=" && argOutput != "+" && argOutput != "-" && argOutput != "/" && argOutput != "*")
+        {
+            cout << "Warning: Bad operator: Set to = by default." << endl;
+            argOutput = "=";
+        }
+
+        argOutput = "\""+argOutput+"\"";
+    }
+    else if ( metadata.type == "object" || metadata.type == "automatism" )
+    {
+        argOutput = "\""+ConvertToString(parameter)+"\"";
+    }
+    else if ( metadata.type == "key" )
+    {
+        argOutput = "\""+ConvertToString(parameter)+"\"";
+    }
+    else if (metadata.type == "objectvar" || metadata.type == "scenevar" || metadata.type == "globalvar" ||
+             metadata.type == "password" || metadata.type == "musicfile" || metadata.type == "soundfile" ||
+             metadata.type == "police")
+    {
+        argOutput = "\""+ConvertToString(parameter)+"\"";
+    }
+    else if ( metadata.type == "mouse" )
+    {
+        argOutput = "\""+ConvertToString(parameter)+"\"";
+    }
+    else if ( metadata.type == "yesorno" )
+    {
+        argOutput += (parameter == "yes" || parameter == "oui") ? GenerateTrue() : GenerateFalse();
+    }
+    else if ( metadata.type == "trueorfalse" )
+    {
+        argOutput += (parameter == "True" || parameter == "Vrai") ? GenerateTrue() : GenerateFalse();
+    }
+    //Code only parameter type
+    else if ( metadata.type == "inlineCode" )
+    {
+        argOutput += metadata.supplementaryInformation;
+    }
+    else
+    {
+        //Try supplementary types if provided
+        if ( supplementaryParametersTypes )
+        {
+            for (unsigned int i = 0;i<supplementaryParametersTypes->size();++i)
+            {
+                if ( (*supplementaryParametersTypes)[i].first == metadata.type )
+                    argOutput += (*supplementaryParametersTypes)[i].second;
+            }
+        }
+
+        //Type unknown
+        if (argOutput.empty())
+        {
+            if ( !metadata.type.empty() ) cout << "Warning: Unknown type of parameter \"" << metadata.type << "\".";
+            argOutput += "\""+ConvertToString(parameter)+"\"";
+        }
+    }
+
+    return argOutput;
+}
+
 vector<string> EventsCodeGenerator::GenerateParametersCodes(vector < gd::Expression > parameters, const vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     vector<string> arguments;
@@ -489,194 +598,11 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(vector < gd::Express
 
     for (unsigned int pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
     {
-        string argOutput;
-
         if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
             parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
-        if ( parametersInfo[pNb].type == "expression" || parametersInfo[pNb].type == "camera" )
-        {
-            CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
-
-            gd::ExpressionParser parser(parameters[pNb].GetPlainString());
-            if ( !parser.ParseMathExpression(platform, project, scene, callbacks) )
-            {
-                cout << "Error :" << parser.firstErrorStr << " in: "<< parameters[pNb].GetPlainString() << endl;
-
-                argOutput = "0";
-            }
-
-            if (argOutput.empty()) argOutput = "0";
-        }
-        else if ( parametersInfo[pNb].type == "string" || parametersInfo[pNb].type == "layer" || parametersInfo[pNb].type == "color" || parametersInfo[pNb].type == "file" || parametersInfo[pNb].type == "joyaxis" )
-        {
-            CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
-
-            gd::ExpressionParser parser(parameters[pNb].GetPlainString());
-            if ( !parser.ParseStringExpression(platform, project, scene, callbacks) )
-            {
-                cout << "Error in text expression" << parser.firstErrorStr << endl;
-
-                argOutput = "\"\"";
-            }
-
-            if (argOutput.empty()) argOutput = "\"\"";
-        }
-        else if ( parametersInfo[pNb].type == "relationalOperator" )
-        {
-            argOutput += parameters[pNb].GetPlainString() == "=" ? "==" :parameters[pNb].GetPlainString();
-            if ( argOutput != "==" && argOutput != "<" && argOutput != ">" && argOutput != "<=" && argOutput != ">=" && argOutput != "!=")
-            {
-                cout << "Warning: Bad relational operator: Set to == by default." << endl;
-                argOutput = "==";
-            }
-
-            argOutput = "\""+argOutput+"\"";
-        }
-        else if ( parametersInfo[pNb].type == "operator" )
-        {
-            argOutput += parameters[pNb].GetPlainString();
-            if ( argOutput != "=" && argOutput != "+" && argOutput != "-" && argOutput != "/" && argOutput != "*")
-            {
-                cout << "Warning: Bad operator: Set to = by default." << endl;
-                argOutput = "=";
-            }
-
-            argOutput = "\""+argOutput+"\"";
-        }
-        else if ( parametersInfo[pNb].type == "object" || parametersInfo[pNb].type == "automatism" )
-        {
-            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
-        }
-        else if ( parametersInfo[pNb].type == "key" )
-        {
-            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
-        }
-        else if (parametersInfo[pNb].type == "objectvar" || parametersInfo[pNb].type == "scenevar" || parametersInfo[pNb].type == "globalvar" ||
-                 parametersInfo[pNb].type == "password" || parametersInfo[pNb].type == "musicfile" || parametersInfo[pNb].type == "soundfile" ||
-                 parametersInfo[pNb].type == "police")
-        {
-            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
-        }
-        else if ( parametersInfo[pNb].type == "mouse" )
-        {
-            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
-        }
-        else if ( parametersInfo[pNb].type == "yesorno" )
-        {
-            argOutput += (parameters[pNb].GetPlainString() == "yes" || parameters[pNb].GetPlainString() == "oui") ? "true" : "false";
-        }
-        else if ( parametersInfo[pNb].type == "trueorfalse" )
-        {
-            argOutput += (parameters[pNb].GetPlainString() == "True" || parameters[pNb].GetPlainString() == "Vrai") ? "true" : "false";
-        }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "currentScene" )
-        {
-            argOutput += "*runtimeContext->scene";
-        }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "inlineCode" )
-        {
-            argOutput += parametersInfo[pNb].supplementaryInformation;
-        }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "mapOfObjectListsOfParameter" )
-        {
-            unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
-            if ( i < parameters.size() )
-            {
-                std::vector<std::string> realObjects = ExpandObjectsName(parameters[i].GetPlainString(), context);
-
-                argOutput += "runtimeContext->ClearObjectListsMap()";
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                {
-                    context.ObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
-                }
-                argOutput += ".ReturnObjectListsMap()";
-            }
-            else
-            {
-                argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
-                ReportError();
-                cout << "Error: Could not get objects for a parameter" << endl;
-            }
-        }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "mapOfObjectListsOfParameterWithoutPicking" )
-        {
-            unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
-            if ( i < parameters.size() )
-            {
-                std::vector<std::string> realObjects = ExpandObjectsName(parameters[i].GetPlainString(), context);
-
-                argOutput += "runtimeContext->ClearObjectListsMap()";
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                {
-                    context.EmptyObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
-                }
-                argOutput += ".ReturnObjectListsMap()";
-            }
-            else
-            {
-                argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
-                ReportError();
-                cout << "Error: Could not get objects for a parameter" << endl;
-            }
-        }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "ptrToObjectOfParameter")
-        {
-            unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
-            if ( i < parameters.size() )
-            {
-                std::vector<std::string> realObjects = ExpandObjectsName(parameters[i].GetPlainString(), context);
-
-                if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
-                {
-                    //If object currently used by instruction is available, use it directly.
-                    argOutput += ManObjListName(context.GetCurrentObject())+"[i]";
-                }
-                else
-                {
-                    for (unsigned int i = 0;i<realObjects.size();++i)
-                    {
-                        context.ObjectsListNeeded(realObjects[i]);
-                        argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
-                    }
-                    argOutput += "NULL";
-                    for (unsigned int i = 0;i<realObjects.size();++i)
-                        argOutput += ")";
-                }
-            }
-            else
-            {
-                argOutput += "NULL";
-                ReportError();
-                cout << "Error: Could not get objects for a parameter" << endl;
-            }
-        }
-        else
-        {
-            //Try supplementary types if provided
-            if ( supplementaryParametersTypes )
-            {
-                for (unsigned int i = 0;i<supplementaryParametersTypes->size();++i)
-                {
-                    if ( (*supplementaryParametersTypes)[i].first == parametersInfo[pNb].type )
-                        argOutput += (*supplementaryParametersTypes)[i].second;
-                }
-            }
-
-            //Type unknown
-            if (argOutput.empty())
-            {
-                if ( !parametersInfo[pNb].type.empty() ) cout << "Warning: Unknown type of parameter \"" << parametersInfo[pNb].type << "\".";
-                argOutput += "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
-            }
-        }
+        std::string argOutput = GenerateParameterCodes(parameters[pNb].GetPlainString(), parametersInfo[pNb], context, parameters,
+                                                       supplementaryParametersTypes);
 
         arguments.push_back(argOutput);
     }
@@ -692,7 +618,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenera
         if ( context.alreadyDeclaredObjectsLists.find(*it) == context.alreadyDeclaredObjectsLists.end() )
         {
             declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)
-                                +" = runtimeContext->GetObjectsRawPointers(\""+ConvertToCppString(*it)+"\");\n";
+                                +" = runtimeContext->GetObjectsRawPointers(\""+ConvertToString(*it)+"\");\n";
             context.alreadyDeclaredObjectsLists.insert(*it);
         }
         else
@@ -744,7 +670,7 @@ string EventsCodeGenerator::GenerateEventsListCode(vector < gd::BaseEventSPtr > 
     return output;
 }
 
-std::string EventsCodeGenerator::ConvertToCppString(std::string plainString)
+std::string EventsCodeGenerator::ConvertToString(std::string plainString)
 {
     for (size_t i = 0;i<plainString.length();++i)
     {
@@ -777,6 +703,11 @@ std::string EventsCodeGenerator::ConvertToCppString(std::string plainString)
     }
 
     return plainString;
+}
+
+std::string EventsCodeGenerator::ConvertToStringExplicit(std::string plainString)
+{
+    return "\""+ConvertToString(plainString)+"\"";
 }
 
 std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::string & objectName, const EventsCodeGenerationContext & context) const

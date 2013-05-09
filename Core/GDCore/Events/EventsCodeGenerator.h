@@ -85,38 +85,11 @@ public:
      * \param context Context used for generation
      * \param supplementaryParametersTypes Optional std::vector of new parameters types ( std::vector of pair<std::string,std::string>("type", "valueToBeInserted") )
      *
-     * Supported parameters type, and how they are used in C++ code:
-     *
-     * - object : Object name. (std::string)
-     * - expression : Mathematical expression. (double)
-     * - string : %Text expression. (std::string)
-     * - layer, color, file, joyaxis : Same as string
-     * - relationalOperator : Used to make a comparison between the function resturn value and value of the parameter preceding the relationOperator parameter. (std::string)
-     * - operator : Used to update a value using a setter and a getter. (std::string)
-     * - key, mouse, objectvar, scenevar, globalvar, password, musicfile, soundfile, police: (std::string)
-     * - trueorfalse, yesorno : (bool)
-     *
-     * <br><br>
-     * "Code only" parameters types:
-     * - currentScene: Reference to the current runtime scene ( RuntimeScene& )
-     * - inlineCode: supplementary information associated with the parameter is directly pasted in the C++ code without change.
-     * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<RuntimeObject*> *>) Example:
-     * \code
-        AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-     * \endcode
-     * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already picked.
-     * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( RuntimeObject * ). Example:
-     * \code
-    .AddParameter("object", _("Object"))
-    .AddParameter("object", _("Target object"))
-    .AddCodeOnlyParameter("ptrToObjectOfParameter", "1") //The called function will be called with this signature : Function(std::string, std::string, RuntimeObject*)
-     * \endcode
      */
-    virtual std::vector<std::string> GenerateParametersCodes(std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
+    std::vector<std::string> GenerateParametersCodes(std::vector < gd::Expression > parameters,
+                                                     const std::vector < gd::ParameterMetadata > & parametersInfo,
+                                                     EventsCodeGenerationContext & context,
+                                                     std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
     /**
      * Generate code for a single condition
@@ -147,17 +120,34 @@ public:
     virtual std::string GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context);
 
     /**
-     * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).
+     * \brief Must convert a plain string ( with line feed, quotes ) to a string that can be inserted into code.
+     * The string construction can be explicit.
      *
      * Usage example :
      * \code
-        cppCode += "std::string(\""+EventsCodeGenerator::ConvertToCppString(name)+"\")";
+        code += "std::string(\""+codeGenerator.ConvertToString(name)+"\")";
      / \endcode
      *
      * \param plainString The string to convert
-     * \return plainString which can be included in a C++ code.
+     * \return plainString which can be included into the generated code.
      */
-    std::string ConvertToCppString(std::string plainString);
+    virtual std::string ConvertToString(std::string plainString);
+
+    /**
+     * \brief Convert a plain string ( with line feed, quotes ) to a string that can be inserted into code.
+     * The string construction must be explicit : for example, quotes must be added if the target language need quotes.
+     *
+     * Usage example :
+     * \code
+        code += codeGenerator.ConvertToStringExplicit(name);
+     / \endcode
+     *
+     * \note The default implementation simply call ConvertToString and add quotes
+     *
+     * \param plainString The string to convert
+     * \return plainString which can be included into the generated code.
+     */
+    virtual std::string ConvertToStringExplicit(std::string plainString);
 
     /**
      * Declare an include file to be added
@@ -241,6 +231,48 @@ public:
 
 protected:
 
+    /**
+     * \brief Generate the code for a single parameter.
+     *
+     * Standard supported parameters type, and how they are used in code:
+     *
+     * - object : Object name -> string
+     * - expression : Mathematical expression -> number (double)
+     * - string : %Text expression -> string
+     * - layer, color, file, joyaxis : Same as string
+     * - relationalOperator : Used to make a comparison between the function resturn value and value of the parameter preceding the relationOperator parameter -> string
+     * - operator : Used to update a value using a setter and a getter -> string
+     * - key, mouse, objectvar, scenevar, globalvar, password, musicfile, soundfile, police -> string
+     * - trueorfalse, yesorno -> boolean ( See GenerateTrue/GenerateFalse ).
+     *
+     * <br><br>
+     * "Code only" parameters types:
+     * - inlineCode: supplementary information associated with the parameter is directly pasted in the code without change.
+     *
+     * <br><br>
+     * Other standard parameters type that should be implemented by platforms:
+     * - currentScene: Reference to the current runtime scene.
+     * - mapOfObjectListsOfParameter : a map containing lists of objects which are specified by the object name in another parameter. (C++: std::map <std::string, std::vector<RuntimeObject*> *>). Example:
+     * \code
+        AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
+        .AddParameter("object", _("Object"))
+        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+
+     * \endcode
+     * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already picked.
+     * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( C++: RuntimeObject * ). Example:
+     * \code
+    .AddParameter("object", _("Object"))
+    .AddParameter("object", _("Target object"))
+    .AddCodeOnlyParameter("ptrToObjectOfParameter", "1") //The called function will be called with this signature on the C++ platform: Function(std::string, std::string, RuntimeObject*)
+     * \endcode
+     */
+    virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+                                               gd::EventsCodeGenerationContext & context,
+                                               const std::vector < gd::Expression > & othersParameters,
+                                               std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
+
     virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                           const ObjectMetadata & objMetadata,
                                                           std::string functionCallName,
@@ -312,6 +344,9 @@ protected:
     std::string GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
     std::string GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, const std::string & getterStartString, unsigned int startFromArgument = 0);
     std::string GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
+
+    std::string GenerateTrue() const { return "true"; };
+    std::string GenerateFalse() const { return "false"; };
 
     gd::Project & project;
     const gd::Layout & scene;

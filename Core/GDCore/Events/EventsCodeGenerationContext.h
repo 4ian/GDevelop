@@ -86,6 +86,11 @@ public:
      */
     const std::set<std::string> & GetObjectsListsToBeDeclaredEmpty() { return emptyObjectsListsToBeDeclared; };
 
+    /**
+     * Return the objects lists which are already declared and can be used in the current context without declaration.
+     */
+    const std::set<std::string> & GetObjectsListsAlreadyDeclared() { return alreadyDeclaredObjectsLists; };
+
 private:
     std::set<std::string> alreadyDeclaredObjectsLists;
     std::set<std::string> objectsListsToBeDeclared;

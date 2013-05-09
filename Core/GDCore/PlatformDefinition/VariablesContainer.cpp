@@ -81,25 +81,10 @@ void VariablesContainer::InsertNewVariable(const std::string & name, unsigned in
 
 void VariablesContainer::InsertVariable(const gd::Variable & variable, unsigned int position)
 {
-    try
-    {
-        const Variable & castedVariable = dynamic_cast<const Variable&>(variable);
-        if (position<variables.size())
-            variables.insert(variables.begin()+position, castedVariable);
-        else
-            variables.push_back(castedVariable);
-    }
-    catch(...) { std::cout << "WARNING: Tried to add a variable which is not a GD C++ Platform Variable to a GD C++ Platform project"; }
-}
-
-void VariablesContainer::Create(const gd::VariablesContainer & source)
-{
-    try
-    {
-        const VariablesContainer & castedSource = dynamic_cast<const VariablesContainer&>(source);
-        operator=(castedSource);
-    }
-    catch(...) { std::cout << "WARNING: Tried to create a VariablesContainer object from an object which is not a VariablesContainer"; }
+    if (position<variables.size())
+        variables.insert(variables.begin()+position, variable);
+    else
+        variables.push_back(variable);
 }
 
 void VariablesContainer::SwapVariables(unsigned int firstVariableIndex, unsigned int secondVariableIndex)

@@ -43,9 +43,9 @@ VariablesExtension::VariablesExtension()
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" )
-                    return "conditionTrue = runtimeScene.getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
 
                 return "";
             };
@@ -69,9 +69,9 @@ VariablesExtension::VariablesExtension()
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == "!=" )
-                    return "conditionTrue = runtimeScene.getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
 
                 return "";
             };
@@ -86,7 +86,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
-                return "conditionTrue = runtimeScene.getVariables().hasVariable(\""+var+"\");";
+                return "conditionTrue.val = runtimeScene.getVariables().hasVariable(\""+var+"\");";
             };
         };
 
@@ -162,9 +162,9 @@ VariablesExtension::VariablesExtension()
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" )
-                    return "conditionTrue = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
 
                 return "";
             };
@@ -188,9 +188,9 @@ VariablesExtension::VariablesExtension()
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == "!=" )
-                    return "conditionTrue = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
+                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
 
                 return "";
             };

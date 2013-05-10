@@ -2,7 +2,7 @@
 /**
  * The runtimeObject represents an object being used on a RuntimeScene.
  *
- * TODO : Forces, automatisms, variables, visiblity
+ * TODO : automatisms
  *
  * @class runtimeObject
  * @constructor 
@@ -23,6 +23,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.layer = "";
     my.id = runtimeScene.createNewUniqueId();
     my.variables = gdjs.variablesContainer();
+    my.forces = [];
     
     //Common members functions related to the object and its runtimeScene :
     
@@ -154,6 +155,73 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.getCenterY = function() {
         return getHeight()/2;
+    }
+    
+    that.addForce = function(x,y, isPermanent) {
+        my.forces.push(gdjs.force(x, y, !isPermanent));
+    }
+    
+    that.addPolarForce = function(angle, len, isPermanent) {
+        var forceX = Math.cos(angle/180*3.14159)*len;
+        var forceY = Math.sin(angle/180*3.14159)*len;
+    
+        my.forces.push(gdjs.force(forceX, forceY, !isPermanent));
+    }
+    
+    that.addForceTowardPosition = function(x,y, len, isPermanent) {
+    
+        var angle = Math.atan2(y - (that.getY()+that.getCenterY()), 
+                               x - (that.getX()+that.getCenterX()));
+        
+        var forceX = Math.cos(angle)*len;
+        var forceY = Math.sin(angle)*len;
+        my.forces.push(gdjs.force(forceX, forceY, !isPermanent));
+    }
+    
+    that.clearForces = function() {
+        my.forces = [];
+    }
+    
+    that.hasNoForces = function() {
+        return my.forces.length == 0;
+    }
+    
+    that.updateForces = function() {
+        for(var i = 0;i<my.forces.length;) {
+        
+            if ( my.forces[i].isTemporary() ) {
+                my.forces.remove(i);
+            }
+            else {
+                ++i;
+            }
+        }
+    }
+    
+    that.getAverageForce = function() {
+        if ( my.forces.length == 0 ) {
+            return null;
+        }
+    
+        var averageX = 0;
+        var averageY = 0;
+        for(var i = 0, len = my.forces.length;i<len;++i) {
+            averageX += my.forces[i].getX();
+            averageY += my.forces[i].getY();
+        }
+        averageX /= my.forces.length;
+        averageY /= my.forces.length;
+        
+        var averageForce = gdjs.force(averageX, averageY);
+        return averageForce;
+    }
+    
+    that.averageForceAngleIs = function(angle, toleranceInDegrees) {
+        
+        var averageAngle = that.getAverageForce().getAngle();
+        if ( averageAngle < 0 ) averageAngle += 360;
+        
+        return Math.abs(angle-averageAngle) < toleranceInDegrees/2;
     }
     
     /**

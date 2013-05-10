@@ -17,6 +17,8 @@
 #include "GDJS/BuiltinExtensions/CommonInstructionsExtension.h"
 #include "GDJS/BuiltinExtensions/BaseObjectExtension.h"
 #include "GDJS/BuiltinExtensions/VariablesExtension.h"
+#include "GDJS/BuiltinExtensions/KeyboardExtension.h"
+#include "GDJS/BuiltinExtensions/MouseExtension.h"
 
 JsPlatform *JsPlatform::singleton = NULL;
 
@@ -67,6 +69,8 @@ JsPlatform::JsPlatform() :
 {
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new KeyboardExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MouseExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
 };

@@ -21,13 +21,24 @@ public:
      * \param events events of the scene
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \param includeFiles A reference to a set of strings where needed includes files will be stored.
-     * \return C++ code
+     * \return JS code
      */
     static std::string GenerateSceneEventsCompleteCode(gd::Project & project,
                                                        gd::Layout & scene,
                                                        std::vector < gd::BaseEventSPtr > & events,
                                                        std::set < std::string > & includeFiles,
                                                        bool compilationForRuntime = false);
+
+    /**
+     * Generate code for executing a condition list
+     *
+     * \param game Game used
+     * \param scene Scene used
+     * \param conditions std::vector of conditions
+     * \param context Context used for generation
+     * \return JS code.
+     */
+    virtual std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, gd::EventsCodeGenerationContext & context);
 
 protected:
 
@@ -59,14 +70,19 @@ protected:
                                                                       std::string parametersStr,
                                                                       std::string defaultOutput);
 
-    virtual std::string GenerateObjectListObjectCondition(const std::string & objectName,
+    virtual std::string GenerateFreeCondition(const std::vector<std::string> & arguments,
+                                              const gd::InstructionMetadata & instrInfos,
+                                              const std::string & returnBoolean,
+                                              bool conditionInverted);
+
+    virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             const std::string & returnBoolean,
                                                             bool conditionInverted);
 
-    virtual std::string GenerateObjectListAutomatismCondition(const std::string & objectName,
+    virtual std::string GenerateAutomatismCondition(const std::string & objectName,
                                                                 const std::string & automatismName,
                                                                 const gd::AutomatismMetadata & autoInfo,
                                                                 const std::vector<std::string> & arguments,
@@ -74,12 +90,12 @@ protected:
                                                                 const std::string & returnBoolean,
                                                                 bool conditionInverted);
 
-    virtual std::string GenerateObjectListObjectAction(const std::string & objectName,
+    virtual std::string GenerateObjectAction(const std::string & objectName,
                                                         const gd::ObjectMetadata & objInfo,
                                                         const std::vector<std::string> & arguments,
                                                         const gd::InstructionMetadata & instrInfos);
 
-    virtual std::string GenerateObjectListAutomatismAction(const std::string & objectName,
+    virtual std::string GenerateAutomatismAction(const std::string & objectName,
                                                             const std::string & automatismName,
                                                             const gd::AutomatismMetadata & autoInfo,
                                                             const std::vector<std::string> & arguments,
@@ -89,7 +105,7 @@ protected:
     virtual std::string GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") const;
     virtual std::string GenerateNegatedPredicat(const std::string & predicat) const { return "!("+predicat+")"; };
     virtual std::string GenerateReferenceToBoolean(const std::string & referenceName, const std::string & referencedBoolean) { return "var "+referenceName+" = "+referencedBoolean+";\n";}
-    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "var "+boolName+" = Object(false);\n";}
+    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "var "+boolName+" = { val:false };\n";}
 
     virtual std::string GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context);
 

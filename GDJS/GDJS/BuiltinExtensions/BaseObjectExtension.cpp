@@ -1,5 +1,8 @@
 #include "BaseObjectExtension.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/CommonTools.h"
 #include <wx/intl.h>
 //Ensure the wxWidgets macro "_" returns a std::string
@@ -30,8 +33,6 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("getX").SetIncludeFile("runtimeobject.js");
     objectConditions["PosY"].codeExtraInformation
         .SetFunctionName("getY").SetIncludeFile("runtimeobject.js");
-    /*objectConditions["MettreXY"].codeExtraInformation
-        .SetFunctionName("changeXY").SetIncludeFile("runtimeobject.js");*/ //TODO
     objectActions["ChangeLayer"].codeExtraInformation
         .SetFunctionName("setLayer").SetIncludeFile("runtimeobject.js");
     objectConditions["Layer"].codeExtraInformation
@@ -62,6 +63,20 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("setVariableValue").SetAssociatedGetter("getVariableValue").SetIncludeFile("runtimeobject.js");
     objectActions["ModVarObjetTxt"].codeExtraInformation
         .SetFunctionName("setVariableValue").SetAssociatedGetter("getVariableValue").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceXY"].codeExtraInformation
+        .SetFunctionName("addForce").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceAL"].codeExtraInformation
+        .SetFunctionName("addPolarForce").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceVersPos"].codeExtraInformation
+        .SetFunctionName("addForceTowardPosition").SetIncludeFile("runtimeobject.js");
+    objectActions["Arreter"].codeExtraInformation
+        .SetFunctionName("clearForces").SetIncludeFile("runtimeobject.js");
+    objectConditions["Arret"].codeExtraInformation
+        .SetFunctionName("hasNoForces").SetIncludeFile("runtimeobject.js");
+    objectConditions["Vitesse"].codeExtraInformation
+        .SetFunctionName("getAverageForce().getLength()").SetIncludeFile("runtimeobject.js");
+    objectConditions["AngleOfDisplacement"].codeExtraInformation
+        .SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
 
     objectExpressions["X"].codeExtraInformation.SetFunctionName("getX");
     objectExpressions["Y"].codeExtraInformation.SetFunctionName("getY");
@@ -73,6 +88,12 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Hauteur"].codeExtraInformation.SetFunctionName("getHeight"); //Deprecated
     objectExpressions["Variable"].codeExtraInformation.SetFunctionName("getVariableValue");
     objectStrExpressions["VariableString"].codeExtraInformation.SetFunctionName("getVariableValue");
+    objectExpressions["ForceX"].codeExtraInformation.SetFunctionName("getAverageForce().getX()");
+    objectExpressions["ForceY"].codeExtraInformation.SetFunctionName("getAverageForce().getY()");
+    objectExpressions["ForceAngle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle()");
+    objectExpressions["Angle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle()"); //Deprecated
+    objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("getAverageForce().getLength()");
+    objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("getAverageForce().getLength()"); //Deprecated
 
     GetAllActions()["Create"].codeExtraInformation
         .SetFunctionName("gdjs.createObjectOnScene");
@@ -83,54 +104,90 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllConditions()["NbObjet"].codeExtraInformation
         .SetFunctionName("gdjs.pickedObjectsCount");
 
+    {
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
+        {
+        public:
+            virtual std::string GenerateCode(gd::Instruction &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &)
+            {
+                return "runtimeScene.updateObjectsForces();";
+            };
+        };
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
+
+        GetAllActions()["MoveObjects"].codeExtraInformation
+            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+    }
+
+    {
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
+        {
+        public:
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                std::string outputCode;
+
+                std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(instruction.GetParameter(0).GetPlainString(), context);
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                {
+                    context.SetCurrentObject(realObjects[i]);
+                    context.ObjectsListNeeded(realObjects[i]);
+
+                    std::string newX, newY;
+
+                    std::string expression1Code;
+                    {
+                        gd::CallbacksForGeneratingExpressionCode callbacks(expression1Code, codeGenerator, context);
+                        gd::ExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
+                        if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression1Code.empty())
+                            expression1Code = "0";
+                    }
+
+                    std::string expression2Code;
+                    {
+                        gd::CallbacksForGeneratingExpressionCode callbacks(expression2Code, codeGenerator, context);
+                        gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
+                        if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression2Code.empty())
+                            expression2Code = "0";
+                    }
+
+                    std::string op1 = instruction.GetParameter(2).GetPlainString();
+                    if ( op1 == "=" || op1.empty() )
+                        newX = expression1Code;
+                    else if ( op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+" )
+                        newX = ManObjListName(realObjects[i])+"[i].getX() "+op1 + expression1Code;
+                    else
+                        return "";
+                    std::string op2 = instruction.GetParameter(4).GetPlainString();
+                    if ( op2 == "=" || op2.empty() )
+                        newY = expression2Code;
+                    else if ( op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+" )
+                        newY = ManObjListName(realObjects[i])+"[i].getY() "+op2 + expression2Code;
+                    else
+                        return "";
+
+                    std::string call = ManObjListName(realObjects[i])+"[i].setPosition("+newX+","+newY+")";
+
+                    outputCode += "for(var i = 0, len = "+ManObjListName(realObjects[i])+".length ;i < len;++i) {\n";
+                    outputCode += "    "+call+";\n";
+                    outputCode += "}\n";
+
+                    context.SetNoCurrentObject();
+                }
+
+                return outputCode;
+            };
+        };
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
+
+        objectActions["MettreXY"].codeExtraInformation
+            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+    }
+
+    /*[""].codeExtraInformation
+        .SetFunctionName("changeXY").SetIncludeFile("runtimeobject.js");*/ //TODO
+
 /*
-
-
-        obj.AddAction("AddForceXY",
-                       _("Add a force to an object"),
-                       _("Add a force to an object. The object will move according to\nall forces it owns. This action create the force with its X and Y coordinates."),
-                       _("Add to _PARAM0_ a force of _PARAM1_ p/s on X axis and _PARAM2_ p/s on Y axis"),
-                       _("Displacement"),
-                       "res/actions/force24.png",
-                       "res/actions/force.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("X coordinate of moving"))
-            .AddParameter("expression", _("Y coordinate of moving"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForce");
-
-        obj.AddAction("AddForceAL",
-                       _("Add a force ( angle )"),
-                       _("Add a force to an object. The object will move according to\nall forces it owns. This action creates the force using the specified angle and length."),
-                       _("Add to _PARAM0_ a force, angle : _PARAM1_° and length : _PARAM2_ pixels"),
-                       _("Displacement"),
-                       "res/actions/force24.png",
-                       "res/actions/force.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Angle"))
-            .AddParameter("expression", _("Length ( in pixels )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForceUsingPolarCoordinates");
-
-
-        obj.AddAction("AddForceVersPos",
-                       _("Add a force so as to move to a position"),
-                       _("Add a force to an object so as it moves to the position."),
-                       _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with a force of _PARAM3_ pixels"),
-                       _("Displacement"),
-                       "res/actions/force24.png",
-                       "res/actions/force.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("X position"))
-            .AddParameter("expression", _("Y position"))
-            .AddParameter("expression", _("Length ( in pixels )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForceTowardPosition");
-
-
         obj.AddAction("AddForceTournePos",
                        _("Add a force so as to move around a position"),
                        _("Add a force to an object so as it rotates toward a position.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
@@ -147,18 +204,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Damping ( Default : 0 )"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAround");
 
-
-        obj.AddAction("Arreter",
-                       _("Stop the object"),
-                       _("Stop the object by deleting all its forces."),
-                       _("Stop the object _PARAM0_"),
-                       _("Displacement"),
-                       "res/actions/arreter24.png",
-                       "res/actions/arreter.png")
-
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("ClearForce");
-
         obj.AddAction("Duplicate",
                        _("Duplicate an object"),
                        _("Create a copy of an object"),
@@ -171,44 +216,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddCodeOnlyParameter("currentScene", "")
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
             .codeExtraInformation.SetFunctionName("Duplicate");
-
-
-        obj.AddCondition("Arret",
-                       _("An object is stopped"),
-                       _("Test if an object does not move"),
-                       _("_PARAM0_ is stopped"),
-                       _("Displacement"),
-                       "res/conditions/arret24.png",
-                       "res/conditions/arret.png")
-
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("IsStopped");
-
-        obj.AddCondition("Vitesse",
-                       _("Speed of the object"),
-                       _("Test the overall speed of an object"),
-                       _("The speed of _PARAM0_ is _PARAM2_ _PARAM1_"),
-                       _("Displacement"),
-                       "res/conditions/vitesse24.png",
-                       "res/conditions/vitesse.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Speed"))
-            .AddParameter("relationalOperator", _("Sign of the test"))
-            .codeExtraInformation.SetFunctionName("TotalForceLength").SetManipulatedType("number");
-
-        obj.AddCondition("AngleOfDisplacement",
-                       _("Angle of moving"),
-                       _("Test the angle of displacement of an object"),
-                       _("The angle of displacement of _PARAM0_ is _PARAM1_ ( tolerance : _PARAM2_° )"),
-                       _("Displacement"),
-                       "res/conditions/vitesse24.png",
-                       "res/conditions/vitesse.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Angle, in degrees"))
-            .AddParameter("expression", _("Tolerance"))
-            .codeExtraInformation.SetFunctionName("TestAngleOfDisplacement");
 
         obj.AddCondition("AutomatismActivated",
                        _("Automatism activated"),
@@ -330,34 +337,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
             .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
-        obj.AddExpression("ForceX", _("Average X coordinates of forces"), _("Average X coordinates of forces"), _("Displacement"), "res/actions/force.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("TotalForceX");
-
-        obj.AddExpression("ForceY", _("Average Y coordinates of forces"), _("Average Y coordinates of forces"), _("Displacement"), "res/actions/force.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("TotalForceY");
-
-        obj.AddExpression("ForceAngle", _("Average angle of the forces"), _("Average angle of the forces"), _("Displacement"), "res/actions/force.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("TotalForceAngle");
-
-        obj.AddExpression("Angle", _("Average angle of the forces"), _("Average angle of the forces"), _("Displacement"), "res/actions/force.png")
-            .AddParameter("object", _("Object"))
-
-            .SetHidden()
-            .codeExtraInformation.SetFunctionName("TotalForceAngle");
-
-        obj.AddExpression("ForceLength", _("Average length of the forces"), _("Average length of the forces"), _("Displacement"), "res/actions/force.png")
-            .AddParameter("object", _("Object"))
-            .codeExtraInformation.SetFunctionName("TotalForceLength");
-
-        obj.AddExpression("Longueur", _("Average length of the forces"), _("Average length of the forces"), _("Displacement"), "res/actions/force.png")
-            .AddParameter("object", _("Object"))
-
-            .SetHidden()
-            .codeExtraInformation.SetFunctionName("TotalForceLength");
-
         obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Object"))
@@ -371,23 +350,6 @@ BaseObjectExtension::BaseObjectExtension()
             .codeExtraInformation.SetFunctionName("GetSqDistanceWithObject");
 */
 /*
-
-    AddAction("CreateByName",
-                   _("Create an object from its name"),
-                   _("Among the objects of the specified group, the action will create the object with the specified name."),
-                   _("Among objects _PARAM2_, create object named _PARAM3_ at position _PARAM4_;_PARAM5_"),
-                   _("Objects"),
-                   "res/actions/create24.png",
-                   "res/actions/create.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "2")
-        .AddParameter("object", _("Groups containing objects which can be created by the action"))
-        .AddParameter("string", _("Text representing the name of the object to create"))
-        .AddParameter("expression", _("X position"))
-        .AddParameter("expression", _("Y position"))
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .codeExtraInformation.SetFunctionName("CreateObjectFromGroupOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
     AddAction("AjoutObjConcern",
                    _("Consider objects"),
                    _("Pick all objects with this name."),
@@ -413,16 +375,6 @@ BaseObjectExtension::BaseObjectExtension()
         .AddCodeOnlyParameter("inlineCode", "0")
         .AddParameter("object", _("Object"))
         .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    AddAction("MoveObjects",
-                   _("Make objects moving"),
-                   _("Moves the objects according to the forces they have.Game Develop call this action at the end of the events by default."),
-                   _("Make objects moving"),
-                   _("Displacement"),
-                   "res/actions/doMove24.png",
-                   "res/actions/doMove.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("MoveObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddCondition("SeDirige",
                    _("An object is moving to another"),

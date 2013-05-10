@@ -13,12 +13,14 @@
 	<script src="jquery.js"></script>
 	<script src="jshashtable.js"></script>
 	<script src="gd.js"></script>
+	<script src="force.js"></script>
 	<script src="runtimegame.js"></script>
 	<script src="variable.js"></script>
 	<script src="variablescontainer.js"></script>
 	<script src="runtimescene.js"></script>
 	<script src="runtimeobject.js"></script>
 	<script src="spriteruntimeobject.js"></script>
+	<script src="inputtools.js"></script>
 	<script src="code.js"></script>
 
 </head>
@@ -40,10 +42,22 @@
         var winHeight = $(project).find("Project").find("Info").find("WindowH").attr("value");
         var renderer = PIXI.autoDetectRenderer(winWidth, winHeight);
         document.body.appendChild(renderer.view); // add the renderer view element to the DOM
+        
+        //Bind keyboards and mouse events
+        $(document).keydown(function(event) {
+            game.onKeyPressed(event.keyCode);
+        });
+        $(document).keyup(function(event) {
+            game.onKeyReleased(event.keyCode);
+        });
+        $(document).mousemove(function(e){
+            game.onMouseMove(e.pageX, e.pageY);
+        }); 
     
         //Create the scene to be played
         var currentScene = gdjs.runtimeScene(game, renderer);
         currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
+        currentScene.setEventsFunction(gdjs.Nouvelle_32sc__4524neCode);
         
         var obj = gdjs.spriteRuntimeObject(currentScene, null)
         obj.setPosition(50,150);
@@ -60,7 +74,6 @@
             requestAnimFrame( GameLoop );
         
             currentScene.renderAndStep();
-            gdjs.Nouvelle_32sc__4524neCode(currentScene);
         }
     }
         

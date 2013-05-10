@@ -6,6 +6,8 @@
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
@@ -87,7 +89,43 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(s
     return "(( "+ManObjListName(objectListName)+".length === 0 ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0].getAutomatism(\""+automatismName+"\")."+functionCallName+"("+parametersStr+"))";
 }
 
-std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::string> & arguments,
+                                                             const gd::InstructionMetadata & instrInfos,
+                                                             const std::string & returnBoolean,
+                                                             bool conditionInverted)
+{
+    //Generate call
+    string predicat;
+    if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
+    {
+        predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
+    }
+    else
+    {
+        string argumentsStr;
+        for (unsigned int i = 0;i<arguments.size();++i)
+        {
+            if ( i != 0 ) argumentsStr += ", ";
+            argumentsStr += arguments[i];
+        }
+
+        predicat = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
+    }
+
+    //Add logical not if needed
+    bool conditionAlreadyTakeCareOfInversion = false;
+    for (unsigned int i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
+    {
+        if( instrInfos.parameters[i].type == "conditionInverted" )
+            conditionAlreadyTakeCareOfInversion = true;
+    }
+    if (!conditionAlreadyTakeCareOfInversion && conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+
+    //Generate condition code
+    return returnBoolean+".val = "+predicat+";\n";
+}
+
+std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
@@ -121,7 +159,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::st
     //Generate whole condition code
     conditionCode += "for(var i = 0;i < "+ManObjListName(objectName)+".length;) {\n";
     conditionCode += "    if ( "+predicat+" ) {\n";
-    conditionCode += "        "+returnBoolean+" = true;\n";
+    conditionCode += "        "+returnBoolean+".val = true;\n";
     conditionCode += "        ++i;\n";
     conditionCode += "    }\n";
     conditionCode += "    else {\n";
@@ -132,7 +170,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::st
     return conditionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectListAutomatismCondition(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string & objectName,
                                                                        const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
@@ -188,7 +226,7 @@ std::string EventsCodeGenerator::GenerateObjectListAutomatismCondition(const std
     return conditionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectListObjectAction(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos)
@@ -227,7 +265,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectAction(const std::strin
     return actionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectListAutomatismAction(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & objectName,
                                                                     const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
@@ -314,13 +352,6 @@ std::string EventsCodeGenerator::GenerateScopeBegin(gd::EventsCodeGenerationCont
 {
     //Generate a list of variables declared in the parent scope
     std::string scopeInheritedVariables = extraVariable;
-    for ( set<string>::iterator it = context.GetObjectsListsAlreadyDeclared().begin() ; it != context.GetObjectsListsAlreadyDeclared().end(); ++it )
-    {
-        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
-
-        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
-        scopeInheritedVariables += ManObjListName(*it);
-    }
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
         if ( !context.ObjectAlreadyDeclared(*it) ) continue;
@@ -336,19 +367,12 @@ std::string EventsCodeGenerator::GenerateScopeBegin(gd::EventsCodeGenerationCont
         scopeInheritedVariables += ManObjListName(*it);
     }
 
-    return "{( function("+scopeInheritedVariables+") {\n";
+    return "( function("+scopeInheritedVariables+") {\n";
 };
 std::string EventsCodeGenerator::GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable) const
 {
     //Generate a list of variables declared in the parent scope
     std::string scopeInheritedVariables = extraVariable;
-    for ( set<string>::iterator it = context.GetObjectsListsAlreadyDeclared().begin() ; it != context.GetObjectsListsAlreadyDeclared().end(); ++it )
-    {
-        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
-
-        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
-        scopeInheritedVariables += ManObjListName(*it);
-    }
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
         if ( !context.ObjectAlreadyDeclared(*it) ) continue;
@@ -364,8 +388,38 @@ std::string EventsCodeGenerator::GenerateScopeEnd(gd::EventsCodeGenerationContex
         scopeInheritedVariables += ManObjListName(*it);
     }
 
-    return "})("+scopeInheritedVariables+");}\n";
+    return "})("+scopeInheritedVariables+");\n";
 };
+
+string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction > & conditions, gd::EventsCodeGenerationContext & context)
+{
+    string outputCode;
+
+    for (unsigned int i = 0;i<conditions.size();++i)
+        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::ToString(i)+"IsTrue");
+
+    for (unsigned int cId =0;cId < conditions.size();++cId)
+    {
+        if (cId != 0) outputCode += "if ( condition"+gd::ToString(cId-1)+"IsTrue.val ) {\n";
+
+        gd::InstructionMetadata instrInfos = gd::MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
+
+        string conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::ToString(cId)+"IsTrue", context);
+        if ( !conditions[cId].GetType().empty() )
+        {
+            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "{";
+            outputCode += conditionCode;
+            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "}";
+        }
+    }
+
+    for (unsigned int cId =0;cId < conditions.size();++cId)
+    {
+        if (cId != 0) outputCode += "}\n";
+    }
+
+    return outputCode;
+}
 
 std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
                                                         gd::EventsCodeGenerationContext & context,

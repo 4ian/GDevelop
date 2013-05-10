@@ -49,12 +49,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
 
-                std::string ifPredicat;
-                for (unsigned int i = 0;i<event.GetConditions().size();++i)
-                {
-                    if (i!=0) ifPredicat += " && ";
-                    ifPredicat += "condition"+gd::ToString(i)+"IsTrue";
-                }
+                std::string ifPredicat = event.GetConditions().empty() ? "" : "condition"+gd::ToString(event.GetConditions().size()-1)+"IsTrue.val";
 
                 if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ") {\n";
                 outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
@@ -62,16 +57,16 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 {
                     outputCode += "\n{ //Subevents\n";
                     outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-                    outputCode += "}\n";
+                    outputCode += "} //End of subevents\n";
                 }
 
-                outputCode += "}\n";
+                if ( !ifPredicat.empty() ) outputCode += "}\n";
 
                 return outputCode;
             }
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::StandardEvent"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::Standard"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 }

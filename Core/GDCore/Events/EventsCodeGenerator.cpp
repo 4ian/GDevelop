@@ -176,7 +176,6 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
     return callStartString+"("+argumentsStr+") "+operatorStr+" ("+rhs+")";
 }
 
-
 std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
 {
     std::string conditionCode;
@@ -229,35 +228,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
         supplementaryParametersTypes.push_back(std::make_pair("conditionInverted", condition.IsInverted() ? "true" : "false"));
         vector<string> arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context, &supplementaryParametersTypes);
 
-        //Generate call
-        string predicat;
-        if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
-        {
-            predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
-        }
-        else
-        {
-            string argumentsStr;
-            for (unsigned int i = 0;i<arguments.size();++i)
-            {
-                if ( i != 0 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
-            }
-
-            predicat = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
-        }
-
-        //Add logical not if needed
-        bool conditionAlreadyTakeCareOfInversion = false;
-        for (unsigned int i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
-        {
-            if( instrInfos.parameters[i].type == "conditionInverted" )
-                conditionAlreadyTakeCareOfInversion = true;
-        }
-        if (!conditionAlreadyTakeCareOfInversion && condition.IsInverted()) predicat = GenerateNegatedPredicat(predicat);
-
-        //Generate condition code
-        conditionCode += returnBoolean+" = "+predicat+";\n";
+        conditionCode += GenerateFreeCondition(arguments, instrInfos, returnBoolean, condition.IsInverted());
     }
 
     //Generate object condition if available
@@ -276,7 +247,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
 
             //Prepare arguments and generate the condition whole code
             vector<string> arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
-            conditionCode += GenerateObjectListObjectCondition(realObjects[i], objInfo, arguments, instrInfos, returnBoolean, condition.IsInverted());
+            conditionCode += GenerateObjectCondition(realObjects[i], objInfo, arguments, instrInfos, returnBoolean, condition.IsInverted());
 
             context.SetNoCurrentObject();
         }
@@ -297,7 +268,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
 
             //Prepare arguments and generate the whole condition code
             vector<string> arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
-            conditionCode += GenerateObjectListAutomatismCondition(realObjects[i], condition.GetParameter(1).GetPlainString(), autoInfo, arguments,
+            conditionCode += GenerateAutomatismCondition(realObjects[i], condition.GetParameter(1).GetPlainString(), autoInfo, arguments,
                                                                instrInfos, returnBoolean, condition.IsInverted());
 
             context.SetNoCurrentObject();
@@ -383,33 +354,11 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
         }
     }
 
-    //Call static function first if available
+    //Call free function first if available
     if (MetadataProvider::HasAction(platform, action.GetType()))
     {
         vector<string> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
-
-        //Generate call
-        string call;
-        if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string" )
-        {
-            if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
-                call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction);
-            else
-                call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
-        }
-        else
-        {
-            string argumentsStr;
-            for (unsigned int i = 0;i<arguments.size();++i)
-            {
-                if ( i != 0 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
-            }
-
-            call = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
-        }
-
-        actionCode += call+";\n";
+        actionCode += GenerateFreeAction(arguments, instrInfos);
     }
 
     //Call object function if available
@@ -428,7 +377,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 
             //Prepare arguments and generate the whole action code
             vector<string> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
-            actionCode += GenerateObjectListObjectAction(realObjects[i], objInfo, arguments, instrInfos);
+            actionCode += GenerateObjectAction(realObjects[i], objInfo, arguments, instrInfos);
 
             context.SetNoCurrentObject();
         }
@@ -449,7 +398,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 
             //Prepare arguments and generate the whole action code
             vector<string> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
-            actionCode += GenerateObjectListAutomatismAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos);
+            actionCode += GenerateAutomatismAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos);
 
             context.SetNoCurrentObject();
         }
@@ -806,7 +755,44 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(s
     return "TODO (GenerateNotPickedObjectAutomatismFunctionCall)";
 }
 
-std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::string & objectName,
+
+std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::string> & arguments,
+                                                             const gd::InstructionMetadata & instrInfos,
+                                                             const std::string & returnBoolean,
+                                                             bool conditionInverted)
+{
+    //Generate call
+    string predicat;
+    if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
+    {
+        predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
+    }
+    else
+    {
+        string argumentsStr;
+        for (unsigned int i = 0;i<arguments.size();++i)
+        {
+            if ( i != 0 ) argumentsStr += ", ";
+            argumentsStr += arguments[i];
+        }
+
+        predicat = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
+    }
+
+    //Add logical not if needed
+    bool conditionAlreadyTakeCareOfInversion = false;
+    for (unsigned int i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
+    {
+        if( instrInfos.parameters[i].type == "conditionInverted" )
+            conditionAlreadyTakeCareOfInversion = true;
+    }
+    if (!conditionAlreadyTakeCareOfInversion && conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+
+    //Generate condition code
+    return returnBoolean+" = "+predicat+";\n";
+}
+
+std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
@@ -844,7 +830,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::st
     return "For each picked object \""+objectName+"\", check "+predicat+".\n";
 }
 
-std::string EventsCodeGenerator::GenerateObjectListAutomatismCondition(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string & objectName,
                                                                        const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
@@ -876,7 +862,32 @@ std::string EventsCodeGenerator::GenerateObjectListAutomatismCondition(const std
     return "For each picked object \""+objectName+"\", check "+predicat+" for automatism \""+automatismName+"\".\n";
 }
 
-std::string EventsCodeGenerator::GenerateObjectListObjectAction(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateFreeAction(const std::vector<std::string> & arguments, const gd::InstructionMetadata & instrInfos)
+{
+    //Generate call
+    string call;
+    if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string" )
+    {
+        if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
+            call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction);
+        else
+            call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
+    }
+    else
+    {
+        string argumentsStr;
+        for (unsigned int i = 0;i<arguments.size();++i)
+        {
+            if ( i != 0 ) argumentsStr += ", ";
+            argumentsStr += arguments[i];
+        }
+
+        call = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
+    }
+    return call+";\n";
+}
+
+std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos)
@@ -909,7 +920,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectAction(const std::strin
 
 }
 
-std::string EventsCodeGenerator::GenerateObjectListAutomatismAction(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & objectName,
                                                                     const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,

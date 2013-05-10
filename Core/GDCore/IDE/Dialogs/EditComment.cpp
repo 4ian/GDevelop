@@ -95,8 +95,7 @@ commentEvent(event_)
 	Com1Edit->ChangeValue( commentEvent.com1 );
 	Com2Edit->ChangeValue( commentEvent.com2 );
 	Com2Edit->Show( !commentEvent.com2.empty() );
-	CheckBox1->Show( !commentEvent.com2
-                 .empty() );
+	CheckBox1->SetValue( !commentEvent.com2.empty() );
 
 	ColorBt->SetBackgroundColour(wxColour(commentEvent.r, commentEvent.v, commentEvent.b ));
 	txtColorBt->SetBackgroundColour(wxColour(commentEvent.textR, commentEvent.textG, commentEvent.textB ));

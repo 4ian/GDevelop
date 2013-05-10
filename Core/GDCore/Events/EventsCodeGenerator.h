@@ -46,7 +46,7 @@ public:
     void PreprocessEventList( std::vector < gd::BaseEventSPtr > & listEvent );
 
     /**
-     * Generate code for executing an event list
+     * \brief Generate code for executing an event list
      *
      * \param events std::vector of events
      * \param context Context used for generation
@@ -55,29 +55,35 @@ public:
     std::string GenerateEventsListCode(std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
 
     /**
-     * Generate code for executing a condition list
+     * \brief Generate code for executing a condition list
+     *
+     * The default implementation create the condition calls using C-style ifs and booleans.
      *
      * \param game Game used
      * \param scene Scene used
      * \param conditions std::vector of conditions
      * \param context Context used for generation
-     * \return C++ code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
+     * \return Code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
      */
-    std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
+    virtual std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
 
     /**
-     * Generate code for executing an action list
+     * \brief Generate code for executing an action list
+     *
+     * The default implementation just calls repeatedly GenerateActionCode.
      *
      * \param game Game used
      * \param scene Scene used
      * \param actions std::vector of actions
      * \param context Context used for generation
-     * \return C++ code
+     * \return Code
      */
-    std::string GenerateActionsListCode(std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
+    virtual std::string GenerateActionsListCode(std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
 
     /**
-     * Generate the code for a parameter of an action/condition/expression.
+     * \brief Generate the code for a parameter of an action/condition/expression.
+     *
+     * This method uses GenerateParameterCodes to generate the parameters code.
      *
      * \param scene Scene used
      * \param parameters std::vector of actual parameters.
@@ -92,23 +98,25 @@ public:
                                                      std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
     /**
-     * Generate code for a single condition
+     * \brief Generate code for a single condition.
      *
-     * \param scene Scene used
-     * \param condition gd::Instruction of the condition
-     * \param returnBoolean The name of the C++ boolean that will contains the condition result.
+     * The generation is really done in GenerateFreeCondition/GenerateObjectCondition or GenerateAutomatismCondition.
+     *
+     * \param condition instruction to be done.
+     * \param returnBoolean The name of the boolean that must contains the condition result.
      * \param context Context used for generation
-     * \return C++ code
+     * \return Code
      */
     std::string GenerateConditionCode(gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
 
     /**
      * Generate code for a single action
      *
-     * \param scene Scene used
-     * \param action gd::Instruction of the action
+     * The generation is really done in GenerateFreeAction/GenerateObjectAction or GenerateAutomatismAction.
+     *
+     * \param condition instruction to be done.
      * \param context Context used for generation
-     * \return C++ code
+     * \return Code
      */
     std::string GenerateActionCode(gd::Instruction & action, EventsCodeGenerationContext & context);
 
@@ -314,14 +322,19 @@ protected:
     virtual std::string GenerateReferenceToBoolean(const std::string & referenceName, const std::string & referencedBoolean) { return "bool & "+referenceName+" = "+referencedBoolean+";\n";}
     virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "bool "+boolName+" = false;\n";}
 
-    virtual std::string GenerateObjectListObjectCondition(const std::string & objectName,
+    virtual std::string GenerateFreeCondition(const std::vector<std::string> & arguments,
+                                              const gd::InstructionMetadata & instrInfos,
+                                              const std::string & returnBoolean,
+                                              bool conditionInverted);
+
+    virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             const std::string & returnBoolean,
                                                             bool conditionInverted);
 
-    virtual std::string GenerateObjectListAutomatismCondition(const std::string & objectName,
+    virtual std::string GenerateAutomatismCondition(const std::string & objectName,
                                                                 const std::string & automatismName,
                                                                 const gd::AutomatismMetadata & autoInfo,
                                                                 const std::vector<std::string> & arguments,
@@ -329,12 +342,15 @@ protected:
                                                                 const std::string & returnBoolean,
                                                                 bool conditionInverted);
 
-    virtual std::string GenerateObjectListObjectAction(const std::string & objectName,
+    virtual std::string GenerateFreeAction(const std::vector<std::string> & arguments,
+                                           const gd::InstructionMetadata & instrInfos);
+
+    virtual std::string GenerateObjectAction(const std::string & objectName,
                                                         const gd::ObjectMetadata & objInfo,
                                                         const std::vector<std::string> & arguments,
                                                         const gd::InstructionMetadata & instrInfos);
 
-    virtual std::string GenerateObjectListAutomatismAction(const std::string & objectName,
+    virtual std::string GenerateAutomatismAction(const std::string & objectName,
                                                             const std::string & automatismName,
                                                             const gd::AutomatismMetadata & autoInfo,
                                                             const std::vector<std::string> & arguments,

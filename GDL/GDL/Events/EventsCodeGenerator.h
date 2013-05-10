@@ -47,6 +47,11 @@ public:
     void PreprocessEventList( std::vector < gd::BaseEventSPtr > & listEvent );
 
 protected:
+    virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+                                               gd::EventsCodeGenerationContext & context,
+                                               const std::vector < gd::Expression > & othersParameters,
+                                               std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
+
     virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                           const gd::ObjectMetadata & objMetadata,
                                                           std::string functionCallName,
@@ -70,14 +75,14 @@ protected:
                                                                       std::string parametersStr,
                                                                       std::string defaultOutput);
 
-    virtual std::string GenerateObjectListObjectCondition(const std::string & objectName,
+    virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             const std::string & returnBoolean,
                                                             bool conditionInverted);
 
-    virtual std::string GenerateObjectListAutomatismCondition(const std::string & objectName,
+    virtual std::string GenerateAutomatismCondition(const std::string & objectName,
                                                                 const std::string & automatismName,
                                                                 const gd::AutomatismMetadata & autoInfo,
                                                                 const std::vector<std::string> & arguments,
@@ -85,12 +90,12 @@ protected:
                                                                 const std::string & returnBoolean,
                                                                 bool conditionInverted);
 
-    virtual std::string GenerateObjectListObjectAction(const std::string & objectName,
+    virtual std::string GenerateObjectAction(const std::string & objectName,
                                                         const gd::ObjectMetadata & objInfo,
                                                         const std::vector<std::string> & arguments,
                                                         const gd::InstructionMetadata & instrInfos);
 
-    virtual std::string GenerateObjectListAutomatismAction(const std::string & objectName,
+    virtual std::string GenerateAutomatismAction(const std::string & objectName,
                                                             const std::string & automatismName,
                                                             const gd::AutomatismMetadata & autoInfo,
                                                             const std::vector<std::string> & arguments,

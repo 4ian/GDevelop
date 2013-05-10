@@ -4,7 +4,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
-#include "GDL/LinkEvent.h"
+#include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDL/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
 
@@ -12,9 +12,9 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        boost::shared_ptr<LinkEvent> linkEvent = boost::dynamic_pointer_cast<LinkEvent>(events[i]);
+        boost::shared_ptr<gd::LinkEvent> linkEvent = boost::dynamic_pointer_cast<gd::LinkEvent>(events[i]);
         boost::shared_ptr<CppCodeEvent> cppCodeEvent = boost::dynamic_pointer_cast<CppCodeEvent>(events[i]);
-        if ( linkEvent != boost::shared_ptr<LinkEvent>() )
+        if ( linkEvent != boost::shared_ptr<gd::LinkEvent>() )
         {
             std::string linked = linkEvent->GetTarget();
             if ( project.HasExternalEventsNamed(linked) )
@@ -93,8 +93,8 @@ bool DependenciesAnalyzer::CheckIfExternalEventsIsLinkedOnlyAtTopLevel(const std
         }
 
         //Check the targets of the links
-        boost::shared_ptr<LinkEvent> linkEvent = boost::dynamic_pointer_cast<LinkEvent>(events[i]);
-        if ( linkEvent != boost::shared_ptr<LinkEvent>() )
+        boost::shared_ptr<gd::LinkEvent> linkEvent = boost::dynamic_pointer_cast<gd::LinkEvent>(events[i]);
+        if ( linkEvent != boost::shared_ptr<gd::LinkEvent>() )
         {
             std::string linked = linkEvent->GetTarget();
             if ( project.HasExternalEventsNamed(linked) )

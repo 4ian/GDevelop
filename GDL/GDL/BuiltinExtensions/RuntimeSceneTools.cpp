@@ -166,6 +166,7 @@ gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string &
 
 gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
 {
+
     return scene.game->GetVariables().ObtainVariable(variableName);
 }
 

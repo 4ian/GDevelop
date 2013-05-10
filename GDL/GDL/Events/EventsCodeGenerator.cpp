@@ -15,6 +15,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/CommonTools.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include "GDL/SceneNameMangler.h"
@@ -74,7 +75,7 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(s
         return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
 }
 
-std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
@@ -126,7 +127,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectCondition(const std::st
     return conditionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectListAutomatismCondition(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string & objectName,
                                                                        const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
@@ -188,7 +189,7 @@ std::string EventsCodeGenerator::GenerateObjectListAutomatismCondition(const std
     return conditionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectListObjectAction(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos)
@@ -229,7 +230,7 @@ std::string EventsCodeGenerator::GenerateObjectListObjectAction(const std::strin
     return actionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectListAutomatismAction(const std::string & objectName,
+std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & objectName,
                                                                     const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
@@ -281,6 +282,104 @@ std::string EventsCodeGenerator::GenerateObjectListAutomatismAction(const std::s
 
 
     return actionCode;
+}
+
+std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+                                                        gd::EventsCodeGenerationContext & context,
+                                                        const std::vector < gd::Expression > & othersParameters,
+                                                        std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+{
+    std::string argOutput;
+
+    //Code only parameter type
+    if ( metadata.type == "currentScene" )
+    {
+        argOutput += "*runtimeContext->scene";
+    }
+    //Code only parameter type
+    else if ( metadata.type == "mapOfObjectListsOfParameter" )
+    {
+        std::string argOutput;
+
+        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
+        if ( i < othersParameters.size() )
+        {
+            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+
+            argOutput += "runtimeContext->ClearObjectListsMap()";
+            for (unsigned int i = 0;i<realObjects.size();++i)
+            {
+                context.ObjectsListNeeded(realObjects[i]);
+                argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+            }
+            argOutput += ".ReturnObjectListsMap()";
+        }
+        else
+        {
+            argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
+            ReportError();
+            cout << "Error: Could not get objects for a parameter" << endl;
+        }
+    }
+    //Code only parameter type
+    else if ( metadata.type == "mapOfObjectListsOfParameterWithoutPicking" )
+    {
+        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
+        if ( i < othersParameters.size() )
+        {
+            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+
+            argOutput += "runtimeContext->ClearObjectListsMap()";
+            for (unsigned int i = 0;i<realObjects.size();++i)
+            {
+                context.EmptyObjectsListNeeded(realObjects[i]);
+                argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+            }
+            argOutput += ".ReturnObjectListsMap()";
+        }
+        else
+        {
+            argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
+            ReportError();
+            cout << "Error: Could not get objects for a parameter" << endl;
+        }
+    }
+    //Code only parameter type
+    else if ( metadata.type == "ptrToObjectOfParameter")
+    {
+        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
+        if ( i < othersParameters.size() )
+        {
+            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+
+            if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
+            {
+                //If object currently used by instruction is available, use it directly.
+                argOutput += ManObjListName(context.GetCurrentObject())+"[i]";
+            }
+            else
+            {
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                {
+                    context.ObjectsListNeeded(realObjects[i]);
+                    argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
+                }
+                argOutput += "NULL";
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                    argOutput += ")";
+            }
+        }
+        else
+        {
+            argOutput += "NULL";
+            ReportError();
+            cout << "Error: Could not get objects for a parameter" << endl;
+        }
+    }
+    else
+        return gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, othersParameters, supplementaryParametersTypes);
+
+    return argOutput;
 }
 
 string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)

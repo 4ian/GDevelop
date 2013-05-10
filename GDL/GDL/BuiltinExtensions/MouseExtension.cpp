@@ -10,7 +10,7 @@ MouseExtension::MouseExtension()
 {
     SetExtensionInformation("BuiltinMouse",
                           _("Mouse features"),
-                          _("Builtin extensions allowing to use mouse"),
+                          _("Builtin extensions allowing to use the mouse"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

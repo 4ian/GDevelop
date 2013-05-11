@@ -21,7 +21,6 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.variables = gdjs.variablesContainer();
     my.runtimeGame = runtimeGame;
     my.lastId = 0;
-    my.eventsObjectsMap = new Hashtable();
     my.initialObjectsXml; 
     
     /**
@@ -35,6 +34,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
                                     parseInt($(sceneXml).attr("v")),
                                     parseInt($(sceneXml).attr("b")));
         my.pixiStage.setBackgroundColor("0x"+bgColor);
+        my.pixiStage.position = new PIXI.Point(150,300);
         
         //Load objects
         my.initialObjectsXml = $(sceneXml).find("Objets");
@@ -202,21 +202,6 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.getVariables = function() {
         return my.variables;
-    }
-    
-    that.clearEventsObjectsMap = function() {
-        my.eventsObjectsMap.clear();
-        
-        return that;
-    }
-    
-    that.addObjectsToEventsMap = function(name, objectList) {
-        my.eventsObjectsMap.put(name, objectList);
-        return that;
-    }
-    
-    that.getEventsObjectsMap = function() {
-        return my.eventsObjectsMap;
     }
     
     /**

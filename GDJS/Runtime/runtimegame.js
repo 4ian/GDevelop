@@ -17,6 +17,8 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Get the variables of the runtimeGame.
+     * @method getVariables
+     * @return a variablesContainer object.
      */
     that.getVariables = function() {
         return my.variables;
@@ -24,6 +26,8 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Get the XML object associated to the game
+     * @method getXml
+     * @return The XML structure associated to the game, which can be parsed with jQuery.
      */
     that.getXml = function() {
         return my.xml;
@@ -31,6 +35,8 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Get the XML structure representing all the initial objects of the game.
+     * @method getInitialObjectsXml
+     * @return The XML structure associated to the initial objects, which can be parsed with jQuery.
      */
     that.getInitialObjectsXml = function() {
         return $(my.xml).find("Objets");
@@ -38,6 +44,8 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Should be called whenever a key is pressed
+     * @method onKeyPressed
+     * @param keyCode {Number} The key code associated to the key press.
      */
     that.onKeyPressed = function(keyCode) {
         my.pressedKeys.put(keyCode, true);
@@ -45,6 +53,8 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Should be called whenever a key is released
+     * @method onKeyReleased
+     * @param keyCode {Number} The key code associated to the key release.
      */
     that.onKeyReleased = function(keyCode) {
         my.pressedKeys.put(keyCode, false);
@@ -52,6 +62,8 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Return true if the key corresponding to keyCode is pressed.
+     * @method isKeyPressed
+     * @param keyCode {Number} The key code to be tested.
      */
     that.isKeyPressed = function(keyCode) {
         return my.pressedKeys.containsKey(keyCode) && my.pressedKeys.get(keyCode);
@@ -59,6 +71,7 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Return true if any key is pressed
+     * @method anyKeyPressed
      */
     that.anyKeyPressed = function(keyCode) {
         var allKeys = my.pressedKeys.entries();
@@ -73,7 +86,12 @@ gdjs.runtimeGame = function(xml)
     }
     
     /**
-     * Should be called when the mouse moved
+     * Should be called when the mouse is moved.<br>
+     * Please note that the coordinates must be expressed relative to the view position.
+     *
+     * @method onMouseMove
+     * @param x {Number} The mouse new X position
+     * @param y {Number} The mouse new Y position
      */
     that.onMouseMove = function(x,y) {
         my.mouseX = x;
@@ -82,6 +100,9 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Get the mouse X position
+     *
+     * @method getMouseX
+     * @return the mouse X position, relative to the game view.
      */
     that.getMouseX = function() {
         return my.mouseX;
@@ -89,6 +110,9 @@ gdjs.runtimeGame = function(xml)
     
     /**
      * Get the mouse Y position
+     *
+     * @method getMouseY
+     * @return the mouse Y position, relative to the game view.
      */
     that.getMouseY = function() {
         return my.mouseY;

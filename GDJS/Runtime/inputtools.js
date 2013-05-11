@@ -3,6 +3,10 @@
  */
 gdjs.inputTools = gdjs.inputTools || {};
 
+/**
+ * Return true if the specified key is pressed
+ * TODO: Map all keys
+ */
 gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     
     if ( key === "a" ) { return runtimeScene.getGame().isKeyPressed(65); }

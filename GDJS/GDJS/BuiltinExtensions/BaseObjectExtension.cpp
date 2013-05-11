@@ -94,6 +94,8 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Angle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle()"); //Deprecated
     objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("getAverageForce().getLength()");
     objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("getAverageForce().getLength()"); //Deprecated
+    objectExpressions["Distance"].codeExtraInformation.SetFunctionName("getDistanceFrom");
+    objectExpressions["SqDistance"].codeExtraInformation.SetFunctionName("getSqDistanceFrom");
 
     GetAllActions()["Create"].codeExtraInformation
         .SetFunctionName("gdjs.createObjectOnScene");
@@ -103,6 +105,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("gdjs.pickedObjectsCount");
     GetAllConditions()["NbObjet"].codeExtraInformation
         .SetFunctionName("gdjs.pickedObjectsCount");
+    GetAllConditions()["CollisionNP"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -337,17 +341,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
             .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
-        obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
-            .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .codeExtraInformation.SetFunctionName("GetDistanceWithObject");
-
-        obj.AddExpression("SqDistance", _("Square distance between two objects"), _("Square distance between two objects"), _("Position"), "res/conditions/distance.png")
-            .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .codeExtraInformation.SetFunctionName("GetSqDistanceWithObject");
 */
 /*
     AddAction("AjoutObjConcern",

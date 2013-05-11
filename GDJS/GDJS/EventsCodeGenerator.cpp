@@ -441,7 +441,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         {
             std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
 
-            argOutput += "runtimeScene.clearEventsObjectsMap()";
+            argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
             for (unsigned int i = 0;i<realObjects.size();++i)
             {
                 context.ObjectsListNeeded(realObjects[i]);
@@ -451,7 +451,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         }
         else
         {
-            return "runtimeScene.clearEventsObjectsMap().getEventsObjectsMap()";
+            return "gdjs.commonTools.clearEventsObjectsMap().getEventsObjectsMap()";
             ReportError();
             cout << "Error: Could not get objects for a parameter" << endl;
         }
@@ -464,7 +464,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         {
             std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
 
-            argOutput += "runtimeScene.clearEventsObjectsMap()";
+            argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
             for (unsigned int i = 0;i<realObjects.size();++i)
             {
                 context.EmptyObjectsListNeeded(realObjects[i]);
@@ -474,7 +474,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         }
         else
         {
-            argOutput += "runtimeScene.clearEventsObjectsMap().getEventsObjectsMap()";
+            argOutput += "gdjs.commonTools.clearEventsObjectsMap().getEventsObjectsMap()";
             ReportError();
             cout << "Error: Could not get objects for a parameter" << endl;
         }

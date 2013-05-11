@@ -1,6 +1,9 @@
 
 /**
  * The spriteRuntimeObject represents an object that can display images.
+ *
+ * <b>TODO:</b> Animation support, custom collisions masks.
+ *
  * @class spriteRuntimeObject
  * @extends runtimeObject
  */

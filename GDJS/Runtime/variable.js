@@ -10,10 +10,20 @@ gdjs.variable = function()
     
     my.value = 0;
     
+    /**
+     * Get the value of the variable
+     * @method getValue
+     * @return {Any} The value stored
+     */
     that.getValue = function() {
         return my.value;
     }
     
+    /**
+     * Change the value of the variable
+     * @method setValue
+     * @param newValue {Any} The new value to be set
+     */
     that.setValue = function(newValue) {
         my.value = newValue;
     }

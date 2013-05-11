@@ -26,6 +26,7 @@ Exporter::~Exporter()
 bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir)
 {
     gd::RecursiveMkDir::MkDir(exportDir);
+    gd::RecursiveMkDir::MkDir(exportDir+"/libs");
     std::set<std::string> includesFiles;
 
     //Generate events code
@@ -58,14 +59,15 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
     ExportResources(strippedProject, exportDir);
 
     //Copy additional dependencies
-    wxCopyFile("./JsPlatform/Runtime/pixi.js", exportDir+"/pixi.js");
-    wxCopyFile("./JsPlatform/Runtime/jquery.js", exportDir+"/jquery.js");
+    wxCopyFile("./JsPlatform/Runtime/libs/pixi.js", exportDir+"/libs/pixi.js");
+    wxCopyFile("./JsPlatform/Runtime/libs/jquery.js", exportDir+"/libs/jquery.js");
+    wxCopyFile("./JsPlatform/Runtime/libs/jshashtable.js", exportDir+"/libs/jshashtable.js");
     wxCopyFile("./JsPlatform/Runtime/index.html", exportDir+"/index.html");
     wxCopyFile("./JsPlatform/Runtime/bunny.png", exportDir+"/bunny.png");
     wxCopyFile("./JsPlatform/Runtime/gd.js", exportDir+"/gd.js");
     wxCopyFile("./JsPlatform/Runtime/runtimeobject.js", exportDir+"/runtimeobject.js");
     wxCopyFile("./JsPlatform/Runtime/runtimescene.js", exportDir+"/runtimescene.js");
-    wxCopyFile("./JsPlatform/Runtime/jshashtable.js", exportDir+"/jshashtable.js");
+    wxCopyFile("./JsPlatform/Runtime/commontools.js", exportDir+"/commontools.js");
     for ( std::set<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
     {
         wxLogNull noLogPlease;

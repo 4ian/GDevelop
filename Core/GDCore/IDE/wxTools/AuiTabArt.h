@@ -68,6 +68,8 @@ public:
                  int orientation,
                  wxRect* out_rect);
 
+    void DisableBackgroundGradient(bool disable = true) { noBgGradient = disable; }
+
     int GetIndentSize();
 
     wxSize GetTabSize(
@@ -110,6 +112,7 @@ protected:
     int m_fixed_tab_width;
     int m_tab_ctrl_height;
     unsigned int m_flags;
+    bool noBgGradient;
 };
 
 

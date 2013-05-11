@@ -55,6 +55,12 @@ public:
      */
     static void SaveActions(const std::vector < gd::Instruction > & list, TiXmlElement * elem);
 
+    /**
+     * \brief Internal method called when opening events created with GD2.x
+     *
+     * Some instructions names have been changed as well as parameters.
+     */
+    static void UpdateInstructionsFromGD2x(const std::vector < gd::Instruction > & list);
 };
 
 }

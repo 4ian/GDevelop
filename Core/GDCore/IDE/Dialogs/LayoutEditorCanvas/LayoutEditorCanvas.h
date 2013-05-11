@@ -240,6 +240,11 @@ public:
      */
     void ReloadResources();
 
+    /**
+     * \brief Can be called ( by previewers for example ) to ask the editor to go back to editing state.
+     */
+    void GoToEditingState();
+
     virtual double GetWidthOfInitialInstance(gd::InitialInstance & instance) const;
     virtual double GetHeightOfInitialInstance(gd::InitialInstance & instance) const;
 

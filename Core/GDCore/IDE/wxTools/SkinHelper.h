@@ -38,8 +38,12 @@ public:
 
     /**
      * Customize the appearance of a wxAuiNotebook.
+     *
+     * \param notebook The notebook to be skinned.
+     * \param subnotebook If set to true, the notebook will be considered as being the child of another,
+     * so that its background won't have a gradient.
      */
-    static void ApplyCurrentSkin(wxAuiNotebook & notebook);
+    static void ApplyCurrentSkin(wxAuiNotebook & notebook, bool subnotebook = false);
 
     /**
      * Customize the appearance of a wxAuiToolBar.

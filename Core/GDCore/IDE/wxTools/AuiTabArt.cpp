@@ -232,6 +232,7 @@ AuiTabArt::AuiTabArt()
     m_disabled_windowlist_bmp = gdAuiBitmapFromBits(GDlist_bits, 16, 16, wxColour(128,128,128));
 
     m_flags = 0;
+    noBgGradient = false;
 }
 
 void AuiTabArt::SetColour(const wxColour& colour)
@@ -262,6 +263,7 @@ wxAuiTabArt* AuiTabArt::Clone()
     art->SetMeasuringFont(m_measuring_font);
     art->SetColour(m_base_colour);
     art->SetActiveColour(m_active_colour);
+    art->DisableBackgroundGradient(noBgGradient);
 
     return art;
 }
@@ -322,7 +324,7 @@ void AuiTabArt::DrawBackground(wxDC& dc,
     // draw background
 
     //Game Develop use a less visible gradient
-    wxColor top_color       = gdAuiStepColour(m_base_colour, 120);
+    wxColor top_color       = noBgGradient ? *wxWHITE : gdAuiStepColour(m_base_colour, 120);
     //Game Develop use a white background
     wxColor bottom_color   = *wxWHITE;
     wxRect r;

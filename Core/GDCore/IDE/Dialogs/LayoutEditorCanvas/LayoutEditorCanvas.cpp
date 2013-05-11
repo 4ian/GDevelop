@@ -1419,6 +1419,12 @@ void LayoutEditorCanvas::ReloadResources()
         wxSetWorkingDirectory(oldWorkingDir);
 }
 
+void LayoutEditorCanvas::GoToEditingState()
+{
+    wxCommandEvent useless;
+    OnEditionBtClick(useless);
+}
+
 }
 
 //The rest of the implementation is available in LayoutEditorCanvas2.cpp

@@ -199,12 +199,13 @@ void SkinHelper::ApplyCurrentSkin(wxAuiManager & auiManager)
     auiManager.SetArtProvider(dockArt);
 }
 
-void SkinHelper::ApplyCurrentSkin(wxAuiNotebook & notebook)
+void SkinHelper::ApplyCurrentSkin(wxAuiNotebook & notebook, bool subnotebook)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     wxString result;
 
     gd::AuiTabArt * tabArt = new gd::AuiTabArt();
+    tabArt->DisableBackgroundGradient(subnotebook);
     pConfig->Read( _T( "/Skin/Defined" ), &result );
     if ( result == "true" )
     {

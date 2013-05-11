@@ -27,7 +27,7 @@ public:
     /**
      * Moves each vertices from the given amount.
      *
-     * \warning edges vector is not updated, you have to call ComputeEdges if needed.
+     * \note Edges are updated, there is no need to call ComputeEdges after calling Move.
      */
     void Move(float x, float y);
 

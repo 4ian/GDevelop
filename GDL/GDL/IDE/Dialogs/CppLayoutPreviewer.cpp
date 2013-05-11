@@ -190,13 +190,16 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     if ( !previewScene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(editor.GetLayout().GetCompiledEventsFile(),
                                                                         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(editor.GetLayout().GetName())) )
     {
-        wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
-        wxCommandEvent useless;
+        wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")
+                   +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
+        editor.GoToEditingState();
+
         return;
     }
     editor.GetLayout().SetRefreshNotNeeded();
 
-    if ( editor.GetProject().GetImageManager() ) editor.GetProject().GetImageManager()->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
+    //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
+    if ( editor.GetProject().GetImageManager() ) editor.GetProject().GetImageManager()->EnableImagesUnloading();
 
     isReloading = false;
 }

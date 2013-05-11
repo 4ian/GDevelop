@@ -71,7 +71,7 @@ bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::stri
                     for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
                     {
                         if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
-                            collision = true;
+                            collision = true; //TODO : Add a break; ?
                     }
 
                     if ( collision ) break;

@@ -96,7 +96,7 @@ public :
 
 private:
 
-    const Sprite * GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    const Sprite * GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate = NULL) const;
     mutable std::vector < AnimationProxy > animations;
 
     //Null objects if need to return a bad object.

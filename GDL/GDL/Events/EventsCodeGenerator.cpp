@@ -299,8 +299,6 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     //Code only parameter type
     else if ( metadata.type == "mapOfObjectListsOfParameter" )
     {
-        std::string argOutput;
-
         unsigned int i = gd::ToInt(metadata.supplementaryInformation);
         if ( i < othersParameters.size() )
         {

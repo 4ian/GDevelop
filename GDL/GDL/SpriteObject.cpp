@@ -23,7 +23,6 @@
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDL/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
 #endif
@@ -127,7 +126,7 @@ void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
     }
 }
 
-const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate) const
 {
     if ( HasNoAnimations() ) return NULL;
 
@@ -144,19 +143,21 @@ const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & inst
         float normalizedAngle = static_cast<int>(instance.GetAngle())%360;
         if ( normalizedAngle < 0 ) normalizedAngle += 360;
 
-        directionId = static_cast<int>(floor(normalizedAngle/45.f))%8;
+        directionId = static_cast<int>(GDRound(normalizedAngle/45.f))%8;
     }
 
     if ( directionId >= animation.GetDirectionsNumber() ) directionId = 0;
 
     const Direction & direction = animation.GetDirection(directionId);
 
+    if ( shouldNotRotate ) *shouldNotRotate = animation.useMultipleDirections;
     return direction.HasNoSprites() ? NULL : &direction.GetSprite(0);
 }
 
 void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
+    bool shouldNotRotate = false;
+    const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout, &shouldNotRotate);
     if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return;
 
     sf::Sprite sprite(associatedSprite->GetSFMLTexture()->texture);
@@ -164,10 +165,10 @@ void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rende
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/sprite.getLocalBounds().width : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/sprite.getLocalBounds().height : 1;
 
+    if ( !shouldNotRotate) sprite.setRotation(instance.GetAngle());
     sprite.setPosition(instance.GetX()+sprite.getLocalBounds().width/2*scaleX,
                        instance.GetY()+sprite.getLocalBounds().height/2*scaleY);
     sprite.setOrigin(sprite.getLocalBounds().width/2, sprite.getLocalBounds().height/2);
-    sprite.setRotation(instance.GetAngle());
     sprite.setScale(scaleX, scaleY);
 
     renderTarget.draw(sprite);

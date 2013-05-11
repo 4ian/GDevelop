@@ -142,7 +142,7 @@ BaseObjectExtension::BaseObjectExtension()
                     std::string expression1Code;
                     {
                         gd::CallbacksForGeneratingExpressionCode callbacks(expression1Code, codeGenerator, context);
-                        gd::ExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
+                        gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
                         if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression1Code.empty())
                             expression1Code = "0";
                     }
@@ -150,19 +150,19 @@ BaseObjectExtension::BaseObjectExtension()
                     std::string expression2Code;
                     {
                         gd::CallbacksForGeneratingExpressionCode callbacks(expression2Code, codeGenerator, context);
-                        gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
+                        gd::ExpressionParser parser(instruction.GetParameters()[4].GetPlainString());
                         if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expression2Code.empty())
                             expression2Code = "0";
                     }
 
-                    std::string op1 = instruction.GetParameter(2).GetPlainString();
+                    std::string op1 = instruction.GetParameter(1).GetPlainString();
                     if ( op1 == "=" || op1.empty() )
                         newX = expression1Code;
                     else if ( op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+" )
                         newX = ManObjListName(realObjects[i])+"[i].getX() "+op1 + expression1Code;
                     else
                         return "";
-                    std::string op2 = instruction.GetParameter(4).GetPlainString();
+                    std::string op2 = instruction.GetParameter(3).GetPlainString();
                     if ( op2 == "=" || op2.empty() )
                         newY = expression2Code;
                     else if ( op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+" )
@@ -389,7 +389,7 @@ BaseObjectExtension::BaseObjectExtension()
     AddCondition("Distance",
                    _("Distance between two objects"),
                    _("Test the distance between two objects."),
-                   _("The distance between _PARAM0_ and _PARAM1_ is _PARAM5__PARAM4_"),
+                   _("The distance between _PARAM0_ and _PARAM1_ is _PARAM4__PARAM5_"),
                    _("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")
@@ -397,8 +397,8 @@ BaseObjectExtension::BaseObjectExtension()
         .AddParameter("object", _("Object 2"))
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-        .AddParameter("expression", _("Distance"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Distance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
@@ -431,21 +431,5 @@ BaseObjectExtension::BaseObjectExtension()
         .AddCodeOnlyParameter("inlineCode", "0")
         .AddParameter("object", _("Object"))
         .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-
-
-    AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
-                   _("Collision"),
-                   _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
-                   _("_PARAM0_ is in collision with _PARAM1_ ( Collision masks )"),
-                   _("Collision"),
-                   "res/conditions/collision24.png",
-                   "res/conditions/collision.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-        .AddCodeOnlyParameter("conditionInverted", "")
-        .codeExtraInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 */
 }

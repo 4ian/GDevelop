@@ -35,11 +35,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "0";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
@@ -61,11 +61,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "\"\"";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
@@ -100,11 +100,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "0";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getVariables().get(\""+var+"\")";
 
@@ -127,11 +127,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "\"\"";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getVariables().get(\""+var+"\")";
 
@@ -154,11 +154,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "0";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
@@ -180,11 +180,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "\"\"";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
 
                 if ( op == "=" || op.empty() )
@@ -219,11 +219,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "0";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getGame().getVariables().get(\""+var+"\")";
 
@@ -246,11 +246,11 @@ VariablesExtension::VariablesExtension()
             {
                 std::string expressionCode;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                 if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty())
                     expressionCode = "\"\"";
 
-                std::string op = instruction.GetParameters()[3].GetPlainString();
+                std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
                 std::string getCode = "runtimeScene.getGame().getVariables().get(\""+var+"\")";
 

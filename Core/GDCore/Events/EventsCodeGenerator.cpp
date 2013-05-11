@@ -32,13 +32,14 @@ namespace gd
  */
 string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
-    unsigned int relationalOperatorIndex = 0;
-    for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
+    unsigned int relationalOperatorIndex = instrInfos.parameters.size();
+    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "relationalOperator" )
             relationalOperatorIndex = i;
     }
-    if ( relationalOperatorIndex == 0 )
+    //Ensure that there is at least one parameter after the relational operator
+    if ( relationalOperatorIndex+1 >= instrInfos.parameters.size() )
     {
         ReportError();
         return "";
@@ -47,11 +48,11 @@ string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::Instruction
     string relationalOperator = arguments[relationalOperatorIndex];
     if ( relationalOperator.size() > 2 ) relationalOperator = relationalOperator.substr(1, relationalOperator.length()-1-1); //Relational operator contains quote which must be removed.
 
-    string rhs = arguments[relationalOperatorIndex-1];
+    string rhs = arguments[relationalOperatorIndex+1];
     string argumentsStr;
     for (unsigned int i = startFromArgument;i<arguments.size();++i)
     {
-        if ( i != relationalOperatorIndex && i != relationalOperatorIndex-1)
+        if ( i != relationalOperatorIndex && i != relationalOperatorIndex+1)
         {
             if ( !argumentsStr.empty() ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -74,14 +75,15 @@ string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::Instruction
  */
 string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
 {
-    unsigned int operatorIndex = 0;
-    for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
+    unsigned int operatorIndex = instrInfos.parameters.size();
+    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "operator" )
             operatorIndex = i;
     }
 
-    if ( operatorIndex == 0 )
+    //Ensure that there is at least one parameter after the operator
+    if ( operatorIndex+1 >= instrInfos.parameters.size() )
     {
         ReportError();
         return "";
@@ -90,13 +92,13 @@ string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata &
     string operatorStr = arguments[operatorIndex];
     if ( operatorStr.size() > 2 ) operatorStr = operatorStr.substr(1, operatorStr.length()-1-1); //Operator contains quote which must be removed.
 
-    string rhs = arguments[operatorIndex-1];
+    string rhs = arguments[operatorIndex+1];
 
     //Generate arguments for calling the "getter" function
     string getterArgumentsStr;
     for (unsigned int i = startFromArgument;i<arguments.size();++i)
     {
-        if ( i != operatorIndex && i != operatorIndex-1)
+        if ( i != operatorIndex && i != operatorIndex+1)
         {
             if ( !getterArgumentsStr.empty() ) getterArgumentsStr += ", ";
             getterArgumentsStr += arguments[i];
@@ -107,12 +109,12 @@ string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata &
     string argumentsStr;
     for (unsigned int i = startFromArgument;i<arguments.size();++i)
     {
-        if ( i != operatorIndex && i != operatorIndex-1) //Generate classic arguments
+        if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
         {
             if ( !argumentsStr.empty() ) argumentsStr += ", ";
             argumentsStr += arguments[i];
         }
-        if ( i == operatorIndex-1 )
+        if ( i == operatorIndex+1 )
         {
             if ( !argumentsStr.empty() ) argumentsStr += ", ";
             if ( operatorStr != "=" )
@@ -138,14 +140,15 @@ string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata &
  */
 string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
-    unsigned int operatorIndex = 0;
-    for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
+    unsigned int operatorIndex = instrInfos.parameters.size();
+    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "operator" )
             operatorIndex = i;
     }
 
-    if ( operatorIndex == 0 )
+    //Ensure that there is at least one parameter after the operator
+    if ( operatorIndex+1 >= instrInfos.parameters.size() )
     {
         ReportError();
         return "";
@@ -154,7 +157,7 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
     string operatorStr = arguments[operatorIndex];
     if ( operatorStr.size() > 2 ) operatorStr = operatorStr.substr(1, operatorStr.length()-1-1); //Operator contains quote which must be removed.
 
-    string rhs = arguments[operatorIndex-1];
+    string rhs = arguments[operatorIndex+1];
 
     //Generate real operator string.
     if ( operatorStr == "+" ) operatorStr = "+=";
@@ -166,7 +169,7 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
     string argumentsStr;
     for (unsigned int i = startFromArgument;i<arguments.size();++i)
     {
-        if ( i != operatorIndex && i != operatorIndex-1) //Generate classic arguments
+        if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
         {
             if ( !argumentsStr.empty() ) argumentsStr += ", ";
             argumentsStr += arguments[i];

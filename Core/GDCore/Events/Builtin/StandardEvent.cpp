@@ -72,13 +72,13 @@ void StandardEvent::LoadFromXml(gd::Project & project, const TiXmlElement * even
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
-        gd::EventsListSerialization::OpenConditions(conditions, eventElem->FirstChildElement( "Conditions" ));
+        gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
     else
         cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
-        gd::EventsListSerialization::OpenActions(actions, eventElem->FirstChildElement( "Actions" ));
+        gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
     else
         cout << "Aucune informations sur les actions d'un évènement";
 

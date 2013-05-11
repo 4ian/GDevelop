@@ -153,14 +153,14 @@ public:
          *  obj.AddAction("String",
          *                 _("Change the string"),
          *                 _("Change the string of a text"),
-         *                 _("Do _PARAM2__PARAM1_ to the string of _PARAM0_"),
+         *                 _("Do _PARAM1__PARAM2_ to the string of _PARAM0_"),
          *                 _("Text"),
          *                 "CppPlatform/Extensions/text24.png",
          *                 "CppPlatform/Extensions/text.png");
          *
          *      .AddParameter("object", _("Object"), "Text", false);
-         *      .AddParameter("string", _("String"))
          *      .AddParameter("operator", _("Modification operator"))
+         *      .AddParameter("string", _("String"))
          *
          *      .codeExtraInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
          *

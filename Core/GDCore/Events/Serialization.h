@@ -38,12 +38,12 @@ public:
     /**
      * \brief Load a list of conditions from a TiXmlElement
      */
-    static void OpenConditions(std::vector < gd::Instruction > & list, const TiXmlElement * elem);
+    static void OpenConditions(gd::Project & project, std::vector < gd::Instruction > & list, const TiXmlElement * elem);
 
     /**
      * \brief Load a list of actions from a TiXmlElement
      */
-    static void OpenActions(std::vector < gd::Instruction > & list, const TiXmlElement * elem);
+    static void OpenActions(gd::Project & project, std::vector < gd::Instruction > & list, const TiXmlElement * elem);
 
     /**
      * \brief Save a list of conditions to a TiXmlElement
@@ -58,9 +58,9 @@ public:
     /**
      * \brief Internal method called when opening events created with GD2.x
      *
-     * Some instructions names have been changed as well as parameters.
+     * Some instructions names have been changed as well as parameters since GD 3.
      */
-    static void UpdateInstructionsFromGD2x(const std::vector < gd::Instruction > & list);
+    static void UpdateInstructionsFromGD2x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions);
 };
 
 }

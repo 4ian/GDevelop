@@ -4,16 +4,54 @@
  */
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/CommonTOols.h"
 
 using namespace std;
 
 namespace gd
 {
+
+
+void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions)
+{
+    for (unsigned int i = 0;i<list.size();++i)
+    {
+        gd::Instruction & instr = list[i];
+
+        const gd::InstructionMetadata & metadata = instructionsAreActions ?
+                                             MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(), instr.GetType()) :
+                                             MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(), instr.GetType());
+
+        //Update parameters
+        const std::vector< gd::Expression > & parameters = instr.GetParameters();
+        for (unsigned int j = 0;j<parameters.size() && j<metadata.parameters.size();++j)
+        {
+            if ( metadata.parameters[j].type == "relationalOperator" ||
+                 metadata.parameters[j].type == "operator" )
+            {
+                if ( j == parameters.size()-1 )
+                {
+                    std::cout << "ERROR: No more parameters after a [relational]operator when trying to update an instruction from GD2.x";
+                }
+                else
+                {
+                    //Exchange parameters
+                    std::string op = parameters[j+1].GetPlainString();
+                    instr.SetParameter(j+1, parameters[j] );
+                    instr.SetParameter(j, gd::Expression(op));
+                }
+            }
+        }
+
+        UpdateInstructionsFromGD2x(project, instr.GetSubInstructions(), instructionsAreActions);
+    }
+}
 
 void EventsListSerialization::LoadEventsFromXml(gd::Project & project, std::vector < boost::shared_ptr<gd::BaseEvent> > & list, const TiXmlElement * events)
 {
@@ -66,7 +104,7 @@ void EventsListSerialization::SaveEventsToXml(const std::vector < boost::shared_
 using namespace std;
 
 
-void gd::EventsListSerialization::OpenConditions(vector < gd::Instruction > & conditions, const TiXmlElement * elem)
+void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector < gd::Instruction > & conditions, const TiXmlElement * elem)
 {
     if (elem == NULL) return;
     const TiXmlElement * elemConditions = elem->FirstChildElement();
@@ -96,15 +134,18 @@ void gd::EventsListSerialization::OpenConditions(vector < gd::Instruction > & co
 
         //Read sub conditions
         if ( elemConditions->FirstChildElement( "SubConditions" ) != NULL )
-            OpenConditions(instruction.GetSubInstructions(), elemConditions->FirstChildElement( "SubConditions" ));
+            OpenConditions(project, instruction.GetSubInstructions(), elemConditions->FirstChildElement( "SubConditions" ));
 
         conditions.push_back( instruction );
 
         elemConditions = elemConditions->NextSiblingElement();
     }
+
+    if ( project.GetLastSaveGDMajorVersion() < 3 )
+        UpdateInstructionsFromGD2x(project, conditions, false);
 }
 
-void gd::EventsListSerialization::OpenActions(vector < gd::Instruction > & actions, const TiXmlElement * elem)
+void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd::Instruction > & actions, const TiXmlElement * elem)
 {
     if (elem == NULL) return;
     const TiXmlElement * elemActions = elem->FirstChildElement();
@@ -133,11 +174,14 @@ void gd::EventsListSerialization::OpenActions(vector < gd::Instruction > & actio
 
         //Read sub actions
         if ( elemActions->FirstChildElement( "SubActions" ) != NULL )
-            OpenActions(instruction.GetSubInstructions(), elemActions->FirstChildElement( "SubActions" ));
+            OpenActions(project, instruction.GetSubInstructions(), elemActions->FirstChildElement( "SubActions" ));
 
         actions.push_back(instruction);
         elemActions = elemActions->NextSiblingElement();
     }
+
+    if ( project.GetLastSaveGDMajorVersion() < 3 )
+        UpdateInstructionsFromGD2x(project, actions, true);
 }
 
 void gd::EventsListSerialization::SaveActions(const vector < gd::Instruction > & list, TiXmlElement * actions)

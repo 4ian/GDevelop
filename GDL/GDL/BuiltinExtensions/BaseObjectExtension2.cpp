@@ -95,7 +95,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("Distance",
                    _("Distance between two objects"),
                    _("Test the distance between two objects."),
-                   _("The distance between _PARAM0_ and _PARAM1_ is _PARAM5__PARAM4_"),
+                   _("The distance between _PARAM0_ and _PARAM1_ is _PARAM4__PARAM5_"),
                    _("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")
@@ -103,8 +103,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddParameter("object", _("Object 2"))
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-        .AddParameter("expression", _("Distance"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Distance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
@@ -143,14 +143,14 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("NbObjet",
                    _("Number of objects"),
                    _("Test the number of concerned objects."),
-                   _("The number of _PARAM0_ is _PARAM3__PARAM2_"),
+                   _("The number of _PARAM0_ is _PARAM2__PARAM3_"),
                    _("Objects"),
                    "res/conditions/nbObjet24.png",
                    "res/conditions/nbObjet.png")
         .AddParameter("object", _("Object"))
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 

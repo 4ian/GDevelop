@@ -30,15 +30,15 @@ JoystickExtension::JoystickExtension()
     AddCondition("JoystickAxis",
                    _("Value of an axis of a joystick"),
                    _("Test the value of an axis of a joystick."),
-                   _("The value of the axis _PARAM2_ of joystick _PARAM1_ is _PARAM4__PARAM3_"),
+                   _("The value of the axis _PARAM2_ of joystick _PARAM1_ is _PARAM3__PARAM4_"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("joyaxis", _("Axis"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/JoystickTools.h");
 
 

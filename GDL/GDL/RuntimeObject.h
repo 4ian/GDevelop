@@ -357,7 +357,7 @@ public:
     void AddForceToMoveAroundObject( const std::string &, float velocity, float length, float clearing, RuntimeObject * object );
     void PutAroundObject( const std::string &, float length, float angleInDegrees, RuntimeObject * object );
 
-    void SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator );
+    void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
     void Duplicate( RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists );
     void ActivateAutomatism( const std::string & automatismName, bool activate = true );

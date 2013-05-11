@@ -86,14 +86,14 @@ MouseExtension::MouseExtension()
     AddCondition("SourisX",
                    _("X position of the mouse"),
                    _("Test the X position of the cursor."),
-                   _("The X position of the cursor is _PARAM2__PARAM1_"),
+                   _("The X position of the cursor is _PARAM1__PARAM2_"),
                    _("Mouse"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
 
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("X position"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("X position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("GetCursorXPosition").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
@@ -103,13 +103,13 @@ MouseExtension::MouseExtension()
     AddCondition("SourisY",
                    _("Y position of the mouse"),
                    _("Test the Y position of the cursor."),
-                   _("The Y position of the cursor is _PARAM2__PARAM1_"),
+                   _("The Y position of the cursor is _PARAM1__PARAM2_"),
                    _("Mouse"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Y position"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Y position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("GetCursorYPosition").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");

@@ -96,21 +96,21 @@ SceneExtension::SceneExtension()
                 std::string value2Code;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
                 }
 
-                if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )
+                if ( instruction.GetParameters()[1].GetPlainString() == "=" || instruction.GetParameters()[1].GetPlainString().empty() )
                     return "conditionTrue = ("+value1Code+" == "+value2Code+");\n";
-                else if ( instruction.GetParameters()[2].GetPlainString() == ">")
+                else if ( instruction.GetParameters()[1].GetPlainString() == ">")
                     return "conditionTrue = ("+value1Code+" > "+value2Code+");\n";
-                else if ( instruction.GetParameters()[2].GetPlainString() == "<")
+                else if ( instruction.GetParameters()[1].GetPlainString() == "<")
                     return "conditionTrue = ("+value1Code+" < "+value2Code+");\n";
-                else if ( instruction.GetParameters()[2].GetPlainString() == "<=")
+                else if ( instruction.GetParameters()[1].GetPlainString() == "<=")
                     return "conditionTrue = ("+value1Code+" <= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[2].GetPlainString() == ">=")
+                else if ( instruction.GetParameters()[1].GetPlainString() == ">=")
                     return "conditionTrue = ("+value1Code+" >= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[2].GetPlainString() == "!=")
+                else if ( instruction.GetParameters()[1].GetPlainString() == "!=")
                     return "conditionTrue = ("+value1Code+" != "+value2Code+");\n";
 
                 return "";
@@ -126,8 +126,8 @@ SceneExtension::SceneExtension()
                    "res/conditions/egal24.png",
                    "res/conditions/egal.png")
         .AddParameter("expression", _("Expression 1"), "",false)
-        .AddParameter("expression", _("Expression 2"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Expression 2"), "",false)
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 

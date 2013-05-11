@@ -32,56 +32,56 @@ SpriteExtension::SpriteExtension()
         obj.AddAction("Opacity",
                        _("Change object's opacity"),
                        _("Change the opacity of an object."),
-                       _("Do _PARAM2__PARAM1_ to the opacity of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
                        _("Visibility"),
                        "res/actions/opacity24.png",
                        "res/actions/opacity.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeAnimation",
                        _("Change the animation"),
                        _("Modify the current animation of the object."),
-                       _("Do _PARAM2__PARAM1_ to the number of current animation of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the number of current animation of _PARAM0_"),
                        _("Animations and images"),
                        "res/actions/animation24.png",
                        "res/actions/animation.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeDirection",
                        _("Change the direction"),
                        _("Change the direction of the object.\nIf the object is set to automatically rotate, the direction is its angle.\nIf the object is in 8 directions mode, the valid directions are 0..7"),
-                       _("Do _PARAM2__PARAM1_ to the direction of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the direction of _PARAM0_"),
                        _("Direction"),
                        "res/actions/direction24.png",
                        "res/actions/direction.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeSprite",
                        _("Current frame"),
                        _("Modify the current frame of the object"),
-                       _("Do _PARAM2__PARAM1_ to animation frame of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to animation frame of _PARAM0_"),
                        _("Animations and images"),
                        "res/actions/sprite24.png",
                        "res/actions/sprite.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
@@ -127,82 +127,82 @@ SpriteExtension::SpriteExtension()
         obj.AddAction("ChangeScale",
                        _("Modify the scale of an object"),
                        _("Modify the scale of the specified object."),
-                       _("Do _PARAM2__PARAM1_ to the scale of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
                        _("Size"),
                        "res/actions/scale24.png",
                        "res/actions/scale.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeScaleWidth",
                        _("Modify the scale on X axis"),
                        _("Modify the scale of the width of an object."),
-                       _("Do _PARAM2__PARAM1_ to the width's scale of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
                        _("Size"),
                        "res/actions/scale24.png",
                        "res/actions/scale.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeScaleHeight",
                        _("Modify the scale on Y axis"),
                        _("Modify the scale of the height of an object."),
-                       _("Do _PARAM2__PARAM1_ to the height's scale of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
                        _("Size"),
                        "res/actions/scale24.png",
                        "res/actions/scale.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
+            .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddCondition("Animation",
                        _("Current animation"),
                        _("Test the number of the current animation of the object."),
-                       _("The number of the current animation of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The number of the current animation of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Animations and images"),
                        "res/conditions/animation24.png",
                        "res/conditions/animation.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Number to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Number to test"), "",false)
             .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("Direction",
                        _("Current direction"),
                        _("Test the direction of the object"),
-                       _("The direction of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The direction of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Direction"),
                        "res/conditions/direction24.png",
                        "res/conditions/direction.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Direction to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Direction to test"), "",false)
             .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("Sprite",
                        _("Current frame"),
                        _("Test the number of the current animation frame."),
-                       _("The animation frame of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Animations and images"),
                        "res/conditions/sprite24.png",
                        "res/conditions/sprite.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Animation frame to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Animation frame to test"), "",false)
             .codeExtraInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("AnimStopped",
@@ -230,53 +230,53 @@ SpriteExtension::SpriteExtension()
         obj.AddCondition("ScaleWidth",
                        _("Scale of the width of an object"),
                        _("Test the scale of the width of an object."),
-                       _("The width's scale of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Size"),
                        "res/conditions/scaleWidth24.png",
                        "res/conditions/scaleWidth.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Value to test"), "",false)
             .codeExtraInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("ScaleHeight",
                        _("Scale of the height of an object"),
                        _("Test the scale of the height of an object."),
-                       _("The height's scale of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Size"),
                        "res/conditions/scaleHeight24.png",
                        "res/conditions/scaleHeight.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Value to test"), "",false)
             .codeExtraInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("Opacity",
                        _("Opacity"),
                        _("Test the opacity of an object"),
-                       _("The opacity of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Visibility"),
                        "res/conditions/opacity24.png",
                        "res/conditions/opacity.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Value to test"), "",false)
             .codeExtraInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("BlendMode",
                        _("Blend mode"),
                        _("Compare the number of the blend mode currently used by an object"),
-                       _("The number of the current blend mode of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The number of the current blend mode of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Effects"),
                        "res/conditions/opacity24.png",
                        "res/conditions/opacity.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+            .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
             .codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddAction("CopyImageOnImageOfSprite",

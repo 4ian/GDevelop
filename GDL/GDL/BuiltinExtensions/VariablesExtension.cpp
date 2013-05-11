@@ -31,7 +31,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -46,17 +46,17 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" || instruction.GetParameters()[3].GetPlainString().empty() )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )
                     return "conditionTrue = ("+variableGetCode+" == "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == ">")
+                else if ( instruction.GetParameters()[2].GetPlainString() == ">")
                     return "conditionTrue = ("+variableGetCode+" > "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "<")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "<")
                     return "conditionTrue = ("+variableGetCode+" < "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "<=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "<=")
                     return "conditionTrue = ("+variableGetCode+" <= "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == ">=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == ">=")
                     return "conditionTrue = ("+variableGetCode+" >= "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "!=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "!=")
                     return "conditionTrue = ("+variableGetCode+" != "+expressionCode+");\n";
 
                 return "";
@@ -68,14 +68,14 @@ VariablesExtension::VariablesExtension()
         AddCondition("VarScene",
                    _("Scene variables"),
                    _("Test a variable."),
-                   _("Variable _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Variable _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
@@ -91,7 +91,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
@@ -106,9 +106,9 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" || instruction.GetParameters()[3].GetPlainString().empty() )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )
                     return "conditionTrue = ("+variableGetCode+" == "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "!=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "!=")
                     return "conditionTrue = ("+variableGetCode+" != "+expressionCode+");\n";
 
                 return "";
@@ -119,14 +119,14 @@ VariablesExtension::VariablesExtension()
         AddCondition("VarSceneTxt",
                    _("Text of a scene variable"),
                    _("Test the text of a variable."),
-                   _("The text of variable _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("The text of variable _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("string", _("Text to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("string", _("Text to test"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
@@ -155,7 +155,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -170,17 +170,17 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" || instruction.GetParameters()[3].GetPlainString().empty() )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )
                     return "conditionTrue = ("+variableGetCode+" == "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == ">")
+                else if ( instruction.GetParameters()[2].GetPlainString() == ">")
                     return "conditionTrue = ("+variableGetCode+" > "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "<")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "<")
                     return "conditionTrue = ("+variableGetCode+" < "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "<=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "<=")
                     return "conditionTrue = ("+variableGetCode+" <= "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == ">=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == ">=")
                     return "conditionTrue = ("+variableGetCode+" >= "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "!=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "!=")
                     return "conditionTrue = ("+variableGetCode+" != "+expressionCode+");\n";
 
                 return "";
@@ -191,14 +191,14 @@ VariablesExtension::VariablesExtension()
         AddCondition("VarGlobal",
                    _("Global variable"),
                    _("Test the value of a global variable."),
-                   _("The global variable _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("The global variable _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
@@ -215,7 +215,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
@@ -230,9 +230,9 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" || instruction.GetParameters()[3].GetPlainString().empty() )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )
                     return "conditionTrue = ("+variableGetCode+" == "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "!=")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "!=")
                     return "conditionTrue = ("+variableGetCode+" != "+expressionCode+");\n";
 
                 return "";
@@ -243,14 +243,14 @@ VariablesExtension::VariablesExtension()
         AddCondition("VarGlobalTxt",
                    _("Text of a global variable"),
                    _("Test the text of a global variable."),
-                   _("The text of the global variable _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("The text of the global variable _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("string", _("Text to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("string", _("Text to test"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
@@ -282,7 +282,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -297,15 +297,15 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" )
                     return variableObtainCode+" = "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "+")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "+")
                     return variableObtainCode+" += "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "-")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "-")
                     return variableObtainCode+" -= "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "*")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "*")
                     return variableObtainCode+" *= "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "/")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "/")
                     return variableObtainCode+" /= "+expressionCode+";\n";
 
                 return "";
@@ -317,14 +317,14 @@ VariablesExtension::VariablesExtension()
         AddAction("ModVarScene",
                    _("Scene variables"),
                    _("Modify a scene variable."),
-                   _("Do _PARAM3__PARAM2_ to variable _PARAM1_"),
+                   _("Do _PARAM2__PARAM3_ to variable _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("expression", _("Value"))
         .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
@@ -341,7 +341,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
@@ -356,9 +356,9 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" )
                     return variableObtainCode+" = "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "+")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "+")
                     return variableObtainCode+" += "+expressionCode+";\n";
 
                 return "";
@@ -369,14 +369,14 @@ VariablesExtension::VariablesExtension()
         AddAction("ModVarSceneTxt",
                    _("Text of a scene variable"),
                    _("Modify the text of a scene variable."),
-                   _("Do _PARAM3__PARAM2_ to the text of variable _PARAM1_"),
+                   _("Do _PARAM2__PARAM3_ to the text of variable _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("string", _("Text"))
         .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("string", _("Text"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
@@ -393,7 +393,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -408,15 +408,15 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" )
                     return variableObtainCode+" = "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "+")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "+")
                     return variableObtainCode+" += "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "-")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "-")
                     return variableObtainCode+" -= "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "*")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "*")
                     return variableObtainCode+" *= "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "/")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "/")
                     return variableObtainCode+" /= "+expressionCode+";\n";
 
                 return "";
@@ -427,14 +427,14 @@ VariablesExtension::VariablesExtension()
         AddAction("ModVarGlobal",
                    _("Global variable"),
                    _("Modify a global variable"),
-                   _("Do _PARAM3__PARAM2_ to global variable _PARAM1_"),
+                   _("Do _PARAM2__PARAM3_ to global variable _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("expression", _("Value"))
         .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
@@ -451,7 +451,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
-                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[3].GetPlainString());
                     if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
@@ -466,9 +466,9 @@ VariablesExtension::VariablesExtension()
                     }
                 }
 
-                if ( instruction.GetParameters()[3].GetPlainString() == "=" )
+                if ( instruction.GetParameters()[2].GetPlainString() == "=" )
                     return variableObtainCode+" = "+expressionCode+";\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == "+")
+                else if ( instruction.GetParameters()[2].GetPlainString() == "+")
                     return variableObtainCode+" += "+expressionCode+";\n";
 
                 return "";
@@ -479,14 +479,14 @@ VariablesExtension::VariablesExtension()
         AddAction("ModVarGlobalTxt",
                    _("Text of a global variable"),
                    _("Modify the text of a global variable."),
-                   _("Do _PARAM3__PARAM2_ to the text of global variable _PARAM1_"),
+                   _("Do _PARAM2__PARAM3_ to the text of global variable _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("string", _("Text"))
         .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("string", _("Text"))
         .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 

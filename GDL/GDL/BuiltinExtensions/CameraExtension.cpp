@@ -18,13 +18,13 @@ CameraExtension::CameraExtension()
     AddCondition("CameraX",
                    _("Camera X position"),
                    _("Test the X position of a camera."),
-                   _("X position of camera _PARAM4_ is _PARAM2__PARAM1_ ( Layer: _PARAM3_ )"),
+                   _("X position of camera _PARAM4_ is _PARAM1__PARAM2_ ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("GetCameraX").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
@@ -34,13 +34,13 @@ CameraExtension::CameraExtension()
     AddCondition("CameraY",
                    _("Camera Y position"),
                    _("Test the Y position of a camera."),
-                   _("The Y position of camera _PARAM4_ is _PARAM2__PARAM1_  ( Layer: _PARAM3_ )"),
+                   _("The Y position of camera _PARAM4_ is _PARAM1__PARAM2_  ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("GetCameraY").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
@@ -50,13 +50,13 @@ CameraExtension::CameraExtension()
     AddAction("CameraX",
                    _("Camera X position"),
                    _("Change X position of the specified camera."),
-                   _("Do _PARAM2__PARAM1_ to X position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
+                   _("Do _PARAM1__PARAM2_ to X position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("SetCameraX").SetManipulatedType("number").SetAssociatedGetter("GetCameraX").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
@@ -64,13 +64,13 @@ CameraExtension::CameraExtension()
     AddAction("CameraY",
                    _("Camera Y position"),
                    _("Change Y position of the specified camera."),
-                   _("Do _PARAM2__PARAM1_ to Y position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
+                   _("Do _PARAM1__PARAM2_ to Y position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("SetCameraY").SetManipulatedType("number").SetAssociatedGetter("GetCameraY").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
@@ -110,13 +110,13 @@ CameraExtension::CameraExtension()
     AddCondition("CameraAngle",
                    _("Angle of a camera of a layer"),
                    _("Test a camera angle."),
-                   _("Angle of camera is _PARAM2__PARAM1_ ( layer : _PARAM3_, camera : _PARAM4_ )"),
+                   _("Angle of camera is _PARAM1__PARAM2_ ( layer : _PARAM3_, camera : _PARAM4_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
@@ -126,13 +126,13 @@ CameraExtension::CameraExtension()
     AddAction("RotateCamera",
                    _("Change camera angle"),
                    _("This action modify the angle of a camera of the specified layer."),
-                   _("Do _PARAM2__PARAM1_ to angle of camera ( layer : _PARAM3_, camera : _PARAM4_ )"),
+                   _("Do _PARAM1__PARAM2_ to angle of camera ( layer : _PARAM3_, camera : _PARAM4_ )"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
         .codeExtraInformation.SetFunctionName("SetCameraAngle").SetAssociatedGetter("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");

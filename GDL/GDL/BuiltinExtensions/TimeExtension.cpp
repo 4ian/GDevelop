@@ -35,13 +35,13 @@ TimeExtension::TimeExtension()
     AddCondition("TimeScale",
                    _("Time scale"),
                    _("Test the time scale."),
-                   _("The time scale is _PARAM2__PARAM1_"),
+                   _("The time scale is _PARAM1__PARAM2_"),
                    _("Timers and time"),
                    "res/conditions/time24.png",
                    "res/conditions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
 
         .codeExtraInformation.SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 

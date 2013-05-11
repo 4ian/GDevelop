@@ -20,7 +20,7 @@ double GD_API PickedObjectsCount( const std::string &, std::map <std::string, st
 /**
  * Only used internally by GD events generated code.
  */
-float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, std::string relationalOperator, bool conditionInverted);
+float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, std::string relationalOperator, float length, bool conditionInverted);
 
 /**
  * Only used internally by GD events generated code.

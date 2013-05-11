@@ -443,7 +443,7 @@ void RuntimeObject::PutAroundObject( const std::string &, float length, float an
 }
 
 
-void RuntimeObject::SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator )
+void RuntimeObject::SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue )
 {
     if ( strcmp(xOperator, "") == 0 || strcmp(xOperator, "=") == 0)
         SetX( xValue );

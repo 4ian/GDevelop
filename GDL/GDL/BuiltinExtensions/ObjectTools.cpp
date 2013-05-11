@@ -136,7 +136,7 @@ namespace GDpriv
     }
 }
 
-float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, string relationalOperator, bool conditionInverted)
+float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, string relationalOperator, float length, bool conditionInverted)
 {
     length *= length;
     const bool sameObjectLists = firstObjName == secondObjName;

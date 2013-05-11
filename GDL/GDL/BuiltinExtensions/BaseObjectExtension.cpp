@@ -33,70 +33,70 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         obj.AddCondition("PosX",
                        _("Test X position of an object"),
                        _("Test the X position of the objext"),
-                       _("The X position of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The X position of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Position"),
                        "res/conditions/position24.png",
                        "res/conditions/position.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("X position"))
             .AddParameter("relationalOperator", _("Sign of the test"))
+            .AddParameter("expression", _("X position"))
             .codeExtraInformation.SetFunctionName("GetX").SetManipulatedType("number");
 
         obj.AddAction("MettreX",
                        _("X position of an object"),
                        _("Change the X position of an object."),
-                       _("Do _PARAM2__PARAM1_ to the X position of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the X position of _PARAM0_"),
                        _("Position"),
                        "res/actions/position24.png",
                        "res/actions/position.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
+            .AddParameter("expression", _("Value"))
             .codeExtraInformation.SetFunctionName("SetX").SetManipulatedType("number").SetAssociatedGetter("GetX");
 
 
         obj.AddCondition("PosY",
                        _("Test Y position of an object"),
                        _("Test the Y position of an object"),
-                       _("The Y position of _PARAM0_ is _PARAM2__PARAM1_"),
+                       _("The Y position of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Position"),
                        "res/conditions/position24.png",
                        "res/conditions/position.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Y position"))
             .AddParameter("relationalOperator", _("Sign of the test"))
+            .AddParameter("expression", _("Y position"))
             .codeExtraInformation.SetFunctionName("GetY").SetManipulatedType("number");
 
         obj.AddAction("MettreY",
                        _("Y position of an object"),
                        _("Change the Y position of an object."),
-                       _("Do _PARAM2__PARAM1_ to the Y position of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to the Y position of _PARAM0_"),
                        _("Position"),
                        "res/actions/position24.png",
                        "res/actions/position.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
+            .AddParameter("expression", _("Value"))
             .codeExtraInformation.SetFunctionName("SetY").SetManipulatedType("number").SetAssociatedGetter("GetY");
 
 
         obj.AddAction("MettreXY",
                        _("Position of an object"),
                        _("Change the position of an object."),
-                       _("Do _PARAM2__PARAM1_;_PARAM4__PARAM3_ to the position of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_;_PARAM3__PARAM4_ to the position of _PARAM0_"),
                        _("Position"),
                        "res/actions/position24.png",
                        "res/actions/position.png")
 
             .AddParameter("object", _("Object"))
+            .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("X position"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Y position"))
-            .AddParameter("operator", _("Modification's sign"))
             .codeExtraInformation.SetFunctionName("SetXY");
 
 
@@ -220,14 +220,14 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         obj.AddAction("ChangePlan",
                        _("Change Z order of an object"),
                        _("Modify the z order of an object"),
-                       _("Do _PARAM2__PARAM1_ to z-Order of _PARAM0_"),
+                       _("Do _PARAM1__PARAM2_ to z-Order of _PARAM0_"),
                        _("Z order"),
                        "res/actions/planicon24.png",
                        "res/actions/planicon.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
+            .AddParameter("expression", _("Value"))
             .codeExtraInformation.SetFunctionName("SetZOrder").SetAssociatedGetter("GetZOrder").SetManipulatedType("number");
 
 
@@ -247,30 +247,30 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         obj.AddAction("ModVarObjet",
                        _("Modify a variable of an object"),
                        _("Modify the value of a variable of an object"),
-                       _("Do _PARAM3__PARAM2_ to variable _PARAM1_ of _PARAM0_"),
+                       _("Do _PARAM2__PARAM3_ to variable _PARAM1_ of _PARAM0_"),
                        _("Variables"),
                        "res/actions/var24.png",
                        "res/actions/var.png")
 
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
+            .AddParameter("expression", _("Value"))
             .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
 
 
         obj.AddAction("ModVarObjetTxt",
                        _("Modify the text of a variable of an object"),
                        _("Modify the text of a variable of an object"),
-                       _("Do _PARAM3__PARAM2_ to the text of variable _PARAM1_ of _PARAM0_"),
+                       _("Do _PARAM2__PARAM3_ to the text of variable _PARAM1_ of _PARAM0_"),
                        _("Variables"),
                        "res/actions/var24.png",
                        "res/actions/var.png")
 
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("string", _("Text"))
             .AddParameter("operator", _("Modification's sign"))
+            .AddParameter("string", _("Text"))
             .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
 
 
@@ -309,8 +309,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/planicon.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Z order"))
             .AddParameter("relationalOperator", _("Sign of the test"))
+            .AddParameter("expression", _("Z order"))
             .codeExtraInformation.SetFunctionName("GetZOrder").SetManipulatedType("number");
 
         obj.AddCondition("Layer",
@@ -323,7 +323,6 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddParameter("layer", _("Layer"))
-            .AddParameter("relationalOperator", _("Layer"))
             .codeExtraInformation.SetFunctionName("IsOnLayer");
 
         obj.AddCondition("Visible",
@@ -368,8 +367,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/vitesse.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("Speed"))
             .AddParameter("relationalOperator", _("Sign of the test"))
+            .AddParameter("expression", _("Speed"))
             .codeExtraInformation.SetFunctionName("TotalForceLength").SetManipulatedType("number");
 
         obj.AddCondition("AngleOfDisplacement",
@@ -388,29 +387,29 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         obj.AddCondition("VarObjet",
                        _("Object's variable"),
                        _("Test the value of a variable of an object."),
-                       _("Variable _PARAM1_ of _PARAM0_ is _PARAM3__PARAM2_"),
+                       _("Variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
                        _("Variables"),
                        "res/conditions/var24.png",
                        "res/conditions/var.png")
 
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("expression", _("Value to test"))
             .AddParameter("relationalOperator", _("Sign of the test"))
+            .AddParameter("expression", _("Value to test"))
             .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
 
         obj.AddCondition("VarObjetTxt",
                        _("Text of variable of an object"),
                        _("Test the text of variable of an object."),
-                       _("The text of variable _PARAM1_ of _PARAM0_ is _PARAM3__PARAM2_"),
+                       _("The text of variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
                        _("Variables"),
                        "res/conditions/var24.png",
                        "res/conditions/var.png")
 
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .AddParameter("string", _("Text to test"))
             .AddParameter("relationalOperator", _("Sign of the test"))
+            .AddParameter("string", _("Text to test"))
             .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
 
         obj.AddCondition("VarObjetDef",

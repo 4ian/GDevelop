@@ -66,7 +66,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	notebook = new wxAuiNotebook(this, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER);
+	notebook = new wxAuiNotebook(this, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxNO_BORDER);
 	scenePanel = new wxPanel(notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	scenePanel->SetBackgroundColour(wxColour(255,255,255));
 	scenePanel->SetHelpText(_("Edit the layout of the scene"));
@@ -146,7 +146,7 @@ mainFrameWrapper(mainFrameWrapper_)
     }
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
-    gd::SkinHelper::ApplyCurrentSkin(*notebook);
+    gd::SkinHelper::ApplyCurrentSkin(*notebook, true);
 
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
     layoutEditorCanvas->ConnectEvents();

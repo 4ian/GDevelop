@@ -719,7 +719,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
     if ( i < ParaEdit.size() && i < instructionMetadata.parameters.size())
     {
-        if ( instructionMetadata.parameters[i].type == "object" )
+        if ( gd::ParameterMetadata::IsObject(instructionMetadata.parameters[i].type) )
         {
             gd::ChooseObjectDialog dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )

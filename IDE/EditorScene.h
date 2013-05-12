@@ -91,10 +91,10 @@ private:
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;
+    gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* scenePanel;
     wxPanel* eventsPanel;
     wxScrollBar* hScrollbar;
-    gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxAuiNotebook* notebook;
     wxScrollBar* vScrollbar;
     //*)

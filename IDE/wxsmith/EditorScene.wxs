@@ -10,7 +10,7 @@
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxAuiNotebook" name="ID_AUINOTEBOOK1" variable="notebook" member="yes">
-					<style>wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER</style>
+					<style>wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxNO_BORDER</style>
 					<handler function="OnnotebookPageChanged" entry="EVT_AUINOTEBOOK_PAGE_CHANGED" />
 					<handler function="OnnotebookPageChanging" entry="EVT_AUINOTEBOOK_PAGE_CHANGING" />
 					<object class="AuiNotebookPage">
@@ -39,8 +39,8 @@
 								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
 								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 							</object>
-							<object class="Custom" name="ID_CUSTOM3" subclass="SceneEditorCanvas" variable="layoutEditorCanvas" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
+							<object class="Custom" name="ID_CUSTOM3" subclass="gd::LayoutEditorCanvas" variable="layoutEditorCanvas" member="yes">
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
 								<local_include>1</local_include>
 								<style></style>
 								<pos>0,0</pos>
@@ -63,7 +63,7 @@
 								<growablerows>0</growablerows>
 								<object class="sizeritem">
 									<object class="Custom" name="ID_CUSTOM2" subclass="EventsEditor" variable="eventsEditor" member="yes">
-										<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, &amp;scene.GetEvents(), mainFrameWrapper);</creating_code>
+										<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, &amp;layout.GetEvents(), mainFrameWrapper);</creating_code>
 										<style></style>
 										<size>456,317</size>
 									</object>

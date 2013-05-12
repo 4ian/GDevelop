@@ -99,8 +99,8 @@ BaseObjectExtension::BaseObjectExtension()
 
     GetAllActions()["Create"].codeExtraInformation
         .SetFunctionName("gdjs.createObjectOnScene");
-    GetAllActions()["CreateByName"].codeExtraInformation
-        .SetFunctionName("gdjs.createObjectOnScene");
+    /*GetAllActions()["CreateByName"].codeExtraInformation
+        .SetFunctionName("gdjs.createObjectOnScene");*/ //TODO
     GetAllExpressions()["Count"].codeExtraInformation
         .SetFunctionName("gdjs.pickedObjectsCount");
     GetAllConditions()["NbObjet"].codeExtraInformation
@@ -208,19 +208,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Damping ( Default : 0 )"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAround");
 
-        obj.AddAction("Duplicate",
-                       _("Duplicate an object"),
-                       _("Create a copy of an object"),
-                       _("Duplicate the object _PARAM0_"),
-                       _("Objects"),
-                       "res/actions/duplicate24.png",
-                       "res/actions/duplicate.png")
-
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("currentScene", "")
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-            .codeExtraInformation.SetFunctionName("Duplicate");
-
         obj.AddCondition("AutomatismActivated",
                        _("Automatism activated"),
                        _("Return true if the automatism is activated for the object."),
@@ -256,10 +243,9 @@ BaseObjectExtension::BaseObjectExtension()
                        "res/actions/forceVers.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Target Object"))
+            .AddParameter("objectPtr", _("Target Object"))
             .AddParameter("expression", _("Length in pixel"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -272,11 +258,10 @@ BaseObjectExtension::BaseObjectExtension()
                        "res/actions/forceTourne.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Rotate around this object"))
+            .AddParameter("objectPtr", _("Rotate around this object"))
             .AddParameter("expression", _("Speed ( Degrees per second )"))
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -289,10 +274,9 @@ BaseObjectExtension::BaseObjectExtension()
                        "res/actions/positionAutour.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("\"Center\" Object"))
+            .AddParameter("objectPtr", _("\"Center\" Object"))
             .AddParameter("expression", _("Distance"))
             .AddParameter("expression", _("Angle, in degrees"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("PutAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -307,8 +291,7 @@ BaseObjectExtension::BaseObjectExtension()
 
             .SetHidden()
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object 2 ( won't move )"))
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+            .AddParameter("objectList", _("Object 2 ( won't move )"))
             .codeExtraInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -323,8 +306,7 @@ BaseObjectExtension::BaseObjectExtension()
 
             .SetHidden()
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object 2 ( won't move )"))
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+            .AddParameter("objectList", _("Object 2 ( won't move )"))
             .codeExtraInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -337,8 +319,7 @@ BaseObjectExtension::BaseObjectExtension()
                        "res/actions/ecarter.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Objects"))
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+            .AddParameter("objectList", _("Objects"))
             .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 */
@@ -351,9 +332,7 @@ BaseObjectExtension::BaseObjectExtension()
                    "res/actions/add24.png",
                    "res/actions/add.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("AjoutHasard",
@@ -364,9 +343,7 @@ BaseObjectExtension::BaseObjectExtension()
                    "res/actions/ajouthasard24.png",
                    "res/actions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddCondition("SeDirige",
@@ -376,10 +353,8 @@ BaseObjectExtension::BaseObjectExtension()
                    _("Displacement"),
                    "res/conditions/sedirige24.png",
                    "res/conditions/sedirige.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("object", _("Object 2"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object 2"))
         .AddParameter("expression", _("Angle of tolerance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("MovesToward").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -393,11 +368,8 @@ BaseObjectExtension::BaseObjectExtension()
                    _("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("object", _("Object 2"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object 2"))
         .AddParameter("expression", _("Distance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -412,9 +384,7 @@ BaseObjectExtension::BaseObjectExtension()
                    "res/conditions/add24.png",
                    "res/conditions/add.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
@@ -427,9 +397,7 @@ BaseObjectExtension::BaseObjectExtension()
                    "res/conditions/ajouthasard24.png",
                    "res/conditions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 */
 }

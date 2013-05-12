@@ -433,11 +433,11 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         return mask;
     }
     
-    that.getDistanceFrom = function(useless, otherObject) {
+    that.getDistanceFrom = function(otherObject) {
         return Math.sqrt(that.getSqDistanceFrom(useless, otherObject));
     }
     
-    that.getSqDistanceFrom = function(useless, otherObject) {
+    that.getSqDistanceFrom = function(otherObject) {
         if ( otherObject == null ) return 0;
         
         var x = that.getX()+that.getCenterX() - (otherObject.getX()+otherObject.getCenterX());

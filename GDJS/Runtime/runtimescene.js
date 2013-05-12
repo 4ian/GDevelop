@@ -217,7 +217,10 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
 /**
  * Allows events to create a new object on a scene.
  */
-gdjs.createObjectOnScene = function(runtimeScene, objectsLists, useless, objectName, x, y, layer) {
+gdjs.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
+    
+    //The objectsLists
+    var objectName = objectsLists.keys()[0];
     
     var obj = null;
     $(runtimeScene.getGame().getInitialObjectsXml()).find("Objet").each( function() { 

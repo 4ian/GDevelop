@@ -434,58 +434,38 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         argOutput = "runtimeScene";
     }
     //Code only parameter type
-    else if ( metadata.type == "mapOfObjectListsOfParameter" )
+    else if ( metadata.type == "objectList" )
     {
-        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
-        if ( i < othersParameters.size() )
-        {
-            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
-            argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
-            for (unsigned int i = 0;i<realObjects.size();++i)
-            {
-                context.ObjectsListNeeded(realObjects[i]);
-                argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
-            }
-            argOutput += ".getEventsObjectsMap()";
-        }
-        else
+        argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
+        for (unsigned int i = 0;i<realObjects.size();++i)
         {
-            return "gdjs.commonTools.clearEventsObjectsMap().getEventsObjectsMap()";
-            ReportError();
-            cout << "Error: Could not get objects for a parameter" << endl;
+            context.ObjectsListNeeded(realObjects[i]);
+            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
         }
+        argOutput += ".getEventsObjectsMap()";
     }
     //Code only parameter type
-    else if ( metadata.type == "mapOfObjectListsOfParameterWithoutPicking" )
+    else if ( metadata.type == "objectListWithoutPicking" )
     {
-        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
-        if ( i < othersParameters.size() )
-        {
-            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
-            argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
-            for (unsigned int i = 0;i<realObjects.size();++i)
-            {
-                context.EmptyObjectsListNeeded(realObjects[i]);
-                argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
-            }
-            argOutput += ".getEventsObjectsMap()";
-        }
-        else
+        argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
+        for (unsigned int i = 0;i<realObjects.size();++i)
         {
-            argOutput += "gdjs.commonTools.clearEventsObjectsMap().getEventsObjectsMap()";
-            ReportError();
-            cout << "Error: Could not get objects for a parameter" << endl;
+            context.EmptyObjectsListNeeded(realObjects[i]);
+            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
         }
+        argOutput += ".getEventsObjectsMap()";
     }
     //Code only parameter type
-    else if ( metadata.type == "ptrToObjectOfParameter")
+    else if ( metadata.type == "objectPtr")
     {
         unsigned int i = gd::ToInt(metadata.supplementaryInformation);
         if ( i < othersParameters.size() )
         {
-            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+            std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
             if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
             {

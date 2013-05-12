@@ -371,8 +371,7 @@ SpriteExtension::SpriteExtension()
                        "res/actions/direction.png")
 
             .AddParameter("object", _("Object to be rotated"), "Sprite", false)
-            .AddParameter("object", _("Rotate toward this object"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
+            .AddParameter("objectPtr", _("Rotate toward this object"))
             .codeExtraInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
 
@@ -455,10 +454,8 @@ SpriteExtension::SpriteExtension()
                       _("Direction"),
                       "res/conditions/estTourne24.png",
                       "res/conditions/estTourne.png")
-        .AddParameter("object", _("Name of the object"), "Sprite", false)
-        .AddParameter("object", _("Name of the second object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddParameter("objectList", _("Name of the object"), "Sprite", false)
+        .AddParameter("objectList", _("Name of the second object"))
         .AddParameter("expression", _("Angle of tolerance (0: minimum tolerance)"), "",false)
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
@@ -470,10 +467,8 @@ SpriteExtension::SpriteExtension()
                       _("Collision"),
                       "res/conditions/collision24.png",
                       "res/conditions/collision.png")
-        .AddParameter("object", _("Object 1"), "Sprite", false)
-        .AddParameter("object", _("Object 2"), "Sprite", false)
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddParameter("objectList", _("Object 1"), "Sprite", false)
+        .AddParameter("objectList", _("Object 2"), "Sprite", false)
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
     #endif

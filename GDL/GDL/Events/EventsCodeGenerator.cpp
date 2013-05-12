@@ -297,81 +297,51 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         argOutput += "*runtimeContext->scene";
     }
     //Code only parameter type
-    else if ( metadata.type == "mapOfObjectListsOfParameter" )
+    else if ( metadata.type == "objectList" )
     {
-        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
-        if ( i < othersParameters.size() )
-        {
-            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
+        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
-            argOutput += "runtimeContext->ClearObjectListsMap()";
+        argOutput += "runtimeContext->ClearObjectListsMap()";
+        for (unsigned int i = 0;i<realObjects.size();++i)
+        {
+            context.ObjectsListNeeded(realObjects[i]);
+            argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+        }
+        argOutput += ".ReturnObjectListsMap()";
+    }
+    //Code only parameter type
+    else if ( metadata.type == "objectListWithoutPicking" )
+    {
+        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
+
+        argOutput += "runtimeContext->ClearObjectListsMap()";
+        for (unsigned int i = 0;i<realObjects.size();++i)
+        {
+            context.EmptyObjectsListNeeded(realObjects[i]);
+            argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+        }
+        argOutput += ".ReturnObjectListsMap()";
+    }
+    //Code only parameter type
+    else if ( metadata.type == "objectPtr")
+    {
+        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
+
+        if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
+        {
+            //If object currently used by instruction is available, use it directly.
+            argOutput += ManObjListName(context.GetCurrentObject())+"[i]";
+        }
+        else
+        {
             for (unsigned int i = 0;i<realObjects.size();++i)
             {
                 context.ObjectsListNeeded(realObjects[i]);
-                argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+                argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
             }
-            argOutput += ".ReturnObjectListsMap()";
-        }
-        else
-        {
-            argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
-            ReportError();
-            cout << "Error: Could not get objects for a parameter" << endl;
-        }
-    }
-    //Code only parameter type
-    else if ( metadata.type == "mapOfObjectListsOfParameterWithoutPicking" )
-    {
-        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
-        if ( i < othersParameters.size() )
-        {
-            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
-
-            argOutput += "runtimeContext->ClearObjectListsMap()";
-            for (unsigned int i = 0;i<realObjects.size();++i)
-            {
-                context.EmptyObjectsListNeeded(realObjects[i]);
-                argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
-            }
-            argOutput += ".ReturnObjectListsMap()";
-        }
-        else
-        {
-            argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
-            ReportError();
-            cout << "Error: Could not get objects for a parameter" << endl;
-        }
-    }
-    //Code only parameter type
-    else if ( metadata.type == "ptrToObjectOfParameter")
-    {
-        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
-        if ( i < othersParameters.size() )
-        {
-            std::vector<std::string> realObjects = ExpandObjectsName(othersParameters[i].GetPlainString(), context);
-
-            if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
-            {
-                //If object currently used by instruction is available, use it directly.
-                argOutput += ManObjListName(context.GetCurrentObject())+"[i]";
-            }
-            else
-            {
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                {
-                    context.ObjectsListNeeded(realObjects[i]);
-                    argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
-                }
-                argOutput += "NULL";
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                    argOutput += ")";
-            }
-        }
-        else
-        {
             argOutput += "NULL";
-            ReportError();
-            cout << "Error: Could not get objects for a parameter" << endl;
+            for (unsigned int i = 0;i<realObjects.size();++i)
+                argOutput += ")";
         }
     }
     else

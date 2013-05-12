@@ -90,7 +90,7 @@ void GD_API SetCameraSize( RuntimeScene & scene, const std::string & layer, unsi
     scene.GetRuntimeLayer(layer).GetCamera(cameraNb).SetSize(width, height);
 }
 
-void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, RuntimeObject * object, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera)
+void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, RuntimeObject * object, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera)
 {
     if ( object == NULL ) return;
 
@@ -136,7 +136,7 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::stri
     return;
 }
 
-void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, RuntimeObject * object,  bool anticipateObjectMove, const std::string & layer, unsigned int camera)
+void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  bool anticipateObjectMove, const std::string & layer, unsigned int camera)
 {
     if ( object == NULL ) return;
 

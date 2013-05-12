@@ -10,14 +10,12 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddAction("Create",
                    _("Create an object"),
                    _("Create an object at specified position"),
-                   _("Create object _PARAM3_ at position _PARAM4_;_PARAM5_"),
+                   _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_"),
                    _("Objects"),
                    "res/actions/create24.png",
                    "res/actions/create.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "3")
-        .AddCodeOnlyParameter("inlineCode", "0") //Useless parameter
-        .AddParameter("object", _("Object to create"))
+        .AddParameter("objectListWithoutPicking", _("Object to create"))
         .AddParameter("expression", _("X position"))
         .AddParameter("expression", _("Y position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
@@ -26,13 +24,12 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddAction("CreateByName",
                    _("Create an object from its name"),
                    _("Among the objects of the specified group, the action will create the object with the specified name."),
-                   _("Among objects _PARAM2_, create object named _PARAM3_ at position _PARAM4_;_PARAM5_"),
+                   _("Among objects _PARAM1_, create object named _PARAM2_ at position _PARAM3_;_PARAM4_"),
                    _("Objects"),
                    "res/actions/create24.png",
                    "res/actions/create.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "2")
-        .AddParameter("object", _("Groups containing objects which can be created by the action"))
+        .AddParameter("objectListWithoutPicking", _("Groups containing objects which can be created by the action"))
         .AddParameter("string", _("Text representing the name of the object to create"))
         .AddParameter("expression", _("X position"))
         .AddParameter("expression", _("Y position"))
@@ -42,27 +39,23 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddAction("AjoutObjConcern",
                    _("Consider objects"),
                    _("Pick all objects with this name."),
-                   _("Consider all _PARAM3_ "),
+                   _("Consider all _PARAM1_ "),
                    _("Objects"),
                    "res/actions/add24.png",
                    "res/actions/add.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("AjoutHasard",
                    _("Take a random object"),
                    _("Take only one object with this name among all"),
-                   _("Take a random _PARAM3_ "),
+                   _("Take a random _PARAM1_ "),
                    _("Objects"),
                    "res/actions/ajouthasard24.png",
                    "res/actions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("MoveObjects",
@@ -78,14 +71,12 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("SeDirige",
                    _("An object is moving to another"),
                    _("Test if an object moves towards another.\nThe first object must move."),
-                   _("_PARAM0_ is moving to _PARAM1_"),
+                   _("_PARAM0_ is moving toward _PARAM1_"),
                    _("Displacement"),
                    "res/conditions/sedirige24.png",
                    "res/conditions/sedirige.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("object", _("Object 2"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object 2"))
         .AddParameter("expression", _("Angle of tolerance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("MovesToward").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -95,15 +86,12 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("Distance",
                    _("Distance between two objects"),
                    _("Test the distance between two objects."),
-                   _("The distance between _PARAM0_ and _PARAM1_ is _PARAM4__PARAM5_"),
+                   _("The distance between _PARAM0_ and _PARAM1_ is below _PARAM2_ pixels"),
                    _("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("object", _("Object 2"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object 2"))
         .AddParameter("expression", _("Distance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -113,14 +101,12 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("AjoutObjConcern",
                    _("Consider objects"),
                    _("Pick all objects with this name."),
-                   _("Consider all _PARAM3_ "),
+                   _("Consider all _PARAM1_ "),
                    _("Objects"),
                    "res/conditions/add24.png",
                    "res/conditions/add.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
@@ -128,14 +114,12 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("AjoutHasard",
                    _("Take a random object"),
                    _("Take only one object with this name among all"),
-                   _("Take a random _PARAM3_ "),
+                   _("Take a random _PARAM1_ "),
                    _("Objects"),
                    "res/conditions/ajouthasard24.png",
                    "res/conditions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
-        .AddCodeOnlyParameter("inlineCode", "0")
-        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
@@ -143,12 +127,11 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     AddCondition("NbObjet",
                    _("Number of objects"),
                    _("Test the number of concerned objects."),
-                   _("The number of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("The number of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Objects"),
                    "res/conditions/nbObjet24.png",
                    "res/conditions/nbObjet.png")
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .AddParameter("objectList", _("Object"))
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -162,18 +145,15 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    _("Collision"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
 
     AddExpression("Count", _("Number of objects"), _("Count the number of specified objects currently concerned"), _("Objects"), "res/conditions/nbObjet.png")
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
     #endif

@@ -248,7 +248,7 @@ bool RuntimeObject::AutomatismActivated( const std::string & automatismName )
     return GetAutomatismRawPointer(automatismName)->Activated();
 }
 
-double RuntimeObject::GetSqDistanceWithObject( const std::string &, RuntimeObject * object )
+double RuntimeObject::GetSqDistanceWithObject( RuntimeObject * object )
 {
     if ( object == NULL ) return 0;
 
@@ -258,12 +258,12 @@ double RuntimeObject::GetSqDistanceWithObject( const std::string &, RuntimeObjec
     return x*x+y*y; // No square root here
 }
 
-double RuntimeObject::GetDistanceWithObject( const std::string & unused, RuntimeObject * other )
+double RuntimeObject::GetDistanceWithObject( RuntimeObject * other )
 {
-    return sqrt(GetSqDistanceWithObject(unused, other));
+    return sqrt(GetSqDistanceWithObject(other));
 }
 
-void RuntimeObject::SeparateFromObjects(const std::string & , std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
@@ -300,7 +300,7 @@ void RuntimeObject::SeparateFromObjects(const std::string & , std::map <std::str
     SetY(GetY()+moveVector.y);
 }
 
-void RuntimeObject::SeparateObjectsWithoutForces( const string & , std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+void RuntimeObject::SeparateObjectsWithoutForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects2;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
@@ -346,7 +346,7 @@ void RuntimeObject::SeparateObjectsWithoutForces( const string & , std::map <std
     }
 }
 
-void RuntimeObject::SeparateObjectsWithForces( const string & , std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+void RuntimeObject::SeparateObjectsWithForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects2;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
@@ -392,7 +392,7 @@ void RuntimeObject::SeparateObjectsWithForces( const string & , std::map <std::s
     }
 }
 
-void RuntimeObject::AddForceTowardObject(const std::string &, float length, float clearing, RuntimeObject * object )
+void RuntimeObject::AddForceTowardObject(RuntimeObject * object, float length, float clearing )
 {
     if ( object == NULL ) return;
 
@@ -406,7 +406,7 @@ void RuntimeObject::AddForceTowardObject(const std::string &, float length, floa
     forces.push_back( forceToAdd );
 }
 
-void RuntimeObject::AddForceToMoveAroundObject( const std::string &, float velocity, float length, float clearing, RuntimeObject * object )
+void RuntimeObject::AddForceToMoveAroundObject( RuntimeObject * object, float velocity, float length, float clearing )
 {
     if ( object == NULL ) return;
 
@@ -432,7 +432,7 @@ void RuntimeObject::AddForceToMoveAroundObject( const std::string &, float veloc
     forces.push_back( forceToAdd );
 }
 
-void RuntimeObject::PutAroundObject( const std::string &, float length, float angleInDegrees, RuntimeObject * object )
+void RuntimeObject::PutAroundObject( RuntimeObject * object, float length, float angleInDegrees )
 {
     if ( object == NULL ) return;
 

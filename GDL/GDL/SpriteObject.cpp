@@ -801,7 +801,7 @@ bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
     return false;
 }
 
-void RuntimeSpriteObject::TurnTowardObject( const std::string &, RuntimeObject * object )
+void RuntimeSpriteObject::TurnTowardObject( RuntimeObject * object )
 {
     if (object == NULL) return;
 

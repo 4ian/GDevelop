@@ -198,7 +198,7 @@ public :
     bool IsFlippedY() const { return isFlippedY; };
 
     void TurnTowardPosition(float Xposition, float Yposition);
-    void TurnTowardObject( const std::string &, RuntimeObject * object );
+    void TurnTowardObject( RuntimeObject * object );
 
     /**
      * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-double GD_API PickedObjectsCount( const std::string &, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists )
+double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists )
 {
     vector<RuntimeObject*> pickedObjects;
     std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists.begin();
@@ -21,9 +21,22 @@ double GD_API PickedObjectsCount( const std::string &, std::map <std::string, st
     return pickedObjects.size();
 }
 
-bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
-    const bool sameObjectLists = firstObjName == secondObjName;
+    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
+    if ( sameObjectLists ) //Make sure that objects lists are really the same
+    {
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
+             it1 != objectsLists1.end() && it2 != objectsLists2.end();
+             ++it1, ++it2)
+        {
+            if ( it1->second != it2->second )
+            {
+                sameObjectLists = false;
+                break;
+            }
+        }
+    }
 
     vector<RuntimeObject*> objects1;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
@@ -71,7 +84,10 @@ bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::stri
                     for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
                     {
                         if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
-                            collision = true; //TODO : Add a break; ?
+                        {
+                            collision = true;
+                            break;
+                        }
                     }
 
                     if ( collision ) break;
@@ -82,11 +98,11 @@ bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::stri
                     if ( !conditionInverted )
                     {
                         isTrue = true;
-                        if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+                        std::vector<RuntimeObject*> * objList = objectsLists1[objects1[i]->GetName()];
+                        if ( find(objList->begin(), objList->end(), objects1[i]) == objList->end() ) objList->push_back(objects1[i]);
 
-                        if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                            objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
+                        objList = objectsLists2[objects2[j]->GetName()];
+                        if ( find(objList->begin(), objList->end(), objects2[j]) == objList->end() ) objList->push_back(objects2[j]);
                     }
                     AuMoinsUnObjet = true;
                 }
@@ -96,59 +112,31 @@ bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::stri
         if ( AuMoinsUnObjet == false && conditionInverted)
         {
             isTrue = true;
-            if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
         }
     }
 
     return isTrue;
 }
 
-namespace GDpriv
-{
-    bool GDinternalEqualToTest(float lhs, float rhs)
-    {
-        return lhs == rhs;
-    }
-    bool GDinternalInferiorOrEqualToTest(float lhs, float rhs)
-    {
-        return lhs <= rhs;
-    }
-    bool GDinternalInferiorToTest(float lhs, float rhs)
-    {
-        return lhs < rhs;
-    }
-    bool GDinternalSuperiorToTest(float lhs, float rhs)
-    {
-        return lhs > rhs;
-    }
-    bool GDinternalSuperiorOrEqualToTest(float lhs, float rhs)
-    {
-        return lhs >= rhs;
-    }
-    bool GDinternalDifferentFromTest(float lhs, float rhs)
-    {
-        return lhs != rhs;
-    }
-    bool GDinternalFalse(float , float )
-    {
-        return false;
-    }
-}
-
-float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, string relationalOperator, float length, bool conditionInverted)
+float GD_API DistanceBetweenObjects( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, bool conditionInverted)
 {
     length *= length;
-    const bool sameObjectLists = firstObjName == secondObjName;
 
-    bool (*relationFunction)(float, float) = &GDpriv::GDinternalFalse;
-
-    if ( relationalOperator == "=" ) relationFunction = &GDpriv::GDinternalEqualToTest;
-    else if ( relationalOperator == "<" ) relationFunction = &GDpriv::GDinternalInferiorToTest;
-    else if ( relationalOperator == ">" ) relationFunction = &GDpriv::GDinternalSuperiorToTest;
-    else if ( relationalOperator == "<=" ) relationFunction = &GDpriv::GDinternalInferiorOrEqualToTest;
-    else if ( relationalOperator == ">=" ) relationFunction = &GDpriv::GDinternalSuperiorOrEqualToTest;
-    else if ( relationalOperator == "!=" ) relationFunction = &GDpriv::GDinternalDifferentFromTest;
+    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
+    if ( sameObjectLists ) //Make sure that objects lists are really the same
+    {
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
+             it1 != objectsLists1.end() && it2 != objectsLists2.end();
+             ++it1, ++it2)
+        {
+            if ( it1->second != it2->second )
+            {
+                sameObjectLists = false;
+                break;
+            }
+        }
+    }
 
     vector<RuntimeObject*> objects1;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
@@ -189,7 +177,7 @@ float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std
                 float X = objects1[i]->GetDrawableX()+objects1[i]->GetCenterX() - (objects2[j]->GetDrawableX()+objects2[j]->GetCenterX());
                 float Y = objects1[i]->GetDrawableY()+objects1[i]->GetCenterY() - (objects2[j]->GetDrawableY()+objects2[j]->GetCenterY());
 
-                if ( relationFunction((X*X+Y*Y), length) )
+                if ( (X*X+Y*Y) <= length )
                 {
                     if ( !conditionInverted )
                     {
@@ -220,9 +208,22 @@ float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std
     return isTrue;
 }
 
-bool GD_API MovesToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API MovesToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
-    const bool sameObjectLists = firstObjName == secondObjName;
+    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
+    if ( sameObjectLists ) //Make sure that objects lists are really the same
+    {
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
+             it1 != objectsLists1.end() && it2 != objectsLists2.end();
+             ++it1, ++it2)
+        {
+            if ( it1->second != it2->second )
+            {
+                sameObjectLists = false;
+                break;
+            }
+        }
+    }
 
     vector<RuntimeObject*> objects1;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)

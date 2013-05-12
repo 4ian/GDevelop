@@ -353,9 +353,9 @@ public:
     void AddForceUsingPolarCoordinates( float angle, float length, float clearing );
     void AddForceTowardPosition( float positionX, float positionY, float length, float clearing );
     void AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing );
-    void AddForceTowardObject( const std::string &, float length, float clearing, RuntimeObject * object );
-    void AddForceToMoveAroundObject( const std::string &, float velocity, float length, float clearing, RuntimeObject * object );
-    void PutAroundObject( const std::string &, float length, float angleInDegrees, RuntimeObject * object );
+    void AddForceTowardObject( RuntimeObject * object, float length, float clearing );
+    void AddForceToMoveAroundObject( RuntimeObject * object, float velocity, float length, float clearing );
+    void PutAroundObject( RuntimeObject * object, float length, float angleInDegrees );
 
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
@@ -366,21 +366,21 @@ public:
     bool IsStopped();
     bool TestAngleOfDisplacement( float angle, float tolerance );
 
-    double GetSqDistanceWithObject( const std::string &, RuntimeObject * other );
-    double GetDistanceWithObject( const std::string &, RuntimeObject * other );
+    double GetSqDistanceWithObject( RuntimeObject * other );
+    double GetDistanceWithObject( RuntimeObject * other );
 
     double GetVariableValue( const std::string & variable ); /** Only used internally by GD events generated code. */
     const std::string & GetVariableString( const std::string & variable ); /** Only used internally by GD events generated code. */
 
-    void SeparateFromObjects(const std::string & , std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    void SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
     /** To be deprecated
      */
-    void SeparateObjectsWithoutForces( const std::string & , std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    void SeparateObjectsWithoutForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
     /** To be deprecated
      */
-    void SeparateObjectsWithForces( const std::string & , std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    void SeparateObjectsWithForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
     ///@}
 
 protected:

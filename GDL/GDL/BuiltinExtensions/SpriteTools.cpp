@@ -13,9 +13,23 @@
 
 using namespace std;
 
-bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API SpriteTurnedToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
-    const bool sameObjectLists = firstObjName == secondObjName;
+    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
+    if ( sameObjectLists ) //Make sure that objects lists are really the same
+    {
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
+             it1 != objectsLists1.end() && it2 != objectsLists2.end();
+             ++it1, ++it2)
+        {
+            if ( it1->second != it2->second )
+            {
+                sameObjectLists = false;
+                break;
+            }
+        }
+    }
+
     bool isTrue = false;
 
     vector<RuntimeObject*> objects1;
@@ -99,8 +113,23 @@ bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::str
 /**
  * Test a collision between two sprites objects
  */
-bool GD_API SpriteCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+bool GD_API SpriteCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
+    bool sameLists = objectsLists1.size() == objectsLists2.size();
+    if ( sameLists ) //Make sure that objects lists are really the same
+    {
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
+             it1 != objectsLists1.end() && it2 != objectsLists2.end();
+             ++it1, ++it2)
+        {
+            if ( it1->second != it2->second )
+            {
+                sameLists = false;
+                break;
+            }
+        }
+    }
+
     vector<RuntimeObject*> objects1;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
@@ -113,7 +142,6 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
     }
 
     bool isTrue = false;
-    bool sameLists = firstObjName == secondObjName;
 
     if ( !sameLists )
     {
@@ -144,13 +172,15 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
                 {
                     if ( !conditionInverted )
                     {
-                        if ( find(objectsLists1[(*obj)->GetName()]->begin(), objectsLists1[(*obj)->GetName()]->end(), (*obj)) == objectsLists1[(*obj)->GetName()]->end() )
-                            objectsLists1[(*obj)->GetName()]->push_back((*obj));
-
-                        if ( find(objectsLists2[(*obj2)->GetName()]->begin(), objectsLists2[(*obj2)->GetName()]->end(), (*obj2)) == objectsLists2[(*obj2)->GetName()]->end() )
-                            objectsLists2[(*obj2)->GetName()]->push_back((*obj2));
-
                         isTrue = true;
+
+                        //Pick the objects
+                        std::vector<RuntimeObject*> * objList = objectsLists1[(*obj)->GetName()];
+                        if ( find(objList->begin(), objList->end(), (*obj)) == objList->end() ) objList->push_back((*obj));
+
+                        objList = objectsLists2[(*obj2)->GetName()];
+                        if ( find(objList->begin(), objList->end(), (*obj2)) == objList->end() ) objList->push_back((*obj2));
+
                     }
 
                     collideWithAtLeastOneObject = true;
@@ -160,8 +190,10 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
             if ( conditionInverted && !collideWithAtLeastOneObject)
             {
                 isTrue = true;
-                if ( find(objectsLists1[(*obj)->GetName()]->begin(), objectsLists1[(*obj)->GetName()]->end(), (*obj)) == objectsLists1[(*obj)->GetName()]->end() )
-                    objectsLists1[(*obj)->GetName()]->push_back((*obj));
+
+                //We are sure that obj is not already in the list.
+                //(As we are iterating over objects1 and only objects1 are added )
+                objectsLists1[(*obj)->GetName()]->push_back((*obj));
             }
         }
     }
@@ -173,18 +205,17 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
             bool collideWithAtLeastOneObject = false;
             for (unsigned int j = i+1;j<objects1.size();++j)
             {
-                //On vérifie que ce n'est pas le même objet
                 if ( CheckCollision( static_cast<RuntimeSpriteObject*>(objects1[i]), static_cast<RuntimeSpriteObject*>(objects1[j]) ) )
                 {
                     if ( !conditionInverted )
                     {
-                        if ( find(objectsLists1[(objects1[i])->GetName()]->begin(), objectsLists1[(objects1[i])->GetName()]->end(), (objects1[i])) == objectsLists1[(objects1[i])->GetName()]->end() )
-                            objectsLists1[(objects1[i])->GetName()]->push_back((objects1[i]));
-
-                        if ( find(objectsLists2[(objects1[j])->GetName()]->begin(), objectsLists2[(objects1[j])->GetName()]->end(), (objects1[j])) == objectsLists2[(objects1[j])->GetName()]->end() )
-                            objectsLists2[(objects1[j])->GetName()]->push_back((objects1[j]));
-
                         isTrue = true;
+
+                        std::vector<RuntimeObject*> * objList = objectsLists1[(objects1[i])->GetName()];
+                        if ( find(objList->begin(), objList->end(), (objects1[i])) == objList->end() ) objList->push_back((objects1[i]));
+
+                        objList = objectsLists1[(objects1[j])->GetName()];
+                        if ( find(objList->begin(), objList->end(), (objects1[j])) == objList->end() ) objList->push_back((objects1[j]));
                     }
 
                     collideWithAtLeastOneObject = true;
@@ -194,8 +225,10 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
             if ( conditionInverted && !collideWithAtLeastOneObject)
             {
                 isTrue = true;
-                if ( find(objectsLists1[(objects1[i])->GetName()]->begin(), objectsLists1[(objects1[i])->GetName()]->end(), (objects1[i])) == objectsLists1[(objects1[i])->GetName()]->end() )
-                    objectsLists1[(objects1[i])->GetName()]->push_back((objects1[i]));
+
+                //We are sure that objects1[i] is not already in the list.
+                //(As we are iterating over objects1 and only objects1 are added )
+                objectsLists1[(objects1[i])->GetName()]->push_back((objects1[i]));
             }
         }
     }

@@ -81,10 +81,15 @@ void GD_API MoveObjects( RuntimeScene & scene )
     return;
 }
 
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+namespace {
+
+void DoCreateObjectOnScene(RuntimeScene & scene, std::string objectName, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const std::string & layer)
 {
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    if ( pickedObjectLists.empty() ) return;
+
+    //Find the object to be created
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
 
     RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
@@ -103,18 +108,27 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
 
     //Add object to scene and let it be concerned by futures actions
     scene.objectsInstances.AddObject(newObject);
-    if ( pickedObjectLists[objectWanted] != NULL && find(pickedObjectLists[objectWanted]->begin(), pickedObjectLists[objectWanted]->end(), newObject.get()) == pickedObjectLists[objectWanted]->end() )
-        pickedObjectLists[objectWanted]->push_back( newObject.get() );
+    pickedObjectLists[objectName]->push_back( newObject.get() );
 }
 
-void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+
+}
+
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const std::string & layer)
+{
+    if ( pickedObjectLists.empty() ) return;
+
+    ::DoCreateObjectOnScene(scene, pickedObjectLists.begin()->first, pickedObjectLists, positionX, positionY, layer);
+}
+
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
     if ( pickedObjectLists[objectWanted] == NULL ) return; //Bail out if the object is not present in the specified group
 
-    CreateObjectOnScene(scene, pickedObjectLists, 0, objectWanted, positionX, positionY, layer);
+    ::DoCreateObjectOnScene(scene, objectWanted, pickedObjectLists, positionX, positionY, layer);
 }
 
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int, const std::string &)
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
@@ -133,7 +147,7 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectName)
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     //Create a list with all objects
     std::vector<RuntimeObject*> allObjects;

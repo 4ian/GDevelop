@@ -202,21 +202,6 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddCodeOnlyParameter("currentScene","")
             .codeExtraInformation.SetFunctionName("DeleteFromScene");
 
-
-        obj.AddAction("Duplicate",
-                       _("Duplicate an object"),
-                       _("Create a copy of an object"),
-                       _("Duplicate the object _PARAM0_"),
-                       _("Objects"),
-                       "res/actions/duplicate24.png",
-                       "res/actions/duplicate.png")
-
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("currentScene", "")
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-            .codeExtraInformation.SetFunctionName("Duplicate");
-
-
         obj.AddAction("ChangePlan",
                        _("Change Z order of an object"),
                        _("Modify the z order of an object"),
@@ -459,10 +444,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/forceVers.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Target Object"))
+            .AddParameter("objectPtr", _("Target Object"))
             .AddParameter("expression", _("Length in pixel"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -475,11 +459,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/forceTourne.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Rotate around this object"))
+            .AddParameter("objectPtr", _("Rotate around this object"))
             .AddParameter("expression", _("Speed ( Degrees per second )"))
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -492,10 +475,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/positionAutour.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("\"Center\" Object"))
+            .AddParameter("objectPtr", _("\"Center\" Object"))
             .AddParameter("expression", _("Distance"))
             .AddParameter("expression", _("Angle, in degrees"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
             .codeExtraInformation.SetFunctionName("PutAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -510,8 +492,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .SetHidden()
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object 2 ( won't move )"))
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+            .AddParameter("objectList", _("Object 2 ( won't move )"))
             .codeExtraInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -526,8 +507,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .SetHidden()
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object 2 ( won't move )"))
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+            .AddParameter("objectList", _("Object 2 ( won't move )"))
             .codeExtraInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -540,8 +520,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/ecarter.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Objects"))
-            .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
+            .AddParameter("objectList", _("Objects"))
             .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
@@ -614,14 +593,12 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
+            .AddParameter("objectPtr", _("Object"))
             .codeExtraInformation.SetFunctionName("GetDistanceWithObject");
 
         obj.AddExpression("SqDistance", _("Square distance between two objects"), _("Square distance between two objects"), _("Position"), "res/conditions/distance.png")
             .AddParameter("object", _("Object"))
-            .AddParameter("object", _("Object"))
-            .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
+            .AddParameter("objectPtr", _("Object"))
             .codeExtraInformation.SetFunctionName("GetSqDistanceWithObject");
 
         obj.AddExpression("Variable", _("Object's variable"), _("Object's variable"), _("Variables"), "res/actions/var.png")

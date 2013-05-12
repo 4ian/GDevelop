@@ -273,7 +273,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
-            if ( instrInfos.parameters[pNb].type == "object" && actions[aId].GetParameter(pNb).GetPlainString() == oldName )
+            if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && actions[aId].GetParameter(pNb).GetPlainString() == oldName )
                 actions[aId].SetParameter(pNb, gd::Expression(newName));
             //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
@@ -324,7 +324,7 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
-            if ( instrInfos.parameters[pNb].type == "object" && conditions[cId].GetParameter(pNb).GetPlainString() == oldName )
+            if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && conditions[cId].GetParameter(pNb).GetPlainString() == oldName )
                 conditions[cId].SetParameter(pNb, gd::Expression(newName));
             //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
@@ -403,7 +403,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
-            if ( instrInfos.parameters[pNb].type == "object" && actions[aId].GetParameter(pNb).GetPlainString() == name )
+            if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && actions[aId].GetParameter(pNb).GetPlainString() == name )
             {
                 deleteMe = true;
                 break;
@@ -459,7 +459,7 @@ bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, g
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
-            if ( instrInfos.parameters[pNb].type == "object" && conditions[cId].GetParameter(pNb).GetPlainString() == name )
+            if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && conditions[cId].GetParameter(pNb).GetPlainString() == name )
             {
                 deleteMe = true; break;
             }

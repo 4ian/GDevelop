@@ -692,7 +692,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
         else
             userCancelled = true;
     }
-    else if ( parameterMetadata.type == "object" )
+    else if ( gd::ParameterMetadata::IsObject(parameterMetadata.type) )
     {
         gd::ChooseObjectDialog dialog(this, project, layout, true, parameterMetadata.supplementaryInformation);
         if ( dialog.ShowModal() == 0 ) return "";

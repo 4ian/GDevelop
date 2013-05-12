@@ -28,7 +28,79 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
                                              MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(), instr.GetType()) :
                                              MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(), instr.GetType());
 
-        //Update parameters
+        //Specific updates for some instructions
+        if ( instr.GetType() == "LinkedObjects::LinkObjects" || instr.GetType() == "LinkedObjects::RemoveLinkBetween" )
+        {
+            instr.SetParameter(1, instr.GetParameter(3));
+            instr.SetParameter(2, instr.GetParameter(4));
+        }
+        else if (instr.GetType() == "LinkedObjects::RemoveAllLinksOf")
+        {
+            instr.SetParameter(1, instr.GetParameter(2));
+        }
+        else if (instr.GetType() == "LinkedObjects::PickObjectsLinkedTo")
+        {
+            instr.SetParameter(1, instr.GetParameter(5));
+            instr.SetParameter(2, instr.GetParameter(3));
+        }
+        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
+        {
+            instr.SetParameter(4, instr.GetParameter(5));
+            instr.SetParameter(5, instr.GetParameter(6));
+        }
+        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
+        {
+            instr.SetParameter(4, instr.GetParameter(5));
+            instr.SetParameter(5, instr.GetParameter(6));
+        }
+        else if (instr.GetType() == "FixCamera" || instr.GetType() == "CentreCamera")
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
+            instr.SetParameters(parameters);
+        }
+        else if (instr.GetType() == "AjoutObjConcern" || instr.GetType() == "AjoutHasard")
+        {
+            instr.SetParameter(1, instr.GetParameter(3));
+        }
+        else if (instr.GetType() == "SeDirige" || instr.GetType() == "EstTourne" )
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
+            if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
+            instr.SetParameters(parameters);
+        }
+        else if (instr.GetType() == "Create")
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 2 ) parameters.erase(parameters.begin()+1);
+            if ( parameters.size() >= 2 ) parameters.erase(parameters.begin()+1);
+            instr.SetParameters(parameters);
+        }
+        else if (instr.GetType() == "CreateByName")
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 2 ) parameters.erase(parameters.begin()+1);
+            instr.SetParameters(parameters);
+        }
+        else if (instr.GetType() == "NbObjet")
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 2 ) parameters.erase(parameters.begin()+1);
+            instr.SetParameters(parameters);
+        }
+        else if (instr.GetType() == "Distance")
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
+            if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
+            if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
+            instr.SetParameters(parameters);
+        }
+
+
+
+        //Common updates for some parameters
         const std::vector< gd::Expression > & parameters = instr.GetParameters();
         for (unsigned int j = 0;j<parameters.size() && j<metadata.parameters.size();++j)
         {

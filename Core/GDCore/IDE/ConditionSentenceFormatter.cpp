@@ -43,7 +43,7 @@ std::string ConditionSentenceFormatter::LabelFromType( const std::string & type 
         return "";
     else if ( type == "expression" )
         return static_cast<string>(_( "Expression" ));
-    else if ( type == "object" )
+    else if ( gd::ParameterMetadata::IsObject(type) )
         return static_cast<string>(_( "Choose the object" ));
     else if ( type == "automatism" )
         return static_cast<string>(_( "Choose automatism" ));
@@ -86,7 +86,7 @@ wxBitmap ConditionSentenceFormatter::BitmapFromType( const std::string & type )
         return CommonBitmapManager->unknownBt;
     else if ( type == "expression" )
         return CommonBitmapManager->expressionBt;
-    else if ( type == "object" )
+    else if ( gd::ParameterMetadata::IsObject(type) )
         return CommonBitmapManager->objectBt;
     else if ( type == "automatism" )
         return CommonBitmapManager->automatismBt;

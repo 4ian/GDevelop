@@ -260,20 +260,19 @@ protected:
      * <br><br>
      * Other standard parameters type that should be implemented by platforms:
      * - currentScene: Reference to the current runtime scene.
-     * - mapOfObjectListsOfParameter : a map containing lists of objects which are specified by the object name in another parameter. (C++: std::map <std::string, std::vector<RuntimeObject*> *>). Example:
+     * - objectList : a map containing lists of objects which are specified by the object name in another parameter. (C++: std::map <std::string, std::vector<RuntimeObject*> *>). Example:
      * \code
         AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
-        .AddParameter("object", _("Object"))
-        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .AddParameter("objectList", _("Object"))
         .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
      * \endcode
-     * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already picked.
-     * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( C++: RuntimeObject * ). Example:
+     * - objectListWithoutPicking : Same as objectList but do not pick object if they are not already picked.
+     * - objectPtr : Return a pointer to object specified by the object name in another parameter ( C++: RuntimeObject * ). Example:
      * \code
     .AddParameter("object", _("Object"))
-    .AddParameter("object", _("Target object"))
-    .AddCodeOnlyParameter("ptrToObjectOfParameter", "1") //The called function will be called with this signature on the C++ platform: Function(std::string, std::string, RuntimeObject*)
+    .AddParameter("objectPtr", _("Target object"))
+    //The called function will be called with this signature on the C++ platform: Function(std::string, RuntimeObject*)
      * \endcode
      */
     virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,

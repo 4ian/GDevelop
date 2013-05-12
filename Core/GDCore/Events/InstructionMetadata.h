@@ -36,6 +36,11 @@ public:
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
     std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
+
+    /**
+     * \brief Return true if the type of the parameter is "object", "objectPtr" or "objectList".
+     */
+    static bool IsObject(const std::string & type) { return type == "object" || type == "objectPtr" || type == "objectList" || type == "objectListWithoutPicking"; }
 };
 
 /**

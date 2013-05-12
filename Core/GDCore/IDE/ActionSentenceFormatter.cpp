@@ -183,7 +183,7 @@ string ActionSentenceFormatter::LabelFromType(const std::string & type)
         return "";
     else if ( type == "expression" )
         return ToString(_("Expression"));
-    else if ( type == "object" )
+    else if ( gd::ParameterMetadata::IsObject(type) )
         return ToString(_("Choose the object"));
     else if ( type == "automatism" )
         return ToString(_("Choose automatism"));
@@ -230,7 +230,7 @@ wxBitmap ActionSentenceFormatter::BitmapFromType(const std::string & type)
         return CommonBitmapManager->unknownBt;
     else if ( type == "expression" )
         return CommonBitmapManager->expressionBt;
-    else if ( type == "object" )
+    else if ( gd::ParameterMetadata::IsObject(type) )
         return CommonBitmapManager->objectBt;
     else if ( type == "automatism" )
         return CommonBitmapManager->automatismBt;

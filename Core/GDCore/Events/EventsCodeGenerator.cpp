@@ -207,7 +207,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
     //Verify that there are not mismatch between object type in parameters
     for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
-        if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
+        if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && instrInfos.parameters[pNb].supplementaryInformation != "" )
         {
             string objectInParameter = condition.GetParameter(pNb).GetPlainString();
             if (gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
@@ -342,7 +342,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
     //Verify that there are not mismatch between object type in parameters
     for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
-        if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
+        if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && instrInfos.parameters[pNb].supplementaryInformation != "" )
         {
             string objectInParameter = action.GetParameter(pNb).GetPlainString();
             if (gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )

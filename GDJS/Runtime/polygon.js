@@ -200,15 +200,25 @@ gdjs.polygon.collisionTest = function(p1,p2) {
 
         if (dist < min_dist) {
             min_dist = dist;
-            move_axis = axis;
+            move_axis[0] = axis[0];
+            move_axis[1] = axis[1];
         }
     }
     
     result.collision = true;
 
-    var d = p1.computeCenter() - p2.computeCenter();
-    if (dotProduct(d, move_axis) < 0) move_axis = -move_axis;
-    result.move_axis = move_axis * min_dist;
+    //Ensure move axis is correctly oriented.
+    var p1Center = p1.computeCenter();
+    var p2Center = p2.computeCenter();
+    var d = [p1Center[0]-p2Center[0], p1Center[1]-p2Center[1]];
+    if (dotProduct(d, move_axis) < 0) {
+        move_axis[0] = -move_axis[0];
+        move_axis[1] = -move_axis[1];
+    }
+    
+    //Add the magnitude to the move axis.
+    result.move_axis[0] = move_axis[0] * min_dist;
+    result.move_axis[1] = move_axis[1] * min_dist;
     
     return result;
 }

@@ -11,7 +11,7 @@ gdjs.force = function(x,y, isTemporary)
     
     my.x = x || 0;
     my.y = y || 0;
-    my.angle = Math.atan2(y,x);
+    my.angle = Math.atan2(y,x)*180/3.14159;
     my.length = Math.sqrt(x*x+y*y);
     my.dirty = false;
     my.temporary = !!isTemporary;

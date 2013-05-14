@@ -120,6 +120,24 @@
                 </Event>
                 <Event disabled="false" folded="false">
                     <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
                     <Conditions />
                     <Actions />
                     <Events>
@@ -131,12 +149,17 @@
                                     <Type value="ModVarGlobal" />
                                     <Parametre value="" />
                                     <Parametre value="test" />
-                                    <Parametre value="4" />
                                     <Parametre value="+" />
+                                    <Parametre value="4" />
                                 </Action>
                             </Actions>
                         </Event>
                     </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions />
                 </Event>
                 <Event disabled="false" folded="false">
                     <Type value="BuiltinCommonInstructions::Link" />
@@ -151,21 +174,19 @@
                             <Type value="VarObjet" Contraire="false" />
                             <Parametre value="NouvelObjet" />
                             <Parametre value="Coucou" />
-                            <Parametre value="2" />
                             <Parametre value="&gt;=" />
+                            <Parametre value="2" />
                         </Condition>
                     </Conditions>
                     <Actions>
                         <Action>
                             <Type value="ChangeDirection" />
                             <Parametre value="NouvelObjet" />
-                            <Parametre value="4" />
                             <Parametre value="+" />
+                            <Parametre value="4" />
                         </Action>
                         <Action>
                             <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="" />
                             <Parametre value="" />
                             <Parametre value="NouvelObjet" />
                             <Parametre value="100" />
@@ -181,8 +202,8 @@
                             <Type value="VarGlobal" Contraire="false" />
                             <Parametre value="" />
                             <Parametre value="test" />
-                            <Parametre value="100" />
                             <Parametre value="&gt;" />
+                            <Parametre value="100" />
                         </Condition>
                     </Conditions>
                     <Actions />
@@ -195,8 +216,8 @@
                                     <Type value="ModVarObjet" />
                                     <Parametre value="NouvelObjet" />
                                     <Parametre value="Coucou" />
-                                    <Parametre value="2" />
                                     <Parametre value="+" />
+                                    <Parametre value="2" />
                                 </Action>
                             </Actions>
                         </Event>
@@ -214,8 +235,8 @@
                         <Condition>
                             <Type value="PosY" Contraire="false" />
                             <Parametre value="NouvelObjet" />
-                            <Parametre value="130" />
                             <Parametre value="&gt;" />
+                            <Parametre value="130" />
                         </Condition>
                     </Conditions>
                     <Actions />
@@ -226,16 +247,16 @@
                                 <Condition>
                                     <Type value="PosY" Contraire="false" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="300" />
                                     <Parametre value="&gt;" />
+                                    <Parametre value="300" />
                                 </Condition>
                             </Conditions>
                             <Actions>
                                 <Action>
                                     <Type value="ChangeDirection" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="10" />
                                     <Parametre value="-" />
+                                    <Parametre value="10" />
                                 </Action>
                             </Actions>
                         </Event>
@@ -245,16 +266,16 @@
                                 <Condition>
                                     <Type value="PosY" Contraire="false" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="300" />
                                     <Parametre value="&lt;" />
+                                    <Parametre value="300" />
                                 </Condition>
                             </Conditions>
                             <Actions>
                                 <Action>
                                     <Type value="ChangeDirection" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="10" />
                                     <Parametre value="+" />
+                                    <Parametre value="10" />
                                 </Action>
                             </Actions>
                         </Event>
@@ -264,16 +285,16 @@
                                 <Condition>
                                     <Type value="PosX" Contraire="false" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="400" />
                                     <Parametre value="&lt;" />
+                                    <Parametre value="400" />
                                 </Condition>
                             </Conditions>
                             <Actions>
                                 <Action>
                                     <Type value="Opacity" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="150" />
                                     <Parametre value="=" />
+                                    <Parametre value="150" />
                                 </Action>
                             </Actions>
                         </Event>
@@ -286,8 +307,8 @@
                         <Action>
                             <Type value="ChangeDirection" />
                             <Parametre value="NouvelObjet" />
-                            <Parametre value="2" />
                             <Parametre value="+" />
+                            <Parametre value="2" />
                         </Action>
                     </Actions>
                 </Event>

@@ -2,7 +2,7 @@
 /**
  * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
  * 
- * TODO : Variables
+ * TODO : Variables loading
  *
  * @class runtimeScene 
  * @param PixiRenderer The PIXI.Renderer to be used
@@ -16,12 +16,14 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.pixiRenderer = pixiRenderer;
     my.instances = new Hashtable();
     my.objects = new Hashtable();
+    my.layers = new Hashtable();
     my.pixiStage = new PIXI.Stage();
     my.latestFrameDate = new Date;
     my.variables = gdjs.variablesContainer();
     my.runtimeGame = runtimeGame;
     my.lastId = 0;
     my.initialObjectsXml; 
+    my.elapsedTime = 0;
     
     /**
      * Load the runtime scene from the given scene.
@@ -35,6 +37,15 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
                                     parseInt($(sceneXml).attr("b")));
         my.pixiStage.setBackgroundColor("0x"+bgColor);
         my.pixiStage.position = new PIXI.Point(150,300);
+        
+        //Load layers
+        $(sceneXml).find("Layers").find("Layer").each( function() { 
+            var name = $(this).attr("Name");
+            
+            my.layers.put(name, gdjs.layer(name, my.pixiStage));
+            console.log("Created layer : \""+name+"\".");
+        });
+        
         
         //Load objects
         my.initialObjectsXml = $(sceneXml).find("Objets");
@@ -62,6 +73,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
                 newObject.setPosition(parseFloat($(this).attr("x")), parseFloat($(this).attr("y")));
                 newObject.setZOrder(parseFloat($(this).attr("plan")));
                 newObject.setAngle(parseFloat($(this).attr("angle")));
+                newObject.setLayer($(this).attr("layer"));
                 
                 that.addObject(newObject);
             }
@@ -95,6 +107,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         //TODO: Sort objects by Z order.
     
         // render the PIXI stage   
+        my.pixiStage.position = PIXI.Point(150,300);
         my.pixiRenderer.render(my.pixiStage);
     }
     
@@ -104,7 +117,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     my.updateTime = function() {
         var now = new Date;
-        var elapsedTime = now - my.latestFrameDate;
+        my.elapsedTime = now - my.latestFrameDate;
         my.latestFrameDate = now;
     }
     
@@ -124,11 +137,11 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         for( var i = 0, len = allObjectsLists.length;i<len;++i) {
             for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
                 var obj = allObjectsLists[i][1][j];
-                var averageForce = obj.getAverageForce();
+                if ( !obj.hasNoForces() ) {
+                    var averageForce = obj.getAverageForce();
                 
-                if (averageForce != null ) {
-                    obj.setX(obj.getX() + averageForce.getX());
-                    obj.setY(obj.getY() + averageForce.getY());
+                    obj.setX(obj.getX() + averageForce.getX()*my.elapsedTime/1000);
+                    obj.setY(obj.getY() + averageForce.getY()*my.elapsedTime/1000);
                     obj.updateForces();
                 }
             }
@@ -209,6 +222,14 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.getInitialObjectsXml = function() {
         return my.initialObjectsXml;
+    }
+    
+    that.getLayer = function(name) {
+        return my.layers.get(name);
+    }
+    
+    that.hasLayer = function(name) {
+        return my.layers.containsKey(name);
     }
     
     return that;

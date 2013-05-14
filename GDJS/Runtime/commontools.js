@@ -27,5 +27,5 @@ gdjs.commonTools.addObjectsToEventsMap = function(name, objectList) {
  * Should be used by events generated code only.
  */
 gdjs.commonTools.getEventsObjectsMap = function() {
-    return gdjs.commonTools.eventsObjectsMap;
+    return gdjs.commonTools.eventsObjectsMap.clone();
 }

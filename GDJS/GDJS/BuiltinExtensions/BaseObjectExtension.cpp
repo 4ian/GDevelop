@@ -53,6 +53,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("deleteFromScene");
     objectActions["MettreAutourPos"].codeExtraInformation
         .SetFunctionName("putAround");
+    objectActions["MettreAutour"].codeExtraInformation
+        .SetFunctionName("putAroundObject").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjet"].codeExtraInformation
         .SetFunctionName("getVariableValue").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjetTxt"].codeExtraInformation
@@ -69,6 +71,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("addPolarForce").SetIncludeFile("runtimeobject.js");
     objectActions["AddForceVersPos"].codeExtraInformation
         .SetFunctionName("addForceTowardPosition").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceVers"].codeExtraInformation
+        .SetFunctionName("addForceTowardObject").SetIncludeFile("runtimeobject.js");
     objectActions["Arreter"].codeExtraInformation
         .SetFunctionName("clearForces").SetIncludeFile("runtimeobject.js");
     objectConditions["Arret"].codeExtraInformation
@@ -77,6 +81,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("getAverageForce().getLength()").SetIncludeFile("runtimeobject.js");
     objectConditions["AngleOfDisplacement"].codeExtraInformation
         .SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
+    objectActions["SeparateFromObjects"].codeExtraInformation
+        .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
 
     objectExpressions["X"].codeExtraInformation.SetFunctionName("getX");
     objectExpressions["Y"].codeExtraInformation.SetFunctionName("getY");
@@ -90,12 +96,13 @@ BaseObjectExtension::BaseObjectExtension()
     objectStrExpressions["VariableString"].codeExtraInformation.SetFunctionName("getVariableValue");
     objectExpressions["ForceX"].codeExtraInformation.SetFunctionName("getAverageForce().getX()");
     objectExpressions["ForceY"].codeExtraInformation.SetFunctionName("getAverageForce().getY()");
-    objectExpressions["ForceAngle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle()");
-    objectExpressions["Angle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle()"); //Deprecated
-    objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("getAverageForce().getLength()");
-    objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("getAverageForce().getLength()"); //Deprecated
+    objectExpressions["ForceAngle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle");
+    objectExpressions["Angle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle"); //Deprecated
+    objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("getAverageForce().getLength");
+    objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("getAverageForce().getLength"); //Deprecated
     objectExpressions["Distance"].codeExtraInformation.SetFunctionName("getDistanceFrom");
     objectExpressions["SqDistance"].codeExtraInformation.SetFunctionName("getSqDistanceFrom");
+
 
     GetAllActions()["Create"].codeExtraInformation
         .SetFunctionName("gdjs.createObjectOnScene");
@@ -107,6 +114,20 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("gdjs.pickedObjectsCount");
     GetAllConditions()["CollisionNP"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
+    GetAllConditions()["Distance"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.distanceTest");
+    GetAllConditions()["SeDirige"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.movesTowardTest");
+
+    GetAllActions()["AjoutObjConcern"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.pickAllObjects");
+    GetAllConditions()["AjoutObjConcern"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.pickAllObjects");
+    GetAllActions()["AjoutHasard"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.pickRandomObject");
+    GetAllConditions()["AjoutHasard"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.pickRandomObject");
+
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -188,9 +209,6 @@ BaseObjectExtension::BaseObjectExtension()
             .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
 
-    /*[""].codeExtraInformation
-        .SetFunctionName("changeXY").SetIncludeFile("runtimeobject.js");*/ //TODO
-
 /*
         obj.AddAction("AddForceTournePos",
                        _("Add a force so as to move around a position"),
@@ -234,21 +252,6 @@ BaseObjectExtension::BaseObjectExtension()
             .codeExtraInformation.SetFunctionName("ActivateAutomatism");
 
 
-        obj.AddAction("AddForceVers",
-                       _("Add a force so as to move to an object"),
-                       _("Add a force to an object so as it moves to another."),
-                       _("Move _PARAM0_ to _PARAM1_ with a force of _PARAM2_ pixels"),
-                       _("Displacement"),
-                       "res/actions/forceVers24.png",
-                       "res/actions/forceVers.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectPtr", _("Target Object"))
-            .AddParameter("expression", _("Length in pixel"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
         obj.AddAction("AddForceTourne",
                        _("Add a force so as to move around an object"),
                        _("Add a force to an object so as it rotates around another.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
@@ -263,22 +266,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
-        obj.AddAction("MettreAutour",
-                       _("Put an object around another"),
-                       _("Position an object around another, with the specified angle and distance."),
-                       _("Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_° and _PARAM2_ pixels distance."),
-                       _("Position"),
-                       "res/actions/positionAutour24.png",
-                       "res/actions/positionAutour.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectPtr", _("\"Center\" Object"))
-            .AddParameter("expression", _("Distance"))
-            .AddParameter("expression", _("Angle, in degrees"))
-            .codeExtraInformation.SetFunctionName("PutAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
 
         //Deprecated action
         obj.AddAction("Rebondir",
@@ -309,95 +296,5 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("objectList", _("Object 2 ( won't move )"))
             .codeExtraInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
-
-        obj.AddAction("SeparateFromObjects",
-                       _("Separate two objects"),
-                       _("Move an object away from another using their collision masks.\nBe sure to call this action on a reasonable number of objects so as\nnot to slow down the game."),
-                       _("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
-                       _("Position"),
-                       "res/actions/ecarter24.png",
-                       "res/actions/ecarter.png")
-
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectList", _("Objects"))
-            .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-*/
-/*
-    AddAction("AjoutObjConcern",
-                   _("Consider objects"),
-                   _("Pick all objects with this name."),
-                   _("Consider all _PARAM3_ "),
-                   _("Objects"),
-                   "res/actions/add24.png",
-                   "res/actions/add.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", _("Object"))
-        .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    AddAction("AjoutHasard",
-                   _("Take a random object"),
-                   _("Take only one object with this name among all"),
-                   _("Take a random _PARAM3_ "),
-                   _("Objects"),
-                   "res/actions/ajouthasard24.png",
-                   "res/actions/ajouthasard.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", _("Object"))
-        .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    AddCondition("SeDirige",
-                   _("An object is moving to another"),
-                   _("Test if an object moves towards another.\nThe first object must move."),
-                   _("_PARAM0_ is moving to _PARAM1_"),
-                   _("Displacement"),
-                   "res/conditions/sedirige24.png",
-                   "res/conditions/sedirige.png")
-        .AddParameter("objectList", _("Object"))
-        .AddParameter("objectList", _("Object 2"))
-        .AddParameter("expression", _("Angle of tolerance"))
-        .AddCodeOnlyParameter("conditionInverted", "")
-        .codeExtraInformation.SetFunctionName("MovesToward").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
-
-    AddCondition("Distance",
-                   _("Distance between two objects"),
-                   _("Test the distance between two objects."),
-                   _("The distance between _PARAM0_ and _PARAM1_ is _PARAM4__PARAM5_"),
-                   _("Position"),
-                   "res/conditions/distance24.png",
-                   "res/conditions/distance.png")
-        .AddParameter("objectList", _("Object"))
-        .AddParameter("objectList", _("Object 2"))
-        .AddParameter("expression", _("Distance"))
-        .AddCodeOnlyParameter("conditionInverted", "")
-        .codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
-
-    AddCondition("AjoutObjConcern",
-                   _("Consider objects"),
-                   _("Pick all objects with this name."),
-                   _("Consider all _PARAM3_ "),
-                   _("Objects"),
-                   "res/conditions/add24.png",
-                   "res/conditions/add.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", _("Object"))
-        .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-
-
-    AddCondition("AjoutHasard",
-                   _("Take a random object"),
-                   _("Take only one object with this name among all"),
-                   _("Take a random _PARAM3_ "),
-                   _("Objects"),
-                   "res/conditions/ajouthasard24.png",
-                   "res/conditions/ajouthasard.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", _("Object"))
-        .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 */
 }

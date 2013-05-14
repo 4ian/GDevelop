@@ -17,13 +17,13 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     image = image ||"bunny.png"
     
     my.texture = PIXI.Texture.fromImage(image);
-    my.bunny = new PIXI.Sprite(my.texture);
+    my.sprite = new PIXI.Sprite(my.texture);
     
-    my.bunny.anchor.x = 0.5;
-    my.bunny.anchor.y = 0.5;   
+    my.sprite.anchor.x = 0.5;
+    my.sprite.anchor.y = 0.5;   
     that.opacity = 255;
     
-    runtimeScene.getPIXIStage().addChild(my.bunny);
+    runtimeScene.getLayer("").getPIXIContainer().addChild(my.sprite);
     
     /**
      * Called when the object is removed from a scene.
@@ -32,22 +32,22 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
      * @param runtimeScene The scene that used to own the object.
      */
     that.removeFromScene = function(runtimeScene) {
-        runtimeScene.getPIXIStage().removeChild(my.bunny);
+        runtimeScene.getPIXIStage().removeChild(my.sprite);
     }
     
     that.setX = function(x) {
         that.x = x;
-        my.bunny.position.x = x;
+        my.sprite.position.x = x;
     }
     
     that.setY = function(y) {
         that.y = y;
-        my.bunny.position.y = y;
+        my.sprite.position.y = y;
     }
     
     that.setAngle = function(angle) {
         that.angle = angle;
-        my.bunny.rotation = gdjs.toRad(angle);
+        my.sprite.rotation = gdjs.toRad(angle);
     }
     
     that.getAngle = function(angle) {
@@ -56,7 +56,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     
     that.setBlendMode = function(newMode) {
         that.blendMode = newMode;
-        my.bunny.blendMode = newMode;
+        my.sprite.blendMode = newMode;
     }
     
     that.getBlendMode = function() {
@@ -65,7 +65,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     
     that.setOpacity = function(opacity) {
         that.opacity = opacity;
-        my.bunny.alpha = opacity/255;
+        my.sprite.alpha = opacity/255;
     }
     
     that.getOpacity = function() {
@@ -74,21 +74,27 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     
     that.hide = function(enable) {
         my.hidden = enable;
-        my.bunny.visible = !enable;
+        my.sprite.visible = !enable;
     }
     
     that.getWidth = function() {
-        return my.bunny.width;
+        return my.sprite.width;
     }
     
     that.getHeight = function() {
-        return my.bunny.height;
+        return my.sprite.height;
     }
     
+    that.setLayer = function(name) {
+        //We need to move the object from the pixi container of the layer
+        runtimeScene.getLayer(that.layer).getPIXIContainer().removeChild(my.sprite);
+        that.layer = name;
+        runtimeScene.getLayer(that.layer).getPIXIContainer().addChild(my.sprite);
+    }
     
     that.deleteFromScene = function(runtimeScene) {
         runtimeScene.markObjectForDeletion(that);
-        runtimeScene.getPIXIStage().removeChild(my.bunny);
+        runtimeScene.getLayer(that.layer).getPIXIContainer().removeChild(my.sprite);
     }
     
     return that;

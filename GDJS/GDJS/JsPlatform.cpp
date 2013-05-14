@@ -19,6 +19,8 @@
 #include "GDJS/BuiltinExtensions/VariablesExtension.h"
 #include "GDJS/BuiltinExtensions/KeyboardExtension.h"
 #include "GDJS/BuiltinExtensions/MouseExtension.h"
+#include "GDJS/BuiltinExtensions/SceneExtension.h"
+#include "GDJS/BuiltinExtensions/CameraExtension.h"
 
 JsPlatform *JsPlatform::singleton = NULL;
 
@@ -69,10 +71,12 @@ JsPlatform::JsPlatform() :
 {
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SceneExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new KeyboardExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MouseExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension));
 };
 
 JsPlatform & JsPlatform::Get()

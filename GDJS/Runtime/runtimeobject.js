@@ -2,7 +2,7 @@
 /**
  * The runtimeObject represents an object being used on a RuntimeScene.
  *
- * <b>TODO</b> : automatisms
+ * <b>TODO</b> : automatisms, variables loading
  *
  * @class runtimeObject
  * @constructor 
@@ -324,6 +324,19 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     }
     
     /** 
+     * Add a force oriented toward another object.<br>
+     * ( Shortcut to addForceTowardPosition )
+     * @method addForceTowardObject
+     * @param obj The target object
+     * @param len {Number} The force length, in pixels.
+     * @param isPermanent {Boolean} Set if the force is permanent or not.
+     */
+    that.addForceTowardObject = function(obj, len, isPermanent) {
+        that.addForceTowardPosition(obj.getY()+obj.getCenterY(), obj.getX()+obj.getCenterX(),
+                                    len, isPermanent);
+    }
+    
+    /** 
      * Deletes all forces applied on the object
      * @method clearForces
      */
@@ -417,6 +430,20 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     }
     
     /**
+     * Put the object around another object, with a specific distance and angle.<br>
+     * The distance is computed between the centers of the objects.
+     *
+     * @method putAround
+     * @param obj The target object
+     * @param distance {Number} The distance between the object and the target
+     * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
+     */
+    that.putAroundObject = function(obj,distance,angleInDegrees) {
+        that.putAround(obj.getY()+obj.getCenterY(), obj.getX()+obj.getCenterX(),
+                       distance, angleInDegrees);
+    }
+    
+    /**
      * Get the hit boxes for the object.<br>
      * The default implementation returns a basic bouding box based on the result of getWidth and
      * getHeight.
@@ -431,6 +458,44 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
 
         var mask = [rectangle];
         return mask;
+    }
+    
+    /**
+     * Separate the object from others objects, using their hitboxes.
+     *
+     * @param objectsLists Tables of objects
+     */
+    that.separateFromObjects = function(objectsLists) {
+            
+        //Prepare the list of objects to iterate over.
+        var objects = [];
+        var lists = objectsLists.values();
+        for(var i = 0, len = lists.length;i<len;++i) {
+            objects.push.apply(objects, lists[i]);
+        }
+        
+        var xMove = 0; var yMove = 0;
+        var hitBoxes = that.getHitBoxes();
+        
+        //Check if their is a collision with each object
+        for(var i = 0, len = objects.length;i<len;++i) {
+            if ( objects[i].getUniqueId() != that.getUniqueId() ) {
+                var otherHitBoxes = objects[i].getHitBoxes();
+                
+                for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
+                    for(var l = 0, lenl = otherHitBoxes.length;l<lenl;++l) {
+                        var result = gdjs.polygon.collisionTest(hitBoxes[k], otherHitBoxes[l]);
+                        if ( result.collision ) {
+                            xMove += result.move_axis[0];
+                            yMove += result.move_axis[1];
+                        }
+                    }
+                }
+            }
+        }
+        
+        //Move according to the results returned by the collision algorithm.
+        that.setPosition(that.getX()+xMove, that.getY()+yMove);
     }
     
     that.getDistanceFrom = function(otherObject) {
@@ -456,4 +521,26 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     }
     
     return that;
+}
+
+/**
+ * Return true if the hitboxes of two objects are overlapping
+ * @method collisionTest
+ * @static
+ * @param obj1 The first runtimeObject
+ * @param obj2 The second runtimeObject
+ */
+gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
+
+    var hitBoxes1 = obj1.getHitBoxes();
+    var hitBoxes2 = obj2.getHitBoxes();
+    for(var k = 0, lenBoxes1 = hitBoxes1.length;k<lenBoxes1;++k) {
+        for(var l = 0, lenBoxes2 = hitBoxes2.length;l<lenBoxes2;++l) {
+            if ( gdjs.polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision ) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

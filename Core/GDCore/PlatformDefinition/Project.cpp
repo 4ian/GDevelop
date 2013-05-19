@@ -443,11 +443,10 @@ public:
         wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
         object->LoadResources(project, layout);
 
-        float defaultWidth = object->GetInitialInstanceDefaultWidth(instance, project, layout);
-        float defaultHeight = object->GetInitialInstanceDefaultHeight(instance, project, layout);
+        sf::Vector2f size = object->GetInitialInstanceDefaultSize(instance, project, layout);
 
-        instance.SetX(instance.GetX() + defaultWidth/2 - instance.GetCustomWidth()/2 );
-        instance.SetY(instance.GetY() + defaultHeight/2 - instance.GetCustomHeight()/2 );
+        instance.SetX(instance.GetX() + size.x/2 - instance.GetCustomWidth()/2 );
+        instance.SetY(instance.GetY() + size.y/2 - instance.GetCustomHeight()/2 );
     }
 
 private:

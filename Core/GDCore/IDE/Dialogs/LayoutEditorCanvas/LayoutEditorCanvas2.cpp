@@ -87,16 +87,24 @@ void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < boost::shared_p
     centerShape->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
     centerShape->setOutlineThickness(1);
     centerShape->setFillColor(sf::Color( 0, 0, 200, 40 ));
+    centerShape->setOrigin(sf::Vector2f(3,3));
 
     boost::shared_ptr<sf::Shape> angleButton = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
-    angleButton->setPosition(position+sf::Vector2f(10.0*cos(angle/180.0*3.14159), 10.0*sin(angle/180.0*3.14159)));
+    angleButton->setPosition(position+sf::Vector2f(25.0*cos(angle/180.0*3.14159), 25.0*sin(angle/180.0*3.14159)));
     angleButton->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
     angleButton->setOutlineThickness(1);
+    angleButton->setOrigin(sf::Vector2f(smallButtonSize/2.0, smallButtonSize/2.0));
+
+    boost::shared_ptr<sf::Shape> line = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(26, 1)));
+    line->setPosition(position+sf::Vector2f(3.0*cos(angle/180.0*3.14159), 3.0*sin(angle/180.0*3.14159)));
+    line->setRotation(angle);
+    line->setFillColor(sf::Color( 0, 0, 200, 128 ));
+    line->setOutlineThickness(0);
 
     //Declare the angle button as a gui element
     gd::LayoutEditorCanvasGuiElement guiElement;
     guiElement.name = "angle";
-    guiElement.area = wxRect(angleButton->getPosition().x, angleButton->getPosition().y, smallButtonSize, smallButtonSize);
+    guiElement.area = wxRect(angleButton->getPosition().x-smallButtonSize/2.0, angleButton->getPosition().y-smallButtonSize/2.0, smallButtonSize, smallButtonSize);
     guiElements.push_back(guiElement);
     if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         angleButton->setFillColor(sf::Color( 220, 220, 220, 255 ));
@@ -106,6 +114,7 @@ void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < boost::shared_p
     angleButtonCenter = position; //Save the position of the center to calculate the new angle when we'll be dragging the button ( See OnMoving method )
 
     //Add the shape to be drawn
+    target.push_back(line);
     target.push_back(centerShape);
     target.push_back(angleButton);
 }
@@ -167,14 +176,16 @@ public:
         if ( !associatedObject ) return;
 
         associatedObject->DrawInitialInstance(instance, editor, editor.project, editor.layout);
-        float width = instance.HasCustomSize() ? instance.GetCustomWidth() : associatedObject->GetInitialInstanceDefaultWidth(instance, editor.project, editor.layout);
-        float height = instance.HasCustomSize() ? instance.GetCustomHeight() : associatedObject->GetInitialInstanceDefaultHeight(instance, editor.project, editor.layout);
+        sf::Vector2f origin = associatedObject->GetInitialInstanceOrigin(instance, editor.project, editor.layout);
+        sf::Vector2f size = sf::Vector2f(instance.GetCustomWidth(), instance.GetCustomHeight());
+        if ( !instance.HasCustomSize() )
+            size = associatedObject->GetInitialInstanceDefaultSize(instance, editor.project, editor.layout);
 
         //Selection rectangle
         if ( editor.selectedInstances.find(&instance) != editor.selectedInstances.end() )
         {
-            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX(), instance.GetY(), editor.editionView);
-            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()+width, instance.GetY()+height, editor.editionView); //TODO
+            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x, instance.GetY()-origin.y, editor.editionView);
+            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x+size.x, instance.GetY()-origin.y+size.y, editor.editionView);
 
             editor.DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
 
@@ -197,8 +208,8 @@ public:
         }
         else if ( highlightedInstance == &instance )
         {
-            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX(), instance.GetY(), editor.editionView);
-            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()+width, instance.GetY()+height, editor.editionView); //TODO
+            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x, instance.GetY()-origin.y, editor.editionView);
+            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x+size.x, instance.GetY()-origin.y+size.y, editor.editionView);
 
             editor.DrawHighlightRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
         }
@@ -498,8 +509,9 @@ void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     boost::shared_ptr<gd::InitialInstance> instance = boost::shared_ptr<gd::InitialInstance>(pastedInstances[0]->Clone());
     if ( instance != boost::shared_ptr<gd::InitialInstance>() )
     {
-        dialog.SetXGap(GetWidthOfInitialInstance(*instance));
-        dialog.SetYGap(GetHeightOfInitialInstance(*instance));
+        sf::Vector2f size = GetInitialInstanceSize(*instance);
+        dialog.SetXGap(size.x);
+        dialog.SetYGap(size.y);
     }
 
     if ( dialog.ShowModal() != 1 ) return;

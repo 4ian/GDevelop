@@ -13,14 +13,17 @@ using namespace std;
 namespace gd
 {
 
-void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext & parent)
+void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext & parent_)
 {
     //Objects lists declared by parent became "already declared" in the child context.
-    alreadyDeclaredObjectsLists = parent.alreadyDeclaredObjectsLists;
-    for ( set<string>::iterator it = parent.objectsListsToBeDeclared.begin() ; it != parent.objectsListsToBeDeclared.end(); ++it )
+    alreadyDeclaredObjectsLists = parent_.alreadyDeclaredObjectsLists;
+    for ( set<string>::iterator it = parent_.objectsListsToBeDeclared.begin() ; it != parent_.objectsListsToBeDeclared.end(); ++it )
         alreadyDeclaredObjectsLists.insert(*it);
-    for ( set<string>::iterator it = parent.emptyObjectsListsToBeDeclared.begin() ; it != parent.emptyObjectsListsToBeDeclared.end(); ++it )
+    for ( set<string>::iterator it = parent_.emptyObjectsListsToBeDeclared.begin() ; it != parent_.emptyObjectsListsToBeDeclared.end(); ++it )
         alreadyDeclaredObjectsLists.insert(*it);
+
+    scopeLevel = parent_.GetScopeLevel()+1;
+    parent = &parent_;
 }
 
 void EventsCodeGenerationContext::ObjectsListNeeded(const std::string & objectName)
@@ -34,7 +37,7 @@ void EventsCodeGenerationContext::EmptyObjectsListNeeded(const std::string & obj
         emptyObjectsListsToBeDeclared.insert(objectName);
 }
 
-std::set<std::string> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
+std::set<std::string> EventsCodeGenerationContext::GetAllObjectsToBeDeclared() const
 {
     std::set <std::string> allObjectListsToBeDeclared(objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
     allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(), emptyObjectsListsToBeDeclared.end());

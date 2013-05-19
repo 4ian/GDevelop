@@ -355,8 +355,12 @@ void LayoutEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElem
             }
             else {
                 gd::Object * associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
-                if ( associatedObject ) resizeOriginalWidths[it->first] = associatedObject->GetInitialInstanceDefaultWidth(*(it->first), project, layout);
-                if ( associatedObject ) resizeOriginalHeights[it->first] = associatedObject->GetInitialInstanceDefaultHeight(*(it->first), project, layout);
+                if ( associatedObject )
+                {
+                    sf::Vector2f size = associatedObject->GetInitialInstanceDefaultSize(*(it->first), project, layout);
+                    resizeOriginalWidths[it->first] = size.x;
+                    resizeOriginalHeights[it->first] = size.y;
+                }
             }
         }
         resizeMouseStartPosition = sf::Vector2f(GetMouseXOnLayout(), GetMouseYOnLayout());
@@ -828,9 +832,12 @@ public:
     {
         if ( instance.IsLocked() ) return;
 
-        if ( editor.selectionRectangle.Contains(instance.GetX(), instance.GetY()) &&
-             editor.selectionRectangle.Contains(instance.GetX()+editor.GetWidthOfInitialInstance(instance),
-                                                instance.GetY()+editor.GetHeightOfInitialInstance(instance)) )
+        sf::Vector2f size = editor.GetInitialInstanceSize(instance);
+        sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
+
+        if ( editor.selectionRectangle.Contains(instance.GetX()-origin.x, instance.GetY()-origin.y) &&
+             editor.selectionRectangle.Contains(instance.GetX()-origin.x+size.x,
+                                                instance.GetY()-origin.y+size.y) )
         {
             selectedList.push_back(&instance);
         }
@@ -1187,8 +1194,10 @@ public:
     {
         if ( pickLockedOnly != instance.IsLocked() ) return;
 
-        wxRect2DDouble boundingBox(instance.GetX(), instance.GetY(),
-                                   editor.GetWidthOfInitialInstance(instance), editor.GetHeightOfInitialInstance(instance));
+        sf::Vector2f size = editor.GetInitialInstanceSize(instance);
+        sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
+
+        wxRect2DDouble boundingBox(instance.GetX()-origin.x, instance.GetY()-origin.y, size.x, size.y);
 
         if ( boundingBox.Contains(wxPoint2DDouble(xPosition, yPosition)) )
         {
@@ -1338,24 +1347,22 @@ double LayoutEditorCanvas::GetMouseYOnLayout() const
     return convertCoords(sf::Mouse::getPosition(*this), editionView).y;
 }
 
-double LayoutEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance) const
+sf::Vector2f LayoutEditorCanvas::GetInitialInstanceSize(gd::InitialInstance & instance) const
 {
-    if (instance.HasCustomSize()) return instance.GetCustomWidth();
+    if (instance.HasCustomSize()) return sf::Vector2f(instance.GetCustomWidth(), instance.GetCustomHeight());
 
     gd::Object * object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetInitialInstanceDefaultWidth(instance, project, layout);
+    if ( object ) return object->GetInitialInstanceDefaultSize(instance, project, layout);
 
-    return 0;
+    return sf::Vector2f(32,32);
 }
 
-double LayoutEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & instance) const
+sf::Vector2f LayoutEditorCanvas::GetInitialInstanceOrigin(gd::InitialInstance & instance) const
 {
-    if (instance.HasCustomSize()) return instance.GetCustomHeight();
-
     gd::Object * object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetInitialInstanceDefaultHeight(instance, project, layout);
+    if ( object ) return object->GetInitialInstanceOrigin(instance, project, layout);
 
-    return 0;
+    return sf::Vector2f(0,0);
 }
 
 gd::Object * LayoutEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const

@@ -35,7 +35,7 @@ public:
     /**
      * \brief Construct a code generator for the specified platform/project/layout.
      */
-    EventsCodeGenerator(gd::Project & project_, const gd::Layout & layout, const gd::Platform & platform_) : project(project_), scene(layout), platform(platform_), errorOccurred(false), compilationForRuntime(false) {};
+    EventsCodeGenerator(gd::Project & project_, const gd::Layout & layout, const gd::Platform & platform_);
     virtual ~EventsCodeGenerator() {};
 
     /**
@@ -110,7 +110,7 @@ public:
     std::string GenerateConditionCode(gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
 
     /**
-     * Generate code for a single action
+     * \brief Generate code for a single action
      *
      * The generation is really done in GenerateFreeAction/GenerateObjectAction or GenerateAutomatismAction.
      *
@@ -121,7 +121,9 @@ public:
     std::string GenerateActionCode(gd::Instruction & action, EventsCodeGenerationContext & context);
 
     /**
-     * Generate code for declaring objects lists.
+     * \brief Generate code for declaring objects lists.
+     *
+     * This method is used for each event.
      *
      * \param context The context to be used.
      */
@@ -129,7 +131,8 @@ public:
 
     /**
      * \brief Must convert a plain string ( with line feed, quotes ) to a string that can be inserted into code.
-     * The string construction can be explicit.
+     *
+     * \note It is the caller responsibility to add proper code need to create a full string.
      *
      * Usage example :
      * \code
@@ -158,84 +161,110 @@ public:
     virtual std::string ConvertToStringExplicit(std::string plainString);
 
     /**
-     * Declare an include file to be added
+     * \brief Declare an include file to be added
      */
     void AddIncludeFile(std::string file) { if ( !file.empty() ) includeFiles.insert(file); };
 
     /**
-     * Add a declaration which will be inserted after includes
+     * \brief Add a declaration which will be inserted after includes
      */
     void AddGlobalDeclaration(std::string declaration) { customGlobalDeclaration.insert(declaration); };
 
     /**
-     * Add some code before events outside main function.
+     * \brief Add some code before events outside the main function.
      */
     void AddCustomCodeOutsideMain(std::string code) { customCodeOutsideMain += code; };
 
     /**
-     * Add some code before events in main function.
+     * \brief Add some code before events in the main function.
      */
     void AddCustomCodeInMain(std::string code) { customCodeInMain += code; };
 
-    /** Get the set containing the include files.
+    /** \brief Get the set containing the include files.
      */
     const std::set<std::string> & GetIncludeFiles() const { return includeFiles; }
 
-    /** Get the custom code to be inserted outside main.
+    /** \brief Get the custom code to be inserted outside main.
      */
     const std::string & GetCustomCodeOutsideMain() const { return customCodeOutsideMain; }
 
-    /** Get the custom code to be inserted inside main.
+    /** \brief Get the custom code to be inserted inside main function.
      */
     const std::string & GetCustomCodeInMain() const { return customCodeInMain; }
 
-    /** Get the custom declaration to be inserted after #includes.
+    /** \brief Get the custom declaration to be inserted after includes.
      */
     const std::set<std::string> & GetCustomGlobalDeclaration() const { return customGlobalDeclaration; }
 
     /**
-     * Return true if code generation is made for runtime only.
+     * \brief Return true if code generation is made for runtime only.
      */
     bool GenerateCodeForRuntime() { return compilationForRuntime; }
 
     /**
-     * Set if the code generated is meant to be used for runtime only and not in the IDE.
+     * \brief Set if the code generated is meant to be used for runtime only and not in the IDE.
      */
     void SetGenerateCodeForRuntime(bool compilationForRuntime_) { compilationForRuntime = compilationForRuntime_; }
 
     /**
-     * Report that an error occurred during code generation ( Event code won't be generated )
+     * \brief Report that an error occurred during code generation ( Event code won't be generated )
      */
     void ReportError();
 
     /**
-     * Return true if an error has occurred during code generation ( in this case, generated code is not usable )
+     * \brief Return true if an error has occurred during code generation ( in this case, generated code is not usable )
      */
     bool ErrorOccurred() const { return errorOccurred; };
 
     /**
-     * Get the project the code is being generated for
+     * \brief Get the project the code is being generated for.
      */
     gd::Project & GetProject() const { return project; }
 
     /**
-     * Get the layout the code is being generated for
+     * \brief Get the layout the code is being generated for.
      */
     const gd::Layout & GetLayout() const { return scene; }
 
     /**
-     * Get the platform the code is being generated for
+     * \brief Get the platform the code is being generated for.
      */
     const gd::Platform & GetPlatform() const { return platform; }
 
     /**
-     * Get a list the "real" objects name when the events refers to \a objectName :<br>
+     * \brief Convert a group name to the full list of objects contained in the group.
+     *
+     * Get a list containing the "real" objects name when the events refers to \a objectName :<br>
      * If \a objectName if really an object, the list will only contains \a objectName unchanged.<br>
      * If \a objectName is a group, the list will contains all the objects of the group.<br>
      * If \a objectName is the "current" object in the context ( i.e: The object being used for launching an action... ),
      * none of the two rules below apply, and the list will only contains the context "current" object name.
      */
     std::vector<std::string> ExpandObjectsName(const std::string & objectName, const EventsCodeGenerationContext & context) const;
+
+    /**
+     * \brief Returns the maximum context depth reached during code generation.
+     */
+    unsigned int GetMaximalScopeLevelReached() { return maxScope; };
+
+    /**
+     * \brief Get the maximum depth of custom conditions reached during code generation.
+     */
+    unsigned int GetMaxCustomConditionsDepth() const { return maxCustomConditionsDepth; }
+
+    /**
+     * \brief Generate the full name for accessing to a boolean variable used for conditions.
+     *
+     * Default implementation just returns the boolean name passed as argument.
+     */
+    virtual std::string GenerateBooleanFullName(const std::string & boolName, const gd::EventsCodeGenerationContext & context ) { return boolName; }
+
+    /**
+     * \brief Get the full name for accessing to a list of objects
+     *
+     * Default implementation simply returns the name mangled using gd::EventsCodeNameMangler.
+     */
+    virtual std::string GetObjectListName(const std::string & name, gd::EventsCodeGenerationContext & context);
 
 protected:
 
@@ -268,7 +297,7 @@ protected:
 
      * \endcode
      * - objectListWithoutPicking : Same as objectList but do not pick object if they are not already picked.
-     * - objectPtr : Return a pointer to object specified by the object name in another parameter ( C++: RuntimeObject * ). Example:
+     * - objectPtr : Return a pointer to object specified by the object name in another parameter ( C++: RuntimeObject* ). Example:
      * \code
     .AddParameter("object", _("Object"))
     .AddParameter("objectPtr", _("Target object"))
@@ -280,58 +309,129 @@ protected:
                                                const std::vector < gd::Expression > & othersParameters,
                                                std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
 
+    /**
+     * \brief Call a function of the current object.
+     * \note The current object is the object being manipulated by a condition or an action.
+     *
+     * \param objectListName The full name of the object list being used
+     * \param objMetadata Metadata about the object being used.
+     * \param functionCallName The function to be called on this object.
+     * \param parametersStr The parameters of the function
+     * \param context The context : May be used to get information about the current scope.
+     */
     virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                           const ObjectMetadata & objMetadata,
                                                           std::string functionCallName,
-                                                          std::string parametersStr);
+                                                          std::string parametersStr,
+                                                          gd::EventsCodeGenerationContext & context);
 
+    /**
+     * \brief Call a function of an object of a list.
+     *
+     * The object to be used must be the first object of the list
+     *
+     * \param objectListName The full name of the object list being used
+     * \param objMetadata Metadata about the object being used.
+     * \param functionCallName The function to be called on this object.
+     * \param parametersStr The parameters of the function
+     * \param context The context : May be used to get information about the current scope.
+     */
     virtual std::string GenerateNotPickedObjectFunctionCall(std::string objectListName,
                                                             const ObjectMetadata & objMetadata,
                                                             std::string functionCallName,
                                                             std::string parametersStr,
-                                                            std::string defaultOutput);
+                                                            std::string defaultOutput,
+                                                            gd::EventsCodeGenerationContext & context);
 
+    /**
+     * \brief Call a function of an automatism of the current object.
+     * \note The current object is the object being manipulated by a condition or an action.
+     *
+     * \param objectListName The full name of the object list being used
+     * \param automatismName The full name of the automatism to be used
+     * \param objMetadata Metadata about the automatism being used.
+     * \param functionCallName The function to be called on this object.
+     * \param parametersStr The parameters of the function
+     * \param context The context : May be used to get information about the current scope.
+     */
     virtual std::string GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
                                                                       std::string automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
                                                                       std::string functionCallName,
-                                                                      std::string parametersStr);
+                                                                      std::string parametersStr,
+                                                            gd::EventsCodeGenerationContext & context);
 
+    /**
+     * \brief Call a function of an automatism of an object of a list.
+     *
+     * The object to be used must be the first object of the list
+     *
+     * \param objectListName The full name of the object list being used
+     * \param automatismName The full name of the automatism to be used
+     * \param objMetadata Metadata about the automatism being used.
+     * \param functionCallName The function to be called on this object.
+     * \param parametersStr The parameters of the function
+     * \param context The context : May be used to get information about the current scope.
+     */
     virtual std::string GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
                                                                       std::string automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
                                                                       std::string functionCallName,
                                                                       std::string parametersStr,
-                                                                      std::string defaultOutput);
+                                                                      std::string defaultOutput,
+                                                            gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Called when a new scope must be entered.
      * \param context The context : Internal events of the scope have been generated, but GenerateObjectsDeclarationCode was not called.
      * \param extraVariable An optional supplementary variable that should be inherited from the parent scope.
      */
-    virtual std::string GenerateScopeBegin(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") const { return "{\n"; };
+    virtual std::string GenerateScopeBegin(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") { return "{\n"; };
 
     /**
      * \brief Called when a new must be ended.
      * \param context The context : Internal events of the scope have been generated, but GenerateObjectsDeclarationCode was not called.
      * \param extraVariable An optional supplementary variable that should be inherited from the parent scope.
      */
-    virtual std::string GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") const { return "}\n"; };
+    virtual std::string GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable = "") { return "}\n"; };
+
+    /**
+     * \brief Must negate a predicat.
+     *
+     * The default implementation generates C-style code : It wraps the predicat inside parenthesis and add a !.
+     */
     virtual std::string GenerateNegatedPredicat(const std::string & predicat) const { return "!("+predicat+")"; };
-    virtual std::string GenerateReferenceToBoolean(const std::string & referenceName, const std::string & referencedBoolean) { return "bool & "+referenceName+" = "+referencedBoolean+";\n";}
-    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "bool "+boolName+" = false;\n";}
+
+    /**
+     * \brief Must create a boolean which is a reference to a boolean declared in the parent scope.
+     *
+     * The default implementation generates C-style code.
+     */
+    virtual std::string GenerateReferenceToUpperScopeBoolean(const std::string & referenceName,
+                                                   const std::string & referencedBoolean,
+                                                   gd::EventsCodeGenerationContext & context) { return "bool & "+referenceName+" = "+referencedBoolean+";\n";}
+
+    /**
+     * \brief Must create a boolean. Its value must be false.
+     *
+     * The default implementation generates C-style code.
+     */
+    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName,
+                                                             const gd::EventsCodeGenerationContext & context) { return "bool "+boolName+" = false;\n";}
 
     virtual std::string GenerateFreeCondition(const std::vector<std::string> & arguments,
                                               const gd::InstructionMetadata & instrInfos,
                                               const std::string & returnBoolean,
-                                              bool conditionInverted);
+                                              bool conditionInverted,
+                                              gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             const std::string & returnBoolean,
-                                                            bool conditionInverted);
+                                                            bool conditionInverted,
+                                                            gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateAutomatismCondition(const std::string & objectName,
                                                                 const std::string & automatismName,
@@ -339,41 +439,54 @@ protected:
                                                                 const std::vector<std::string> & arguments,
                                                                 const gd::InstructionMetadata & instrInfos,
                                                                 const std::string & returnBoolean,
-                                                                bool conditionInverted);
+                                                                bool conditionInverted,
+                                                                gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateFreeAction(const std::vector<std::string> & arguments,
-                                           const gd::InstructionMetadata & instrInfos);
+                                           const gd::InstructionMetadata & instrInfos,
+                                           gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateObjectAction(const std::string & objectName,
                                                         const gd::ObjectMetadata & objInfo,
                                                         const std::vector<std::string> & arguments,
-                                                        const gd::InstructionMetadata & instrInfos);
+                                                        const gd::InstructionMetadata & instrInfos,
+                                                        gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateAutomatismAction(const std::string & objectName,
                                                             const std::string & automatismName,
                                                             const gd::AutomatismMetadata & autoInfo,
                                                             const std::vector<std::string> & arguments,
-                                                            const gd::InstructionMetadata & instrInfos);
+                                                            const gd::InstructionMetadata & instrInfos,
+                                                            gd::EventsCodeGenerationContext & context);
 
 
     std::string GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
     std::string GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, const std::string & getterStartString, unsigned int startFromArgument = 0);
     std::string GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
 
+    /**
+     * \brief Must return an expression whose value is true.
+     */
     std::string GenerateTrue() const { return "true"; };
+
+    /**
+     * \brief Must return an expression whose value is false.
+     */
     std::string GenerateFalse() const { return "false"; };
 
-    gd::Project & project;
-    const gd::Layout & scene;
-    const gd::Platform & platform;
+    gd::Project & project; ///< The project being used.
+    const gd::Layout & scene; ///< The scene being generated.
+    const gd::Platform & platform; ///< The platform being used.
 
-    bool errorOccurred;
-    bool compilationForRuntime;
+    bool errorOccurred; ///< Must be set to true if an error occured.
+    bool compilationForRuntime; ///< Is set to true if the code generation is made for runtime only.
 
     std::set<std::string> includeFiles; ///< List of headers files used by instructions. A (shared) pointer is used so as context created from another one can share the same list.
     std::string customCodeOutsideMain; ///< Custom code inserted before events ( and not in events function )
     std::string customCodeInMain; ///< Custom code inserted before events ( in main function )
     std::set<std::string> customGlobalDeclaration; ///< Custom global C++ declarations inserted after includes
+    unsigned int maxScope; ///< The maximum depth value for all the contexts created.
+    unsigned int maxCustomConditionsDepth; ///< The maximum depth value for all the custom conditions created.
 };
 
 }

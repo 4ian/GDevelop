@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
+#include <SFML/System/Vector2.hpp>
 namespace gd { class Automatism; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -140,16 +141,20 @@ public:
     virtual void LoadResources(gd::Project & project, gd::Layout & layout) {};
 
     /**
-     * \brief Called when the IDE wants to know the width of an initial instance which has a default width.
+     * \brief Called when the IDE wants to know the default size an initial instance.
      * \see gd::InitialInstance
      */
-    virtual float GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const { return 32; }
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
 
     /**
-     * \brief Called when the IDE wants to know the height of an initial instance which has a default height.
+     * \brief Called when the IDE wants to know the origin of an initial instance. ( Relative to the object )
+     *
+     * The default implementation returns point (0;0) and it should be ok for most objects except for objects whose
+     * origin can be modified ( sprites for example )
+     *
      * \see gd::InitialInstance
      */
-    virtual float GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const { return 32; }
+    virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
     ///@}
 
     /** \name  Others IDE related functions

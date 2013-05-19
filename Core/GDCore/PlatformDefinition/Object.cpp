@@ -40,6 +40,17 @@ void Object::Init(const gd::Object & object)
     	automatisms[it->first] = it->second->Clone();
 }
 
+
+sf::Vector2f Object::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(32,32);
+}
+
+sf::Vector2f Object::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(0,0);
+}
+
 #if defined(GD_IDE_ONLY)
 std::vector < std::string > Object::GetAllAutomatismNames() const
 {
@@ -94,8 +105,9 @@ bool Object::HasAutomatismNamed(const std::string & name) const
 
 void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    sf::RectangleShape mask(sf::Vector2f(instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultWidth(instance, project, layout),
-                                         instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultHeight(instance, project, layout)));
+    sf::RectangleShape mask(instance.HasCustomSize() ?
+                            sf::Vector2f(instance.GetCustomWidth(),instance.GetCustomHeight()) :
+                            GetInitialInstanceDefaultSize(instance, project, layout));
     mask.setPosition(instance.GetX(), instance.GetY());
     mask.setRotation(instance.GetAngle());
     mask.setFillColor(sf::Color( 147,151,255 ));

@@ -129,7 +129,7 @@ public:
     {
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
-        ExtraInformation() : accessType(Reference), doNotEncloseInstructionCodeWithinBrackets(false) {};
+        ExtraInformation() : accessType(Reference) {};
 
         /**
          * Set the C++ function name which will be used when generating the C++ code.
@@ -188,15 +188,6 @@ public:
             return *this;
         }
 
-        /**
-         * Set that the instruction should not be enclose within brackets ( { } )
-         */
-        ExtraInformation & DoNotEncloseInstructionCodeWithinBrackets(bool disableBrackets = true)
-        {
-            doNotEncloseInstructionCodeWithinBrackets = disableBrackets;
-            return *this;
-        }
-
         /** \brief Class used to redefine instruction code generation
          */
         class CustomCodeGenerator
@@ -215,7 +206,6 @@ public:
         std::string type;
         AccessType accessType;
         std::string optionalAssociatedInstruction;
-        bool doNotEncloseInstructionCodeWithinBrackets;
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };

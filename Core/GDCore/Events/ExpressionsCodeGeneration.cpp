@@ -133,9 +133,9 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         //Build string to access the object
         codeGenerator.AddIncludeFile(objInfo.optionalIncludeFile);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
-            output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr);
+            output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
-            output = codeGenerator.GenerateNotPickedObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output);
+            output = codeGenerator.GenerateNotPickedObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
     }
 
     plainExpression += output;
@@ -176,9 +176,9 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         //Build string to access the object
         codeGenerator.AddIncludeFile(objInfo.optionalIncludeFile);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
-            output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr);
+            output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
-            output = codeGenerator.GenerateNotPickedObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output);
+            output = codeGenerator.GenerateNotPickedObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
     }
 
     plainExpression += output;
@@ -220,9 +220,9 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         //Build string to access the automatism
         codeGenerator.AddIncludeFile(autoInfo.optionalIncludeFile);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
-            output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr);
+            output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
-            output = codeGenerator.GenerateNotPickedObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output);
+            output = codeGenerator.GenerateNotPickedObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
     }
 
     plainExpression += output;
@@ -264,9 +264,9 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         //Build string to access the automatism
         codeGenerator.AddIncludeFile(autoInfo.optionalIncludeFile);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
-            output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr);
+            output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
-            output = codeGenerator.GenerateNotPickedObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output);
+            output = codeGenerator.GenerateNotPickedObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
     }
 
     plainExpression += output;

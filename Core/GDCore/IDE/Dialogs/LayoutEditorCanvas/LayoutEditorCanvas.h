@@ -245,8 +245,8 @@ public:
      */
     void GoToEditingState();
 
-    virtual double GetWidthOfInitialInstance(gd::InitialInstance & instance) const;
-    virtual double GetHeightOfInitialInstance(gd::InitialInstance & instance) const;
+    virtual sf::Vector2f GetInitialInstanceSize(gd::InitialInstance & instance) const;
+    virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance) const;
 
     //(*Declarations(LayoutEditorCanvas)
     //*)

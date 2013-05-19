@@ -2,7 +2,7 @@
 /**
  * The runtimeObject represents an object being used on a RuntimeScene.
  *
- * <b>TODO</b> : automatisms, variables loading
+ * <b>TODO</b> : automatisms
  *
  * @class runtimeObject
  * @constructor 
@@ -22,7 +22,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     my.hidden = false;
     that.layer = "";
     my.id = runtimeScene.createNewUniqueId();
-    my.variables = gdjs.variablesContainer();
+    my.variables = gdjs.variablesContainer(objectXml ? $(objectXml).find("Variables") : undefined);
     my.forces = [];
     
     //Common members functions related to the object and its runtimeScene :
@@ -31,7 +31,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * Called each time the scene is rendered.
      *
      * @method updateTime
-     * @param elapsedTime {Number} The time elapsedTime since the last frame, in milliseconds.
+     * @param elapsedTime {Number} The time elapsedTime since the last frame, in <b>seconds</b>.
      */
     that.updateTime = function(elapsedTime) {
         //Nothing to do.
@@ -109,6 +109,32 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.getY = function() {
         return that.y;
+    }
+    
+    /**
+     * Get the X position of the rendered object.<br>
+     * For most objects, this will returns the same value as getX(). But if the object
+     * has an origin that is not the same as the point (0,0) of the object displayed,
+     * getDrawableX will differs.
+     *
+     * @method getDrawableX
+     * @return {Number} The X position of the rendered object.
+     */
+    that.getDrawableX = function() {
+        return that.getX();
+    }
+    
+    /**
+     * Get the Y position of the rendered object.<br>
+     * For most objects, this will returns the same value as getY(). But if the object
+     * has an origin that is not the same as the point (0,0) of the object displayed,
+     * getDrawableY will differs.
+     *
+     * @method getDrawableY
+     * @return {Number} The Y position of the rendered object.
+     */
+    that.getDrawableY = function() {
+        return that.getY();
     }
     
     /**
@@ -332,7 +358,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @param isPermanent {Boolean} Set if the force is permanent or not.
      */
     that.addForceTowardObject = function(obj, len, isPermanent) {
-        that.addForceTowardPosition(obj.getY()+obj.getCenterY(), obj.getX()+obj.getCenterX(),
+        that.addForceTowardPosition(obj.getX()+obj.getCenterX(), obj.getY()+obj.getCenterY(),
                                     len, isPermanent);
     }
     
@@ -452,6 +478,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @return {Array} An array composed of polygon.
      */
     that.getHitBoxes = function() {
+        //TODO: Stop keeping recreating temporaries.
         var rectangle = gdjs.polygon.createRectangle(that.getWidth(), that.getHeight());
         rectangle.rotate(that.getAngle()/180*3.14159);
         rectangle.move(that.getX()+that.getCenterX(), that.getY()+that.getCenterY());

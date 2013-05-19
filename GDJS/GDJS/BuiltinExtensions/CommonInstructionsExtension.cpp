@@ -49,7 +49,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
 
-                std::string ifPredicat = event.GetConditions().empty() ? "" : "condition"+gd::ToString(event.GetConditions().size()-1)+"IsTrue.val";
+                std::string ifPredicat = event.GetConditions().empty() ? "" : codeGenerator.GenerateBooleanFullName("condition"+gd::ToString(event.GetConditions().size()-1)+"IsTrue", context)+".val";
 
                 if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ") {\n";
                 outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);

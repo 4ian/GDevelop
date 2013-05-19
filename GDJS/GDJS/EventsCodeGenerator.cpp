@@ -9,6 +9,7 @@
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/SceneNameMangler.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -41,9 +42,49 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ; declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
         output += *declaration+"\n";
 
+    //Global objects lists
+    std::string globalObjectLists;
+    std::string globalObjectListsReset;
+    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    {
+        for (unsigned int j = 1;j<=codeGenerator.GetMaximalScopeLevelReached();++j)
+        {
+            globalObjectLists += codeGenerator.GetCodeNamespace()
+                                 +ManObjListName(project.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
+            globalObjectListsReset += codeGenerator.GetCodeNamespace()
+                                      +ManObjListName(project.GetObject(i).GetName())+gd::ToString(j) + ".length = 0;\n";
+
+        }
+    }
+    for (unsigned int i = 0;i<scene.GetObjectsCount();++i)
+    {
+        for (unsigned int j = 1;j<=codeGenerator.GetMaximalScopeLevelReached();++j)
+        {
+            globalObjectLists += codeGenerator.GetCodeNamespace()
+                                 +ManObjListName(scene.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
+            globalObjectListsReset += codeGenerator.GetCodeNamespace()
+                                      +ManObjListName(scene.GetObject(i).GetName())+gd::ToString(j) + ".length = 0;\n";
+        }
+    }
+
+    //Condition global booleans
+    std::string globalConditionsBooleans;
+    for (unsigned int i = 0;i<=codeGenerator.GetMaxCustomConditionsDepth();++i)
+    {
+        globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"conditionTrue_"+gd::ToString(i)+" = {val:false};\n";
+        for (unsigned int j = 0;j<=codeGenerator.GetMaxConditionsIndex();++j)
+        {
+            globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::ToString(j)+"IsTrue_"+gd::ToString(i)+" = {val:false};\n";
+        }
+    }
+
     output +=
-    codeGenerator.GetCustomCodeOutsideMain()+"\n"
-    +"gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = function(runtimeScene) {\n"
+    "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n"+
+    codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
+    +globalObjectLists+"\n"
+    +globalConditionsBooleans+"\n"
+    +"gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.func = function(runtimeScene) {\n"
+    +globalObjectListsReset+"\n"
 	+codeGenerator.GetCustomCodeInMain()
     +wholeEventsCode
     +"return;\n"
@@ -56,27 +97,30 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
 std::string EventsCodeGenerator::GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                       const gd::ObjectMetadata & objMetadata,
                                                       std::string functionCallName,
-                                                      std::string parametersStr)
+                                                      std::string parametersStr,
+                                                      gd::EventsCodeGenerationContext & context)
 {
-    return "("+ManObjListName(objectListName)+"[i]."+functionCallName+"("+parametersStr+"))";
+    return "("+GetObjectListName(objectListName, context)+"[i]."+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateNotPickedObjectFunctionCall(std::string objectListName,
                                                         const gd::ObjectMetadata & objMetadata,
                                                         std::string functionCallName,
                                                         std::string parametersStr,
-                                                        std::string defaultOutput)
+                                                        std::string defaultOutput,
+                                                      gd::EventsCodeGenerationContext & context)
 {
-    return "(( "+ManObjListName(objectListName)+".length === 0 ) ? "+defaultOutput+" :"+ ManObjListName(objectListName)+"[0]."+functionCallName+"("+parametersStr+"))";
+    return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+ GetObjectListName(objectListName, context)+"[0]."+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
                                                                                        std::string automatismName,
                                                       const gd::AutomatismMetadata & autoInfo,
                                                       std::string functionCallName,
-                                                      std::string parametersStr)
+                                                      std::string parametersStr,
+                                                      gd::EventsCodeGenerationContext & context)
 {
-    return "("+ManObjListName(objectListName)+"[i].getAutomatism(\""+automatismName+"\")."+functionCallName+"("+parametersStr+"))";
+    return "("+GetObjectListName(objectListName, context)+"[i].getAutomatism(\""+automatismName+"\")."+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
@@ -84,15 +128,17 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(s
                                                         const gd::AutomatismMetadata & autoInfo,
                                                         std::string functionCallName,
                                                         std::string parametersStr,
-                                                        std::string defaultOutput)
+                                                        std::string defaultOutput,
+                                                      gd::EventsCodeGenerationContext & context)
 {
-    return "(( "+ManObjListName(objectListName)+".length === 0 ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0].getAutomatism(\""+automatismName+"\")."+functionCallName+"("+parametersStr+"))";
+    return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+GetObjectListName(objectListName, context)+"[0].getAutomatism(\""+automatismName+"\")."+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::string> & arguments,
                                                              const gd::InstructionMetadata & instrInfos,
                                                              const std::string & returnBoolean,
-                                                             bool conditionInverted)
+                                                             bool conditionInverted,
+                                                             gd::EventsCodeGenerationContext & context)
 {
     //Generate call
     string predicat;
@@ -122,20 +168,21 @@ std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::st
     if (!conditionAlreadyTakeCareOfInversion && conditionInverted) predicat = GenerateNegatedPredicat(predicat);
 
     //Generate condition code
-    return returnBoolean+".val = "+predicat+";\n";
+    return GenerateBooleanFullName(returnBoolean, context)+".val = "+predicat+";\n";
 }
 
 std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
-                                                                   const gd::ObjectMetadata & objInfo,
-                                                                   const std::vector<std::string> & arguments,
-                                                                   const gd::InstructionMetadata & instrInfos,
-                                                                   const std::string & returnBoolean,
-                                                                   bool conditionInverted)
+                                                         const gd::ObjectMetadata & objInfo,
+                                                         const std::vector<std::string> & arguments,
+                                                         const gd::InstructionMetadata & instrInfos,
+                                                         const std::string & returnBoolean,
+                                                         bool conditionInverted,
+                                                        gd::EventsCodeGenerationContext & context)
 {
     std::string conditionCode;
 
     //Prepare call
-    string objectFunctionCallNamePart = ManObjListName(objectName)+"[i]."+instrInfos.codeExtraInformation.functionCallName;
+    string objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i]."+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
     string predicat;
@@ -157,13 +204,13 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
     //Generate whole condition code
-    conditionCode += "for(var i = 0;i < "+ManObjListName(objectName)+".length;) {\n";
+    conditionCode += "for(var i = 0;i < "+GetObjectListName(objectName, context)+".length;) {\n";
     conditionCode += "    if ( "+predicat+" ) {\n";
-    conditionCode += "        "+returnBoolean+".val = true;\n";
+    conditionCode += "        "+GenerateBooleanFullName(returnBoolean, context)+".val = true;\n";
     conditionCode += "        ++i;\n";
     conditionCode += "    }\n";
     conditionCode += "    else {\n";
-    conditionCode += "        "+ManObjListName(objectName)+".remove(i);\n";
+    conditionCode += "        "+GetObjectListName(objectName, context)+".remove(i);\n";
     conditionCode += "    }\n";
     conditionCode += "}\n";
 
@@ -171,17 +218,18 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
 }
 
 std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string & objectName,
-                                                                       const std::string & automatismName,
+                                                             const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    const std::string & returnBoolean,
-                                                                   bool conditionInverted)
+                                                                   bool conditionInverted,
+                                                      gd::EventsCodeGenerationContext & context)
 {
     std::string conditionCode;
 
     //Prepare call
-    string objectFunctionCallNamePart = ManObjListName(objectName)+"[i].getAutomatism(\""+automatismName+"\")."
+    string objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\")."
                                         +instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
@@ -211,13 +259,13 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
     }
     else
     {
-        conditionCode += "for(var i = 0;i < "+ManObjListName(objectName)+".length;) {\n";
+        conditionCode += "for(var i = 0;i < "+GetObjectListName(objectName, context)+".length;) {\n";
         conditionCode += "    if ( "+predicat+" ) {\n";
-        conditionCode += "        "+returnBoolean+" = true;\n";
+        conditionCode += "        "+GenerateBooleanFullName(returnBoolean, context)+".val = true;\n";
         conditionCode += "        ++i;\n";
         conditionCode += "    }\n";
         conditionCode += "    else {\n";
-        conditionCode += "        "+ManObjListName(objectName)+".remove(i);\n";
+        conditionCode += "        "+GetObjectListName(objectName, context)+".remove(i);\n";
         conditionCode += "    }\n";
         conditionCode += "}";
     }
@@ -229,12 +277,13 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
 std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
                                                                    const std::vector<std::string> & arguments,
-                                                                   const gd::InstructionMetadata & instrInfos)
+                                                                   const gd::InstructionMetadata & instrInfos,
+                                                      gd::EventsCodeGenerationContext & context)
 {
     std::string actionCode;
 
     //Prepare call
-    string objectPart = ManObjListName(objectName)+"[i]." ;
+    string objectPart = GetObjectListName(objectName, context)+"[i]." ;
 
     //Create call
     string call;
@@ -257,7 +306,7 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
         call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
     }
 
-    actionCode += "for(var i = 0, len = "+ManObjListName(objectName)+".length ;i < len;++i) {\n";
+    actionCode += "for(var i = 0, len = "+GetObjectListName(objectName, context)+".length ;i < len;++i) {\n";
     actionCode += "    "+call+";\n";
     actionCode += "}\n";
 
@@ -269,13 +318,14 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
                                                                     const std::string & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
                                                                    const std::vector<std::string> & arguments,
-                                                                   const gd::InstructionMetadata & instrInfos)
+                                                                   const gd::InstructionMetadata & instrInfos,
+                                                      gd::EventsCodeGenerationContext & context)
 {
     std::string actionCode;
 
     //Prepare call
     //Add a static_cast if necessary
-    string objectPart = ManObjListName(objectName)+"[i].getAutomatism(\""+automatismName+"\").";
+    string objectPart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\").";
 
     //Create call
     string call;
@@ -306,7 +356,7 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     }
     else
     {
-        actionCode += "for(var i = 0, len = "+ManObjListName(objectName)+".length ;i < len;++i) {\n";
+        actionCode += "for(var i = 0, len = "+GetObjectListName(objectName, context)+".length ;i < len;++i) {\n";
         actionCode += "    "+call+";\n";
         actionCode += "}\n";
     }
@@ -315,101 +365,63 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     return actionCode;
 }
 
+std::string EventsCodeGenerator::GetObjectListName(const std::string & name, gd::EventsCodeGenerationContext & context)
+{
+    return GetCodeNamespace()+ManObjListName(name) +gd::ToString(context.GetScopeLevel());
+}
+
 std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
 {
     std::string declarationsCode;
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
+        declarationsCode += GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel());
         if ( !context.ObjectAlreadyDeclared(*it) )
         {
-            declarationsCode += "var "+ManObjListName(*it) +" = runtimeScene.getObjects(\""+ConvertToString(*it)+"\").slice(0);\n";
+            declarationsCode += ".createFrom(runtimeScene.getObjects(\""+ConvertToString(*it)+"\"));\n";
             context.SetObjectDeclared(*it);
         }
         else
         {
-            declarationsCode += "var "+ManObjListName(*it)+"T = "+ManObjListName(*it)+".slice(0);\n";
-            declarationsCode += "var "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
+            declarationsCode += ".createFrom("+GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel()-1)+");\n";
         }
     }
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
     {
+        declarationsCode += GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel());
         if ( !context.ObjectAlreadyDeclared(*it) )
         {
-            declarationsCode += "var "+ManObjListName(*it)+" = [];\n";
+            declarationsCode +=".length = 0;\n";
             context.SetObjectDeclared(*it);
         }
         else
         {
-            declarationsCode += "var "+ManObjListName(*it)+"T = "+ManObjListName(*it)+".slice(0);\n";
-            declarationsCode += "var "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
+            declarationsCode += ".createFrom("+GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel()-1)+");\n";
         }
     }
 
     return declarationsCode ;
 }
 
-std::string EventsCodeGenerator::GenerateScopeBegin(gd::EventsCodeGenerationContext & context, const std::string & extraVariable) const
-{
-    //Generate a list of variables declared in the parent scope
-    std::string scopeInheritedVariables = extraVariable;
-    for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
-    {
-        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
-
-        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
-        scopeInheritedVariables += ManObjListName(*it);
-    }
-    for ( set<string>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
-    {
-        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
-
-        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
-        scopeInheritedVariables += ManObjListName(*it);
-    }
-
-    return "( function("+scopeInheritedVariables+") {\n";
-};
-std::string EventsCodeGenerator::GenerateScopeEnd(gd::EventsCodeGenerationContext & context, const std::string & extraVariable) const
-{
-    //Generate a list of variables declared in the parent scope
-    std::string scopeInheritedVariables = extraVariable;
-    for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
-    {
-        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
-
-        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
-        scopeInheritedVariables += ManObjListName(*it);
-    }
-    for ( set<string>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
-    {
-        if ( !context.ObjectAlreadyDeclared(*it) ) continue;
-
-        scopeInheritedVariables += !scopeInheritedVariables.empty() ? ", " : "";
-        scopeInheritedVariables += ManObjListName(*it);
-    }
-
-    return "})("+scopeInheritedVariables+");\n";
-};
-
 string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction > & conditions, gd::EventsCodeGenerationContext & context)
 {
     string outputCode;
 
     for (unsigned int i = 0;i<conditions.size();++i)
-        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::ToString(i)+"IsTrue");
+        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::ToString(i)+"IsTrue", context);
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
-        if (cId != 0) outputCode += "if ( condition"+gd::ToString(cId-1)+"IsTrue.val ) {\n";
+        if (cId != 0) outputCode += "if ( "+GenerateBooleanFullName("condition"+gd::ToString(cId-1)+"IsTrue", context)+".val ) {\n";
 
         gd::InstructionMetadata instrInfos = gd::MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
 
         string conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::ToString(cId)+"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
         {
-            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "{";
+            outputCode += "{\n";
             outputCode += conditionCode;
-            if ( !instrInfos.codeExtraInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "}";
+            outputCode += "}";
         }
     }
 
@@ -417,6 +429,8 @@ string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction 
     {
         if (cId != 0) outputCode += "}\n";
     }
+
+    maxConditionsIndex = std::max(conditions.size(), maxConditionsIndex);
 
     return outputCode;
 }
@@ -442,7 +456,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             context.ObjectsListNeeded(realObjects[i]);
-            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
         }
         argOutput += ".getEventsObjectsMap()";
     }
@@ -455,40 +469,30 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             context.EmptyObjectsListNeeded(realObjects[i]);
-            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
         }
         argOutput += ".getEventsObjectsMap()";
     }
     //Code only parameter type
     else if ( metadata.type == "objectPtr")
     {
-        unsigned int i = gd::ToInt(metadata.supplementaryInformation);
-        if ( i < othersParameters.size() )
-        {
-            std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
+        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
-            if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
-            {
-                //If object currently used by instruction is available, use it directly.
-                argOutput = ManObjListName(context.GetCurrentObject())+"[i]";
-            }
-            else
-            {
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                {
-                    context.ObjectsListNeeded(realObjects[i]);
-                    argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
-                }
-                argOutput += "null";
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                    argOutput += ")";
-            }
+        if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
+        {
+            //If object currently used by instruction is available, use it directly.
+            argOutput = GetObjectListName(context.GetCurrentObject(), context)+"[i]";
         }
         else
         {
-            ReportError();
-            cout << "Error: Could not get objects for a parameter" << endl;
-            return "null";
+            for (unsigned int i = 0;i<realObjects.size();++i)
+            {
+                context.ObjectsListNeeded(realObjects[i]);
+                argOutput += "("+GetObjectListName(realObjects[i], context)+".length !== 0 ? "+GetObjectListName(realObjects[i], context)+"[0] : ";
+            }
+            argOutput += "null";
+            for (unsigned int i = 0;i<realObjects.size();++i)
+                argOutput += ")";
         }
     }
     else
@@ -497,8 +501,33 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     return argOutput;
 }
 
+std::string EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(const std::string & referenceName,
+                                                            const std::string & referencedBoolean,
+                                                            gd::EventsCodeGenerationContext & context)
+{
+    if ( context.GetParentContext() == NULL) return "";
+
+    return GenerateBooleanFullName(referenceName, context)+" = "+GenerateBooleanFullName(referencedBoolean, *context.GetParentContext())+";\n";
+}
+
+std::string EventsCodeGenerator::GenerateBooleanInitializationToFalse(const std::string & boolName, const gd::EventsCodeGenerationContext & context)
+{
+    return GenerateBooleanFullName(boolName, context)+".val = false;\n";
+}
+
+std::string EventsCodeGenerator::GenerateBooleanFullName(const std::string & boolName, const gd::EventsCodeGenerationContext & context )
+{
+    return GetCodeNamespace()+boolName+"_"+gd::ToString(context.GetCurrentConditionDepth());
+}
+
+std::string EventsCodeGenerator::GetCodeNamespace()
+{
+    return "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.";
+}
+
 EventsCodeGenerator::EventsCodeGenerator(gd::Project & project, const gd::Layout & layout) :
-    gd::EventsCodeGenerator(project, layout, JsPlatform::Get())
+    gd::EventsCodeGenerator(project, layout, JsPlatform::Get()),
+    maxConditionsIndex(0)
 {
 }
 

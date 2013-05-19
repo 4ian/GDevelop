@@ -41,11 +41,12 @@ VariablesExtension::VariablesExtension()
 
                 std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
+                std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" )
-                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
 
                 return "";
             };
@@ -67,11 +68,12 @@ VariablesExtension::VariablesExtension()
 
                 std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
+                std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == "!=" )
-                    return "conditionTrue.val = runtimeScene.getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
 
                 return "";
             };
@@ -86,7 +88,8 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
-                return "conditionTrue.val = runtimeScene.getVariables().hasVariable(\""+var+"\");";
+                std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
+                return boolean+" = runtimeScene.getVariables().hasVariable(\""+var+"\");";
             };
         };
 
@@ -160,11 +163,12 @@ VariablesExtension::VariablesExtension()
 
                 std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
+                std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" )
-                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
 
                 return "";
             };
@@ -186,11 +190,12 @@ VariablesExtension::VariablesExtension()
 
                 std::string op = instruction.GetParameters()[2].GetPlainString();
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
+                std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
                 else if ( op == "!=" )
-                    return "conditionTrue.val = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
 
                 return "";
             };
@@ -205,7 +210,8 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString());
-                return "conditionTrue = runtimeScene.getGame().getVariables().hasVariable(\""+var+"\");";
+                std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
+                return boolean+" = runtimeScene.getGame().getVariables().hasVariable(\""+var+"\");";
             };
         };
 

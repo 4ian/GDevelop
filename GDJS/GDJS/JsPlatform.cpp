@@ -21,6 +21,7 @@
 #include "GDJS/BuiltinExtensions/MouseExtension.h"
 #include "GDJS/BuiltinExtensions/SceneExtension.h"
 #include "GDJS/BuiltinExtensions/CameraExtension.h"
+#include "GDJS/BuiltinExtensions/TimeExtension.h"
 
 JsPlatform *JsPlatform::singleton = NULL;
 
@@ -77,6 +78,7 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new TimeExtension));
 };
 
 JsPlatform & JsPlatform::Get()

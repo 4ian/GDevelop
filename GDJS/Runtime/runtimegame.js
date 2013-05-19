@@ -14,6 +14,8 @@ gdjs.runtimeGame = function(xml)
     my.pressedKeys = new Hashtable();
     my.mouseX = 0;
     my.mouseY = 0;
+    my.imageManager = gdjs.imageManager(that);
+    my.minFPS = xml ? parseInt($(xml).find("Info").find("FPSmin").attr("value")) : 15;
     
     /**
      * Get the variables of the runtimeGame.
@@ -22,6 +24,10 @@ gdjs.runtimeGame = function(xml)
      */
     that.getVariables = function() {
         return my.variables;
+    }
+    
+    that.getImageManager = function() {
+        return my.imageManager;
     }
     
     /**
@@ -116,6 +122,10 @@ gdjs.runtimeGame = function(xml)
      */
     that.getMouseY = function() {
         return my.mouseY;
+    }
+    
+    that.getMinimalFramerate = function() {
+        return my.minFPS;
     }
     
     return that;

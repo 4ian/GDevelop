@@ -23,64 +23,68 @@ SpriteExtension::SpriteExtension()
 
     std::map<std::string, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
     std::map<std::string, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
-    spriteActions["ChangeDirection"].codeExtraInformation.
-        SetFunctionName("setAngle").SetAssociatedGetter("getAngle").SetIncludeFile("spriteruntimeobject.js");
+    std::map<std::string, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
     spriteActions["ChangeBlendMode"].codeExtraInformation.
         SetFunctionName("setBlendMode").SetIncludeFile("spriteruntimeobject.js");
     spriteActions["Opacity"].codeExtraInformation.
         SetFunctionName("setOpacity").SetAssociatedGetter("getOpacity").SetIncludeFile("spriteruntimeobject.js");
-
     spriteConditions["BlendMode"].codeExtraInformation.
         SetFunctionName("getBlendMode").SetIncludeFile("spriteruntimeobject.js");
     spriteConditions["Opacity"].codeExtraInformation.
         SetFunctionName("getOpacity").SetIncludeFile("spriteruntimeobject.js");
 
+    spriteActions["ChangeAnimation"].codeExtraInformation.
+        SetFunctionName("setAnimation").SetAssociatedGetter("getAnimation");
+    spriteActions["ChangeDirection"].codeExtraInformation.
+        SetFunctionName("setDirectionOrAngle").SetAssociatedGetter("getDirectionOrAngle");
+    spriteActions["ChangeSprite"].codeExtraInformation.
+        SetFunctionName("setAnimationFrame").SetAssociatedGetter("getAnimationFrame");
+    spriteConditions["Animation"].codeExtraInformation.
+        SetFunctionName("getAnimation");
+    spriteConditions["Direction"].codeExtraInformation.
+        SetFunctionName("getDirectionOrAngle");
+    spriteConditions["Sprite"].codeExtraInformation.
+        SetFunctionName("getAnimationFrame");
+
+    spriteActions["ChangeScaleWidth"].codeExtraInformation.
+        SetFunctionName("setScaleX").SetAssociatedGetter("getScaleX");
+    spriteActions["ChangeScaleHeight"].codeExtraInformation.
+        SetFunctionName("setScaleY").SetAssociatedGetter("getScaleY");
+    spriteConditions["ScaleWidth"].codeExtraInformation
+        .SetFunctionName("getScaleX");
+    spriteConditions["ScaleHeight"].codeExtraInformation
+        .SetFunctionName("getScaleY");
+
     GetAllConditions()["Collision"].codeExtraInformation //No pixel perfect collision for now on the JS platform.
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
+
+    spriteExpressions["X"].codeExtraInformation.
+        SetFunctionName("getPointX");
+    spriteExpressions["Y"].codeExtraInformation.
+        SetFunctionName("getPointY");
+    spriteExpressions["PointX"].codeExtraInformation.
+        SetFunctionName("getPointX");
+    spriteExpressions["PointY"].codeExtraInformation.
+        SetFunctionName("getPointY");
+    spriteExpressions["Direc"].codeExtraInformation. //Deprecated
+        SetFunctionName("getDirectionOrAngle");
+    spriteExpressions["Direction"].codeExtraInformation.
+        SetFunctionName("getDirectionOrAngle");
+    spriteExpressions["Anim"].codeExtraInformation.  //Deprecated
+        SetFunctionName("getAnimation");
+    spriteExpressions["Animation"].codeExtraInformation.
+        SetFunctionName("getAnimation");
+    spriteExpressions["Sprite"].codeExtraInformation.
+        SetFunctionName("getAnimationFrame");
+    spriteExpressions["ScaleX"].codeExtraInformation.
+        SetFunctionName("getScaleX");
+    spriteExpressions["ScaleY"].codeExtraInformation.
+        SetFunctionName("getScaleY");
 
 /*
 
     //Declaration of all objects available
     {
-        gd::ObjectMetadata & obj = AddObject("Sprite",
-                   _("Sprite"),
-                   _("Animated object which can be used most element of a game"),
-                   "CppPlatform/Extensions/spriteicon.png",
-                   &CreateSpriteObject,
-                   &DestroySpriteObject,
-                   "RuntimeSpriteObject");
-
-        AddRuntimeObject(obj, &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
-
-        #if defined(GD_IDE_ONLY)
-        obj.SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddAction("ChangeAnimation",
-                       _("Change the animation"),
-                       _("Modify the current animation of the object."),
-                       _("Do _PARAM1__PARAM2_ to the number of current animation of _PARAM0_"),
-                       _("Animations and images"),
-                       "res/actions/animation24.png",
-                       "res/actions/animation.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("operator", _("Modification's sign"), "",false)
-            .AddParameter("expression", _("Value"), "",false)
-            .codeExtraInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddAction("ChangeSprite",
-                       _("Current frame"),
-                       _("Modify the current frame of the object"),
-                       _("Do _PARAM1__PARAM2_ to animation frame of _PARAM0_"),
-                       _("Animations and images"),
-                       "res/actions/sprite24.png",
-                       "res/actions/sprite.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("operator", _("Modification's sign"), "",false)
-            .AddParameter("expression", _("Value"), "",false)
-            .codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
 
         obj.AddAction("PauseAnimation",
                        _("Pause the animation"),
@@ -134,74 +138,6 @@ SpriteExtension::SpriteExtension()
             .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
 
-
-        obj.AddAction("ChangeScaleWidth",
-                       _("Modify the scale on X axis"),
-                       _("Modify the scale of the width of an object."),
-                       _("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
-                       _("Size"),
-                       "res/actions/scale24.png",
-                       "res/actions/scale.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("operator", _("Modification's sign"), "",false)
-            .AddParameter("expression", _("Value"), "",false)
-            .codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-
-        obj.AddAction("ChangeScaleHeight",
-                       _("Modify the scale on Y axis"),
-                       _("Modify the scale of the height of an object."),
-                       _("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
-                       _("Size"),
-                       "res/actions/scale24.png",
-                       "res/actions/scale.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("operator", _("Modification's sign"), "",false)
-            .AddParameter("expression", _("Value"), "",false)
-            .codeExtraInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-
-        obj.AddCondition("Animation",
-                       _("Current animation"),
-                       _("Test the number of the current animation of the object."),
-                       _("The number of the current animation of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _("Animations and images"),
-                       "res/conditions/animation24.png",
-                       "res/conditions/animation.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .AddParameter("expression", _("Number to test"), "",false)
-            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("Direction",
-                       _("Current direction"),
-                       _("Test the direction of the object"),
-                       _("The direction of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _("Direction"),
-                       "res/conditions/direction24.png",
-                       "res/conditions/direction.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .AddParameter("expression", _("Direction to test"), "",false)
-            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("Sprite",
-                       _("Current frame"),
-                       _("Test the number of the current animation frame."),
-                       _("The animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _("Animations and images"),
-                       "res/conditions/sprite24.png",
-                       "res/conditions/sprite.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .AddParameter("expression", _("Animation frame to test"), "",false)
-            .codeExtraInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
         obj.AddCondition("AnimStopped",
                        _("Animation is paused"),
                        _("Test if the animation of an object is paused"),
@@ -223,32 +159,6 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .codeExtraInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("ScaleWidth",
-                       _("Scale of the width of an object"),
-                       _("Test the scale of the width of an object."),
-                       _("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _("Size"),
-                       "res/conditions/scaleWidth24.png",
-                       "res/conditions/scaleWidth.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .AddParameter("expression", _("Value to test"), "",false)
-            .codeExtraInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("ScaleHeight",
-                       _("Scale of the height of an object"),
-                       _("Test the scale of the height of an object."),
-                       _("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _("Size"),
-                       "res/conditions/scaleHeight24.png",
-                       "res/conditions/scaleHeight.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .AddParameter("expression", _("Value to test"), "",false)
-            .codeExtraInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("BlendMode",
                        _("Blend mode"),
@@ -371,60 +281,6 @@ SpriteExtension::SpriteExtension()
             .AddCodeOnlyParameter("currentScene", "")
             .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes")
             .codeExtraInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
-
-        obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
-            .SetHidden()
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("", _("Name of the point"), "", true)
-            .codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("Y", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
-            .SetHidden()
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("", _("Name of the point"), "", true)
-            .codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("PointX", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("", _("Name of the point"), "",false)
-            .codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("PointY", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("", _("Name of the point"), "",false)
-            .codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("Direc", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
-            .SetHidden()
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("Direction", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("Anim", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
-            .SetHidden()
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("Animation", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("ScaleX", _("Scale of the width of an object"), _("Scale of the width of an object"), _("Size"), "res/actions/scaleWidth.png")
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddExpression("ScaleY", _("Scale of the height of an object"), _("Scale of the height of an object"), _("Size"), "res/actions/scaleHeight.png")
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDL/SpriteObject.h");
         #endif
 
     }

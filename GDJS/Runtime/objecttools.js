@@ -96,7 +96,7 @@ gdjs.objectTools.distanceTest = function( objectsLists1, objectsLists2, distance
         var x = obj1.getX()+obj1.getCenterX()-(obj2.getX()+obj2.getCenterX());
         var y = obj1.getY()+obj1.getCenterY()-(obj2.getY()+obj2.getCenterY());
         
-        return X*X+Y*Y <= distance;
+        return x*x+y*y <= distance;
     }
 
     return gdjs.objectTools.TwoListsTest(distanceTest, objectsLists1, objectsLists2, inverted);
@@ -153,4 +153,59 @@ gdjs.objectTools.pickRandomObject = function(runtimeScene, objectsLists) {
     }
     
     return true;
+}
+/**
+ * Do the work of creating a new object
+ * @private
+ */
+gdjs.objectTools.doCreateObjectOnScene = function(runtimeScene, objectName, objectsLists, x, y, layer) {
+
+    //Find the object to create
+    var obj = null;
+    $(runtimeScene.getInitialObjectsXml()).find("Objet").each( function() { 
+        if ( $(this).attr("nom") === objectName && $(this).attr("type") === "Sprite" /*TODO*/ ) {
+            obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
+            return false;
+        }
+    });
+    if ( obj == null ) {
+        $(runtimeScene.getGame().getInitialObjectsXml()).find("Objet").each( function() { 
+            if ( $(this).attr("nom") === objectName && $(this).attr("type") === "Sprite" /*TODO*/ ) {
+                obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
+                return false;
+            }
+        });
+    }
+    
+    //Add it to the scene
+    if ( obj != null ) {
+        obj.setPosition(x,y);
+        obj.setLayer(layer);
+        runtimeScene.addObject(obj);
+        
+        //Let the new object be picked by next actions/conditions.
+        if ( objectsLists.containsKey(objectName) ) {
+            objectsLists.get(objectName).push(obj);
+        }
+    } 
+}
+
+/**
+ * Allows events to create a new object on a scene.
+ */
+gdjs.objectTools.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
+    gdjs.objectTools.doCreateObjectOnScene(runtimeScene, objectsLists.keys()[0], objectsLists, x, y, layer);
+}
+
+/**
+ * Allows events to create a new object on a scene.
+ */
+gdjs.objectTools.createObjectFromGroupOnScene = function(runtimeScene, objectsLists, objectName, x, y, layer) {
+    gdjs.objectTools.doCreateObjectOnScene(runtimeScene, objectName, objectsLists, x, y, layer);
+}
+
+gdjs.objectTools.pickedObjectsCount = function(objectName, objectsLists) {
+    if ( objectsLists.containsKey(objectName) ) {
+        return objectsLists.get(objectName).length;
+    }
 }

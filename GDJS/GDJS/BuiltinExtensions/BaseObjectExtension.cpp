@@ -83,6 +83,10 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
     objectActions["SeparateFromObjects"].codeExtraInformation
         .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
+    objectActions["Ecarter"].codeExtraInformation //Deprecated and emulated using separateFromObjects
+        .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
+    objectActions["Rebondir"].codeExtraInformation //Deprecated and emulated using separateFromObjects
+        .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
 
     objectExpressions["X"].codeExtraInformation.SetFunctionName("getX");
     objectExpressions["Y"].codeExtraInformation.SetFunctionName("getY");
@@ -105,13 +109,13 @@ BaseObjectExtension::BaseObjectExtension()
 
 
     GetAllActions()["Create"].codeExtraInformation
-        .SetFunctionName("gdjs.createObjectOnScene");
+        .SetFunctionName("gdjs.objectTools.createObjectOnScene");
     /*GetAllActions()["CreateByName"].codeExtraInformation
         .SetFunctionName("gdjs.createObjectOnScene");*/ //TODO
     GetAllExpressions()["Count"].codeExtraInformation
-        .SetFunctionName("gdjs.pickedObjectsCount");
+        .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
     GetAllConditions()["NbObjet"].codeExtraInformation
-        .SetFunctionName("gdjs.pickedObjectsCount");
+        .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
     GetAllConditions()["CollisionNP"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
     GetAllConditions()["Distance"].codeExtraInformation
@@ -180,20 +184,20 @@ BaseObjectExtension::BaseObjectExtension()
                     if ( op1 == "=" || op1.empty() )
                         newX = expression1Code;
                     else if ( op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+" )
-                        newX = ManObjListName(realObjects[i])+"[i].getX() "+op1 + expression1Code;
+                        newX = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getX() "+op1 + expression1Code;
                     else
                         return "";
                     std::string op2 = instruction.GetParameter(3).GetPlainString();
                     if ( op2 == "=" || op2.empty() )
                         newY = expression2Code;
                     else if ( op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+" )
-                        newY = ManObjListName(realObjects[i])+"[i].getY() "+op2 + expression2Code;
+                        newY = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getY() "+op2 + expression2Code;
                     else
                         return "";
 
-                    std::string call = ManObjListName(realObjects[i])+"[i].setPosition("+newX+","+newY+")";
+                    std::string call = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].setPosition("+newX+","+newY+")";
 
-                    outputCode += "for(var i = 0, len = "+ManObjListName(realObjects[i])+".length ;i < len;++i) {\n";
+                    outputCode += "for(var i = 0, len = "+codeGenerator.GetObjectListName(realObjects[i], context)+".length ;i < len;++i) {\n";
                     outputCode += "    "+call+";\n";
                     outputCode += "}\n";
 
@@ -266,35 +270,5 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-        //Deprecated action
-        obj.AddAction("Rebondir",
-                       _("Move an object away from another"),
-                       _("Move an object away from another, using forces."),
-                       _("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
-                       _("Displacement"),
-                       "res/actions/ecarter24.png",
-                       "res/actions/ecarter.png")
-
-            .SetHidden()
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectList", _("Object 2 ( won't move )"))
-            .codeExtraInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
-
-        //Deprecated action
-        obj.AddAction("Ecarter",
-                       _("Move an object away from another"),
-                       _("Move an object away from another without using forces."),
-                       _("Move away _PARAM0_ of _PARAM2_ ( only _PARAM0_ will move )"),
-                       _("Position"),
-                       "res/actions/ecarter24.png",
-                       "res/actions/ecarter.png")
-
-            .SetHidden()
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectList", _("Object 2 ( won't move )"))
-            .codeExtraInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-
 */
 }

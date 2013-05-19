@@ -18,12 +18,15 @@
 	<script src="polygon.js"></script>
 	<script src="force.js"></script>
 	<script src="layer.js"></script>
+	<script src="timer.js"></script>
+	<script src="imagemanager.js"></script>
 	<script src="runtimegame.js"></script>
 	<script src="variable.js"></script>
 	<script src="variablescontainer.js"></script>
 	<script src="runtimescene.js"></script>
 	<script src="runtimeobject.js"></script>
 	<script src="spriteruntimeobject.js"></script>
+	<script src="runtimescenetools.js"></script>
     
     <!-- Scripts for events -->
 	<script src="inputtools.js"></script>
@@ -65,21 +68,12 @@
         //Create the scene to be played
         var currentScene = gdjs.runtimeScene(game, renderer);
         currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
-        currentScene.setEventsFunction(gdjs.Nouvelle_32sc__4524neCode);
+        currentScene.setEventsFunction(gdjs.Nouvelle_32sc__4524neCode.func);
         
-        var obj = gdjs.spriteRuntimeObject(currentScene, null)
-        obj.setPosition(50,150);
+        requestAnimFrame( gameLoop );
         
-        var obj2 = gdjs.spriteRuntimeObject(currentScene, null)
-        obj2.setPosition(150,350);
-        
-        currentScene.addObject(obj);
-        currentScene.addObject(obj2);
-        
-        requestAnimFrame( GameLoop );
-        
-        function GameLoop() {
-            requestAnimFrame( GameLoop );
+        function gameLoop() {
+            requestAnimFrame( gameLoop );
         
             currentScene.renderAndStep();
         }

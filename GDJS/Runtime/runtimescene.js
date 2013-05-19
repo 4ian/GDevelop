@@ -1,8 +1,6 @@
 
 /**
  * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
- * 
- * TODO : Variables loading
  *
  * @class runtimeScene 
  * @param PixiRenderer The PIXI.Renderer to be used
@@ -13,10 +11,11 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     var my = {};
     
     my.eventsFunction = null;
-    my.pixiRenderer = pixiRenderer;
     my.instances = new Hashtable();
     my.objects = new Hashtable();
     my.layers = new Hashtable();
+    my.timers = new Hashtable();
+    my.pixiRenderer = pixiRenderer;
     my.pixiStage = new PIXI.Stage();
     my.latestFrameDate = new Date;
     my.variables = gdjs.variablesContainer();
@@ -24,28 +23,32 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.lastId = 0;
     my.initialObjectsXml; 
     my.elapsedTime = 0;
+    my.timeFromStart = 0;
+    my.firstFrame = true;
     
     /**
      * Load the runtime scene from the given scene.
      * \param sceneXml A jquery object containing the scene in XML format.
      */
     that.loadFromScene = function(sceneXml) {
+    
+        //Setup main properties
         document.title = $(sceneXml).attr("titre");
-        
-        var bgColor = gdjs.rgbToHex(parseInt($(sceneXml).attr("r")), 
-                                    parseInt($(sceneXml).attr("v")),
-                                    parseInt($(sceneXml).attr("b")));
-        my.pixiStage.setBackgroundColor("0x"+bgColor);
-        my.pixiStage.position = new PIXI.Point(150,300);
+        my.firstFrame = true;
+        that.setBackgroundColor(parseInt($(sceneXml).attr("r")), 
+                                parseInt($(sceneXml).attr("v")),
+                                parseInt($(sceneXml).attr("b")));
         
         //Load layers
         $(sceneXml).find("Layers").find("Layer").each( function() { 
             var name = $(this).attr("Name");
             
-            my.layers.put(name, gdjs.layer(name, my.pixiStage));
+            my.layers.put(name, gdjs.layer(name, that));
             console.log("Created layer : \""+name+"\".");
         });
         
+        //Load variables
+        my.variables = gdjs.variablesContainer($(sceneXml).find("Variables"));
         
         //Load objects
         my.initialObjectsXml = $(sceneXml).find("Objets");
@@ -98,6 +101,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         that.render();
         my.eventsFunction(that);
         my.updateObjects();
+        
+        my.firstFrame = false;
     }
     
     /** 
@@ -116,23 +121,49 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      * @todo
      */
     my.updateTime = function() {
+        //Compute the elapsed time since last frame
         var now = new Date;
         my.elapsedTime = now - my.latestFrameDate;
         my.latestFrameDate = now;
+        my.elapsedTime = Math.min(my.elapsedTime, 1000/my.runtimeGame.getMinimalFramerate());
+        
+        //Update timers and others members
+        var timers = my.timers.values();
+        for ( var i = 0, len = timers.length;i<len;++i) {
+            timers[i].updateTime(my.elapsedTime);
+        }
+        my.timeFromStart += my.elapsedTime;
     }
     
     /**
      * Update the objects (update positions, time management...)
      */
     my.updateObjects = function() {
-        that.updateObjectsForces();
+        var allObjectsLists = my.instances.entries();
+        
+        that.updateObjectsForces(allObjectsLists);
+        
+        for( var i = 0, len = allObjectsLists.length;i<len;++i) {
+            for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
+                var obj = allObjectsLists[i][1][j];
+                obj.updateTime(my.elapsedTime/1000);
+            }
+        }
+    }
+    
+    /**
+     * Change the background color
+     * @method setBackgroundColor
+     */
+    that.setBackgroundColor = function(r,g,b) {
+        my.pixiStage.setBackgroundColor("0x"+gdjs.rgbToHex(r,g,b));
     }
     
     /**
      * Update the objects positions according to their forces
      */
-    that.updateObjectsForces = function() {
-        var allObjectsLists = my.instances.entries();
+    that.updateObjectsForces = function(objects) {
+        var allObjectsLists = objects ? objects : my.instances.entries();
         
         for( var i = 0, len = allObjectsLists.length;i<len;++i) {
             for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
@@ -189,6 +220,14 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
+     * Return the time elapsed since the last frame, in milliseconds.
+     * @method getElapsedTime
+     */
+    that.getElapsedTime = function() {
+        return my.elapsedTime;
+    }
+    
+    /**
      * Create an identifier for a new object
      */
     that.createNewUniqueId = function() {
@@ -201,6 +240,13 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.getPIXIStage = function() {
         return my.pixiStage;
+    }
+    
+    /**
+     * Get the PIXI renderer associated to the RuntimeScene.
+     */
+    that.getPIXIRenderer = function() {
+        return my.pixiRenderer;
     }
     
     /**
@@ -232,45 +278,32 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         return my.layers.containsKey(name);
     }
     
-    return that;
-}
-
-/**
- * Allows events to create a new object on a scene.
- */
-gdjs.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
-    
-    //The objectsLists
-    var objectName = objectsLists.keys()[0];
-    
-    var obj = null;
-    $(runtimeScene.getGame().getInitialObjectsXml()).find("Objet").each( function() { 
-        if ( $(this).attr("nom") === objectName ) {
-            obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
-            return false;
-        }
-    });
-    $(runtimeScene.getInitialObjectsXml()).find("Objet").each( function() { 
-        if ( $(this).attr("nom") === objectName ) {
-            obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
-            return false;
-        }
-    });
-    
-    if ( obj != null ) {
-        obj.setPosition(x,y);
-        obj.setLayer(layer);
-        runtimeScene.addObject(obj);
-        
-        //Let the new object be picked by next actions/conditions.
-        if ( objectsLists.containsKey(objectName) ) {
-            objectsLists.get(objectName).push(obj);
-        }
-    }   
-}
-
-gdjs.pickedObjectsCount = function(objectName, objectsLists) {
-    if ( objectsLists.containsKey(objectName) ) {
-        return objectsLists.get(objectName).length;
+    that.addTimer = function(name) {
+        my.timers.put(name, gdjs.timer(name));
     }
+    
+    that.hasTimer = function(name) {
+        return my.timers.containsKey(name);
+    }
+    
+    that.getTimer = function(name) {
+        return my.timers.get(name);
+    }
+    
+    that.removeTimer = function(name) {
+        if ( my.timers.containsKey(name) ) my.timers.remove(name);
+    }
+    
+    that.getTimeFromStart = function() {
+        return my.timeFromStart;
+    }
+    
+    /**
+     * Return true if the scene is rendering its first frame.
+     */
+    that.isFirstFrame = function() {
+        return my.firstFrame;
+    }
+    
+    return that;
 }

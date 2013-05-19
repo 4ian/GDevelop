@@ -34,8 +34,22 @@ gdjs.returnFalse = function() {
 }
 
 // Array Remove - By John Resig (MIT Licensed)
-Array.prototype.remove = function(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
+Array.prototype.remove = function(from) {
+  /*var rest = this.slice((to || from) + 1 || this.length);
   this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);
+  return this.push.apply(this, rest);*/
+  
+    for (var i = from, len = this.length - 1; i < len; i++)
+        this[i] = this[i + 1];
+
+    this.length = len;
+  
+};
+
+Array.prototype.createFrom = function(arr) {
+    var len = arr.length;
+    this.length = len;
+    for (var i = 0; i < len;++i) {
+        this[i] = arr[i];
+    }
 };

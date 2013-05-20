@@ -27,6 +27,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     my.id = runtimeScene.createNewUniqueId();
     my.variables = gdjs.variablesContainer(objectXml ? $(objectXml).find("Variables") : undefined);
     my.forces = [];
+    my.forcesGarbage = [];
     
     //Common members functions related to the object and its runtimeScene :
     
@@ -373,7 +374,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @method clearForces
      */
     that.clearForces = function() {
-        my.forces = [];
+        my.forces.length = 0;
     }
     
     /** 

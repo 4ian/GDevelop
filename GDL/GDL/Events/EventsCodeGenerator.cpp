@@ -26,7 +26,8 @@ using namespace std;
 std::string EventsCodeGenerator::GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                       const gd::ObjectMetadata & objMetadata,
                                                       std::string functionCallName,
-                                                      std::string parametersStr)
+                                                      std::string parametersStr,
+                                                      gd::EventsCodeGenerationContext & context)
 {
     bool castNeeded = !objMetadata.cppClassName.empty();
     if ( !castNeeded )
@@ -39,7 +40,8 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectFunctionCall(std::string
                                                         const gd::ObjectMetadata & objMetadata,
                                                         std::string functionCallName,
                                                         std::string parametersStr,
-                                                        std::string defaultOutput)
+                                                        std::string defaultOutput,
+                                                        gd::EventsCodeGenerationContext & context)
 {
     bool castNeeded = !objMetadata.cppClassName.empty();
     if ( !castNeeded )
@@ -52,7 +54,8 @@ std::string EventsCodeGenerator::GenerateCurrentObjectAutomatismFunctionCall(std
                                                                                        std::string automatismName,
                                                       const gd::AutomatismMetadata & autoInfo,
                                                       std::string functionCallName,
-                                                      std::string parametersStr)
+                                                      std::string parametersStr,
+                                                      gd::EventsCodeGenerationContext & context)
 {
     bool castNeeded = !autoInfo.cppClassName.empty();
     if ( !castNeeded )
@@ -66,7 +69,8 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(s
                                                         const gd::AutomatismMetadata & autoInfo,
                                                         std::string functionCallName,
                                                         std::string parametersStr,
-                                                        std::string defaultOutput)
+                                                        std::string defaultOutput,
+                                                        gd::EventsCodeGenerationContext & context)
 {
     bool castNeeded = !autoInfo.cppClassName.empty();
     if ( !castNeeded )
@@ -80,7 +84,8 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    const std::string & returnBoolean,
-                                                                   bool conditionInverted)
+                                                                   bool conditionInverted,
+                                                                   gd::EventsCodeGenerationContext & context)
 {
     std::string conditionCode;
 
@@ -133,7 +138,8 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
                                                                    const std::vector<std::string> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    const std::string & returnBoolean,
-                                                                   bool conditionInverted)
+                                                                   bool conditionInverted,
+                                                                   gd::EventsCodeGenerationContext & context)
 {
     std::string conditionCode;
 
@@ -190,9 +196,10 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
 }
 
 std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
-                                                                   const gd::ObjectMetadata & objInfo,
-                                                                   const std::vector<std::string> & arguments,
-                                                                   const gd::InstructionMetadata & instrInfos)
+                                                       const gd::ObjectMetadata & objInfo,
+                                                       const std::vector<std::string> & arguments,
+                                                       const gd::InstructionMetadata & instrInfos,
+                                                       gd::EventsCodeGenerationContext & context)
 {
     std::string actionCode;
 
@@ -231,10 +238,11 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
 }
 
 std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & objectName,
-                                                                    const std::string & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
-                                                                   const std::vector<std::string> & arguments,
-                                                                   const gd::InstructionMetadata & instrInfos)
+                                                            const std::string & automatismName,
+                                                            const gd::AutomatismMetadata & autoInfo,
+                                                            const std::vector<std::string> & arguments,
+                                                            const gd::InstructionMetadata & instrInfos,
+                                                            gd::EventsCodeGenerationContext & context)
 {
     std::string actionCode;
 

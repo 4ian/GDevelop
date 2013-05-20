@@ -55,32 +55,37 @@ protected:
     virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
                                                           const gd::ObjectMetadata & objMetadata,
                                                           std::string functionCallName,
-                                                          std::string parametersStr);
+                                                          std::string parametersStr,
+                                                          gd::EventsCodeGenerationContext & context);
     virtual std::string GenerateNotPickedObjectFunctionCall(std::string objectListName,
                                                             const gd::ObjectMetadata & objMetadata,
                                                             std::string functionCallName,
                                                             std::string parametersStr,
-                                                            std::string defaultOutput);
+                                                            std::string defaultOutput,
+                                                            gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
                                                                       std::string automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
                                                                       std::string functionCallName,
-                                                                      std::string parametersStr);
+                                                                      std::string parametersStr,
+                                                                      gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
                                                                       std::string automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
                                                                       std::string functionCallName,
                                                                       std::string parametersStr,
-                                                                      std::string defaultOutput);
+                                                                      std::string defaultOutput,
+                                                                      gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             const std::string & returnBoolean,
-                                                            bool conditionInverted);
+                                                            bool conditionInverted,
+                                                            gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateAutomatismCondition(const std::string & objectName,
                                                                 const std::string & automatismName,
@@ -88,18 +93,21 @@ protected:
                                                                 const std::vector<std::string> & arguments,
                                                                 const gd::InstructionMetadata & instrInfos,
                                                                 const std::string & returnBoolean,
-                                                                bool conditionInverted);
+                                                                bool conditionInverted,
+                                                                gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateObjectAction(const std::string & objectName,
                                                         const gd::ObjectMetadata & objInfo,
                                                         const std::vector<std::string> & arguments,
-                                                        const gd::InstructionMetadata & instrInfos);
+                                                        const gd::InstructionMetadata & instrInfos,
+                                                        gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateAutomatismAction(const std::string & objectName,
                                                             const std::string & automatismName,
                                                             const gd::AutomatismMetadata & autoInfo,
                                                             const std::vector<std::string> & arguments,
-                                                            const gd::InstructionMetadata & instrInfos);
+                                                            const gd::InstructionMetadata & instrInfos,
+                                                            gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Construct a code generator for the specified project and layout.

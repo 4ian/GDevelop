@@ -292,7 +292,6 @@ public:
     ///@{
 
     Force force5; ///< \deprecated Old custom force used to manage collisions.
-    std::vector < Force > forces; ///< Forces applied to object
 
     /**
      * Automatically called at each frame so as to update forces applied on the object.
@@ -394,6 +393,7 @@ protected:
     std::string                                             layer; ///<Name of the layer on which the object is.
     std::map<std::string, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
     gd::VariablesContainer                                  objectVariables; ///<List of the variables of the object
+    std::vector < Force >                                   forces; ///< Forces applied to object
 
     /**
      * Initialize object using another object. Used by copy-ctor and assign-op.

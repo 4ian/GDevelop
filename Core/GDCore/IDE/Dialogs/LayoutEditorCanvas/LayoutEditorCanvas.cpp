@@ -256,7 +256,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
             idForPlatformsMenu[id] = project.GetUsedPlatforms()[i]->GetName();
             platformsMenu.Append(id, _("Preview for ") + project.GetUsedPlatforms()[i]->GetFullName(),
                                  _("Launch a preview for this platform"), wxITEM_RADIO);
-            Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnPreviewForPlatformSelected);
+            mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&LayoutEditorCanvas::OnPreviewForPlatformSelected, NULL, this);
         }
         else {
             platformsMenu.Append(id, _("No preview available for ")+ project.GetUsedPlatforms()[i]->GetFullName(), _("No preview can be done for this platform"), wxITEM_RADIO);

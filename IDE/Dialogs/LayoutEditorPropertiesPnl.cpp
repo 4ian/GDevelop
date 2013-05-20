@@ -109,8 +109,9 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
         {
             for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             {
-                selectedInitialInstances[i]->SetCustomWidth(layoutEditorCanvas->GetWidthOfInitialInstance(*selectedInitialInstances[i]));
-                selectedInitialInstances[i]->SetCustomHeight(layoutEditorCanvas->GetHeightOfInitialInstance(*selectedInitialInstances[i]));
+                sf::Vector2f size = layoutEditorCanvas->GetInitialInstanceSize(*selectedInitialInstances[i]);
+                selectedInitialInstances[i]->SetCustomWidth(size.x);
+                selectedInitialInstances[i]->SetCustomHeight(size.y);
             }
         }
 

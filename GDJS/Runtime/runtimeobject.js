@@ -27,6 +27,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     my.id = runtimeScene.createNewUniqueId();
     my.variables = gdjs.variablesContainer(objectXml ? $(objectXml).find("Variables") : undefined);
     my.forces = [];
+    my.averageForce = gdjs.force(0,0,false); //A force returned by getAverageForce method.
     my.forcesGarbage = [];
     
     //Common members functions related to the object and its runtimeScene :
@@ -313,6 +314,28 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         return that.getHeight()/2;
     }
     
+    /**
+     * Get a force from the garbage, or create a new force is garbage is empty.<br>
+     * To be used each time a force is created so as to avoid temporaries objects.
+     *
+     * @method getRecycledForce
+     * @private
+     * @param x {Number} The x coordinates of the force
+     * @param y {Number} The y coordinates of the force
+     * @param isTemporary {Boolean} Set if the force is temporary or not.
+     */
+    my.getRecycledForce = function(x, y, isTemporary) {
+        if ( my.forcesGarbage.length === 0 )
+            return gdjs.force(x, y, isTemporary);
+        else {
+            var recycledForce = my.forcesGarbage.pop();
+            recycledForce.setX(x);
+            recycledForce.setY(y);
+            recycledForce.setTemporary(isTemporary);
+            return recycledForce;
+        }
+    }
+    
     /** 
      * Add a force to the object to make it moving.
      * @method addForce
@@ -321,7 +344,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @param isPermanent {Boolean} Set if the force is permanent or not.
      */
     that.addForce = function(x,y, isPermanent) {
-        my.forces.push(gdjs.force(x, y, !isPermanent));
+        my.forces.push(my.getRecycledForce(x, y, !isPermanent));
     }
     
     /** 
@@ -335,7 +358,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         var forceX = Math.cos(angle/180*3.14159)*len;
         var forceY = Math.sin(angle/180*3.14159)*len;
     
-        my.forces.push(gdjs.force(forceX, forceY, !isPermanent));
+        my.forces.push(my.getRecycledForce(forceX, forceY, !isPermanent));
     }
     
     /** 
@@ -353,7 +376,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         
         var forceX = Math.cos(angle)*len;
         var forceY = Math.sin(angle)*len;
-        my.forces.push(gdjs.force(forceX, forceY, !isPermanent));
+        my.forces.push(my.getRecycledForce(forceX, forceY, !isPermanent));
     }
     
     /** 
@@ -374,6 +397,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @method clearForces
      */
     that.clearForces = function() {
+        my.forcesGarbage.push.apply(my.forcesGarbage, my.forces);
         my.forces.length = 0;
     }
     
@@ -395,6 +419,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         for(var i = 0;i<my.forces.length;) {
         
             if ( my.forces[i].isTemporary() ) {
+                my.forcesGarbage.push(my.forces[i]);
                 my.forces.remove(i);
             }
             else {
@@ -423,8 +448,9 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         averageX /= my.forces.length;
         averageY /= my.forces.length;
         
-        var averageForce = gdjs.force(averageX, averageY);
-        return averageForce;
+        my.averageForce.setX(averageX);
+        my.averageForce.setY(averageY);
+        return my.averageForce;
     }
     
     /** 

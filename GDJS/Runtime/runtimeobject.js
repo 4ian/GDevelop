@@ -21,6 +21,9 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.zOrder = 0;
     my.hidden = false;
     that.layer = "";
+    that.hitBoxes = [];
+    that.hitBoxes.push(gdjs.polygon.createRectangle(0,0));
+    that.hitBoxesDirty = true;
     my.id = runtimeScene.createNewUniqueId();
     my.variables = gdjs.variablesContainer(objectXml ? $(objectXml).find("Variables") : undefined);
     my.forces = [];
@@ -79,6 +82,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.setX = function(x) {
         that.x = x;
+        hitBoxesDirty = true;
     }
     
     /**
@@ -99,6 +103,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.setY = function(y) {
         that.y = y;
+        hitBoxesDirty = true;
     }
     
     /**
@@ -165,6 +170,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.setAngle = function(angle) {
         that.angle = angle;
+        hitBoxesDirty = true;
     }
     
     /**
@@ -478,13 +484,27 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @return {Array} An array composed of polygon.
      */
     that.getHitBoxes = function() {
-        //TODO: Stop keeping recreating temporaries.
-        var rectangle = gdjs.polygon.createRectangle(that.getWidth(), that.getHeight());
-        rectangle.rotate(that.getAngle()/180*3.14159);
-        rectangle.move(that.getX()+that.getCenterX(), that.getY()+that.getCenterY());
-
-        var mask = [rectangle];
-        return mask;
+        if ( that.hitBoxesDirty ) {
+        
+            //Avoid a naive implementation requiring to recreate temporaries each time
+            //the function is called:
+            //(var rectangle = gdjs.polygon.createRectangle(that.getWidth(), that.getHeight());
+            //...)
+            var width = that.getWidth();
+            var height = that.getHeight();
+            that.hitBoxes[0].vertices[0][0] =-width/2.0;
+            that.hitBoxes[0].vertices[0][1] =-height/2.0;
+            that.hitBoxes[0].vertices[1][0] =+width/2.0;
+            that.hitBoxes[0].vertices[1][1] =-height/2.0;
+            that.hitBoxes[0].vertices[2][0] =+width/2.0;
+            that.hitBoxes[0].vertices[2][1] =+height/2.0;
+            that.hitBoxes[0].vertices[3][0] =-width/2.0;
+            that.hitBoxes[0].vertices[3][1] =+height/2.0;
+            
+            that.hitBoxes[0].rotate(that.getAngle()/180*3.14159);
+            that.hitBoxes[0].move(that.getX()+that.getCenterX(), that.getY()+that.getCenterY());
+        }
+        return that.hitBoxes;
     }
     
     /**

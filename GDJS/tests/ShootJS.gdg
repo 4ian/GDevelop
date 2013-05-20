@@ -2501,18 +2501,6 @@
                             <Parametre value="=" />
                             <Parametre value="Variable(Power)/100" />
                         </Action>
-                        <Action>
-                            <Type value="MettreX" />
-                            <Parametre value="Power" />
-                            <Parametre value="=" />
-                            <Parametre value="PowerPanel.X()+18+Power.Width()/2-1/Power.ScaleX()*Power.Width()/2" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreX" />
-                            <Parametre value="Health" />
-                            <Parametre value="=" />
-                            <Parametre value="HealthPanel.X()+18+Health.Width()/2-1/Health.ScaleX()*Health.Width()/2" />
-                        </Action>
                     </Actions>
                 </Event>
                 <Event disabled="false" folded="false">

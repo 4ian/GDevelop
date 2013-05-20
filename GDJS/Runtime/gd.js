@@ -48,8 +48,10 @@ Array.prototype.remove = function(from) {
 
 Array.prototype.createFrom = function(arr) {
     var len = arr.length;
-    this.length = len;
-    for (var i = 0; i < len;++i) {
-        this[i] = arr[i];
+    if ( len != undefined ) {
+        this.length = len;
+        for (var i = 0; i < len;++i) {
+            this[i] = arr[i];
+        }
     }
 };

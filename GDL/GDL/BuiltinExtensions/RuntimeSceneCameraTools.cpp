@@ -94,44 +94,20 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, RuntimeObject *
 {
     if ( object == NULL ) return;
 
-    float decalementX = 0;
-    float decalementY = 0;
-
-    //Prise en compte des déplacements de l'objet
+    float xOffset = 0;
+    float yOffset = 0;
     if ( anticipateObjectMove )
     {
-        decalementX = ( object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
-        decalementY = ( object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        xOffset = object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
+        yOffset = object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
     }
 
-    //Si on est dans le cadre
-    if ( object->GetX() > left
-        && object->GetX() < right
-        && object->GetY() > top
-        && object->GetY() < bottom
-        )
-    {
-        scene.GetRuntimeLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(object->GetX() + decalementX, object->GetY() + decalementY));
-    }
+    RuntimeCamera & cam = scene.GetRuntimeLayer(layer).GetCamera(camera);
 
-    //Si on n'est pas dedans.
-    if ( ( object->GetX() < left
-        || object->GetX() > right )
-        && object->GetY() > top
-        && object->GetY() < bottom )
+    double newX = std::min(std::max(object->GetDrawableX() + object->GetCenterX() + xOffset, left+cam.GetWidth()/2), right-cam.GetWidth()/2);
+    double newY = std::min(std::max(object->GetDrawableY() + object->GetCenterY() + yOffset, top+cam.GetHeight()/2), bottom-cam.GetHeight()/2);
 
-    {
-        scene.GetRuntimeLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(scene.GetRuntimeLayer(layer).GetCamera(camera).GetViewCenter().x,
-                                                                           object->GetY() + decalementY));
-    }
-    if ( ( object->GetY() < top
-        || object->GetY() > bottom )
-        && object->GetX() > left
-        && object->GetX() < right)
-    {
-        scene.GetRuntimeLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(object->GetX() + decalementX,
-                                                                           scene.GetRuntimeLayer(layer).GetCamera(camera).GetViewCenter().y));
-    }
+    cam.SetViewCenter(sf::Vector2f(newX, newY));
 
     return;
 }
@@ -140,17 +116,16 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  
 {
     if ( object == NULL ) return;
 
-    float decalementX = 0;
-    float decalementY = 0;
-
-    //Prise en compte des déplacements de l'objet
+    float xOffset = 0;
+    float yOffset = 0;
     if ( anticipateObjectMove )
     {
-        decalementX = ( object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
-        decalementY = ( object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        xOffset = object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
+        yOffset = object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
     }
 
-    scene.GetRuntimeLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(object->GetX() + decalementX, object->GetY() + decalementY));
+    scene.GetRuntimeLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(object->GetDrawableX() + object->GetCenterX() + xOffset,
+                                                                              object->GetDrawableY() + object->GetCenterY() + yOffset));
 
     return;
 }

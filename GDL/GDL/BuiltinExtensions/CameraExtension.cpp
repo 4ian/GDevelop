@@ -212,7 +212,7 @@ CameraExtension::CameraExtension()
     AddAction("FixCamera",
                    _("Center the camera on an object within limits"),
                    _("Center the camera on the specified object, without leaving the specified limits."),
-                   _("Center the camera on _PARAM1_ ( limit : from _PARAM3_;_PARAM4_ to _PARAM5_;_PARAM6_ )  ( layer : _PARAM8_, camera : _PARAM9_ )"),
+                   _("Center the camera on _PARAM1_ ( limit : from _PARAM2_;_PARAM3_ to _PARAM4_;_PARAM5_ )  ( layer : _PARAM7_, camera : _PARAM8_ )"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")

@@ -165,29 +165,34 @@ void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rende
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/sprite.getLocalBounds().width : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/sprite.getLocalBounds().height : 1;
 
-    if ( !shouldNotRotate) sprite.setRotation(instance.GetAngle());
-    sprite.setPosition(instance.GetX()+sprite.getLocalBounds().width/2*scaleX,
-                       instance.GetY()+sprite.getLocalBounds().height/2*scaleY);
-    sprite.setOrigin(sprite.getLocalBounds().width/2, sprite.getLocalBounds().height/2);
+    sprite.setOrigin( associatedSprite->GetCentre().GetX(), associatedSprite->GetCentre().GetY() ); ;
+    sprite.setRotation( shouldNotRotate ? 0 : instance.GetAngle() );
+    sprite.setPosition( instance.GetX() + (associatedSprite->GetCentre().GetX() - associatedSprite->GetOrigine().GetX())*scaleX,
+                        instance.GetY() + (associatedSprite->GetCentre().GetY() - associatedSprite->GetOrigine().GetY())*scaleY );
     sprite.setScale(scaleX, scaleY);
 
     renderTarget.draw(sprite);
 }
 
-float SpriteObject::GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+sf::Vector2f SpriteObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
-    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return 0;
+    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return sf::Vector2f(32,32);
 
-    return associatedSprite->GetSFMLTexture()->texture.getSize().x;
+    sf::Vector2u size = associatedSprite->GetSFMLTexture()->texture.getSize();
+    return sf::Vector2f(size.x, size.y);
 }
 
-float SpriteObject::GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
-    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return 0;
+    if ( associatedSprite == NULL ) return sf::Vector2f(0,0);
 
-    return associatedSprite->GetSFMLTexture()->texture.getSize().y;
+    float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
+    float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;
+
+    return sf::Vector2f(associatedSprite->GetOrigine().GetX()*scaleX,
+                        associatedSprite->GetOrigine().GetY()*scaleY);
 }
 
 bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
@@ -366,30 +371,31 @@ float RuntimeSpriteObject::GetCenterY() const
     return GetCurrentSprite().GetCentre().GetY()*scaleY;
 }
 
-float RuntimeSpriteObject::GetPointX(const std::string & point) const
+float RuntimeSpriteObject::GetPointX(const std::string & name) const
 {
-    if ( !point.empty() )
+    if ( !name.empty() )
     {
-        return GetCurrentSFMLSprite().getTransform().transformPoint(GetCurrentSprite().GetPoint(point).GetX(),
-                                                                    GetCurrentSprite().GetPoint(point).GetY()).x;
+        const Point & point = GetCurrentSprite().GetPoint(name);
+        return GetCurrentSFMLSprite().getTransform().transformPoint(point.GetX(), point.GetY()).x;
     }
 
     return GetX();
 }
 
-float RuntimeSpriteObject::GetPointY(const std::string & point) const
+float RuntimeSpriteObject::GetPointY(const std::string & name) const
 {
-    if ( !point.empty() )
+    if ( !name.empty() )
     {
-        return GetCurrentSFMLSprite().getTransform().transformPoint(GetCurrentSprite().GetPoint(point).GetX(),
-                                                                    GetCurrentSprite().GetPoint(point).GetY()).y;
+        const Point & point = GetCurrentSprite().GetPoint(name);
+        return GetCurrentSFMLSprite().getTransform().transformPoint(point.GetX(), point.GetY()).y;
     }
 
     return GetY();
 }
 
-void RuntimeSpriteObject::ChangeScale(double newScale, const std::string & operatorStr)
+void RuntimeSpriteObject::ChangeScale( const std::string & operatorStr, double newScale)
 {
+    //TODO : Generate appropriate code calling SetScaleX/Y instead of this.
     if ( operatorStr == "=" )
     {
         SetScaleX(newScale);

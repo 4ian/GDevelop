@@ -68,8 +68,8 @@ public :
     virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
     virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene);
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
-    virtual float GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
-    virtual float GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
     virtual void LoadResources(gd::Project & project, gd::Layout & layout);
 
     virtual bool SupportShaders() { return true; }
@@ -203,7 +203,7 @@ public :
     /**
      * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).
      */
-    void ChangeScale(double newValue, const std::string & operatorStr);
+    void ChangeScale(const std::string & operatorStr, double newValue);
 
     /**
      * Only used internally by GD events generated code: Prefer using original SetColor.

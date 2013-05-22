@@ -8,7 +8,6 @@
 
 /**
  * \brief Represents a force to be applied on an object.
- * Can have an X/Y component or an angle/length.
  *
  * \ingroup GameEngine
  */
@@ -17,12 +16,14 @@ class GD_API Force
 public:
 
     Force();
+    Force(const Force & other);
+    Force(float x, float y, float clearing);
 
-    float GetX() const;
-    float GetY() const;
+    float GetX() const { return x; };
+    float GetY() const { return y; };
     float GetAngle() const;
     float GetLength() const;
-    float GetClearing() const;
+    float GetClearing() const { return clearing; };
 
     void SetX(float x_);
     void SetY(float y_);
@@ -32,17 +33,15 @@ public:
 
 private:
 
-    mutable float X;
-    mutable float Y;
+    float x;
+    float y;
     mutable float angle;
     mutable float length;
     float clearing;
 
-    mutable bool ALneedUpdate;
-    mutable bool XYneedUpdate;
+    mutable bool isDirty;
 
     static const float PI;
-
 };
 
 #endif // FORCE_H_INCLUDED

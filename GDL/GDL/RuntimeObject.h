@@ -384,6 +384,10 @@ public:
 
 protected:
 
+    /** \brief Get a force that is recycled from the garbage, or created if the garbage is empty.
+     */
+    Force* GetRecycledForce(float x, float y, float clearing);
+
     std::string                                             name; ///< The full name of the object
     std::string                                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
     float                                                   X; ///<X position on the scene
@@ -393,7 +397,8 @@ protected:
     std::string                                             layer; ///<Name of the layer on which the object is.
     std::map<std::string, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
     gd::VariablesContainer                                  objectVariables; ///<List of the variables of the object
-    std::vector < Force >                                   forces; ///< Forces applied to object
+    std::vector < Force* >                                  forces; ///< Forces applied to object
+    std::vector < Force* >                                  forcesGarbage;
 
     /**
      * Initialize object using another object. Used by copy-ctor and assign-op.

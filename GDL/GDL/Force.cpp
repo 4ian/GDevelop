@@ -12,98 +12,100 @@
 
 float const Force::PI = 3.14159265;
 
+
 Force::Force() :
-X(0),
-Y(0),
-angle(0),
-length(0),
-clearing(0),
-ALneedUpdate(false),
-XYneedUpdate(false)
+    x(0),
+    y(0),
+    angle(0),
+    length(0),
+    clearing(0),
+    isDirty(false)
 {
 }
 
-float Force::GetX() const
+Force::Force(const Force & other) :
+    x(other.x),
+    y(other.y),
+    angle(other.angle),
+    length(other.length),
+    clearing(other.clearing),
+    isDirty(other.isDirty)
 {
-    if ( XYneedUpdate )
-    {
-        X = length * ( cos( angle * PI / 180 ) );
-        Y = length * ( sin( angle * PI / 180 ) );
-        XYneedUpdate = false;
-    }
-
-    return X;
 }
 
-float Force::GetY() const
+Force::Force(float x_, float y_, float clearing_) :
+    x(x_),
+    y(y_),
+    clearing(clearing_),
+    isDirty(true)
 {
-    if ( XYneedUpdate )
-    {
-        X = length * ( cos( angle * PI / 180 ) );
-        Y = length * ( sin( angle * PI / 180 ) );
-        XYneedUpdate = false;
-    }
 
-    return Y;
 }
+
 float Force::GetAngle() const
 {
-    if ( ALneedUpdate )
+    if ( isDirty )
     {
-        angle = atan2(Y,X)*180/PI;
-        length = sqrt( X*X + Y*Y );
-        ALneedUpdate = false;
+        angle = atan2(y,x)*180.0/PI;
+        length = sqrt( x*x + y*y );
+        isDirty = false;
     }
 
     return angle;
 }
 float Force::GetLength() const
 {
-    if ( ALneedUpdate )
+    if ( isDirty )
     {
-        angle = atan2(Y,X)*180/PI;
-        length = sqrt( X*X + Y*Y );
-        ALneedUpdate = false;
+        angle = atan2(y,x)*180.0/PI;
+        length = sqrt( x*x + y*y );
+        isDirty = false;
     }
 
     return length;
 }
-float Force::GetClearing() const
-{
-    return clearing;
-}
 
 void Force::SetX(float x_)
 {
-    if ( X != x_ )
+    if ( x != x_ )
     {
-        ALneedUpdate = true;
-        X = x_;
+        isDirty = true;
+        x = x_;
     }
 }
 void Force::SetY(float y_)
 {
-    if ( Y != y_ )
+    if ( y != y_ )
     {
-        ALneedUpdate = true;
-        Y = y_;
+        isDirty = true;
+        y = y_;
     }
 }
 void Force::SetAngle(float angle_)
 {
-    if ( angle != angle_ )
+    if ( isDirty )
     {
-        XYneedUpdate = true;
-        angle = angle_;
+        length = sqrt( x*x + y*y );
+        isDirty = false;
     }
+
+    angle = angle_;
+
+    x = cos(angle/180.0*PI)*length;
+    y = sin(angle/180.0*PI)*length;
 }
 void Force::SetLength(float length_)
 {
-    if ( length != length_ )
+    if ( isDirty )
     {
-        XYneedUpdate = true;
-        length = length_;
+        angle = atan2(y,x)*180/PI;
+        isDirty = false;
     }
+
+    length = length_;
+
+    x = cos(angle/180.0*PI)*length;
+    y = sin(angle/180.0*PI)*length;
 }
 void Force::SetClearing(float clearing_)
 {

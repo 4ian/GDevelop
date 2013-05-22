@@ -39,9 +39,13 @@ RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
 
 RuntimeObject::~RuntimeObject()
 {
-    //Do not forget to delete automatisms which are managed using raw pointers.
+    //Do not forget to delete automatisms and forces which are managed using raw pointers.
     for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
+    for (unsigned int i = 0;i<forces.size();++i)
+        delete forces[i];
+    for (unsigned int i = 0;i<forcesGarbage.size();++i)
+        delete forcesGarbage[i];
 }
 
 void RuntimeObject::Init(const RuntimeObject & object)
@@ -55,8 +59,14 @@ void RuntimeObject::Init(const RuntimeObject & object)
     zOrder = object.zOrder;
     hidden = object.hidden;
     layer = object.layer;
-    forces = object.forces;
     force5 = object.force5;
+
+    //Copy forces
+    for (unsigned int i = 0;i<forces.size();++i)
+        delete forces[i];
+
+    for (unsigned int i = 0;i<object.forces.size();++i)
+        forces.push_back(new Force(*object.forces[i]));
 
     //Do not forget to delete automatisms which are managed using raw pointers.
     for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
@@ -146,18 +156,29 @@ void RuntimeObject::PutAroundAPosition( float positionX, float positionY, float 
 
 void RuntimeObject::AddForce( float x, float y, float clearing )
 {
-    Force forceToAdd;
-    forceToAdd.SetX( x ); forceToAdd.SetY( y ); forceToAdd.SetClearing( clearing );
-    forces.push_back( forceToAdd );
+    forces.push_back( GetRecycledForce(x,y, clearing) );
 }
 
 void RuntimeObject::AddForceUsingPolarCoordinates( float angle, float length, float clearing )
 {
-    Force forceToAdd;
-    forceToAdd.SetAngle( angle );
-    forceToAdd.SetLength( length );
-    forceToAdd.SetClearing( clearing );
-    forces.push_back( forceToAdd );
+    angle *= 3.14159/180.0;
+    forces.push_back( GetRecycledForce(cos(angle)*length,sin(angle)*length, clearing) );
+}
+
+Force * RuntimeObject::GetRecycledForce(float x, float y, float clearing)
+{
+    if ( forcesGarbage.empty() )
+        return new Force(x, y, clearing);
+    else
+    {
+        Force * force = forcesGarbage.back();
+        forcesGarbage.pop_back();
+
+        force->SetX(x);
+        force->SetY(y);
+        force->SetClearing(clearing);
+        return force;
+    }
 }
 
 /**
@@ -165,16 +186,12 @@ void RuntimeObject::AddForceUsingPolarCoordinates( float angle, float length, fl
  */
 void RuntimeObject::AddForceTowardPosition( float positionX, float positionY, float length, float clearing )
 {
-    Force forceToAdd;
-    forceToAdd.SetLength( length );
-    forceToAdd.SetClearing( clearing );
-
 	//Workaround Visual C++ internal error (!) by using temporary doubles.
 	double y = positionY - (GetDrawableY()+GetCenterY());
 	double x = positionX - (GetDrawableX()+GetCenterX());
-    forceToAdd.SetAngle( atan2(y,x) * 180 / 3.14159 );
+	float angle = atan2(y,x);
 
-    forces.push_back( forceToAdd );
+    forces.push_back( GetRecycledForce(cos(angle)*length, sin(angle)*length, clearing) );
 }
 
 
@@ -196,12 +213,7 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
     int newX = cos(newangle/180.f*3.14159f) * distance;
     int newY = sin(newangle/180.f*3.14159f) * distance;
 
-    Force forceToAdd;
-    forceToAdd.SetX( newX-oldX );
-    forceToAdd.SetY( newY-oldY );
-    forceToAdd.SetClearing( clearing );
-
-    forces.push_back( forceToAdd );
+    forces.push_back( GetRecycledForce(newX-oldX, newY-oldY, clearing) );
 }
 
 void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
@@ -396,40 +408,17 @@ void RuntimeObject::AddForceTowardObject(RuntimeObject * object, float length, f
 {
     if ( object == NULL ) return;
 
-    Force forceToAdd;
-    forceToAdd.SetLength( length );
-    forceToAdd.SetClearing( clearing );
-    forceToAdd.SetAngle( atan2(( object->GetDrawableY() + object->GetCenterY() ) - ( GetDrawableY() + GetCenterY() ),
-                             ( object->GetDrawableX() + object->GetCenterX() ) - ( GetDrawableX() + GetCenterX() ) )
-                             * 180 / 3.14159 );
-
-    forces.push_back( forceToAdd );
+    AddForceTowardPosition(object->GetDrawableX() + object->GetCenterX(),
+                           object->GetDrawableY() + object->GetCenterY(),
+                           length, clearing);
 }
 
 void RuntimeObject::AddForceToMoveAroundObject( RuntimeObject * object, float velocity, float length, float clearing )
 {
     if ( object == NULL ) return;
 
-    //Angle en degré entre les deux objets
-    float angle = atan2(( GetDrawableY() + GetCenterY()) - ( object->GetDrawableY() + object->GetCenterY() ),
-                        ( GetDrawableX() + GetCenterX() ) - ( object->GetDrawableX() + object->GetCenterX() ) )
-                         * 180 / 3.14159f;
-    float newangle = angle + velocity;
-
-    //position actuelle de l'objet 1 par rapport à l'objet centre
-    int oldX = ( GetDrawableX() + GetCenterX() ) - ( object->GetDrawableX() + object->GetCenterX() );
-    int oldY = ( GetDrawableY() + GetCenterY()) - ( object->GetDrawableY() + object->GetCenterY());
-
-    //nouvelle position à atteindre
-    int newX = cos(newangle/180.f*3.14159f) * length;
-    int newY = sin(newangle/180.f*3.14159f) * length;
-
-    Force forceToAdd;
-    forceToAdd.SetX( newX-oldX );
-    forceToAdd.SetY( newY-oldY );
-    forceToAdd.SetClearing( clearing );
-
-    forces.push_back( forceToAdd );
+    AddForceToMoveAround(object->GetDrawableX() + object->GetCenterX(), object->GetDrawableY() + object->GetCenterY(),
+                         velocity, length, clearing);
 }
 
 void RuntimeObject::PutAroundObject( RuntimeObject * object, float length, float angleInDegrees )
@@ -501,8 +490,12 @@ Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name) con
 
 bool RuntimeObject::ClearForce()
 {
-    force5.SetLength(0);
+    force5.SetLength(0); //Clear the deprecated forces
     force5.SetClearing(0);
+
+    //Move all forces to garbage
+    forcesGarbage.reserve(forcesGarbage.size()+forces.size());
+    copy(forces.begin(),forces.end(),back_inserter(forcesGarbage));
     forces.clear();
 
     return true;
@@ -519,18 +512,25 @@ struct NullForce
     }
 };
 
-bool RuntimeObject::UpdateForce( float ElapsedTime )
+bool RuntimeObject::UpdateForce( float elapsedTime )
 {
-    force5.SetLength( force5.GetLength() - force5.GetLength() * ( 1 - force5.GetClearing() ) * ElapsedTime );
+    force5.SetLength( force5.GetLength() - force5.GetLength() * ( 1 - force5.GetClearing() ) * elapsedTime );
     if ( force5.GetClearing() == 0 ) force5.SetLength(0);
 
-    for ( unsigned int i = 0; i < forces.size();i++ )
+    for ( unsigned int i = 0; i < forces.size();)
     {
-        forces[i].SetLength( forces[i].GetLength() - forces[i].GetLength() * ( 1 - forces[i].GetClearing() ) * ElapsedTime );
-        if ( forces[i].GetClearing() == 0 ) {forces[i].SetLength(0); }
-    }
+        if ( forces[i]->GetClearing() == 0 || forces[i]->GetLength() <= 0.001 )
+        {
+            forcesGarbage.push_back(forces[i]);
+            forces.erase(forces.begin()+i);
+        }
+        else
+        {
+            forces[i]->SetLength( forces[i]->GetLength() - forces[i]->GetLength() * ( 1 - forces[i]->GetClearing() ) * elapsedTime );
+            ++i;
+        }
 
-    forces.erase( std::remove_if( forces.begin(), forces.end(), NullForce() ), forces.end() );
+    }
 
     return true;
 }
@@ -539,7 +539,7 @@ float RuntimeObject::TotalForceX() const
 {
     float ForceXsimple = 0;
     for ( unsigned int i = 0; i < forces.size();i++ )
-        ForceXsimple += forces[i].GetX();
+        ForceXsimple += forces[i]->GetX();
 
     return ForceXsimple + force5.GetX();
 }
@@ -548,7 +548,7 @@ float RuntimeObject::TotalForceY() const
 {
     float ForceYsimple = 0;
     for ( unsigned int i = 0; i < forces.size();i++ )
-        ForceYsimple += forces[i].GetY();
+        ForceYsimple += forces[i]->GetY();
 
     return ForceYsimple + force5.GetY();
 }

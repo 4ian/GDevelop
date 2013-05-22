@@ -42,10 +42,6 @@ RuntimeObject::~RuntimeObject()
     //Do not forget to delete automatisms and forces which are managed using raw pointers.
     for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
-    for (unsigned int i = 0;i<forces.size();++i)
-        delete forces[i];
-    for (unsigned int i = 0;i<forcesGarbage.size();++i)
-        delete forcesGarbage[i];
 }
 
 void RuntimeObject::Init(const RuntimeObject & object)
@@ -60,13 +56,7 @@ void RuntimeObject::Init(const RuntimeObject & object)
     hidden = object.hidden;
     layer = object.layer;
     force5 = object.force5;
-
-    //Copy forces
-    for (unsigned int i = 0;i<forces.size();++i)
-        delete forces[i];
-
-    for (unsigned int i = 0;i<object.forces.size();++i)
-        forces.push_back(new Force(*object.forces[i]));
+    forces = object.forces;
 
     //Do not forget to delete automatisms which are managed using raw pointers.
     for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
@@ -156,31 +146,14 @@ void RuntimeObject::PutAroundAPosition( float positionX, float positionY, float 
 
 void RuntimeObject::AddForce( float x, float y, float clearing )
 {
-    forces.push_back( GetRecycledForce(x,y, clearing) );
+    forces.push_back( Force(x,y, clearing) );
 }
 
 void RuntimeObject::AddForceUsingPolarCoordinates( float angle, float length, float clearing )
 {
     angle *= 3.14159/180.0;
-    forces.push_back( GetRecycledForce(cos(angle)*length,sin(angle)*length, clearing) );
+    forces.push_back( Force(cos(angle)*length,sin(angle)*length, clearing) );
 }
-
-Force * RuntimeObject::GetRecycledForce(float x, float y, float clearing)
-{
-    if ( forcesGarbage.empty() )
-        return new Force(x, y, clearing);
-    else
-    {
-        Force * force = forcesGarbage.back();
-        forcesGarbage.pop_back();
-
-        force->SetX(x);
-        force->SetY(y);
-        force->SetClearing(clearing);
-        return force;
-    }
-}
-
 /**
  * Add a force toward a position
  */
@@ -191,7 +164,7 @@ void RuntimeObject::AddForceTowardPosition( float positionX, float positionY, fl
 	double x = positionX - (GetDrawableX()+GetCenterX());
 	float angle = atan2(y,x);
 
-    forces.push_back( GetRecycledForce(cos(angle)*length, sin(angle)*length, clearing) );
+    forces.push_back( Force(cos(angle)*length, sin(angle)*length, clearing) );
 }
 
 
@@ -213,7 +186,7 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
     int newX = cos(newangle/180.f*3.14159f) * distance;
     int newY = sin(newangle/180.f*3.14159f) * distance;
 
-    forces.push_back( GetRecycledForce(newX-oldX, newY-oldY, clearing) );
+    forces.push_back( Force(newX-oldX, newY-oldY, clearing) );
 }
 
 void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
@@ -490,12 +463,9 @@ Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name) con
 
 bool RuntimeObject::ClearForce()
 {
-    force5.SetLength(0); //Clear the deprecated forces
+    force5.SetLength(0); //Clear the deprecated force
     force5.SetClearing(0);
 
-    //Move all forces to garbage
-    forcesGarbage.reserve(forcesGarbage.size()+forces.size());
-    copy(forces.begin(),forces.end(),back_inserter(forcesGarbage));
     forces.clear();
 
     return true;
@@ -519,14 +489,11 @@ bool RuntimeObject::UpdateForce( float elapsedTime )
 
     for ( unsigned int i = 0; i < forces.size();)
     {
-        if ( forces[i]->GetClearing() == 0 || forces[i]->GetLength() <= 0.001 )
-        {
-            forcesGarbage.push_back(forces[i]);
+        if ( forces[i].GetClearing() == 0 || forces[i].GetLength() <= 0.001 )
             forces.erase(forces.begin()+i);
-        }
         else
         {
-            forces[i]->SetLength( forces[i]->GetLength() - forces[i]->GetLength() * ( 1 - forces[i]->GetClearing() ) * elapsedTime );
+            forces[i].SetLength( forces[i].GetLength() - forces[i].GetLength() * ( 1 - forces[i].GetClearing() ) * elapsedTime );
             ++i;
         }
 
@@ -539,7 +506,7 @@ float RuntimeObject::TotalForceX() const
 {
     float ForceXsimple = 0;
     for ( unsigned int i = 0; i < forces.size();i++ )
-        ForceXsimple += forces[i]->GetX();
+        ForceXsimple += forces[i].GetX();
 
     return ForceXsimple + force5.GetX();
 }
@@ -548,7 +515,7 @@ float RuntimeObject::TotalForceY() const
 {
     float ForceYsimple = 0;
     for ( unsigned int i = 0; i < forces.size();i++ )
-        ForceYsimple += forces[i]->GetY();
+        ForceYsimple += forces[i].GetY();
 
     return ForceYsimple + force5.GetY();
 }

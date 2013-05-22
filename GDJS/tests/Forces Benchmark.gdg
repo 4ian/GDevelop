@@ -27,12 +27,13 @@
         </Extensions>
         <Platforms current="Game Develop JS platform">
             <Platform name="Game Develop JS platform" />
+            <Platform name="Game Develop C++ platform" />
         </Platforms>
         <WindowW value="800" />
         <WindowH value="600" />
         <Portable />
         <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
+        <FPSmax value="-1" />
         <FPSmin value="10" />
         <verticalSync value="false" />
     </Info>

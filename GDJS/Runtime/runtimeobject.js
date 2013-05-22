@@ -371,8 +371,8 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.addForceTowardPosition = function(x,y, len, isPermanent) {
     
-        var angle = Math.atan2(y - (that.getY()+that.getCenterY()), 
-                               x - (that.getX()+that.getCenterX()));
+        var angle = Math.atan2(y - (that.getDrawableY()+that.getCenterY()), 
+                               x - (that.getDrawableX()+that.getCenterX()));
         
         var forceX = Math.cos(angle)*len;
         var forceY = Math.sin(angle)*len;
@@ -388,7 +388,10 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @param isPermanent {Boolean} Set if the force is permanent or not.
      */
     that.addForceTowardObject = function(obj, len, isPermanent) {
-        that.addForceTowardPosition(obj.getX()+obj.getCenterX(), obj.getY()+obj.getCenterY(),
+        if ( obj == null ) return;
+    
+        that.addForceTowardPosition(obj.getDrawableX()+obj.getCenterX(), 
+                                    obj.getDrawableY()+obj.getCenterY(),
                                     len, isPermanent);
     }
     
@@ -445,8 +448,6 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
             averageX += my.forces[i].getX();
             averageY += my.forces[i].getY();
         }
-        averageX /= my.forces.length;
-        averageY /= my.forces.length;
         
         my.averageForce.setX(averageX);
         my.averageForce.setY(averageY);

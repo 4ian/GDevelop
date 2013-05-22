@@ -27,7 +27,6 @@ gdjs.polygon = function(runtimeGame, pixiRenderer)
             that.vertices[i][0] += x;
             that.vertices[i][1] += y;
         }
-        that.computeEdges();
     }
     
     that.rotate = function(angle) {

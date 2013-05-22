@@ -77,7 +77,7 @@ gdjs.force = function(x,y, isTemporary)
     that.setLength = function(len) {
     
         if ( my.dirty ) {
-            my.angle = Math.atan2(y,x);
+            my.angle = Math.atan2(my.y, my.x)*180/3.14159;
             my.dirty = false;
         }
         

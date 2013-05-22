@@ -33,17 +33,12 @@ gdjs.returnFalse = function() {
     return false;
 }
 
-// Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function(from) {
-  /*var rest = this.slice((to || from) + 1 || this.length);
-  this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);*/
-  
+    //Adapted from the nice articles available at https://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript 
     for (var i = from, len = this.length - 1; i < len; i++)
         this[i] = this[i + 1];
 
     this.length = len;
-  
 };
 
 Array.prototype.createFrom = function(arr) {

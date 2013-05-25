@@ -8,17 +8,16 @@ using namespace std;
 
 double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists )
 {
-    vector<RuntimeObject*> pickedObjects;
+    unsigned int size = 0;
     std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists.begin();
     for (;it!=objectsLists.end();++it)
     {
         if ( it->second == NULL ) continue;
 
-        std::vector<RuntimeObject*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) pickedObjects.push_back(list[i]);
+        size += (it->second)->size();
     }
 
-    return pickedObjects.size();
+    return size;
 }
 
 bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )

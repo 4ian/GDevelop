@@ -25,7 +25,7 @@ SceneExtension::SceneExtension()
 
     GetAllConditions()["DepartScene"].codeExtraInformation
         .SetFunctionName("gdjs.runtimeSceneTools.sceneJustBegins");
-    GetAllConditions()["SceneBackground"].codeExtraInformation
+    GetAllActions()["SceneBackground"].codeExtraInformation
         .SetFunctionName("gdjs.runtimeSceneTools.setBackgroundColor");
 
     {

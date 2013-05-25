@@ -170,6 +170,8 @@
 		</Compiler>
 		<Unit filename="GDJS/BuiltinExtensions/AdvancedExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/AdvancedExtension.h" />
+		<Unit filename="GDJS/BuiltinExtensions/AudioExtension.cpp" />
+		<Unit filename="GDJS/BuiltinExtensions/AudioExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/BaseObjectExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/BaseObjectExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/CameraExtension.cpp" />

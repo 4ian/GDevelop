@@ -27,10 +27,11 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
                                                                  std::set < std::string > & includeFiles,
                                                                  bool compilationForRuntime)
 {
-    string output;
+    string output = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n";
 
     //Prepare the global context
-    gd::EventsCodeGenerationContext context;
+    unsigned int maxScopeLevelReached = 0;
+    gd::EventsCodeGenerationContext context(&maxScopeLevelReached);
     EventsCodeGenerator codeGenerator(project, scene);
     codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
     codeGenerator.PreprocessEventList(events);
@@ -47,7 +48,7 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     std::string globalObjectListsReset;
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
     {
-        for (unsigned int j = 1;j<=codeGenerator.GetMaximalScopeLevelReached();++j)
+        for (unsigned int j = 1;j<=maxScopeLevelReached;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
                                  +ManObjListName(project.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
@@ -58,7 +59,7 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     }
     for (unsigned int i = 0;i<scene.GetObjectsCount();++i)
     {
-        for (unsigned int j = 1;j<=codeGenerator.GetMaximalScopeLevelReached();++j)
+        for (unsigned int j = 1;j<=maxScopeLevelReached;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
                                  +ManObjListName(scene.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
@@ -72,14 +73,13 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     for (unsigned int i = 0;i<=codeGenerator.GetMaxCustomConditionsDepth();++i)
     {
         globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"conditionTrue_"+gd::ToString(i)+" = {val:false};\n";
-        for (unsigned int j = 0;j<=codeGenerator.GetMaxConditionsIndex();++j)
+        for (unsigned int j = 0;j<=codeGenerator.GetMaxConditionsListsSize();++j)
         {
             globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::ToString(j)+"IsTrue_"+gd::ToString(i)+" = {val:false};\n";
         }
     }
 
     output +=
-    "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n"+
     codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
     +globalObjectLists+"\n"
     +globalConditionsBooleans+"\n"
@@ -430,7 +430,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction 
         if (cId != 0) outputCode += "}\n";
     }
 
-    maxConditionsIndex = std::max(conditions.size(), maxConditionsIndex);
+    maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
 
     return outputCode;
 }
@@ -526,8 +526,7 @@ std::string EventsCodeGenerator::GetCodeNamespace()
 }
 
 EventsCodeGenerator::EventsCodeGenerator(gd::Project & project, const gd::Layout & layout) :
-    gd::EventsCodeGenerator(project, layout, JsPlatform::Get()),
-    maxConditionsIndex(0)
+    gd::EventsCodeGenerator(project, layout, JsPlatform::Get())
 {
 }
 

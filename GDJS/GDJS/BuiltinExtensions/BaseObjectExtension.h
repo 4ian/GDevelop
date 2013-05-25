@@ -9,7 +9,7 @@
  */
 class BaseObjectExtension : public gd::PlatformExtension
 {
-    public :
+public :
 
     BaseObjectExtension();
     virtual ~BaseObjectExtension() {};

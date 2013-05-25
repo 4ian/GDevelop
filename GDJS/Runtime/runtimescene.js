@@ -25,6 +25,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.elapsedTime = 0;
     my.timeFromStart = 0;
     my.firstFrame = true;
+    my.soundManager = gdjs.soundManager();
     
     /**
      * Load the runtime scene from the given scene.
@@ -296,6 +297,14 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     that.getTimeFromStart = function() {
         return my.timeFromStart;
+    }
+    
+    /**
+     * Get the soundManager of the scene.
+     - @return The soundManager of the scene.
+     */
+    that.getSoundManager = function() {
+        return my.soundManager;
     }
     
     /**

@@ -41,14 +41,14 @@ public:
     virtual std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, gd::EventsCodeGenerationContext & context);
 
     /**
-     * The maximum number of conditions in a list during code generation.
-     */
-    unsigned int GetMaxConditionsIndex() const { return maxConditionsIndex; }
-
-    /**
      * \brief Generate the full name for accessing to a boolean variable used for conditions.
      */
     virtual std::string GenerateBooleanFullName(const std::string & boolName, const gd::EventsCodeGenerationContext & context);
+
+    /**
+     * \brief Set a boolean to false.
+     */
+    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName, const gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Get the full name for accessing to a list of objects
@@ -129,13 +129,10 @@ protected:
     virtual std::string GenerateReferenceToUpperScopeBoolean(const std::string & referenceName,
                                                    const std::string & referencedBoolean,
                                                    gd::EventsCodeGenerationContext & context);
-    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName, const gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context);
 
     std::string GetCodeNamespace();
-
-    unsigned int maxConditionsIndex;
 
     /**
      * \brief Construct a code generator for the specified project and layout.

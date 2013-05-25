@@ -49,14 +49,15 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
     //Strip the project
     gd::Project strippedProject = StripProject(project, layout.GetName());
 
+    //Export resources and finalize stripping
+    ExportResources(strippedProject, exportDir);
+    strippedProject.GetLayout(layout.GetName()).GetEvents().clear();
+
     //Export the project
     if ( !strippedProject.SaveToFile(exportDir+"/data.xml") ) {
         lastError = gd::ToString(_("Unable to write ")+exportDir+"data.xml");
         return false;
     }
-
-    //Export resources
-    ExportResources(strippedProject, exportDir);
 
     //Copy additional dependencies
     wxCopyFile("./JsPlatform/Runtime/libs/pixi.js", exportDir+"/libs/pixi.js");
@@ -90,7 +91,6 @@ gd::Project Exporter::StripProject(const gd::Project & project, std::string layo
         if ( !layout.empty() && layout != strippedProject.GetLayout(i).GetName() )
             strippedProject.RemoveLayout(strippedProject.GetLayout(i).GetName());
         else {
-            strippedProject.GetLayout(i).GetEvents().clear();
             strippedProject.GetLayout(i).GetObjectGroups().clear();
             ++i;
         }

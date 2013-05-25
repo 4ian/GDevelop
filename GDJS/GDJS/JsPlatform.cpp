@@ -22,6 +22,7 @@
 #include "GDJS/BuiltinExtensions/SceneExtension.h"
 #include "GDJS/BuiltinExtensions/CameraExtension.h"
 #include "GDJS/BuiltinExtensions/TimeExtension.h"
+#include "GDJS/BuiltinExtensions/AudioExtension.h"
 
 JsPlatform *JsPlatform::singleton = NULL;
 
@@ -79,6 +80,7 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new TimeExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AudioExtension));
 };
 
 JsPlatform & JsPlatform::Get()

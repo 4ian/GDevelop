@@ -204,8 +204,13 @@ gdjs.objectTools.createObjectFromGroupOnScene = function(runtimeScene, objectsLi
     gdjs.objectTools.doCreateObjectOnScene(runtimeScene, objectName, objectsLists, x, y, layer);
 }
 
-gdjs.objectTools.pickedObjectsCount = function(objectName, objectsLists) {
-    if ( objectsLists.containsKey(objectName) ) {
-        return objectsLists.get(objectName).length;
+gdjs.objectTools.pickedObjectsCount = function(objectsLists) {
+
+    var size = 0;
+    var values = objectsLists.values();
+    for(var i = 0, len = values.length;i<len;++i) {
+        size += values[i].length;
     }
+    
+    return size;
 }

@@ -90,6 +90,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     my.frameElapsedTime = 0;
     my.scaleX = 1;
     my.scaleY = 1;
+    my.blendMode = 0;
     that.opacity = 255;
     if ( objectXml ) {
         $(objectXml).find("Animations").find("Animation").each( function() {
@@ -193,7 +194,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         my.sprite.position.y = that.y + (my.animationFrame.center.y - my.animationFrame.origin.y)*my.scaleY;
         my.sprite.rotation = gdjs.toRad(that.angle);
         my.sprite.visible = !that.hidden;
-        my.sprite.blendMode = that.blendMode;
+        my.sprite.blendMode = my.blendMode;
         my.sprite.alpha = that.opacity/255;
         my.sprite.scale.x = my.scaleX;
         my.sprite.scale.y = my.scaleY;
@@ -306,12 +307,12 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     }
     
     that.setBlendMode = function(newMode) {
-        that.blendMode = newMode;
+        my.blendMode = newMode;
         my.spriteDirty = true;
     }
     
     that.getBlendMode = function() {
-        return that.blendMode;
+        return my.blendMode;
     }
     
     that.setOpacity = function(opacity) {

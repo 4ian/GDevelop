@@ -26,7 +26,7 @@ public:
      * \param destinationDirectory The directory where resources must be copied to
      * \param updateOriginalProject If set to true, \a project will be updated with the new resources filenames.
      * \param optionalProgressDialog An optional pointer to a wxProgressDialog. Can be NULL.
-     * \parma askAboutAbsoluteFilenames If set to false, the users won't be asked anything and the files
+     * \param askAboutAbsoluteFilenames If set to false, the users won't be asked anything and the files
      * with absolutes filenames will be copied into the destination directory and their filenames updated.
      *
      * \return true if no error happened

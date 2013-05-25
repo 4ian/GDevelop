@@ -4,6 +4,7 @@
  */
 #ifndef OBJECTMETADATA_H
 #define OBJECTMETADATA_H
+#if defined(GD_IDE_ONLY)
 #include <string>
 #include <map>
 #include <wx/bitmap.h>
@@ -109,5 +110,5 @@ private:
 
 
 }
-
+#endif
 #endif // OBJECTMETADATA_H

@@ -187,6 +187,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
 
     if ( !instrInfos.codeExtraInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
+    maxConditionsListsSize = std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
     if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
     {
@@ -314,6 +315,8 @@ string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction 
             outputCode += "}";
         }
     }
+
+    maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
 
     return outputCode;
 }
@@ -614,7 +617,6 @@ string EventsCodeGenerator::GenerateEventsListCode(vector < gd::BaseEventSPtr > 
         //Each event has its own context : Objects picked in an event are totally different than the one picked in another.
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
-        maxScope = std::max(maxScope, context.GetScopeLevel());
 
         string eventCoreCode = events[eId]->GenerateEventCode(*this, context);
         string scopeBegin = GenerateScopeBegin(context);
@@ -984,8 +986,8 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project & project_, const gd::Layou
     platform(platform_),
     errorOccurred(false),
     compilationForRuntime(false),
-    maxScope(0),
-    maxCustomConditionsDepth(0)
+    maxCustomConditionsDepth(0),
+    maxConditionsListsSize(0)
 {
 };
 

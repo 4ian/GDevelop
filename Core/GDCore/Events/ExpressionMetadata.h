@@ -1,6 +1,7 @@
 
 #ifndef EXPRESSIONMETADATA_H
 #define EXPRESSIONMETADATA_H
+#if defined(GD_IDE_ONLY)
 #include <string>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
@@ -228,4 +229,5 @@ private:
 
 }
 
+#endif
 #endif // EXPRESSIONMETADATA_H

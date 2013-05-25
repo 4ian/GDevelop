@@ -4,6 +4,7 @@
  */
 #ifndef AUTOMATISMMETADATA_H
 #define AUTOMATISMMETADATA_H
+#if defined(GD_IDE_ONLY)
 #include <string>
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
@@ -118,4 +119,5 @@ private:
 
 }
 
+#endif
 #endif // AUTOMATISMMETADATA_H

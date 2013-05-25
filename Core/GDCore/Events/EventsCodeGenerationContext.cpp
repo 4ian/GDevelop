@@ -15,6 +15,8 @@ namespace gd
 
 void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext & parent_)
 {
+    parent = &parent_;
+
     //Objects lists declared by parent became "already declared" in the child context.
     alreadyDeclaredObjectsLists = parent_.alreadyDeclaredObjectsLists;
     for ( set<string>::iterator it = parent_.objectsListsToBeDeclared.begin() ; it != parent_.objectsListsToBeDeclared.end(); ++it )
@@ -22,8 +24,13 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
     for ( set<string>::iterator it = parent_.emptyObjectsListsToBeDeclared.begin() ; it != parent_.emptyObjectsListsToBeDeclared.end(); ++it )
         alreadyDeclaredObjectsLists.insert(*it);
 
+    customConditionDepth = parent_.customConditionDepth;
     scopeLevel = parent_.GetScopeLevel()+1;
-    parent = &parent_;
+    if ( parent_.maxScopeLevel )
+    {
+        maxScopeLevel = parent_.maxScopeLevel;
+        *maxScopeLevel = std::max(*maxScopeLevel, scopeLevel);
+    }
 }
 
 void EventsCodeGenerationContext::ObjectsListNeeded(const std::string & objectName)

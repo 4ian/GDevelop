@@ -5,6 +5,7 @@
 
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
+#if defined(GD_IDE_ONLY)
 #include <string>
 #include "GDCore/Events/Instruction.h"
 #include <boost/shared_ptr.hpp>
@@ -231,6 +232,7 @@ private:
 
 }
 
+#endif
 #endif // INSTRUCTIONMETADATA_H
 
 

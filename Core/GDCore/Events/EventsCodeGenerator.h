@@ -243,14 +243,14 @@ public:
     std::vector<std::string> ExpandObjectsName(const std::string & objectName, const EventsCodeGenerationContext & context) const;
 
     /**
-     * \brief Returns the maximum context depth reached during code generation.
-     */
-    unsigned int GetMaximalScopeLevelReached() { return maxScope; };
-
-    /**
      * \brief Get the maximum depth of custom conditions reached during code generation.
      */
     unsigned int GetMaxCustomConditionsDepth() const { return maxCustomConditionsDepth; }
+
+    /**
+     * \brief Get the maximum size of a list of conditions.
+     */
+    unsigned int GetMaxConditionsListsSize() const { return maxConditionsListsSize; }
 
     /**
      * \brief Generate the full name for accessing to a boolean variable used for conditions.
@@ -258,6 +258,14 @@ public:
      * Default implementation just returns the boolean name passed as argument.
      */
     virtual std::string GenerateBooleanFullName(const std::string & boolName, const gd::EventsCodeGenerationContext & context ) { return boolName; }
+
+    /**
+     * \brief Must create a boolean. Its value must be false.
+     *
+     * The default implementation generates C-style code.
+     */
+    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName,
+                                                             const gd::EventsCodeGenerationContext & context) { return "bool "+boolName+" = false;\n";}
 
     /**
      * \brief Get the full name for accessing to a list of objects
@@ -411,14 +419,6 @@ protected:
                                                    const std::string & referencedBoolean,
                                                    gd::EventsCodeGenerationContext & context) { return "bool & "+referenceName+" = "+referencedBoolean+";\n";}
 
-    /**
-     * \brief Must create a boolean. Its value must be false.
-     *
-     * The default implementation generates C-style code.
-     */
-    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName,
-                                                             const gd::EventsCodeGenerationContext & context) { return "bool "+boolName+" = false;\n";}
-
     virtual std::string GenerateFreeCondition(const std::vector<std::string> & arguments,
                                               const gd::InstructionMetadata & instrInfos,
                                               const std::string & returnBoolean,
@@ -485,8 +485,8 @@ protected:
     std::string customCodeOutsideMain; ///< Custom code inserted before events ( and not in events function )
     std::string customCodeInMain; ///< Custom code inserted before events ( in main function )
     std::set<std::string> customGlobalDeclaration; ///< Custom global C++ declarations inserted after includes
-    unsigned int maxScope; ///< The maximum depth value for all the contexts created.
     unsigned int maxCustomConditionsDepth; ///< The maximum depth value for all the custom conditions created.
+    unsigned int maxConditionsListsSize; ///< The maximum size of a list of conditions.
 };
 
 }

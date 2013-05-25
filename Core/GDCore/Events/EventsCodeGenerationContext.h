@@ -23,8 +23,9 @@ class GD_CORE_API EventsCodeGenerationContext
 public:
     /**
      * Default constructor. You may want to call InheritsFrom just after.
+     * \param maxScopeLevel Optional pointer to an unsigned integer that will be updated to contain the maximal scope depth reached.
      */
-    EventsCodeGenerationContext() : scopeLevel(0), customConditionDepth(0), parent(NULL) {};
+    EventsCodeGenerationContext(unsigned int * maxScopeLevel_ = NULL) : scopeLevel(0), customConditionDepth(0), maxScopeLevel(maxScopeLevel_), parent(NULL) {};
     virtual ~EventsCodeGenerationContext() {};
 
     /**
@@ -128,6 +129,7 @@ private:
     std::string currentObject;
     unsigned int scopeLevel;
     unsigned int customConditionDepth;
+    unsigned int * maxScopeLevel;
     const EventsCodeGenerationContext * parent;
 };
 

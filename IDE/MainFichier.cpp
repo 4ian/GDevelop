@@ -47,11 +47,10 @@ void MainFrame::CreateNewProject()
     NewProjectDialog dialog(this);
     if ( dialog.ShowModal() == 1 )
     {
-        boost::shared_ptr<gd::Platform> associatedPlatform = gd::PlatformManager::GetInstance()->GetPlatform(dialog.GetChosenTemplatePlatform());
-        if ( associatedPlatform != boost::shared_ptr<gd::Platform>() )
+        gd::Platform* associatedPlatform = gd::PlatformManager::GetInstance()->GetPlatform(dialog.GetChosenTemplatePlatform());
+        if ( associatedPlatform != NULL )
         {
             boost::shared_ptr<gd::Project> newProject(new gd::Project);
-            newProject->AddPlatform(associatedPlatform);
 
             //Be sure that the directory of the target exists
             wxString targetDirectory = wxFileName::FileName(dialog.GetChosenFilename()).GetPath();
@@ -67,6 +66,7 @@ void MainFrame::CreateNewProject()
                 newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
 
             newProject->SetProjectFile(dialog.GetChosenFilename());
+            newProject->AddPlatform(associatedPlatform);
             newProject->SaveToFile(newProject->GetProjectFile());
 
             games.push_back(newProject);
@@ -168,7 +168,7 @@ void MainFrame::Open( string file )
         if ( startPage ) startPage->Refresh();
 
         string unknownExtensions = "";
-        for (unsigned int i = 0;i<newProject->GetUsedPlatformExtensions().size();++i)
+        for (unsigned int i = 0;i<newProject->GetUsedExtensions().size();++i)
         {
             bool extensionFound = false;
 
@@ -178,7 +178,7 @@ void MainFrame::Open( string file )
                 std::vector < boost::shared_ptr<gd::PlatformExtension> > allExtensions = platform.GetAllPlatformExtensions();
                 for (unsigned int e = 0;e<allExtensions.size();++e)
                 {
-                    if ( allExtensions[e]->GetName() == newProject->GetUsedPlatformExtensions()[i])
+                    if ( allExtensions[e]->GetName() == newProject->GetUsedExtensions()[i])
                     {
                         extensionFound = true;
                         break;
@@ -188,7 +188,7 @@ void MainFrame::Open( string file )
             }
 
             if ( !extensionFound )
-                unknownExtensions += newProject->GetUsedPlatformExtensions()[i]+"\n";
+                unknownExtensions += newProject->GetUsedExtensions()[i]+"\n";
         }
 
         if (unknownExtensions != "")

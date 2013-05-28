@@ -449,7 +449,7 @@ void ProjectManager::Refresh()
 
         //Extensions
         gdTreeItemProjectData * extensionsItemData = new gdTreeItemProjectData("Extensions", "", mainEditor.games[i].get());
-        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->GetUsedPlatformExtensions().size()) + ")", 3 ,3, extensionsItemData);
+        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->GetUsedExtensions().size()) + ")", 3 ,3, extensionsItemData);
     }
 
     projectsTree->ExpandAll();
@@ -543,7 +543,7 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     {
         EditExtensionsOfGame(*game);
 
-        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->GetUsedPlatformExtensions().size()) + ")");
+        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->GetUsedExtensions().size()) + ")");
     }
     else if ( data->GetString() == "SourceFile")
     {

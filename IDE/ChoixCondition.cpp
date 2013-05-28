@@ -300,9 +300,9 @@ void ChoixCondition::RefreshList()
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
-	    if ( find(game.GetUsedPlatformExtensions().begin(),
-                  game.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == game.GetUsedPlatformExtensions().end() )
+	    if ( find(game.GetUsedExtensions().begin(),
+                  game.GetUsedExtensions().end(),
+                  extensions[i]->GetName()) == game.GetUsedExtensions().end() )
             continue;
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
@@ -461,9 +461,9 @@ void ChoixCondition::RefreshObjectConditionsList()
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
-	    if ( find(game.GetUsedPlatformExtensions().begin(),
-                  game.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == game.GetUsedPlatformExtensions().end() )
+	    if ( find(game.GetUsedExtensions().begin(),
+                  game.GetUsedExtensions().end(),
+                  extensions[i]->GetName()) == game.GetUsedExtensions().end() )
             continue;
 
         wxTreeItemId extensionItem = objectConditionsTree->GetRootItem();

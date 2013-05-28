@@ -41,3 +41,7 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, CreateRuntimeO
     runtimeObjectCreationFunctionTable[object.GetName()] = createFun;
     runtimeObjectDestroyFunctionTable[object.GetName()] = destroyFun;
 }
+
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/PlatformExtension.cpp"
+#endif

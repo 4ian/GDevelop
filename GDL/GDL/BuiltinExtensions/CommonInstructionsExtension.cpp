@@ -247,8 +247,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Standard event: Actions are run if conditions are fulfilled."),
                   "",
                   "res/eventaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent),
-                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -308,8 +308,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Link to some external events"),
                   "",
                   "res/lienaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::LinkEvent),
-                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  boost::shared_ptr<gd::BaseEvent>(new gd::LinkEvent))
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -377,8 +377,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("The event is repeated while the conditions are true"),
                   "",
                   "res/while.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::WhileEvent),
-                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  boost::shared_ptr<gd::BaseEvent>(new gd::WhileEvent))
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -441,8 +441,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Event repeated a number of times"),
                   "",
                   "res/repeat.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent),
-                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  boost::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent))
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -567,8 +567,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Repeat the event for each specified object."),
                   "",
                   "res/foreach.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent),
-                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent))
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -639,8 +639,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Execute C++ code"),
                   "",
                   "res/source_cpp16.png",
-                  boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent),
-                  boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent))
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));

@@ -3,8 +3,6 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #ifndef PLATFORM_H
 #define PLATFORM_H
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -46,6 +44,7 @@ public:
      */
     bool AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension);
 
+#if defined(GD_IDE_ONLY)
     /**
      * We provide a specific ChangesNotifier to ensure that compilation jobs are done properly.
      */
@@ -60,6 +59,7 @@ public:
      * When destroyed, our platform need to do ensure the destruction of some singletons.
      */
     virtual void OnIDEClosed();
+#endif
 
     /**
      * Get access to the CppPlatform instance. ( CppPlatform is a singleton ).
@@ -79,10 +79,11 @@ private:
 
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
     std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
+#if defined(GD_IDE_ONLY)
     ChangesNotifier changesNotifier;
+#endif
 
     static CppPlatform * singleton;
 };
 
 #endif // PLATFORM_H
-#endif

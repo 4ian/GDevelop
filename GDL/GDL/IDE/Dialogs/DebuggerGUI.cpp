@@ -192,9 +192,9 @@ objectChanged(true)
     objectsTree->AddRoot(_("Objects"));
 
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
-    for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
+    for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
@@ -331,9 +331,9 @@ void DebuggerGUI::UpdateGUI()
 
     //Extensions tab
     unsigned int extListCtrlId = 0;
-    for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
+    for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )

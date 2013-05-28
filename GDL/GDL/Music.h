@@ -19,7 +19,8 @@ public:
     virtual ~Music();
 
     /**
-     * Open the music from a file.
+     * \brief Open the music from a file.
+     *
      * Example :
      * \code
      * Music myMusic;
@@ -30,12 +31,14 @@ public:
     bool OpenFromFile(const std::string & filename);
 
     /**
-     * Change music buffer. Call OpenFromMemory after to use this buffer
+     * \brief Change music buffer.
+     *
+     * You must call OpenFromMemory after to use this buffer.
      */
     void SetBuffer(const char * newbuffer, std::size_t size);
 
     /**
-     * Open sound stored in buffer.
+     * Open sound stored in buffer ( See SetBuffer ).
      * \param size The buffer size.
      */
     bool OpenFromMemory(std::size_t size);
@@ -44,62 +47,68 @@ public:
     char * buffer;  ///< Music buffer when music have been loaded from memory
 
     /**
-     * Play music.
+     * \brief Play the music.
      */
     void Play();
 
     /**
-     * Pause music.
+     * \brief Pause the music.
      */
     void Pause();
 
     /**
-     * Stop music.
+     * \brief Stop the music.
      */
     void Stop();
 
     /**
-     * Get Music SFML Status ( Paused, Playing, Stopped )
+     * \brief Get the music status
+     * \return sf::Music::Paused, sf::Music::Playing or sf::Music::Stopped.
      */
     inline sf::Music::Status GetStatus() const { return music.getStatus(); };
 
     /**
      * Make music looping or not.
+     * \param loop true to activate looping.
      */
     void SetLoop(bool loop);
 
     /**
-     * Change music volume
+     * \brief Change the music volume.
+     * \param volume The new volume, between 0 and 100.
      */
     void SetVolume(float volume_);
 
     /**
-     * Get music volume
+     * \brief Get the music volume.
      */
     inline float GetVolume() const { return volume; }
 
     /**
-     * Change the pitch.
+     * \brief Change the music pitch.
      */
     void SetPitch(float newPitch) { music.setPitch(newPitch); };
 
     /**
-     * Get music pitch.
+     * \brief Get the music pitch.
      */
     float GetPitch() const { return music.getPitch(); };
 
     /**
-     * Change the current playing position of the music.
+     * \brief Change the current playing position of the music.
+     * \param timeOffset The new playing position, in seconds.
      */
     void SetPlayingOffset(unsigned int timeOffset) { music.setPlayingOffset(sf::seconds(timeOffset)); };
 
     /**
-     * Return the current playing position of the music, in milliseconds.
+     * \brief Return the current playing position of the music, in seconds.
      */
     unsigned int GetPlayingOffset() const { return music.getPlayingOffset().asSeconds(); };
 
     /**
-     * Internal member functions to update music volume according to global volume.
+     * \brief Internal member functions to update music volume according to global volume.
+     *
+     * Called by the sound manager when the global volume is updated.
      */
     void UpdateVolume();
 

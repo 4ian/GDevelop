@@ -1,3 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#include <cstring>
 #include "GDL/RuntimeObject.h"
 #include "GDL/Object.h"
 #include "GDL/Automatism.h"

@@ -3,6 +3,6 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if !defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/ExternalLayout.cpp"
 #endif

@@ -132,10 +132,11 @@ void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repe
 
     boost::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
-    if(RessourcesLoader::GetInstance()->HasFile(file))
+    if(ressourcesLoader->HasFile(file))
     {
-        music->OpenFromMemory(gd::RessourcesLoader::GetInstance()->LoadBinaryFile(file),
-                                  gd::RessourcesLoader::GetInstance()->GetBinaryFileSize(file));
+        unsigned int size = ressourcesLoader->GetBinaryFileSize(file);
+        music->SetBuffer(ressourcesLoader->LoadBinaryFile(file), size);
+        music->OpenFromMemory(size);
     }
     else
     #endif
@@ -158,10 +159,11 @@ void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, 
 
     boost::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
-    if(RessourcesLoader::GetInstance()->HasFile(file))
+    if(ressourcesLoader->HasFile(file))
     {
-        music->OpenFromMemory(gd::RessourcesLoader::GetInstance()->LoadBinaryFile(file),
-                                  gd::RessourcesLoader::GetInstance()->GetBinaryFileSize(file));
+        unsigned int size = ressourcesLoader->GetBinaryFileSize(file);
+        music->SetBuffer(ressourcesLoader->LoadBinaryFile(file), size);
+        music->OpenFromMemory(size);
     }
     else
     #endif

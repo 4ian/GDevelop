@@ -17,6 +17,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Variable.h"
 #include "GDL/Text.h"
+#include "GDL/CppPlatform.h"
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {

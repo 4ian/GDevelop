@@ -72,9 +72,9 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, gd::Project * game_
 
 RuntimeScene::~RuntimeScene()
 {
-	for (unsigned int i = 0;i<game->GetUsedPlatformExtensions().size();++i)
+	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
         if ( extension != boost::shared_ptr<ExtensionBase>() )
             extension->SceneUnloaded(*this);
@@ -621,9 +621,9 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     std::cout << ".";
     //Extensions specific initialization
-	for (unsigned int i = 0;i<game->GetUsedPlatformExtensions().size();++i)
+	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
         if ( extension != boost::shared_ptr<ExtensionBase>() )
         {

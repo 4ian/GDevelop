@@ -867,6 +867,7 @@
 		<Unit filename="GDL/Variable.h" />
 		<Unit filename="GDL/VariableList.cpp" />
 		<Unit filename="GDL/VariableList.h" />
+		<Unit filename="GDL/Version.cpp" />
 		<Unit filename="GDL/Version.h" />
 		<Unit filename="GDL/XmlFilesHelper.cpp" />
 		<Unit filename="GDL/XmlFilesHelper.h" />
@@ -892,7 +893,7 @@
 			<lib_finder disable_auto="1" />
 			<AutoVersioning>
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDL/Version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

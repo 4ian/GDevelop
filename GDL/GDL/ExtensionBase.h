@@ -43,8 +43,8 @@ typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const
 #else
     //Emulating wxWidgets internationalization macro
     #ifndef _
-        #define _(x) x // "Emule" la macro de WxWidgets
-        #define wxT(x) x // "Emule" la macro de WxWidgets
+        #define _(x) x
+        #define wxT(x) x
     #endif
 #endif
 
@@ -57,12 +57,9 @@ typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const
  *  - New objects, which have a type. The new
  *   objects creations/destructions functions are provided
  *   by the extension.
- *  - Information at edittime
+ *  - More information when compiled for the IDE.
  */
-class GD_API ExtensionBase
-#if defined(GD_IDE_ONLY)
-: public gd::PlatformExtension
-#endif
+class GD_API ExtensionBase : public gd::PlatformExtension
 {
 public :
 

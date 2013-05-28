@@ -224,9 +224,9 @@ namespace
         }
 
         //Construct the list of the external shared libraries files to be used
-        for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
+        for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
         {
-            boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+            boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
             boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
             if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 

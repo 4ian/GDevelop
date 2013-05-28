@@ -4,5 +4,6 @@
  */
 
 #if !defined(GD_IDE_ONLY)
+#include "CppPlatform.h"
 #include "GDCore/PlatformDefinition/Project.cpp"
 #endif

@@ -3,7 +3,6 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
 #include "GDL/CppPlatform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -39,15 +38,19 @@
 #include "GDL/RuntimeObject.h"
 #include "GDL/Object.h"
 #include "GDL/CommonTools.h"
+
+#if defined(GD_IDE_ONLY)
 #include <wx/intl.h>
 #include <wx/config.h>
 #include <wx/filename.h>
+#endif
 
 CppPlatform *CppPlatform::singleton = NULL;
 
 CppPlatform::CppPlatform() :
     gd::Platform()
 {
+#if defined(GD_IDE_ONLY)
     //Events compiler setup
     cout << "* Setting up events compiler..." << endl;
     CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
@@ -66,6 +69,7 @@ CppPlatform::CppPlatform() :
     bool deleteTemporaries;
     if ( wxConfigBase::Get()->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
         CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
+#endif
 
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
@@ -86,13 +90,11 @@ CppPlatform::CppPlatform() :
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
-
-
 }
 
 std::string CppPlatform::GetDescription() const
 {
-    return ToString(_("Allows to create 2D games which can be compiled and play on Windows or Linux."));
+    return ToString(_("Allows to create 2D games which can be compiled and played on Windows or Linux."));
 }
 
 bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension)
@@ -138,6 +140,7 @@ boost::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene &
     return boost::shared_ptr<RuntimeObject> (newObject, runtimeObjDestroyFunctionTable[type]);
 }
 
+#if defined(GD_IDE_ONLY)
 boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
@@ -151,6 +154,7 @@ void CppPlatform::OnIDEClosed()
     SoundManager::GetInstance()->DestroySingleton();
     FontManager::GetInstance()->DestroySingleton();
 }
+#endif
 
 CppPlatform & CppPlatform::Get()
 {
@@ -168,6 +172,10 @@ void CppPlatform::DestroySingleton()
     }
 }
 
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/Platform.cpp"
+#endif
+
 /**
  * Used by Game Develop to create the platform class
  */
@@ -181,4 +189,3 @@ extern "C" gd::Platform * GD_API CreateGDPlatform() {
 extern "C" void GD_API DestroyGDPlatform() {
     CppPlatform::DestroySingleton();
 }
-#endif

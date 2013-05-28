@@ -68,9 +68,9 @@ void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
     task.userFriendlyName = "Linking code for project "+game.GetName();
 
     //Construct the list of the external shared libraries files to be used
-    for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
+    for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
         if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
@@ -385,10 +385,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxSafeYield();
 
     //Copy extensions
-    for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
+    for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
@@ -397,20 +397,20 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( windowsTarget)
             {
-                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedPlatformExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedPlatformExtensions()[i]+".xgdw", true ) == false )
-                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Windows in compilation directory.\n" )));
+                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedExtensions()[i]+".xgdw", true ) == false )
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Windows in compilation directory.\n" )));
             }
 
             if ( linuxTarget )
             {
-                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedPlatformExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdl", true ) == false )
-                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Linux in compilation directory.\n" )));
+                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedExtensions()[i]+".xgdl", true ) == false )
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Linux in compilation directory.\n" )));
             }
 
             if ( macTarget )
             {
-                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedPlatformExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdm", true ) == false )
-                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Mac OS in compilation directory.\n" )));
+                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedExtensions()[i]+".xgdm", true ) == false )
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Mac OS in compilation directory.\n" )));
             }
         }
         if ( extension != boost::shared_ptr<ExtensionBase>() )

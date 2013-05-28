@@ -11,11 +11,15 @@ gdjs.runtimeGame = function(xml)
     
     my.variables = gdjs.variablesContainer();
     my.xml = xml;
-    my.pressedKeys = new Hashtable();
-    my.mouseX = 0;
-    my.mouseY = 0;
     my.imageManager = gdjs.imageManager(that);
     my.minFPS = xml ? parseInt($(xml).find("Info").find("FPSmin").attr("value")) : 15;
+    
+    //Inputs :
+    my.pressedKeys = new Hashtable();
+    my.pressedMouseButtons = new Array(5);
+    my.mouseX = 0;
+    my.mouseY = 0;
+    my.mouseWheelDelta = 0;
     
     /**
      * Get the variables of the runtimeGame.
@@ -124,6 +128,55 @@ gdjs.runtimeGame = function(xml)
         return my.mouseY;
     }
     
+    /**
+     * Should be called whenever a mouse button is pressed
+     * @method onMouseButtonPressed
+     * @param buttonCode {Number} The mouse button code associated to the event.<br>0: Left button<br>1: Right button
+     */
+    that.onMouseButtonPressed = function(buttonCode) {
+        my.pressedMouseButtons[buttonCode] = true;
+    }
+    
+    /**
+     * Should be called whenever a mouse button is released
+     * @method onMouseButtonReleased
+     * @param buttonCode {Number} The mouse button code associated to the event. ( See onMouseButtonPressed )
+     */
+    that.onMouseButtonReleased = function(buttonCode) {
+        my.pressedMouseButtons[buttonCode] = false;
+    }
+    
+    /**
+     * Return true if the mouse button corresponding to buttonCode is pressed.
+     * @method isMouseButtonPressed
+     * @param buttonCode {Number} The mouse button code.<br>0: Left button<br>1: Right button
+     */
+    that.isMouseButtonPressed = function(buttonCode) {
+        return my.pressedMouseButtons[buttonCode] != undefined && my.pressedMouseButtons[buttonCode];
+    }
+    
+    /**
+     * Should be called whenever the mouse wheel is used
+     * @method onMouseWheel
+     * @param wheelDelta {Number} The mouse wheel delta
+     */
+    that.onMouseWheel = function(wheelDelta) {
+        my.mouseWheelDelta = wheelDelta;
+    }
+    
+    /**
+     * Return the mouse wheel delta
+     * @method getMouseWheelDelta
+     */
+    that.getMouseWheelDelta = function() {
+        return my.mouseWheelDelta;
+    }
+    
+    /**
+     * Return the minimal fps that must be guaranteed by the game.
+     * ( Otherwise, game is slowed down ).
+     * @method getMinimalFramerate
+     */
     that.getMinimalFramerate = function() {
         return my.minFPS;
     }

@@ -74,3 +74,20 @@ gdjs.inputTools.anyKeyPressed = function(runtimeScene) {
     return runtimeScene.getGame().anyKeyPressed();
 }
     
+gdjs.inputTools.isMouseButtonPressed = function(runtimeScene, button) {
+    //TODO : Implement others buttons
+    if ( button == "Left" ) return runtimeScene.getGame().isMouseButtonPressed(0);
+    if ( button == "Right" ) return runtimeScene.getGame().isMouseButtonPressed(1);
+}
+
+gdjs.inputTools.hideCursor = function(runtimeScene) {
+    runtimeScene.getPIXIRenderer().view.style.cursor = 'none';
+}
+
+gdjs.inputTools.showCursor = function(runtimeScene) {
+    runtimeScene.getPIXIRenderer().view.style.cursor = '';
+}
+
+gdjs.inputTools.getMouseWheelDelta = function(runtimeScene) {
+    return runtimeScene.getGame().getMouseWheelDelta();
+}

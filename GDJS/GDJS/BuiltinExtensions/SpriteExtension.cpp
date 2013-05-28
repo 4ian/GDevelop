@@ -54,9 +54,15 @@ SpriteExtension::SpriteExtension()
         .SetFunctionName("getScaleX");
     spriteConditions["ScaleHeight"].codeExtraInformation
         .SetFunctionName("getScaleY");
+    spriteActions["TourneVersPos"].codeExtraInformation.
+        SetFunctionName("turnTowardPosition");
+    spriteActions["TourneVers"].codeExtraInformation.
+        SetFunctionName("turnTowardObject");
 
     GetAllConditions()["Collision"].codeExtraInformation //No pixel perfect collision for now on the JS platform.
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
+    GetAllConditions()["EstTourne"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.turnedTowardTest");
 
     spriteExpressions["X"].codeExtraInformation.
         SetFunctionName("getPointX");
@@ -108,21 +114,6 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
-
-
-        obj.AddAction("TourneVersPos",
-                       _("Rotate an object toward a position"),
-                       _("Rotate an object towards a position."),
-                       _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_"),
-                       _("Direction"),
-                       "res/actions/direction24.png",
-                       "res/actions/direction.png")
-
-            .AddParameter("object", _("Object to be rotated"), "Sprite", false)
-            .AddParameter("expression", _("X position"), "",false)
-            .AddParameter("expression", _("Y position"), "",false)
-            .codeExtraInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDL/SpriteObject.h");
-
 
 
         obj.AddAction("ChangeScale",
@@ -255,20 +246,6 @@ SpriteExtension::SpriteExtension()
             .AddParameter("yesorno", _("Activate flipping"), "",false)
             .codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
 
-
-        obj.AddAction("TourneVers",
-                       _("Rotate an object toward another"),
-                       _("Rotate an object towards another."),
-                       _("Rotate _PARAM0_ towards _PARAM1_"),
-                       _("Direction"),
-                       "res/actions/direction24.png",
-                       "res/actions/direction.png")
-
-            .AddParameter("object", _("Object to be rotated"), "Sprite", false)
-            .AddParameter("objectPtr", _("Rotate toward this object"))
-            .codeExtraInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
-
-
         obj.AddCondition("SourisSurObjet",
                        _("The cursor is on an object"),
                        _("Test if the cursor is over a Sprite object. The test is accurate by default (check that the cursor is not on a transparent pixel)."),
@@ -284,22 +261,6 @@ SpriteExtension::SpriteExtension()
         #endif
 
     }
-
-    #if defined(GD_IDE_ONLY)
-    //Declaration of all conditions available
-    AddCondition("EstTourne",
-                      _("An object is turned toward another"),
-                      _("Test if an object is turned toward another"),
-                      _("_PARAM0_ is rotated towards _PARAM1_"),
-                      _("Direction"),
-                      "res/conditions/estTourne24.png",
-                      "res/conditions/estTourne.png")
-        .AddParameter("objectList", _("Name of the object"), "Sprite", false)
-        .AddParameter("objectList", _("Name of the second object"))
-        .AddParameter("expression", _("Angle of tolerance (0: minimum tolerance)"), "",false)
-        .AddCodeOnlyParameter("conditionInverted", "")
-        .codeExtraInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
-
 
 */
 }

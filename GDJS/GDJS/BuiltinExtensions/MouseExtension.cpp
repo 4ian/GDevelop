@@ -24,6 +24,12 @@ MouseExtension::MouseExtension()
         .SetFunctionName("runtimeScene.getGame().getMouseX").SetIncludeFile("inputtools.h");
     GetAllConditions()["SourisY"].codeExtraInformation
         .SetFunctionName("runtimeScene.getGame().getMouseY").SetIncludeFile("inputtools.h");
+    GetAllConditions()["SourisBouton"].codeExtraInformation
+        .SetFunctionName("gdjs.inputTools.isMouseButtonPressed").SetIncludeFile("inputtools.h");
+    GetAllActions()["CacheSouris"].codeExtraInformation
+        .SetFunctionName("gdjs.inputTools.hideCursor").SetIncludeFile("inputtools.h");
+    GetAllActions()["MontreSouris"].codeExtraInformation
+        .SetFunctionName("gdjs.inputTools.showCursor").SetIncludeFile("inputtools.h");
 
     //TODO: Support for layers
     GetAllExpressions()["MouseX"].codeExtraInformation
@@ -58,27 +64,6 @@ MouseExtension::MouseExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .codeExtraInformation.SetFunctionName("CenterCursorVertically").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
 
-    AddAction("CacheSouris",
-                   _("Hide the cursor"),
-                   _("Hide the cursor."),
-                   _("Hide the cursor"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("HideCursor").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
-
-    AddAction("MontreSouris",
-                   _("Show the cursor"),
-                   _("Show the cursor."),
-                   _("Show the cursor"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("ShowCursor").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
-
     AddAction("SetSourisXY",
                    _("Position the cursor of the mouse"),
                    _("Position the cursor to given coordinates."),
@@ -102,19 +87,6 @@ MouseExtension::MouseExtension()
 
         .AddCodeOnlyParameter("currentScene", "")
         .codeExtraInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
-
-    AddCondition("SourisBouton",
-                   _("Mouse button"),
-                   _("Test if the choosen button of the mouse is pressed."),
-                   _("The button _PARAM1_ is pressed"),
-                   _("Mouse"),
-                   "res/conditions/mouse24.png",
-                   "res/conditions/mouse.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("mouse", _("Button to test"))
-        .codeExtraInformation.SetFunctionName("MouseButtonPressed").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
-
-
 
     AddExpression("MouseWheelDelta", _("Mouse wheel : Displacement"), _("Mouse wheel displacement"), _("Mouse"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")

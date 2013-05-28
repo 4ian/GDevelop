@@ -607,6 +607,15 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
  */
 gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
 
+    //Temporary test :
+    if ( obj1.getX() + obj1.getWidth() < obj2.getX()
+         || obj1.getX() > obj2.getX() + obj2.getWidth()
+         || obj1.getY() + obj1.getHeight() < obj2.getY()
+         || obj1.getY() > obj2.getY() + obj2.getHeight() )
+         return false;
+         
+    return true;
+
     var hitBoxes1 = obj1.getHitBoxes();
     var hitBoxes2 = obj2.getHitBoxes();
     for(var k = 0, lenBoxes1 = hitBoxes1.length;k<lenBoxes1;++k) {

@@ -22,6 +22,14 @@ gdjs.runtimeSceneTools.getElapsedTimeInSeconds = function(runtimeScene) {
     return runtimeScene.getElapsedTime()/1000;
 }
 
+gdjs.runtimeSceneTools.setTimeScale = function(runtimeScene, timeScale) {
+    return runtimeScene.setTimeScale(timeScale);
+}
+
+gdjs.runtimeSceneTools.getTimeScale = function(runtimeScene) {
+    return runtimeScene.getTimeScale();
+}
+
 gdjs.runtimeSceneTools.timerElapsedTime = function(runtimeScene, timeInSeconds, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) {
         runtimeScene.addTimer(timerName);
@@ -68,4 +76,31 @@ gdjs.runtimeSceneTools.getTimerElapsedTimeInSeconds = function(runtimeScene, tim
 
 gdjs.runtimeSceneTools.getTimeFromStartInSeconds = function(runtimeScene) {
     return runtimeScene.getTimeFromStart()/1000;
+}
+
+gdjs.runtimeSceneTools.getTime = function(what) {
+    var now = new Date();
+    
+    if ( what === "hour" )
+        return now.getHours();
+    else if ( what === "min" )
+        return now.getMinutes();
+    else if ( what === "sec" )
+        return now.getSeconds();
+    else if ( what === "mday" )
+        return now.getdate();
+    else if ( what === "mon" )
+        return now.getMonth();
+    else if ( what === "year" )
+        return now.getFullYear()-1900; //Conform to the C way of returning years.
+    else if ( what === "wday" )
+        return now.getday();
+    else if ( what === "yday" ) {
+        var start = new Date(now.getFullYear(), 0, 0);
+        var diff = now - start;
+        var oneDay = 1000 * 60 * 60 * 24;
+        return Math.floor(diff / oneDay);
+    }
+        
+    return 0;
 }

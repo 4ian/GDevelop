@@ -110,8 +110,8 @@ BaseObjectExtension::BaseObjectExtension()
 
     GetAllActions()["Create"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.createObjectOnScene");
-    /*GetAllActions()["CreateByName"].codeExtraInformation
-        .SetFunctionName("gdjs.createObjectOnScene");*/ //TODO
+    GetAllActions()["CreateByName"].codeExtraInformation
+        .SetFunctionName("gdjs.objectTools.createObjectFromGroupOnScene");
     GetAllExpressions()["Count"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
     GetAllConditions()["NbObjet"].codeExtraInformation

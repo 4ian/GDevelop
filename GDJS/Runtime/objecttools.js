@@ -120,6 +120,23 @@ gdjs.objectTools.movesTowardTest = function( objectsLists1, objectsLists2, toler
     return gdjs.objectTools.TwoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
 }
 
+gdjs.objectTools.turnedTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
+    
+    var turnedTowardTestInner = function(obj1, obj2) {
+    
+        if ( obj1.hasNoForces() ) return false;
+        
+        var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
+                                  obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+        objAngle *= 180/3.14159;
+        
+        console.log(Math.abs(objAngle-obj1.getAverageForce().getAngle()));
+        return Math.abs(objAngle-obj1.getAngle()) <= tolerance/2;
+    }
+
+    return gdjs.objectTools.TwoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
+}
+
 gdjs.objectTools.pickAllObjects = function(runtimeScene, objectsLists) {
     
     var entries = objectsLists.entries();

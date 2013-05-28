@@ -32,6 +32,10 @@ TimeExtension::TimeExtension()
         .SetFunctionName("gdjs.runtimeSceneTools.unpauseTimer");
     GetAllActions()["RemoveTimer"].codeExtraInformation
         .SetFunctionName("gdjs.runtimeSceneTools.removeTimer");
+    GetAllConditions()["TimeScale"].codeExtraInformation
+        .SetFunctionName("gdjs.runtimeSceneTools.getTimeScale");
+    GetAllActions()["ChangeTimeScale"].codeExtraInformation
+        .SetFunctionName("gdjs.runtimeSceneTools.setTimeScale");
 
     GetAllExpressions()["TimeDelta"].codeExtraInformation
         .SetFunctionName("gdjs.runtimeSceneTools.getElapsedTimeInSeconds");
@@ -45,51 +49,8 @@ TimeExtension::TimeExtension()
         .SetFunctionName("gdjs.runtimeSceneTools.getTimeFromStartInSeconds");
     GetAllExpressions()["TempsDebut"].codeExtraInformation
         .SetFunctionName("gdjs.runtimeSceneTools.getTimeFromStartInSeconds");
-
-
-/*
-
-
-    AddCondition("TimeScale",
-                   _("Time scale"),
-                   _("Test the time scale."),
-                   _("The time scale is _PARAM1__PARAM2_"),
-                   _("Timers and time"),
-                   "res/conditions/time24.png",
-                   "res/conditions/time.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
-
-        .codeExtraInformation.SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
-
-    AddAction("ChangeTimeScale",
-                   _("Change time scale"),
-                   _("Change the time scale of the game."),
-                   _("Set time scale to _PARAM1_"),
-                   _("Timers and time"),
-                   "res/actions/time24.png",
-                   "res/actions/time.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Scale ( 1 : Default, 2 : Faster, 0.5 : Slower... )"))
-
-        .codeExtraInformation.SetFunctionName("SetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
-
-
-    AddExpression("TimeScale", _("Time scale"), _("Time scale"), _("Time"), "res/actions/time.png")
-        .AddCodeOnlyParameter("currentScene", "")
-
-        .codeExtraInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
-
-    AddExpression("TimeScale", _("Time scale"), _("Time scale"), _("Time"), "res/actions/time.png")
-        .SetHidden()
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
-
-
-    AddExpression("Time", _("Current time"), _("Current time"), _("Time"), "res/actions/time.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("", _("Hour : hour\nMinutes : min\nSeconds : sec\nDay in the month : mday\nMonths since January : mon\nYear since 1900 : year\nDays since sunday :wday\nDays since January 1st : yday"), "",false)
-        .codeExtraInformation.SetFunctionName("GetTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
-*/
+    GetAllExpressions()["TimeScale"].codeExtraInformation
+        .SetFunctionName("gdjs.runtimeSceneTools.getTimeScale");
+    GetAllExpressions()["Time"].codeExtraInformation
+        .SetFunctionName("gdjs.runtimeSceneTools.getTime");
 }

@@ -23,6 +23,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.lastId = 0;
     my.initialObjectsXml; 
     my.elapsedTime = 0;
+    my.timeScale = 1;
     my.timeFromStart = 0;
     my.firstFrame = true;
     my.soundManager = gdjs.soundManager();
@@ -127,6 +128,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         my.elapsedTime = now - my.latestFrameDate;
         my.latestFrameDate = now;
         my.elapsedTime = Math.min(my.elapsedTime, 1000/my.runtimeGame.getMinimalFramerate());
+        my.elapsedTime *= my.timeScale;
         
         //Update timers and others members
         var timers = my.timers.values();
@@ -312,6 +314,22 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.isFirstFrame = function() {
         return my.firstFrame;
+    }
+    
+    /**
+     * Set the time scale of the scene
+     * @method setTimeScale
+     * @param timeScale {Number} The new time scale ( Must be positive ).
+     */
+    that.setTimeScale = function(timeScale) {
+        if ( timeScale >= 0 ) my.timeScale = timeScale;
+    }
+    
+    /**
+     * Get the time scale of the scene
+     */
+    that.getTimeScale = function() {
+        return my.timeScale;
     }
     
     return that;

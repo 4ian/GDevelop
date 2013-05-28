@@ -46,7 +46,8 @@
     
 	
     var launch = function(project) {
-    
+        var isMSIE = /*@cc_on!@*/0;
+
         var game = gdjs.runtimeGame($(project).find("Project"));
     
         //Create a renderer
@@ -65,6 +66,36 @@
         $(document).mousemove(function(e){
             game.onMouseMove(e.pageX, e.pageY);
         }); 
+        renderer.view.onmousedown = function(e){
+            game.onMouseButtonPressed(e.button === 2 ? 1 : 0);
+            return false;
+        };
+        renderer.view.onmouseup = function(e){
+            game.onMouseButtonReleased(e.button === 2 ? 1 : 0);
+            return false;
+        };
+        renderer.view.onmouseout = function(e){
+            game.onMouseButtonReleased(0);
+            game.onMouseButtonReleased(1);
+            game.onMouseWheel(0);
+            return false;
+        };
+        window.addEventListener('click', function(e) {
+            e.preventDefault();
+            return false;
+        }, false);
+        renderer.view.oncontextmenu = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        };
+        renderer.view.onmousewheel = function (event){
+            game.onMouseWheel(event.wheelDelta);
+        }
+        
+        //Load all assets
+        
+
     
         //Create the scene to be played
         var currentScene = gdjs.runtimeScene(game, renderer);

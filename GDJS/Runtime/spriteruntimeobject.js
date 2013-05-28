@@ -367,22 +367,32 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         runtimeScene.getLayer(that.layer).getPIXIContainer().removeChild(my.sprite);
     }
     
+    /** 
+     * Change the object angle so that it is facing the specified position.
+     
+     * @method turnTowardPosition
+     * @param x {Number} The target x position
+     * @param y {Number} The target y position
+     */
+    that.turnTowardPosition = function(x,y) {
+        var angle = Math.atan2(y - (that.getDrawableY()+that.getCenterY()), 
+                               x - (that.getDrawableX()+that.getCenterX()));
+        
+        that.setAngle(angle);
+    }
+    
+    /** 
+     * Change the object angle so that it is facing another object
+     
+     * @method turnTowardObject
+     * @param obj The target object
+     */
+    that.turnTowardObject = function(obj) {
+        if ( obj == null ) return;
+    
+        that.turnTowardPosition(obj.getDrawableX()+obj.getCenterX(), 
+                                obj.getDrawableY()+obj.getCenterY());
+    }
+    
     return that;
 }
-
-
-    /*
-    my.updatePIXISpriteTexture = function() {
-        if ( my.currentAnimation >= my.animations.length ||
-             my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
-            return;
-        }
-        
-        var direction = my.animations[my.currentAnimation].directions[my.currentDirection];
-        if ( my.currentFrame >= direction.frames.length ) {
-            return;
-        }
-        var frame = direction.frames[my.currentFrame];
-    
-        my.sprite.texture = runtimeScene.getGame().getImageManager().getPIXITexture(frame.image);
-    }*/

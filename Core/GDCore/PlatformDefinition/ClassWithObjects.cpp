@@ -91,7 +91,7 @@ unsigned int ClassWithObjects::GetObjectsCount() const
 {
     return initialObjects.size();
 }
-
+#if defined(GD_IDE_ONLY)
 void ClassWithObjects::InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position)
 {
     boost::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
@@ -100,6 +100,7 @@ void ClassWithObjects::InsertNewObject(gd::Project & project, const std::string 
     else
         initialObjects.push_back(newObject);
 }
+#endif
 
 void ClassWithObjects::InsertObject(const gd::Object & object, unsigned int position)
 {

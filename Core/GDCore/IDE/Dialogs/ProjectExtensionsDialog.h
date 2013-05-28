@@ -3,6 +3,7 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
 #ifndef ProjectExtensionsDialog_H
 #define ProjectExtensionsDialog_H
 
@@ -26,6 +27,8 @@ namespace gd
 
 /**
  * \brief Dialog designed for editing the extensions used by a project.
+ *
+ * \ingroup IDEDialogs
  */
 class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 {
@@ -101,4 +104,5 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 
 }
 
+#endif
 #endif

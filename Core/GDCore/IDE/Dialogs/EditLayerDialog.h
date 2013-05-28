@@ -2,8 +2,10 @@
  *  Game Develop
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
+
 #ifndef GDCORE_EDITLAYER_H
 #define GDCORE_EDITLAYER_H
+#if defined(GD_IDE_ONLY)
 
 //(*Headers(EditLayerDialog)
 #include <wx/sizer.h>
@@ -22,12 +24,25 @@
 namespace gd
 {
 
+/**
+ * \brief Dialog used to edit a layer
+ * \todo Use a property grid to edit layers
+ *
+ * \ingroup IDEDialogs
+ */
 class EditLayerDialog: public wxDialog
 {
 public:
 
+    /**
+     * Default constructor
+     * \param parent The wxWidgets parent window
+     * \param layer The layer to edit
+     */
     EditLayerDialog(wxWindow* parent, Layer & layer_);
     virtual ~EditLayerDialog();
+
+protected:
 
     //(*Declarations(EditLayerDialog)
     wxStaticText* StaticText9;
@@ -57,8 +72,6 @@ public:
     wxTextCtrl* viewportY2Edit;
     wxTextCtrl* cameraHeightEdit;
     //*)
-
-protected:
 
     //(*Identifiers(EditLayerDialog)
     static const long ID_STATICTEXT1;
@@ -114,4 +127,5 @@ private:
 
 
 }
+#endif
 #endif

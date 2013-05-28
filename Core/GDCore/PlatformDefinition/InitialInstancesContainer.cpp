@@ -77,7 +77,6 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
     }
 }
 
-#if defined(GD_IDE_ONLY)
 
 void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
 {
@@ -113,6 +112,7 @@ void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialIns
         func(*sortedInstances[i]);
 }
 
+#if defined(GD_IDE_ONLY)
 gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
 {
     gd::InitialInstance newInstance;

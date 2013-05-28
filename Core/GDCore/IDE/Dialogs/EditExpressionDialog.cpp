@@ -376,9 +376,9 @@ lastErrorPos(std::string::npos)
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
-	    if ( find(project.GetUsedPlatformExtensions().begin(),
-                  project.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == project.GetUsedPlatformExtensions().end() )
+	    if ( find(project.GetUsedExtensions().begin(),
+                  project.GetUsedExtensions().end(),
+                  extensions[i]->GetName()) == project.GetUsedExtensions().end() )
             continue;
 
         //Add keywords of static expressions
@@ -516,9 +516,9 @@ void EditExpressionDialog::RefreshLists()
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
-	    if ( find(project.GetUsedPlatformExtensions().begin(),
-                  project.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == project.GetUsedPlatformExtensions().end() )
+	    if ( find(project.GetUsedExtensions().begin(),
+                  project.GetUsedExtensions().end(),
+                  extensions[i]->GetName()) == project.GetUsedExtensions().end() )
             continue;
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();

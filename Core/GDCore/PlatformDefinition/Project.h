@@ -60,6 +60,7 @@ public:
      */
     const std::string & GetName() const {return name;}
 
+#if defined(GD_IDE_ONLY)
     /**
      * Must change the name of the project with the name passed as parameter.
      */
@@ -91,6 +92,7 @@ public:
      * \see gd::Project::SetLastCompilationDirectory
      */
     const std::string & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
+#endif
 
     /**
      * Change game's main window default width.
@@ -147,22 +149,23 @@ public:
     /**
      * Return a reference to the vector containing the names of extensions used by the project.
      */
-    const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };
+    const std::vector < std::string > & GetUsedExtensions() const { return extensionsUsed; };
 
     /**
      * Return a reference to the vector containing the names of extensions used by the project.
      */
-    std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
+    std::vector < std::string > & GetUsedExtensions() { return extensionsUsed; };
 
+    #if defined(GD_IDE_ONLY)
     /**
      * Return the list of platforms used by the project.
      */
-    const std::vector < boost::shared_ptr<Platform> > & GetUsedPlatforms() const { return platforms; };
+    const std::vector < Platform* > & GetUsedPlatforms() const { return platforms; };
 
     /**
      * Add a platform to the project
      */
-    void AddPlatform(boost::shared_ptr<Platform> platform);
+    void AddPlatform(Platform* platform);
 
     /**
      * Remove a platform from the project.
@@ -176,6 +179,7 @@ public:
      * Return a reference to the platform being currently used to edit the project.
      */
     Platform & GetCurrentPlatform() const;
+    #endif
 
     ///@}
 
@@ -223,6 +227,7 @@ public:
      */
     boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName = "");
 
+#if defined(GD_IDE_ONLY)
     /**
      * Create an event of the given type.
      *
@@ -236,6 +241,7 @@ public:
      */
     boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type, const std::string & platformName = "");
     ///@}
+#endif
 
     /** \name GUI property grid management
      * Members functions related to managing the wxWidgets property grid used to display the properties of the project.
@@ -347,6 +353,7 @@ public:
      */
     void LoadFromXml(const TiXmlElement * element);
 
+    #if defined(GD_IDE_ONLY)
     /**
      * Get the major version of Game Develop used to save the project.
      */
@@ -356,13 +363,14 @@ public:
      * Get the minor version of Game Develop used to save the project.
      */
     unsigned int GetLastSaveGDMinorVersion() { return GDMinorVersion; };
+    #endif
     ///@}
 
     /** \name External events management
      * Members functions related to external events management.
      */
     ///@{
-
+    #if defined(GD_IDE_ONLY)
     /**
      * Return true if external events called "name" exists.
      */
@@ -415,7 +423,7 @@ public:
      * Must delete external events named "name".
      */
     void RemoveExternalEvents(const std::string & name);
-
+    #endif
     ///@}
 
     /** \name External layout management
@@ -483,6 +491,7 @@ public:
      */
     ///@{
 
+    #if defined(GD_IDE_ONLY)
     /**
      * \brief Return a reference to the vector containing the project's objects groups.
      */
@@ -492,6 +501,7 @@ public:
      * \brief Return a const reference to the vector containing the project's objects groups.
      */
     const std::vector <ObjectGroup> & GetObjectGroups() const { return objectGroups; }
+    #endif
 
     ///@}
 
@@ -608,15 +618,15 @@ private:
     gd::VariablesContainer                              variables; ///< Initial global variables
     std::vector < boost::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project
-    std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     boost::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform projects.
+    std::vector < std::string >                         extensionsUsed; ///< List of extensions used
+    std::vector < gd::Platform* >                       platforms; ///< Pointers to the platforms this project supports.
     #if defined(GD_IDE_ONLY)
+    std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     std::string                                         author; ///< Game author name
     std::string                                         gameFile; ///< File of the game
     std::string                                         latestCompilationDirectory; ///< File of the game
-    std::vector < std::string >                         extensionsUsed; ///< List of extensions used
-    std::vector < boost::shared_ptr<gd::Platform> >     platforms; ///< Pointers to the platforms this project supports.
-    boost::shared_ptr< gd::Platform >                   currentPlatform; ///< The platform being used to edit the project.
+    gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
     std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.

@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
@@ -6,11 +10,12 @@
 
 using namespace std;
 
-
 namespace gd
 {
 
+#if defined(GD_IDE_ONLY)
 gd::ChangesNotifier Platform::defaultEmptyChangesNotifier;
+#endif
 
 Platform::Platform()
 {
@@ -113,6 +118,7 @@ boost::shared_ptr<gd::AutomatismsSharedData> Platform::CreateAutomatismSharedDat
     return boost::shared_ptr<gd::AutomatismsSharedData>();
 }
 
+#if defined(GD_IDE_ONLY)
 boost::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const std::string & eventType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -129,5 +135,6 @@ boost::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(gd::La
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new gd::LayoutEditorPreviewer);
 }
+#endif
 
 }

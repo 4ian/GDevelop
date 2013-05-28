@@ -5,8 +5,10 @@
 #include "ObjectMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
+#if defined(GD_IDE_ONLY)
 #include <wx/file.h>
 #include <wx/bitmap.h>
+#endif
 
 namespace gd
 {
@@ -21,12 +23,21 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
                    const std::string & cppClassName_)
 {
     name = name_;
+#if defined(GD_IDE_ONLY)
     SetFullName(std::string(fullname_));
     SetDescription(std::string(informations_));
     SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY));
+#endif
     createFunPtr = createFunPtrP;
     destroyFunPtr = destroyFunPtrP;
     cppClassName = cppClassName_;
+}
+
+ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
+{
+#if defined(GD_IDE_ONLY)
+    optionalIncludeFile = includeFile; return *this;
+#endif
 }
 
 gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
@@ -37,9 +48,11 @@ gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace, nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return conditionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::InstructionMetadata & ObjectMetadata::AddAction(const std::string & name,
@@ -50,9 +63,11 @@ gd::InstructionMetadata & ObjectMetadata::AddAction(const std::string & name,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace, nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return actionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::ExpressionMetadata & ObjectMetadata::AddExpression(const std::string & name,
@@ -61,9 +76,11 @@ gd::ExpressionMetadata & ObjectMetadata::AddExpression(const std::string & name,
                                        const std::string & group,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     expressionsInfos[nameWithNamespace] = ExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
     return expressionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::StrExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string & name,
@@ -72,9 +89,32 @@ gd::StrExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string &
                                        const std::string & group,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     strExpressionsInfos[nameWithNamespace] = StrExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
     return strExpressionsInfos[nameWithNamespace];
+#endif
+}
+
+ObjectMetadata & ObjectMetadata::SetFullName(const std::string & fullname_)
+{
+#if defined(GD_IDE_ONLY)
+    fullname = fullname_; return *this;
+#endif
+}
+
+ObjectMetadata & ObjectMetadata::SetDescription(const std::string & description_)
+{
+#if defined(GD_IDE_ONLY)
+    description = description_; return *this;
+#endif
+}
+
+ObjectMetadata & ObjectMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
+{
+#if defined(GD_IDE_ONLY)
+    icon = bitmap_; return *this;
+#endif
 }
 
 }

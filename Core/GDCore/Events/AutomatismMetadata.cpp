@@ -7,8 +7,10 @@
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#if defined(GD_IDE_ONLY)
 #include <wx/file.h>
 #include <wx/bitmap.h>
+#endif
 
 namespace gd
 {
@@ -27,6 +29,7 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
     instance(instance_),
     sharedDatasInstance(sharedDatasInstance_)
 {
+#if defined(GD_IDE_ONLY)
     SetFullName(std::string(fullname_));
     SetDescription(std::string(description_));
     SetDefaultName(std::string(defaultName_));
@@ -36,6 +39,7 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
     {
         SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY));
     } else { SetBitmapIcon(wxBitmap(24,24));}
+#endif
 
     if ( instance ) instance->SetTypeName(name_);
     if ( sharedDatasInstance ) sharedDatasInstance->SetTypeName(name_);
@@ -49,9 +53,11 @@ gd::InstructionMetadata & AutomatismMetadata::AddCondition(const std::string & n
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace, nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return conditionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::InstructionMetadata & AutomatismMetadata::AddAction(const std::string & name,
@@ -62,9 +68,11 @@ gd::InstructionMetadata & AutomatismMetadata::AddAction(const std::string & name
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace, nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return actionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::ExpressionMetadata & AutomatismMetadata::AddExpression(const std::string & name,
@@ -73,9 +81,11 @@ gd::ExpressionMetadata & AutomatismMetadata::AddExpression(const std::string & n
                                        const std::string & group,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     expressionsInfos[nameWithNamespace] = ExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
     return expressionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::StrExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::string & name,
@@ -84,10 +94,48 @@ gd::StrExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::stri
                                        const std::string & group,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     strExpressionsInfos[nameWithNamespace] = StrExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
     return strExpressionsInfos[nameWithNamespace];
+#endif
 }
 
+AutomatismMetadata & AutomatismMetadata::SetFullName(const std::string & fullname_)
+{
+#if defined(GD_IDE_ONLY)
+    fullname = fullname_; return *this;
+#endif
+}
+AutomatismMetadata & AutomatismMetadata::SetDefaultName(const std::string & defaultName_)
+{
+#if defined(GD_IDE_ONLY)
+    defaultName = defaultName_; return *this;
+#endif
+}
+AutomatismMetadata & AutomatismMetadata::SetDescription(const std::string & description_)
+{
+#if defined(GD_IDE_ONLY)
+    description = description_; return *this;
+#endif
+}
+AutomatismMetadata & AutomatismMetadata::SetGroup(const std::string & group_)
+{
+#if defined(GD_IDE_ONLY)
+    group = group_; return *this;
+#endif
+}
+AutomatismMetadata & AutomatismMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
+{
+#if defined(GD_IDE_ONLY)
+    icon = bitmap_; return *this;
+#endif
+}
+AutomatismMetadata & AutomatismMetadata::SetIncludeFile(const std::string & includeFile)
+{
+#if defined(GD_IDE_ONLY)
+    optionalIncludeFile = includeFile; return *this;
+#endif
+}
 
 }

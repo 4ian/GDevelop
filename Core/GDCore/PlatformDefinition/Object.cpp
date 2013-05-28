@@ -40,7 +40,7 @@ void Object::Init(const gd::Object & object)
     	automatisms[it->first] = it->second->Clone();
 }
 
-
+#if defined(GD_IDE_ONLY)
 sf::Vector2f Object::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     return sf::Vector2f(32,32);
@@ -51,7 +51,6 @@ sf::Vector2f Object::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd
     return sf::Vector2f(0,0);
 }
 
-#if defined(GD_IDE_ONLY)
 std::vector < std::string > Object::GetAllAutomatismNames() const
 {
     std::vector < std::string > allNameIdentifiers;

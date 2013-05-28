@@ -226,9 +226,9 @@ void ProjectExtensionsDialog::UpdateList()
         wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
         if (associatedData)
         {
-            if ( find(  project.GetUsedPlatformExtensions().begin(),
-                        project.GetUsedPlatformExtensions().end(),
-                        associatedData->GetData()) != project.GetUsedPlatformExtensions().end() )
+            if ( find(  project.GetUsedExtensions().begin(),
+                        project.GetUsedExtensions().end(),
+                        associatedData->GetData()) != project.GetUsedExtensions().end() )
             {
                 ExtensionsList->Check(i, true);
             }
@@ -289,7 +289,7 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
  */
 void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
 {
-    project.GetUsedPlatformExtensions().clear();
+    project.GetUsedExtensions().clear();
 
     for (unsigned int i =0;i<ExtensionsList->GetCount();++i)
     {
@@ -298,7 +298,7 @@ void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
             wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
 
             if (associatedData)
-                project.GetUsedPlatformExtensions().push_back(string(associatedData->GetData().mb_str()));
+                project.GetUsedExtensions().push_back(string(associatedData->GetData().mb_str()));
         }
     }
 

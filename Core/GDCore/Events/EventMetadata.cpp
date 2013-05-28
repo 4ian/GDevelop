@@ -10,13 +10,11 @@ EventMetadata::EventMetadata(const std::string & name_,
                              const std::string & description_,
                              const std::string & group_,
                              const std::string & smallicon_,
-                             boost::shared_ptr<gd::BaseEvent> instance_,
-                            boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGenerator_) :
+                             boost::shared_ptr<gd::BaseEvent> instance_) :
 fullname(fullname_),
 description(description_),
 group(group_),
-instance(instance_),
-codeGeneration(codeGenerator_)
+instance(instance_)
 {
     if ( instance ) instance->SetType(name_);
 }

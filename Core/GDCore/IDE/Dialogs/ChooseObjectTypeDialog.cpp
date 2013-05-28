@@ -145,9 +145,9 @@ void ChooseObjectTypeDialog::RefreshList()
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if this extension is enabled
-	    bool extensionEnabled = find(project.GetUsedPlatformExtensions().begin(),
-                                      project.GetUsedPlatformExtensions().end(),
-                                      extensions[i]->GetName()) != project.GetUsedPlatformExtensions().end();
+	    bool extensionEnabled = find(project.GetUsedExtensions().begin(),
+                                      project.GetUsedExtensions().end(),
+                                      extensions[i]->GetName()) != project.GetUsedExtensions().end();
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
@@ -219,9 +219,9 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
 
     if ( extension != boost::shared_ptr<PlatformExtension>() )
     {
-	    bool extensionEnabled = find(project.GetUsedPlatformExtensions().begin(),
-                                      project.GetUsedPlatformExtensions().end(),
-                                      extension->GetName()) != project.GetUsedPlatformExtensions().end();
+	    bool extensionEnabled = find(project.GetUsedExtensions().begin(),
+                                      project.GetUsedExtensions().end(),
+                                      extension->GetName()) != project.GetUsedExtensions().end();
 
         if ( !extensionEnabled )
         {
@@ -233,7 +233,7 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
                 return;
             }
             else
-                project.GetUsedPlatformExtensions().push_back(extension->GetName());
+                project.GetUsedExtensions().push_back(extension->GetName());
 
         }
     }

@@ -44,7 +44,9 @@ namespace gd
 
 Project::Project() :
     useExternalSourceFiles(false),
+    #if defined(GD_IDE_ONLY)
     name(_("Project")),
+    #endif
     windowWidth(800),
     windowHeight(600),
     maxFPS(60),
@@ -78,6 +80,10 @@ Project::Project() :
     extensionsUsed.push_back("BuiltinStringInstructions");
     extensionsUsed.push_back("BuiltinMathematicalTools");
     extensionsUsed.push_back("BuiltinExternalLayouts");
+    #endif
+
+    #if !defined(GD_IDE_ONLY)
+    platforms.push_back(&CppPlatform::Get());
     #endif
 }
 
@@ -125,6 +131,7 @@ boost::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedData
     return boost::shared_ptr<gd::AutomatismsSharedData>();
 }
 
+#if defined(GD_IDE_ONLY)
 boost::shared_ptr<gd::BaseEvent> Project::CreateEvent(const std::string & type, const std::string & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
@@ -140,13 +147,13 @@ boost::shared_ptr<gd::BaseEvent> Project::CreateEvent(const std::string & type, 
 
 Platform & Project::GetCurrentPlatform() const
 {
-    if ( currentPlatform == boost::shared_ptr<gd::Platform>() )
+    if ( currentPlatform == NULL )
         std::cout << "FATAL ERROR: Project has no assigned current platform. GD will crash." << std::endl;
 
     return *currentPlatform;
 }
 
-void Project::AddPlatform(boost::shared_ptr<Platform> platform)
+void Project::AddPlatform(Platform* platform)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -156,7 +163,7 @@ void Project::AddPlatform(boost::shared_ptr<Platform> platform)
 
     //Add the platform and make it the current one if the game has no other platform.
     platforms.push_back(platform);
-    if ( currentPlatform == boost::shared_ptr<gd::Platform>() ) currentPlatform = platform;
+    if ( currentPlatform == NULL ) currentPlatform = platform;
 }
 
 bool Project::RemovePlatform(const std::string & platformName)
@@ -178,6 +185,7 @@ bool Project::RemovePlatform(const std::string & platformName)
 
     return false;
 }
+#endif
 
 bool Project::HasLayoutNamed(const std::string & name) const
 {
@@ -221,7 +229,9 @@ gd::Layout & Project::InsertNewLayout(const std::string & name, unsigned int pos
         scenes.push_back(newScene);
 
     newScene->SetName(name);
+    #if defined(GD_IDE_ONLY)
     newScene->UpdateAutomatismsSharedData(*this);
+    #endif
     return *newScene;
 }
 
@@ -233,7 +243,9 @@ void Project::InsertLayout(const gd::Layout & layout, unsigned int position)
     else
         scenes.push_back(newScene);
 
+    #if defined(GD_IDE_ONLY)
     newScene->UpdateAutomatismsSharedData(*this);
+    #endif
 }
 
 void Project::RemoveLayout(const std::string & name)
@@ -244,6 +256,7 @@ void Project::RemoveLayout(const std::string & name)
     scenes.erase(scene);
 }
 
+#if defined(GD_IDE_ONLY)
 bool Project::HasExternalEventsNamed(const std::string & name) const
 {
     return ( find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)) != externalEvents.end() );
@@ -304,7 +317,7 @@ void Project::RemoveExternalEvents(const std::string & name)
 
     externalEvents.erase(events);
 }
-
+#endif
 bool Project::HasExternalLayoutNamed(const std::string & name) const
 {
     return ( find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)) != externalLayouts.end() );
@@ -368,6 +381,7 @@ void Project::RemoveExternalLayout(const std::string & name)
     externalLayouts.erase(externalLayout);
 }
 
+#if defined(GD_IDE_ONLY)
 //Compatibility with GD2010498
 void OpenImagesFromGD2010498(gd::Project & game, const TiXmlElement * imagesElem, const TiXmlElement * dossierElem)
 {
@@ -454,6 +468,7 @@ private:
     gd::Layout & layout;
 };
 //End of compatibility code
+#endif
 
 void Project::LoadFromXml(const TiXmlElement * rootElement)
 {
@@ -462,6 +477,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     const TiXmlElement * elem = rootElement->FirstChildElement();
 
     //Comparaison de versions
+    #if defined(GD_IDE_ONLY)
     GDMajorVersion = 0;
     GDMinorVersion = 0;
     int build = 0;
@@ -478,30 +494,25 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         GDMinorVersion = minor;
         if ( GDMajorVersion > gd::VersionWrapper::Major() )
         {
-            #if defined(GD_IDE_ONLY)
             wxLogWarning( _( "The version of the editor used to create this game seems to be a new version.\nThe game can not open, or datas may be missing.\nYou should check if a new version of Game Develop is available." ) );
-            #endif
         }
         else
         {
             if ( GDMajorVersion == gd::VersionWrapper::Major() && (build > gd::VersionWrapper::Build() || GDMinorVersion > gd::VersionWrapper::Minor() || revision > gd::VersionWrapper::Revision()) )
             {
-                #if defined(GD_IDE_ONLY)
                 wxLogWarning( _( "The version of the editor used to create this game seems to be greater.\nThe game can not open, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
-                #endif
             }
         }
 
         //Compatibility code
-        #if defined(GD_IDE_ONLY)
         if ( GDMajorVersion <= 1 )
         {
             wxLogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
             return;
         }
-        #endif
         //End of Compatibility code
     }
+    #endif
 
     elem = rootElement->FirstChildElement( "Info" );
     if ( elem ) LoadProjectInformationFromXml(elem);
@@ -536,7 +547,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     #if defined(GD_IDE_ONLY)
     if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion <= 1 && build <= 10822) )
     {
-        GetUsedPlatformExtensions().push_back("BuiltinExternalLayouts");
+        GetUsedExtensions().push_back("BuiltinExternalLayouts");
     }
     #endif
 
@@ -573,6 +584,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
             scenes.back()->LoadFromXml(*this, elem);
 
             //Compatibility code with GD 2.x
+            #if defined(GD_IDE_ONLY)
             if ( GDMajorVersion <= 2 )
             {
                 SpriteObjectsPositionUpdater updater(*this, *scenes.back());
@@ -580,6 +592,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
                 instances.IterateOverInstances(updater);
 
             }
+            #endif
             //End of compatibility code
         }
         else
@@ -666,7 +679,7 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
              platformElem = platformElem->NextSiblingElement())
         {
             std::string name = platformElem->Attribute("name") ? platformElem->Attribute("name") : "";
-            boost::shared_ptr<gd::Platform> platform = gd::PlatformManager::GetInstance()->GetPlatform(name);
+            gd::Platform * platform = gd::PlatformManager::GetInstance()->GetPlatform(name);
 
             if ( platform ) {
                 AddPlatform(platform);
@@ -692,8 +705,8 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
             if ( extensionsElem->Attribute("name") )
             {
                 std::string extensionName = extensionsElem->Attribute("name");
-                if ( find(GetUsedPlatformExtensions().begin(), GetUsedPlatformExtensions().end(), extensionName ) == GetUsedPlatformExtensions().end() )
-                    GetUsedPlatformExtensions().push_back(extensionName);
+                if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
+                    GetUsedExtensions().push_back(extensionName);
             }
 
             extensionsElem = extensionsElem->NextSiblingElement();
@@ -738,11 +751,11 @@ void Project::SaveToXml(TiXmlElement * root) const
 
         TiXmlElement * extensions = new TiXmlElement( "Extensions" );
         infos->LinkEndChild( extensions );
-        for (unsigned int i =0;i<GetUsedPlatformExtensions().size();++i)
+        for (unsigned int i =0;i<GetUsedExtensions().size();++i)
         {
             TiXmlElement * extension = new TiXmlElement( "Extension" );
             extensions->LinkEndChild( extension );
-            extension->SetAttribute("name", GetUsedPlatformExtensions().at(i).c_str());
+            extension->SetAttribute("name", GetUsedExtensions().at(i).c_str());
         }
 
         TiXmlElement * platformsElem = new TiXmlElement( "Platforms" );
@@ -1035,7 +1048,7 @@ bool Project::ValidateObjectName(const std::string & name)
 
 std::string Project::GetBadObjectNameWarning()
 {
-    return gd::ToString(_("Please use only letters, digits\nand underscores ( _ ).\nName used by expressions\nare also forbidden."));
+    return gd::ToString(_("Please use only letters, digits\nand underscores ( _ )."));
 }
 #endif
 
@@ -1065,14 +1078,15 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     author = game.author;
     latestCompilationDirectory = game.latestCompilationDirectory;
-    extensionsUsed = game.GetUsedPlatformExtensions();
-    #endif
+    extensionsUsed = game.GetUsedExtensions();
+    objectGroups = game.objectGroups;
 
     GDMajorVersion = game.GDMajorVersion;
     GDMinorVersion = game.GDMinorVersion;
 
-    platforms = game.platforms;
     currentPlatform = game.currentPlatform;
+    #endif
+    platforms = game.platforms;
 
     //Resources
     resourcesManager = game.resourcesManager;

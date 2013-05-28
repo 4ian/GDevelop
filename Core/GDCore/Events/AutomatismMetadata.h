@@ -4,14 +4,18 @@
  */
 #ifndef AUTOMATISMMETADATA_H
 #define AUTOMATISMMETADATA_H
-#if defined(GD_IDE_ONLY)
 #include <string>
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
+#if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
+#endif
 namespace gd { class Automatism; }
 namespace gd { class AutomatismsSharedData; }
+namespace gd { class InstructionMetadata; }
+namespace gd { class ExpressionMetadata; }
+class wxBitmap;
 
 namespace gd
 {
@@ -79,20 +83,20 @@ public:
                                            const std::string & group_,
                                            const std::string & smallicon_);
 
-    AutomatismMetadata & SetFullName(const std::string & fullname_) { fullname = fullname_; return *this; }
-    AutomatismMetadata & SetDefaultName(const std::string & defaultName_) { defaultName = defaultName_; return *this; }
-    AutomatismMetadata & SetDescription(const std::string & description_) { description = description_; return *this; }
-    AutomatismMetadata & SetGroup(const std::string & group_) { group = group_; return *this; }
-    AutomatismMetadata & SetBitmapIcon(const wxBitmap & bitmap_) { icon = bitmap_; return *this; }
-#if defined(GD_IDE_ONLY)
-    AutomatismMetadata & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
-#endif
+    AutomatismMetadata & SetFullName(const std::string & fullname_);
+    AutomatismMetadata & SetDefaultName(const std::string & defaultName_);
+    AutomatismMetadata & SetDescription(const std::string & description_);
+    AutomatismMetadata & SetGroup(const std::string & group_);
+    AutomatismMetadata & SetBitmapIcon(const wxBitmap & bitmap_);
+    AutomatismMetadata & SetIncludeFile(const std::string & includeFile);
 
+#if defined(GD_IDE_ONLY)
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDefaultName() const { return defaultName; }
     const std::string & GetDescription() const  { return description; }
     const std::string & GetGroup() const  { return group; }
     const wxBitmap & GetBitmapIcon() const { return icon; }
+#endif
     boost::shared_ptr<gd::Automatism> GetInstance() const { return instance; }
     boost::shared_ptr<gd::AutomatismsSharedData> GetSharedDataInstance() const { return sharedDatasInstance; }
 
@@ -107,11 +111,13 @@ public:
 #endif
 private:
     std::string extensionNamespace;
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string defaultName;
     std::string description;
     std::string group;
     wxBitmap icon;
+#endif
 
     boost::shared_ptr<gd::Automatism> instance;
     boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance;
@@ -119,5 +125,4 @@ private:
 
 }
 
-#endif
 #endif // AUTOMATISMMETADATA_H

@@ -15,6 +15,10 @@
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
+namespace gd { class ObjectMetadata; }
+namespace gd { class AutomatismMetadata; }
+namespace gd { class BaseEvent; }
+namespace gd { class EventMetadata; }
 namespace gd { class StrExpressionMetadata; }
 namespace gd { class EventCodeGenerator; }
 namespace gd { class ArbitraryResourceWorker; }
@@ -88,6 +92,7 @@ public:
 
     /**
      * \brief Declare a new condition as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::InstructionMetadata & AddCondition(const std::string & name_,
                                            const std::string & fullname_,
@@ -99,6 +104,7 @@ public:
 
     /**
      * \brief Declare a new action as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::InstructionMetadata & AddAction(const std::string & name_,
                                            const std::string & fullname_,
@@ -109,6 +115,7 @@ public:
                                            const std::string & smallicon_);
     /**
      * \brief Declare a new expression as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::ExpressionMetadata & AddExpression(const std::string & name_,
                                            const std::string & fullname_,
@@ -117,6 +124,7 @@ public:
                                            const std::string & smallicon_);
     /**
      * \brief Declare a new string expression as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::StrExpressionMetadata & AddStrExpression(const std::string & name_,
                                            const std::string & fullname_,
@@ -126,6 +134,7 @@ public:
 
     /**
      * \brief Declare a new object as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::ObjectMetadata & AddObject(const std::string & name_,
                                    const std::string & fullname_,
@@ -137,6 +146,7 @@ public:
 
     /**
      * \brief Declare a new automatism as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::AutomatismMetadata & AddAutomatism(const std::string & name_,
                                           const std::string & fullname_,
@@ -150,14 +160,14 @@ public:
 
     /**
      * \brief Declare a new event as being part of the extension.
+     * \note This method does nothing when used for GD C++ runtime.
      */
     gd::EventMetadata & AddEvent(const std::string & name_,
                                  const std::string & fullname_,
                                  const std::string & description_,
                                  const std::string & group_,
                                  const std::string & smallicon_,
-                                 boost::shared_ptr<gd::BaseEvent> instance,
-                                 boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGen = boost::shared_ptr<gd::EventMetadata::CodeGenerator>());
+                                 boost::shared_ptr<gd::BaseEvent> instance);
 
     /**
      * \brief Return the name extension user friendly name.
@@ -248,6 +258,7 @@ public:
     std::map<std::string, gd::EventMetadata > & GetAllEvents();
     std::map<std::string, gd::AutomatismMetadata > & GetAllAutomatisms();
 
+    #if defined(GD_IDE_ONLY)
     /**
      * \brief Return a reference to a map containing the names of the actions (in the first members) and the metadata associated with (in the second members).
      */
@@ -329,6 +340,7 @@ public:
      * It is still possible to make some changes after the cloning by using getter methods.
      */
     void CloneExtension(const std::string & platformName, const std::string & extensionName);
+    #endif
 
 private:
 
@@ -346,18 +358,22 @@ private:
 
     std::map<std::string, gd::ObjectMetadata > objectsInfos;
     std::map<std::string, gd::AutomatismMetadata > automatismsInfo;
+    #if defined(GD_IDE_ONLY)
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;
     std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
     std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
     std::map<std::string, gd::EventMetadata > eventsInfos;
+    #endif
 
     ObjectMetadata badObjectMetadata;
     AutomatismMetadata badAutomatismMetadata;
+    #if defined(GD_IDE_ONLY)
     static std::map<std::string, gd::InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
     static std::map<std::string, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
     static std::map<std::string, gd::ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
     static std::map<std::string, gd::StrExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
+    #endif
 };
 
 }

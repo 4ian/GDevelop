@@ -27,7 +27,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < gd:
 {
     //Get all extensions used
     std::vector< boost::shared_ptr<gd::PlatformExtension> > allGameExtensions;
-    std::vector<std::string> usedExtensions = project.GetUsedPlatformExtensions();
+    std::vector<std::string> usedExtensions = project.GetUsedExtensions();
     for (unsigned int i = 0;i<usedExtensions.size();++i)
     {
         boost::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(usedExtensions[i]);

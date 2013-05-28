@@ -53,6 +53,8 @@ public:
      */
     const std::string & GetExpression() const {return expression;}
 
+private:
+
     //(*Declarations(EditExpressionDialog)
     wxButton* SinBt;
     wxPanel* mathPanel;
@@ -104,8 +106,6 @@ public:
     wxButton* Button12;
     //*)
 
-protected:
-
     //(*Identifiers(EditExpressionDialog)
     static const long ID_CUSTOM1;
     static const long ID_BUTTON1;
@@ -155,8 +155,6 @@ protected:
     static const long ID_BUTTON11;
     static const long ID_PANEL4;
     //*)
-
-private:
 
     //(*Handlers(EditExpressionDialog)
     void OnOkBtClick(wxCommandEvent& event);
@@ -248,10 +246,3 @@ private:
 };
 }
 #endif
-
-
-
-
-
-
-

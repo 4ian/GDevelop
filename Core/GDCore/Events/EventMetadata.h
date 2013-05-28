@@ -46,13 +46,18 @@ public:
                                 std::vector < boost::shared_ptr<gd::BaseEvent> > & eventList, unsigned int indexOfTheEventInThisList);
     };
 
+    /**
+     * Set the code generator used when generating code from events.
+     */
+    void SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGenerator) { codeGeneration = codeGenerator; }
+
     EventMetadata(const std::string & name_,
                  const std::string & fullname_,
                  const std::string & description_,
                  const std::string & group_,
                  const std::string & smallicon_,
-                 boost::shared_ptr<gd::BaseEvent> instance,
-                 boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGenerator);
+                 boost::shared_ptr<gd::BaseEvent> instance);
+
     EventMetadata() {};
     virtual ~EventMetadata() {};
 

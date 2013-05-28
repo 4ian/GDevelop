@@ -13,15 +13,19 @@
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/Event.h"
+#if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
+#endif
 
 namespace gd
 {
 
+#if defined(GD_IDE_ONLY)
 std::map<std::string, gd::InstructionMetadata > PlatformExtension::badConditionsMetadata;
 std::map<std::string, gd::InstructionMetadata > PlatformExtension::badActionsMetadata;
 std::map<std::string, gd::ExpressionMetadata > PlatformExtension::badExpressionsMetadata;
 std::map<std::string, gd::StrExpressionMetadata > PlatformExtension::badStrExpressionsMetadata;
+#endif
 
 gd::InstructionMetadata & PlatformExtension::AddCondition(const std::string & name,
                                        const std::string & fullname,
@@ -31,9 +35,11 @@ gd::InstructionMetadata & PlatformExtension::AddCondition(const std::string & na
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     conditionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(), nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return conditionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::InstructionMetadata & PlatformExtension::AddAction(const std::string & name,
@@ -44,9 +50,11 @@ gd::InstructionMetadata & PlatformExtension::AddAction(const std::string & name,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     actionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(), nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return actionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::ExpressionMetadata & PlatformExtension::AddExpression(const std::string & name,
@@ -55,9 +63,11 @@ gd::ExpressionMetadata & PlatformExtension::AddExpression(const std::string & na
                                        const std::string & group,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     expressionsInfos[nameWithNamespace] = ExpressionMetadata(GetNameSpace(), nameWithNamespace, fullname, description, group, smallicon);
     return expressionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::StrExpressionMetadata & PlatformExtension::AddStrExpression(const std::string & name,
@@ -66,9 +76,11 @@ gd::StrExpressionMetadata & PlatformExtension::AddStrExpression(const std::strin
                                        const std::string & group,
                                        const std::string & smallicon)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     strExpressionsInfos[nameWithNamespace] = StrExpressionMetadata(GetNameSpace(), nameWithNamespace, fullname, description, group, smallicon);
     return strExpressionsInfos[nameWithNamespace];
+#endif
 }
 
 gd::ObjectMetadata & PlatformExtension::AddObject(const std::string & name,
@@ -79,9 +91,11 @@ gd::ObjectMetadata & PlatformExtension::AddObject(const std::string & name,
                                DestroyFunPtr destroyFunPtrP,
                                const std::string & cppClassName)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP, destroyFunPtrP, cppClassName);
     return objectsInfos[nameWithNamespace];
+#endif
 }
 
 gd::AutomatismMetadata & PlatformExtension::AddAutomatism(const std::string & name,
@@ -94,9 +108,11 @@ gd::AutomatismMetadata & PlatformExtension::AddAutomatism(const std::string & na
                                                       boost::shared_ptr<gd::Automatism> instance,
                                                       boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
-   automatismsInfo[nameWithNamespace] = AutomatismMetadata(GetNameSpace(), nameWithNamespace, fullname, defaultName, description, group, icon24x24, className, instance, sharedDatasInstance);
-   return automatismsInfo[nameWithNamespace];
+    automatismsInfo[nameWithNamespace] = AutomatismMetadata(GetNameSpace(), nameWithNamespace, fullname, defaultName, description, group, icon24x24, className, instance, sharedDatasInstance);
+    return automatismsInfo[nameWithNamespace];
+#endif
 }
 
 gd::EventMetadata & PlatformExtension::AddEvent(const std::string & name_,
@@ -104,12 +120,13 @@ gd::EventMetadata & PlatformExtension::AddEvent(const std::string & name_,
                                                  const std::string & description_,
                                                  const std::string & group_,
                                                  const std::string & smallicon_,
-                                                 boost::shared_ptr<gd::BaseEvent> instance_,
-                                                 boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGen_)
+                                                 boost::shared_ptr<gd::BaseEvent> instance_)
 {
+#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name_ : GetNameSpace()+name_;
-    eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace, fullname_, description_, group_, smallicon_, instance_, codeGen_);
+    eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace, fullname_, description_, group_, smallicon_, instance_);
     return eventsInfos[nameWithNamespace];
+#endif
 }
 
 void PlatformExtension::SetExtensionInformation(const std::string & name_,
@@ -333,9 +350,10 @@ void PlatformExtension::SetNameSpace(std::string nameSpace_)
     nameSpace = nameSpace_+"::";
 }
 
+#if defined(GD_IDE_ONLY)
 void PlatformExtension::CloneExtension(const std::string & platformName, const std::string & extensionName)
 {
-    boost::shared_ptr<gd::Platform> platform = gd::PlatformManager::GetInstance()->GetPlatform(platformName);
+    gd::Platform* platform = gd::PlatformManager::GetInstance()->GetPlatform(platformName);
     if ( !platform ) {
         std::cout << "Unable to clone extension \""<< extensionName << "\" from " << platformName << ": This platform doesn't exist.";
         return;
@@ -349,6 +367,7 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
 
     *this = *extension;
 }
+#endif
 
 PlatformExtension::PlatformExtension()
 {

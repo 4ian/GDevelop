@@ -30,15 +30,15 @@ bool PlatformManager::AddPlatform(boost::shared_ptr<gd::Platform> newPlatform)
     return true;
 }
 
-boost::shared_ptr<gd::Platform> PlatformManager::GetPlatform(const std::string & platformName) const
+gd::Platform* PlatformManager::GetPlatform(const std::string & platformName) const
 {
     for (unsigned int i = 0;i<platformsLoaded.size();++i)
     {
         if ( platformsLoaded[i]->GetName() == platformName )
-            return platformsLoaded[i];
+            return platformsLoaded[i].get();
     }
 
-    return boost::shared_ptr<gd::Platform>();
+    return NULL;
 }
 
 void PlatformManager::NotifyPlatformIDEInitialized() const

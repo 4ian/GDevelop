@@ -122,6 +122,7 @@ public:
      */
     ///@{
 
+#if defined(GD_IDE_ONLY)
     /**
      * Get the events of the layout
      */
@@ -136,6 +137,7 @@ public:
      * Called by the IDE when events have been changed.
      */
     void OnEventsModified() {};
+#endif
     ///@}
 
     /** \name Layout objects groups management
@@ -248,6 +250,7 @@ public:
      */
     void UpdateAutomatismsSharedData(gd::Project & project);
 
+#if defined(GD_IDE_ONLY)
     /**
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
@@ -259,7 +262,7 @@ public:
      * \see gd::LayoutEditorCanvasOptions
      */
     gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() { return associatedSettings; }
-
+#endif
 
     /** \name Other properties
      */

@@ -1,5 +1,6 @@
 #ifndef LAYOUTEDITORPREVIEWER_H
 #define LAYOUTEDITORPREVIEWER_H
+#if defined(GD_IDE_ONLY)
 #include <wx/event.h>
 namespace gd { class LayoutEditorCanvas; }
 class wxRibbonButtonBar;
@@ -70,4 +71,5 @@ public:
 
 }
 
+#endif
 #endif // LAYOUTEDITORPREVIEWER_H

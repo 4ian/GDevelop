@@ -79,12 +79,14 @@ public:
      */
     unsigned int GetObjectsCount() const;
 
+#if defined(GD_IDE_ONLY)
     /**
      * \brief Add a new empty object of type \a objectType called \a name at the specified position in the layout list.<br>
      *
      * \note The object is created using the project's current platform.
      */
     void InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
+#endif
 
     /**
      * \brief Must add a new object constructed from the layout passed as parameter.

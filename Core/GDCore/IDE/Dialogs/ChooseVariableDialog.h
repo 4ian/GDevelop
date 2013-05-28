@@ -2,6 +2,8 @@
  *  Game Develop
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
+
+#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_CHOOSEVARIABLEDIALOG_H
 #define GDCORE_CHOOSEVARIABLEDIALOG_H
 
@@ -144,4 +146,5 @@ private:
 
 }
 
+#endif
 #endif

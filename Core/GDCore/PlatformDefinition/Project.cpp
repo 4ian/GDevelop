@@ -54,7 +54,8 @@ Project::Project() :
     verticalSync(false),
     imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
     #if defined(GD_IDE_ONLY)
-    ,GDMajorVersion(gd::VersionWrapper::Major()),
+    ,currentPlatform(NULL),
+    GDMajorVersion(gd::VersionWrapper::Major()),
     GDMinorVersion(gd::VersionWrapper::Minor())
     #endif
 {

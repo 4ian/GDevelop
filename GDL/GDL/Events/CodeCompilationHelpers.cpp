@@ -411,14 +411,13 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
     }
 
     Game gameCopy = *game;
-    gd::Layout sceneCopy = game->GetLayout(game->GetLayoutPosition(associatedScene));
+    gd::ExternalEvents eventsCopy = *externalEvents;
 
     //Generate the code
     cout << "Generating C++ code...\n";
-    if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
+    gd::EventsCodeGenerator::DeleteUselessEvents(eventsCopy.GetEvents());
 
-    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, false /*Compilation for edittime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, eventsCopy, false /*Compilation for edittime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -486,14 +485,13 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     }
 
     Game gameCopy = *game;
-    Scene sceneCopy = game->GetLayout(game->GetLayoutPosition(associatedScene));
+    gd::ExternalEvents eventsCopy = *externalEvents;
 
     //Generate the code
     cout << "Generating C++ code...\n";
-    if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
+    gd::EventsCodeGenerator::DeleteUselessEvents(eventsCopy.GetEvents());
 
-    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, true /*Compilation for runtime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, eventsCopy, true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"RuntimeEventsSource.cpp").c_str() );
     myfile << eventsOutput;

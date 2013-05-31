@@ -112,9 +112,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     /** 
      * Render the PIXI stage associated to the runtimeScene.
      */
-    that.render = function(){
-        //TODO: Sort objects by Z order.
-    
+    that.render = function(){    
         // render the PIXI stage   
         my.pixiStage.position = PIXI.Point(150,300);
         my.pixiRenderer.render(my.pixiStage);

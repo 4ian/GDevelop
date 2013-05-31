@@ -29,7 +29,6 @@ gdjs.spriteAnimationFrame = function(imageManager, frameXml)
         
         var center = $(frameXml).find("PointCentre");
         if ( center.attr("automatic") != "true" ) {
-            console.log("CentreNonAuto");
             that.center.x = parseFloat(origin.attr("X"));
             that.center.y = parseFloat(origin.attr("Y"));
         }
@@ -83,7 +82,7 @@ gdjs.spriteAnimation = function(imageManager, animationXml)
 /**
  * The spriteRuntimeObject represents an object that can display images.
  *
- * <b>TODO:</b> Animation support, custom collisions masks.
+ * <b>TODO:</b> custom collisions masks.
  *
  * @class spriteRuntimeObject
  * @extends runtimeObject
@@ -114,7 +113,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     my.spriteDirty = true; 
     my.textureDirty = true; 
     my.sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getInvalidPIXITexture());
-    runtimeScene.getLayer("").getPIXIContainer().addChild(my.sprite);
+    runtimeScene.getLayer("").addChildToPIXIContainer(my.sprite, that.zOrder);
     
     /**
      * Called when the object is removed from a scene.
@@ -352,9 +351,9 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     
     that.setLayer = function(name) {
         //We need to move the object from the pixi container of the layer
-        runtimeScene.getLayer(that.layer).getPIXIContainer().removeChild(my.sprite);
+        runtimeScene.getLayer(that.layer).removePIXIContainerChild(my.sprite);
         that.layer = name;
-        runtimeScene.getLayer(that.layer).getPIXIContainer().addChild(my.sprite);
+        runtimeScene.getLayer(that.layer).addChildToPIXIContainer(my.sprite, that.zOrder);
     }
     
     that.setScaleX = function(newScale) {
@@ -377,7 +376,20 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     
     that.deleteFromScene = function(runtimeScene) {
         runtimeScene.markObjectForDeletion(that);
-        runtimeScene.getLayer(that.layer).getPIXIContainer().removeChild(my.sprite);
+        runtimeScene.getLayer(that.layer).removePIXIContainerChild(my.sprite);
+    }
+    
+    /**
+     * Set the Z order of the object.
+     *
+     * @method setZOrder
+     * @param z {Number} The new Z order position of the object
+     */
+    that.setZOrder = function(z) {
+        if ( z != that.zOrder ) {        
+            runtimeScene.getLayer(that.layer).changePIXIContainerChildZOrder(my.sprite, z);
+            that.zOrder = z;
+        }
     }
     
     /** 

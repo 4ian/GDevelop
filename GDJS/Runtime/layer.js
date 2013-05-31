@@ -2,8 +2,10 @@
 /**
  * Represents a layer used to display objects.<br>
  * The layer connects its Pixi container to the Pixi stage during its construction,
- * but then its objects responsibility to connect themselves to the layer's container
- * ( See getPIXIContainer method ).
+ * but then it is objects responsibility to connect themselves to the layer's container
+ * ( See addChildToPIXIContainer method ).<br>
+ * Layers do not provide direct access to their pixi container as they do some extra work
+ * to ensure that z orders remains correct.
  * 
  * TODO : Viewports and support for multiple cameras
  *
@@ -52,13 +54,46 @@ gdjs.layer = function(name, runtimeScene)
     }
     
     /**
-     * Get the pixi container associated to the layer.<br>
-     * All objects which are on this layer must be children of this container.
-     * @method getPIXIContainer
-     * @return The pixi container of the layer
+     * Add a child to the pixi container associated to the layer.<br>
+     * All objects which are on this layer must be children of this container.<br>
+     *
+     * @method addChildToPIXIContainer
+     * @param child The child ( PIXI object ) to be added.
+     * @param zOrder The z order of the associated object.
      */
-    that.getPIXIContainer = function() {
-        return my.pixiContainer;
+    that.addChildToPIXIContainer = function(child, zOrder) {
+        child.zOrder = zOrder; //Extend the pixi object with a z order.
+        
+        for( var i = 0, len = my.pixiContainer.children.length; i < len;++i) {
+            if ( my.pixiContainer.children[i].zOrder >= zOrder ) {
+                my.pixiContainer.addChildAt(child, i);
+                return;
+            }
+        }
+        my.pixiContainer.addChild(child);
+    }
+    
+    /**
+     * Change the z order of a child associated to an object.
+     *
+     * @method changePIXIContainerChildZOrder
+     * @param child The child ( PIXI object ) to be modified.
+     * @param newZOrder The z order of the associated object.
+     */
+    that.changePIXIContainerChildZOrder = function(child, newZOrder) {
+        my.pixiContainer.removeChild(child);
+        that.addChildToPIXIContainer(child, newZOrder);
+    }
+    
+    /**
+     * Remove a child from the internal pixi container.<br>
+     * Should be called when an object is deleted or removed from the layer.
+     *
+     * @method removePIXIContainerChild
+     * @param child The child ( PIXI object ) to be removed.
+     */
+    that.removePIXIContainerChild = function(child) {
+        my.pixiContainer.removeChild(child);
     }
     
     /**

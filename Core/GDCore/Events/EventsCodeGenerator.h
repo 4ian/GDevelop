@@ -272,7 +272,7 @@ public:
      *
      * Default implementation simply returns the name mangled using gd::EventsCodeNameMangler.
      */
-    virtual std::string GetObjectListName(const std::string & name, gd::EventsCodeGenerationContext & context);
+    virtual std::string GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context);
 
 protected:
 

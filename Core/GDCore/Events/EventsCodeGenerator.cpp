@@ -975,7 +975,7 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
 
 }
 
-std::string EventsCodeGenerator::GetObjectListName(const std::string & name, gd::EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context)
 {
     return ManObjListName(name);
 }

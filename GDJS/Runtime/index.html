@@ -56,6 +56,7 @@
         var renderer = PIXI.autoDetectRenderer(winWidth, winHeight);
         document.body.appendChild(renderer.view); // add the renderer view element to the DOM
         
+        console.log("ab");
         //Bind keyboards and mouse events
         $(document).keydown(function(event) {
             game.onKeyPressed(event.keyCode);
@@ -92,24 +93,56 @@
         renderer.view.onmousewheel = function (event){
             game.onMouseWheel(event.wheelDelta);
         }
+        console.log("ab");
         
         //Load all assets
+        var loadingStage = new PIXI.Stage();
+        var text = new PIXI.Text("Loading...", {font: "bold italic 60px Arvo", fill: "#3e1707", align: "center", stroke: "#a4410e", strokeThickness: 7});
+        loadingStage.addChild(text);
+        text.position.x = winWidth/2;
+        text.position.y = winHeight/2;
+        var loadingCount = 0;
         
-
-    
-        //Create the scene to be played
-        var currentScene = gdjs.runtimeScene(game, renderer);
-        currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
-        currentScene.setEventsFunction(gdjs.Nouvelle_32sc__4524neCode.func);
         
-        requestAnimFrame( gameLoop );
+        console.log("ab");
+        var assets = [];
+        $(project).find("Resources").find("Resources").find("Resource").each( function() {
+            if ( $(this).attr("file") ) {
+                assets.push($(this).attr("file"));
+            }
+            console.log($(this).attr("file"));
+        });
+        var assetLoader = new PIXI.AssetLoader(assets);
+        assetLoader.load();
+        assetLoader.onComplete = onAssetsLoaded;
+        assetLoader.onProgress = onAssetsLoadingProgress;
         
-        function gameLoop() {
+        console.log("a");
+        
+        function onAssetsLoaded() {
+        console.log("loaded!");
+            //Create the scene to be played
+            var currentScene = gdjs.runtimeScene(game, renderer);
+            currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
+            currentScene.setEventsFunction(gdjs.Nouvelle_32sc__4524neCode.func);
+            
             requestAnimFrame( gameLoop );
+            
+            function gameLoop() {
+                requestAnimFrame( gameLoop );
+            
+                currentScene.renderAndStep();
+            }
+        }
         
-            currentScene.renderAndStep();
+        function onAssetsLoadingProgress() {
+        console.log("progress!");
+            renderer.render(loadingStage);
+            loadingCount++;
+            text.setText(loadingCount.toString());
         }
     }
+
         
 	</script>
 

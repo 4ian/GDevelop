@@ -2,6 +2,8 @@
 /**
  * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
  *
+ * TODO : z order, position souris calques
+ *
  * @class runtimeScene 
  * @param PixiRenderer The PIXI.Renderer to be used
  */

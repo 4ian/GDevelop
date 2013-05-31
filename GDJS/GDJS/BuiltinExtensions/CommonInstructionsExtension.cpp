@@ -261,7 +261,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 //Write final code
                 std::string whileBoolean = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                    +"Code.stopDoWhile"+gd::ToString(context.GetScopeLevel());
+                    +"Code.stopDoWhile"+gd::ToString(context.GetContextDepth());
                 codeGenerator.AddGlobalDeclaration(whileBoolean+" = false;\n");
                 outputCode += whileBoolean+" = false;\n";
                 outputCode += "do {";
@@ -322,10 +322,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 //Write final code
                 std::string repeatCountVar = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                    +"Code.repeatCount"+gd::ToString(context.GetScopeLevel());
+                    +"Code.repeatCount"+gd::ToString(context.GetContextDepth());
                 codeGenerator.AddGlobalDeclaration(repeatCountVar+" = 0;\n");
                 std::string repeatIndexVar = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                    +"Code.repeatIndex"+gd::ToString(context.GetScopeLevel());
+                    +"Code.repeatIndex"+gd::ToString(context.GetContextDepth());
                 codeGenerator.AddGlobalDeclaration(repeatIndexVar+" = 0;\n");
                 outputCode += repeatCountVar+" = "+repeatCountCode+";\n";
                 outputCode += "for("+repeatIndexVar+" = 0;"+repeatIndexVar+" < "+repeatCountVar+";++"+repeatIndexVar+") {\n";
@@ -398,12 +398,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 std::string objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
 
                 std::string forEachTotalCountVar = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                    +"Code.forEachTotalCount"+gd::ToString(context.GetScopeLevel());
+                    +"Code.forEachTotalCount"+gd::ToString(context.GetContextDepth());
                 codeGenerator.AddGlobalDeclaration(forEachTotalCountVar+" = 0;\n");
                 std::string forEachIndexVar = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                    +"Code.forEachIndex"+gd::ToString(context.GetScopeLevel());
+                    +"Code.forEachIndex"+gd::ToString(context.GetContextDepth());
                 codeGenerator.AddGlobalDeclaration(forEachIndexVar+" = 0;\n");
-                std::string forEachObjectsList = codeGenerator.GetObjectListName("_ForEachObjects", context);
+                std::string forEachObjectsList = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
+                    +"Code.forEachObjects"+gd::ToString(context.GetContextDepth());
                 codeGenerator.AddGlobalDeclaration(forEachObjectsList+" = [];\n");
 
 
@@ -414,7 +415,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     for (unsigned int i = 0;i<realObjects.size();++i)
                     {
                         std::string forEachCountVar = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                            +"Code.forEachCount"+gd::ToString(i)+"_"+gd::ToString(context.GetScopeLevel());
+                            +"Code.forEachCount"+gd::ToString(i)+"_"+gd::ToString(context.GetContextDepth());
                         codeGenerator.AddGlobalDeclaration(forEachCountVar+" = 0;\n");
 
                         outputCode += forEachCountVar+" = "+codeGenerator.GetObjectListName(realObjects[i], parentContext)+".length;\n";
@@ -431,11 +432,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 else
                     outputCode += "for("+forEachIndexVar+" = 0;"+forEachIndexVar+" < "+forEachTotalCountVar+";++"+forEachIndexVar+") {\n";
 
+                outputCode += objectDeclaration;
+
                 //Clear all concerned objects lists and keep only one object
                 if ( realObjects.size() == 1 )
                 {
                     std::string temporary = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                        +"Code.forEachTemporary"+gd::ToString(context.GetScopeLevel());
+                        +"Code.forEachTemporary"+gd::ToString(context.GetContextDepth());
                     codeGenerator.AddGlobalDeclaration(temporary+" = null;\n");
                     outputCode += temporary+" = "+codeGenerator.GetObjectListName(realObjects[0], parentContext)+"["+forEachIndexVar+"];\n";
                     outputCode += codeGenerator.GetObjectListName(realObjects[0], context)+".length = 0;\n";
@@ -453,7 +456,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                         for (unsigned int j = 0;j<=i;++j)
                         {
                             std::string forEachCountVar = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())
-                                +"Code.forEachCount"+gd::ToString(j)+"_"+gd::ToString(context.GetScopeLevel());
+                                +"Code.forEachCount"+gd::ToString(j)+"_"+gd::ToString(context.GetContextDepth());
 
                             if (j!=0) count+= "+";
                             count += forEachCountVar;
@@ -466,12 +469,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     }
                 }
 
-                outputCode += "{"; //This scope is used as the for loop modified the objects list.
-                outputCode += objectDeclaration;
-
                 outputCode += conditionsCode;
-                outputCode += "if (" +ifPredicat+ ")\n";
-                outputCode += "{\n";
+                outputCode += "if (" +ifPredicat+ ") {\n";
                 outputCode += actionsCode;
                 if ( event.HasSubEvents() )
                 {
@@ -480,8 +479,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     outputCode += "} //Subevents end.\n";
                 }
                 outputCode += "}\n";
-
-                outputCode += "}";
 
                 outputCode += "}\n"; //End of for loop
 

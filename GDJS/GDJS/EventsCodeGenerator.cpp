@@ -30,8 +30,8 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     string output = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n";
 
     //Prepare the global context
-    unsigned int maxScopeLevelReached = 0;
-    gd::EventsCodeGenerationContext context(&maxScopeLevelReached);
+    unsigned int maxDepthLevelReached = 0;
+    gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
     EventsCodeGenerator codeGenerator(project, scene);
     codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
     codeGenerator.PreprocessEventList(events);
@@ -48,7 +48,7 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     std::string globalObjectListsReset;
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
     {
-        for (unsigned int j = 1;j<=maxScopeLevelReached;++j)
+        for (unsigned int j = 1;j<=maxDepthLevelReached;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
                                  +ManObjListName(project.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
@@ -59,7 +59,7 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     }
     for (unsigned int i = 0;i<scene.GetObjectsCount();++i)
     {
-        for (unsigned int j = 1;j<=maxScopeLevelReached;++j)
+        for (unsigned int j = 1;j<=maxDepthLevelReached;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
                                  +ManObjListName(scene.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
@@ -365,9 +365,9 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     return actionCode;
 }
 
-std::string EventsCodeGenerator::GetObjectListName(const std::string & name, gd::EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context)
 {
-    return GetCodeNamespace()+ManObjListName(name) +gd::ToString(context.GetScopeLevel());
+    return GetCodeNamespace()+ManObjListName(name)+gd::ToString(context.GetLastDepthObjectListWasNeeded(name));
 }
 
 std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
@@ -375,7 +375,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
     std::string declarationsCode;
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
-        declarationsCode += GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel());
+        declarationsCode += GetObjectListName(*it, context);
         if ( !context.ObjectAlreadyDeclared(*it) )
         {
             declarationsCode += ".createFrom(runtimeScene.getObjects(\""+ConvertToString(*it)+"\"));\n";
@@ -383,12 +383,15 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
         }
         else
         {
-            declarationsCode += ".createFrom("+GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel()-1)+");\n";
+            if (context.GetParentContext())
+                declarationsCode += ".createFrom("+GetObjectListName(*it, *context.GetParentContext())+");\n";
+            else
+                std::cout << "ERROR: During code generation, a context tried tried to use an alreadu declared object list without having a parent" << std::endl;
         }
     }
     for ( set<string>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
     {
-        declarationsCode += GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel());
+        declarationsCode += GetObjectListName(*it, context);
         if ( !context.ObjectAlreadyDeclared(*it) )
         {
             declarationsCode +=".length = 0;\n";
@@ -396,7 +399,10 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
         }
         else
         {
-            declarationsCode += ".createFrom("+GetCodeNamespace()+ManObjListName(*it)+gd::ToString(context.GetScopeLevel()-1)+");\n";
+            if (context.GetParentContext())
+                declarationsCode += ".createFrom("+GetObjectListName(*it, *context.GetParentContext())+");\n";
+            else
+                std::cout << "ERROR: During code generation, a context tried tried to use an alreadu declared object list without having a parent" << std::endl;
         }
     }
 

@@ -53,7 +53,7 @@ public:
     /**
      * \brief Get the full name for accessing to a list of objects
      */
-    virtual std::string GetObjectListName(const std::string & name, gd::EventsCodeGenerationContext & context);
+    virtual std::string GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context);
 
 protected:
 

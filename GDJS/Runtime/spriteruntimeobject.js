@@ -2,7 +2,7 @@
 /**
  * A frame used by a spriteAnimation in a spriteRuntimeObject.
  *
- * <b>TODO</b> : Center and origin loading.
+ * <b>TODO</b> : Center and origin loading, points position when the sprite is distorted/rotated.
  *
  * @class spriteAnimationFrame
  * @constructor
@@ -20,9 +20,19 @@ gdjs.spriteAnimationFrame = function(imageManager, frameXml)
     if ( frameXml ) {
         $(frameXml).find("Points").find("Point").each( function() {
             //console.log("point:"+$(this).attr("nom"));
-            var point = {x:parseFloat($(this).attr("X")), y:parseFloat($(this).attr("X"))};
+            var point = {x:parseFloat($(this).attr("X")), y:parseFloat($(this).attr("Y"))};
             that.points.put($(this).attr("nom"), point);
         });  
+        var origin = $(frameXml).find("PointOrigine");
+        that.origin.x = parseFloat(origin.attr("X"));
+        that.origin.y = parseFloat(origin.attr("Y"));
+        
+        var center = $(frameXml).find("PointCentre");
+        if ( center.attr("automatic") != "true" ) {
+            console.log("CentreNonAuto");
+            that.center.x = parseFloat(origin.attr("X"));
+            that.center.y = parseFloat(origin.attr("Y"));
+        }
     }
     
     return that;
@@ -316,6 +326,9 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     }
     
     that.setOpacity = function(opacity) {
+        if ( opacity < 0 ) opacity = 0;
+        if ( opacity > 255 ) opacity = 255;
+        
         that.opacity = opacity;
         my.spriteDirty = true;
     }

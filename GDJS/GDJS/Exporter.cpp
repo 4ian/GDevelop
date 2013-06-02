@@ -4,6 +4,8 @@
  */
 #include <sstream>
 #include <fstream>
+#include <streambuf>
+#include <string>
 #include <wx/filename.h>
 #include <wx/log.h>
 #include "GDCore/TinyXml/tinyxml.h"
@@ -30,24 +32,28 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
     std::set<std::string> includesFiles;
 
     //Generate events code
-    gd::Layout exportedLayout = layout;
-    std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(project, exportedLayout, exportedLayout.GetEvents(), includesFiles,
-                                                                                    false /*Export for edittime*/);
-
-    //Export the code
-    std::ofstream file;
-    file.open ( std::string(exportDir+"code.js").c_str() );
-    if ( file.is_open() ) {
-        file << eventsOutput;
-        file.close();
-    }
-    else {
-        lastError = gd::ToString(_("Unable to write ")+exportDir+"code.js");
-        return false;
+    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+    {
+        gd::Layout & exportedLayout = project.GetLayout(i);
+        std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(project, exportedLayout,
+                                                                                        exportedLayout.GetEvents(), includesFiles,
+                                                                                        false /*Export for edittime*/);
+        //Export the code
+        std::ofstream file;
+        file.open ( std::string(exportDir+"code"+gd::ToString(i)+".js").c_str() );
+        if ( file.is_open() ) {
+            file << eventsOutput;
+            file.close();
+        }
+        else {
+            lastError = gd::ToString(_("Unable to write ")+exportDir+"code"+gd::ToString(i)+".js");
+            return false;
+        }
     }
 
     //Strip the project
-    gd::Project strippedProject = StripProject(project, layout.GetName());
+    gd::Project strippedProject = StripProject(project, "");
+    strippedProject.SetFirstLayout(layout.GetName());
 
     //Export resources and finalize stripping
     ExportResources(strippedProject, exportDir);
@@ -59,11 +65,44 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
         return false;
     }
 
+    //Create the index file
+    {
+        std::ifstream t("./JsPlatform/Runtime/index.html");
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        std::string str = buffer.str();
+
+        size_t pos = str.find("<!-- GDJS_CODE_FILES -->");
+        if ( pos < str.length() ) {
+
+            std::string codeFilesIncludes;
+            for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+                codeFilesIncludes += "<script src=\"code"+gd::ToString(i)+".js\"></script>\n";
+
+            str = str.replace(pos, 24, codeFilesIncludes);
+        }
+        else {
+            std::cout << "Unable to find <!-- GDJS_CODE_FILES --> in index file." << std::endl;
+        }
+
+        {
+            std::ofstream file;
+            file.open ( std::string(exportDir+"/index.html").c_str() );
+            if ( file.is_open() ) {
+                file << str;
+                file.close();
+            }
+            else {
+                lastError = "Unable to write index file.";
+                return false;
+            }
+        }
+    }
+
     //Copy additional dependencies
     wxCopyFile("./JsPlatform/Runtime/libs/pixi.js", exportDir+"/libs/pixi.js");
     wxCopyFile("./JsPlatform/Runtime/libs/jquery.js", exportDir+"/libs/jquery.js");
     wxCopyFile("./JsPlatform/Runtime/libs/jshashtable.js", exportDir+"/libs/jshashtable.js");
-    wxCopyFile("./JsPlatform/Runtime/index.html", exportDir+"/index.html");
     wxCopyFile("./JsPlatform/Runtime/bunny.png", exportDir+"/bunny.png");
     wxCopyFile("./JsPlatform/Runtime/gd.js", exportDir+"/gd.js");
     wxCopyFile("./JsPlatform/Runtime/runtimeobject.js", exportDir+"/runtimeobject.js");

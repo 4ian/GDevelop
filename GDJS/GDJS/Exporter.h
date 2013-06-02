@@ -34,7 +34,7 @@ public:
 private:
 
     /**
-     * Create a stripped version of the project for export
+     * \brief Create a stripped version of the project for export
      *
      * \param project The project to be stripped.
      * \param layout Optional layout name. If not empty, all layouts will be removed except this layout.
@@ -42,7 +42,7 @@ private:
     static gd::Project StripProject(const gd::Project & project, std::string layout);
 
     /**
-     * Copy the resources to the export directory, updating the resources filenames.
+     * \brief Copy all the resources of the project to to the export directory, updating the resources filenames.
      *
      * \param project The project with resources to be exported.
      * \param exportDir The directory where the preview must be created.

@@ -1,13 +1,17 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>pixi.js example 1</title>
+	<title></title>
 	<style>
 		body {
 			margin: 0;
 			padding: 0;
 			background-color: #000000;
 		}
+        #canvasArea {
+            margin-left: auto;
+            margin-right: auto;        
+        }
 	</style>
     <!-- Libs and GDJS core files -->
 	<script src="libs/pixi.js"></script>
@@ -33,10 +37,12 @@
 	<script src="inputtools.js"></script>
 	<script src="objecttools.js"></script>
 	<script src="cameratools.js"></script>
-	<script src="code.js"></script>
+	<!-- GDJS_CODE_FILES -->
 
 </head>
 <body>
+    <div id="canvasArea"></div>
+
 	<script>
     
     $( document ).ready( function() {
@@ -54,7 +60,12 @@
         var winWidth = $(project).find("Project").find("Info").find("WindowW").attr("value");
         var winHeight = $(project).find("Project").find("Info").find("WindowH").attr("value");
         var renderer = PIXI.autoDetectRenderer(winWidth, winHeight);
-        document.body.appendChild(renderer.view); // add the renderer view element to the DOM
+        var canvasArea = document.getElementById("canvasArea")
+        //Manage canvas position. TODO: Factor this into a function and manage window resizing.
+        canvasArea.style["padding-top"] = ($(window).height()-winHeight)/2+"px";
+        canvasArea.style.width = winWidth+"px";
+        canvasArea.style.height = winHeight+"px";
+        canvasArea.appendChild(renderer.view); // add the renderer view element to the DOM
         
         //Bind keyboards and mouse events
         $(document).keydown(function(event) {
@@ -64,7 +75,8 @@
             game.onKeyReleased(event.keyCode);
         });
         $(document).mousemove(function(e){
-            game.onMouseMove(e.pageX, e.pageY);
+            game.onMouseMove(e.pageX-canvasArea.getBoundingClientRect().left, 
+                             e.pageY-canvasArea.getBoundingClientRect().top);
         }); 
         renderer.view.onmousedown = function(e){
             game.onMouseButtonPressed(e.button === 2 ? 1 : 0);
@@ -93,6 +105,11 @@
             game.onMouseWheel(event.wheelDelta);
         }
         
+        if ( !game.hasScene() ) {
+            console.log("The game has no scene.");
+            return;
+        }
+        
         //Load all assets
         var loadingStage = new PIXI.Stage();
         var text = new PIXI.Text("Loading...", {font: "bold italic 60px Arvo", fill: "#3e1707", align: "center", stroke: "#a4410e", strokeThickness: 7});
@@ -117,15 +134,27 @@
         function onAssetsLoaded() {
             //Create the scene to be played
             var currentScene = gdjs.runtimeScene(game, renderer);
-            currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
-            currentScene.setEventsFunction(gdjs.Nouvelle_32sc__4524neCode.func);
+            var firstSceneName = $(project).find("Project").find("Scenes").attr("firstScene");
+            var firstSceneXml = game.hasScene(firstSceneName) ? game.getSceneXml(firstSceneName) : game.getSceneXml();
+                
+            currentScene.loadFromScene(firstSceneXml);
             
             requestAnimFrame( gameLoop );
             
             function gameLoop() {
-                requestAnimFrame( gameLoop );
-            
-                currentScene.renderAndStep();
+                if ( !currentScene.renderAndStep() ) {
+                    if ( currentScene.gameStopRequested() )
+                        postGameScreen();
+                    else {
+                        var nextSceneName = currentScene.getRequestedScene();
+                        currentScene = gdjs.runtimeScene(game, renderer);
+                        currentScene.loadFromScene(game.getSceneXml(nextSceneName));
+                        requestAnimFrame( gameLoop );
+                    }   
+                }
+                else { 
+                    requestAnimFrame( gameLoop );
+                }
             }
         }
         
@@ -133,6 +162,10 @@
             renderer.render(loadingStage);
             loadingCount++;
             text.setText(loadingCount.toString());
+        }
+        
+        function postGameScreen() {
+            //TODO
         }
     }
 

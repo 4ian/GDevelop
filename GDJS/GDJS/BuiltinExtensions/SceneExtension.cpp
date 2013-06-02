@@ -27,6 +27,10 @@ SceneExtension::SceneExtension()
         .SetFunctionName("gdjs.runtimeSceneTools.sceneJustBegins");
     GetAllActions()["SceneBackground"].codeExtraInformation
         .SetFunctionName("gdjs.runtimeSceneTools.setBackgroundColor");
+    GetAllActions()["Scene"].codeExtraInformation
+        .SetFunctionName("gdjs.runtimeSceneTools.changeScene");
+    GetAllActions()["Quit"].codeExtraInformation
+        .SetFunctionName("gdjs.runtimeSceneTools.stopGame");
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -70,27 +74,6 @@ SceneExtension::SceneExtension()
     }
 
         /*
-
-    AddAction("Scene",
-                   _("Go to a scene"),
-                   _("Change and start the specified scene."),
-                   _("Go to scene _PARAM1_"),
-                   _("Scene"),
-                   "res/actions/goscene24.png",
-                   "res/actions/goscene.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the scene"), "",false)
-        .codeExtraInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    AddAction("Quit",
-                   _("Quit the game"),
-                   _("Quit the game"),
-                   _("Quit the game"),
-                   _("Scene"),
-                   "res/actions/quit24.png",
-                   "res/actions/quit.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("DisableInputWhenFocusIsLost",
                    _("Disable input when focus is lost"),

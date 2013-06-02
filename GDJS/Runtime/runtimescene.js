@@ -29,12 +29,22 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.timeFromStart = 0;
     my.firstFrame = true;
     my.soundManager = gdjs.soundManager();
+    my.gameStopRequested = false;
+    my.requestedScene = "";
+    my.isLoaded = false; // True if loadFromScene was called and the scene is being played.
     
     /**
      * Load the runtime scene from the given scene.
      * \param sceneXml A jquery object containing the scene in XML format.
      */
     that.loadFromScene = function(sceneXml) {
+    
+        if ( sceneXml == undefined ) {
+            console.error("loadFromScene was called without a scene");
+            return;
+        }
+        
+        if ( my.isLoaded ) that.unloadScene();
     
         //Setup main properties
         document.title = $(sceneXml).attr("titre");
@@ -86,6 +96,17 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
             }
         });
         
+        //Set up the function to be executed at each tick
+        var module = gdjs[$(sceneXml).attr("mangledName")+"Code"];
+        if ( module && module.func ) my.eventsFunction = module.func;
+        
+        isLoaded = true;
+    }
+    
+    that.unloadScene = function() {
+        if ( !my.isLoaded ) return;
+        
+        
     }
     
     /**
@@ -97,8 +118,12 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
-     * Step and render the scene.
+     * Step and render the scene.<br>
      * Should be called in a game loop.
+     *
+     * @method renderAndStep
+     * @return true if the game loop should continue, false if a scene change or a game stop was
+     * requested.
      */
     that.renderAndStep = function() {
         my.updateTime();
@@ -107,6 +132,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         my.updateObjects();
         
         my.firstFrame = false;
+        
+        return my.requestedScene == "" && !my.gameStopRequested;
     }
     
     /** 
@@ -327,9 +354,45 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the time scale of the scene
+     * @method getTimeScale
      */
     that.getTimeScale = function() {
         return my.timeScale;
+    }
+    
+    /**
+     * Return true if the scene requested the game to be stopped.
+     * @method gameStopRequested
+     */
+    that.gameStopRequested = function() { 
+        return my.gameStopRequested;
+    }
+    
+    /**
+     * When called, the scene will be flagged as requesting the game to be stopped.<br>
+     * ( i.e: gameStopRequested will return true ).
+     *
+     * @method requestGameStop
+     */
+    that.requestGameStop = function() {
+        my.gameStopRequested = true;
+    }
+    
+    /**
+     * Return the name of the new scene to be launched instead of this one.
+     * @method getRequestedScene
+     */
+    that.getRequestedScene = function() { 
+        return my.requestedScene;
+    }
+    
+    /**
+     * When called, the scene will be flagged as requesting a new scene to be launched.
+     *
+     * @method requestSceneChange
+     */
+    that.requestSceneChange = function(sceneName) {
+        my.requestedScene = sceneName;
     }
     
     return that;

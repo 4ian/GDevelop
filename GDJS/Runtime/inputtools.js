@@ -1,5 +1,9 @@
 /**
  * @module gdjs.inputTools
+ *
+ * TODO : Handle camera rotation for GetMouseX/GetMouseY.
+ * TODO : Map all keys
+ * TODO : Implement others buttons for mouse
  */
 gdjs.inputTools = gdjs.inputTools || {};
 
@@ -75,7 +79,6 @@ gdjs.inputTools.anyKeyPressed = function(runtimeScene) {
 }
     
 gdjs.inputTools.isMouseButtonPressed = function(runtimeScene, button) {
-    //TODO : Implement others buttons
     if ( button == "Left" ) return runtimeScene.getGame().isMouseButtonPressed(0);
     if ( button == "Right" ) return runtimeScene.getGame().isMouseButtonPressed(1);
 }
@@ -90,4 +93,14 @@ gdjs.inputTools.showCursor = function(runtimeScene) {
 
 gdjs.inputTools.getMouseWheelDelta = function(runtimeScene) {
     return runtimeScene.getGame().getMouseWheelDelta();
+}
+
+gdjs.inputTools.getMouseX = function(runtimeScene, layer, camera) {
+    var offset = runtimeScene.hasLayer(layer) ? runtimeScene.getLayer(layer).getCameraX() : 0;
+    return runtimeScene.getGame().getMouseX()+offset;
+}
+
+gdjs.inputTools.getMouseY = function(runtimeScene, layer, camera) {
+    var offset = runtimeScene.hasLayer(layer) ? runtimeScene.getLayer(layer).getCameraY() : 0;
+    return runtimeScene.getGame().getMouseY()+offset;
 }

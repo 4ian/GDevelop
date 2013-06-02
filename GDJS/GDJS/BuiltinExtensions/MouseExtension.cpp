@@ -21,9 +21,9 @@ MouseExtension::MouseExtension()
     CloneExtension("Game Develop C++ platform", "BuiltinMouse");
 
     GetAllConditions()["SourisX"].codeExtraInformation
-        .SetFunctionName("runtimeScene.getGame().getMouseX").SetIncludeFile("inputtools.h");
+        .SetFunctionName("gdjs.inputTools.getMouseX").SetIncludeFile("inputtools.h");
     GetAllConditions()["SourisY"].codeExtraInformation
-        .SetFunctionName("runtimeScene.getGame().getMouseY").SetIncludeFile("inputtools.h");
+        .SetFunctionName("gdjs.inputTools.getMouseY").SetIncludeFile("inputtools.h");
     GetAllConditions()["SourisBouton"].codeExtraInformation
         .SetFunctionName("gdjs.inputTools.isMouseButtonPressed").SetIncludeFile("inputtools.h");
     GetAllActions()["CacheSouris"].codeExtraInformation
@@ -31,15 +31,14 @@ MouseExtension::MouseExtension()
     GetAllActions()["MontreSouris"].codeExtraInformation
         .SetFunctionName("gdjs.inputTools.showCursor").SetIncludeFile("inputtools.h");
 
-    //TODO: Support for layers
     GetAllExpressions()["MouseX"].codeExtraInformation
-        .SetFunctionName("runtimeScene.getGame().getMouseX").SetIncludeFile("inputtools.h");
+        .SetFunctionName("gdjs.inputTools.getMouseX").SetIncludeFile("inputtools.h");
     GetAllExpressions()["SourisX"].codeExtraInformation
-        .SetFunctionName("runtimeScene.getGame().getMouseX").SetIncludeFile("inputtools.h"); //Deprecated
+        .SetFunctionName("gdjs.inputTools.getMouseX").SetIncludeFile("inputtools.h"); //Deprecated
     GetAllExpressions()["MouseY"].codeExtraInformation
-        .SetFunctionName("runtimeScene.getGame().getMouseY").SetIncludeFile("inputtools.h"); //Deprecated
+        .SetFunctionName("gdjs.inputTools.getMouseY").SetIncludeFile("inputtools.h");
     GetAllExpressions()["SourisY"].codeExtraInformation
-        .SetFunctionName("runtimeScene.getGame().getMouseY").SetIncludeFile("inputtools.h"); //Deprecated
+        .SetFunctionName("gdjs.inputTools.getMouseY").SetIncludeFile("inputtools.h"); //Deprecated
 
     /*
     AddAction("CentreSourisX",
@@ -87,9 +86,5 @@ MouseExtension::MouseExtension()
 
         .AddCodeOnlyParameter("currentScene", "")
         .codeExtraInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
-
-    AddExpression("MouseWheelDelta", _("Mouse wheel : Displacement"), _("Mouse wheel displacement"), _("Mouse"), "res/actions/mouse.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("GetMouseWheelDelta").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
 */
 }

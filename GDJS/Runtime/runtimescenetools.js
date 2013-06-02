@@ -104,3 +104,12 @@ gdjs.runtimeSceneTools.getTime = function(what) {
         
     return 0;
 }
+
+gdjs.runtimeSceneTools.changeScene = function(currentScene, newSceneName) {
+    if ( currentScene.getGame().getSceneXml(newSceneName) != undefined )
+        currentScene.requestSceneChange(newSceneName);
+}
+
+gdjs.runtimeSceneTools.stopGame = function(currentScene) {
+    currentScene.requestGameStop();
+}

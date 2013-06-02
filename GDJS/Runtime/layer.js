@@ -65,7 +65,7 @@ gdjs.layer = function(name, runtimeScene)
         child.zOrder = zOrder; //Extend the pixi object with a z order.
         
         for( var i = 0, len = my.pixiContainer.children.length; i < len;++i) {
-            if ( my.pixiContainer.children[i].zOrder >= zOrder ) {
+            if ( my.pixiContainer.children[i].zOrder >= zOrder ) { //TODO : Dichotomic search
                 my.pixiContainer.addChildAt(child, i);
                 return;
             }

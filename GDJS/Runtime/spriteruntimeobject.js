@@ -419,5 +419,26 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
                                 obj.getDrawableY()+obj.getCenterY());
     }
     
+    
+    /** 
+     * Return true if the cursor is on the object.<br>
+     * TODO : Support layer's camera rotation.
+     *
+     * @method cursorOnObject
+     * @return true if the cursor is on the object.
+     */
+    that.cursorOnObject = function() {
+        var layer = runtimeScene.getLayer(that.layer);
+        
+        var mouseX = runtimeScene.getGame().getMouseX()+layer.getCameraX();
+        var mouseY = runtimeScene.getGame().getMouseY()+layer.getCameraY();
+        
+        if ( mouseX >= that.getX() && mouseX <= that.getX()+that.getWidth()
+            && mouseY >= that.getY() && mouseY <= that.getY()+that.getHeight())
+            return true;
+            
+        return false;
+    }
+    
     return that;
 }

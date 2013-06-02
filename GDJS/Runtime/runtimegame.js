@@ -35,12 +35,53 @@ gdjs.runtimeGame = function(xml)
     }
     
     /**
-     * Get the XML object associated to the game
+     * Get the XML structure associated to the game
      * @method getXml
      * @return The XML structure associated to the game, which can be parsed with jQuery.
      */
     that.getXml = function() {
         return my.xml;
+    }
+    
+    /**
+     * Get the XML structure associated to a scene.
+     *
+     * @method getSceneXml
+     * @param sceneName The name of the scene. If not defined, the first scene will be returned.
+     * @return The XML structure associated to the scene, which can be parsed with jQuery.
+     */
+    that.getSceneXml = function(sceneName) {
+        var scene = undefined;
+        $(my.xml).find("Scenes").find("Scene").each( function() {
+            if ( sceneName == undefined || $(this).attr("nom") == sceneName ) {
+                scene = $(this);
+                return false;
+            }
+        });
+        
+        if ( scene == undefined )
+            console.warn("The game has no scene called \""+sceneName+"\"");
+        
+        return scene;
+    }
+    
+    /**
+     * Check if a scene exists
+     *
+     * @method getSceneXml
+     * @param sceneName The name of the scene to search.
+     * @return true if the scene exists. If sceneName is undefined, true if the game has a scene.
+     */
+    that.hasScene = function(sceneName) {
+        var isTrue = false;
+        $(my.xml).find("Scenes").find("Scene").each( function() {
+            if ( sceneName == undefined || $(this).attr("nom") == sceneName ) {
+                isTrue = true;
+                return false;
+            }
+        });
+        
+        return isTrue;
     }
     
     /**

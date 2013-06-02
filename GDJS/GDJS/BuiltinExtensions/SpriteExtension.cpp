@@ -59,6 +59,9 @@ SpriteExtension::SpriteExtension()
     spriteActions["TourneVers"].codeExtraInformation.
         SetFunctionName("turnTowardObject");
 
+    spriteConditions["SourisSurObjet"].codeExtraInformation.
+        SetFunctionName("cursorOnObject");
+
     GetAllConditions()["Collision"].codeExtraInformation //No pixel perfect collision for now on the JS platform.
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
     GetAllConditions()["EstTourne"].codeExtraInformation
@@ -245,19 +248,6 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("yesorno", _("Activate flipping"), "",false)
             .codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("SourisSurObjet",
-                       _("The cursor is on an object"),
-                       _("Test if the cursor is over a Sprite object. The test is accurate by default (check that the cursor is not on a transparent pixel)."),
-                       _("The cursor is on _PARAM0_"),
-                       _("Mouse"),
-                       "res/conditions/surObjet24.png",
-                       "res/conditions/surObjet.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes")
-            .codeExtraInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
         #endif
 
     }

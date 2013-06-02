@@ -10,11 +10,23 @@
 			<growablecols>0</growablecols>
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
-				<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
-					<label>Just press a key</label>
+				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+					<focused>1</focused>
+					<handler function="OnPanel1KeyDown1" entry="EVT_KEY_DOWN" />
+					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
+								<label>Press a key</label>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
 				</object>
-				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">

@@ -1098,9 +1098,9 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
     if ( !noNeedForSceneRecompilation )
     {
         if ( externalEvents != NULL )
-            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game.GetCurrentPlatform(), game, *externalEvents);
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
         else
-            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game.GetCurrentPlatform(), game, scene);
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
     }
 }
 

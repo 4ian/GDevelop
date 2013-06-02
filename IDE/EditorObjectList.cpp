@@ -444,7 +444,8 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
     gd::Automatism & automatism = object.GetAutomatism(autoType);
 
     automatism.EditAutomatism(this, project, layout, mainFrameWrapper);
-    project.GetCurrentPlatform().GetChangesNotifier().OnAutomatismEdited(project, globalObjects ? NULL : layout, object, automatism);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismEdited(project, globalObjects ? NULL : layout, object, automatism);
 }
 
 /**
@@ -456,7 +457,8 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     if ( !objects.HasObjectNamed(name) ) return;
 
     objects.GetObject(name).EditObject(this, project, mainFrameWrapper);
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectEdited(project, globalObjects ? NULL : layout, objects.GetObject(name));
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObjects ? NULL : layout, objects.GetObject(name));
 
     //Reload thumbnail
     int thumbnailID = -1;
@@ -468,6 +470,9 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     }
 
     objectsList->SetItemImage( item, thumbnailID );
+
+    //Reload resources
+    if (!globalObjects && layout) objects.GetObject(name).LoadResources(project, *layout);
 }
 
 ////////////////////////////////////////////////////////////
@@ -535,7 +540,8 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     }
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectAdded(project, globalObjects ? NULL : layout, objects.GetObject(name));
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, globalObjects ? NULL : layout, objects.GetObject(name));
 
     objectsList->EditLabel(itemAdded);
 
@@ -586,7 +592,8 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
         }
     }
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectsDeleted(project, globalObjects ? NULL : layout, objectsDeleted);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, globalObjects ? NULL : layout, objectsDeleted);
 
     //Removing items
     void * nothing;
@@ -661,7 +668,8 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             }
         }
     }
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectRenamed(project, globalObjects ? NULL : layout, objects.GetObject(newName), ancienNom);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObjects ? NULL : layout, objects.GetObject(newName), ancienNom);
 
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     return;
@@ -705,7 +713,8 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 
     std::vector<std::string> objectsDeleted;
     objectsDeleted.push_back(name);
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectsDeleted(project, globalObjects ? NULL : layout, objectsDeleted);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, globalObjects ? NULL : layout, objectsDeleted);
 }
 
 /**
@@ -739,7 +748,8 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 
     //Add it to the list
     objects.InsertObject(*object, objects.GetObjectsCount());
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectAdded(project, globalObjects ? NULL : layout, *object);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, globalObjects ? NULL : layout, *object);
 
     //Refresh the list and select the newly added item
     searchCtrl->Clear();
@@ -866,7 +876,10 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 
     gd::ChooseVariableDialog dialog(this, objects.GetObject(name).GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
-        project.GetCurrentPlatform().GetChangesNotifier().OnObjectVariablesChanged(project, globalObjects ? NULL : layout, objects.GetObject(name));
+    {
+        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectVariablesChanged(project, globalObjects ? NULL : layout, objects.GetObject(name));
+    }
 }
 
 /**
@@ -902,7 +915,8 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 
         gd::Object & object = objects.GetObject(name);
         object.AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
-        project.GetCurrentPlatform().GetChangesNotifier().OnAutomatismAdded(project, globalObjects ? NULL : layout, object, object.GetAutomatism(autoName));
+        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, globalObjects ? NULL : layout, object, object.GetAutomatism(autoName));
     }
 }
 
@@ -928,7 +942,8 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
 
     objects.GetObject(name).RemoveAutomatism(automatisms[selection]);
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnAutomatismDeleted(project, globalObjects ? NULL : layout, objects.GetObject(name), automatisms[selection]);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismDeleted(project, globalObjects ? NULL : layout, objects.GetObject(name), automatisms[selection]);
 }
 
 /**
@@ -963,7 +978,8 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     std::string oldName = automatism.GetName();
     automatism.SetName(newName);
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnAutomatismRenamed(project, globalObjects ? NULL : layout, object, automatism, oldName);
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismRenamed(project, globalObjects ? NULL : layout, object, automatism, oldName);
 }
 
 /**

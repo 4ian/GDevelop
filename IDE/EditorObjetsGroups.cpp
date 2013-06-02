@@ -343,7 +343,8 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
         if ( dialog.ShowModal() == 1 )
             *i = dialog.group;
 
-        project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupEdited(project, EditingLayoutGroups() ? &layout : NULL, i->GetName());
+        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupEdited(project, EditingLayoutGroups() ? &layout : NULL, i->GetName());
         return;
     }
 }
@@ -373,7 +374,8 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( NewGroup );
     ObjetsGroupsList->AppendItem( rootId, name );
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(name));
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(name));
     wxLogStatus( _( "The group was correctly added." ) );
 }
 
@@ -417,7 +419,8 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
                 gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), groupName);
             }
 
-            project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, groupName);
+            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, groupName);
             ObjetsGroupsList->Delete( itemSelected );
         }
     }
@@ -526,7 +529,8 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 
             gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), renamedGroupOldName, newName);
 
-            project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupRenamed(project, EditingLayoutGroups() ? &layout : NULL, newName, renamedGroupOldName);
+            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupRenamed(project, EditingLayoutGroups() ? &layout : NULL, newName, renamedGroupOldName);
             return;
         }
     }
@@ -591,7 +595,8 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     clipboard->SetObjectGroup(*i);
     objectsGroups->erase( i );
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(ObjetsGroupsList->GetItemText( itemSelected )));
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(ObjetsGroupsList->GetItemText( itemSelected )));
     ObjetsGroupsList->Delete( itemSelected );
 }
 
@@ -616,6 +621,7 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( groupPasted );
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
-    project.GetCurrentPlatform().GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL,  groupPasted.GetName());
+    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL,  groupPasted.GetName());
 }
 

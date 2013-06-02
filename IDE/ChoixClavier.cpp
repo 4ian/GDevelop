@@ -16,6 +16,7 @@ using namespace std;
 
 //(*IdInit(ChoixClavier)
 const long ChoixClavier::ID_STATICTEXT3 = wxNewId();
+const long ChoixClavier::ID_PANEL1 = wxNewId();
 const long ChoixClavier::ID_STATICLINE1 = wxNewId();
 const long ChoixClavier::ID_STATICBITMAP2 = wxNewId();
 const long ChoixClavier::ID_HYPERLINKCTRL1 = wxNewId();
@@ -31,16 +32,24 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 {
 	//(*Initialize(ChoixClavier)
 	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Choose a key"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxWANTS_CHARS, _T("wxID_ANY"));
-	SetClientSize(wxSize(234,179));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Just press a key"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	FlexGridSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	Panel1->SetFocus();
+	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer2->AddGrowableCol(0);
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Press a key"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	Panel1->SetSizer(FlexGridSizer2);
+	FlexGridSizer2->Fit(Panel1);
+	FlexGridSizer2->SetSizeHints(Panel1);
+	FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -57,9 +66,10 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 	FlexGridSizer3->Add(Button1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	SetSizer(FlexGridSizer1);
-	Layout();
+	FlexGridSizer1->Fit(this);
+	FlexGridSizer1->SetSizeHints(this);
 
+	Panel1->Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&ChoixClavier::OnPanel1KeyDown1,0,this);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChoixClavier::OnhelpBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixClavier::OnButton1Click);
 	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&ChoixClavier::OnKeyDown);
@@ -73,6 +83,21 @@ ChoixClavier::~ChoixClavier()
 }
 
 void ChoixClavier::OnKeyDown(wxKeyEvent& event)
+{
+    OnPanel1KeyDown1(event);
+}
+
+void ChoixClavier::OnButton1Click(wxCommandEvent& event)
+{
+    EndModal(0);
+}
+
+void ChoixClavier::OnhelpBtClick(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"));
+}
+
+void ChoixClavier::OnPanel1KeyDown1(wxKeyEvent& event)
 {
     int code = event.GetKeyCode();
 
@@ -174,14 +199,4 @@ void ChoixClavier::OnKeyDown(wxKeyEvent& event)
     }
 
     EndModal(1);
-}
-
-void ChoixClavier::OnButton1Click(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-void ChoixClavier::OnhelpBtClick(wxCommandEvent& event)
-{
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"));
 }

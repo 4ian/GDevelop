@@ -783,7 +783,10 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     gd::ChooseVariableDialog dialog(this, layout.GetVariables(), /*editingOnly=*/true);
     dialog.SetAssociatedLayout(game, &layout);
     if ( dialog.ShowModal() == 1 )
-        game->GetCurrentPlatform().GetChangesNotifier().OnVariablesModified(*game, &layout);
+    {
+        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+            game->GetUsedPlatforms()[j]->GetChangesNotifier().OnVariablesModified(*game, &layout);
+    }
 }
 
 /**
@@ -860,7 +863,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
 
-        game->GetCurrentPlatform().GetChangesNotifier().OnLayoutRenamed(*game, layout, data->GetSecondString());
+        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+            game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutRenamed(*game, layout, data->GetSecondString());
     }
     //Renaming external events
     else if ( data->GetString() == "ExternalEvents")
@@ -891,7 +895,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
-        game->GetCurrentPlatform().GetChangesNotifier().OnExternalEventsRenamed(*game, events, data->GetSecondString());
+        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+            game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsRenamed(*game, events, data->GetSecondString());
     }
     //Renaming external layout
     else if ( data->GetString() == "ExternalLayout")
@@ -922,7 +927,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
-        game->GetCurrentPlatform().GetChangesNotifier().OnExternalLayoutRenamed(*game, layout, data->GetSecondString());
+        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+            game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutRenamed(*game, layout, data->GetSecondString());
     }
 }
 
@@ -971,7 +977,10 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
     project->InsertNewLayout(newSceneName, position);
 
     if ( project->HasLayoutNamed(newSceneName) )
-        project->GetCurrentPlatform().GetChangesNotifier().OnLayoutAdded(*project, project->GetLayout(newSceneName));
+    {
+        for ( unsigned int j = 0; j < project->GetUsedPlatforms().size();++j)
+            project->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutAdded(*project, project->GetLayout(newSceneName));
+    }
     else
         wxLogError(_("Unable to add the new layout!"));
 }
@@ -1063,7 +1072,8 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     if ( waitDialog ) delete waitDialog;
 
     game->RemoveLayout(sceneName);
-    game->GetCurrentPlatform().GetChangesNotifier().OnLayoutDeleted(*game, sceneName);
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutDeleted(*game, sceneName);
 }
 
 /**
@@ -1130,7 +1140,8 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     if ( waitDialog ) delete waitDialog;
 
     game->RemoveLayout(layoutName);
-    game->GetCurrentPlatform().GetChangesNotifier().OnLayoutDeleted(*game, layoutName);
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutDeleted(*game, layoutName);
 }
 
 void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
@@ -1155,7 +1166,8 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
 
     newLayout.SetName(newLayoutName);
     game->InsertLayout(newLayout, game->GetLayoutPosition(data->GetSecondString()));
-    game->GetCurrentPlatform().GetChangesNotifier().OnLayoutAdded(*game, game->GetLayout(newLayoutName));
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutAdded(*game, game->GetLayout(newLayoutName));
 
     //Insert in tree
     gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", newLayoutName, game);
@@ -1186,7 +1198,8 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     dialog.SetAssociatedProject(game);
     if ( dialog.ShowModal() == 1 )
     {
-        game->GetCurrentPlatform().GetChangesNotifier().OnVariablesModified(*game);
+        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+            game->GetUsedPlatforms()[j]->GetChangesNotifier().OnVariablesModified(*game);
     }
 }
 
@@ -1443,7 +1456,8 @@ void ProjectManager::AddExternalEventsToGame(gd::Project * project)
     }
 
     project->InsertNewExternalEvents(newName, project->GetExternalEventsCount());
-    project->GetCurrentPlatform().GetChangesNotifier().OnExternalEventsAdded(*project, project->GetExternalEvents(newName));
+    for ( unsigned int j = 0; j < project->GetUsedPlatforms().size();++j)
+        project->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsAdded(*project, project->GetExternalEvents(newName));
 }
 
 void ProjectManager::OnRenameExternalEventsSelected(wxCommandEvent& event)
@@ -1482,7 +1496,8 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalEvents(externalEventsName);
-    game->GetCurrentPlatform().GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
 }
 
 void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
@@ -1533,7 +1548,8 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalEvents(externalEventsName);
-    game->GetCurrentPlatform().GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
 }
 
 void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
@@ -1555,7 +1571,8 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
 
     newEvents.SetName(newName);
     game->InsertExternalEvents(newEvents, game->GetExternalEventsPosition(data->GetSecondString()));
-    game->GetCurrentPlatform().GetChangesNotifier().OnExternalEventsAdded(*game, game->GetExternalEvents(newName));
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsAdded(*game, game->GetExternalEvents(newName));
 
     //Insert in tree
     gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEvents", newName, game);
@@ -1580,7 +1597,8 @@ void ProjectManager::AddExternalLayoutToGame(gd::Project * project)
     }
 
     project->InsertNewExternalLayout(newName, project->GetExternalLayoutsCount());
-    project->GetCurrentPlatform().GetChangesNotifier().OnExternalLayoutAdded(*project, project->GetExternalLayout(newName));
+    for ( unsigned int j = 0; j < project->GetUsedPlatforms().size();++j)
+        project->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutAdded(*project, project->GetExternalLayout(newName));
 }
 
 void ProjectManager::OnAddExternalLayoutSelected(wxCommandEvent& event)
@@ -1683,7 +1701,8 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalLayout(externalLayoutName);
-    game->GetCurrentPlatform().GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
 }
 
 void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
@@ -1734,7 +1753,8 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalLayout(externalLayoutName);
-    game->GetCurrentPlatform().GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
 }
 
 void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
@@ -1756,7 +1776,8 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
 
     newExternalLayout.SetName(newName);
     game->InsertExternalLayout(newExternalLayout, game->GetExternalLayoutPosition(data->GetSecondString()));
-    game->GetCurrentPlatform().GetChangesNotifier().OnExternalLayoutAdded(*game, game->GetExternalLayout(newName));
+    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutAdded(*game, game->GetExternalLayout(newName));
 
     //Insert in tree
     gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalLayout", newName, game);

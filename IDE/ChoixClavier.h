@@ -5,6 +5,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/statline.h>
+#include <wx/panel.h>
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -25,6 +26,7 @@ public:
     wxStaticText* StaticText2;
     wxButton* Button1;
     wxStaticBitmap* StaticBitmap1;
+    wxPanel* Panel1;
     wxStaticLine* StaticLine1;
     wxHyperlinkCtrl* helpBt;
     //*)
@@ -35,6 +37,7 @@ protected:
 
     //(*Identifiers(ChoixClavier)
     static const long ID_STATICTEXT3;
+    static const long ID_PANEL1;
     static const long ID_STATICLINE1;
     static const long ID_STATICBITMAP2;
     static const long ID_HYPERLINKCTRL1;
@@ -49,6 +52,7 @@ private:
     void OnTextCtrl1Text(wxCommandEvent& event);
     void OnPanel1KeyDown(wxKeyEvent& event);
     void OnhelpBtClick(wxCommandEvent& event);
+    void OnPanel1KeyDown1(wxKeyEvent& event);
     //*)
 
     DECLARE_EVENT_TABLE()

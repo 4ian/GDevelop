@@ -63,12 +63,17 @@ public:
     /**
      * Change the name of the layout with the name passed as parameter.
      */
-    void SetName(const std::string & name_) {name = name_;};
+    void SetName(const std::string & name_);
 
     /**
      * Return the name of the layout.
      */
     const std::string & GetName() const {return name;};
+
+    /**
+     * Return the name of the layout mangled by SceneNameMangler.
+     */
+    const std::string & GetMangledName() const {return mangledName;};
 
     /**
      * Set the background color
@@ -132,11 +137,6 @@ public:
      * Get the events of the layout
      */
     std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
-
-    /**
-     * Called by the IDE when events have been changed.
-     */
-    void OnEventsModified() {};
 #endif
     ///@}
 
@@ -420,6 +420,7 @@ public:
 
 private:
     std::string                                 name; ///< Scene name
+    std::string                                 mangledName; ///< The scene name mangled by SceneNameMangler
     unsigned int                                backgroundColorR; ///< Background color Red component
     unsigned int                                backgroundColorG; ///< Background color Green component
     unsigned int                                backgroundColorB; ///< Background color Blue component

@@ -102,6 +102,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     isMovingView(false),
     hasJustRightClicked(false),
     ctrlPressed(false),
+    altPressed(false),
     shiftPressed(false),
     isMovingInstance(false),
     isSelecting(false),
@@ -464,10 +465,10 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), wxBitmap("res/preview24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
+        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", wxBitmap("res/preview24.png", wxBITMAP_TYPE_ANY), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -714,8 +715,12 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
         {
             SelectInstance(instance);
 
-            if (!isMovingInstance && ctrlPressed)
+            if (!isMovingInstance && ctrlPressed) //Clone objects
             {
+                std::vector < InitialInstance* > selection = GetSelection();
+                for (unsigned int i = 0;i<selection.size();++i)
+                    instances.InsertInitialInstance(*selection[i]);
+
                 for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
                     (*it)->InitialInstancesUpdated();
             }

@@ -26,8 +26,8 @@ namespace gd
 class GD_CORE_API EventsChangesNotifier
 {
 public:
-    static void NotifyChangesInEventsOfScene(const gd::Platform & platform, gd::Project & project, gd::Layout & layout);
-    static void NotifyChangesInEventsOfExternalEvents(const gd::Platform & platform, gd::Project & project, gd::ExternalEvents & externalEvents);
+    static void NotifyChangesInEventsOfScene(gd::Project & project, gd::Layout & layout);
+    static void NotifyChangesInEventsOfExternalEvents(gd::Project & project, gd::ExternalEvents & externalEvents);
 
 private:
     /**

@@ -72,6 +72,7 @@ private:
     //(*Handlers(ChooseLayerDialog)
     void OnokBtClick(wxCommandEvent& event);
     void OncancelBtClick(wxCommandEvent& event);
+    void OnlayersListDClick(wxCommandEvent& event);
     //*)
 
     bool addQuotes;

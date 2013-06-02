@@ -12,8 +12,6 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/checklst.h>
-#include <wx/statline.h>
-#include <wx/panel.h>
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -46,16 +44,12 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 		wxButton* FermerBt;
 		wxStaticText* StaticText6;
 		wxTextCtrl* infoEdit;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxStaticText* StaticText5;
-		wxStaticLine* StaticLine1;
 		wxHyperlinkCtrl* helpBt;
 		wxStaticText* licenseTxt;
 		wxStaticText* StaticText4;
-		wxStaticBitmap* StaticBitmap3;
 		wxStaticBitmap* wincompatibleBmp;
 		wxStaticBitmap* linuxcompatibleBmp;
 		//*)
@@ -63,10 +57,6 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 	protected:
 
 		//(*Identifiers(ProjectExtensionsDialog)
-		static const long ID_STATICBITMAP3;
-		static const long ID_STATICTEXT1;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE1;
 		static const long ID_CHECKLISTBOX1;
 		static const long ID_TEXTCTRL2;
 		static const long ID_STATICTEXT5;

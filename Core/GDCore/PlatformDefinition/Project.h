@@ -484,6 +484,16 @@ public:
      */
     void RemoveExternalLayout(const std::string & name);
 
+    /**
+     * Set the first layout of the project.
+     */
+    void SetFirstLayout(const std::string & name ) { firstLayout = name; }
+
+    /**
+     * Get the first layout of the project.
+     */
+    const std::string & GetFirstLayout() { return firstLayout; }
+
     ///@}
 
     /** \name Global objects groups management
@@ -621,6 +631,7 @@ private:
     boost::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform projects.
     std::vector < std::string >                         extensionsUsed; ///< List of extensions used
     std::vector < gd::Platform* >                       platforms; ///< Pointers to the platforms this project supports.
+    std::string                                         firstLayout;
     #if defined(GD_IDE_ONLY)
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     std::string                                         author; ///< Game author name

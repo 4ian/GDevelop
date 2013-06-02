@@ -7,7 +7,6 @@
 
 //(*InternalHeaders(ProjectExtensionsDialog)
 #include <wx/bitmap.h>
-#include <wx/settings.h>
 #include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/image.h>
@@ -32,10 +31,6 @@ namespace gd
 {
 
 //(*IdInit(ProjectExtensionsDialog)
-const long ProjectExtensionsDialog::ID_STATICBITMAP3 = wxNewId();
-const long ProjectExtensionsDialog::ID_STATICTEXT1 = wxNewId();
-const long ProjectExtensionsDialog::ID_PANEL1 = wxNewId();
-const long ProjectExtensionsDialog::ID_STATICLINE1 = wxNewId();
 const long ProjectExtensionsDialog::ID_CHECKLISTBOX1 = wxNewId();
 const long ProjectExtensionsDialog::ID_TEXTCTRL2 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT5 = wxNewId();
@@ -74,7 +69,6 @@ project(project_)
 	wxStaticBoxSizer* StaticBoxSizer3;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer12;
-	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
@@ -84,19 +78,6 @@ project(project_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(2);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/extension64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
-	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop can use extensions to increase or simplify the creation possibilities.\nCheck extensions you want to use in your game."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT, _T("ID_STATICTEXT1"));
-	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	Panel1->SetSizer(FlexGridSizer6);
-	FlexGridSizer6->Fit(Panel1);
-	FlexGridSizer6->SetSizeHints(Panel1);
-	FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
 	FlexGridSizer12->AddGrowableRow(0);

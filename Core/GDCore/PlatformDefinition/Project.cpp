@@ -571,35 +571,40 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     if ( elem ) GetVariables().LoadFromXml(elem);
 
     //Scenes
-    elem = rootElement->FirstChildElement( "Scenes" ) ? rootElement->FirstChildElement( "Scenes" )->FirstChildElement() : NULL;
-    while ( elem )
-    {
-        std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
+    if ( rootElement->FirstChildElement( "Scenes" ) ) {
+        firstLayout = rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") ?
+            rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") : "";
 
-        //Add a new layout
-        boost::shared_ptr<gd::Layout> layout = boost::shared_ptr<gd::Layout>(new gd::Layout);
-        if ( layout )
+        elem = rootElement->FirstChildElement( "Scenes" ) ? rootElement->FirstChildElement( "Scenes" )->FirstChildElement() : NULL;
+        while ( elem )
         {
-            scenes.push_back(layout);
-            scenes.back()->SetName(layoutName);
-            scenes.back()->LoadFromXml(*this, elem);
+            std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
 
-            //Compatibility code with GD 2.x
-            #if defined(GD_IDE_ONLY)
-            if ( GDMajorVersion <= 2 )
+            //Add a new layout
+            boost::shared_ptr<gd::Layout> layout = boost::shared_ptr<gd::Layout>(new gd::Layout);
+            if ( layout )
             {
-                SpriteObjectsPositionUpdater updater(*this, *scenes.back());
-                gd::InitialInstancesContainer & instances = scenes.back()->GetInitialInstances();
-                instances.IterateOverInstances(updater);
+                scenes.push_back(layout);
+                scenes.back()->SetName(layoutName);
+                scenes.back()->LoadFromXml(*this, elem);
 
+                //Compatibility code with GD 2.x
+                #if defined(GD_IDE_ONLY)
+                if ( GDMajorVersion <= 2 )
+                {
+                    SpriteObjectsPositionUpdater updater(*this, *scenes.back());
+                    gd::InitialInstancesContainer & instances = scenes.back()->GetInitialInstances();
+                    instances.IterateOverInstances(updater);
+
+                }
+                #endif
+                //End of compatibility code
             }
-            #endif
-            //End of compatibility code
-        }
-        else
-            std::cout << "ERROR : Unable to create a layout when loading a project!" << std::endl;
+            else
+                std::cout << "ERROR : Unable to create a layout when loading a project!" << std::endl;
 
-        elem = elem->NextSiblingElement();
+            elem = elem->NextSiblingElement();
+        }
     }
 
     #if defined(GD_IDE_ONLY)
@@ -825,6 +830,7 @@ void Project::SaveToXml(TiXmlElement * root) const
     //Scenes
     TiXmlElement * scenes = new TiXmlElement( "Scenes" );
     root->LinkEndChild( scenes );
+    scenes->SetAttribute("firstScene", firstLayout.c_str());
     for ( unsigned int i = 0;i < GetLayoutCount();i++ )
     {
         TiXmlElement * scene = new TiXmlElement( "Scene" );

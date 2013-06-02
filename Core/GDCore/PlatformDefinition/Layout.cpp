@@ -14,6 +14,7 @@
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/CommonTools.h"
@@ -62,6 +63,12 @@ Layout::Layout() :
     layer.SetCameraCount(1);
     initialLayers.push_back(layer);
 }
+
+void Layout::SetName(const std::string & name_)
+{
+    name = name_;
+    mangledName = gd::SceneNameMangler::GetMangledSceneName(name);
+};
 
 gd::Layer & Layout::GetLayer(const std::string & name)
 {
@@ -204,6 +211,7 @@ void Layout::SaveToXml(TiXmlElement * scene) const
     if ( scene == NULL ) return;
 
     scene->SetAttribute( "nom", GetName().c_str() );
+    scene->SetAttribute( "mangledName", GetMangledName().c_str() );
     scene->SetDoubleAttribute( "r", GetBackgroundColorRed() );
     scene->SetDoubleAttribute( "v", GetBackgroundColorGreen() );
     scene->SetDoubleAttribute( "b", GetBackgroundColorBlue() );
@@ -334,7 +342,7 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
 
 void Layout::Init(const Layout & other)
 {
-    name = other.name;
+    SetName(other.name);
     backgroundColorR = other.backgroundColorR;
     backgroundColorG = other.backgroundColorG;
     backgroundColorB = other.backgroundColorB;

@@ -47,6 +47,10 @@
 
 CppPlatform *CppPlatform::singleton = NULL;
 
+#if defined(GD_IDE_ONLY)
+ChangesNotifier CppPlatform::changesNotifier;
+#endif
+
 CppPlatform::CppPlatform() :
     gd::Platform()
 {

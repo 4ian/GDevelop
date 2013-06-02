@@ -62,6 +62,11 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
     reloadingText.setString(string(_("Compiling...").mb_str()));
     reloadingText.setCharacterSize(40);
     reloadingText.setFont(*FontManager::GetInstance()->GetFont(""));
+
+    //Launch now events compilation if needed :
+    //Useful when opening a scene for the first time for example.
+    if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(editor.GetLayout()) )
+        CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());
 }
 
 /**
@@ -103,7 +108,7 @@ void CppLayoutPreviewer::StopPreview()
 
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(&editor);
-    //setFramerateLimit(30);
+    previewScene.GetCodeExecutionEngine()->Unload();
 
     //Parse now the results of profiling
     if ( profiler ) profiler->ParseProfileEvents();
@@ -125,17 +130,22 @@ void CppLayoutPreviewer::OnUpdate()
     }
     else //We're displaying the scene
     {
-        //Then display the scene
         if ( previewScene.running )
         {
+            //Render the scene
             int retourEvent = previewScene.RenderAndStep();
+            if ( externalPreviewWindow && externalPreviewWindow->IsShown() ) //Be sure that the editor is updated.
+            {
+                editor.clear(sf::Color(255,255,255));
+                editor.display();
+            }
 
             if ( retourEvent == -2 )
-                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled editor.GetProject(), the editor.GetProject() will quit." ));
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
             else if ( retourEvent != -1 )
             {
                 if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < editor.GetProject().GetLayoutCount())
-                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled editor.GetProject(), the scene will change for " ) + "\"" + editor.GetProject().GetLayout(retourEvent).GetName() + "\"");
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + editor.GetProject().GetLayout(retourEvent).GetName() + "\"");
             }
         }
         else if ( !previewScene.running ) //Paused
@@ -163,7 +173,6 @@ void CppLayoutPreviewer::RefreshFromLayout()
     if ( debugger ) previewScene.debugger = debugger.get();
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
-    //Useful when opening a scene for the first time for example.
     if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(editor.GetLayout()) )
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());

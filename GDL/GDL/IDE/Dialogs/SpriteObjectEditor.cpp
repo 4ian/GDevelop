@@ -1752,7 +1752,8 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                     image.SetUserAdded(false);
 
                     game.GetResourcesManager().AddResource(image);
-                    game.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(game, name);
+                    for ( unsigned int j = 0; j < game.GetUsedPlatforms().size();++j)
+                        game.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(game, name);
                 }
 
                 Sprite sprite;

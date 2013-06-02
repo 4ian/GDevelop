@@ -425,7 +425,8 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
         //Add to all images
         if ( project.GetResourcesManager().AddResource(name, gd::ToString(file.GetFullPath())) )
         {
-            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, name);
+            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, name);
 
             resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
         }
@@ -544,8 +545,9 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
                 }
             }*/
 
-            project.GetResourcesManager().RemoveResource(imageName),
-            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, imageName);
+            project.GetResourcesManager().RemoveResource(imageName);
+            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, imageName);
             RemoveImageFromTree( resourcesTree->GetRootItem(), imageName );
         }
         else if ( data && data->GetString() == "Folder" )
@@ -781,15 +783,19 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
             {
                 project.GetResourcesManager().RenameResource(renamedItemOldName, propertyNewValue);
 
-                project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
-                project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, propertyNewValue);
+                for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                {
+                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
+                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, propertyNewValue);
+                }
 
                 RenameInTree(resourcesTree->GetRootItem(), renamedItemOldName, propertyNewValue, "Image");
             }
             else
                 project.GetResourcesManager().GetResource(data->GetSecondString()).ChangeProperty(project, propertyName, propertyNewValue);
 
-            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
+            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
         }
         else if ( data && data->GetString() == "Folder")
         {
@@ -900,8 +906,11 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
 
             project.GetResourcesManager().RenameResource(renamedItemOldName, newName);
 
-            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
-            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, newName);
+            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            {
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, newName);
+            }
 
             RenameInTree(resourcesTree->GetRootItem(), renamedItemOldName, newName, "Image");
 

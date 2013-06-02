@@ -173,25 +173,25 @@ void ChangesNotifier::OnEventsModified(gd::Project & game, gd::ExternalEvents & 
 void ChangesNotifier::OnLayoutAdded(gd::Project & project, gd::Layout & layout) const
 {
     //A new layout may trigger recompilation of some events.
-    gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(CppPlatform::Get(), project, layout);
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(project, layout);
 }
 
 void ChangesNotifier::OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const
 {
     //A renamed layout may trigger recompilation of some events.
-    gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(CppPlatform::Get(), project, layout);
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(project, layout);
 }
 
 void ChangesNotifier::OnExternalEventsAdded(gd::Project & project, gd::ExternalEvents & events) const
 {
     //New external events may trigger recompilation of some events.
-    gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(CppPlatform::Get(), project, events);
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(project, events);
 }
 
 void ChangesNotifier::OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const std::string & oldName) const
 {
     //A renamed external events sheet may trigger recompilation of some events.
-    gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(CppPlatform::Get(), project, events);
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(project, events);
 }
 
 void ChangesNotifier::OnExternalEventsDeleted(gd::Project & project, const std::string deletedLayout) const

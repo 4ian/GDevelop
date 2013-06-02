@@ -128,10 +128,10 @@ void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel )
 void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::GetInstance();
-    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
 
     boost::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
+    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
     if(ressourcesLoader->HasFile(file))
     {
         unsigned int size = ressourcesLoader->GetBinaryFileSize(file);
@@ -155,10 +155,10 @@ void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repe
 void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel , bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::GetInstance();
-    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
 
     boost::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
+    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
     if(ressourcesLoader->HasFile(file))
     {
         unsigned int size = ressourcesLoader->GetBinaryFileSize(file);

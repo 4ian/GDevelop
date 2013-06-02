@@ -48,7 +48,7 @@ public:
     /**
      * We provide a specific ChangesNotifier to ensure that compilation jobs are done properly.
      */
-    virtual ChangesNotifier & GetChangesNotifier() { return changesNotifier; };
+    virtual ChangesNotifier & GetChangesNotifier() const { return changesNotifier; };
 
     /**
      * Preview can be done directly inside the editor thanks to CppLayoutPreviewer
@@ -80,7 +80,7 @@ private:
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
     std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
 #if defined(GD_IDE_ONLY)
-    ChangesNotifier changesNotifier;
+    static ChangesNotifier changesNotifier;
 #endif
 
     static CppPlatform * singleton;

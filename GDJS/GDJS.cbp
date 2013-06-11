@@ -51,6 +51,7 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
+					<Add option="-lws2_32" />
 					<Add library="user32" />
 					<Add directory="../IDE/bin/debug" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
@@ -103,6 +104,7 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
+					<Add option="-lws2_32" />
 					<Add library="user32" />
 					<Add directory="../IDE/bin/release" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
@@ -155,6 +157,7 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
+					<Add option="-lws2_32" />
 					<Add library="user32" />
 					<Add directory="../IDE/bin/dev" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
@@ -190,17 +193,31 @@
 		<Unit filename="GDJS/BuiltinExtensions/TimeExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/VariablesExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/VariablesExtension.h" />
+		<Unit filename="GDJS/Dialogs/ProjectExportDialog.cpp" />
+		<Unit filename="GDJS/Dialogs/ProjectExportDialog.h" />
 		<Unit filename="GDJS/EventsCodeGenerator.cpp" />
 		<Unit filename="GDJS/EventsCodeGenerator.h" />
 		<Unit filename="GDJS/Exporter.cpp" />
 		<Unit filename="GDJS/Exporter.h" />
+		<Unit filename="GDJS/HttpServer.cpp" />
+		<Unit filename="GDJS/HttpServer.h" />
 		<Unit filename="GDJS/JsPlatform.cpp" />
 		<Unit filename="GDJS/JsPlatform.h" />
+		<Unit filename="GDJS/mongoose/mongoose.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="GDJS/mongoose/mongoose.h" />
+		<Unit filename="wxsmith/ProjectExportDialog.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />
+			<wxsmith version="1">
+				<resources>
+					<wxDialog wxs="wxsmith/ProjectExportDialog.wxs" src="GDJS\Dialogs\ProjectExportDialog.cpp" hdr="GDJS\Dialogs\ProjectExportDialog.h" fwddecl="0" i18n="1" name="ProjectExportDialog" language="CPP" />
+				</resources>
+			</wxsmith>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

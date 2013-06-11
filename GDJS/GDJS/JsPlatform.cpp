@@ -11,6 +11,7 @@
 #include "GDJS/Exporter.h"
 #include <wx/filename.h>
 #include <wx/log.h>
+#include <wx/bitmap.h>
 
 //Builtin extensions
 #include "GDJS/BuiltinExtensions/SpriteExtension.h"
@@ -48,13 +49,13 @@ public:
     {
         std::string exportDir = gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/");
 
-        Exporter exporter(project);
+        Exporter exporter(&project);
         if ( !exporter.ExportLayoutForPreview(layout, exportDir) )
         {
             wxLogError(_("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
                        +_("\n\nPlease report this error on the Game Develop website, or contact the extension developer if it seems related to a third party extension."));
         }
-        wxLaunchDefaultBrowser(exportDir+"index.html");
+        wxLaunchDefaultBrowser("localhost:2828");
 
         return false;
     }
@@ -63,14 +64,28 @@ private:
     gd::Layout & layout;
 };
 
+void JsPlatform::OnIDEInitialized()
+{
+    //Initializing the tiny web server used to preview the games
+    std::cout << "Starting web server..." << std::endl;
+    std::string exportDir = gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/");
+    httpServer.Run(exportDir);
+}
+
 boost::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new Previewer(editor.GetProject(), editor.GetLayout()));
 }
 
+boost::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const
+{
+    return boost::shared_ptr<gd::ProjectExporter>(new Exporter);
+}
+
 JsPlatform::JsPlatform() :
     gd::Platform()
 {
+    //Adding built-in extensions.
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SceneExtension));

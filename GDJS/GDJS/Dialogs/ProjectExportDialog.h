@@ -9,12 +9,12 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-#include <wx/gauge.h>
 //*)
 #include "GDCore/CommonTools.h"
 namespace gd { class Project; }
@@ -33,43 +33,45 @@ public:
     virtual ~ProjectExportDialog();
 
     /**
-     * \brief Get the wxWidgets control used to show the export progress.
-     */
-    wxGauge * GetProgressGauge() { return progressGauge; };
-
-    /**
      * \brief Get the directory where project must be exported.
      */
     std::string GetExportDir();
+
+    /**
+     * \brief Check if the user wants to minify the JS files.
+     */
+    bool RequestMinify();
 
 protected:
 
     //(*Declarations(ProjectExportDialog)
     wxStaticText* statusTxt;
     wxStaticBitmap* StaticBitmap1;
+    wxStaticText* StaticText1;
     wxStaticText* status2Txt;
     wxStaticLine* StaticLine2;
     wxButton* exportBt;
     wxButton* closeBt;
-    wxGauge* progressGauge;
     wxButton* browseBt;
     wxHyperlinkCtrl* helpBt;
     wxStaticText* StaticText4;
+    wxCheckBox* minifyCheck;
     wxTextCtrl* dirEdit;
     //*)
 
     //(*Identifiers(ProjectExportDialog)
-    static const long ID_GAUGE1;
-    static const long ID_BUTTON1;
-    static const long ID_STATICTEXT2;
-    static const long ID_STATICTEXT1;
     static const long ID_STATICTEXT4;
     static const long ID_TEXTCTRL1;
     static const long ID_BUTTON5;
+    static const long ID_CHECKBOX1;
+    static const long ID_STATICTEXT2;
+    static const long ID_STATICTEXT1;
+    static const long ID_STATICTEXT3;
     static const long ID_STATICLINE2;
     static const long ID_STATICBITMAP2;
     static const long ID_HYPERLINKCTRL1;
     static const long ID_BUTTON2;
+    static const long ID_BUTTON1;
     //*)
 
 private:

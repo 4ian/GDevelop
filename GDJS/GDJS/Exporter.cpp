@@ -22,6 +22,13 @@
 #include "GDJS/EventsCodeGenerator.h"
 #include "GDJS/Dialogs/ProjectExportDialog.h"
 
+//Nice tool fonction
+static void InsertUnique(std::vector<std::string> & container, std::string str)
+{
+    if ( std::find(container.begin(), container.end(), str) == container.end() )
+        container.push_back(str);
+}
+
 Exporter::~Exporter()
 {
 }
@@ -32,10 +39,11 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
 
     gd::RecursiveMkDir::MkDir(exportDir);
     gd::RecursiveMkDir::MkDir(exportDir+"/libs");
-    std::set<std::string> includesFiles;
+    std::vector<std::string> includesFiles;
 
     //Generate events code
-    if ( !ExportEventsCode(exportDir, includesFiles) ) return false;
+    if ( !ExportEventsCode(*project, gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSCodeTemp/"), includesFiles) )
+        return false;
 
     //Strip the project
     gd::Project strippedProject = StripProject(*project, "");
@@ -47,20 +55,20 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
 
     //Export the project
     if ( !strippedProject.SaveToFile(exportDir+"/data.xml") ) {
-        lastError = gd::ToString(_("Unable to write ")+exportDir+"data.xml");
+        lastError = gd::ToString(_("Unable to write ")+exportDir+"/data.xml");
         return false;
     }
 
-    //Create the index file
-    if ( !ExportIndexFile(*project, exportDir) ) return false;
-
     //Copy additional dependencies
-    ExportIncludesAndLibs(includesFiles, exportDir);
+    ExportIncludesAndLibs(includesFiles, exportDir, false);
+
+    //Create the index file
+    if ( !ExportIndexFile(*project, exportDir, includesFiles) ) return false;
 
     return true;
 }
 
-bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir)
+bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles)
 {
     std::ifstream t("./JsPlatform/Runtime/index.html");
     std::stringstream buffer;
@@ -71,13 +79,21 @@ bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir)
     if ( pos < str.length() ) {
 
         std::string codeFilesIncludes;
-        for (unsigned int i = 0;i<project.GetLayoutCount();++i)
-            codeFilesIncludes += "<script src=\"code"+gd::ToString(i)+".js\"></script>\n";
+        for (std::vector<std::string>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
+        {
+            if ( !wxFileExists(exportDir+"/"+*it) ) continue;
+
+            wxFileName relativeFile = wxFileName::FileName(exportDir+"/"+*it);
+            relativeFile.MakeRelativeTo(exportDir, wxPATH_UNIX);
+            codeFilesIncludes += "<script src=\""+gd::ToString(relativeFile.GetFullPath())+"\"></script>\n";
+        }
 
         str = str.replace(pos, 24, codeFilesIncludes);
     }
     else {
         std::cout << "Unable to find <!-- GDJS_CODE_FILES --> in index file." << std::endl;
+        lastError = "Unable to find <!-- GDJS_CODE_FILES --> in index file.";
+        return false;
     }
 
     {
@@ -96,25 +112,58 @@ bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir)
     return true;
 }
 
-bool Exporter::ExportEventsCode(std::string exportDir, std::set<std::string> & includesFiles)
+bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles)
 {
-    if ( !project ) return false;
+    gd::RecursiveMkDir::MkDir(outputDir);
 
-    for (unsigned int i = 0;i<project->GetLayoutCount();++i)
+    //First, do not forget common includes ( They must be included before events generated code files ).
+    InsertUnique(includesFiles, "libs/pixi.js");
+    InsertUnique(includesFiles, "libs/jquery.js");
+    InsertUnique(includesFiles, "libs/jshashtable.js");
+    InsertUnique(includesFiles, "gd.js");
+    InsertUnique(includesFiles, "commontools.js");
+    InsertUnique(includesFiles, "runtimeobject.js");
+    InsertUnique(includesFiles, "runtimescene.js");
+    InsertUnique(includesFiles, "polygon.js");
+    InsertUnique(includesFiles, "force.js");
+    InsertUnique(includesFiles, "layer.js");
+    InsertUnique(includesFiles, "timer.js");
+    InsertUnique(includesFiles, "imagemanager.js");
+    InsertUnique(includesFiles, "runtimegame.js");
+    InsertUnique(includesFiles, "variable.js");
+    InsertUnique(includesFiles, "variablescontainer.js");
+    InsertUnique(includesFiles, "runtimescene.js");
+    InsertUnique(includesFiles, "runtimeobject.js");
+    InsertUnique(includesFiles, "spriteruntimeobject.js");
+    InsertUnique(includesFiles, "soundmanager.js");
+
+    //Common includes for events only.
+    InsertUnique(includesFiles, "runtimescenetools.js");
+    InsertUnique(includesFiles, "inputtools.js");
+    InsertUnique(includesFiles, "objecttools.js");
+    InsertUnique(includesFiles, "cameratools.js");
+
+    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
     {
-        gd::Layout & exportedLayout = project->GetLayout(i);
-        std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(*project, exportedLayout,
-                                                                                        exportedLayout.GetEvents(), includesFiles,
+        std::set<std::string> eventsIncludes;
+        gd::Layout & exportedLayout = project.GetLayout(i);
+        std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(project, exportedLayout,
+                                                                                        exportedLayout.GetEvents(), eventsIncludes,
                                                                                         false /*Export for edittime*/);
         //Export the code
         std::ofstream file;
-        file.open ( std::string(exportDir+"code"+gd::ToString(i)+".js").c_str() );
+        file.open ( std::string(outputDir+"code"+gd::ToString(i)+".js").c_str() );
         if ( file.is_open() ) {
             file << eventsOutput;
             file.close();
+
+            for ( std::set<std::string>::iterator include = eventsIncludes.begin() ; include != eventsIncludes.end(); ++include )
+                InsertUnique(includesFiles, *include);
+
+            InsertUnique(includesFiles, std::string(outputDir+"code"+gd::ToString(i)+".js"));
         }
         else {
-            lastError = gd::ToString(_("Unable to write ")+exportDir+"code"+gd::ToString(i)+".js");
+            lastError = gd::ToString(_("Unable to write ")+outputDir+"code"+gd::ToString(i)+".js");
             return false;
         }
     }
@@ -122,23 +171,82 @@ bool Exporter::ExportEventsCode(std::string exportDir, std::set<std::string> & i
     return true;
 }
 
-void Exporter::ExportIncludesAndLibs(const std::set<std::string> & includesFiles, std::string exportDir)
+bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, std::string exportDir, bool minify)
 {
-    wxCopyFile("./JsPlatform/Runtime/libs/pixi.js", exportDir+"/libs/pixi.js");
-    wxCopyFile("./JsPlatform/Runtime/libs/jquery.js", exportDir+"/libs/jquery.js");
-    wxCopyFile("./JsPlatform/Runtime/libs/jshashtable.js", exportDir+"/libs/jshashtable.js");
-    wxCopyFile("./JsPlatform/Runtime/bunny.png", exportDir+"/bunny.png");
-    wxCopyFile("./JsPlatform/Runtime/gd.js", exportDir+"/gd.js");
-    wxCopyFile("./JsPlatform/Runtime/runtimeobject.js", exportDir+"/runtimeobject.js");
-    wxCopyFile("./JsPlatform/Runtime/runtimescene.js", exportDir+"/runtimescene.js");
-    wxCopyFile("./JsPlatform/Runtime/commontools.js", exportDir+"/commontools.js");
-    for ( std::set<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
+    //Includes files :
+    if ( minify )
     {
-        wxLogNull noLogPlease;
-        if ( wxFileExists("./JsPlatform/Runtime/"+*include) ) {
-            wxCopyFile("./JsPlatform/Runtime/"+*include, exportDir+*include);
+        std::string javaExec = GetJavaExecutablePath();
+        if ( javaExec.empty() || !wxFileExists(javaExec) )
+        {
+            std::cout << "Java executable not found." << std::endl;
+            wxLogWarning(_("The exported script could not be minified : Check that the Java Runtime Environment is installed."));
+            minify = false;
+        }
+        else
+        {
+            std::string jsPlatformDir = gd::ToString(wxGetCwd()+"/JsPlatform/");
+            std::string cmd = javaExec+" -jar \""+jsPlatformDir+"Tools/compiler.jar\" --js ";
+
+            std::string allJsFiles;
+            for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
+            {
+                if ( wxFileExists(jsPlatformDir+"Runtime/"+*include) )
+                    allJsFiles += "\""+jsPlatformDir+"Runtime/"+*include+"\" ";
+                else if ( wxFileExists(*include) )
+                    allJsFiles += "\""+*include+"\" ";
+            }
+
+            cmd += allJsFiles;
+            cmd += "--js_output_file "+exportDir+"/code.js";
+
+            wxArrayString output;
+            wxArrayString errors;
+            long res = wxExecute(cmd, output, errors);
+            if ( res != 0 )
+            {
+                std::cout << "Execution of the closure compiler failed ( Command line : " << cmd << ")." << std::endl;
+                std::cout << "Output: ";
+                for (size_t i = 0;i<output.size();++i) std::cout << output[i] << std::endl;
+                for (size_t i = 0;i<errors.size();++i) std::cout << errors[i] << std::endl;
+
+                wxLogWarning(_("The exported script could not be minified : Check that the Java Runtime Environment is installed.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
+                minify = false;
+            }
+            else
+            {
+                includesFiles.clear();
+                InsertUnique(includesFiles, "code.js");
+                return true;
+            }
+
         }
     }
+
+    //If the close compiler failed or was not request, simply copy all the include files.
+    if ( !minify )
+    {
+        for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
+        {
+            wxLogNull noLogPlease;
+            if ( wxFileExists("./JsPlatform/Runtime/"+*include) )
+            {
+                wxCopyFile("./JsPlatform/Runtime/"+*include, exportDir+"/"+*include);
+                //Ok, the filename is relative to the export dir.
+            }
+            else if ( wxFileExists(*include) )
+            {
+                wxCopyFile(*include, exportDir+"/"+wxFileName::FileName(*include).GetFullName());
+                *include = gd::ToString(wxFileName::FileName(*include).GetFullName()); //Ensure filename is relative to the export dir.
+            }
+            else
+            {
+                std::cout << "Could not copy include file " << *include << " (File not found)." << std::endl;
+            }
+        }
+    }
+
+    return true;
 }
 
 gd::Project Exporter::StripProject(const gd::Project & project, std::string layout)
@@ -151,7 +259,8 @@ gd::Project Exporter::StripProject(const gd::Project & project, std::string layo
     {
         if ( !layout.empty() && layout != strippedProject.GetLayout(i).GetName() )
             strippedProject.RemoveLayout(strippedProject.GetLayout(i).GetName());
-        else {
+        else
+        {
             strippedProject.GetLayout(i).GetObjectGroups().clear();
             ++i;
         }
@@ -170,20 +279,35 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
     ProjectExportDialog dialog(NULL, project);
     if ( dialog.ShowModal() == 0 ) return;
 
+    bool minify = dialog.RequestMinify();
     std::string exportDir = dialog.GetExportDir();
     gd::RecursiveMkDir::MkDir(exportDir);
     gd::RecursiveMkDir::MkDir(exportDir+"/libs");
-    std::set<std::string> includesFiles;
+    std::vector<std::string> includesFiles;
 
     //TODO: Handle errors
-    ExportEventsCode(exportDir, includesFiles);
-    ExportIndexFile(project, exportDir);
+    if ( !ExportEventsCode(project, gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSCodeTemp/"), includesFiles) )
+    {
+        wxLogError(_("Error during exporting: Unable to export events ( "+lastError+")."));
+        return;
+    }
 
     gd::Project strippedProject = StripProject(project);
     ExportResources(strippedProject, exportDir);
-    ExportIncludesAndLibs(includesFiles, exportDir);
+    ExportIncludesAndLibs(includesFiles, exportDir, minify);
+    if ( !ExportIndexFile(project, exportDir, includesFiles) )
+    {
+        wxLogError(_("Error during exporting:\n"+lastError));
+        return;
+    }
 
-    dialog.GetProgressGauge()->SetValue(100);
+    if ( !strippedProject.SaveToFile(exportDir+"/data.xml") ) {
+        lastError = gd::ToString(_("Unable to write ")+exportDir+"/data.xml");
+        wxLogError(wxString(lastError));
+        return;
+    }
+
+
     if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"),
                       _("Compilation finished"), wxYES_NO) == wxYES )
     {
@@ -200,4 +324,28 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
 std::string Exporter::GetProjectExportButtonLabel()
 {
     return gd::ToString(_("Export to the web"));
+}
+
+std::string Exporter::GetJavaExecutablePath()
+{
+    std::vector<std::string> guessPaths;
+    #if defined(WINDOWS)
+
+        //Try some common paths.
+        guessPaths.push_back("C:/Program Files/java/jre7/bin/java.exe");
+        guessPaths.push_back("C:/Program Files/java/jre6/bin/java.exe");
+        guessPaths.push_back("C:/Program Files (x86)/java/jre7/bin/java.exe");
+        guessPaths.push_back("C:/Program Files (x86)/java/jre6/bin/java.exe");
+
+    #else
+        #warning Please complete this so as to return a path to the Java executable.
+    #endif
+
+    for (size_t i = 0;i<guessPaths.size();++i)
+    {
+            if ( wxFileExists(guessPaths[i]) )
+                return guessPaths[i];
+    }
+
+    return "";
 }

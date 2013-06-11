@@ -14,19 +14,21 @@
 #include <wx/filename.h>
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDJS/Exporter.h"
 
 //(*IdInit(ProjectExportDialog)
-const long ProjectExportDialog::ID_GAUGE1 = wxNewId();
-const long ProjectExportDialog::ID_BUTTON1 = wxNewId();
-const long ProjectExportDialog::ID_STATICTEXT2 = wxNewId();
-const long ProjectExportDialog::ID_STATICTEXT1 = wxNewId();
 const long ProjectExportDialog::ID_STATICTEXT4 = wxNewId();
 const long ProjectExportDialog::ID_TEXTCTRL1 = wxNewId();
 const long ProjectExportDialog::ID_BUTTON5 = wxNewId();
+const long ProjectExportDialog::ID_CHECKBOX1 = wxNewId();
+const long ProjectExportDialog::ID_STATICTEXT2 = wxNewId();
+const long ProjectExportDialog::ID_STATICTEXT1 = wxNewId();
+const long ProjectExportDialog::ID_STATICTEXT3 = wxNewId();
 const long ProjectExportDialog::ID_STATICLINE2 = wxNewId();
 const long ProjectExportDialog::ID_STATICBITMAP2 = wxNewId();
 const long ProjectExportDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long ProjectExportDialog::ID_BUTTON2 = wxNewId();
+const long ProjectExportDialog::ID_BUTTON1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(ProjectExportDialog,wxDialog)
@@ -46,7 +48,7 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Export the project"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(1);
@@ -55,16 +57,6 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
 	FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
 	FlexGridSizer10->AddGrowableRow(0);
-	progressGauge = new wxGauge(this, ID_GAUGE1, 100, wxDefaultPosition, wxSize(238,16), 0, wxDefaultValidator, _T("ID_GAUGE1"));
-	FlexGridSizer10->Add(progressGauge, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	exportBt = new wxButton(this, ID_BUTTON1, _("Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	FlexGridSizer10->Add(exportBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer7->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	statusTxt = new wxStaticText(this, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer7->Add(statusTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	status2Txt = new wxStaticText(this, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer7->Add(status2Txt, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Options"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer5->AddGrowableCol(1);
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Export folder:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -72,12 +64,24 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
 	FlexGridSizer8->AddGrowableRow(0);
-	dirEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	dirEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(201,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer8->Add(dirEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	browseBt = new wxButton(this, ID_BUTTON5, _("..."), wxDefaultPosition, wxSize(30,23), 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	FlexGridSizer8->Add(browseBt, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer5->Add(4,9,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	minifyCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Minify and optimize"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	minifyCheck->SetValue(true);
+	FlexGridSizer5->Add(minifyCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer10->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer7->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	statusTxt = new wxStaticText(this, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer7->Add(statusTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	status2Txt = new wxStaticText(this, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer7->Add(status2Txt, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Note"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT3, _("When the exportation is done, send the files to your website \n( you need a web hosting ) and just go to the website to start \nthe game.\nMore exportation options ( Facebook... ) are coming soon!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticBoxSizer1->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -94,15 +98,17 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
 	FlexGridSizer3->Add(FlexGridSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	closeBt = new wxButton(this, ID_BUTTON2, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(closeBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	exportBt = new wxButton(this, ID_BUTTON1, _("Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	FlexGridSizer3->Add(exportBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExportDialog::OnexportBtClick);
 	Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExportDialog::OnbrowseBtClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ProjectExportDialog::OnhelpBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExportDialog::OncloseBtClick);
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExportDialog::OnexportBtClick);
 	//*)
 
     dirEdit->AutoCompleteDirectories();
@@ -111,6 +117,12 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     else
     {
         dirEdit->SetValue(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+DeleteInvalidCharacters(project.GetName()));
+    }
+
+    if ( Exporter::GetJavaExecutablePath().empty() )
+    {
+        minifyCheck->Disable();
+        minifyCheck->SetValue(false);
     }
 }
 
@@ -158,7 +170,14 @@ void ProjectExportDialog::OnbrowseBtClick(wxCommandEvent& event)
     if ( dialog.ShowModal() == wxID_OK )
         dirEdit->SetValue(dialog.GetPath());
 }
+
 std::string ProjectExportDialog::GetExportDir()
 {
     return std::string(dirEdit->GetValue().mb_str());
 }
+
+bool ProjectExportDialog::RequestMinify()
+{
+    return minifyCheck->GetValue();
+}
+

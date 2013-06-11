@@ -90,6 +90,10 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     +"return;\n"
     +"}\n";
 
+    //Export the symbols to avoid them being stripped by the Closure Compiler:
+    output += "gdjs['"+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code']"
+        +"= gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code;\n";
+
     includeFiles = codeGenerator.GetIncludeFiles();
     return output;
 }

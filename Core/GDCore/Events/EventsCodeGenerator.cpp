@@ -821,7 +821,7 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
     //Add a static_cast if necessary
     string objectFunctionCallNamePart =
     ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
-        "static_cast<"+objInfo.cppClassName+"*>("+GetObjectListName(objectName, context)+"[i])->"+instrInfos.codeExtraInformation.functionCallName
+        "static_cast<"+objInfo.className+"*>("+GetObjectListName(objectName, context)+"[i])->"+instrInfos.codeExtraInformation.functionCallName
     :   GetObjectListName(objectName, context)+"[i]->"+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call

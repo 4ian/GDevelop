@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
+#include <iostream>
 #include "ObjectMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
@@ -19,8 +20,8 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
                    const std::string & informations_,
                    const std::string & icon24x24_,
                    CreateFunPtr createFunPtrP,
-                   DestroyFunPtr destroyFunPtrP,
-                   const std::string & cppClassName_)
+                   DestroyFunPtr destroyFunPtrP) :
+    extensionNamespace(extensionNamespace_)
 {
     name = name_;
 #if defined(GD_IDE_ONLY)
@@ -30,7 +31,6 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 #endif
     createFunPtr = createFunPtrP;
     destroyFunPtr = destroyFunPtrP;
-    cppClassName = cppClassName_;
 }
 
 ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
@@ -77,9 +77,9 @@ gd::ExpressionMetadata & ObjectMetadata::AddExpression(const std::string & name,
                                        const std::string & smallicon)
 {
 #if defined(GD_IDE_ONLY)
-    std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
-    expressionsInfos[nameWithNamespace] = ExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
-    return expressionsInfos[nameWithNamespace];
+    //Be careful, objects expression do not have namespace ( not necessary as objects inherits from only one derived object )
+    expressionsInfos[name] = ExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
+    return expressionsInfos[name];
 #endif
 }
 
@@ -90,9 +90,9 @@ gd::StrExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string &
                                        const std::string & smallicon)
 {
 #if defined(GD_IDE_ONLY)
-    std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
-    strExpressionsInfos[nameWithNamespace] = StrExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
-    return strExpressionsInfos[nameWithNamespace];
+    //Be careful, objects expression do not have namespace ( not necessary as objects inherits from only one derived object )
+    strExpressionsInfos[name] = StrExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
+    return strExpressionsInfos[name];
 #endif
 }
 

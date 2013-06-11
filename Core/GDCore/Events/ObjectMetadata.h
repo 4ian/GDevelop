@@ -37,13 +37,12 @@ public:
                    const std::string & informations_,
                    const std::string & icon24x24_,
                    CreateFunPtr createFunPtrP,
-                   DestroyFunPtr destroyFunPtrP,
-                   const std::string & cppClassName_);
+                   DestroyFunPtr destroyFunPtrP);
     ObjectMetadata() : createFunPtr(NULL), destroyFunPtr(NULL) {}
     virtual ~ObjectMetadata() {};
 
     /**
-     * Declare a new condition as being part of the extension.
+     * \brief Declare a new condition as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
     gd::InstructionMetadata & AddCondition(const std::string & name_,
@@ -55,7 +54,7 @@ public:
                                            const std::string & smallicon_);
 
     /**
-     * Declare a new action as being part of the extension.
+     * \brief Declare a new action as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
     gd::InstructionMetadata & AddAction(const std::string & name_,
@@ -66,7 +65,7 @@ public:
                                            const std::string & icon_,
                                            const std::string & smallicon_);
     /**
-     * Declare a new expression as being part of the extension.
+     * \brief Declare a new expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
     gd::ExpressionMetadata & AddExpression(const std::string & name_,
@@ -75,7 +74,7 @@ public:
                                            const std::string & group_,
                                            const std::string & smallicon_);
     /**
-     * Declare a new string expression as being part of the extension.
+     * \brief Declare a new string expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
     gd::StrExpressionMetadata & AddStrExpression(const std::string & name_,
@@ -85,13 +84,13 @@ public:
                                            const std::string & smallicon_);
 
     /**
-     * Set the name shown to the user.
+     * \brief Set the name shown to the user.
      * \note This method does nothing when used for GD C++ runtime.
      */
     ObjectMetadata & SetFullName(const std::string & fullname_);
 
     /**
-     * Set the description shown to the user.
+     * \brief Set the description shown to the user.
      * \note This method does nothing when used for GD C++ runtime.
      */
     ObjectMetadata & SetDescription(const std::string & description_);
@@ -122,7 +121,7 @@ public:
     std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
 
     std::string optionalIncludeFile;
-    std::string cppClassName;
+    std::string className;
 #endif
     CreateFunPtr createFunPtr;
     DestroyFunPtr destroyFunPtr;

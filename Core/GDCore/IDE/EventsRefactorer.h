@@ -9,6 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 namespace gd { class Layout; }
+namespace gd { class Platform; }
 namespace gd { class Project; }
 namespace gd { class ExternalEvents; }
 namespace gd { class BaseEvent; }

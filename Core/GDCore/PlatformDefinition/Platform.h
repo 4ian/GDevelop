@@ -21,6 +21,7 @@ namespace gd { class BaseEvent; }
 namespace gd { class AutomatismsSharedData; }
 namespace gd { class PlatformExtension; }
 namespace gd { class LayoutEditorCanvas; }
+namespace gd { class ProjectExporter; }
 
 typedef void (*DestroyFunPtr)(gd::Object*);
 typedef gd::Object * (*CreateFunPtr)(std::string name);
@@ -49,10 +50,22 @@ public:
      */
     virtual std::string GetFullName() const { return "Unnamed platform"; }
 
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Must return a text describing the platform in a few words.
+     */
+    virtual std::string GetSubtitle() const { return ""; }
+
     /**
      * \brief Must return a text describing the platform, displayed to users.
      */
     virtual std::string GetDescription() const { return ""; }
+
+    /**
+     * \brief Must return a filename to a 32*32 image file for the platform.
+     */
+    virtual std::string GetIcon() const { return ""; }
+    #endif
 
 
     /** \name Extensions management
@@ -111,11 +124,9 @@ public:
      * \brief Create an event of given type
      */
     boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
-    #endif
 
     ///@}
 
-    #if defined(GD_IDE_ONLY)
 
     /** \name Notification of changes
      * The platform can do extra work when a change occurs by providing a special gd::ChangesNotifier
@@ -144,6 +155,14 @@ public:
      * The default implementation simply return a gd::LayoutEditorPreviewer object doing nothing.
      */
     virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+
+    /**
+     * \brief Must provide a gd::ProjectExporter object that will be used
+     * by the IDE to export the project so as to be used without the IDE.
+     *
+     * The default implementation simply return a gd::ProjectExporter object doing nothing.
+     */
+    virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
     ///@}
 
     /**

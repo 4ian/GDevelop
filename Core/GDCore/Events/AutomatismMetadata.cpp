@@ -34,7 +34,7 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
     SetDescription(std::string(description_));
     SetDefaultName(std::string(defaultName_));
     SetGroup(group_);
-    cppClassName = className_;
+    className = className_;
     if ( wxFile::Exists(icon24x24_) )
     {
         SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY));
@@ -82,9 +82,9 @@ gd::ExpressionMetadata & AutomatismMetadata::AddExpression(const std::string & n
                                        const std::string & smallicon)
 {
 #if defined(GD_IDE_ONLY)
-    std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
-    expressionsInfos[nameWithNamespace] = ExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
-    return expressionsInfos[nameWithNamespace];
+    //Be careful, automatisms expression do not have namespace ( not necessary as we refer to the auomatism name in the expression )
+    expressionsInfos[name] = ExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
+    return expressionsInfos[name];
 #endif
 }
 
@@ -95,9 +95,9 @@ gd::StrExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::stri
                                        const std::string & smallicon)
 {
 #if defined(GD_IDE_ONLY)
-    std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
-    strExpressionsInfos[nameWithNamespace] = StrExpressionMetadata(extensionNamespace, nameWithNamespace, fullname, description, group, smallicon);
-    return strExpressionsInfos[nameWithNamespace];
+    //Be careful, automatisms expression do not have namespace ( not necessary as we refer to the auomatism name in the expression )
+    strExpressionsInfos[name] = StrExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
+    return strExpressionsInfos[name];
 #endif
 }
 

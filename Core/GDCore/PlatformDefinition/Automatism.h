@@ -56,7 +56,7 @@ public:
     /**
      * \brief Called when user wants to edit the automatism.
      */
-    void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * optionalLayout, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * optionalLayout, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
 
     /**
      * \brief Save the object to XML

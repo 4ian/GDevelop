@@ -348,6 +348,8 @@
 		<Unit filename="GDCore/IDE/Dialogs/ObjectListDialogsHelper.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/ObjectsPropgridHelper.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ProjectExtensionsDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp" />
@@ -376,6 +378,8 @@
 		<Unit filename="GDCore/IDE/PlatformLoader.h" />
 		<Unit filename="GDCore/IDE/PlatformManager.cpp" />
 		<Unit filename="GDCore/IDE/PlatformManager.h" />
+		<Unit filename="GDCore/IDE/ProjectExporter.cpp" />
+		<Unit filename="GDCore/IDE/ProjectExporter.h" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.cpp" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.h" />
 		<Unit filename="GDCore/IDE/ResourcesAbsolutePathChecker.cpp" />

@@ -5,6 +5,7 @@
 #include "Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
+#include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include <string>
 
@@ -135,6 +136,13 @@ boost::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(gd::La
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new gd::LayoutEditorPreviewer);
 }
+
+boost::shared_ptr<gd::ProjectExporter> Platform::GetProjectExporter() const
+{
+    return boost::shared_ptr<gd::ProjectExporter>(new gd::ProjectExporter);
+}
+
+
 #endif
 
 }

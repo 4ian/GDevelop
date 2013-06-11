@@ -144,6 +144,7 @@ void Object::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
         }
     }
 
+    DoLoadFromXml(project, elemScene);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -165,6 +166,8 @@ void Object::SaveToXml(TiXmlElement * elem)
 
         GetAutomatism(allAutomatisms[i]).SaveToXml(automatism);
     }
+
+    DoSaveToXml(elem);
 }
 #endif
 

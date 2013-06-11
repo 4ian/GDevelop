@@ -164,7 +164,7 @@ public:
          *                 "CppPlatform/Extensions/text24.png",
          *                 "CppPlatform/Extensions/text.png");
          *
-         *      .AddParameter("object", _("Object"), "Text", false);
+         *      .AddParameter("object", _("Object"), "Text", false)
          *      .AddParameter("operator", _("Modification operator"))
          *      .AddParameter("string", _("String"))
          *

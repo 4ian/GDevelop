@@ -18,11 +18,18 @@
 #include <dirent.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#ifdef __WXMSW__
+#include <wx/msw/uxtheme.h>
+#endif
 #include <wx/clntdata.h>
+#include <wx/imaglist.h>
+#include <wx/log.h>
 
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;
@@ -31,6 +38,8 @@ namespace gd
 {
 
 //(*IdInit(ProjectExtensionsDialog)
+const long ProjectExtensionsDialog::ID_LISTCTRL1 = wxNewId();
+const long ProjectExtensionsDialog::ID_STATICTEXT1 = wxNewId();
 const long ProjectExtensionsDialog::ID_CHECKLISTBOX1 = wxNewId();
 const long ProjectExtensionsDialog::ID_TEXTCTRL2 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT5 = wxNewId();
@@ -47,6 +56,8 @@ const long ProjectExtensionsDialog::ID_STATICBITMAP5 = wxNewId();
 const long ProjectExtensionsDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT2 = wxNewId();
 const long ProjectExtensionsDialog::ID_BUTTON3 = wxNewId();
+const long ProjectExtensionsDialog::ID_MENUITEM1 = wxNewId();
+const long ProjectExtensionsDialog::ID_MENUITEM2 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(ProjectExtensionsDialog,wxDialog)
@@ -55,7 +66,8 @@ BEGIN_EVENT_TABLE(ProjectExtensionsDialog,wxDialog)
 END_EVENT_TABLE()
 
 ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project & project_) :
-project(project_)
+    project(project_),
+    currentPlatform(&project.GetCurrentPlatform())
 {
 	//(*Initialize(ProjectExtensionsDialog)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -69,6 +81,7 @@ project(project_)
 	wxStaticBoxSizer* StaticBoxSizer3;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer12;
+	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
@@ -77,7 +90,14 @@ project(project_)
 	Create(parent, wxID_ANY, _("Use extension modules for Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(2);
+	FlexGridSizer1->AddGrowableRow(1);
+	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer6->AddGrowableCol(0);
+	platformList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(713,106), wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL1"));
+	FlexGridSizer6->Add(platformList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Right click to add or remove a platform.\nPlatforms which are not used by the project are grayed."), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, _T("ID_STATICTEXT1"));
+	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
 	FlexGridSizer12->AddGrowableRow(0);
@@ -163,18 +183,37 @@ project(project_)
 	FlexGridSizer4->Add(FermerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
+	usePlatformMenuItem = new wxMenuItem((&notUsedPlatformMenu), ID_MENUITEM1, _("Use this platform"), wxEmptyString, wxITEM_NORMAL);
+	notUsedPlatformMenu.Append(usePlatformMenuItem);
+	removePlatformMenuItem = new wxMenuItem((&usedPlatformMenu), ID_MENUITEM2, _("Do not use this platform anymore"), wxEmptyString, wxITEM_NORMAL);
+	usedPlatformMenu.Append(removePlatformMenuItem);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
 
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnplatformListItemSelect);
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ProjectExtensionsDialog::OnplatformListItemRClick);
 	Connect(ID_CHECKLISTBOX1,wxEVT_COMMAND_LISTBOX_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnExtensionsListSelect);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ProjectExtensionsDialog::OnhelpBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnFermerBtClick);
+	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnusePlatformMenuItemSelected);
+	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnremovePlatformMenuItemSelected);
+	Connect(wxEVT_SIZE,(wxObjectEventFunction)&ProjectExtensionsDialog::OnResize);
 	//*)
+
+    #if defined(__WXMSW__) //Offer nice look to list
+    {
+        wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+        if(theme) theme->SetWindowTheme((HWND) platformList->GetHWND(), L"EXPLORER", NULL);
+    }
+    #endif
 
     FlexGridSizer10->Show(false); //Cross compilation is not available and so the bitmaps are not relevant.
 
-	UpdateList();
+    platformList->InsertColumn(0,_("Platform"), wxLIST_FORMAT_LEFT, 640);
+    platformList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 640);
+    RefreshPlatformList();
+	RefreshExtensionList();
 }
 
 ProjectExtensionsDialog::~ProjectExtensionsDialog()
@@ -183,11 +222,62 @@ ProjectExtensionsDialog::~ProjectExtensionsDialog()
 	//*)
 }
 
-void ProjectExtensionsDialog::UpdateList()
+
+void ProjectExtensionsDialog::RefreshPlatformList()
+{
+    platformList->DeleteAllItems();
+
+    wxImageList * imageList = new wxImageList(32,32);
+    imageList->Add(wxBitmap("res/icon32.png", wxBITMAP_TYPE_ANY));
+    platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
+
+    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+    const std::vector< Platform * > & usedPlatforms = project.GetUsedPlatforms();
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        //Check if the platform is used by the game
+        bool used = false;
+        for (unsigned int j = 0;j<usedPlatforms.size();++j)
+        {
+            if (usedPlatforms[j]==platforms[i].get())
+            {
+                used = true;
+                break;
+            }
+        }
+
+        long index = used ? 0 : platformList->GetItemCount();
+
+        //Add the item
+        platformList->InsertItem(index, platforms[i]->GetFullName(), 0);
+        gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName(), used ? "true" : "false");
+        platformList->SetItemPtrData(index, wxPtrToUInt(associatedData));
+        platformList->SetItem(index, 1, platforms[i]->GetDescription());
+
+        if ( wxFileExists(platforms[i]->GetIcon()))
+        {
+            wxBitmap icon = wxBitmap(platforms[i]->GetIcon(), wxBITMAP_TYPE_ANY);
+            if ( icon.IsOk() && icon.GetWidth() == 32 && icon.GetHeight() == 32)
+            {
+                imageList->Add(icon);
+                platformList->SetItemImage(index, imageList->GetImageCount()-1);
+            }
+        }
+
+        if (!used)
+            platformList->SetItemTextColour(index, wxColor(128,128,128));
+
+        if ( platforms[i].get() == currentPlatform )
+            platformList->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE);
+    }
+}
+
+void ProjectExtensionsDialog::RefreshExtensionList()
 {
     ExtensionsList->Clear();
+    if (!currentPlatform) return;
 
-    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
 
     //Create the list of available extensions
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
@@ -217,16 +307,24 @@ void ProjectExtensionsDialog::UpdateList()
     }
 }
 
+void ProjectExtensionsDialog::RefreshExtensionListColumnsWidth()
+{
+    platformList->SetColumnWidth(0, platformList->GetSize().GetWidth()*2.0/5.0-5);
+    platformList->SetColumnWidth(1, platformList->GetSize().GetWidth()*3.0/5.0-5);
+}
+
 /**
  * Display information about an extension when selecting one.
  */
 void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
 {
+    if (!currentPlatform) return;
+
     int id = event.GetSelection();
     wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
     if (associatedData == NULL) return;
 
-    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
 
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
     {
@@ -235,30 +333,6 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
             infoEdit->ChangeValue(extensionsInstalled[i]->GetDescription());
             authorTxt->SetLabel(extensionsInstalled[i]->GetAuthor());
             licenseTxt->SetLabel(extensionsInstalled[i]->GetLicense());
-
-            {
-                std::ifstream testFile( string("ProjectExtensionsDialog/"+extensionsInstalled[i]->GetName()+".xgdw").c_str() );
-                if ( testFile || ( extensionsInstalled[i]->IsBuiltin() ) ) //Use namespace to check if it is a builtin extension
-                    wincompatibleBmp->SetBitmap(wxBitmap(_T("res/win-compatible.png"), wxBITMAP_TYPE_ANY));
-                else
-                    wincompatibleBmp->SetBitmap(wxBitmap(_T("res/win-notcompatible.png"), wxBITMAP_TYPE_ANY));
-            }
-
-            {
-                std::ifstream testFile( string("ProjectExtensionsDialog/"+extensionsInstalled[i]->GetName()+".xgdl").c_str() );
-                if ( testFile || ( extensionsInstalled[i]->IsBuiltin() ) ) //Use namespace to check if it is a builtin extension
-                    linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-compatible.png"), wxBITMAP_TYPE_ANY));
-                else
-                    linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-notcompatible.png"), wxBITMAP_TYPE_ANY));
-            }
-
-            {
-                std::ifstream testFile( string("ProjectExtensionsDialog/"+extensionsInstalled[i]->GetName()+".xgdm").c_str() );
-                if ( testFile || ( extensionsInstalled[i]->IsBuiltin() ) ) //Use namespace to check if it is a builtin extension
-                    maccompatibleBmp->SetBitmap(wxBitmap(_T("res/mac-compatible.png"), wxBITMAP_TYPE_ANY));
-                else
-                    maccompatibleBmp->SetBitmap(wxBitmap(_T("res/mac-notcompatible.png"), wxBITMAP_TYPE_ANY));
-            }
 
             return;
         }
@@ -291,4 +365,78 @@ void ProjectExtensionsDialog::OnhelpBtClick(wxCommandEvent& event)
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"));
 }
 
+void ProjectExtensionsDialog::OnResize(wxSizeEvent& event)
+{
+    RefreshExtensionListColumnsWidth();
+    event.Skip();
 }
+
+void ProjectExtensionsDialog::OnusePlatformMenuItemSelected(wxCommandEvent& event)
+{
+    project.AddPlatform(currentPlatform);
+    RefreshPlatformList();
+    RefreshExtensionList();
+}
+
+void ProjectExtensionsDialog::OnremovePlatformMenuItemSelected(wxCommandEvent& event)
+{
+    if ( !project.RemovePlatform(currentPlatform->GetName()) )
+    {
+        wxLogWarning(_("Unable to remove this platform: The project must use at least one plaform."));
+    }
+    RefreshPlatformList();
+    RefreshExtensionList();
+}
+
+void ProjectExtensionsDialog::OnplatformListItemSelect(wxListEvent& event)
+{
+    gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(event.GetItem().GetData());
+    if ( associatedData != NULL )
+    {
+        std::string chosenPlatform = associatedData->GetString();
+
+        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+        for (unsigned int i = 0;i<platforms.size();++i)
+        {
+            if ( platforms[i]->GetName() == chosenPlatform )
+            {
+                currentPlatform = platforms[i].get();
+                RefreshExtensionList();
+            }
+        }
+    }
+}
+
+void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
+{
+    gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(event.GetItem().GetData());
+    if ( associatedData != NULL )
+    {
+        std::string chosenPlatform = associatedData->GetString();
+
+        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+        for (unsigned int i = 0;i<platforms.size();++i)
+        {
+            if ( platforms[i]->GetName() == chosenPlatform )
+            {
+                currentPlatform = platforms[i].get();
+            }
+        }
+
+        const std::vector< Platform * > & usedPlatforms = project.GetUsedPlatforms();
+        for (unsigned int j = 0;j<usedPlatforms.size();++j)
+        {
+            if ( usedPlatforms[j]->GetName() == chosenPlatform)
+            {
+                PopupMenu(&usedPlatformMenu);
+                return;
+            }
+        }
+
+        PopupMenu(&notUsedPlatformMenu);
+    }
+}
+
+
+}
+

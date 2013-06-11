@@ -244,13 +244,13 @@ public:
     /**
      * \brief Load object from an xml element.
      */
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Save object to an xml element.
      */
-    virtual void SaveToXml(TiXmlElement * elemScene);
+    void SaveToXml(TiXmlElement * elemScene);
     #endif
     ///@}
 
@@ -259,6 +259,18 @@ protected:
     std::string                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
     std::map<std::string, gd::Automatism* > automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
     gd::VariablesContainer                  objectVariables; ///<List of the variables of the object
+
+    /**
+     * \brief Derived objects can redefine this method to load custom attributes.
+     */
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene) {};
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Derived objects can redefine this method to save custom attributes.
+     */
+    virtual void DoSaveToXml(TiXmlElement * elemScene) {};
+    #endif
 
     /**
      * Initialize object using another object. Used by copy-ctor and assign-op.

@@ -141,8 +141,7 @@ public:
                                    const std::string & informations_,
                                    const std::string & icon24x24_,
                                    CreateFunPtr createFunPtrP,
-                                   DestroyFunPtr destroyFunPtrP,
-                                   const std::string & cppClassName_);
+                                   DestroyFunPtr destroyFunPtrP);
 
     /**
      * \brief Declare a new automatism as being part of the extension.
@@ -339,7 +338,7 @@ public:
      * This can be used when you want a platform to conform to another.<br>
      * It is still possible to make some changes after the cloning by using getter methods.
      */
-    void CloneExtension(const std::string & platformName, const std::string & extensionName);
+    void CloneExtension(const std::string & platformName, const std::string & extensionName, bool clearInstructionsFunctionsName = true);
     #endif
 
 private:

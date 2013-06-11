@@ -88,12 +88,11 @@ gd::ObjectMetadata & PlatformExtension::AddObject(const std::string & name,
                                const std::string & informations,
                                const std::string & icon24x24,
                                CreateFunPtr createFunPtrP,
-                               DestroyFunPtr destroyFunPtrP,
-                               const std::string & cppClassName)
+                               DestroyFunPtr destroyFunPtrP)
 {
 #if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
-    objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP, destroyFunPtrP, cppClassName);
+    objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP, destroyFunPtrP);
     return objectsInfos[nameWithNamespace];
 #endif
 }
@@ -351,7 +350,7 @@ void PlatformExtension::SetNameSpace(std::string nameSpace_)
 }
 
 #if defined(GD_IDE_ONLY)
-void PlatformExtension::CloneExtension(const std::string & platformName, const std::string & extensionName)
+void PlatformExtension::CloneExtension(const std::string & platformName, const std::string & extensionName, bool clearInstructionsFunctionsName)
 {
     gd::Platform* platform = gd::PlatformManager::GetInstance()->GetPlatform(platformName);
     if ( !platform ) {
@@ -363,6 +362,14 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
     if ( !extension ) {
         std::cout << "Unable to clone extension \""<< extensionName << "\" from " << platformName << ": This extension doesn't exist.";
         return;
+    }
+
+    if ( clearInstructionsFunctionsName )
+    {
+        for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllActions().begin();it != GetAllActions().end();++it)
+            it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+                .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+
     }
 
     *this = *extension;

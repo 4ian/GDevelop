@@ -5,10 +5,39 @@
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+		<handler function="OnResize" entry="EVT_SIZE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
-			<growablerows>2</growablerows>
+			<growablerows>1</growablerows>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxListCtrl" name="ID_LISTCTRL1" variable="platformList" member="yes">
+							<size>713,106</size>
+							<style>wxLC_REPORT|wxLC_NO_HEADER</style>
+							<handler function="OnplatformListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+							<handler function="OnplatformListItemRClick" entry="EVT_LIST_ITEM_RIGHT_CLICK" />
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+							<label>Right click to add or remove a platform.&#x0A;Platforms which are not used by the project are grayed.</label>
+							<style>wxALIGN_RIGHT</style>
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
 					<cols>3</cols>
@@ -276,6 +305,18 @@
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="notUsedPlatformMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM1" variable="usePlatformMenuItem" member="yes">
+				<label>Use this platform</label>
+				<handler function="OnusePlatformMenuItemSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="usedPlatformMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM2" variable="removePlatformMenuItem" member="yes">
+				<label>Do not use this platform anymore</label>
+				<handler function="OnremovePlatformMenuItemSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>

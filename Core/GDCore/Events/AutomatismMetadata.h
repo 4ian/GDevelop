@@ -107,7 +107,7 @@ public:
     std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
 
     std::string optionalIncludeFile;
-    std::string cppClassName;
+    std::string className;
 #endif
 private:
     std::string extensionNamespace;

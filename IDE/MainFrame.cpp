@@ -37,6 +37,8 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/ProjectExporter.h"
+#include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #ifdef __WXMSW__
@@ -301,6 +303,20 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonHelpBtClick );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_TOGGLED, ( wxObjectEventFunction )&MainFrame::OnRibbonToggleBtClick );
 
+    //Update the file menu with exporting items
+    for (unsigned int i = 0;i<gd::PlatformManager::GetInstance()->GetAllPlatforms().size();++i)
+    {
+        boost::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::GetInstance()->GetAllPlatforms()[i]->GetProjectExporter();
+        if ( exporter != boost::shared_ptr<gd::ProjectExporter>()
+             && !exporter->GetProjectExportButtonLabel().empty() )
+        {
+            long id = wxNewId();
+
+            fileMenu.Insert(10, id, exporter->GetProjectExportButtonLabel());
+            Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
+            idToPlatformExportMenuMap[id] = gd::PlatformManager::GetInstance()->GetAllPlatforms()[i].get();
+        }
+    }
 
     wxIconBundle icons;
     icons.AddIcon("res/icon16.png");

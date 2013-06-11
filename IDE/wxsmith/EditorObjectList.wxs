@@ -44,36 +44,13 @@
 		</object>
 		<object class="wxMenu" variable="ContextMenu" member="yes">
 			<object class="wxMenuItem" name="idMenuModObj" variable="editMenuI" member="no">
-				<label>Change the object properties</label>
-				<bitmap>res/editicon.png</bitmap>
+				<label>Edit</label>
 				<handler function="OneditMenuISelected" entry="EVT_MENU" />
 			</object>
-			<object class="wxMenuItem" name="idMenuModVar" variable="editVarMenuI" member="no">
-				<label>Initial variables</label>
-				<bitmap>res/var.png</bitmap>
-				<handler function="OneditVarMenuISelected" entry="EVT_MENU" />
-			</object>
-			<object class="wxMenu" name="ID_MENUITEM1" variable="automatismsMenu" member="yes">
-				<label>Automatisms</label>
-				<object class="separator" />
-				<object class="wxMenuItem" name="ID_MENUITEM2" variable="addAutomatismItem" member="yes">
-					<label>Add an automatism</label>
-					<bitmap>res/addicon.png</bitmap>
-					<handler function="OnaddAutomatismItemSelected" entry="EVT_MENU" />
-				</object>
-				<object class="wxMenuItem" name="ID_MENUITEM5" variable="renameAutomatism" member="yes">
-					<label>Rename an automatism</label>
-					<bitmap>res/editnom.png</bitmap>
-					<handler function="OnrenameAutomatismSelected" entry="EVT_MENU" />
-				</object>
-				<object class="wxMenuItem" name="ID_MENUITEM3" variable="deleteAutomatismItem" member="yes">
-					<label>Delete an automatism</label>
-					<bitmap>res/deleteicon.png</bitmap>
-					<handler function="OndeleteAutomatismItemSelected" entry="EVT_MENU" />
-				</object>
-			</object>
-			<object class="wxMenuItem" name="idMenuEffects" variable="effectsMenuI" member="yes">
-				<label>Effects</label>
+			<object class="wxMenuItem" name="idMenuProp" variable="editPropMenuItem" member="no">
+				<label>Other properties</label>
+				<bitmap>res/editpropicon.png</bitmap>
+				<handler function="OneditPropMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuModName" variable="editNameMenuI" member="no">
 				<label>Rename</label>
@@ -88,7 +65,7 @@
 				<handler function="OnaddObjMenuISelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDelObj" variable="delObjMenuI" member="no">
-				<label>Delete the object</label>
+				<label>Delete</label>
 				<accel>Del</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OndelObjMenuISelected" entry="EVT_MENU" />

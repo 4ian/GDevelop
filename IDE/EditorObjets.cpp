@@ -115,6 +115,14 @@ void EditorObjets::Refresh()
     globalObjectsGroups->Refresh();
 }
 
+void EditorObjets::SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl, wxAuiManager * manager)
+{
+    sceneObjectsEditor->SetAssociatedPropertiesPanel(propPnl, manager);
+    //ObjetsGroups->SetAssociatedPropertiesPanel();
+    globalObjectsEditor->SetAssociatedPropertiesPanel(propPnl, manager);
+    //globalObjectsGroups->SetAssociatedPropertiesPanel();
+}
+
 /**
  * Need to resize manually notebook
  */

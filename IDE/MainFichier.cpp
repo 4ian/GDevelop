@@ -12,6 +12,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
+#include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
@@ -20,7 +21,6 @@
 #include "MainFrame.h"
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
-#include "Compilation.h"
 #include "Fusion.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
@@ -346,8 +346,14 @@ void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    Compilation Dialog( this, *GetCurrentGame() ); //TODO : Abstract
-    Dialog.ShowModal();
+    long id =event.GetId();
+    if ( idToPlatformExportMenuMap.find(id) == idToPlatformExportMenuMap.end() )
+        return;
+
+    boost::shared_ptr<gd::ProjectExporter> exporter = idToPlatformExportMenuMap[id]->GetProjectExporter();
+    if ( !exporter ) return;
+
+    exporter->ShowProjectExportDialog(*GetCurrentGame());
 }
 
 void MainFrame::OnRecentClicked( wxCommandEvent& event )

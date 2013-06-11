@@ -20,6 +20,8 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "EditorObjetsGroups.h"
+class LayoutEditorPropertiesPnl;
+class wxAuiManager;
 
 /**
  * \brief Editor composed of 4 sub editors allowing to edit objects and groups of the scene and of the game.
@@ -46,6 +48,12 @@ public:
      * of type gd::LayoutEditorCanvasAssociatedEditor ) to notify that objects have been changed.
      */
     virtual void ObjectsUpdated() { Refresh(); };
+
+    /**
+     * Can be used to associate a LayoutEditorPropertiesPnl, and the wxAuiManager used to display it,
+     * to the sub editors: They will be able to display objects properties in the property grid.
+     */
+    virtual void SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl, wxAuiManager * manager);
 
 protected:
 

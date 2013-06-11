@@ -12,6 +12,7 @@
 //*)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.h"
+#include "GDCore/IDE/Dialogs/ObjectsPropgridHelper.h"
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class InitialInstance; }
 namespace gd { class Project; }
@@ -25,7 +26,8 @@ class LayoutEditorPropertiesPnl: public wxPanel, public gd::LayoutEditorCanvasAs
 {
 public:
 
-    LayoutEditorPropertiesPnl(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::LayoutEditorCanvas * layoutEditorCanvas = NULL);
+    LayoutEditorPropertiesPnl(wxWindow* parent, gd::Project & project, gd::Layout & layout,
+                              gd::LayoutEditorCanvas * layoutEditorCanvas, gd::MainFrameWrapper & mainFrameWrapper);
     virtual ~LayoutEditorPropertiesPnl();
 
     /**
@@ -49,7 +51,7 @@ public:
      * Members functions related to displaying the properties of an object selected in a objects editor
      */
     ///@{
-    virtual void SelectedObject(const gd::Object & object) {};
+    virtual void SelectedObject(gd::Object * object, gd::Layout * layout);
     virtual void ObjectsUpdated() {};
     ///@}
 
@@ -74,8 +76,11 @@ private:
     gd::Project & project;
     gd::Layout & layout;
     gd::LayoutEditorCanvas * layoutEditorCanvas; ///< Optional pointer to the LayoutEditorCanvas which is using this editor to display instances properties
+    gd::Object * object; ///< The object being selected, if any, in the objects list editor using the property grid.
+    gd::Layout * objectLayout; ///< The layout of the selected object : NULL if object is global. Otherwise, should be equal to the other layout member.
 
     gd::InitialInstancesPropgridHelper instancesHelper; ///< The class managing the property grid when a gd::InitialInstance is selected.
+    gd::ObjectsPropgridHelper objectsHelper; ///< The class managing the property grid when a gd::Object is selected.
 
     bool displayInstancesProperties; ///< True if displaying the properties of a gd::InitialInstance, false for the properties of a gd::Object.
 

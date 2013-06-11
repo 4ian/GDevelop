@@ -229,7 +229,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
             //Creating external editors and linking them to the layout canvas
             objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper));
             layersEditor = boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
-            propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas) );
+            propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper) );
             initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );
 
             layoutEditorCanvas->AddAssociatedEditor(objectsEditor.get());

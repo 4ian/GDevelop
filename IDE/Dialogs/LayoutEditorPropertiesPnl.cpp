@@ -27,12 +27,16 @@ BEGIN_EVENT_TABLE(LayoutEditorPropertiesPnl,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::LayoutEditorCanvas * layoutEditorCanvas_) :
+LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Project & project_,
+                                                     gd::Layout & layout_, gd::LayoutEditorCanvas * layoutEditorCanvas_,
+                                                     gd::MainFrameWrapper & mainFrameWrapper) :
     grid(NULL),
     project(project_),
     layout(layout_),
     layoutEditorCanvas(layoutEditorCanvas_),
+    object(NULL),
     instancesHelper(project, layout),
+    objectsHelper(project, mainFrameWrapper),
     displayInstancesProperties(true)
 {
 	//(*Initialize(LayoutEditorPropertiesPnl)
@@ -51,6 +55,7 @@ LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Proje
 	Connect(wxEVT_SIZE,(wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnResize);
 	//*)
 	instancesHelper.SetGrid(grid);
+	objectsHelper.SetGrid(grid);
     Connect(ID_PROPGRID, wxEVT_PG_SELECTED, (wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnPropertySelected);
     Connect(ID_PROPGRID, wxEVT_PG_CHANGED, (wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnPropertyChanged);
 
@@ -67,6 +72,10 @@ LayoutEditorPropertiesPnl::~LayoutEditorPropertiesPnl()
 void LayoutEditorPropertiesPnl::Refresh()
 {
     if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.RefreshFrom(layoutEditorCanvas->GetSelection());
+    else if ( !displayInstancesProperties ) objectsHelper.RefreshFrom(object);
+
+    grid->Refresh();
+    grid->Update();
 }
 
 void LayoutEditorPropertiesPnl::SelectedInitialInstance(const gd::InitialInstance &)
@@ -92,9 +101,22 @@ void LayoutEditorPropertiesPnl::InitialInstancesUpdated()
     Refresh();
 }
 
+void LayoutEditorPropertiesPnl::SelectedObject(gd::Object * object_, gd::Layout * objectLayout_)
+{
+    displayInstancesProperties = false;
+    object = object_;
+    objectLayout = objectLayout_;
+    Refresh();
+}
+
 void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
 {
     if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
+    else if ( object && !displayInstancesProperties )
+    {
+        if ( objectsHelper.OnPropertySelected(object, objectLayout, event) )
+            Refresh();
+    }
 }
 
 void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
@@ -116,6 +138,11 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
         }
 
         instancesHelper.OnPropertyChanged(selectedInitialInstances, event);
+    }
+    else if ( object && !displayInstancesProperties )
+    {
+        if ( objectsHelper.OnPropertyChanged(object, objectLayout, event) )
+            Refresh();
     }
 }
 

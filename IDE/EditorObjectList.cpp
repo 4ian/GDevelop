@@ -50,6 +50,7 @@
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "MainFrame.h"
+#include "Dialogs/LayoutEditorPropertiesPnl.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -66,12 +67,7 @@ using namespace gd;
 const long EditorObjectList::ID_TREECTRL1 = wxNewId();
 const long EditorObjectList::ID_TEXTCTRL1 = wxNewId();
 const long EditorObjectList::idMenuModObj = wxNewId();
-const long EditorObjectList::idMenuModVar = wxNewId();
-const long EditorObjectList::ID_MENUITEM2 = wxNewId();
-const long EditorObjectList::ID_MENUITEM5 = wxNewId();
-const long EditorObjectList::ID_MENUITEM3 = wxNewId();
-const long EditorObjectList::ID_MENUITEM1 = wxNewId();
-const long EditorObjectList::idMenuEffects = wxNewId();
+const long EditorObjectList::idMenuProp = wxNewId();
 const long EditorObjectList::idMenuModName = wxNewId();
 const long EditorObjectList::idMenuAddObj = wxNewId();
 const long EditorObjectList::idMenuDelObj = wxNewId();
@@ -107,16 +103,18 @@ BEGIN_EVENT_TABLE(EditorObjectList,wxPanel)
 END_EVENT_TABLE()
 
 EditorObjectList::EditorObjectList(wxWindow* parent, gd::Project & project_, gd::ClassWithObjects & objects_, gd::MainFrameWrapper & mainFrameWrapper_, gd::Layout * layout_) :
-objects(objects_),
-project(project_),
-layout(layout_),
-mainFrameWrapper(mainFrameWrapper_),
-globalObjects(&objects == &project)
+    objects(objects_),
+    project(project_),
+    layout(layout_),
+    mainFrameWrapper(mainFrameWrapper_),
+    propPnl(NULL),
+    propPnlManager(NULL),
+    globalObjects(&objects == &project)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
 	wxMenuItem* editNameMenuI;
-	wxMenuItem* editVarMenuI;
+	wxMenuItem* editPropMenuItem;
 	wxMenuItem* editMenuI;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxMenuItem* addObjMenuI;
@@ -130,26 +128,11 @@ globalObjects(&objects == &project)
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(searchCtrl, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
-	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Change the object properties"), wxEmptyString, wxITEM_NORMAL);
-	editMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
+	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
 	ContextMenu.Append(editMenuI);
-	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Initial variables"), wxEmptyString, wxITEM_NORMAL);
-	editVarMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
-	ContextMenu.Append(editVarMenuI);
-	automatismsMenu = new wxMenu();
-	automatismsMenu->AppendSeparator();
-	addAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM2, _("Add an automatism"), wxEmptyString, wxITEM_NORMAL);
-	addAutomatismItem->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
-	automatismsMenu->Append(addAutomatismItem);
-	renameAutomatism = new wxMenuItem(automatismsMenu, ID_MENUITEM5, _("Rename an automatism"), wxEmptyString, wxITEM_NORMAL);
-	renameAutomatism->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
-	automatismsMenu->Append(renameAutomatism);
-	deleteAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM3, _("Delete an automatism"), wxEmptyString, wxITEM_NORMAL);
-	deleteAutomatismItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
-	automatismsMenu->Append(deleteAutomatismItem);
-	ContextMenu.Append(ID_MENUITEM1, _("Automatisms"), automatismsMenu, wxEmptyString);
-	effectsMenuI = new wxMenuItem((&ContextMenu), idMenuEffects, _("Effects"), wxEmptyString, wxITEM_NORMAL);
-	ContextMenu.Append(effectsMenuI);
+	editPropMenuItem = new wxMenuItem((&ContextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
+	editPropMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
+	ContextMenu.Append(editPropMenuItem);
 	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
 	editNameMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(editNameMenuI);
@@ -157,7 +140,7 @@ globalObjects(&objects == &project)
 	addObjMenuI = new wxMenuItem((&ContextMenu), idMenuAddObj, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
 	addObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	ContextMenu.Append(addObjMenuI);
-	delObjMenuI = new wxMenuItem((&ContextMenu), idMenuDelObj, _("Delete the object\tDel"), wxEmptyString, wxITEM_NORMAL);
+	delObjMenuI = new wxMenuItem((&ContextMenu), idMenuDelObj, _("Delete\tDel"), wxEmptyString, wxITEM_NORMAL);
 	delObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	ContextMenu.Append(delObjMenuI);
 	ContextMenu.AppendSeparator();
@@ -200,10 +183,7 @@ globalObjects(&objects == &project)
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorObjectList::OnobjectsListItemMenu);
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorObjectList::OnsearchCtrlText);
 	Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditMenuISelected);
-	Connect(idMenuModVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditVarMenuISelected);
-	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddAutomatismItemSelected);
-	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnrenameAutomatismSelected);
-	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OndeleteAutomatismItemSelected);
+	Connect(idMenuProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditPropMenuItemSelected);
 	Connect(idMenuModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditNameMenuISelected);
 	Connect(idMenuAddObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddObjMenuISelected);
 	Connect(idMenuDelObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OndelObjMenuISelected);
@@ -295,6 +275,12 @@ void EditorObjectList::ConnectEvents()
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::Refresh, NULL, this);
 }
 
+void EditorObjectList::SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl_, wxAuiManager * manager_)
+{
+    propPnl = propPnl_;
+    propPnlManager = manager_;
+}
+
 ////////////////////////////////////////////////////////////
 /// Menu contextuel
 ////////////////////////////////////////////////////////////
@@ -322,37 +308,6 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
     }
     else
     {
-        //Find object so as to update automatisms list
-        string name = ToString(objectsList->GetItemText( item ));
-        if ( !objects.HasObjectNamed(name) ) return;
-
-        //Remove already present automatisms from menu
-        for (vector < std::pair<long, std::string> >::iterator idIter = idForAutomatism.begin();
-             idIter != idForAutomatism.end();
-             ++idIter)
-        {
-            automatismsMenu->Destroy(idIter->first);
-        }
-        idForAutomatism.clear();
-
-        //Add each automatism of the object
-        vector < std::string > allObjectAutomatisms = objects.GetObject(name).GetAllAutomatismNames();
-        for(unsigned int j = 0;j<allObjectAutomatisms.size();++j)
-        {
-            //Find an identifier for the menu item
-            long id = wxNewId();
-
-            idForAutomatism.push_back(std::make_pair(id, allObjectAutomatisms[j]));
-            wxMenuItem * menuItem = new wxMenuItem(automatismsMenu, id,
-                                                   objects.GetObject(name).GetAutomatism(allObjectAutomatisms[j]).GetName());
-            automatismsMenu->Insert(0, menuItem);
-            Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnAutomatismSelected);
-        }
-
-        //TODO
-        ContextMenu.Enable(idMenuEffects, false);
-
-
         //Popup menu
         PopupMenu( &ContextMenu );
     }
@@ -379,7 +334,13 @@ void EditorObjectList::OnobjectsListSelectionChanged(wxTreeEvent& event)
             LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected ( Layout \""+layout->GetName()+"\" )"));
         else
             LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected"));
+
+        std::string selectedObject = gd::ToString(objectsList->GetItemText(item));
+        if ( propPnl ) propPnl->SelectedObject(objects.HasObjectNamed(selectedObject) ? &objects.GetObject(selectedObject) : NULL,
+                                               globalObjects ? NULL : layout);
     }
+    else
+        if ( propPnl ) propPnl->SelectedObject(NULL, globalObjects ? NULL : layout);
 }
 
 
@@ -425,27 +386,6 @@ void EditorObjectList::Refresh()
 void EditorObjectList::OnRefreshBtClick( wxCommandEvent& event )
 {
     Refresh();
-}
-
-
-void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
-{
-    string name = ToString(objectsList->GetItemText( item ));
-    if ( !objects.HasObjectNamed(name) ) return;
-
-    std::string autoType;
-    for (unsigned int i = 0;i<idForAutomatism.size();++i)
-    {
-    	if ( idForAutomatism[i].first == event.GetId() )
-            autoType = idForAutomatism[i].second;
-    }
-
-    gd::Object & object = objects.GetObject(name);
-    gd::Automatism & automatism = object.GetAutomatism(autoType);
-
-    automatism.EditAutomatism(this, project, layout, mainFrameWrapper);
-    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismEdited(project, globalObjects ? NULL : layout, object, automatism);
 }
 
 /**
@@ -672,6 +612,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObjects ? NULL : layout, objects.GetObject(newName), ancienNom);
 
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
+    if ( propPnl ) propPnl->SelectedObject(&objects.GetObject(newName), globalObjects ? NULL : layout);
     return;
 }
 
@@ -865,6 +806,7 @@ void EditorObjectList::OnSetFocus(wxFocusEvent& event)
 /**
  * Editing initial variables
  */
+/*
 void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 {
     std::string name = ToString( objectsList->GetItemText( item ));
@@ -874,113 +816,13 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
         return;
     }
 
-    gd::ChooseVariableDialog dialog(this, objects.GetObject(name).GetVariables(), /*editingOnly=*/true);
+    gd::ChooseVariableDialog dialog(this, objects.GetObject(name).GetVariables(), true);
     if ( dialog.ShowModal() == 1 )
     {
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectVariablesChanged(project, globalObjects ? NULL : layout, objects.GetObject(name));
     }
-}
-
-/**
- * Add an automatism to the object
- */
-void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
-{
-    std::string name = ToString( objectsList->GetItemText( item ));
-    if ( !objects.HasObjectNamed(name) )
-    {
-        wxLogStatus( _( "Can't find the object to edit" ) );
-        return;
-    }
-
-    gd::ChooseAutomatismTypeDialog dialog(this, project);
-    if ( dialog.ShowModal() == 1)
-    {
-        //Find automatism metadata
-        boost::shared_ptr<gd::PlatformExtension> extension = boost::shared_ptr<gd::PlatformExtension> ();
-        std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-        for (unsigned int i = 0;i<extensions.size();++i)
-        {
-            std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-            if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.GetSelectedAutomatismType()) != automatismsTypes.end() )
-                extension = extensions[i];
-        }
-        gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.GetSelectedAutomatismType());
-
-        //Add automatism to object
-        std::string autoName = metadata.GetDefaultName();
-        for (unsigned int j = 0;objects.GetObject(name).HasAutomatismNamed(autoName);++j)
-            autoName = metadata.GetDefaultName()+ToString(j);
-
-        gd::Object & object = objects.GetObject(name);
-        object.AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
-        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, globalObjects ? NULL : layout, object, object.GetAutomatism(autoName));
-    }
-}
-
-void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
-{
-    std::string name = ToString( objectsList->GetItemText( item ));
-    if ( !objects.HasObjectNamed(name) )
-    {
-        wxLogStatus( _( "Can't find the object to edit" ) );
-        return;
-    }
-
-    //Create automatism array
-    wxArrayString automatismsStr;
-
-    //Fill array
-    std::vector <std::string> automatisms = objects.GetObject(name).GetAllAutomatismNames();
-    for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add(objects.GetObject(name).GetAutomatism(automatisms[i]).GetName());
-
-    int selection = wxGetSingleChoiceIndex(_("Choose the automatism to delete"), _("Choose the automatism to delete"), automatismsStr);
-    if ( selection == -1 ) return;
-
-    objects.GetObject(name).RemoveAutomatism(automatisms[selection]);
-
-    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismDeleted(project, globalObjects ? NULL : layout, objects.GetObject(name), automatisms[selection]);
-}
-
-/**
- * Rename an automatism
- */
-void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
-{
-    std::string name = ToString( objectsList->GetItemText( item ));
-    if ( !objects.HasObjectNamed(name) )
-    {
-        wxLogStatus( _( "Can't find the object to edit" ) );
-        return;
-    }
-
-    //Create automatism array
-    wxArrayString automatismsStr;
-
-    //Fill array
-    vector <std::string> automatisms = objects.GetObject(name).GetAllAutomatismNames();
-    for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add(objects.GetObject(name).GetAutomatism(automatisms[i]).GetName());
-
-    int selection = wxGetSingleChoiceIndex(_("Choose the automatism to rename"), _("Choose the automatism to rename"), automatismsStr);
-    if ( selection == -1 ) return;
-
-    gd::Object & object = objects.GetObject(name);
-    gd::Automatism & automatism = object.GetAutomatism(automatisms[selection]);
-
-    std::string newName = ToString(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()));
-    if ( newName == automatism.GetName() || newName.empty() ) return;
-
-    std::string oldName = automatism.GetName();
-    automatism.SetName(newName);
-
-    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismRenamed(project, globalObjects ? NULL : layout, object, automatism, oldName);
-}
+}*/
 
 /**
  * Handle accelerators
@@ -1047,3 +889,8 @@ void EditorObjectList::OnsearchCtrlText(wxCommandEvent& event)
     Refresh();
 }
 
+void EditorObjectList::OneditPropMenuItemSelected(wxCommandEvent& event)
+{
+    if ( propPnl && propPnlManager ) propPnlManager->GetPane("PROPERTIES").Show();
+    propPnlManager->Update();
+}

@@ -26,6 +26,7 @@ namespace gd {class ClassWithObjects;}
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+class LayoutEditorPropertiesPnl;
 
 
 /**
@@ -48,16 +49,26 @@ public:
     EditorObjectList(wxWindow* parent, gd::Project & project_, gd::ClassWithObjects & objects, gd::MainFrameWrapper & mainFrameWrapper, gd::Layout * layout = NULL);
     virtual ~EditorObjectList();
 
+    static void CreateRibbonPage(wxRibbonPage * page);
+    void ConnectEvents();
+
+    void Refresh();
+
+    /**
+     * Can be used to associate a LayoutEditorPropertiesPnl, and the wxAuiManager used to display it,
+     * to the editor.
+     */
+    void SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl, wxAuiManager * manager);
+
+    gd::ClassWithObjects & objects;
+
+protected:
+
     //(*Declarations(EditorObjectList)
-    wxMenuItem* renameAutomatism;
-    wxMenuItem* effectsMenuI;
-    wxMenuItem* addAutomatismItem;
     wxSearchCtrl* searchCtrl;
-    wxMenu* automatismsMenu;
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItem1;
     wxTreeCtrl* objectsList;
-    wxMenuItem* deleteAutomatismItem;
     wxMenuItem* copyMenuI;
     wxMenu ContextMenu;
     wxMenuItem* moveUpMenuI;
@@ -69,25 +80,11 @@ public:
     wxMenuItem* pasteMenuI;
     //*)
 
-    static void CreateRibbonPage(wxRibbonPage * page);
-    void ConnectEvents();
-
-    void Refresh();
-
-    gd::ClassWithObjects & objects;
-
-protected:
-
     //(*Identifiers(EditorObjectList)
     static const long ID_TREECTRL1;
     static const long ID_TEXTCTRL1;
     static const long idMenuModObj;
-    static const long idMenuModVar;
-    static const long ID_MENUITEM2;
-    static const long ID_MENUITEM5;
-    static const long ID_MENUITEM3;
-    static const long ID_MENUITEM1;
-    static const long idMenuEffects;
+    static const long idMenuProp;
     static const long idMenuModName;
     static const long idMenuAddObj;
     static const long idMenuDelObj;
@@ -144,6 +141,8 @@ private:
     void OnrenameAutomatismSelected(wxCommandEvent& event);
     void OnobjectsListKeyDown(wxTreeEvent& event);
     void OnsearchCtrlText(wxCommandEvent& event);
+    void OneditVarMenuISelected1(wxCommandEvent& event);
+    void OneditPropMenuItemSelected(wxCommandEvent& event);
     //*)
     void OnAutomatismSelected(wxCommandEvent & event);
     void OnRefreshBtClick(wxCommandEvent& event);
@@ -160,6 +159,9 @@ private:
     gd::Layout * layout; ///< Layout edited. Can be NULL.
     bool globalObjects; ///< If true, the objects edited are global. Automatically deduced (in the constructor) by checking if &project == &objects.
     gd::MainFrameWrapper & mainFrameWrapper;
+
+    LayoutEditorPropertiesPnl * propPnl;
+    wxAuiManager * propPnlManager;
 
     std::vector < std::pair<long, std::string> > idForAutomatism;
 

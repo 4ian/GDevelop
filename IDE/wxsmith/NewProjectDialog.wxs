@@ -27,7 +27,7 @@
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
-						<option>1</option>
+						<option>2</option>
 					</object>
 					<object class="sizeritem">
 						<object class="wxListCtrl" name="ID_LISTCTRL2" variable="templateList" member="yes">
@@ -37,7 +37,7 @@
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
-						<option>3</option>
+						<option>5</option>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

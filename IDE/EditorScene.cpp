@@ -115,7 +115,7 @@ mainFrameWrapper(mainFrameWrapper_)
     objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper) );
     layersEditor =  boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
     initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, layout.GetInitialInstances(), *layoutEditorCanvas) );
-    propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas));
+    propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper));
 
     //Link some editors together
     layoutEditorCanvas->AddAssociatedEditor(objectsEditor.get());
@@ -124,6 +124,7 @@ mainFrameWrapper(mainFrameWrapper_)
     layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
     layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
     eventsEditor->SetAssociatedLayoutCanvas(layoutEditorCanvas);
+    objectsEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
 
     //Display editors in panes
     m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );

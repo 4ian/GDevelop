@@ -60,9 +60,9 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	platformList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL1"));
-	BoxSizer1->Add(platformList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer1->Add(platformList, 2, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	templateList = new wxListCtrl(this, ID_LISTCTRL2, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL2"));
-	BoxSizer1->Add(templateList, 3, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer1->Add(templateList, 5, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(1);
@@ -160,7 +160,21 @@ void NewProjectDialog::RefreshPlatformList()
         gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName());
         platformList->SetItemPtrData(0, wxPtrToUInt(associatedData));
 
-        if (i == 0) chosenTemplatePlatform = platforms[i]->GetName();
+        if ( wxFileExists(platforms[i]->GetIcon()))
+        {
+            wxBitmap icon = wxBitmap(platforms[i]->GetIcon(), wxBITMAP_TYPE_ANY);
+            if ( icon.IsOk() && icon.GetWidth() == 32 && icon.GetHeight() == 32)
+            {
+                imageList->Add(icon);
+                platformList->SetItemImage(0, imageList->GetImageCount()-1);
+            }
+        }
+
+        if (i == 0)
+        {
+            chosenTemplatePlatform = platforms[i]->GetName();
+            platformList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE);
+        }
     }
 }
 

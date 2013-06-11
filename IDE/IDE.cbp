@@ -484,12 +484,6 @@
 		</Unit>
 		<Unit filename="CodeEditor.cpp" />
 		<Unit filename="CodeEditor.h" />
-		<Unit filename="Compilation.cpp">
-			<Option virtualFolder="Editeur principal/Fichier/" />
-		</Unit>
-		<Unit filename="Compilation.h">
-			<Option virtualFolder="Editeur principal/Fichier/" />
-		</Unit>
 		<Unit filename="CompilationChecker.cpp">
 			<Option weight="63" />
 		</Unit>
@@ -581,12 +575,6 @@
 		</Unit>
 		<Unit filename="EntryPoint.cpp" />
 		<Unit filename="EntryPoint.h" />
-		<Unit filename="ErrorCompilation.cpp">
-			<Option virtualFolder="Editeur principal/Fichier/" />
-		</Unit>
-		<Unit filename="ErrorCompilation.h">
-			<Option virtualFolder="Editeur principal/Fichier/" />
-		</Unit>
 		<Unit filename="EventsEditor.cpp" />
 		<Unit filename="EventsEditor.h" />
 		<Unit filename="ExtensionBugReportDlg.cpp" />
@@ -765,7 +753,6 @@
 					<wxDialog wxs="wxsmith/ChoixTemplateEvent.wxs" src="ChoixTemplateEvent.cpp" hdr="ChoixTemplateEvent.h" fwddecl="0" i18n="1" name="ChoixTemplateEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/Credits.wxs" src="Credits.cpp" hdr="Credits.h" fwddecl="0" i18n="1" name="Credits" language="CPP" />
 					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" fwddecl="0" i18n="1" name="MessagePlus" language="CPP" />
-					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" fwddecl="0" i18n="1" name="Compilation" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" fwddecl="0" i18n="1" name="ChoixClavier" language="CPP" />
 					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" fwddecl="0" i18n="1" name="mp3ogg" language="CPP" />
 					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" fwddecl="0" i18n="1" name="SigneModification" language="CPP" />
@@ -774,7 +761,6 @@
 					<wxDialog wxs="wxsmith/Fusion.wxs" src="Fusion.cpp" hdr="Fusion.h" fwddecl="0" i18n="1" name="Fusion" language="CPP" />
 					<wxDialog wxs="wxsmith/MAJ.wxs" src="MAJ.cpp" hdr="MAJ.h" fwddecl="0" i18n="1" name="MAJ" language="CPP" />
 					<wxDialog wxs="wxsmith/CreateTemplate.wxs" src="CreateTemplate.cpp" hdr="CreateTemplate.h" fwddecl="0" i18n="1" name="CreateTemplate" language="CPP" />
-					<wxDialog wxs="wxsmith/ErrorCompilation.wxs" src="ErrorCompilation.cpp" hdr="ErrorCompilation.h" fwddecl="0" i18n="1" name="ErrorCompilation" language="CPP" />
 					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" fwddecl="0" i18n="1" name="GeneratePassword" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorScene.wxs" src="EditorScene.cpp" hdr="EditorScene.h" fwddecl="0" i18n="1" name="EditorScene" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" fwddecl="0" i18n="1" name="EditorObjetsGroups" language="CPP" />

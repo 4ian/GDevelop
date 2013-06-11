@@ -24,10 +24,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                    _("Base object"),
                    "res/objeticon24.png",
                    &CreateBaseObject,
-                   &DestroyBaseObject,
-                   "");
+                   &DestroyBaseObject);
 
-        AddRuntimeObject(obj, &CreateBaseRuntimeObject, &DestroyBaseRuntimeObject);
+        AddRuntimeObject(obj, "", &CreateBaseRuntimeObject, &DestroyBaseRuntimeObject);
 
         #if defined(GD_IDE_ONLY)
         obj.AddCondition("PosX",

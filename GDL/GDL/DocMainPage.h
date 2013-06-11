@@ -255,7 +255,7 @@ Objects are declared like this :
 
  * \code
             {
-    ObjectMetadata & obj = AddObject("Name",
+    gd::ObjectMetadata & obj = AddObject("Name",
                            _("Name displayed to users"),
                            _("Description"),
                            "path-to-an-32-by-32-icon.png",
@@ -270,7 +270,7 @@ Objects are declared like this :
 You can then declare the actions, conditions, and expressions related to the objects, like normal actions/conditions/expressions, but with "_OBJECT_" added in the name of the macro ( DECLARE_OBJECTACTION instead of AddAction ).
 You will also want to specify where the object is located using ExtensionObjectInfos::SetIncludeFile. For example :
 * \code
-objInfos.SetIncludeFile("TextObject/TextObject.h");
+obj.SetIncludeFile("TextObject/TextObject.h");
 * \endcode
 
 Finally, finish the declaration by adding DECLARE_END_OBJECT().
@@ -331,7 +331,7 @@ Finally, finish the declaration by adding }.
             #endif
 
             {
-                ObjectMetadata & obj = AddObject("ObjectName",
+                gd::ObjectMetadata & obj = AddObject("ObjectName",
                            _("Object name"),
                            _("Description"),
                            "CppPlatform/Extensions/myicon.png",
@@ -340,7 +340,7 @@ Finally, finish the declaration by adding }.
                            "ObjectClassName");
 
                 #if defined(GD_IDE_ONLY)
-                objInfos.SetIncludeFile("MyExtension/MyIncludeFile.h");
+                obj.SetIncludeFile("MyExtension/MyIncludeFile.h");
 
                 DECLARE_OBJECTACTION[...]
                 DECLARE_OBJECTCONDITION[...]

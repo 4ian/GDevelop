@@ -6,6 +6,7 @@
 #include "GDL/CppPlatform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDL/IDE/Exporter.h"
 #include "GDL/Project.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/SoundManager.h"
@@ -148,6 +149,11 @@ boost::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene &
 boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
+}
+
+boost::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
+{
+    return boost::shared_ptr<gd::ProjectExporter>(new Exporter);
 }
 
 void CppPlatform::OnIDEClosed()

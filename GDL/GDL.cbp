@@ -770,6 +770,8 @@
 		<Unit filename="GDL/IDE/CompilerMessagesParser.h" />
 		<Unit filename="GDL/IDE/DependenciesAnalyzer.cpp" />
 		<Unit filename="GDL/IDE/DependenciesAnalyzer.h" />
+		<Unit filename="GDL/IDE/Dialogs/CompilationErrorDialog.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/CompilationErrorDialog.h" />
 		<Unit filename="GDL/IDE/Dialogs/CppLayoutPreviewer.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/CppLayoutPreviewer.h" />
 		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.cpp" />
@@ -778,6 +780,8 @@
 		<Unit filename="GDL/IDE/Dialogs/EditCppCodeEvent.h" />
 		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.h" />
+		<Unit filename="GDL/IDE/Dialogs/ProjectExportDialog.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/ProjectExportDialog.h" />
 		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.h" />
 		<Unit filename="GDL/IDE/Dialogs/RenderDialog.cpp" />
@@ -792,6 +796,8 @@
 		<Unit filename="GDL/IDE/DndResourcesEditor.h" />
 		<Unit filename="GDL/IDE/ExecutableIconChanger.cpp" />
 		<Unit filename="GDL/IDE/ExecutableIconChanger.h" />
+		<Unit filename="GDL/IDE/Exporter.cpp" />
+		<Unit filename="GDL/IDE/Exporter.h" />
 		<Unit filename="GDL/IDE/FullProjectCompiler.cpp" />
 		<Unit filename="GDL/IDE/FullProjectCompiler.h" />
 		<Unit filename="GDL/IDE/ImageFilesWatcher.cpp" />
@@ -882,8 +888,10 @@
 		<Unit filename="GDL/tinyxml/tinyxml.h" />
 		<Unit filename="GDL/tinyxml/tinyxmlerror.cpp" />
 		<Unit filename="GDL/tinyxml/tinyxmlparser.cpp" />
+		<Unit filename="wxsmith/CompilationErrorDialog.wxs" />
 		<Unit filename="wxsmith/DebuggerGUI.wxs" />
 		<Unit filename="wxsmith/ProfileDlg.wxs" />
+		<Unit filename="wxsmith/ProjectExportDialog.wxs" />
 		<Unit filename="wxsmith/RenderDialog.wxs" />
 		<Unit filename="wxsmith/SpriteObjectEditor.wxs" />
 		<Extensions>
@@ -910,6 +918,8 @@
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDL\IDE\Dialogs\ProfileDlg.cpp" hdr="GDL\IDE\Dialogs\ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="GDL\IDE\Dialogs\DebuggerGUI.cpp" hdr="GDL\IDE\Dialogs\DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="GDL\IDE\Dialogs\RenderDialog.cpp" hdr="GDL\IDE\Dialogs\RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectExportDialog.wxs" src="GDL\IDE\Dialogs\ProjectExportDialog.cpp" hdr="GDL\IDE\Dialogs\ProjectExportDialog.h" fwddecl="0" i18n="1" name="ProjectExportDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/CompilationErrorDialog.wxs" src="GDL\IDE\Dialogs\CompilationErrorDialog.cpp" hdr="GDL\IDE\Dialogs\CompilationErrorDialog.h" fwddecl="0" i18n="1" name="CompilationErrorDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

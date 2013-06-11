@@ -29,11 +29,11 @@ std::string EventsCodeGenerator::GenerateCurrentObjectFunctionCall(std::string o
                                                       std::string parametersStr,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    bool castNeeded = !objMetadata.cppClassName.empty();
+    bool castNeeded = !objMetadata.className.empty();
     if ( !castNeeded )
         return "("+ManObjListName(objectListName)+"[i]->"+functionCallName+"("+parametersStr+"))";
     else
-        return "(static_cast<"+objMetadata.cppClassName+"*>("+ManObjListName(objectListName)+"[i])->"+functionCallName+"("+parametersStr+"))";
+        return "(static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[i])->"+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateNotPickedObjectFunctionCall(std::string objectListName,
@@ -43,11 +43,11 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectFunctionCall(std::string
                                                         std::string defaultOutput,
                                                         gd::EventsCodeGenerationContext & context)
 {
-    bool castNeeded = !objMetadata.cppClassName.empty();
+    bool castNeeded = !objMetadata.className.empty();
     if ( !castNeeded )
         return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ ManObjListName(objectListName)+"[0]->"+functionCallName+"("+parametersStr+"))";
     else
-        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+objMetadata.cppClassName+"*>("+ManObjListName(objectListName)+"[0])->"+functionCallName+"("+parametersStr+"))";
+        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[0])->"+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
@@ -57,11 +57,11 @@ std::string EventsCodeGenerator::GenerateCurrentObjectAutomatismFunctionCall(std
                                                       std::string parametersStr,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    bool castNeeded = !autoInfo.cppClassName.empty();
+    bool castNeeded = !autoInfo.className.empty();
     if ( !castNeeded )
         return "("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+functionCallName+"("+parametersStr+"))";
     else
-        return "(static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
+        return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
@@ -72,11 +72,11 @@ std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(s
                                                         std::string defaultOutput,
                                                         gd::EventsCodeGenerationContext & context)
 {
-    bool castNeeded = !autoInfo.cppClassName.empty();
+    bool castNeeded = !autoInfo.className.empty();
     if ( !castNeeded )
         return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\")->"+functionCallName+"("+parametersStr+"))";
     else
-        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
+        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
 }
 
 std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
@@ -93,7 +93,7 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
     //Add a static_cast if necessary
     string objectFunctionCallNamePart =
     ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
-        "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(objectName)+"[i])->"+instrInfos.codeExtraInformation.functionCallName
+        "static_cast<"+objInfo.className+"*>("+ManObjListName(objectName)+"[i])->"+instrInfos.codeExtraInformation.functionCallName
     :   ManObjListName(objectName)+"[i]->"+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
@@ -147,7 +147,7 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
     //Add a static_cast if necessary
     string objectFunctionCallNamePart =
     ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
-        "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+instrInfos.codeExtraInformation.functionCallName
+        "static_cast<"+autoInfo.className+"*>("+ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+instrInfos.codeExtraInformation.functionCallName
     :   ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
@@ -205,7 +205,7 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
 
     //Prepare call
     //Add a static_cast if necessary
-    string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(objectName)+"[i])->" : ManObjListName(objectName)+"[i]->" ;
+    string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.className+"*>("+ManObjListName(objectName)+"[i])->" : ManObjListName(objectName)+"[i]->" ;
 
     //Create call
     string call;
@@ -250,7 +250,7 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     //Add a static_cast if necessary
     string objectPart =
     ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
-        "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"
+        "static_cast<"+autoInfo.className+"*>("+ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"
     :   ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->";
 
     //Create call

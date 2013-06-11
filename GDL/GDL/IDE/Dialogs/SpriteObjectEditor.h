@@ -28,6 +28,9 @@ namespace gd { class Resource; }
 namespace gd { class Project; }
 class Sprite;
 
+/**
+ * \brief Editor for Sprite Object.
+ */
 class SpriteObjectEditor: public wxDialog
 {
 public:
@@ -36,7 +39,7 @@ public:
     virtual ~SpriteObjectEditor();
 
     /**
-     * Used by DndTextSpriteObjectEditor so as to add a dragged image
+     * \brief Used by DndTextSpriteObjectEditor so as to add a dragged image
      */
     void AddImageToCurrentAnimation(wxString image);
 

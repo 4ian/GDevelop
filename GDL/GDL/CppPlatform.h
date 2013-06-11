@@ -27,7 +27,8 @@ class GD_API CppPlatform : public gd::Platform
 public:
 
     virtual std::string GetName() const { return "Game Develop C++ platform"; }
-    virtual std::string GetFullName() const { return "C++ Platform"; }
+    virtual std::string GetFullName() const { return "Native platform"; }
+    virtual std::string GetSubtitle() const { return "C++ and OpenGL based games for Windows or Linux."; }
     virtual std::string GetDescription() const;
 
     /**
@@ -45,15 +46,22 @@ public:
     bool AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension);
 
 #if defined(GD_IDE_ONLY)
+    virtual std::string GetIcon() const { return "CppPlatform/icon32.png"; }
+
     /**
      * We provide a specific ChangesNotifier to ensure that compilation jobs are done properly.
      */
     virtual ChangesNotifier & GetChangesNotifier() const { return changesNotifier; };
 
     /**
-     * Preview can be done directly inside the editor thanks to CppLayoutPreviewer
+     * \brief Preview can be done directly inside the editor thanks to CppLayoutPreviewer
      */
     virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+
+    /**
+     * \brief Expose to the IDE how to export games.
+     */
+    virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
 
     /**
      * When destroyed, our platform need to do ensure the destruction of some singletons.
@@ -81,6 +89,7 @@ private:
     std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
 #if defined(GD_IDE_ONLY)
     static ChangesNotifier changesNotifier;
+    wxBitmap icon32;
 #endif
 
     static CppPlatform * singleton;

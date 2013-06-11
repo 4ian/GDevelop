@@ -24,7 +24,7 @@ class RuntimeScene;
  * - An important function is RuntimeObject::Draw. It is called to render the object on the scene. This function take in parameter a reference to the target where render the object.
  * - RuntimeObjects must be able to return their size, by redefining RuntimeObject::GetWidth and RuntimeObject::GetHeight
  * - RuntimeObjects must be able to return the position where they have precisely drawn ( for example, Sprite can draw image not exactly at the position of the object, if the origin point was moved ). They must also be able to return the position of their center. See RuntimeObject::GetDrawableX, RuntimeObject::GetDrawableY and RuntimeObject::GetCenterX, RuntimeObject::GetCenterY.
- * - If objects need to load ressources ( for example textures at the loading ), it must be done inside the constructor creating the object from a gd::RuntimeObject.
+ * - If objects need to load ressources ( for example textures at the loading ), it must be done inside the constructor creating the object from a gd::Object.
  * - When objects are placed at the start of the scene, scenes call RuntimeObject::ExtraInitializationFromInitialInstance, passing a gd::InitialInstance object in parameter ( containing information like the position where place the object ). Note that common information were already changed ( Position, angle, layer... ). You just need to setup the object with the information related to your object.
  * - Finally, objects can expose debugging features: RuntimeObject::GetPropertyForDebugger, RuntimeObject::ChangeProperty and RuntimeObject::GetNumberOfProperties
  *
@@ -373,20 +373,16 @@ public:
 
     void SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
-    /** To be deprecated
+    /** \deprecated
      */
     void SeparateObjectsWithoutForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
-    /** To be deprecated
+    /** \deprecated
      */
     void SeparateObjectsWithForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
     ///@}
 
 protected:
-
-    /** \brief Get a force that is recycled from the garbage, or created if the garbage is empty.
-     */
-    Force* GetRecycledForce(float x, float y, float clearing);
 
     std::string                                             name; ///< The full name of the object
     std::string                                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )

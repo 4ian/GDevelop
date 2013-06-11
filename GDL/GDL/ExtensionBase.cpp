@@ -36,8 +36,11 @@ DestroyRuntimeObjectFunPtr ExtensionBase::GetDestroyRuntimeObjectFunction(std::s
     return NULL;
 }
 
-void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, CreateRuntimeObjectFunPtr createFun, DestroyRuntimeObjectFunPtr destroyFun)
+void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun, DestroyRuntimeObjectFunPtr destroyFun)
 {
+#if defined(GD_IDE_ONLY)
+    object.className = className;
+#endif
     runtimeObjectCreationFunctionTable[object.GetName()] = createFun;
     runtimeObjectDestroyFunctionTable[object.GetName()] = destroyFun;
 }

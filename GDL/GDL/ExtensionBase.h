@@ -67,9 +67,13 @@ public :
     virtual ~ExtensionBase();
 
     /**
-     * To be called so as to declare the creation and destruction function of a RuntimeObject associated to a gd::Object.
+     * \brief To be called so as to declare the creation and destruction function of a RuntimeObject associated to a gd::Object.
+     * \param object The object associated to the RuntimeObject being declared.
+     * \param className The C++ class name associated to the RuntimeObject.
+     * \param createFun The function used to create the object.
+     * \param destroyFun The function used to destroy the object.
      */
-    void AddRuntimeObject(gd::ObjectMetadata & object, CreateRuntimeObjectFunPtr createFun, DestroyRuntimeObjectFunPtr destroyFun);
+    void AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun, DestroyRuntimeObjectFunPtr destroyFun);
 
     /**
      * Return a function to create the runtime object if the type is handled by the extension

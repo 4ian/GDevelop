@@ -21,10 +21,9 @@ SpriteExtension::SpriteExtension()
                    _("Animated object which can be used most element of a game"),
                    "CppPlatform/Extensions/spriteicon.png",
                    &CreateSpriteObject,
-                   &DestroySpriteObject,
-                   "RuntimeSpriteObject");
+                   &DestroySpriteObject);
 
-        AddRuntimeObject(obj, &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
+        AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
 
         #if defined(GD_IDE_ONLY)
         obj.SetIncludeFile("GDL/SpriteObject.h");

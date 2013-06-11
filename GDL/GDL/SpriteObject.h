@@ -75,11 +75,6 @@ public :
     virtual bool SupportShaders() { return true; }
     #endif
 
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
-    #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
-    #endif
-
     /** \name Animations
      * Methods related to animations management
      */
@@ -95,6 +90,11 @@ public :
     ///@}
 
 private:
+
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
+    #endif
 
     const Sprite * GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate = NULL) const;
     mutable std::vector < AnimationProxy > animations;

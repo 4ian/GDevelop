@@ -230,12 +230,8 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    try
-    {
-        SpriteObjectEditor dialog( parent, dynamic_cast<Game&>(project), *this, mainFrameWrapper );
-        dialog.ShowModal();
-    }
-    catch (...) { std::cout << "WARNING: The IDE probably passed a project which is not a GD C++ Platform Game."; }
+    SpriteObjectEditor dialog( parent, dynamic_cast<Game&>(project), *this, mainFrameWrapper );
+    dialog.ShowModal();
 }
 
 
@@ -822,10 +818,8 @@ void RuntimeSpriteObject::TurnTowardObject( RuntimeObject * object )
 }
 
 
-void SpriteObject::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
+void SpriteObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
 {
-    gd::Object::LoadFromXml(project, elemScene);
-
     if ( elemScene->FirstChildElement( "Animations" ) == NULL ) return;
 
     const TiXmlElement * elemObjetScene = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
@@ -854,10 +848,8 @@ void SpriteObject::LoadFromXml(gd::Project & project, const TiXmlElement * elemS
 }
 
 #if defined(GD_IDE_ONLY)
-void SpriteObject::SaveToXml(TiXmlElement * elem)
+void SpriteObject::DoSaveToXml(TiXmlElement * elem)
 {
-    gd::Object::SaveToXml(elem);
-
     //Animations
     TiXmlElement * animations = new TiXmlElement( "Animations" );
     elem->LinkEndChild( animations );

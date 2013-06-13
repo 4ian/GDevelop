@@ -33,6 +33,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.requestedScene = "";
     my.collisionGrid = new HSHG();
     my.isLoaded = false; // True if loadFromScene was called and the scene is being played.
+    that.layers = my.layers;
     
     /**
      * Load the runtime scene from the given scene.

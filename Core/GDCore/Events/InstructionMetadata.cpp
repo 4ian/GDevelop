@@ -2,9 +2,14 @@
 #include "GDCore/CommonTools.h"
 #include <wx/file.h>
 #include <wx/bitmap.h>
+#include <wx/intl.h>
 
 namespace gd
 {
+InstructionMetadata::InstructionMetadata() :
+    sentence(gd::ToString(_("Unknown or unsupported instruction")))
+{
+}
 
 InstructionMetadata::InstructionMetadata(const std::string & extensionNamespace_,
                         const std::string & name_,

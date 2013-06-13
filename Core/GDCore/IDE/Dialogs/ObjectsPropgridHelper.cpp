@@ -82,8 +82,15 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, layout, *object);
 
-            //Reload resources
+            //Reload resources : Do not forget to switch the working directory.
+            wxString oldWorkingDir = wxGetCwd();
+            if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+                wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+
             if (layout) object->LoadResources(project, *layout);
+
+            if ( wxDirExists(oldWorkingDir))
+                wxSetWorkingDirectory(oldWorkingDir);
         }
         else if ( event.GetPropertyName() == _("Variables") )
         {

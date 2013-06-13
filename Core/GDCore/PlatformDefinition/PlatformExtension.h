@@ -336,9 +336,20 @@ public:
      * \brief Clone the extension of another platform.
      *
      * This can be used when you want a platform to conform to another.<br>
-     * It is still possible to make some changes after the cloning by using getter methods.
+     * It is still possible to make some changes after the cloning by using getter methods.<br>
+     * See also gd::PlatformExtension::StripUnimplementedInstructionsAndExpressions.
+     *
+     * \param platformName The name of the platform in which the source extension must be searched for.
+     * \param extensionName The name of the source extension to be copied.
+     * \param stripFunctionsNameAndCodeGeneration If set to true, all functions names and code generator of all instructions/expression/events
+     * will be removed.
      */
-    void CloneExtension(const std::string & platformName, const std::string & extensionName, bool clearInstructionsFunctionsName = true);
+    void CloneExtension(const std::string & platformName, const std::string & extensionName, bool stripFunctionsNameAndCodeGeneration = true);
+
+    /**
+     * \brief Delete all instructions having no functions name or custom code generator.
+     */
+    void StripUnimplementedInstructionsAndExpressions();
     #endif
 
 private:

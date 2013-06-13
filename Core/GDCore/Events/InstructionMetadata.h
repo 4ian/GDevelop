@@ -212,9 +212,11 @@ public:
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 
-    /** Don't use this constructor. Only here to fulfill std::map requirements
+    /** \brief DefaultConstructor.
+     *
+     * Please do not use this constructor. Only here to fulfill std::map requirements
      */
-    InstructionMetadata() {};
+    InstructionMetadata();
 
     std::vector < ParameterMetadata > parameters;
 private:

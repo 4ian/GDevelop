@@ -175,7 +175,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
-        const gd::InstructionMetadata & InstructionMetadata = MetadataProvider::GetConditionMetadata(platform, conditions[j].GetType());
+        const gd::InstructionMetadata & instructionMetadata = MetadataProvider::GetConditionMetadata(platform, conditions[j].GetType());
         InstructionItem accessor(&conditions[j], /*isCondition=*/true, &conditions, j, event);
 
         //Get the width available
@@ -187,23 +187,23 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = ConditionSentenceFormatter::Translate(conditions[j], InstructionMetadata);
+            std::string text = ConditionSentenceFormatter::Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
             dc.SetBrush(selectionRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(conditions[j], InstructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
+            DrawInstruction(conditions[j], instructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = ConditionSentenceFormatter::Translate(conditions[j], InstructionMetadata);
+            std::string text = ConditionSentenceFormatter::Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
             dc.SetBrush(highlightRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(conditions[j], InstructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
+            DrawInstruction(conditions[j], instructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
 
             if ( selection.IsDraggingInstruction() )
             {
@@ -213,21 +213,24 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
             }
         }
         else
-            height = DrawInstruction(conditions[j], InstructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
+            height = DrawInstruction(conditions[j], instructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
+        const wxBitmap * bmp = &instructionMetadata.GetSmallBitmapIcon();
+        if ( !bmp->IsOk() ) bmp = &gd::CommonBitmapManager::GetInstance()->unknownBt;
+
         if ( conditions[j].IsInverted() )
         {
             dc.DrawBitmap( gd::CommonBitmapManager::GetInstance()->invertedCondition, x + 1, y, true );
-            if ( InstructionMetadata.GetSmallBitmapIcon().IsOk() ) dc.DrawBitmap( InstructionMetadata.GetSmallBitmapIcon(), x + iconWidth + 1, y, true );
+            if ( bmp->IsOk() ) dc.DrawBitmap( *bmp, x + iconWidth + 1, y, true );
         }
-        else if ( InstructionMetadata.GetSmallBitmapIcon().IsOk() ) dc.DrawBitmap( InstructionMetadata.GetSmallBitmapIcon(), x + 1, y, true );
+        else if ( bmp->IsOk() ) dc.DrawBitmap( *bmp, x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub conditions
-        if ( InstructionMetadata.CanHaveSubInstructions() )
+        if ( instructionMetadata.CanHaveSubInstructions() )
             y += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection, platform);
     }
 
@@ -312,7 +315,9 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
             height = DrawInstruction(actions[j], instructionMetadata, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
-        if ( instructionMetadata.GetSmallBitmapIcon().IsOk() ) dc.DrawBitmap( instructionMetadata.GetSmallBitmapIcon(), x + 1, y, true );
+        const wxBitmap * bmp = &instructionMetadata.GetSmallBitmapIcon();
+        if ( !bmp->IsOk() ) bmp = &gd::CommonBitmapManager::GetInstance()->unknownBt;
+        if ( bmp->IsOk() ) dc.DrawBitmap( *bmp, x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;

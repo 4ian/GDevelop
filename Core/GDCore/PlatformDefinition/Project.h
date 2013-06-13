@@ -176,9 +176,15 @@ public:
     bool RemovePlatform(const std::string & platformName);
 
     /**
-     * Return a reference to the platform being currently used to edit the project.
+     * \brief Return a reference to the platform being currently used to edit the project.
      */
     Platform & GetCurrentPlatform() const;
+
+    /**
+     * \brief Set the platform to be used to edit the project.
+     * \param platformName The name of the new current platform. If not found, the current platform won't be changed.
+     */
+    void SetCurrentPlatform(const std::string & platformName);
     #endif
 
     ///@}

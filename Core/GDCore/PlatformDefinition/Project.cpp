@@ -167,6 +167,18 @@ void Project::AddPlatform(Platform* platform)
     if ( currentPlatform == NULL ) currentPlatform = platform;
 }
 
+void Project::SetCurrentPlatform(const std::string & platformName)
+{
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if (platforms[i]->GetName() == platformName)
+        {
+            currentPlatform = platforms[i];
+            return;
+        }
+    }
+}
+
 bool Project::RemovePlatform(const std::string & platformName)
 {
     if ( platforms.size() <= 1 ) return false;

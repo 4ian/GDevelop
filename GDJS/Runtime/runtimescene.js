@@ -31,6 +31,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.soundManager = gdjs.soundManager();
     my.gameStopRequested = false;
     my.requestedScene = "";
+    my.collisionGrid = new HSHG();
     my.isLoaded = false; // True if loadFromScene was called and the scene is being played.
     
     /**
@@ -38,7 +39,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      * \param sceneXml A jquery object containing the scene in XML format.
      */
     that.loadFromScene = function(sceneXml) {
-    
+        RTSCENE = that;
         if ( sceneXml == undefined ) {
             console.error("loadFromScene was called without a scene");
             return;
@@ -109,6 +110,21 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         
     }
     
+    my.updateQuadTrees = function () {
+        my.collisionGrid.update();
+    }
+    
+    /**
+     * Set the function called each time the runtimeScene is stepped.
+     * The function will be passed the runtimeScene as argument.
+     */
+    that.getPotentialCollidingObjects = function(obj1NameId, obj2NameId) {
+        
+        var pairs = my.collisionGrid.queryForCollisionPairs(obj1NameId, obj2NameId,
+                                                            gdjs.runtimeObject.collisionTest);
+        return pairs;
+    }
+    
     /**
      * Set the function called each time the runtimeScene is stepped.
      * The function will be passed the runtimeScene as argument.
@@ -127,6 +143,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.renderAndStep = function() {
         my.updateTime();
+        my.updateQuadTrees();
         that.render();
         my.eventsFunction(that);
         my.updateObjects();
@@ -220,6 +237,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         }
     
         my.instances.get(obj.name).push(obj);
+        my.collisionGrid.addObject(obj);
     }
     
     /**
@@ -238,6 +256,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     that.markObjectForDeletion = function(obj) {
         if ( my.instances.containsKey(obj.getName()) ) {
             
+            my.collisionGrid.removeObject(obj);
             var objId = obj.getUniqueId();
             var allInstances = my.instances.get(obj.getName());
             for(var i = 0, len = allInstances.length;i<len;++i) {

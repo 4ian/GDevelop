@@ -99,6 +99,21 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
+                <Objet nom="NouvelObjet" x="400.500000" y="253.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="NouvelObjet" x="195.500000" y="95.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="NouvelObjet" x="563.500000" y="370.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
             </Positions>
             <Events>
                 <Event disabled="false" folded="false">
@@ -120,25 +135,10 @@
                                     <Type value="Create" />
                                     <Parametre value="" />
                                     <Parametre value="NouvelObjet" />
-                                    <Parametre value="Random(800)" />
-                                    <Parametre value="Random(600)" />
+                                    <Parametre value="Random(400)" />
+                                    <Parametre value="Random(300)" />
                                     <Parametre value="" />
                                 </Action>
-                                <Action>
-                                    <Type value="Create" />
-                                    <Parametre value="" />
-                                    <Parametre value="NouvelObjet1" />
-                                    <Parametre value="0" />
-                                    <Parametre value="0" />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Repeat" />
-                            <RepeatExpression value="100" />
-                            <Conditions />
-                            <Actions>
                                 <Action>
                                     <Type value="Create" />
                                     <Parametre value="" />

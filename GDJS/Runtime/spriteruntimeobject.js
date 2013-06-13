@@ -305,11 +305,13 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     
     that.setX = function(x) {
         that.x = x;
+        that.hitBoxesDirty = true;
         my.sprite.position.x = x;
     }
     
     that.setY = function(y) {
         that.y = y;
+        that.hitBoxesDirty = true;
         my.sprite.position.y = y;
     }
     
@@ -385,11 +387,13 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     that.setScaleX = function(newScale) {
         if ( newScale > 0 ) my.scaleX = newScale;
         my.spriteDirty = true;
+        that.hitBoxesDirty = true;
     }
     
     that.setScaleY = function(newScale) {
         if ( newScale > 0 ) my.scaleY = newScale;
         my.spriteDirty = true;
+        that.hitBoxesDirty = true;
     }
     
     that.getScaleY = function() {

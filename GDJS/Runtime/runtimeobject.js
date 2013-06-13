@@ -14,6 +14,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     
     that = {};
     that.name = $(objectXml).attr("nom") || "";
+    my.nameId = gdjs.runtimeObject.getNameIdentifier(that.name);
     that.type = $(objectXml).attr("type") || "";
     that.x = 0;
     that.y = 0;
@@ -51,6 +52,15 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.getName = function() {
         return that.name;
+    }
+    
+    /**
+     * Get the name identifier of the object.
+     * @method getNameId
+     * @return {Number} The object's name identifier.
+     */
+    that.getNameId = function() {
+        return my.nameId;
     }
     
     /**
@@ -506,18 +516,29 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     /**
      * Get the hit boxes for the object.<br>
      * The default implementation returns a basic bouding box based on the result of getWidth and
-     * getHeight.
+     * getHeight. You should probably redefine updateHitBoxes instead of this function.
      *
      * @method getHitBoxes
      * @return {Array} An array composed of polygon.
      */
     that.getHitBoxes = function() {
+        //Avoid a naive implementation requiring to recreate temporaries each time
+        //the function is called:
+        //(var rectangle = gdjs.polygon.createRectangle(that.getWidth(), that.getHeight());
+        //...)
         if ( that.hitBoxesDirty ) {
-        
-            //Avoid a naive implementation requiring to recreate temporaries each time
-            //the function is called:
-            //(var rectangle = gdjs.polygon.createRectangle(that.getWidth(), that.getHeight());
-            //...)
+            that.updateHitBoxes();
+            that.updateAABB();
+            that.hitBoxesDirty = false;
+        }
+        return that.hitBoxes;
+    }
+    /**
+     * Update the hit boxes for the object.<br>
+     * The default implementation set a basic bouding box based on the result of getWidth and
+     * getHeight. 
+     */
+    that.updateHitBoxes = function() {
             var width = that.getWidth();
             var height = that.getHeight();
             that.hitBoxes[0].vertices[0][0] =-width/2.0;
@@ -531,8 +552,6 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
             
             that.hitBoxes[0].rotate(that.getAngle()/180*3.14159);
             that.hitBoxes[0].move(that.getX()+that.getCenterX(), that.getY()+that.getCenterY());
-        }
-        return that.hitBoxes;
     }
     
     /**
@@ -595,6 +614,25 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         runtimeScene.markObjectForDeletion(that);
     }
     
+    //Experimental
+    that.getAABB = function() {
+        if ( that.hitBoxesDirty ) {
+            that.updateHitBoxes();
+            that.updateAABB();
+            that.hitBoxesDirty = false;
+        }
+        
+        return that.aabb;
+    }
+    
+    that.updateAABB = function() {
+        that.aabb.min[0] = that.getDrawableX();
+        that.aabb.min[1] = that.getDrawableY();
+        that.aabb.max[0] = that.getDrawableX()+that.getWidth();
+        that.aabb.max[1] = that.getDrawableY()+that.getHeight();
+    }
+    that.aabb = { min:[0,0], max:[0,0] };
+    
     return that;
 }
 
@@ -607,14 +645,13 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
  */
 gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
 
-    //Temporary test :
-    /*if ( obj1.getX() + obj1.getWidth() < obj2.getX()
+    
+    if ( obj1.getX() + obj1.getWidth() < obj2.getX()
          || obj1.getX() > obj2.getX() + obj2.getWidth()
          || obj1.getY() + obj1.getHeight() < obj2.getY()
          || obj1.getY() > obj2.getY() + obj2.getHeight() )
          return false;
          
-    return true;*/
 
     var hitBoxes1 = obj1.getHitBoxes();
     var hitBoxes2 = obj2.getHitBoxes();
@@ -627,4 +664,25 @@ gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
     }
 
     return false;
+}
+
+gdjs.runtimeObject.distanceTest = function(obj1, obj2, distance) {
+    var x = obj1.getX()+obj1.getCenterX()-(obj2.getX()+obj2.getCenterX());
+    var y = obj1.getY()+obj1.getCenterY()-(obj2.getY()+obj2.getCenterY());
+    
+    return x*x+y*y <= distance;
+}
+
+gdjs.runtimeObject.getNameIdentifier = function(name) {
+    gdjs.runtimeObject.getNameIdentifier.identifiers = 
+        gdjs.runtimeObject.getNameIdentifier.identifiers 
+        || new Hashtable();
+        
+    if ( gdjs.runtimeObject.getNameIdentifier.identifiers.containsKey(name) )
+        return gdjs.runtimeObject.getNameIdentifier.identifiers.get(name);
+    
+    var newKey = gdjs.runtimeObject.getNameIdentifier.identifiers.keys().length;
+    
+    gdjs.runtimeObject.getNameIdentifier.identifiers.put(name, newKey);
+    return newKey;
 }

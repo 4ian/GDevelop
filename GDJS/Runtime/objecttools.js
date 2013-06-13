@@ -7,7 +7,7 @@ gdjs.objectTools = gdjs.objectTools || {};
  * Do a test on two tables of objects so as to remove the objects for which the test is false.
  * If inverted == true, only the objects of the first table are filtered.
  */
-gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inverted) {
+gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inverted, extraParam) {
     var objects1 = [];
     var objects2 = [];
     var objects1Values = objectsLists1.values();
@@ -52,7 +52,7 @@ gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inv
         
             if ( sameObjectLists || (objects1[i].getUniqueId() != objects2[j].getUniqueId()) ) {                
 
-                if ( func(objects1[i], objects2[j]) ) {
+                if ( func(objects1[i], objects2[j], extraParam) ) {
                     if ( !inverted ) {
                         isTrue = true;
                         
@@ -83,23 +83,98 @@ gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inv
     return isTrue;
 }
 
+//TODO: Same object lists, inverted
 gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted) {
-    return gdjs.objectTools.TwoListsTest(gdjs.runtimeObject.collisionTest,
-                                         objectsLists1, objectsLists2, inverted);
+
+    if ( inverted )
+        return gdjs.objectTools.TwoListsTest(gdjs.runtimeObject.collisionTest,
+                                                     objectsLists1, objectsLists2, inverted);
+
+    var objects1 = [];
+    var objects2 = [];
+    var objects1NameId = [];
+    var objects2NameId = [];
+    var objects1Values = objectsLists1.values();
+    var objects2Values = objectsLists2.values();
+    
+    
+    //Check if we're dealing with the same lists of objects
+    var objects1Keys = objectsLists1.keys();
+    var objects2Keys = objectsLists2.keys();
+    var sameObjectLists = objects1Keys.length === objects2Keys.length;
+    if ( sameObjectLists ) {
+        for( var i = 0, len = objects1Keys.length;i<len;++i) {
+            if ( objects1Keys[i] !== objects2Keys[i] ) {
+                sameObjectLists = false;
+                break;
+            }
+        }
+    }
+    
+    //Prepare list of objects to iterate over.
+    //And remove these objects from the original tables.
+    for(var i = 0, len = objects1Values.length;i<len;++i) {
+        if ( objects1Values[i].length !== 0 ) {
+            objects1.push.apply(objects1, objects1Values[i]);
+            objects1NameId.push(objects1Values[i][0].getNameId());
+            objects1Values[i].length = 0; //Be sure not to lose the reference to the original array
+        }
+    }
+    
+    if (sameObjectLists) {
+        objects2 = objects1.slice(0);
+        objects2NameId = objects1NameId;
+    }
+    else
+    {
+        for(var i = 0, len = objects2Values.length;i<len;++i) {
+            if ( objects2Values[i].length !== 0 ) {
+                objects2.push.apply(objects2, objects2Values[i]);
+                objects2NameId.push(objects2Values[i][0].getNameId());
+                objects2Values[i].length = 0; //Be sure not to lose the reference to the original array
+            }
+        }
+    }
+    
+    var isTrue = false;
+    
+    //Search all the pairs colliding.
+    var pairs = [];
+    //TODO : RTSCENE.
+    var pairs /*tmp*/ = RTSCENE.getPotentialCollidingObjects(objects1NameId, objects2NameId); 
+    
+    for(var i = 0, len = pairs.length;i<len;++i) {
+        if ( objects1.indexOf(pairs[i][0]) !== -1 && objects2.indexOf(pairs[i][1]) !== -1 ) {
+            
+            var objList = objectsLists1.get(pairs[i][0].getName());
+            if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
+            
+            objList = objectsLists2.get(pairs[i][1].getName());
+            if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
+            
+            isTrue = true;
+        }
+        else if ( objects1.indexOf(pairs[i][1]) !== -1 && objects2.indexOf(pairs[i][0]) !== -1 ) {
+            
+            var objList = objectsLists1.get(pairs[i][1].getName());
+            if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
+            
+            objList = objectsLists2.get(pairs[i][0].getName());
+            if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
+            
+            isTrue = true;
+        }
+    }
+    
+    return isTrue;
+    
 }
 
 gdjs.objectTools.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
     
     distance *= distance;
-    
-    var distanceTest = function(obj1, obj2) {
-        var x = obj1.getX()+obj1.getCenterX()-(obj2.getX()+obj2.getCenterX());
-        var y = obj1.getY()+obj1.getCenterY()-(obj2.getY()+obj2.getCenterY());
-        
-        return x*x+y*y <= distance;
-    }
-
-    return gdjs.objectTools.TwoListsTest(distanceTest, objectsLists1, objectsLists2, inverted);
+    return gdjs.objectTools.TwoListsTest(gdjs.runtimeObject.distanceTest, objectsLists1, 
+        objectsLists2, inverted, distance);
 }
 
 

@@ -120,6 +120,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "libs/pixi.js");
     InsertUnique(includesFiles, "libs/jquery.js");
     InsertUnique(includesFiles, "libs/jshashtable.js");
+    InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "commontools.js");
     InsertUnique(includesFiles, "runtimeobject.js");

@@ -48,6 +48,7 @@ AudioExtension::AudioExtension()
     GetAllExpressions()["GlobalVolume"].codeExtraInformation
         .SetFunctionName("gdjs.soundTools.getGlobalVolume");
 
+    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
     /*
 
     AddAction("ModVolumeSoundCanal",

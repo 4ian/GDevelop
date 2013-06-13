@@ -3,12 +3,12 @@
  * variable is an object storing a number or a string
  * @class variable
  */
-gdjs.variable = function()
+gdjs.variable = function(value)
 {
     var that = {};
     var my = {};
     
-    my.value = 0;
+    my.value = value || 0;
     
     /**
      * Get the value of the variable

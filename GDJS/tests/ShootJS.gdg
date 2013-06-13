@@ -55,16 +55,31 @@
             <Resource kind="image" name="Health.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Health.png" />
             <Resource kind="image" name="Panel.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Panel.png" />
             <Resource kind="image" name="Power.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Power.png" />
+            <Resource kind="image" name="Explosion.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion.png" />
+            <Resource kind="image" name="Explosion2.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion2.png" />
+            <Resource kind="image" name="Explosion3.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion3.png" />
+            <Resource kind="image" name="Explosion4.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion4.png" />
+            <Resource kind="image" name="Explosion5.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion5.png" />
+            <Resource kind="image" name="Explosion6.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion6.png" />
+            <Resource kind="image" name="Explosion7.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion7.png" />
+            <Resource kind="image" name="Explosion8.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Explosion8.png" />
+            <Resource kind="image" name="rusty_ship.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="rusty_ship.png" />
+            <Resource kind="image" name="LifeBonus.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="LifeBonus.png" />
         </Resources>
         <ResourceFolders />
     </Resources>
     <Objects />
     <ObjectGroups />
     <Variables />
-    <Scenes>
-        <Scene nom="Nouvelle scène" r="0.000000" v="0.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="true" associatedLayout="" />
-            <GroupesObjets />
+    <Scenes firstScene="">
+        <Scene nom="Nouvelle scène" mangledName="Nouvelle_32sc__4524ne" r="0.000000" v="0.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="0.375723" windowMask="true" associatedLayout="" />
+            <GroupesObjets>
+                <Groupe nom="Bad">
+                    <Objet nom="Bad1" />
+                    <Objet nom="Bad2" />
+                </Groupe>
+            </GroupesObjets>
             <Objets>
                 <Objet nom="Player" type="Sprite">
                     <Variables />
@@ -225,8 +240,10 @@
                         </Animation>
                     </Animations>
                 </Objet>
-                <Objet nom="Bad" type="Sprite">
-                    <Variables />
+                <Objet nom="Bad1" type="Sprite">
+                    <Variables>
+                        <Variable Name="Life" Value="3" />
+                    </Variables>
                     <Animations>
                         <Animation typeNormal="true">
                             <Direction boucle="false" tempsEntre="1.000000">
@@ -260,18 +277,6 @@
                             </Direction>
                         </Animation>
                     </Animations>
-                </Objet>
-                <Objet nom="Engine" type="">
-                    <Variables />
-                </Objet>
-                <Objet nom="SmokeExplosion" type="">
-                    <Variables />
-                </Objet>
-                <Objet nom="Explosion" type="">
-                    <Variables />
-                </Objet>
-                <Objet nom="Background" type="">
-                    <Variables />
                 </Objet>
                 <Objet nom="HealthPanel" type="Sprite">
                     <Variables />
@@ -621,6 +626,103 @@
                         </Animation>
                     </Animations>
                 </Objet>
+                <Objet nom="Explosion" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="0.040000">
+                                <Sprites>
+                                    <Sprite image="Explosion.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion3.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion4.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion5.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion6.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion7.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="Explosion8.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Bad2" type="Sprite">
+                    <Variables>
+                        <Variable Name="Life" Value="5" />
+                    </Variables>
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="rusty_ship.png">
+                                        <Points>
+                                            <Point nom="BulletSpawn" X="21.000000" Y="48.000000" />
+                                        </Points>
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="48.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="LifeBonus" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="LifeBonus.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="25.000000" Y="25.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
             </Objets>
             <Layers>
                 <Layer Name="Background" Visibility="true">
@@ -682,14 +784,14 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="3385.000000" y="340.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="3646.461426" y="363.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="3319.000000" y="54.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="3580.461426" y="77.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2.000000" />
                     </floatInfos>
@@ -731,7 +833,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="3023.000000" y="240.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="3284.461426" y="263.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="1.000000" />
                     </floatInfos>
@@ -780,7 +882,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2755.000000" y="374.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3016.461426" y="397.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -822,14 +924,14 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="1831.000000" y="130.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2092.461426" y="153.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="1414.000000" y="146.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="1922.354004" y="153.984619" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -864,175 +966,147 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="949.000000" y="149.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="945.769104" y="145.769241" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="988.000000" y="252.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="947.615417" y="292.384583" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1360.000000" y="36.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="1334.153809" y="31.153862" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1429.000000" y="175.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="1338.538452" y="279.999939" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1643.000000" y="426.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="1319.923218" y="485.769196" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1535.000000" y="291.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="2171.446045" y="437.323120" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1796.000000" y="298.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="2169.646240" y="304.661560" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1902.000000" y="355.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="2432.461426" y="250.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="2004.000000" y="225.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="2162.107666" y="160.353851" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="2171.000000" y="227.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="2159.307861" y="47.630802" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1890.000000" y="94.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="2317.461426" y="431.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="1800.000000" y="29.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="2764.461426" y="111.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="2056.000000" y="408.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Etoile" x="2503.000000" y="88.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Etoile" x="2043.000000" y="75.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="2304.461426" y="98.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="1.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="2557.000000" y="286.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="2818.461426" y="309.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2198.000000" y="376.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2459.461426" y="399.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2258.000000" y="333.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2519.461426" y="356.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2254.000000" y="156.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2515.461426" y="179.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2191.000000" y="102.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2452.461426" y="125.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2156.000000" y="55.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2417.461426" y="78.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2091.000000" y="14.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2352.461426" y="37.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2143.000000" y="416.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Bad" x="2313.000000" y="231.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Bad" x="2428.000000" y="229.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2404.461426" y="439.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -1053,90 +1127,80 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2691.000000" y="160.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2952.461426" y="183.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="3687.000000" y="59.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3948.461426" y="82.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Engine" x="383.000000" y="230.000000" plan="0" layer="" angle="2.405972" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Background" x="1500.000000" y="300.000000" plan="0" layer="Background" angle="177.546143" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Bad" x="2812.000000" y="25.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3073.461426" y="48.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="2885.000000" y="220.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3146.461426" y="243.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="3117.000000" y="126.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3378.461426" y="149.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2675005.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="3165.000000" y="342.000000" plan="0" layer="" angle="39.320217" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3426.461426" y="365.769226" plan="0" layer="" angle="39.320217" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2675005.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="3495.000000" y="52.000000" plan="0" layer="" angle="69.579002" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3756.461426" y="75.769226" plan="0" layer="" angle="69.579002" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2675005.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="3565.000000" y="248.000000" plan="0" layer="" angle="167.708405" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3826.461426" y="271.769226" plan="0" layer="" angle="167.708405" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2675005.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="3488.000000" y="375.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3749.461426" y="398.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2675005.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="3383.000000" y="189.000000" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3644.461426" y="212.769226" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="3043.560303" y="44.872017" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3305.021729" y="68.641243" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="3331.000000" y="272.000000" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3592.461426" y="295.769226" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
@@ -1163,17 +1227,17 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="2084.000000" y="482.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="2345.461426" y="505.769226" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="1954.000000" y="497.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="2215.461426" y="520.769226" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="1779.000000" y="436.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="1999.907715" y="286.953857" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="1.000000" />
                     </floatInfos>
@@ -1206,440 +1270,484 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="2947.000000" y="373.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3208.461426" y="396.769226" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="2739.000000" y="262.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Bad1" x="3000.461426" y="285.769226" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="3965.000000" y="256.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="3965.000000" y="256.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4067.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4067.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4167.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4167.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4267.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4267.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4367.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4367.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4467.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4467.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4567.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4567.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4667.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4667.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4767.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4767.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4867.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4867.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4967.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4967.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5067.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5067.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5167.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5167.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5267.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5267.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5367.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5367.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5467.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5467.000000" y="105.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4067.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4067.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4167.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4167.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4267.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4267.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4367.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4367.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4467.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4467.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4567.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4567.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4667.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4667.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4767.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4767.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4867.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4867.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4967.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4967.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5067.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5067.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5167.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5167.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5267.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5267.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5367.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5367.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5467.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5467.000000" y="205.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4067.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4067.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4167.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4167.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4267.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4267.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4367.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4367.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4467.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4467.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4567.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4567.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4667.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4667.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4767.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4767.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4867.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4867.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4967.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4967.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5067.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5067.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5167.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5167.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5267.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5267.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5367.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5367.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5467.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5467.000000" y="305.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4067.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4067.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4167.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4167.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4267.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4267.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4367.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4367.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4467.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4467.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4567.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4567.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4667.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4667.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4767.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4767.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4867.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4867.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="4967.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="4967.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5067.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5067.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5167.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5167.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5267.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5267.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5367.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5367.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Bad" x="5467.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
+                <Objet nom="Bad1" x="5467.000000" y="405.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="83.000000" height="131.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2674909.000000" />
                     </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bad2" x="2686.699707" y="310.892334" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bad2" x="2685.007080" y="166.846191" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="LifeBonus" x="3343.330078" y="386.892334" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="1779.000000" y="436.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="1414.000000" y="146.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bad2" x="1672.653442" y="308.230774" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bad2" x="1670.960938" y="164.184647" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="LifeBonus" x="1826.252930" y="261.800049" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
@@ -1656,6 +1764,7 @@
                     <Conditions>
                         <Condition>
                             <Type value="DepartScene" Contraire="false" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>
@@ -1664,13 +1773,6 @@
                             <Parametre value="Etoile" />
                             <Parametre value="=" />
                             <Parametre value="-5" />
-                        </Action>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Bad" />
-                            <Parametre value="Vie" />
-                            <Parametre value="=" />
-                            <Parametre value="3" />
                         </Action>
                         <Action>
                             <Type value="Cache" />
@@ -1787,12 +1889,6 @@
                             <Parametre value="0" />
                             <Parametre value="0" />
                         </Action>
-                        <Action>
-                            <Type value="ParticleSystem::Flow" />
-                            <Parametre value="Engine" />
-                            <Parametre value="0" />
-                            <Parametre value="=" />
-                        </Action>
                     </Actions>
                 </Event>
                 <Event disabled="false" folded="false">
@@ -1817,55 +1913,6 @@
                             <Parametre value="300" />
                             <Parametre value="0" />
                             <Parametre value="0" />
-                        </Action>
-                        <Action>
-                            <Type value="ParticleSystem::Flow" />
-                            <Parametre value="Engine" />
-                            <Parametre value="700" />
-                            <Parametre value="=" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="true" />
-                            <Parametre value="" />
-                            <Parametre value="Right" />
-                        </Condition>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="true" />
-                            <Parametre value="" />
-                            <Parametre value="Left" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ParticleSystem::Flow" />
-                            <Parametre value="Engine" />
-                            <Parametre value="230" />
-                            <Parametre value="=" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="MettreXY" />
-                            <Parametre value="Engine" />
-                            <Parametre value="=" />
-                            <Parametre value="Player.PointX(Centre)-20" />
-                            <Parametre value="=" />
-                            <Parametre value="Player.PointY(Centre)" />
-                        </Action>
-                        <Action>
-                            <Type value="ParticleSystem::EmitterAngle" />
-                            <Parametre value="Engine" />
-                            <Parametre value="180" />
-                            <Parametre value="=" />
                         </Action>
                     </Actions>
                 </Event>
@@ -1936,6 +1983,9 @@
                             <Type value="PlaySound" />
                             <Parametre value="" />
                             <Parametre value="MiniTir.wav" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="ChangeBlendMode" />
@@ -1961,7 +2011,7 @@
                     <Type value="BuiltinCommonInstructions::Standard" />
                     <Conditions>
                         <Condition>
-                            <Type value="ParticleSystem::NoMoreParticles" Contraire="false" />
+                            <Type value="AnimationEnded" Contraire="false" />
                             <Parametre value="Explosion" />
                         </Condition>
                     </Conditions>
@@ -1969,22 +2019,6 @@
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="Explosion" />
-                            <Parametre value="" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="ParticleSystem::NoMoreParticles" Contraire="false" />
-                            <Parametre value="SmokeExplosion" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Delete" />
-                            <Parametre value="SmokeExplosion" />
                             <Parametre value="" />
                         </Action>
                     </Actions>
@@ -2002,12 +2036,14 @@
                             <Type value="Collision" Contraire="false" />
                             <Parametre value="Rock" />
                             <Parametre value="PlayerBullet" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="PlayerBullet" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="Create" />
@@ -2015,6 +2051,7 @@
                             <Parametre value="MiniRock" />
                             <Parametre value="Rock.X()+Random(30)" />
                             <Parametre value="Rock.Y()+Random(30)" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="Create" />
@@ -2022,6 +2059,7 @@
                             <Parametre value="MiniRock" />
                             <Parametre value="Rock.X()+Random(30)" />
                             <Parametre value="Rock.Y()+Random(30)" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="Create" />
@@ -2029,13 +2067,7 @@
                             <Parametre value="MiniRock" />
                             <Parametre value="Rock.X()+Random(30)" />
                             <Parametre value="Rock.Y()+Random(30)" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
                             <Parametre value="" />
-                            <Parametre value="SmokeExplosion" />
-                            <Parametre value="Rock.PointX(Centre)" />
-                            <Parametre value="Rock.PointY(Centre)" />
                         </Action>
                         <Action>
                             <Type value="ChangeDirection" />
@@ -2053,11 +2085,15 @@
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="Rock" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="PlaySound" />
                             <Parametre value="" />
                             <Parametre value="Explosion.wav" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                            <Parametre value="" />
                         </Action>
                     </Actions>
                 </Event>
@@ -2068,35 +2104,19 @@
                             <Type value="Collision" Contraire="false" />
                             <Parametre value="MiniRock" />
                             <Parametre value="PlayerBullet" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>
                         <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="SmokeExplosion" />
-                            <Parametre value="MiniRock.PointX(Centre)" />
-                            <Parametre value="MiniRock.PointY(Centre)" />
-                        </Action>
-                        <Action>
-                            <Type value="ParticleSystem::ParticleSize1" />
-                            <Parametre value="SmokeExplosion" />
-                            <Parametre value="5" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="ParticleSystem::ParticleSize2" />
-                            <Parametre value="SmokeExplosion" />
-                            <Parametre value="5" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
                             <Type value="Delete" />
                             <Parametre value="PlayerBullet" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="MiniRock" />
+                            <Parametre value="" />
                         </Action>
                     </Actions>
                 </Event>
@@ -2107,6 +2127,7 @@
                             <Type value="Collision" Contraire="false" />
                             <Parametre value="BadBullet" />
                             <Parametre value="Player" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>
@@ -2116,22 +2137,12 @@
                             <Parametre value="Explosion" />
                             <Parametre value="BadBullet.X()" />
                             <Parametre value="BadBullet.Y()" />
-                        </Action>
-                        <Action>
-                            <Type value="ParticleSystem::ParticleSize1" />
-                            <Parametre value="Explosion" />
-                            <Parametre value="5" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="ParticleSystem::ParticleSize2" />
-                            <Parametre value="Explosion" />
-                            <Parametre value="5" />
-                            <Parametre value="=" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="BadBullet" />
+                            <Parametre value="" />
                         </Action>
                         <Action>
                             <Type value="ModVarScene" />
@@ -2139,6 +2150,18 @@
                             <Parametre value="Health" />
                             <Parametre value="-" />
                             <Parametre value="7" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangeScaleHeight" />
+                            <Parametre value="Explosion" />
+                            <Parametre value="=" />
+                            <Parametre value="0.5" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangeScaleWidth" />
+                            <Parametre value="Explosion" />
+                            <Parametre value="=" />
+                            <Parametre value="0.5" />
                         </Action>
                     </Actions>
                 </Event>
@@ -2162,6 +2185,7 @@
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="PlayerBullet" />
+                            <Parametre value="" />
                         </Action>
                     </Actions>
                 </Event>
@@ -2181,6 +2205,7 @@
                         <Action>
                             <Type value="Delete" />
                             <Parametre value="BadBullet" />
+                            <Parametre value="" />
                         </Action>
                     </Actions>
                 </Event>
@@ -2259,14 +2284,21 @@
                             <Actions>
                                 <Action>
                                     <Type value="AddForceXY" />
-                                    <Parametre value="Bad" />
+                                    <Parametre value="Bad1" />
+                                    <Parametre value="-50" />
+                                    <Parametre value="0" />
+                                    <Parametre value="0" />
+                                </Action>
+                                <Action>
+                                    <Type value="AddForceXY" />
+                                    <Parametre value="Bad2" />
                                     <Parametre value="-30" />
                                     <Parametre value="0" />
                                     <Parametre value="0" />
                                 </Action>
                                 <Action>
                                     <Type value="AddForceVers" />
-                                    <Parametre value="Bad" />
+                                    <Parametre value="Bad1" />
                                     <Parametre value="Player" />
                                     <Parametre value="12" />
                                     <Parametre value="0" />
@@ -2281,7 +2313,7 @@
                                     <Type value="PosX" Contraire="false" />
                                     <Parametre value="Bad" />
                                     <Parametre value="&lt;" />
-                                    <Parametre value="CameraX()+200" />
+                                    <Parametre value='CameraX(&quot;&quot;,0)+200' />
                                 </Condition>
                             </Conditions>
                             <Actions>
@@ -2302,27 +2334,7 @@
                         </Event>
                         <Event disabled="false" folded="false">
                             <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="ModVarObjet" />
-                                    <Parametre value="Bad" />
-                                    <Parametre value="FireRate" />
-                                    <Parametre value="+" />
-                                    <Parametre value="TimeDelta()" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
                             <Conditions>
-                                <Condition>
-                                    <Type value="VarObjet" Contraire="false" />
-                                    <Parametre value="Bad" />
-                                    <Parametre value="FireRate" />
-                                    <Parametre value="&gt;=" />
-                                    <Parametre value="2" />
-                                </Condition>
                                 <Condition>
                                     <Type value="VarScene" Contraire="false" />
                                     <Parametre value="" />
@@ -2337,29 +2349,94 @@
                                     <Parametre value="Player.X()" />
                                 </Condition>
                             </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="ModVarObjet" />
-                                    <Parametre value="Bad" />
-                                    <Parametre value="FireRate" />
-                                    <Parametre value="=" />
-                                    <Parametre value="0+Random(100)/100" />
-                                </Action>
-                                <Action>
-                                    <Type value="Create" />
-                                    <Parametre value="" />
-                                    <Parametre value="BadBullet" />
-                                    <Parametre value="Bad.PointX(BulletSpawn)" />
-                                    <Parametre value="Bad.PointY(BulletSpawn)" />
-                                </Action>
-                                <Action>
-                                    <Type value="AddForceVers" />
-                                    <Parametre value="BadBullet" />
-                                    <Parametre value="Player" />
-                                    <Parametre value="310" />
-                                    <Parametre value="1" />
-                                </Action>
-                            </Actions>
+                            <Actions />
+                            <Events>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Standard" />
+                                    <Conditions />
+                                    <Actions>
+                                        <Action>
+                                            <Type value="ModVarObjet" />
+                                            <Parametre value="Bad" />
+                                            <Parametre value="FireRate" />
+                                            <Parametre value="+" />
+                                            <Parametre value="TimeDelta()" />
+                                        </Action>
+                                    </Actions>
+                                </Event>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Standard" />
+                                    <Conditions>
+                                        <Condition>
+                                            <Type value="VarObjet" Contraire="false" />
+                                            <Parametre value="Bad1" />
+                                            <Parametre value="FireRate" />
+                                            <Parametre value="&gt;=" />
+                                            <Parametre value="1.3" />
+                                        </Condition>
+                                    </Conditions>
+                                    <Actions>
+                                        <Action>
+                                            <Type value="ModVarObjet" />
+                                            <Parametre value="Bad1" />
+                                            <Parametre value="FireRate" />
+                                            <Parametre value="=" />
+                                            <Parametre value="0+Random(50)/100" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="Create" />
+                                            <Parametre value="" />
+                                            <Parametre value="BadBullet" />
+                                            <Parametre value="Bad1.PointX(BulletSpawn)" />
+                                            <Parametre value="Bad1.PointY(BulletSpawn)" />
+                                            <Parametre value="" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceVers" />
+                                            <Parametre value="BadBullet" />
+                                            <Parametre value="Player" />
+                                            <Parametre value="410" />
+                                            <Parametre value="1" />
+                                        </Action>
+                                    </Actions>
+                                </Event>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Standard" />
+                                    <Conditions>
+                                        <Condition>
+                                            <Type value="VarObjet" Contraire="false" />
+                                            <Parametre value="Bad2" />
+                                            <Parametre value="FireRate" />
+                                            <Parametre value="&gt;=" />
+                                            <Parametre value="2" />
+                                        </Condition>
+                                    </Conditions>
+                                    <Actions>
+                                        <Action>
+                                            <Type value="ModVarObjet" />
+                                            <Parametre value="Bad2" />
+                                            <Parametre value="FireRate" />
+                                            <Parametre value="=" />
+                                            <Parametre value="0+Random(70)/100" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="Create" />
+                                            <Parametre value="" />
+                                            <Parametre value="BadBullet" />
+                                            <Parametre value="Bad2.PointX(BulletSpawn)" />
+                                            <Parametre value="Bad2.PointY(BulletSpawn)" />
+                                            <Parametre value="" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceVers" />
+                                            <Parametre value="BadBullet" />
+                                            <Parametre value="Player" />
+                                            <Parametre value="310" />
+                                            <Parametre value="1" />
+                                        </Action>
+                                    </Actions>
+                                </Event>
+                            </Events>
                         </Event>
                         <Event disabled="false" folded="false">
                             <Type value="BuiltinCommonInstructions::Standard" />
@@ -2368,6 +2445,7 @@
                                     <Type value="Collision" Contraire="false" />
                                     <Parametre value="Rock" />
                                     <Parametre value="Bad" />
+                                    <Parametre value="" />
                                 </Condition>
                             </Conditions>
                             <Actions>
@@ -2377,6 +2455,7 @@
                                     <Parametre value="MiniRock" />
                                     <Parametre value="Rock.X()+Random(30)" />
                                     <Parametre value="Rock.Y()+Random(30)" />
+                                    <Parametre value="" />
                                 </Action>
                                 <Action>
                                     <Type value="Create" />
@@ -2384,6 +2463,7 @@
                                     <Parametre value="MiniRock" />
                                     <Parametre value="Rock.X()+Random(30)" />
                                     <Parametre value="Rock.Y()+Random(30)" />
+                                    <Parametre value="" />
                                 </Action>
                                 <Action>
                                     <Type value="Create" />
@@ -2391,13 +2471,7 @@
                                     <Parametre value="MiniRock" />
                                     <Parametre value="Rock.X()+Random(30)" />
                                     <Parametre value="Rock.Y()+Random(30)" />
-                                </Action>
-                                <Action>
-                                    <Type value="Create" />
                                     <Parametre value="" />
-                                    <Parametre value="SmokeExplosion" />
-                                    <Parametre value="Rock.PointX(Centre)" />
-                                    <Parametre value="Rock.PointY(Centre)" />
                                 </Action>
                                 <Action>
                                     <Type value="ChangeDirection" />
@@ -2415,11 +2489,15 @@
                                 <Action>
                                     <Type value="Delete" />
                                     <Parametre value="Rock" />
+                                    <Parametre value="" />
                                 </Action>
                                 <Action>
                                     <Type value="PlaySound" />
                                     <Parametre value="" />
                                     <Parametre value="Explosion.wav" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
                                 </Action>
                             </Actions>
                         </Event>
@@ -2430,19 +2508,21 @@
                                     <Type value="Collision" Contraire="false" />
                                     <Parametre value="PlayerBullet" />
                                     <Parametre value="Bad" />
+                                    <Parametre value="" />
                                 </Condition>
                             </Conditions>
                             <Actions>
                                 <Action>
                                     <Type value="ModVarObjet" />
                                     <Parametre value="Bad" />
-                                    <Parametre value="Vie" />
+                                    <Parametre value="Life" />
                                     <Parametre value="-" />
                                     <Parametre value="1" />
                                 </Action>
                                 <Action>
                                     <Type value="Delete" />
                                     <Parametre value="PlayerBullet" />
+                                    <Parametre value="" />
                                 </Action>
                             </Actions>
                         </Event>
@@ -2452,7 +2532,7 @@
                                 <Condition>
                                     <Type value="VarObjet" Contraire="false" />
                                     <Parametre value="Bad" />
-                                    <Parametre value="Vie" />
+                                    <Parametre value="Life" />
                                     <Parametre value="&lt;=" />
                                     <Parametre value="0" />
                                 </Condition>
@@ -2469,15 +2549,57 @@
                                 <Action>
                                     <Type value="Delete" />
                                     <Parametre value="Bad" />
+                                    <Parametre value="" />
                                 </Action>
                                 <Action>
                                     <Type value="PlaySound" />
                                     <Parametre value="" />
                                     <Parametre value="Explosion.wav" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
                                 </Action>
                             </Actions>
                         </Event>
                     </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Bonus" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="Player" />
+                            <Parametre value="LifeBonus" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="LifeBonus" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="" />
+                            <Parametre value="Health" />
+                            <Parametre value="+" />
+                            <Parametre value="50" />
+                        </Action>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="" />
+                            <Parametre value="Power" />
+                            <Parametre value="+" />
+                            <Parametre value="50" />
+                        </Action>
+                    </Actions>
                 </Event>
                 <Event disabled="false" folded="false">
                     <Type value="BuiltinCommonInstructions::Comment" />
@@ -2624,6 +2746,18 @@
                     </Events>
                 </Event>
                 <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="LifeBonus" />
+                            <Parametre value="=" />
+                            <Parametre value="128+cos(TimeFromStart()*3)*128" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
                     <Type value="BuiltinCommonInstructions::Comment" />
                     <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
                     <Com1 value="Rotate rocks" />
@@ -2683,6 +2817,7 @@
                             <Type value="CentreCamera" />
                             <Parametre value="" />
                             <Parametre value="Camera" />
+                            <Parametre value="" />
                             <Parametre value="" />
                             <Parametre value="" />
                         </Action>

@@ -63,6 +63,8 @@ CameraExtension::CameraExtension()
         .SetFunctionName("gdjs.cameraTools.centerCameraWithinLimits");
     GetAllActions()["CentreCamera"].codeExtraInformation
         .SetFunctionName("gdjs.cameraTools.centerCamera");
+
+    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*
     AddAction("AddCamera",
                    _("Add a camera to a layer"),

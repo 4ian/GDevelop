@@ -45,6 +45,7 @@ gdjs.spriteAnimationFrame = function(imageManager, frameXml)
  */
 gdjs.spriteAnimation = function(imageManager, animationXml)
 {
+	//Internal object representing a direction of an animation.
     var direction = function(imageManager, directionXml) {
         
         var that = {};
@@ -97,6 +98,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     my.currentDirection = 0;
     my.currentFrame = 0;
     my.frameElapsedTime = 0;
+	my.animationPaused = false;
     my.scaleX = 1;
     my.scaleY = 1;
     my.blendMode = 0;
@@ -188,9 +190,31 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         }
     }
     
-    that.getAnimationFrame = function() {
-        return my.currentFrame;
+	/**
+	 * Return true if animation has ended.
+	 */
+    that.hasAnimationEnded = function() {
+        if ( my.currentAnimation >= my.animations.length ||
+             my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
+            return;
+        }
+		if ( my.animations[my.currentAnimation].loop ) return false;
+        var direction = my.animations[my.currentAnimation].directions[my.currentDirection];
+        
+        return my.currentFrame == direction.frames.length-1;
     }
+
+	that.animationPaused = function() {
+		return my.animationPaused;
+	}
+
+	that.pauseAnimation = function() {
+		my.animationPaused = true;
+	}
+
+	that.playAnimation = function() {
+		my.animationPaused = false;
+	}
     
     /**
      * Update the internal PIXI.Sprite position, angle...
@@ -233,6 +257,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
      * @method updateTime
      */
     that.updateTime = function(elapsedTime) {
+		if ( my.animationPaused ) return;
+
         var oldFrame = my.currentFrame;
         my.frameElapsedTime += elapsedTime;
         

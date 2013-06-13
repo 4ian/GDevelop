@@ -45,6 +45,14 @@ SpriteExtension::SpriteExtension()
         SetFunctionName("getDirectionOrAngle");
     spriteConditions["Sprite"].codeExtraInformation.
         SetFunctionName("getAnimationFrame");
+    spriteConditions["AnimationEnded"].codeExtraInformation.
+        SetFunctionName("hasAnimationEnded");
+    spriteActions["PauseAnimation"].codeExtraInformation.
+        SetFunctionName("pauseAnimation");
+    spriteActions["PlayAnimation"].codeExtraInformation.
+        SetFunctionName("playAnimation");
+    spriteConditions["AnimStopped"].codeExtraInformation.
+        SetFunctionName("animationPaused");
 
     spriteActions["ChangeScaleWidth"].codeExtraInformation.
         SetFunctionName("setScaleX").SetAssociatedGetter("getScaleX");
@@ -90,33 +98,11 @@ SpriteExtension::SpriteExtension()
     spriteExpressions["ScaleY"].codeExtraInformation.
         SetFunctionName("getScaleY");
 
+
+    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*
-
-    //Declaration of all objects available
+    //Objects instructions:
     {
-
-        obj.AddAction("PauseAnimation",
-                       _("Pause the animation"),
-                       _("Pause the current animation of the object"),
-                       _("Pause the current animation of _PARAM0_"),
-                       _("Animations and images"),
-                       "res/actions/animation24.png",
-                       "res/actions/animation.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDL/SpriteObject.h");
-
-
-        obj.AddAction("PlayAnimation",
-                       _("Play the animation"),
-                       _("Play the current animation of the object"),
-                       _("Play the current animation of _PARAM0_"),
-                       _("Animations and images"),
-                       "res/actions/animation24.png",
-                       "res/actions/animation.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeScale",
@@ -131,28 +117,6 @@ SpriteExtension::SpriteExtension()
             .AddParameter("operator", _("Modification's sign"), "",false)
             .AddParameter("expression", _("Value"), "",false)
             .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("AnimStopped",
-                       _("Animation is paused"),
-                       _("Test if the animation of an object is paused"),
-                       _("The animation of _PARAM0_ is paused"),
-                       _("Animations and images"),
-                       "res/conditions/animation24.png",
-                       "res/conditions/animation.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
-
-        obj.AddCondition("AnimationEnded",
-                       _("Animation finished"),
-                       _("Check if the animation being played by the Sprite object is finished."),
-                       _("The animation of _PARAM0_ is finished"),
-                       _("Animations and images"),
-                       "res/conditions/animation24.png",
-                       "res/conditions/animation.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .codeExtraInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("BlendMode",
                        _("Blend mode"),

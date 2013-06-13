@@ -53,17 +53,17 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
     ExportResources(strippedProject, exportDir);
     strippedProject.GetLayout(layout.GetName()).GetEvents().clear();
 
-    //Export the project
-    if ( !strippedProject.SaveToFile(exportDir+"/data.xml") ) {
-        lastError = gd::ToString(_("Unable to write ")+exportDir+"/data.xml");
-        return false;
-    }
-
     //Copy additional dependencies
     ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     //Create the index file
     if ( !ExportIndexFile(*project, exportDir, includesFiles) ) return false;
+
+    //Export the project
+    if ( !strippedProject.SaveToFile(exportDir+"/data.xml") ) {
+        lastError = gd::ToString(_("Unable to write ")+exportDir+"/data.xml");
+        return false;
+    }
 
     return true;
 }
@@ -84,8 +84,8 @@ bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir, con
             if ( !wxFileExists(exportDir+"/"+*it) ) continue;
 
             wxFileName relativeFile = wxFileName::FileName(exportDir+"/"+*it);
-            relativeFile.MakeRelativeTo(exportDir, wxPATH_UNIX);
-            codeFilesIncludes += "<script src=\""+gd::ToString(relativeFile.GetFullPath())+"\"></script>\n";
+            relativeFile.MakeRelativeTo(exportDir);
+            codeFilesIncludes += "<script src=\""+gd::ToString(relativeFile.GetFullPath(wxPATH_UNIX))+"\"></script>\n";
         }
 
         str = str.replace(pos, 24, codeFilesIncludes);

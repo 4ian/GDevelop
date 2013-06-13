@@ -73,6 +73,7 @@ SceneExtension::SceneExtension()
             .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
+    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
         /*
 
     AddAction("DisableInputWhenFocusIsLost",

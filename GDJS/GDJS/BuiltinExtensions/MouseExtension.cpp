@@ -40,6 +40,7 @@ MouseExtension::MouseExtension()
     GetAllExpressions()["SourisY"].codeExtraInformation
         .SetFunctionName("gdjs.inputTools.getMouseY").SetIncludeFile("inputtools.h"); //Deprecated
 
+    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
     /*
     AddAction("CentreSourisX",
                    _("Center mouse horizontaly"),

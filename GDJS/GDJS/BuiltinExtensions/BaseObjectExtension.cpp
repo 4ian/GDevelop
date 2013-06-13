@@ -213,6 +213,7 @@ BaseObjectExtension::BaseObjectExtension()
             .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
 
+    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*
         obj.AddAction("AddForceTournePos",
                        _("Add a force so as to move around a position"),

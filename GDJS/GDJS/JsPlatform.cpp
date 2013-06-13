@@ -16,6 +16,7 @@
 //Builtin extensions
 #include "GDJS/BuiltinExtensions/SpriteExtension.h"
 #include "GDJS/BuiltinExtensions/CommonInstructionsExtension.h"
+#include "GDJS/BuiltinExtensions/MathematicalToolsExtension.h"
 #include "GDJS/BuiltinExtensions/BaseObjectExtension.h"
 #include "GDJS/BuiltinExtensions/VariablesExtension.h"
 #include "GDJS/BuiltinExtensions/KeyboardExtension.h"
@@ -55,7 +56,8 @@ public:
             wxLogError(_("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
                        +_("\n\nPlease report this error on the Game Develop website, or contact the extension developer if it seems related to a third party extension."));
         }
-        wxLaunchDefaultBrowser("localhost:2828");
+        if ( !wxLaunchDefaultBrowser("localhost:2828") )
+            wxLogError(_("Unable to launch your browser.\Open manually your browser and type \"localhost:2828\" in the address bar ( without the quotes ) to launch the preview"));
 
         return false;
     }
@@ -87,15 +89,16 @@ JsPlatform::JsPlatform() :
 {
     //Adding built-in extensions.
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SceneExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new KeyboardExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MouseExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new TimeExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AudioExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MathematicalToolsExtension));
 };
 
 JsPlatform & JsPlatform::Get()

@@ -10,7 +10,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 {
     SetExtensionInformation("BuiltinStringInstructions",
                           _("Text manipulation"),
-                          _("Builtin extension providing expressions for manipulating texts."),
+                          _("Built-in extension providing expressions for manipulating texts."),
                           "Compil Games",
                           "Freeware");
 

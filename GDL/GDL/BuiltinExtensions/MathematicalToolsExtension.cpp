@@ -9,7 +9,7 @@ MathematicalToolsExtension::MathematicalToolsExtension()
 {
     SetExtensionInformation("BuiltinMathematicalTools",
                           _("Mathematical tools"),
-                          _("Builtin extension providing mathematical tools"),
+                          _("Built-in extension providing mathematical tools"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

@@ -5,7 +5,7 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
 {
     SetExtensionInformation("BuiltinExternalLayouts",
                           _("External layouts"),
-                          _("Builtin extension providing actions and conditions related to external layouts"),
+                          _("Built-in extension providing actions and conditions related to external layouts"),
                           "Compil Games",
                           "Freeware");
 

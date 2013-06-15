@@ -4,7 +4,7 @@ CommonConversionsExtension::CommonConversionsExtension()
 {
     SetExtensionInformation("BuiltinCommonConversions",
                           _("Standard Conversions"),
-                          _("Builtin extension providing standard conversions expressions."),
+                          _("Built-in extension providing standard conversions expressions."),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

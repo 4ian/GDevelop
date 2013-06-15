@@ -10,7 +10,7 @@ AdvancedExtension::AdvancedExtension()
 {
     SetExtensionInformation("BuiltinAdvanced",
                           _("Advanced control features"),
-                          _("Builtin extension providing advanced control features."),
+                          _("Built-in extension providing advanced control features."),
                           "Compil Games",
                           "Freeware");
 

@@ -36,7 +36,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 {
     SetExtensionInformation("BuiltinCommonInstructions",
                           _("Standard events"),
-                          _("Builtin extension providing standard events."),
+                          _("Built-in extension providing standard events."),
                           "Compil Games",
                           "Freeware");
 

@@ -16,7 +16,7 @@ SceneExtension::SceneExtension()
 {
     SetExtensionInformation("BuiltinScene",
                           _("Scene management features"),
-                          _("Builtin extension allowing to manipulate scenes"),
+                          _("Built-in extension allowing to manipulate scenes"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

@@ -8,7 +8,7 @@ JoystickExtension::JoystickExtension()
 {
     SetExtensionInformation("BuiltinJoystick",
                           _("Joysticks features"),
-                          _("Builtin extension allowing to use joysticks"),
+                          _("Built-in extension allowing to use joysticks"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

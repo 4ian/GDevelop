@@ -13,7 +13,7 @@ WindowExtension::WindowExtension()
 {
     SetExtensionInformation("BuiltinWindow",
                           _("Window features"),
-                          _("Builtin extension allowing to manipulate the game's window"),
+                          _("Built-in extension allowing to manipulate the game's window"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

@@ -15,7 +15,7 @@ VariablesExtension::VariablesExtension()
 {
     SetExtensionInformation("BuiltinVariables",
                           _("Variable features"),
-                          _("Builtin extension allowing to manipulate variables"),
+                          _("Built-in extension allowing to manipulate variables"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

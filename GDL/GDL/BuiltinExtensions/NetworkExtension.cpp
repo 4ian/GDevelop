@@ -9,7 +9,7 @@ NetworkExtension::NetworkExtension()
 {
     SetExtensionInformation("BuiltinNetwork",
                           _("Basic internet features"),
-                          _("Builtin extension providing network features."),
+                          _("Built-in extension providing network features."),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

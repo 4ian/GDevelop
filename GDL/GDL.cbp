@@ -782,8 +782,6 @@
 		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.h" />
 		<Unit filename="GDL/IDE/Dialogs/ProjectExportDialog.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/ProjectExportDialog.h" />
-		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.h" />
 		<Unit filename="GDL/IDE/Dialogs/RenderDialog.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/RenderDialog.h" />
 		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.cpp" />
@@ -913,7 +911,6 @@
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/IDE/Dialogs/EditForEachEvent.cpp" hdr="GDL/IDE/Dialogs/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDL/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDL\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/ProjectUpdateDlg.wxs" src="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" hdr="GDL\IDE\Dialogs\ProjectUpdateDlg.h" fwddecl="0" i18n="1" name="ProjectUpdateDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" hdr="GDL\IDE\Dialogs\SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDL\IDE\Dialogs\ProfileDlg.cpp" hdr="GDL\IDE\Dialogs\ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="GDL\IDE\Dialogs\DebuggerGUI.cpp" hdr="GDL\IDE\Dialogs\DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />

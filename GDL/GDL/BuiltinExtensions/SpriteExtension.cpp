@@ -18,7 +18,7 @@ SpriteExtension::SpriteExtension()
     {
         gd::ObjectMetadata & obj = AddObject("Sprite",
                    _("Sprite"),
-                   _("Animated object which can be used most element of a game"),
+                   _("Animated object which can be used for most elements of a game"),
                    "CppPlatform/Extensions/spriteicon.png",
                    &CreateSpriteObject,
                    &DestroySpriteObject);

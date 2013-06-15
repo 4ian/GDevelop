@@ -5,7 +5,6 @@
 
 #ifndef EXTERNALLAYOUTSEXTENSION_H
 #define EXTERNALLAYOUTSEXTENSION_H
-
 #include "GDL/ExtensionBase.h"
 
 /**

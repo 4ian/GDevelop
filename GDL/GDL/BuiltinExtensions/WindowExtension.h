@@ -16,13 +16,13 @@ namespace gd {class ArbitraryResourceWorker;}
  */
 class WindowExtension : public ExtensionBase
 {
-    public:
-        WindowExtension();
-        virtual ~WindowExtension() {};
+public:
+    WindowExtension();
+    virtual ~WindowExtension() {};
 
-        #if defined(GD_IDE_ONLY)
-        virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker);
-        #endif
+    #if defined(GD_IDE_ONLY)
+    virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker);
+    #endif
 };
 
 #endif // WINDOWEXTENSION_H

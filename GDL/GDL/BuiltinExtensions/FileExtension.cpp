@@ -5,7 +5,7 @@ FileExtension::FileExtension()
 {
     SetExtensionInformation("BuiltinFile",
                           _("Files"),
-                          _("Builtin extension providing actions and conditions on files."),
+                          _("Built-in extension providing functions for manipulation files."),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

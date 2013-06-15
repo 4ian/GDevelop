@@ -10,7 +10,7 @@ KeyboardExtension::KeyboardExtension()
 {
     SetExtensionInformation("BuiltinKeyboard",
                           _("Keyboard features"),
-                          _("Builtin extensions allowing to use keyboard"),
+                          _("Built-in extensions allowing to use keyboard"),
                           "Compil Games",
                           "Freeware");
     #if defined(GD_IDE_ONLY)

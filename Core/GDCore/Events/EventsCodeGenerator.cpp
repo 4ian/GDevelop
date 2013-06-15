@@ -211,10 +211,20 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
     //Verify that there are not mismatch between object type in parameters
     for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
-        if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && instrInfos.parameters[pNb].supplementaryInformation != "" )
+        if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) )
         {
             string objectInParameter = condition.GetParameter(pNb).GetPlainString();
-            if (gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
+
+            if ( !scene.HasObjectNamed(objectInParameter) && !project.HasObjectNamed(objectInParameter)
+                 && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
+                 && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
+            {
+                cout << "Bad object (" << objectInParameter << ") in a parameter of a condition " << condition.GetType() << endl;
+                condition.SetParameter(pNb, gd::Expression(""));
+                condition.SetType("");
+            }
+            else if ( !instrInfos.parameters[pNb].supplementaryInformation.empty()
+                      && gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
                 cout << "Bad object type in a parameter of a condition " << condition.GetType() << endl;
                 cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << endl;
@@ -349,10 +359,19 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
     //Verify that there are not mismatch between object type in parameters
     for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
-        if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && instrInfos.parameters[pNb].supplementaryInformation != "" )
+        if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) )
         {
             string objectInParameter = action.GetParameter(pNb).GetPlainString();
-            if (gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
+            if ( !scene.HasObjectNamed(objectInParameter) && !project.HasObjectNamed(objectInParameter)
+                 && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
+                 && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
+            {
+                cout << "Bad object (" << objectInParameter << ") in a parameter of an action " << action.GetType() << endl;
+                action.SetParameter(pNb, gd::Expression(""));
+                action.SetType("");
+            }
+            else if ( !instrInfos.parameters[pNb].supplementaryInformation.empty()
+                     && gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
                 cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << action.GetType() << endl;
                 cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;

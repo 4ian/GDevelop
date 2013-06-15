@@ -24,6 +24,8 @@ disabled(false)
 
 std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
 {
+    if ( IsDisabled() ) return "";
+
     try
     {
         if ( type.empty() ) return "";

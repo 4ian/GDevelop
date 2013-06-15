@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
+#include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -489,8 +490,9 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
     const TiXmlElement * elem = rootElement->FirstChildElement();
 
-    //Comparaison de versions
+    //Checking version
     #if defined(GD_IDE_ONLY)
+    wxString updateText;
     GDMajorVersion = 0;
     GDMinorVersion = 0;
     int build = 0;
@@ -543,15 +545,12 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion <= 0) )
+    if ( GDMajorVersion < 3 )
     {
-        //TODO
-        /*
-        updateText += _("The action \"Create an object from its name\" need you to specify a group of objects containing all the objects which can be created by the action.\nFor example, if the objects created by the action can be Object1, Object2 or Object3, you can create a group containing these 3 objects and pass it as parameter of the action.\n\n");
-        updateText += _("Functions setup has been changed. You have now to specify the objects to be passed as arguments to the function, if needed. As below, you can create an object group containing the objects to be passed as arguments to the function.\n\n");
-        updateText += _("Finally, if you're using Linked Objects extension, the actions/conditions now always need you to specify the name of objects to be taken into account: Check your events related to this extension.\n\n");
+        updateText += _("Sprite scaling has changed since GD 2: The resizing is made so that the origin point of the object won't move whatever the scale of the object.\n");
+        updateText += _("You may have to slightly change the position of some objects if you have changed their size.\n\n");
         updateText += _("Thank you for your understanding.\n");
-        */
+
     }
     #endif
     //End of Compatibility code
@@ -663,6 +662,14 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
             externalLayoutElem = externalLayoutElem->NextSiblingElement();
         }
     }
+
+    #if defined(GD_IDE_ONLY) //TODO
+    if (!updateText.empty())
+    {
+        ProjectUpdateDialog updateDialog(NULL, updateText);
+        updateDialog.ShowModal();
+    }
+    #endif
 
     return;
 }
@@ -1049,13 +1056,6 @@ bool Project::LoadFromFile(const std::string & filename)
     TiXmlHandle hdl( &doc );
     LoadFromXml(hdl.FirstChildElement().Element());
 
-    /*#if defined(GD_IDE_ONLY) //TODO
-    if (!updateText.empty())
-    {
-        ProjectUpdateDlg updateDialog(NULL, updateText);
-        updateDialog.ShowModal();
-    }
-    #endif*/
     return true;
 }
 

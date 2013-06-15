@@ -29,6 +29,14 @@
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
+				<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+					<label>You can also use the grayed automatisms:&#x0A;Their associated extension will be automatically enabled.</label>
+				</object>
+				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
 				<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
 					<size>10,-1</size>
 				</object>
@@ -37,8 +45,17 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-					<cols>3</cols>
-					<growablecols>0</growablecols>
+					<cols>4</cols>
+					<growablecols>1</growablecols>
+					<object class="sizeritem">
+						<object class="wxChoice" name="ID_CHOICE1" variable="platformChoice" member="yes">
+							<hidden>1</hidden>
+							<handler function="OnplatformChoiceSelect" entry="EVT_CHOICE" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
 							<cols>3</cols>

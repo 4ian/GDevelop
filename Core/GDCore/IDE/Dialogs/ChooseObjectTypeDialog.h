@@ -11,6 +11,7 @@
 #include <wx/stattext.h>
 #include <wx/statline.h>
 #include <wx/hyperlink.h>
+#include <wx/choice.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -46,6 +47,7 @@ public:
 
     //(*Declarations(ChooseObjectTypeDialog)
     wxStaticBitmap* StaticBitmap2;
+    wxChoice* platformChoice;
     wxStaticText* StaticText2;
     wxStaticText* StaticText1;
     wxButton* cancelBt;
@@ -63,6 +65,7 @@ protected:
     static const long ID_LISTCTRL1;
     static const long ID_STATICTEXT1;
     static const long ID_STATICLINE2;
+    static const long ID_CHOICE1;
     static const long ID_STATICBITMAP5;
     static const long ID_HYPERLINKCTRL2;
     static const long ID_BUTTON1;
@@ -81,6 +84,7 @@ private:
     void OnhelpBtClick(wxCommandEvent& event);
     void OnResize(wxSizeEvent& event);
     void OnobjectsListItemSelect1(wxListEvent& event);
+    void OnplatformChoiceSelect(wxCommandEvent& event);
     //*)
 
     void UpdateListColumnsWidth();

@@ -34,7 +34,9 @@ namespace gd
 //(*IdInit(ChooseAutomatismTypeDialog)
 const long ChooseAutomatismTypeDialog::ID_STATICTEXT1 = wxNewId();
 const long ChooseAutomatismTypeDialog::ID_LISTCTRL1 = wxNewId();
+const long ChooseAutomatismTypeDialog::ID_STATICTEXT2 = wxNewId();
 const long ChooseAutomatismTypeDialog::ID_STATICLINE2 = wxNewId();
+const long ChooseAutomatismTypeDialog::ID_CHOICE1 = wxNewId();
 const long ChooseAutomatismTypeDialog::ID_STATICBITMAP5 = wxNewId();
 const long ChooseAutomatismTypeDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long ChooseAutomatismTypeDialog::ID_BUTTON1 = wxNewId();
@@ -62,10 +64,15 @@ project(project_)
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	automatismsList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(277,175), wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(automatismsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("You can also use the grayed automatisms:\nTheir associated extension will be automatically enabled."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer1->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer2->AddGrowableCol(0);
+	FlexGridSizer2 = new wxFlexGridSizer(0, 4, 0, 0);
+	FlexGridSizer2->AddGrowableCol(1);
+	platformChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+	platformChoice->Hide();
+	FlexGridSizer2->Add(platformChoice, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
 	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
@@ -85,6 +92,7 @@ project(project_)
 
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&ChooseAutomatismTypeDialog::OnautomatismsListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&ChooseAutomatismTypeDialog::OnautomatismsListItemActivated);
+	Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&ChooseAutomatismTypeDialog::OnplatformChoiceSelect);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChooseAutomatismTypeDialog::OnhelpBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseAutomatismTypeDialog::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseAutomatismTypeDialog::OncancelBtClick);
@@ -95,6 +103,14 @@ project(project_)
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
     if(theme) theme->SetWindowTheme((HWND) automatismsList->GetHWND(), L"EXPLORER", NULL);
     #endif
+
+    for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
+    {
+        platformChoice->Append( project.GetUsedPlatforms()[i]->GetFullName() );
+        if ( project.GetUsedPlatforms()[i] == &project.GetCurrentPlatform() ) platformChoice->SetSelection(i);
+    }
+
+    if ( project.GetUsedPlatforms().size() != 1 ) platformChoice->Show();
 
     automatismsList->InsertColumn(0,_("Automatism"), wxLIST_FORMAT_LEFT, 320);
     automatismsList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 320);
@@ -251,6 +267,14 @@ void ChooseAutomatismTypeDialog::OnResize(wxSizeEvent& event)
 void ChooseAutomatismTypeDialog::OnhelpBtClick(wxCommandEvent& event)
 {
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object")); //TODO: Automatism help page
+}
+
+void ChooseAutomatismTypeDialog::OnplatformChoiceSelect(wxCommandEvent& event)
+{
+    if ( event.GetInt() >= project.GetUsedPlatforms().size() ) return;
+
+    project.SetCurrentPlatform(project.GetUsedPlatforms()[event.GetInt()]->GetName());
+    RefreshList();
 }
 
 }

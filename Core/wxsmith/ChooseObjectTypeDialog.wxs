@@ -48,6 +48,15 @@
 					<cols>4</cols>
 					<growablecols>1</growablecols>
 					<object class="sizeritem">
+						<object class="wxChoice" name="ID_CHOICE1" variable="platformChoice" member="yes">
+							<hidden>1</hidden>
+							<handler function="OnplatformChoiceSelect" entry="EVT_CHOICE" />
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
 							<cols>3</cols>
 							<growablerows>0</growablerows>

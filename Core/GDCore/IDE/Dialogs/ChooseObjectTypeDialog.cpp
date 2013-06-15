@@ -37,6 +37,7 @@ const long ChooseObjectTypeDialog::ID_STATICTEXT2 = wxNewId();
 const long ChooseObjectTypeDialog::ID_LISTCTRL1 = wxNewId();
 const long ChooseObjectTypeDialog::ID_STATICTEXT1 = wxNewId();
 const long ChooseObjectTypeDialog::ID_STATICLINE2 = wxNewId();
+const long ChooseObjectTypeDialog::ID_CHOICE1 = wxNewId();
 const long ChooseObjectTypeDialog::ID_STATICBITMAP5 = wxNewId();
 const long ChooseObjectTypeDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long ChooseObjectTypeDialog::ID_BUTTON1 = wxNewId();
@@ -70,6 +71,9 @@ project(project_)
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 4, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
+	platformChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+	platformChoice->Hide();
+	FlexGridSizer2->Add(platformChoice, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
 	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
@@ -89,6 +93,7 @@ project(project_)
 
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnobjectsListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnobjectsListItemActivated);
+	Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnplatformChoiceSelect);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnhelpBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OncancelBtClick);
@@ -100,6 +105,14 @@ project(project_)
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
     if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
     #endif
+
+    for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
+    {
+        platformChoice->Append( project.GetUsedPlatforms()[i]->GetFullName() );
+        if ( project.GetUsedPlatforms()[i] == &project.GetCurrentPlatform() ) platformChoice->SetSelection(i);
+    }
+
+    if ( project.GetUsedPlatforms().size() != 1 ) platformChoice->Show();
 
     objectsList->InsertColumn(0,_("Object"), wxLIST_FORMAT_LEFT, 320);
     objectsList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 320);
@@ -271,6 +284,14 @@ void ChooseObjectTypeDialog::OnResize(wxSizeEvent& event)
     objectsList->Refresh();
     objectsList->Update();
     event.Skip();
+}
+
+void ChooseObjectTypeDialog::OnplatformChoiceSelect(wxCommandEvent& event)
+{
+    if ( event.GetInt() >= project.GetUsedPlatforms().size() ) return;
+
+    project.SetCurrentPlatform(project.GetUsedPlatforms()[event.GetInt()]->GetName());
+    RefreshList();
 }
 
 }

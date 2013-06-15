@@ -352,6 +352,8 @@
 		<Unit filename="GDCore/IDE/Dialogs/ObjectsPropgridHelper.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ProjectExtensionsDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/ProjectUpdateDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ResourceLibraryDialog.h" />
 		<Unit filename="GDCore/IDE/EventsChangesNotifier.cpp" />
@@ -479,6 +481,7 @@
 		<Unit filename="wxsmith/LayoutEditorCanvas.wxs" />
 		<Unit filename="wxsmith/ObjectsOnBadLayerDialog.wxs" />
 		<Unit filename="wxsmith/ProjectExtensionsDialog.wxs" />
+		<Unit filename="wxsmith/ProjectUpdateDialog.wxs" />
 		<Unit filename="wxsmith/ResourceLibraryDialog.wxs" />
 		<Extensions>
 			<code_completion />
@@ -515,6 +518,7 @@
 					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCore\IDE\Dialogs\EditComment.cpp" hdr="GDCore\IDE\Dialogs\EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCore\IDE\Dialogs\EditForEachEvent.cpp" hdr="GDCore\IDE\Dialogs\EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCore\IDE\Dialogs\EditRepeatEvent.cpp" hdr="GDCore\IDE\Dialogs\EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectUpdateDialog.wxs" src="GDCore\IDE\Dialogs\ProjectUpdateDialog.cpp" hdr="GDCore\IDE\Dialogs\ProjectUpdateDialog.h" fwddecl="0" i18n="1" name="ProjectUpdateDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

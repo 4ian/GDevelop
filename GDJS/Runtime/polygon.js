@@ -42,14 +42,19 @@ gdjs.polygon = function(runtimeGame, pixiRenderer)
     
     that.computeEdges = function() {
         var v1, v2;
-        that.edges = [];
+        //Ensure edge array has the right size. ( And avoid recreating an edge array ).
+        while ( that.edges.length < that.vertices.length ) {
+            that.edges.push([0,0]);
+        }
+        if ( that.edges.length != that.vertices.length )
+            that.edges.length = that.vertices.length;
 
         for (var i = 0, len = that.vertices.length;i<len;++i) {
             v1 = that.vertices[i];
             if ((i + 1) >= len) v2 = that.vertices[0];
             else v2 = that.vertices[i + 1];
 
-            that.edges.push([v2[0] - v1[0], v2[1] - v1[1]]);
+            that.edges[i] = [v2[0] - v1[0], v2[1] - v1[1]];
         }
     }
     

@@ -116,7 +116,9 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
     GetAllConditions()["NbObjet"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
-    GetAllConditions()["CollisionNP"].codeExtraInformation
+    GetAllConditions()["CollisionNP"]
+        .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
+        .codeExtraInformation
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
     GetAllConditions()["Distance"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.distanceTest");

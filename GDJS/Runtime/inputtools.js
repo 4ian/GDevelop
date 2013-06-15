@@ -9,7 +9,7 @@ gdjs.inputTools = gdjs.inputTools || {};
 
 /**
  * Return true if the specified key is pressed
- * TODO: Map all keys
+ * TODO: Map all keys and uses a hash table.
  */
 gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     
@@ -40,11 +40,6 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key === "y" ) { return runtimeScene.getGame().isKeyPressed(89); }
     if ( key === "z" ) { return runtimeScene.getGame().isKeyPressed(90); }
     
-    if ( key === "Left" ) { return runtimeScene.getGame().isKeyPressed(37); }
-    if ( key === "Up" ) { return runtimeScene.getGame().isKeyPressed(38); }
-    if ( key === "Right" ) { return runtimeScene.getGame().isKeyPressed(39); }
-    if ( key === "Down" ) { return runtimeScene.getGame().isKeyPressed(40); }
-    
     if ( key === "Numpad0" ) { return runtimeScene.getGame().isKeyPressed(96); }
     if ( key === "Numpad1" ) { return runtimeScene.getGame().isKeyPressed(97); }
     if ( key === "Numpad2" ) { return runtimeScene.getGame().isKeyPressed(98); }
@@ -55,6 +50,47 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key === "Numpad7" ) { return runtimeScene.getGame().isKeyPressed(103); }
     if ( key === "Numpad8" ) { return runtimeScene.getGame().isKeyPressed(104); }
     if ( key === "Numpad9" ) { return runtimeScene.getGame().isKeyPressed(105); }
+    
+    if ( key == "RControl" ) { return runtimeScene.getGame().isKeyPressed(17); }
+    if ( key == "RShift" ) { return runtimeScene.getGame().isKeyPressed(16); }
+    if ( key == "RAlt" ) { return runtimeScene.getGame().isKeyPressed(18); }
+    if ( key == "LControl" ) { return runtimeScene.getGame().isKeyPressed(17); }
+    if ( key == "LShift" ) { return runtimeScene.getGame().isKeyPressed(16);}
+    if ( key == "LAlt" ) { return runtimeScene.getGame().isKeyPressed(18); }
+    if ( key == "LSystem" ) { return runtimeScene.getGame().isKeyPressed(91); }
+    if ( key == "RSystem" ) { return runtimeScene.getGame().isKeyPressed(91); }
+    /*if ( key == "Menu" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Menu ); }
+    if ( key == "LBracket" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::LBracket ); }
+    if ( key == "RBracket" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::RBracket ); }
+    if ( key == "SemiColon" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::SemiColon ); }
+    if ( key == "Comma" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Comma ); }
+    if ( key == "Period" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Period ); }
+    if ( key == "Quote" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Quote ); }
+    if ( key == "Slash" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Slash ); }
+    if ( key == "BackSlash" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::BackSlash ); }
+    if ( key == "Tilde" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Tilde ); }
+    if ( key == "Equal" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Equal ); }
+    if ( key == "Dash" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Dash ); }*/
+    if ( key == "Space" ) { return runtimeScene.getGame().isKeyPressed(32); }
+    if ( key == "Return" ) { return runtimeScene.getGame().isKeyPressed(13); }
+    if ( key == "Back" ) { return runtimeScene.getGame().isKeyPressed(8); }
+    if ( key == "Tab" ) { return runtimeScene.getGame().isKeyPressed(9); }
+    if ( key == "PageUp" ) { return runtimeScene.getGame().isKeyPressed(33); }
+    if ( key == "PageDown" ) { return runtimeScene.getGame().isKeyPressed(34); }
+    if ( key == "End" ) { return runtimeScene.getGame().isKeyPressed(35); }
+    if ( key == "Home" ) { return runtimeScene.getGame().isKeyPressed(36); }
+    if ( key == "Delete" ) { return runtimeScene.getGame().isKeyPressed(46); }
+    if ( key == "Insert" ) { return runtimeScene.getGame().isKeyPressed(45); }
+    
+    if ( key == "Add" ) { return runtimeScene.getGame().isKeyPressed(107); }
+    if ( key == "Subtract" ) { return runtimeScene.getGame().isKeyPressed(109); }
+    if ( key == "Multiply" ) { return runtimeScene.getGame().isKeyPressed(106); }
+    if ( key == "Divide" ) { return runtimeScene.getGame().isKeyPressed(111); }
+
+    if ( key === "Left" ) { return runtimeScene.getGame().isKeyPressed(37); }
+    if ( key === "Up" ) { return runtimeScene.getGame().isKeyPressed(38); }
+    if ( key === "Right" ) { return runtimeScene.getGame().isKeyPressed(39); }
+    if ( key === "Down" ) { return runtimeScene.getGame().isKeyPressed(40); }
     
     if ( key === "F1" ) { return runtimeScene.getGame().isKeyPressed(112); }
     if ( key === "F2" ) { return runtimeScene.getGame().isKeyPressed(113); }

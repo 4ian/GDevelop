@@ -29,3 +29,23 @@ gdjs.commonTools.addObjectsToEventsMap = function(name, objectList) {
 gdjs.commonTools.getEventsObjectsMap = function() {
     return gdjs.commonTools.eventsObjectsMap.clone();
 }
+
+/**
+ * Convert a string to a float.
+ * @method toNumber
+ * @private
+ * @static
+ */
+gdjs.commonTools.toNumber = function(str) {
+    return parseFloat(str);
+}
+
+/**
+ * Convert a number to a string.
+ * @method toString
+ * @private
+ * @static
+ */
+gdjs.commonTools.toString = function(num) {
+    return num.toString();
+}

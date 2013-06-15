@@ -13,7 +13,7 @@
 #include <wx/log.h>
 #include <wx/bitmap.h>
 
-//Builtin extensions
+//Built-in extensions
 #include "GDJS/BuiltinExtensions/SpriteExtension.h"
 #include "GDJS/BuiltinExtensions/CommonInstructionsExtension.h"
 #include "GDJS/BuiltinExtensions/MathematicalToolsExtension.h"
@@ -25,6 +25,14 @@
 #include "GDJS/BuiltinExtensions/CameraExtension.h"
 #include "GDJS/BuiltinExtensions/TimeExtension.h"
 #include "GDJS/BuiltinExtensions/AudioExtension.h"
+#include "GDJS/BuiltinExtensions/NetworkExtension.h"
+#include "GDJS/BuiltinExtensions/WindowExtension.h"
+#include "GDJS/BuiltinExtensions/CommonConversionsExtension.h"
+#include "GDJS/BuiltinExtensions/StringInstructionsExtension.h"
+#include "GDJS/BuiltinExtensions/JoystickExtension.h"
+#include "GDJS/BuiltinExtensions/ExternalLayoutsExtension.h"
+#include "GDJS/BuiltinExtensions/AdvancedExtension.h"
+#include "GDJS/BuiltinExtensions/FileExtension.h"
 
 JsPlatform *JsPlatform::singleton = NULL;
 
@@ -56,8 +64,11 @@ public:
             wxLogError(_("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
                        +_("\n\nPlease report this error on the Game Develop website, or contact the extension developer if it seems related to a third party extension."));
         }
+
         if ( !wxLaunchDefaultBrowser("localhost:2828") )
-            wxLogError(_("Unable to launch your browser.\Open manually your browser and type \"localhost:2828\" in the address bar ( without the quotes ) to launch the preview"));
+        {
+            wxLogError(_("Unable to launch your browser :(\nOpen manually your browser and type \"localhost:2828\" in the address bar ( without the quotes ) to launch the preview!"));
+        }
 
         return false;
     }
@@ -91,14 +102,22 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SceneExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new KeyboardExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MouseExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonConversionsExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MouseExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new KeyboardExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new JoystickExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SceneExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new TimeExtension));
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AudioExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MathematicalToolsExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AudioExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new FileExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new NetworkExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new WindowExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new StringInstructionsExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AdvancedExtension));
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new ExternalLayoutsExtension));
 };
 
 JsPlatform & JsPlatform::Get()

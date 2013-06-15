@@ -111,7 +111,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         
     }
     
-    my.updateQuadTrees = function () {
+    that.updatePotentialCollidingObjects = function () {
         my.collisionGrid.update();
     }
     
@@ -144,7 +144,6 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.renderAndStep = function() {
         my.updateTime();
-        my.updateQuadTrees();
         that.render();
         my.eventsFunction(that);
         my.updateObjects();

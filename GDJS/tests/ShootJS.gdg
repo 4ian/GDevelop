@@ -1928,7 +1928,7 @@
                         <Condition>
                             <Type value="KeyPressed" Contraire="false" />
                             <Parametre value="" />
-                            <Parametre value="a" />
+                            <Parametre value="RControl" />
                         </Condition>
                         <Condition>
                             <Type value="VarScene" Contraire="false" />
@@ -2037,6 +2037,7 @@
                             <Parametre value="Rock" />
                             <Parametre value="PlayerBullet" />
                             <Parametre value="" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>
@@ -2105,6 +2106,7 @@
                             <Parametre value="MiniRock" />
                             <Parametre value="PlayerBullet" />
                             <Parametre value="" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>
@@ -2127,6 +2129,7 @@
                             <Type value="Collision" Contraire="false" />
                             <Parametre value="BadBullet" />
                             <Parametre value="Player" />
+                            <Parametre value="" />
                             <Parametre value="" />
                         </Condition>
                     </Conditions>
@@ -2446,6 +2449,7 @@
                                     <Parametre value="Rock" />
                                     <Parametre value="Bad" />
                                     <Parametre value="" />
+                                    <Parametre value="" />
                                 </Condition>
                             </Conditions>
                             <Actions>
@@ -2508,6 +2512,7 @@
                                     <Type value="Collision" Contraire="false" />
                                     <Parametre value="PlayerBullet" />
                                     <Parametre value="Bad" />
+                                    <Parametre value="" />
                                     <Parametre value="" />
                                 </Condition>
                             </Conditions>
@@ -2576,6 +2581,7 @@
                             <Type value="CollisionNP" Contraire="false" />
                             <Parametre value="Player" />
                             <Parametre value="LifeBonus" />
+                            <Parametre value="" />
                             <Parametre value="" />
                         </Condition>
                     </Conditions>

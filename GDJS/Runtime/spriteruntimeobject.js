@@ -260,7 +260,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
 		if ( my.animationPaused ) return;
 
         var oldFrame = my.currentFrame;
-        my.frameElapsedTime += elapsedTime;
+        my.frameElapsedTime = my.frameElapsedTime+elapsedTime;
         
         if ( my.currentAnimation >= my.animations.length ||
              my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
@@ -460,11 +460,10 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     that.cursorOnObject = function() {
         var layer = runtimeScene.getLayer(that.layer);
         
-        var mouseX = runtimeScene.getGame().getMouseX()+layer.getCameraX();
-        var mouseY = runtimeScene.getGame().getMouseY()+layer.getCameraY();
-        
-        if ( mouseX >= that.getX() && mouseX <= that.getX()+that.getWidth()
-            && mouseY >= that.getY() && mouseY <= that.getY()+that.getHeight())
+        if ( runtimeScene.getGame().getMouseX()+layer.getCameraX() >= that.getX() 
+            && runtimeScene.getGame().getMouseX()+layer.getCameraX() <= that.getX()+that.getWidth()
+            && runtimeScene.getGame().getMouseY()+layer.getCameraY() >= that.getY() 
+            && runtimeScene.getGame().getMouseY()+layer.getCameraY() <= that.getY()+that.getHeight())
             return true;
             
         return false;

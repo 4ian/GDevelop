@@ -84,7 +84,7 @@ gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inv
 }
 
 //TODO: Same object lists, inverted
-gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted) {
+gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
 
     if ( inverted )
         return gdjs.objectTools.TwoListsTest(gdjs.runtimeObject.collisionTest,
@@ -139,9 +139,8 @@ gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2,
     var isTrue = false;
     
     //Search all the pairs colliding.
-    var pairs = [];
-    //TODO : RTSCENE.
-    var pairs /*tmp*/ = RTSCENE.getPotentialCollidingObjects(objects1NameId, objects2NameId); 
+    runtimeScene.updatePotentialCollidingObjects();
+    var pairs = runtimeScene.getPotentialCollidingObjects(objects1NameId, objects2NameId); 
     
     for(var i = 0, len = pairs.length;i<len;++i) {
         if ( objects1.indexOf(pairs[i][0]) !== -1 && objects2.indexOf(pairs[i][1]) !== -1 ) {

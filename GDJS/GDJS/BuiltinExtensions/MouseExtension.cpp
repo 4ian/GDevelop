@@ -15,7 +15,7 @@ MouseExtension::MouseExtension()
 {
     SetExtensionInformation("BuiltinMouse",
                           _("Mouse features"),
-                          _("Builtin extensions allowing to use the mouse"),
+                          _("Built-in extensions allowing to use the mouse"),
                           "Compil Games",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "BuiltinMouse");

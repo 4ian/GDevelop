@@ -3,7 +3,7 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 
 /**
- * \brief Built-in extension providing functions for all objects
+ * \brief Built-in extension providing audio functions.
  *
  * \ingroup BuiltinExtensions
  */

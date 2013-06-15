@@ -15,7 +15,7 @@ SceneExtension::SceneExtension()
 {
     SetExtensionInformation("BuiltinScene",
                           _("Scene management features"),
-                          _("Builtin extension allowing to manipulate scenes"),
+                          _("Built-in extension allowing to manipulate scenes"),
                           "Compil Games",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "BuiltinScene");
@@ -51,18 +51,20 @@ SceneExtension::SceneExtension()
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
                 }
 
+                std::string resultingBoolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
+
                 if ( instruction.GetParameters()[1].GetPlainString() == "=" || instruction.GetParameters()[1].GetPlainString().empty() )
-                    return "conditionTrue.val = ("+value1Code+" == "+value2Code+");\n";
+                    return resultingBoolean + " = ("+value1Code+" == "+value2Code+");\n";
                 else if ( instruction.GetParameters()[1].GetPlainString() == ">")
-                    return "conditionTrue.val = ("+value1Code+" > "+value2Code+");\n";
+                    return resultingBoolean + " = ("+value1Code+" > "+value2Code+");\n";
                 else if ( instruction.GetParameters()[1].GetPlainString() == "<")
-                    return "conditionTrue.val = ("+value1Code+" < "+value2Code+");\n";
+                    return resultingBoolean + " = ("+value1Code+" < "+value2Code+");\n";
                 else if ( instruction.GetParameters()[1].GetPlainString() == "<=")
-                    return "conditionTrue.val = ("+value1Code+" <= "+value2Code+");\n";
+                    return resultingBoolean + " = ("+value1Code+" <= "+value2Code+");\n";
                 else if ( instruction.GetParameters()[1].GetPlainString() == ">=")
-                    return "conditionTrue.val = ("+value1Code+" >= "+value2Code+");\n";
+                    return resultingBoolean + " = ("+value1Code+" >= "+value2Code+");\n";
                 else if ( instruction.GetParameters()[1].GetPlainString() == "!=")
-                    return "conditionTrue.val = ("+value1Code+" != "+value2Code+");\n";
+                    return resultingBoolean + " = ("+value1Code+" != "+value2Code+");\n";
 
                 return "";
             };

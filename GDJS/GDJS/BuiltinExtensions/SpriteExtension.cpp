@@ -70,8 +70,11 @@ SpriteExtension::SpriteExtension()
     spriteConditions["SourisSurObjet"].codeExtraInformation.
         SetFunctionName("cursorOnObject");
 
-    GetAllConditions()["Collision"].codeExtraInformation //No pixel perfect collision for now on the JS platform.
+    GetAllConditions()["Collision"]
+        .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
+        .codeExtraInformation //No pixel perfect collision for now on the JS platform.
         .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
+
     GetAllConditions()["EstTourne"].codeExtraInformation
         .SetFunctionName("gdjs.objectTools.turnedTowardTest");
 

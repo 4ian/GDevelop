@@ -15,7 +15,7 @@ TimeExtension::TimeExtension()
 {
     SetExtensionInformation("BuiltinTime",
                           _("Time"),
-                          _("Builtin extension providing actions and conditions about the time."),
+                          _("Built-in extension providing actions and conditions about the time."),
                           "Compil Games",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "BuiltinTime");

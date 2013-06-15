@@ -17,9 +17,17 @@ gdjs.variablesContainer = function(initialVariablesXml)
         $(initialVariablesXml).find("Variable").each( function() { 
             
             var variable = gdjs.variable();
-            variable.setValue($(this).attr("Value"));
+            var initialValue = $(this).attr("Value")
+            //Try to guess the type of the value, as GD has no way ( for now ) to specify
+            //the type of a variable.
+            if(Math.round(initialValue) == initialValue) {  //Number
+                variable.setValue(parseFloat(initialValue));
+            }
+            else { //We have a string.
+                variable.setValue(initialValue);
+            }
+            
             my.variables.put($(this).attr("Name"), variable);
-            console.log("Init var"+$(this).attr("Name")+" to "+$(this).attr("Value"));
         });
     }
     

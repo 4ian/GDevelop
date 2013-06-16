@@ -1,3 +1,7 @@
+/**
+ *  Game Develop JS Platform
+ *  2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 /**
  * Represents a layer used to display objects.<br>

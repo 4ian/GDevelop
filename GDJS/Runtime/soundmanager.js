@@ -1,3 +1,7 @@
+/**
+ *  Game Develop JS Platform
+ *  2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 /**
  * A soundManager manages the sound channels of a scene.

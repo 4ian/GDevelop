@@ -1,3 +1,7 @@
+/**
+ *  Game Develop JS Platform
+ *  2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 /**
  * A frame used by a spriteAnimation in a spriteRuntimeObject.

@@ -1,3 +1,7 @@
+/**
+ *  Game Develop JS Platform
+ *  2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 /**
  * The imageManager stores textures that can be used by the objects

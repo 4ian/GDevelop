@@ -1,3 +1,7 @@
+/**
+ *  Game Develop JS Platform
+ *  2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 /**
  * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.

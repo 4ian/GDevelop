@@ -5,27 +5,25 @@
         <Nom value="Shoot" />
         <Auteur value="" />
         <Extensions>
+            <Extension name="Sprite" />
             <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
             <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
             <Extension name="BuiltinMouse" />
             <Extension name="BuiltinKeyboard" />
             <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMathematicalTools" />
             <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinAudio" />
             <Extension name="BuiltinFile" />
             <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinWindow" />
             <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="BuiltinAdvanced" />
             <Extension name="BuiltinExternalLayouts" />
-            <Extension name="ParticleSystem" />
-            <Extension name="CommonDialogs" />
         </Extensions>
         <Platforms current="Game Develop JS platform">
             <Platform name="Game Develop JS platform" />
@@ -72,8 +70,8 @@
     <ObjectGroups />
     <Variables />
     <Scenes firstScene="">
-        <Scene nom="Nouvelle scène" mangledName="Nouvelle_32sc__4524ne" r="0.000000" v="0.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="0.375723" windowMask="true" associatedLayout="" />
+        <Scene nom="Game" mangledName="Game" r="0.000000" v="0.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="0.764708" windowMask="true" associatedLayout="" />
             <GroupesObjets>
                 <Groupe nom="Bad">
                     <Objet nom="Bad1" />
@@ -770,7 +768,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="546.000000" y="208.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4188.041504" y="390.122833" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2.000000" />
                     </floatInfos>
@@ -784,7 +782,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="3646.461426" y="363.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="5276.274902" y="343.953857" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -798,14 +796,14 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="765.000000" y="222.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4407.041504" y="404.122833" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2.000000" />
                     </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="761.000000" y="88.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4403.041504" y="270.122833" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -833,7 +831,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="3284.461426" y="263.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4914.274902" y="243.953873" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="1.000000" />
                     </floatInfos>
@@ -861,7 +859,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Rock" x="657.000000" y="43.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Rock" x="3876.657959" y="189.815231" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -1036,7 +1034,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="2317.461426" y="431.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4770.685547" y="168.923859" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="0.000000" />
                     </floatInfos>
@@ -1057,7 +1055,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="2818.461426" y="309.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4448.274902" y="289.953857" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2.000000" />
                     </floatInfos>
@@ -1220,7 +1218,7 @@
                     <stringInfos />
                     <InitialVariables />
                 </Objet>
-                <Objet nom="Etoile" x="556.000000" y="38.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                <Objet nom="Etoile" x="4198.041504" y="220.122833" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos>
                         <Info name="animation" value="2.000000" />
                     </floatInfos>
@@ -1748,6 +1746,111 @@
                 </Objet>
                 <Objet nom="LifeBonus" x="1826.252930" y="261.800049" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="2818.461426" y="309.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="3646.461426" y="363.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="3284.461426" y="263.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="2818.461426" y="309.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="4998.859863" y="128.461853" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="4693.090820" y="123.923141" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="4170.859863" y="74.461853" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="4188.041504" y="390.122833" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="546.000000" y="208.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="765.000000" y="222.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="761.000000" y="88.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Rock" x="657.000000" y="43.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="556.000000" y="38.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="546.000000" y="208.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Etoile" x="2317.461426" y="431.769226" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
                     <stringInfos />
                     <InitialVariables />
                 </Objet>

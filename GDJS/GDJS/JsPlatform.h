@@ -6,14 +6,16 @@
 #define JSPLATFORM_H
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/CommonTools.h"
 #include <wx/bitmap.h>
+#include <wx/intl.h>
 #include "HttpServer.h"
 
 /**
  * \brief Game Develop Javascript Platform
  *
- * Platform designed to be used to create 2D games based on Javascript.
- *
+ * Platform designed to be used to create 2D games based on Javascript.<br>
+ * <br>
  * This is the core class that is exposing to the IDE the features of the platform.<br>
  * The IDE creates this platform during its startup, thanks to CreateGDPlatform/DestroyGDPlatform.
  */
@@ -22,9 +24,9 @@ class GD_API JsPlatform : public gd::Platform
 public:
 
     virtual std::string GetName() const { return "Game Develop JS platform"; }
-    virtual std::string GetFullName() const { return "Web platform"; }
-    virtual std::string GetSubtitle() const { return "HTML5 and javascript based games for web browsers."; }
-    virtual std::string GetDescription() const { return "Allows to create 2D games which can be played in a web browser."; }
+    virtual std::string GetFullName() const { return gd::ToString(_("Web platform")); }
+    virtual std::string GetSubtitle() const { return gd::ToString(_("HTML5 and javascript based games for web browsers.")); }
+    virtual std::string GetDescription() const { return gd::ToString(_("Allows to create 2D games which can be played in a web browser.")); }
     virtual std::string GetIcon() const { return "JsPlatform/icon32.png"; }
 
     /**

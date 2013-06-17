@@ -331,7 +331,6 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
         file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY));
         file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", wxBitmap("res/close24.png", wxBITMAP_TYPE_ANY));
-        file2_bar->AddButton(idRibbonCompil, !hideLabels ? _("Compilation") : "", wxBitmap("res/compilicon24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -353,7 +352,6 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
         tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : "", wxBitmap("res/musicicon24.png", wxBITMAP_TYPE_ANY));
         tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : "", wxBitmap("res/strip24.png", wxBITMAP_TYPE_ANY));
-
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

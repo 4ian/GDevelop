@@ -167,7 +167,7 @@ EditorObjectList::EditorObjectList(wxWindow* parent, gd::Project & project_, gd:
 	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	rootContextMenu.Append(MenuItem3);
-	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Supprimer les objets\tDEL"), _("Delete all selected objects"), wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete the objects\tDEL"), _("Delete all selected objects"), wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	multipleContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);

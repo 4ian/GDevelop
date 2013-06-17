@@ -119,7 +119,7 @@
 		</object>
 		<object class="wxMenu" variable="multipleContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem2" member="yes">
-				<label>Supprimer les objets</label>
+				<label>Delete the objects</label>
 				<accel>DEL</accel>
 				<help>Delete all selected objects</help>
 				<bitmap>res/deleteicon.png</bitmap>

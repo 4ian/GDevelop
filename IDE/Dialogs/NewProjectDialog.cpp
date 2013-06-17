@@ -26,6 +26,7 @@
 const long NewProjectDialog::ID_STATICTEXT1 = wxNewId();
 const long NewProjectDialog::ID_LISTCTRL1 = wxNewId();
 const long NewProjectDialog::ID_LISTCTRL2 = wxNewId();
+const long NewProjectDialog::ID_STATICTEXT3 = wxNewId();
 const long NewProjectDialog::ID_STATICTEXT2 = wxNewId();
 const long NewProjectDialog::ID_TEXTCTRL1 = wxNewId();
 const long NewProjectDialog::ID_BUTTON3 = wxNewId();
@@ -64,6 +65,8 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 	templateList = new wxListCtrl(this, ID_LISTCTRL2, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL2"));
 	BoxSizer1->Add(templateList, 5, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	descTxt = new wxStaticText(this, ID_STATICTEXT3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer1->Add(descTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(1);
 	FlexGridSizer4->AddGrowableRow(0);
@@ -307,6 +310,8 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
     {
         chosenTemplatePlatform = associatedData->GetString();
     }
+    gd::Platform * platform = gd::PlatformManager::GetInstance()->GetPlatform(chosenTemplatePlatform);
+    if ( platform ) descTxt->SetLabel(platform->GetDescription());
     RefreshTemplateList();
 }
 

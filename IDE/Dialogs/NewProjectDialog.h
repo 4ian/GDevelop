@@ -49,6 +49,7 @@ public:
 protected:
 
     //(*Declarations(NewProjectDialog)
+    wxStaticText* descTxt;
     wxStaticText* StaticText2;
     wxListCtrl* platformList;
     wxStaticText* StaticText1;
@@ -65,6 +66,7 @@ protected:
     static const long ID_STATICTEXT1;
     static const long ID_LISTCTRL1;
     static const long ID_LISTCTRL2;
+    static const long ID_STATICTEXT3;
     static const long ID_STATICTEXT2;
     static const long ID_TEXTCTRL1;
     static const long ID_BUTTON3;

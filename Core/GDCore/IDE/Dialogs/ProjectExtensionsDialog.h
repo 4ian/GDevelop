@@ -14,6 +14,7 @@
 #include <wx/menu.h>
 #include <wx/textctrl.h>
 #include <wx/checklst.h>
+#include <wx/statline.h>
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -56,6 +57,8 @@ public:
     wxMenuItem* removePlatformMenuItem;
     wxMenuItem* usePlatformMenuItem;
     wxStaticText* StaticText5;
+    wxStaticText* StaticText7;
+    wxStaticLine* StaticLine1;
     wxHyperlinkCtrl* helpBt;
     wxStaticText* licenseTxt;
     wxMenu usedPlatformMenu;
@@ -70,6 +73,7 @@ protected:
     static const long ID_LISTCTRL1;
     static const long ID_STATICTEXT1;
     static const long ID_CHECKLISTBOX1;
+    static const long ID_STATICTEXT9;
     static const long ID_TEXTCTRL2;
     static const long ID_STATICTEXT5;
     static const long ID_STATICTEXT3;
@@ -81,6 +85,7 @@ protected:
     static const long ID_STATICBITMAP1;
     static const long ID_STATICTEXT8;
     static const long ID_HYPERLINKCTRL1;
+    static const long ID_STATICLINE1;
     static const long ID_STATICBITMAP5;
     static const long ID_HYPERLINKCTRL2;
     static const long ID_STATICTEXT2;
@@ -103,6 +108,7 @@ private:
     void OnremovePlatformMenuItemSelected(wxCommandEvent& event);
     void OnplatformListItemSelect(wxListEvent& event);
     void OnplatformListItemRClick(wxListEvent& event);
+    void OnExtensionsListToggled(wxCommandEvent& event);
     //*)
     void RefreshExtensionList();
     void RefreshPlatformList();

@@ -61,7 +61,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object)
         grid->Append( new wxStringProperty(_("Edition"), wxString("AUTO:"+automatisms[i]), _("Click to edit...")) );
         grid->SetPropertyCell(wxString("AUTO:"+automatisms[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(wxString("AUTO:"+automatisms[i]));
-        grid->Append( new wxStringProperty(_(""), "AUTO_RENAME:"+automatisms[i], _("Rename...")) );
+        grid->Append( new wxStringProperty("", "AUTO_RENAME:"+automatisms[i], _("Rename...")) );
         grid->SetPropertyCell(wxString("AUTO_RENAME:"+automatisms[i]), 1, _("Rename..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+automatisms[i]));
     }
@@ -86,12 +86,10 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             wxString oldWorkingDir = wxGetCwd();
             if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
                 wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
-            std::cout << "CWDfze:" << wxGetCwd();
 
             if (layout) object->LoadResources(project, *layout);
 
             wxSetWorkingDirectory(oldWorkingDir);
-            std::cout << "CWDoo:" << wxGetCwd();
         }
         else if ( event.GetPropertyName() == _("Variables") )
         {

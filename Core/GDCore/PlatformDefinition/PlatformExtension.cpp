@@ -315,8 +315,7 @@ boost::shared_ptr<gd::AutomatismsSharedData> PlatformExtension::CreateAutomatism
 
 void PlatformExtension::SetNameSpace(std::string nameSpace_)
 {
-    //For backward compatibility
-    //or for extension without namespace
+    //Most of the builtin extensions do not have namespace
     if (name == "Sprite" ||
         name == "BuiltinObject" ||
         name == "BuiltinAudio" ||
@@ -343,6 +342,11 @@ void PlatformExtension::SetNameSpace(std::string nameSpace_)
 
 
     nameSpace = nameSpace_+"::";
+}
+
+bool PlatformExtension::IsBuiltin() const
+{
+    return nameSpace.empty() || name == "BuiltinExternalLayouts" || name == "BuiltinCommonInstructions";
 }
 
 #if defined(GD_IDE_ONLY)

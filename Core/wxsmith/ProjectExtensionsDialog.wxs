@@ -54,9 +54,18 @@
 									<object class="sizeritem">
 										<object class="wxCheckListBox" name="ID_CHECKLISTBOX1" variable="ExtensionsList" member="yes">
 											<size>294,281</size>
+											<handler function="OnExtensionsListToggled" entry="EVT_CHECKLISTBOX" />
 											<handler function="OnExtensionsListSelect" entry="EVT_LISTBOX" />
 										</object>
 										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText7" member="yes">
+											<label>Built-in extensions are automatically used by the project&#x0A;and are not shown here.</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
 										<option>1</option>
 									</object>
@@ -247,6 +256,13 @@
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<option>1</option>
 					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+					<size>10,-1</size>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>

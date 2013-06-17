@@ -31,6 +31,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/CommonTools.h"
 
 using namespace std;
 
@@ -41,6 +42,7 @@ namespace gd
 const long ProjectExtensionsDialog::ID_LISTCTRL1 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT1 = wxNewId();
 const long ProjectExtensionsDialog::ID_CHECKLISTBOX1 = wxNewId();
+const long ProjectExtensionsDialog::ID_STATICTEXT9 = wxNewId();
 const long ProjectExtensionsDialog::ID_TEXTCTRL2 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT5 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT3 = wxNewId();
@@ -52,6 +54,7 @@ const long ProjectExtensionsDialog::ID_STATICBITMAP4 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICBITMAP1 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT8 = wxNewId();
 const long ProjectExtensionsDialog::ID_HYPERLINKCTRL1 = wxNewId();
+const long ProjectExtensionsDialog::ID_STATICLINE1 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICBITMAP5 = wxNewId();
 const long ProjectExtensionsDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT2 = wxNewId();
@@ -107,6 +110,8 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	FlexGridSizer2->AddGrowableRow(0);
 	ExtensionsList = new wxCheckListBox(this, ID_CHECKLISTBOX1, wxDefaultPosition, wxSize(294,281), 0, 0, 0, wxDefaultValidator, _T("ID_CHECKLISTBOX1"));
 	FlexGridSizer2->Add(ExtensionsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText7 = new wxStaticText(this, ID_STATICTEXT9, _("Built-in extensions are automatically used by the project\nand are not shown here."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	FlexGridSizer2->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer12->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -165,6 +170,8 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	FlexGridSizer3->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -193,6 +200,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnplatformListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ProjectExtensionsDialog::OnplatformListItemRClick);
+	Connect(ID_CHECKLISTBOX1,wxEVT_COMMAND_CHECKLISTBOX_TOGGLED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnExtensionsListToggled);
 	Connect(ID_CHECKLISTBOX1,wxEVT_COMMAND_LISTBOX_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnExtensionsListSelect);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ProjectExtensionsDialog::OnhelpBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnFermerBtClick);
@@ -284,11 +292,8 @@ void ProjectExtensionsDialog::RefreshExtensionList()
     {
         wxStringClientData * associatedData = new wxStringClientData(extensionsInstalled[i]->GetName());
 
-        if ( extensionsInstalled[i]->GetName().find("Builtin") < extensionsInstalled[i]->GetName().length() )
-            ExtensionsList->Insert(extensionsInstalled[i]->GetFullName(), ExtensionsList->GetCount(), associatedData);
-        else
+        if ( !extensionsInstalled[i]->IsBuiltin() )
             ExtensionsList->Insert(extensionsInstalled[i]->GetFullName(), 0, associatedData);
-
     }
 
     //Check used extensions
@@ -336,6 +341,21 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
 
             return;
         }
+    }
+}
+
+void ProjectExtensionsDialog::OnExtensionsListToggled(wxCommandEvent& event)
+{
+    if (!currentPlatform) return;
+
+    int id = event.GetSelection();
+    wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
+    if (associatedData == NULL) return;
+
+    boost::shared_ptr<PlatformExtension> ext = currentPlatform->GetExtension(gd::ToString(associatedData->GetData()));
+    if ( ext != boost::shared_ptr<PlatformExtension>() && ext->IsBuiltin() )
+    {
+        ExtensionsList->Check(id);
     }
 }
 
@@ -439,4 +459,3 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
 
 
 }
-

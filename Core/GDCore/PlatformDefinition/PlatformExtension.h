@@ -196,7 +196,7 @@ public:
     /**
      * \brief Return true if the extension is a standard extension that cannot be deactivated
      */
-    bool IsBuiltin() const { return nameSpace.empty(); }
+    bool IsBuiltin() const;
 
     /**
      * \brief Get the namespace of the extension.

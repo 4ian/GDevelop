@@ -81,7 +81,6 @@ const long MainFrame::ID_MENUITEM11 = wxNewId();
 const long MainFrame::ID_MENUITEM12 = wxNewId();
 const long MainFrame::ID_MENUITEM13 = wxNewId();
 const long MainFrame::ID_MENUITEM16 = wxNewId();
-const long MainFrame::ID_MENUITEM15 = wxNewId();
 const long MainFrame::ID_MENUITEM19 = wxNewId();
 const long MainFrame::ID_MENUITEM17 = wxNewId();
 const long MainFrame::ID_MENUITEM27 = wxNewId();
@@ -213,9 +212,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/save_all16.png"))));
     fileMenu.Append(MenuItem12);
     fileMenu.AppendSeparator();
-    MenuItem9 = new wxMenuItem((&fileMenu), ID_MENUITEM15, _("Compile to a standalone game."), wxEmptyString, wxITEM_NORMAL);
-    MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/compilationicon.png"))));
-    fileMenu.Append(MenuItem9);
     fileMenu.AppendSeparator();
     MenuItem15 = new wxMenuItem((&fileMenu), ID_MENUITEM19, _("Close the current project"), wxEmptyString, wxITEM_NORMAL);
     fileMenu.Append(MenuItem15);
@@ -271,7 +267,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveSelected);
     Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
     Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAllSelected);
-    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuCompilationSelected);
     Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnCloseCurrentProjectSelected);
     Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPrefSelected);
     Connect(ID_MENUITEM27,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuAideSelected);
@@ -312,7 +307,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
         {
             long id = wxNewId();
 
-            fileMenu.Insert(10, id, exporter->GetProjectExportButtonLabel());
+            fileMenu.Insert(11, id, exporter->GetProjectExportButtonLabel());
             Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
             idToPlatformExportMenuMap[id] = gd::PlatformManager::GetInstance()->GetAllPlatforms()[i].get();
         }
@@ -900,7 +895,24 @@ void MainFrame::OnRibbonFileBtEnter(wxMouseEvent& event)
 void MainFrame::OnRibbonFileBtClick(wxMouseEvent& event)
 {
     if ( scenesLockingShortcuts.empty() )
+    {
+        for(std::map<long, gd::Platform*>::const_iterator it = idToPlatformExportMenuMap.begin();it != idToPlatformExportMenuMap.end();++it)
+        {
+            fileMenu.Enable(it->first, false);
+        }
+
+        if ( CurrentGameIsValid() )
+        {
+            const std::vector<gd::Platform*> & usedPlaftorms = GetCurrentGame()->GetUsedPlatforms();
+            for(std::map<long, gd::Platform*>::const_iterator it = idToPlatformExportMenuMap.begin();it != idToPlatformExportMenuMap.end();++it)
+            {
+                if ( std::find(usedPlaftorms.begin(), usedPlaftorms.end(), it->second) != usedPlaftorms.end() )
+                    fileMenu.Enable(it->first, true);
+            }
+        }
+
         PopupMenu(&fileMenu, ribbonFileBt->GetPosition().x, ribbonFileBt->GetPosition().y+ribbonFileBt->GetSize().GetHeight());
+    }
     else
         PopupMenu(&disabledFileMenu, ribbonFileBt->GetPosition().x, ribbonFileBt->GetPosition().y+ribbonFileBt->GetSize().GetHeight());
 }

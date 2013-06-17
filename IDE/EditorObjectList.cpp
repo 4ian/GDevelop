@@ -412,7 +412,19 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     objectsList->SetItemImage( item, thumbnailID );
 
     //Reload resources
-    if (!globalObjects && layout) objects.GetObject(name).LoadResources(project, *layout);
+    if (layout)
+    {
+        //Reload resources : Do not forget to switch the working directory.
+        wxString oldWorkingDir = wxGetCwd();
+        if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+            wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+            std::cout << "CWDobjl:" << wxGetCwd();
+
+        objects.GetObject(name).LoadResources(project, *layout);
+
+        wxSetWorkingDirectory(oldWorkingDir);
+            std::cout << "CWDobl2:" << wxGetCwd();
+    }
 }
 
 ////////////////////////////////////////////////////////////

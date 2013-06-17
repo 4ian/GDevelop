@@ -247,7 +247,6 @@ private:
     static const long ID_MENUITEM12;
     static const long ID_MENUITEM13;
     static const long ID_MENUITEM16;
-    static const long ID_MENUITEM15;
     static const long ID_MENUITEM19;
     static const long ID_MENUITEM17;
     static const long ID_MENUITEM27;
@@ -307,7 +306,6 @@ private:
     wxMenuItem* MenuItem21;
     wxMenuItem* MenuItem16;
     wxMenuItem* MenuItem43;
-    wxMenuItem* MenuItem9;
     wxMenu saveContextMenu;
     wxMenuItem* MenuItem19;
     wxMenu fileMenu;

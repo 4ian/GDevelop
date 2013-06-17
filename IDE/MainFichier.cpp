@@ -73,6 +73,8 @@ void MainFrame::CreateNewProject()
             SetCurrentGame(games.size()-1);
             if ( startPage ) startPage->Refresh();
 
+            //Ensure working directory is set to the IDE one.
+            wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
             if ( newProject->GetLayoutCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
         }
         else wxLogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
@@ -82,6 +84,9 @@ void MainFrame::CreateNewProject()
         wxCommandEvent uselessEvent;
         OnOpenExampleSelected(uselessEvent);
     }
+
+    //Ensure working directory is set to the IDE one.
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 }
 
 void MainFrame::OnMenuNewSelected( wxCommandEvent& event )

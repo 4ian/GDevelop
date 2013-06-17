@@ -90,6 +90,7 @@ const long EventsEditor::idRibbonTemplate = wxNewId();
 const long EventsEditor::idRibbonCreateTemplate = wxNewId();
 const long EventsEditor::idRibbonHelp = wxNewId();
 const long EventsEditor::idRibbonProfiling = wxNewId();
+const long EventsEditor::idRibbonPlatform = wxNewId();
 const long EventsEditor::idSearchReplace = wxNewId();
 const long EventsEditor::idRibbonFoldAll = wxNewId();
 const long EventsEditor::idRibbonUnFoldAll = wxNewId();
@@ -286,8 +287,54 @@ EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & s
 	if ( config->Read("EventsEditor/Font", &eventsEditorFont) )
         gd::EventsRenderingHelper::GetInstance()->SetFont(eventsEditorFont);
 
+    //Create platform list
+    for (unsigned int i = 0;i<game.GetUsedPlatforms().size();++i)
+    {
+        long id = wxNewId();
+        idForPlatformsMenu[id] = game.GetUsedPlatforms()[i]->GetName();
+        platformsMenu.Append(id, _("Edit events using ") + game.GetUsedPlatforms()[i]->GetFullName(),
+                             _("Display the events as they are interpreted by the selected platform."), wxITEM_RADIO);
+        mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EventsEditor::OnPlatformSelected, NULL, this);
+    }
+
+    RecreateCustomEventsMenu();
+
+    searchDialog = new SearchEvents(this, game, scene, events);
+
+    RecomputeAllEventsWidth(*events); //Recompute all widths
+    liveEditingPanel->Show(false);
+    liveEdit->SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+    liveEditingPanel->Show(false);
+    eventContextPanel->Show(false);
+    listContextPanel->Show(false);
+
+    if ( hideContextPanelsLabels )
+    {
+        addEventBt->SetLabel("");
+        addSubEventBt->SetLabel("");
+        addMoreBt->SetLabel("");
+        addInstrBt->SetLabel("");
+
+        eventContextPanel->SetSize(5+16+5+16+5+16+5,eventContextPanel->GetSize().y);
+        listContextPanel->SetSize(5+16+5,listContextPanel->GetSize().y);
+    }
+
+    latestState = CloneVectorOfEvents(*events);
+}
+
+void EventsEditor::RecreateCustomEventsMenu()
+{
     //Adding events types
     const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
+
+    //Clear the menu
+    for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
+         idIter != idForEventTypesMenu.end();
+         ++idIter)
+    {
+        eventTypesMenu.Destroy(idIter->first);
+    }
+    idForEventTypesMenu.clear();
 
     //Insert extension specific events types
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -327,27 +374,6 @@ EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & s
         }
 	}
 
-    searchDialog = new SearchEvents(this, game, scene, events);
-
-    RecomputeAllEventsWidth(*events); //Recompute all widths
-    liveEditingPanel->Show(false);
-    liveEdit->SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
-    liveEditingPanel->Show(false);
-    eventContextPanel->Show(false);
-    listContextPanel->Show(false);
-
-    if ( hideContextPanelsLabels )
-    {
-        addEventBt->SetLabel("");
-        addSubEventBt->SetLabel("");
-        addMoreBt->SetLabel("");
-        addInstrBt->SetLabel("");
-
-        eventContextPanel->SetSize(5+16+5+16+5+16+5,eventContextPanel->GetSize().y);
-        listContextPanel->SetSize(5+16+5,listContextPanel->GetSize().y);
-    }
-
-    latestState = CloneVectorOfEvents(*events);
 }
 
 EventsEditor::~EventsEditor()
@@ -409,6 +435,7 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -433,6 +460,7 @@ void EventsEditor::ConnectEvents()
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnCreateTemplateBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnSearchBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnProfilingBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonPlatform, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EventsEditor::OnPlatformBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnHelpBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonFoldAll, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonUnFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonUnFoldAll, NULL, this);
@@ -1633,6 +1661,18 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 {
     if ( searchDialog )
         searchDialog->Show();
+}
+
+void EventsEditor::OnPlatformBtClick(wxRibbonButtonBarEvent& event)
+{
+    event.PopupMenu(&platformsMenu);
+}
+
+void EventsEditor::OnPlatformSelected(wxCommandEvent& event)
+{
+    game.SetCurrentPlatform(idForPlatformsMenu[event.GetId()]);
+    RecreateCustomEventsMenu();
+    Refresh();
 }
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)

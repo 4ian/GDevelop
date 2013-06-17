@@ -19,6 +19,7 @@
 #include <wx/ribbon/page.h>
 #include <wx/ribbon/buttonbar.h>
 #include <vector>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/Events/Event.h"
@@ -181,6 +182,7 @@ protected:
     static const long idRibbonHelp;
     static const long idSearchReplace;
     static const long idRibbonProfiling;
+    static const long idRibbonPlatform;
     static const long idRibbonFoldAll;
     static const long idRibbonUnFoldAll;
 
@@ -250,6 +252,8 @@ private:
     void OnCreateTemplateBtClick(wxCommandEvent& event);
     void OnSearchBtClick(wxCommandEvent& event);
     void OnProfilingBtClick(wxCommandEvent& event);
+    void OnPlatformBtClick(wxRibbonButtonBarEvent& event);
+    void OnPlatformSelected(wxCommandEvent& event);
     void OnAddCustomEventFromMenuSelected(wxCommandEvent& event);
     void OnRibbonAddEventBtClick(wxRibbonButtonBarEvent& evt);
     void OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt);
@@ -258,6 +262,8 @@ private:
     void OnRibbonFoldAll(wxRibbonButtonBarEvent& evt);
     void OnRibbonUnFoldAll(wxRibbonButtonBarEvent& evt);
     void HandleSelectionAfterClick(int x, int y, bool allowLiveEditingParameters = true);
+
+    void RecreateCustomEventsMenu();
 
     void AddEvent(EventItem & previousEventItem);
     void AddSubEvent(EventItem & parentEventItem);
@@ -291,6 +297,9 @@ private:
     std::vector < gd::BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
     gd::MainFrameWrapper & mainFrameWrapper;
     gd::LayoutEditorCanvas * layoutCanvas;
+
+    std::map<long, std::string> idForPlatformsMenu;
+    wxMenu platformsMenu; ///< Used to display and allow the user to choose the plaform being used to edit the events.
 
     EventsEditorItemsAreas itemsAreas; ///< Areas management
     EventsEditorSelection selection; ///<Selection management and input

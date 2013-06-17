@@ -137,11 +137,6 @@
 				<handler function="OnMenuSaveAllSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
-			<object class="wxMenuItem" name="ID_MENUITEM15" variable="MenuItem9" member="yes">
-				<label>Compile to a standalone game.</label>
-				<bitmap>res/compilationicon.png</bitmap>
-				<handler function="OnMenuCompilationSelected" entry="EVT_MENU" />
-			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">
 				<label>Close the current project</label>

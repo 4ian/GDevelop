@@ -340,7 +340,7 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

@@ -335,6 +335,8 @@ bool Game_Develop_EditorApp::OnInit()
 
     cout << "* Initialization ended." << endl;
 
+    wxLogWarning(_("This is a beta version of Game Develop 3.\n\nSome features may be missing and bugs present: Report any feedback on www.forum.compilgames.net.\nThanks!"));
+
     //Checking for updates
     {
         wxString result;

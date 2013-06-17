@@ -154,7 +154,7 @@ void NewProjectDialog::RefreshPlatformList()
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (unsigned int i = platforms.size()-1;i<platforms.size();--i)
     {
         platformList->InsertItem(0, platforms[i]->GetFullName(), 0);
         gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName());

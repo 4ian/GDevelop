@@ -78,6 +78,7 @@ bool CppLayoutPreviewer::LaunchPreview( )
 
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
+            std::cout << "CWDcp:" << wxGetCwd();
 
     previewScene.running = false;
     playing = false;
@@ -190,6 +191,7 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     //Switch the working directory as we are making calls to the runtime scene
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
+            std::cout << "CWDhi:" << wxGetCwd();
 
     //Load the scene ( compilation is done )
     std::cout << "Initializing RuntimeScene from layout..." << std::endl;
@@ -218,6 +220,7 @@ void CppLayoutPreviewer::PlayPreview()
     playing = true;
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
+            std::cout << "CWDgre:" << wxGetCwd();
 
     previewScene.running = true;
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);

@@ -154,7 +154,7 @@ namespace
         {
             if (game.HasExternalEventsNamed(*i))
             {
-                gd::ExternalEvents events = game.GetExternalEvents(*i);
+                gd::ExternalEvents & events = game.GetExternalEvents(*i);
 
                 DependenciesAnalyzer analyzer(game);
                 if ( !analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName()).empty() )
@@ -457,19 +457,23 @@ bool ExternalEventsCodeCompilerPostWork::Execute()
 
 bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
 {
+    std::cout << "AVEC:" << externalEvents << std::endl;
     if ( game == NULL || externalEvents == NULL )
     {
         std::cout << "WARNING: Cannot execute pre work: No valid associated game or external events." << std::endl;
         return false;
     }
 
+    std::cout << "B";
     DependenciesAnalyzer analyzer(*game);
+    std::cout << "B";
     if ( !analyzer.Analyze(externalEvents->GetEvents()) )
     {
         //Circular dependency exists
         std::cout << "WARNING: Circular dependency for external events " << externalEvents->GetName() << std::endl;
         return false;
     }
+    std::cout << "B";
     std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(externalEvents->GetName());
     if ( associatedScene.empty() )
     {
@@ -484,6 +488,7 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
         return true;
     }
 
+    std::cout << "C";
     Game gameCopy = *game;
     gd::ExternalEvents eventsCopy = *externalEvents;
 
@@ -491,6 +496,7 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     cout << "Generating C++ code...\n";
     gd::EventsCodeGenerator::DeleteUselessEvents(eventsCopy.GetEvents());
 
+    std::cout << "D";
     std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, eventsCopy, true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"RuntimeEventsSource.cpp").c_str() );

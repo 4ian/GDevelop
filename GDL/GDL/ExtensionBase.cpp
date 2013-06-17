@@ -46,5 +46,9 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, std::string cl
 }
 
 #if !defined(GD_IDE_ONLY)
+//Implementations of some dependencies of ExtensionBase are compiled in this compilation unit
+//when compiling for runtime:
 #include "GDCore/PlatformDefinition/PlatformExtension.cpp"
+#include "GDCore/Events/ObjectMetadata.cpp"
+#include "GDCore/Events/AutomatismMetadata.cpp"
 #endif

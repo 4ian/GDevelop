@@ -151,15 +151,16 @@ std::string CodeCompilerCall::GetFullCall() const
         {
             args.push_back("-L\""+baseDir+"\"");
             args.push_back("-L\""+baseDir+"CppPlatform/Extensions/\"");
+            args.push_back("-lgdl");
         }
         else
         {
             args.push_back("-L\""+baseDir+"\"");
             args.push_back("-L\""+baseDir+"CppPlatform/Runtime/\"");
             args.push_back("-L\""+baseDir+"CppPlatform/Extensions/Runtime/\"");
+            args.push_back("\""+baseDir+"CppPlatform/Runtime/libgdl.a\"");
         }
 
-        args.push_back("-lgdl");
         args.push_back("-lstdc++");
         if ( !compilationForRuntime ) args.push_back("-lGDCore");
         #if defined(RELEASE) || defined(DEV)

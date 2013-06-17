@@ -94,7 +94,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
             std::vector< gd::Expression > parameters = instr.GetParameters();
             if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
             if ( parameters.size() >= 3 ) parameters.erase(parameters.begin()+2);
-            if ( parameters.size() >= 4 && parameters[3].GetPlainString() == ">=" || parameters[3].GetPlainString() == ">" )
+            if ( parameters.size() >= 4 && (parameters[3].GetPlainString() == ">=" || parameters[3].GetPlainString() == ">") )
             {
                 instr.SetInverted(true);
             }
@@ -128,7 +128,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
             }
         }
 
-        UpdateInstructionsFromGD2x(project, instr.GetSubInstructions(), instructionsAreActions);
+        //UpdateInstructionsFromGD2x(project, instr.GetSubInstructions(), instructionsAreActions);
     }
 }
 

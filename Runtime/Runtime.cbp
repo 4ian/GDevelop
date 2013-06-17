@@ -18,6 +18,7 @@
 					<Add option="-g" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -125,6 +126,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -169,6 +171,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -214,6 +217,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -258,6 +262,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -303,6 +308,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -343,6 +349,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -378,6 +385,7 @@
 			<Add directory="../GDL" />
 			<Add directory="../ExtLibs/boost" />
 			<Add directory="../ExtLibs/SFML/include" />
+			<Add directory="../Core" />
 		</Compiler>
 		<Linker>
 			<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />

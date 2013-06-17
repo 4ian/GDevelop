@@ -7,7 +7,11 @@
 #define PLATFORM_H
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDL/CommonTools.h"
 #include "GDL/IDE/ChangesNotifier.h"
+#if defined(GD_IDE_ONLY)
+#include <wx/intl.h>
+#endif
 namespace gd { class Automatism; }
 namespace gd { class Object; }
 class RuntimeObject;
@@ -27,9 +31,11 @@ class GD_API CppPlatform : public gd::Platform
 public:
 
     virtual std::string GetName() const { return "Game Develop C++ platform"; }
-    virtual std::string GetFullName() const { return "Native platform"; }
-    virtual std::string GetSubtitle() const { return "C++ and OpenGL based games for Windows or Linux."; }
+    #if defined(GD_IDE_ONLY)
+    virtual std::string GetFullName() const { return ToString(_("Native platform")); }
+    virtual std::string GetSubtitle() const { return ToString(_("C++ and OpenGL based games for Windows or Linux.")); }
     virtual std::string GetDescription() const;
+    #endif
 
     /**
      * Create a RuntimeObject from a gd::Object for a scene.

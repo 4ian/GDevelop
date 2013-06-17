@@ -97,11 +97,6 @@ CppPlatform::CppPlatform() :
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
 }
 
-std::string CppPlatform::GetDescription() const
-{
-    return ToString(_("Allows to create 2D games which can be compiled and played on Windows or Linux."));
-}
-
 bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension)
 {
     boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(platformExtension);
@@ -146,6 +141,11 @@ boost::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene &
 }
 
 #if defined(GD_IDE_ONLY)
+std::string CppPlatform::GetDescription() const
+{
+    return ToString(_("Allows to create 2D games which can be compiled and played on Windows or Linux."));
+}
+
 boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));

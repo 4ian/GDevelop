@@ -90,11 +90,9 @@ gd::ObjectMetadata & PlatformExtension::AddObject(const std::string & name,
                                CreateFunPtr createFunPtrP,
                                DestroyFunPtr destroyFunPtrP)
 {
-#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP, destroyFunPtrP);
     return objectsInfos[nameWithNamespace];
-#endif
 }
 
 gd::AutomatismMetadata & PlatformExtension::AddAutomatism(const std::string & name,
@@ -107,11 +105,9 @@ gd::AutomatismMetadata & PlatformExtension::AddAutomatism(const std::string & na
                                                       boost::shared_ptr<gd::Automatism> instance,
                                                       boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance)
 {
-#if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     automatismsInfo[nameWithNamespace] = AutomatismMetadata(GetNameSpace(), nameWithNamespace, fullname, defaultName, description, group, icon24x24, className, instance, sharedDatasInstance);
     return automatismsInfo[nameWithNamespace];
-#endif
 }
 
 gd::EventMetadata & PlatformExtension::AddEvent(const std::string & name_,

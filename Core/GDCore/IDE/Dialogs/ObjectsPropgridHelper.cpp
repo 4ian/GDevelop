@@ -86,11 +86,12 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             wxString oldWorkingDir = wxGetCwd();
             if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
                 wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+            std::cout << "CWDfze:" << wxGetCwd();
 
             if (layout) object->LoadResources(project, *layout);
 
-            if ( wxDirExists(oldWorkingDir))
-                wxSetWorkingDirectory(oldWorkingDir);
+            wxSetWorkingDirectory(oldWorkingDir);
+            std::cout << "CWDoo:" << wxGetCwd();
         }
         else if ( event.GetPropertyName() == _("Variables") )
         {

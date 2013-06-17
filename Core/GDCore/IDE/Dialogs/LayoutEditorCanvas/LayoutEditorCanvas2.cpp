@@ -48,6 +48,7 @@ void LayoutEditorCanvas::OnUpdate()
         {
             if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
                 wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
+            std::cout << "CWDd:" << wxGetCwd();
 
             for (unsigned int i = 0;i<project.imagesChanged.size();++i)
                 project.GetImageManager()->ReloadImage(project.imagesChanged[i]);
@@ -57,6 +58,12 @@ void LayoutEditorCanvas::OnUpdate()
             layout.SetRefreshNeeded();
 
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
+            std::cout << "CWDe:" << wxGetCwd();
+        }
+        if ( firstRefresh )
+        {
+            firstRefresh = false;
+            ReloadResources();
         }
 
         //Then display the layout

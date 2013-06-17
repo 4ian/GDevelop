@@ -1,5 +1,6 @@
 #ifndef PROJECTUPDATEDIALOG_H
 #define PROJECTUPDATEDIALOG_H
+#if defined(GD_IDE_ONLY)
 
 //(*Headers(ProjectUpdateDialog)
 #include <wx/sizer.h>
@@ -44,4 +45,5 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

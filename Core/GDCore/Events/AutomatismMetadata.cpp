@@ -104,38 +104,44 @@ gd::StrExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::stri
 AutomatismMetadata & AutomatismMetadata::SetFullName(const std::string & fullname_)
 {
 #if defined(GD_IDE_ONLY)
-    fullname = fullname_; return *this;
+    fullname = fullname_;
 #endif
+    return *this;
 }
 AutomatismMetadata & AutomatismMetadata::SetDefaultName(const std::string & defaultName_)
 {
 #if defined(GD_IDE_ONLY)
-    defaultName = defaultName_; return *this;
+    defaultName = defaultName_;
 #endif
+    return *this;
 }
 AutomatismMetadata & AutomatismMetadata::SetDescription(const std::string & description_)
 {
 #if defined(GD_IDE_ONLY)
-    description = description_; return *this;
+    description = description_;
 #endif
+    return *this;
 }
 AutomatismMetadata & AutomatismMetadata::SetGroup(const std::string & group_)
 {
 #if defined(GD_IDE_ONLY)
-    group = group_; return *this;
+    group = group_;
 #endif
+    return *this;
 }
 AutomatismMetadata & AutomatismMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
 #if defined(GD_IDE_ONLY)
-    icon = bitmap_; return *this;
+    icon = bitmap_;
 #endif
+    return *this;
 }
 AutomatismMetadata & AutomatismMetadata::SetIncludeFile(const std::string & includeFile)
 {
 #if defined(GD_IDE_ONLY)
-    optionalIncludeFile = includeFile; return *this;
+    optionalIncludeFile = includeFile;
 #endif
+    return *this;
 }
 
 }

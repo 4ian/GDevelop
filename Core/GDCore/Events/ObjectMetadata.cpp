@@ -36,8 +36,9 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
 {
 #if defined(GD_IDE_ONLY)
-    optionalIncludeFile = includeFile; return *this;
+    optionalIncludeFile = includeFile;
 #endif
+    return *this;
 }
 
 gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
@@ -99,22 +100,25 @@ gd::StrExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string &
 ObjectMetadata & ObjectMetadata::SetFullName(const std::string & fullname_)
 {
 #if defined(GD_IDE_ONLY)
-    fullname = fullname_; return *this;
+    fullname = fullname_;
 #endif
+    return *this;
 }
 
 ObjectMetadata & ObjectMetadata::SetDescription(const std::string & description_)
 {
 #if defined(GD_IDE_ONLY)
-    description = description_; return *this;
+    description = description_;
 #endif
+    return *this;
 }
 
 ObjectMetadata & ObjectMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
 #if defined(GD_IDE_ONLY)
-    icon = bitmap_; return *this;
+    icon = bitmap_;
 #endif
+    return *this;
 }
 
 }

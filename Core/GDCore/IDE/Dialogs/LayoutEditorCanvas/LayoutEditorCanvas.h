@@ -468,6 +468,7 @@ protected:
     bool isMovingInstance;
     static const float gapBetweenButtonsAndRectangle = 5;
     static const float smallButtonSize = 5;
+    bool firstRefresh;
 
     bool isSelecting;
     wxRect selectionRectangle;

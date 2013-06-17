@@ -105,6 +105,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     altPressed(false),
     shiftPressed(false),
     isMovingInstance(false),
+    firstRefresh(true),
     isSelecting(false),
     editing(true)
 {
@@ -167,7 +168,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         wxMenuItem * undo20item = new wxMenuItem(&undoMenu, idUndo20, _("Cancel 20 changes"), wxEmptyString, wxITEM_NORMAL);
         undoMenu.Append(undo20item);
         undoMenu.AppendSeparator();
-        wxMenuItem * clearHistoryItem = new wxMenuItem(&undoMenu, idClearHistory, _("Delete the historic"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * clearHistoryItem = new wxMenuItem(&undoMenu, idClearHistory, _("Delete the history"), wxEmptyString, wxITEM_NORMAL);
         clearHistoryItem->SetBitmap(wxImage( "res/history_clear16.png" ) );
         undoMenu.Append(clearHistoryItem);
     }
@@ -268,7 +269,6 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     setFramerateLimit(30);
     editionView.setCenter( (project.GetMainWindowDefaultWidth()/2),(project.GetMainWindowDefaultHeight()/2));
     RecreateRibbonToolbar();
-    ReloadResources();
 }
 
 LayoutEditorCanvas::~LayoutEditorCanvas()
@@ -1417,8 +1417,6 @@ void LayoutEditorCanvas::SetParentAuiManager(wxAuiManager * parentAuiManager_)
 
 void LayoutEditorCanvas::ReloadResources()
 {
-    wxString oldWorkingDir = wxGetCwd();
-
     if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
 
@@ -1427,8 +1425,7 @@ void LayoutEditorCanvas::ReloadResources()
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
         project.GetObject(i).LoadResources(project, layout);
 
-    if ( wxDirExists(oldWorkingDir))
-        wxSetWorkingDirectory(oldWorkingDir);
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 }
 
 void LayoutEditorCanvas::GoToEditingState()

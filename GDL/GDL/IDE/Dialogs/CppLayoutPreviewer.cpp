@@ -78,7 +78,6 @@ bool CppLayoutPreviewer::LaunchPreview( )
 
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
-            std::cout << "CWDcp:" << wxGetCwd();
 
     previewScene.running = false;
     playing = false;
@@ -113,6 +112,12 @@ void CppLayoutPreviewer::StopPreview()
 
     //Parse now the results of profiling
     if ( profiler ) profiler->ParseProfileEvents();
+
+    //Reset the scene.
+    RuntimeScene newScene(&editor, &previewGame);
+    previewScene = newScene;
+    previewScene.running = false;
+    if ( debugger ) previewScene.debugger = debugger.get();
     if ( debugger ) debugger->Pause();
 }
 
@@ -220,7 +225,6 @@ void CppLayoutPreviewer::PlayPreview()
     playing = true;
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
-            std::cout << "CWDgre:" << wxGetCwd();
 
     previewScene.running = true;
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);

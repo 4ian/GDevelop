@@ -15,6 +15,7 @@ FontManager::~FontManager()
 
 void FontManager::UnloadAllFonts()
 {
+    //TODO: Delete defaultFont to avoid ati crash !
     //Need to explicit delete fonts
     for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
         delete (*it).second;

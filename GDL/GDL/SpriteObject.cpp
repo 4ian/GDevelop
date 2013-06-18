@@ -167,8 +167,8 @@ void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rende
 
     sprite.setOrigin( associatedSprite->GetCentre().GetX(), associatedSprite->GetCentre().GetY() ); ;
     sprite.setRotation( shouldNotRotate ? 0 : instance.GetAngle() );
-    sprite.setPosition( instance.GetX() + (associatedSprite->GetCentre().GetX() - associatedSprite->GetOrigine().GetX())*scaleX,
-                        instance.GetY() + (associatedSprite->GetCentre().GetY() - associatedSprite->GetOrigine().GetY())*scaleY );
+    sprite.setPosition( instance.GetX() + (associatedSprite->GetCentre().GetX() - associatedSprite->GetOrigine().GetX())*abs(scaleX),
+                        instance.GetY() + (associatedSprite->GetCentre().GetY() - associatedSprite->GetOrigine().GetY())*abs(scaleY) );
     sprite.setScale(scaleX, scaleY);
 
     renderTarget.draw(sprite);
@@ -191,8 +191,8 @@ sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instan
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;
 
-    return sf::Vector2f(associatedSprite->GetOrigine().GetX()*scaleX,
-                        associatedSprite->GetOrigine().GetY()*scaleY);
+    return sf::Vector2f(associatedSprite->GetOrigine().GetX()*abs(scaleX),
+                        associatedSprite->GetOrigine().GetY()*abs(scaleY));
 }
 
 bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
@@ -295,7 +295,7 @@ unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
  */
 float RuntimeSpriteObject::GetDrawableX() const
 {
-    return X - GetCurrentSprite().GetOrigine().GetX()*scaleX;
+    return X - GetCurrentSprite().GetOrigine().GetX()*abs(scaleX);
 }
 
 /**
@@ -303,7 +303,7 @@ float RuntimeSpriteObject::GetDrawableX() const
  */
 float RuntimeSpriteObject::GetDrawableY() const
 {
-    return Y - GetCurrentSprite().GetOrigine().GetY()*scaleY;
+    return Y - GetCurrentSprite().GetOrigine().GetY()*abs(scaleY);
 }
 
 /**
@@ -355,7 +355,7 @@ void RuntimeSpriteObject::SetOriginalSize()
 float RuntimeSpriteObject::GetCenterX() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSprite().GetCentre().GetX()*scaleX;
+    return GetCurrentSprite().GetCentre().GetX()*abs(scaleX);
 }
 
 /**
@@ -364,7 +364,7 @@ float RuntimeSpriteObject::GetCenterX() const
 float RuntimeSpriteObject::GetCenterY() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSprite().GetCentre().GetY()*scaleY;
+    return GetCurrentSprite().GetCentre().GetY()*abs(scaleY);
 }
 
 float RuntimeSpriteObject::GetPointX(const std::string & name) const
@@ -503,8 +503,8 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
 
     ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCentre().GetX(), ptrToCurrentSprite->GetCentre().GetY() ); ;
     ptrToCurrentSprite->GetSFMLSprite().setRotation( multipleDirections ? 0 : currentAngle );
-    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCentre().GetX() - ptrToCurrentSprite->GetOrigine().GetX())*scaleX,
-                                                     Y + (ptrToCurrentSprite->GetCentre().GetY() - ptrToCurrentSprite->GetOrigine().GetY())*scaleY );
+    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCentre().GetX() - ptrToCurrentSprite->GetOrigine().GetX())*abs(scaleX),
+                                                     Y + (ptrToCurrentSprite->GetCentre().GetY() - ptrToCurrentSprite->GetOrigine().GetY())*abs(scaleY) );
     ptrToCurrentSprite->GetSFMLSprite().setScale( scaleX, scaleY );
     ptrToCurrentSprite->GetSFMLSprite().setColor( sf::Color( colorR, colorV, colorB, opacity ) );
 
@@ -772,12 +772,20 @@ void RuntimeSpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int
 
 void RuntimeSpriteObject::FlipX(bool flip)
 {
-    if ( flip != isFlippedX ) scaleX *= -1;
+    if ( flip != isFlippedX )
+    {
+        scaleX *= -1;
+        needUpdateCurrentSprite = true;
+    }
     isFlippedX = flip;
 };
 void RuntimeSpriteObject::FlipY(bool flip)
 {
-    if ( flip != isFlippedY ) scaleY *= -1;
+    if ( flip != isFlippedY )
+    {
+        scaleY *= -1;
+        needUpdateCurrentSprite = true;
+    }
     isFlippedY = flip;
 };
 

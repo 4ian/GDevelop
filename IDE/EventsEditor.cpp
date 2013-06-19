@@ -295,6 +295,10 @@ EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & s
         platformsMenu.Append(id, _("Edit events using ") + game.GetUsedPlatforms()[i]->GetFullName(),
                              _("Display the events as they are interpreted by the selected platform."), wxITEM_RADIO);
         mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EventsEditor::OnPlatformSelected, NULL, this);
+
+        platformsMenu.Check(id, false);
+        if ( game.GetUsedPlatforms()[i] == &game.GetCurrentPlatform() )
+            platformsMenu.Check(id, true);
     }
 
     RecreateCustomEventsMenu();

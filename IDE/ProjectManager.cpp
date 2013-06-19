@@ -23,6 +23,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/ExternalLayout.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
@@ -447,7 +448,9 @@ void ProjectManager::Refresh()
 
         //Extensions
         gdTreeItemProjectData * extensionsItemData = new gdTreeItemProjectData("Extensions", "", mainEditor.games[i].get());
-        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->GetUsedExtensions().size()) + ")", 3 ,3, extensionsItemData);
+        int extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
+        projectsTree->AppendItem(projectItem, _("Extensions") + (extensionsCount > 0 ? " (" + ToString(extensionsCount) + ")" : ""),
+                                 3 ,3, extensionsItemData);
     }
 
     projectsTree->ExpandAll();
@@ -541,7 +544,12 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     {
         EditExtensionsOfGame(*game);
 
-        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->GetUsedExtensions().size()) + ")");
+        int extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
+        projectsTree->SetItemText(selectedItem, _("Extensions") + (extensionsCount > 0 ? " (" + ToString(extensionsCount) + ")" : ""));
+        for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
+        {
+            std::cout << game->GetUsedExtensions()[i] << std::endl;
+        }
     }
     else if ( data->GetString() == "SourceFile")
     {

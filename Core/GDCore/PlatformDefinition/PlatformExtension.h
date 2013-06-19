@@ -352,6 +352,11 @@ public:
     void StripUnimplementedInstructionsAndExpressions();
     #endif
 
+    /**
+     * \brief Return the name of all the extensions which are considered provided by platforms.
+     */
+    static std::vector<std::string> GetBuiltinExtensionsNames();
+
 private:
 
     /**

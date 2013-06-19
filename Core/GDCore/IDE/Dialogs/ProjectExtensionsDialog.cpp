@@ -352,11 +352,13 @@ void ProjectExtensionsDialog::OnExtensionsListToggled(wxCommandEvent& event)
     wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
     if (associatedData == NULL) return;
 
-    boost::shared_ptr<PlatformExtension> ext = currentPlatform->GetExtension(gd::ToString(associatedData->GetData()));
-    if ( ext != boost::shared_ptr<PlatformExtension>() && ext->IsBuiltin() )
-    {
-        ExtensionsList->Check(id);
-    }
+    std::vector<std::string>::iterator it =
+        std::find(project.GetUsedExtensions().begin(), project.GetUsedExtensions().end(), gd::ToString(associatedData->GetData()));
+
+    if ( ExtensionsList->IsChecked(id) && it == project.GetUsedExtensions().end() )
+        project.GetUsedExtensions().push_back(gd::ToString(associatedData->GetData()));
+    else if ( !ExtensionsList->IsChecked(id) && it != project.GetUsedExtensions().end() )
+        project.GetUsedExtensions().erase(it);
 }
 
 /**
@@ -364,16 +366,14 @@ void ProjectExtensionsDialog::OnExtensionsListToggled(wxCommandEvent& event)
  */
 void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
 {
-    project.GetUsedExtensions().clear();
-
-    for (unsigned int i =0;i<ExtensionsList->GetCount();++i)
+    //For sanity sake, make sure that built-in extensions are used by the project
+    std::vector<std::string> builtinExtensions = gd::PlatformExtension::GetBuiltinExtensionsNames();
+    for(unsigned int i = 0;i<builtinExtensions.size();++i)
     {
-    	if ( ExtensionsList->IsChecked(i) )
+        if ( std::find(project.GetUsedExtensions().begin(), project.GetUsedExtensions().end(), builtinExtensions[i])
+             == project.GetUsedExtensions().end())
         {
-            wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
-
-            if (associatedData)
-                project.GetUsedExtensions().push_back(string(associatedData->GetData().mb_str()));
+            project.GetUsedExtensions().push_back(builtinExtensions[i]);
         }
     }
 

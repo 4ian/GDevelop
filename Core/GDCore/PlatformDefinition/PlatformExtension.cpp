@@ -344,9 +344,36 @@ void PlatformExtension::SetNameSpace(std::string nameSpace_)
     nameSpace = nameSpace_+"::";
 }
 
+std::vector<std::string> PlatformExtension::GetBuiltinExtensionsNames()
+{
+    std::vector<std::string> builtinExtensions;
+    builtinExtensions.push_back("Sprite");
+    builtinExtensions.push_back("BuiltinObject");
+    builtinExtensions.push_back("BuiltinAudio");
+    builtinExtensions.push_back("BuiltinMouse");
+    builtinExtensions.push_back("BuiltinKeyboard");
+    builtinExtensions.push_back("BuiltinJoystick");
+    builtinExtensions.push_back("BuiltinTime");
+    builtinExtensions.push_back("BuiltinFile");
+    builtinExtensions.push_back("BuiltinVariables");
+    builtinExtensions.push_back("BuiltinCamera");
+    builtinExtensions.push_back("BuiltinWindow");
+    builtinExtensions.push_back("BuiltinNetwork");
+    builtinExtensions.push_back("BuiltinScene");
+    builtinExtensions.push_back("BuiltinAdvanced");
+    builtinExtensions.push_back("BuiltinCommonConversions");
+    builtinExtensions.push_back("BuiltinStringInstructions");
+    builtinExtensions.push_back("BuiltinMathematicalTools");
+    builtinExtensions.push_back("BuiltinExternalLayouts");
+    builtinExtensions.push_back("BuiltinCommonInstructions");
+
+    return builtinExtensions;
+}
+
 bool PlatformExtension::IsBuiltin() const
 {
-    return nameSpace.empty() || name == "BuiltinExternalLayouts" || name == "BuiltinCommonInstructions";
+    std::vector<std::string > builtinExtensions = GetBuiltinExtensionsNames();
+    return std::find(builtinExtensions.begin(), builtinExtensions.end(), name) != builtinExtensions.end();
 }
 
 #if defined(GD_IDE_ONLY)
@@ -427,7 +454,7 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
         }
 
         for(std::map<std::string, gd::EventMetadata >::iterator it = eventsInfos.begin();it!=eventsInfos.end();++it)
-            it->second.codeGeneration.reset();
+            it->second.codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>();
     }
 }
 
@@ -563,7 +590,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         }
     }
 
-    for(std::map<std::string, gd::EventMetadata >::iterator it = eventsInfos.begin();it!=eventsInfos.end();++it)
+    for(std::map<std::string, gd::EventMetadata >::iterator it = eventsInfos.begin();it!=eventsInfos.end();)
     {
         if ( it->second.codeGeneration == boost::shared_ptr<gd::EventMetadata::CodeGenerator>())
             eventsInfos.erase(it++);

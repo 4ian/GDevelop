@@ -251,18 +251,26 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     {
         boost::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
         previewers[project.GetUsedPlatforms()[i]->GetName()] = previewer;
-        if ( i == 0 ) currentPreviewer = previewer;
 
         long id = wxNewId();
-        if ( previewer ) {
+        if ( previewer )
+        {
             idForPlatformsMenu[id] = project.GetUsedPlatforms()[i]->GetName();
             platformsMenu.Append(id, _("Preview for ") + project.GetUsedPlatforms()[i]->GetFullName(),
                                  _("Launch a preview for this platform"), wxITEM_RADIO);
             mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&LayoutEditorCanvas::OnPreviewForPlatformSelected, NULL, this);
         }
-        else {
+        else
+        {
             platformsMenu.Append(id, _("No preview available for ")+ project.GetUsedPlatforms()[i]->GetFullName(), _("No preview can be done for this platform"), wxITEM_RADIO);
             platformsMenu.Enable(id, false);
+        }
+
+        platformsMenu.Check(id, false);
+        if ( &project.GetCurrentPlatform() == project.GetUsedPlatforms()[i] )
+        {
+            currentPreviewer = previewer;
+            platformsMenu.Check(id, true);
         }
     }
 

@@ -559,7 +559,8 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     #if defined(GD_IDE_ONLY)
     if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion <= 1 && build <= 10822) )
     {
-        GetUsedExtensions().push_back("BuiltinExternalLayouts");
+        if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "BuiltinExternalLayouts") == GetUsedExtensions().end() )
+            GetUsedExtensions().push_back("BuiltinExternalLayouts");
     }
     #endif
 

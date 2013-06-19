@@ -131,13 +131,13 @@ private:
  */
 class GD_CORE_API SFMLTextureWrapper
 {
-    public :
-        SFMLTextureWrapper(sf::Texture & texture);
-        SFMLTextureWrapper() {};
-        ~SFMLTextureWrapper() {};
+public :
+    SFMLTextureWrapper(sf::Texture & texture);
+    SFMLTextureWrapper() {};
+    ~SFMLTextureWrapper();
 
-        sf::Texture texture;
-        sf::Image image; ///< Associated sfml image, used for pixel perfect collision for example. If you update the image, call LoadFromImage on texture to update it also.
+    sf::Texture texture;
+    sf::Image image; ///< Associated sfml image, used for pixel perfect collision for example. If you update the image, call LoadFromImage on texture to update it also.
 };
 
 /**
@@ -148,15 +148,15 @@ class GD_CORE_API SFMLTextureWrapper
  */
 class GD_CORE_API OpenGLTextureWrapper
 {
-    public :
-        OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper> sfmlTexture_);
-        OpenGLTextureWrapper() : texture(0) {};
-        ~OpenGLTextureWrapper() { glDeleteTextures(1, &texture); };
-        inline GLuint GetOpenGLTexture() const { return texture; }
+public :
+    OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper> sfmlTexture_);
+    OpenGLTextureWrapper() : texture(0) {};
+    ~OpenGLTextureWrapper();
+    inline GLuint GetOpenGLTexture() const { return texture; }
 
-    private :
-        boost::shared_ptr<SFMLTextureWrapper> sfmlTexture;
-        GLuint texture;
+private :
+    boost::shared_ptr<SFMLTextureWrapper> sfmlTexture;
+    GLuint texture;
 };
 
 

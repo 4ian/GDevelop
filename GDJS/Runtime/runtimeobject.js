@@ -47,6 +47,17 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         //Nothing to do.
     }
     
+    /**
+     * Called when the object is created from an initial instance at the startup of the scene.<br>
+     * Note that common properties ( position, angle, z order... ) have already been setup.
+     *
+     * @method extraInitializationFromInitialInstance
+     * @param initialInstanceXml The xml structure of the initial instance.
+     */
+    that.extraInitializationFromInitialInstance = function(initialInstanceXml) {
+        //Nothing to do.
+    }
+    
     //Common properties:
     
     /**

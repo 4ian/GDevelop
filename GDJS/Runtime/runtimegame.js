@@ -103,7 +103,6 @@ gdjs.runtimeGame = function(xml)
      * @param keyCode {Number} The key code associated to the key press.
      */
     that.onKeyPressed = function(keyCode) {
-    console.log(keyCode);
         my.pressedKeys.put(keyCode, true);
     }
     

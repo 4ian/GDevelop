@@ -6,8 +6,6 @@
 /**
  * A frame used by a spriteAnimation in a spriteRuntimeObject.
  *
- * <b>TODO</b> : Center and origin loading, points position when the sprite is distorted/rotated.
- *
  * @class spriteAnimationFrame
  * @constructor
  */
@@ -33,9 +31,23 @@ gdjs.spriteAnimationFrame = function(imageManager, frameXml)
         
         var center = $(frameXml).find("PointCentre");
         if ( center.attr("automatic") != "true" ) {
-            that.center.x = parseFloat(origin.attr("X"));
-            that.center.y = parseFloat(origin.attr("Y"));
+            that.center.x = parseFloat(center.attr("X"));
+            that.center.y = parseFloat(center.attr("Y"));
         }
+    }
+    
+    /** 
+     * Get a point of the frame.<br>
+     * If the point does not exist, the origin is returned.
+     *
+     * @method getPoint
+     * @return The requested point.
+     */
+    that.getPoint = function(name) {
+        if ( name == "Centre" ) return that.center;
+        else if ( name == "Origin" ) return that.origin;
+        
+        return that.points.containsKey(name) ? that.points.get(name) : that.origin;
     }
     
     return that;
@@ -87,7 +99,7 @@ gdjs.spriteAnimation = function(imageManager, animationXml)
 /**
  * The spriteRuntimeObject represents an object that can display images.
  *
- * <b>TODO:</b> custom collisions masks.
+ * <b>TODO:</b> custom collisions masks, points position when the sprite is distorted/rotated.
  *
  * @class spriteRuntimeObject
  * @extends runtimeObject
@@ -106,6 +118,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     my.scaleX = 1;
     my.scaleY = 1;
     my.blendMode = 0;
+    my.flippedX = false;
+    my.flippedY = false;
     that.opacity = 255;
     if ( objectXml ) {
         $(objectXml).find("Animations").find("Animation").each( function() {
@@ -121,15 +135,93 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     my.sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getInvalidPIXITexture());
     runtimeScene.getLayer("").addChildToPIXIContainer(my.sprite, that.zOrder);
     
+    //Others intialisation and internal state management :
+    
     /**
-     * Called when the object is removed from a scene.
-     *
-     * @method removeFromScene
-     * @param runtimeScene The scene that used to own the object.
+     * 
      */
-    that.removeFromScene = function(runtimeScene) {
-        runtimeScene.getPIXIStage().removeChild(my.sprite);
+    that.extraInitializationFromInitialInstance = function(initialInstanceXml) {
+        if ( $(initialInstanceXml).attr("personalizedSize") === "true" ) {
+            that.setWidth(parseFloat($(initialInstanceXml).attr("width")));
+            that.setHeight(parseFloat($(initialInstanceXml).attr("height")));
+        }
     }
+    
+    /**
+     * Update the internal PIXI.Sprite position, angle...
+     */
+    my.updatePIXISprite = function() {
+        
+        my.sprite.anchor.x = my.animationFrame.center.x/my.sprite.texture.frame.width;
+        my.sprite.anchor.y = my.animationFrame.center.y/my.sprite.texture.frame.height;
+        my.sprite.position.x = that.x + (my.animationFrame.center.x - my.animationFrame.origin.x)*Math.abs(my.scaleX);
+        my.sprite.position.y = that.y + (my.animationFrame.center.y - my.animationFrame.origin.y)*Math.abs(my.scaleY);
+        if ( my.flippedX ) my.sprite.position.x += (my.sprite.texture.frame.width/2-my.animationFrame.center.x)*Math.abs(my.scaleX)*2;
+        if ( my.flippedY ) my.sprite.position.y += (my.sprite.texture.frame.height/2-my.animationFrame.center.y)*Math.abs(my.scaleY)*2;
+        my.sprite.rotation = gdjs.toRad(that.angle);
+        my.sprite.visible = !that.hidden;
+        my.sprite.blendMode = my.blendMode;
+        my.sprite.alpha = my.sprite.visible ? that.opacity/255 : 0; //TODO: Workaround not working property in PIXI.js
+        my.sprite.scale.x = my.scaleX;
+        my.sprite.scale.y = my.scaleY;
+        
+        my.spriteDirty = false;
+    }
+    
+    /**
+     * Update the internal texture of the PIXI sprite.
+     */
+    my.updatePIXITexture = function() {
+        if ( my.currentAnimation >= my.animations.length ||
+             my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
+            return;
+        }
+        var direction = my.animations[my.currentAnimation].directions[my.currentDirection];
+        
+        my.animationFrame = direction.frames[my.currentFrame];
+        my.sprite.setTexture(my.animationFrame.pixiTexture);
+        my.spriteDirty = true;
+    }
+    
+    my.updatePIXITexture();
+    
+    /**
+     * Update the current frame according to the elapsed time.
+     * @method updateTime
+     */
+    that.updateTime = function(elapsedTime) {
+		if ( my.animationPaused ) return;
+
+        var oldFrame = my.currentFrame;
+        my.frameElapsedTime = my.frameElapsedTime+elapsedTime;
+        
+        if ( my.currentAnimation >= my.animations.length ||
+             my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
+            return;
+        }
+        
+        var direction = my.animations[my.currentAnimation].directions[my.currentDirection];
+        
+        if ( my.frameElapsedTime > direction.timeBetweenFrames ) {
+            var count = Math.floor(my.frameElapsedTime / direction.timeBetweenFrames);
+            my.currentFrame += count;
+            my.frameElapsedTime = Math.max(my.frameElapsedTime-count*direction.timeBetweenFrames, 0);
+        }
+        
+        if ( my.currentFrame >= direction.frames.length ) {
+            my.currentFrame = direction.loop ? my.currentFrame % direction.frames.length : direction.frames.length-1;
+        }
+        
+        if ( oldFrame != my.currentFrame || my.textureDirty ) my.updatePIXITexture();
+        if ( my.spriteDirty ) my.updatePIXISprite();
+    }
+    
+    that.deleteFromScene = function(runtimeScene) {
+        runtimeScene.markObjectForDeletion(that);
+        runtimeScene.getLayer(that.layer).removePIXIContainerChild(my.sprite);
+    }
+    
+    //Animations :
     
     that.setAnimation = function(newAnimation) {
         if ( newAnimation < my.animations.length ) {
@@ -220,91 +312,72 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
 		my.animationPaused = false;
 	}
     
-    /**
-     * Update the internal PIXI.Sprite position, angle...
-     */
-    my.updatePIXISprite = function() {
-        
-        my.sprite.anchor.x = my.animationFrame.center.x/my.sprite.texture.width;
-        my.sprite.anchor.y = my.animationFrame.center.y/my.sprite.texture.height;
-        my.sprite.position.x = that.x + (my.animationFrame.center.x - my.animationFrame.origin.x)*my.scaleX;
-        my.sprite.position.y = that.y + (my.animationFrame.center.y - my.animationFrame.origin.y)*my.scaleY;
-        my.sprite.rotation = gdjs.toRad(that.angle);
-        my.sprite.visible = !that.hidden;
-        my.sprite.blendMode = my.blendMode;
-        my.sprite.alpha = that.opacity/255;
-        my.sprite.scale.x = my.scaleX;
-        my.sprite.scale.y = my.scaleY;
-        
-        my.spriteDirty = false;
-    }
-    
-    /**
-     * Update the internal texture of the PIXI sprite.
-     */
-    my.updatePIXITexture = function() {
-        if ( my.currentAnimation >= my.animations.length ||
-             my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
-            return;
-        }
-        var direction = my.animations[my.currentAnimation].directions[my.currentDirection];
-        
-        my.animationFrame = direction.frames[my.currentFrame];
-        my.sprite.setTexture(my.animationFrame.pixiTexture);
-        my.spriteDirty = true;
-    }
-    
-    my.updatePIXITexture();
-    
-    /**
-     * Update the current frame according to the elapsed time.
-     * @method updateTime
-     */
-    that.updateTime = function(elapsedTime) {
-		if ( my.animationPaused ) return;
-
-        var oldFrame = my.currentFrame;
-        my.frameElapsedTime = my.frameElapsedTime+elapsedTime;
-        
-        if ( my.currentAnimation >= my.animations.length ||
-             my.currentDirection >= my.animations[my.currentAnimation].directions.length) {
-            return;
-        }
-        
-        var direction = my.animations[my.currentAnimation].directions[my.currentDirection];
-        
-        if ( my.frameElapsedTime > direction.timeBetweenFrames ) {
-            var count = Math.floor(my.frameElapsedTime / direction.timeBetweenFrames);
-            my.currentFrame += count;
-            my.frameElapsedTime = Math.max(my.frameElapsedTime-count*direction.timeBetweenFrames, 0);
-        }
-        
-        if ( my.currentFrame >= direction.frames.length ) {
-            my.currentFrame = direction.loop ? my.currentFrame % direction.frames.length : direction.frames.length-1;
-        }
-        
-        if ( oldFrame != my.currentFrame || my.textureDirty ) my.updatePIXITexture();
-        if ( my.spriteDirty ) my.updatePIXISprite();
-    }
+    //Position :
     
     that.getPointX = function(name) {
-        if ( my.animationFrame.points.containsKey(name) ) {
-            var point = my.animationFrame.points.get(name);
-            
-            return point.x*my.scaleX+that.getX(); //TODO
+        if ( name.length === 0 ) return that.getX();
+        
+        var pt = my.animationFrame.getPoint(name);
+        var cPt = my.animationFrame.center;
+        var x = pt.x;
+        var y = pt.y;
+        var cx = cPt.x;
+        var cy = cPt.y;
+        
+        if ( my.flippedX ) {
+            x = my.sprite.texture.frame.width - x;
+            cx = my.sprite.texture.frame.width - cx;
+        }
+        if ( my.flippedY ) {
+            y = my.sprite.texture.frame.height - y;
+            cy = my.sprite.texture.frame.height - cy;
         }
         
-        return that.getX();
+        x *= Math.abs(my.scaleX);
+        y *= Math.abs(my.scaleY);
+        cx *= Math.abs(my.scaleX);
+        cy *= Math.abs(my.scaleY);
+        
+        x = cx + Math.cos(that.angle/180*3.14159)*(x-cx) - Math.sin(that.angle/180*3.14159)*(y-cy);
+        
+        return x + that.getDrawableX();
     }
     
     that.getPointY = function(name) {
-        if ( my.animationFrame.points.containsKey(name) ) {
-            var point = my.animationFrame.points.get(name);
-            
-            return point.y*my.scaleY+that.getY(); //TODO
+        if ( name.length === 0 ) return that.getY();
+        
+        var pt = my.animationFrame.getPoint(name);
+        var cPt = my.animationFrame.center;
+        var x = pt.x;
+        var y = pt.y;
+        var cx = cPt.x;
+        var cy = cPt.y;
+        
+        if ( my.flippedX ) {
+            x = my.sprite.texture.frame.width - x;
+            cx = my.sprite.texture.frame.width - cx;
+        }
+        if ( my.flippedY ) {
+            y = my.sprite.texture.frame.height - y;
+            cy = my.sprite.texture.frame.height - cy;
         }
         
-        return that.getY();
+        x *= Math.abs(my.scaleX);
+        y *= Math.abs(my.scaleY);
+        cx *= Math.abs(my.scaleX);
+        cy *= Math.abs(my.scaleY);
+        
+        y = cy + Math.sin(that.angle/180*3.14159)*(x-cx) + Math.cos(that.angle/180*3.14159)*(y-cy);
+        
+        return y + that.getDrawableY();
+    }
+    
+    that.getDrawableX = function() {
+        return that.x - my.animationFrame.origin.x*Math.abs(my.scaleX);
+    }
+    
+    that.getDrawableY = function() {
+        return that.y - my.animationFrame.origin.y*Math.abs(my.scaleY);
     }
     
     that.setX = function(x) {
@@ -347,6 +420,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
             return my.currentDirection*45;
     }
     
+    //Visibility and display :
+    
     that.setBlendMode = function(newMode) {
         my.blendMode = newMode;
         my.spriteDirty = true;
@@ -373,14 +448,6 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         my.sprite.visible = !enable;
     }
     
-    that.getWidth = function() {
-        return my.sprite.width;
-    }
-    
-    that.getHeight = function() {
-        return my.sprite.height;
-    }
-    
     that.setLayer = function(name) {
         //We need to move the object from the pixi container of the layer
         runtimeScene.getLayer(that.layer).removePIXIContainerChild(my.sprite);
@@ -388,14 +455,56 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         runtimeScene.getLayer(that.layer).addChildToPIXIContainer(my.sprite, that.zOrder);
     }
     
+    that.flipX = function(enable) {
+        if ( enable != my.flippedX ) {
+            my.scaleX *= -1;
+            my.spriteDirty = true;
+            my.flippedX = enable;
+        }
+    }
+    
+    that.flipY = function(enable) {
+        if ( enable != my.flippedY ) {
+            my.scaleY *= -1;
+            my.spriteDirty = true;
+            my.flippedY = enable;
+        }
+    }
+    
+    //Scale and size :
+    
+    that.getWidth = function() {
+        if ( my.spriteDirty ) my.updatePIXISprite();
+        return my.sprite.width;
+    }
+    
+    that.getHeight = function() {
+        if ( my.spriteDirty ) my.updatePIXISprite();
+        return my.sprite.height;
+    }
+    
+    that.setWidth = function(newWidth) {
+        if ( my.spriteDirty ) my.updatePIXISprite();
+        var newScaleX = newWidth/my.sprite.texture.frame.width;
+        that.setScaleX(!my.isFlippedX ? newScaleX : -newScaleX);
+    }
+    
+    that.setHeight = function(newHeight) {
+        if ( my.spriteDirty ) my.updatePIXISprite();
+        var newScaleY = newHeight/my.sprite.texture.frame.height;
+        that.setScaleY(!my.isFlippedY ? newScaleY : -newScaleY);
+    }
+    
     that.setScaleX = function(newScale) {
         if ( newScale > 0 ) my.scaleX = newScale;
+        if ( my.isFlippedX ) my.scaleX *= -1;
         my.spriteDirty = true;
         that.hitBoxesDirty = true;
     }
     
     that.setScaleY = function(newScale) {
         if ( newScale > 0 ) my.scaleY = newScale;
+        if ( my.isFlippedY ) my.scaleX *= -1;
         my.spriteDirty = true;
         that.hitBoxesDirty = true;
     }
@@ -408,10 +517,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         return my.scaleX;
     }
     
-    that.deleteFromScene = function(runtimeScene) {
-        runtimeScene.markObjectForDeletion(that);
-        runtimeScene.getLayer(that.layer).removePIXIContainerChild(my.sprite);
-    }
+    //Other :
     
     /**
      * Set the Z order of the object.

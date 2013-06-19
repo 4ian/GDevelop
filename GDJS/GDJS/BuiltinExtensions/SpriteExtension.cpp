@@ -66,6 +66,10 @@ SpriteExtension::SpriteExtension()
         SetFunctionName("turnTowardPosition");
     spriteActions["TourneVers"].codeExtraInformation.
         SetFunctionName("turnTowardObject");
+    spriteActions["FlipX"].codeExtraInformation.
+        SetFunctionName("flipX");
+    spriteActions["FlipY"].codeExtraInformation.
+        SetFunctionName("flipY");
 
     spriteConditions["SourisSurObjet"].codeExtraInformation.
         SetFunctionName("cursorOnObject");
@@ -189,32 +193,6 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
             .codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
-
-
-        obj.AddAction("FlipX",
-                       _("Flip the object horizontally"),
-                       _("Flip the object horizontally"),
-                       _("Flip horizontally _PARAM0_ : _PARAM1_"),
-                       _("Effects"),
-                       "res/actions/flipX24.png",
-                       "res/actions/flipX.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("yesorno", _("Activate flipping"), "",false)
-            .codeExtraInformation.SetFunctionName("FlipX").SetIncludeFile("GDL/SpriteObject.h");
-
-
-        obj.AddAction("FlipY",
-                       _("Flip the object vertically"),
-                       _("Flip the object vertically"),
-                       _("Flip vertically _PARAM0_ : _PARAM1_"),
-                       _("Effects"),
-                       "res/actions/flipY24.png",
-                       "res/actions/flipY.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("yesorno", _("Activate flipping"), "",false)
-            .codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
         #endif
 
     }

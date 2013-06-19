@@ -490,5 +490,5 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         GetAllEvents()["BuiltinCommonInstructions::ForEach"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
-
+    StripUnimplementedInstructionsAndExpressions();
 }

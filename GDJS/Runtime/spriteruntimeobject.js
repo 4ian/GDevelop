@@ -99,7 +99,7 @@ gdjs.spriteAnimation = function(imageManager, animationXml)
 /**
  * The spriteRuntimeObject represents an object that can display images.
  *
- * <b>TODO:</b> custom collisions masks, points position when the sprite is distorted/rotated.
+ * <b>TODO:</b> custom collisions masks.
  *
  * @class spriteRuntimeObject
  * @extends runtimeObject

@@ -143,6 +143,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "inputtools.js");
     InsertUnique(includesFiles, "objecttools.js");
     InsertUnique(includesFiles, "cameratools.js");
+    InsertUnique(includesFiles, "soundtools.js");
 
     for (unsigned int i = 0;i<project.GetLayoutCount();++i)
     {

@@ -18,5 +18,5 @@ AdvancedExtension::AdvancedExtension()
 
     CloneExtension("Game Develop C++ platform", "BuiltinAdvanced");
 
-    GetAllConditions()["Always"].codeExtraInformation.SetFunctionName("gdjs.returnFalse").SetIncludeFile("gd.js");
+    GetAllConditions()["Always"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.returnFalse").SetIncludeFile("commontools.js");
 }

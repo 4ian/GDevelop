@@ -1,23 +1,30 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * @module gdjs.inputTools
+ * Tools related to input ( Keyboard, mouse ), for events generated code.
  *
- * TODO : Handle camera rotation for GetMouseX/GetMouseY.
- * TODO : Map all keys
- * TODO : Implement others buttons for mouse
+ * TODO : Handle camera rotation for GetMouseX/GetMouseY.<br>
+ * TODO : Map all keys<br>
+ * TODO : Implement others buttons for mouse<br>
+ *
+ * @namespace gdjs.evtTools
+ * @class input
+ * @static
+ * @private
  */
-gdjs.inputTools = gdjs.inputTools || {};
+gdjs.evtTools.input = gdjs.evtTools.input || {};
 
 /**
  * Return true if the specified key is pressed
  * TODO: Map all keys and uses a hash table.
+ * @method isKeyPressed
+ * @private
  */
-gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
-    
+gdjs.evtTools.input.isKeyPressed = function(runtimeScene, key) {
+
     if ( key === "a" ) { return runtimeScene.getGame().isKeyPressed(65); }
     if ( key === "b" ) { return runtimeScene.getGame().isKeyPressed(66); }
     if ( key === "c" ) { return runtimeScene.getGame().isKeyPressed(67); }
@@ -44,7 +51,7 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key === "x" ) { return runtimeScene.getGame().isKeyPressed(88); }
     if ( key === "y" ) { return runtimeScene.getGame().isKeyPressed(89); }
     if ( key === "z" ) { return runtimeScene.getGame().isKeyPressed(90); }
-    
+
     if ( key === "Numpad0" ) { return runtimeScene.getGame().isKeyPressed(96); }
     if ( key === "Numpad1" ) { return runtimeScene.getGame().isKeyPressed(97); }
     if ( key === "Numpad2" ) { return runtimeScene.getGame().isKeyPressed(98); }
@@ -55,7 +62,7 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key === "Numpad7" ) { return runtimeScene.getGame().isKeyPressed(103); }
     if ( key === "Numpad8" ) { return runtimeScene.getGame().isKeyPressed(104); }
     if ( key === "Numpad9" ) { return runtimeScene.getGame().isKeyPressed(105); }
-    
+
     if ( key == "RControl" ) { return runtimeScene.getGame().isKeyPressed(17); }
     if ( key == "RShift" ) { return runtimeScene.getGame().isKeyPressed(16); }
     if ( key == "RAlt" ) { return runtimeScene.getGame().isKeyPressed(18); }
@@ -86,7 +93,7 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key == "Home" ) { return runtimeScene.getGame().isKeyPressed(36); }
     if ( key == "Delete" ) { return runtimeScene.getGame().isKeyPressed(46); }
     if ( key == "Insert" ) { return runtimeScene.getGame().isKeyPressed(45); }
-    
+
     if ( key == "Add" ) { return runtimeScene.getGame().isKeyPressed(107); }
     if ( key == "Subtract" ) { return runtimeScene.getGame().isKeyPressed(109); }
     if ( key == "Multiply" ) { return runtimeScene.getGame().isKeyPressed(106); }
@@ -96,7 +103,7 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key === "Up" ) { return runtimeScene.getGame().isKeyPressed(38); }
     if ( key === "Right" ) { return runtimeScene.getGame().isKeyPressed(39); }
     if ( key === "Down" ) { return runtimeScene.getGame().isKeyPressed(40); }
-    
+
     if ( key === "F1" ) { return runtimeScene.getGame().isKeyPressed(112); }
     if ( key === "F2" ) { return runtimeScene.getGame().isKeyPressed(113); }
     if ( key === "F3" ) { return runtimeScene.getGame().isKeyPressed(114); }
@@ -109,39 +116,39 @@ gdjs.inputTools.isKeyPressed = function(runtimeScene, key) {
     if ( key === "F10" ) { return runtimeScene.getGame().isKeyPressed(121); }
     if ( key === "F11" ) { return runtimeScene.getGame().isKeyPressed(122); }
     if ( key === "F12" ) { return runtimeScene.getGame().isKeyPressed(123); }
-    
+
     if ( key === "Pause" ) { return runtimeScene.getGame().isKeyPressed(19); }
-    
+
     return false;
 }
 
-gdjs.inputTools.anyKeyPressed = function(runtimeScene) {
+gdjs.evtTools.input.anyKeyPressed = function(runtimeScene) {
     return runtimeScene.getGame().anyKeyPressed();
 }
-    
-gdjs.inputTools.isMouseButtonPressed = function(runtimeScene, button) {
+
+gdjs.evtTools.input.isMouseButtonPressed = function(runtimeScene, button) {
     if ( button == "Left" ) return runtimeScene.getGame().isMouseButtonPressed(0);
     if ( button == "Right" ) return runtimeScene.getGame().isMouseButtonPressed(1);
 }
 
-gdjs.inputTools.hideCursor = function(runtimeScene) {
+gdjs.evtTools.input.hideCursor = function(runtimeScene) {
     runtimeScene.getPIXIRenderer().view.style.cursor = 'none';
 }
 
-gdjs.inputTools.showCursor = function(runtimeScene) {
+gdjs.evtTools.input.showCursor = function(runtimeScene) {
     runtimeScene.getPIXIRenderer().view.style.cursor = '';
 }
 
-gdjs.inputTools.getMouseWheelDelta = function(runtimeScene) {
+gdjs.evtTools.input.getMouseWheelDelta = function(runtimeScene) {
     return runtimeScene.getGame().getMouseWheelDelta();
 }
 
-gdjs.inputTools.getMouseX = function(runtimeScene, layer, camera) {
+gdjs.evtTools.input.getMouseX = function(runtimeScene, layer, camera) {
     var offset = runtimeScene.hasLayer(layer) ? runtimeScene.getLayer(layer).getCameraX() : 0;
     return runtimeScene.getGame().getMouseX()+offset;
 }
 
-gdjs.inputTools.getMouseY = function(runtimeScene, layer, camera) {
+gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
     var offset = runtimeScene.hasLayer(layer) ? runtimeScene.getLayer(layer).getCameraY() : 0;
     return runtimeScene.getGame().getMouseY()+offset;
 }

@@ -82,6 +82,20 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     }
 
     {
+        //If we do not add a code generator to the comments, they will be stripped as considered as not implemented by the platform.
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                return "";
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        GetAllEvents()["BuiltinCommonInstructions::Comment"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+    }
+
+    {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)

@@ -41,10 +41,10 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Load the runtime scene from the given scene.
-     * \param sceneXml A jquery object containing the scene in XML format.
+     * @method loadFromScene
+     * @param sceneXml A jquery object containing the scene in XML format.
      */
     that.loadFromScene = function(sceneXml) {
-        RTSCENE = that;
         if ( sceneXml == undefined ) {
             console.error("loadFromScene was called without a scene");
             return;
@@ -91,8 +91,9 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
             else {
             
                 var associatedObject = my.objects.get(objectName);
+                var objectType = $(associatedObject).attr("type");
                 
-                newObject = gdjs.spriteRuntimeObject(that, associatedObject);
+                newObject = gdjs.getObjectConstructor(objectType)(that, associatedObject);
                 newObject.setPosition(parseFloat($(this).attr("x")), parseFloat($(this).attr("y")));
                 newObject.setZOrder(parseFloat($(this).attr("plan")));
                 newObject.setAngle(parseFloat($(this).attr("angle")));
@@ -113,16 +114,23 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     that.unloadScene = function() {
         if ( !my.isLoaded ) return;
         
-        
     }
     
+    /**
+     * Update the list of the potentially colliding objects.
+     * @method updatePotentialCollidingObjects
+     */
     that.updatePotentialCollidingObjects = function () {
         my.collisionGrid.update();
     }
     
     /**
-     * Set the function called each time the runtimeScene is stepped.
-     * The function will be passed the runtimeScene as argument.
+     * Get an array of potentially colliding objects having the specified name identifiers.<br>
+     * You need to call updatePotentialCollidingObjects method before calling this.
+     *
+     * @method getPotentialCollidingObjects
+     * @param obj1NameId {Number} The number representing the first objects.
+     * @param obj2NameId {Number} The number representing the second objects.
      */
     that.getPotentialCollidingObjects = function(obj1NameId, obj2NameId) {
         
@@ -132,8 +140,14 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
-     * Set the function called each time the runtimeScene is stepped.
+     * Set the function called each time the runtimeScene is stepped.<br>
      * The function will be passed the runtimeScene as argument.
+     *
+     * Note that this is already set up by the runtimeScene constructor and that you should
+     * not need to use this method.
+     *
+     * @method setEventsFunction
+     * @param The function to be called.
      */
     that.setEventsFunction = function(func) {
         my.eventsFunction = func;
@@ -160,6 +174,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /** 
      * Render the PIXI stage associated to the runtimeScene.
+     * @method render
      */
     that.render = function(){    
         // render the PIXI stage   
@@ -168,8 +183,9 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
-     * Called when rendering to do all times related management.
-     * @todo
+     * Called when rendering to do all times related tasks.
+     * @method updateTime
+     * @private
      */
     my.updateTime = function() {
         //Compute the elapsed time since last frame
@@ -189,6 +205,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Update the objects (update positions, time management...)
+     * @method updateObjects
+     * @private
      */
     my.updateObjects = function() {
         var allObjectsLists = my.instances.entries();
@@ -213,6 +231,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Update the objects positions according to their forces
+     * @method updateObjectsForces
      */
     that.updateObjectsForces = function(objects) {
         var allObjectsLists = objects ? objects : my.instances.entries();
@@ -233,7 +252,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Add an object to the instances living on the scene.
-     * \param obj The object to be added.
+     * @method addObject
+     * @param obj The object to be added.
      */
     that.addObject = function(obj) {
         if ( !my.instances.containsKey(obj.name) ) {
@@ -247,7 +267,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get all the instances of the object called name.
-     * \param name Name of the object the instances must be returned.
+     * @method getObjects
+     * @param name Name of the object the instances must be returned.
      */
     that.getObjects = function(name){
         if ( !my.instances.containsKey(name) ) {
@@ -258,6 +279,11 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         return my.instances.get(name);
     }
     
+    /**
+     * Must be called whenever an object must be removed from the scene.
+     * @method markObjectForDeletion
+     * @param object The object to be removed.
+     */
     that.markObjectForDeletion = function(obj) {
         if ( my.instances.containsKey(obj.getName()) ) {
             
@@ -282,7 +308,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
-     * Create an identifier for a new object
+     * Create an identifier for a new object.
+     * @method createNewUniqueId
      */
     that.createNewUniqueId = function() {
         my.lastId++;
@@ -291,6 +318,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the PIXI.Stage associated to the RuntimeScene.
+     * @method getPIXIStage
      */
     that.getPIXIStage = function() {
         return my.pixiStage;
@@ -298,6 +326,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the PIXI renderer associated to the RuntimeScene.
+     * @method getPIXIRenderer
      */
     that.getPIXIRenderer = function() {
         return my.pixiRenderer;
@@ -305,6 +334,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the runtimeGame associated to the RuntimeScene.
+     * @method getGame
      */
     that.getGame = function() {
         return my.runtimeGame;
@@ -312,6 +342,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the variables of the runtimeScene.
+     * @method getVariables
+     * @return The container holding the variables of the scene.
      */
     that.getVariables = function() {
         return my.variables;
@@ -319,6 +351,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the XML structure representing all the initial objects of the scene.
+     * @method getInitialObjectsXml
      */
     that.getInitialObjectsXml = function() {
         return my.initialObjectsXml;
@@ -354,7 +387,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Get the soundManager of the scene.
-     - @return The soundManager of the scene.
+     * @return The soundManager of the scene.
      */
     that.getSoundManager = function() {
         return my.soundManager;
@@ -362,6 +395,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     
     /**
      * Return true if the scene is rendering its first frame.
+     * @method isFirstFrame
      */
     that.isFirstFrame = function() {
         return my.firstFrame;

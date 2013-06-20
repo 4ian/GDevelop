@@ -52,6 +52,8 @@
     var launch = function(project) {
         var isMSIE = /*@cc_on!@*/0;
 
+        gdjs.registerObjects();
+
         var game = gdjs.runtimeGame($(project).find("Project"));
     
         //Create a renderer

@@ -1,4 +1,4 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -6,33 +6,34 @@
 /**
  * The polygon represents a polygon that can be used to create collisions masks for runtimeObject.
  *
- * @class polygon 
+ * @namespace gdjs
+ * @class polygon
  */
 gdjs.polygon = function(runtimeGame, pixiRenderer)
 {
     var that = {};
-    
+
     /**
      * The vertices of the polygon
      * @property vertices
      */
     that.vertices = [];
-    
+
     /**
      * The edges of the polygon. This property is only valid after calling
      * computeEdges, and remains valid until vertices are modified.
      * @property edges
      */
     that.edges = [];
-    
+
     that.move = function(x,y) {
         for(var i = 0, len = that.vertices.length;i<len;++i) {
-            
+
             that.vertices[i][0] += x;
             that.vertices[i][1] += y;
         }
     }
-    
+
     that.rotate = function(angle) {
         var t, cosa = Math.cos(-angle),
                sina = Math.sin(-angle); //We want a clockwise rotation
@@ -43,7 +44,7 @@ gdjs.polygon = function(runtimeGame, pixiRenderer)
             that.vertices[i][1] = -t*sina + that.vertices[i][1]*cosa;
         }
     }
-    
+
     that.computeEdges = function() {
         var v1, v2;
         //Ensure edge array has the right size. ( And avoid recreating an edge array ).
@@ -61,28 +62,28 @@ gdjs.polygon = function(runtimeGame, pixiRenderer)
             that.edges[i] = [v2[0] - v1[0], v2[1] - v1[1]];
         }
     }
-    
+
     that.isConvex = function() {
         that.computeEdges();
         edgesLen = that.edges.length;
-        
+
         if ( edgesLen < 3 ) {
             return false;
         }
-        
+
         var zProductIsPositive = (that.edges[0][0]*that.edges[0+1][1] - that.edges[0][1]*that.edges[0+1][0]) > 0;
 
         for (var i = 1;i<edgesLen-1;++i) {
             var zCrossProduct = that.edges[i][0]*that.edges[i+1][1] - that.edges[i][1]*that.edges[i+1][0];
             if ( (zCrossProduct > 0) !== zProductIsPositive ) return false;
         }
-        
+
         var lastZCrossProduct = that.edges[edgesLen-1][0]*that.edges[0][1] - that.edges[edgesLen][1]*that.edges[0][0];
         if ( (lastZCrossProduct > 0) !== zProductIsPositive ) return false;
-        
+
         return true;
     }
-    
+
     that.computeCenter = function() {
         var center = [0,0];
         var len = that.vertices.length;
@@ -96,10 +97,10 @@ gdjs.polygon = function(runtimeGame, pixiRenderer)
 
         return center;
     }
-    
+
     return that;
 }
-    
+
 gdjs.polygon.createRectangle = function(width, height) {
     var rect = gdjs.polygon();
     rect.vertices.push([-width/2.0, -height/2.0]);
@@ -127,7 +128,7 @@ gdjs.polygon.createRectangle = function(width, height) {
 gdjs.polygon.collisionTest = function(p1,p2) {
 
     //Tools functions :
-    
+
     var normalise = function(v)
     {
         var len = Math.sqrt(v[0]*v[0] + v[1]*v[1]);
@@ -158,7 +159,7 @@ gdjs.polygon.collisionTest = function(p1,p2) {
             else if (dp > minMax[1])
                 minMax[1] = dp;
         }
-        
+
         return minMax;
     }
 
@@ -169,18 +170,18 @@ gdjs.polygon.collisionTest = function(p1,p2) {
     }
 
     //Algorithm core :
-    
+
     p1.computeEdges();
     p2.computeEdges();
-    
+
     var edge = [0, 0];
     var move_axis = [0, 0];
     var mtd = [0, 0];
-    
+
     var min_dist = Number.MAX_VALUE;
-    
+
     var result = {collision:false, move_axis:[0,0] };
-    
+
     //Iterate over all the edges composing the polygons
     for (var i = 0, len1 = p1.vertices.length, len2 = p2.vertices.length; i < len1+len2; i++) {
         if (i < len1) { // or <=
@@ -197,7 +198,7 @@ gdjs.polygon.collisionTest = function(p1,p2) {
         var minMaxB = project(axis, p2);
 
         //If the projections on the axis do not overlap, then their is no collision
-        if (distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]) > 0) { 
+        if (distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]) > 0) {
             result.collision = false;
             result.move_axis[0] = 0;
             result.move_axis[1] = 0;
@@ -212,7 +213,7 @@ gdjs.polygon.collisionTest = function(p1,p2) {
             move_axis[1] = axis[1];
         }
     }
-    
+
     result.collision = true;
 
     //Ensure move axis is correctly oriented.
@@ -223,10 +224,10 @@ gdjs.polygon.collisionTest = function(p1,p2) {
         move_axis[0] = -move_axis[0];
         move_axis[1] = -move_axis[1];
     }
-    
+
     //Add the magnitude to the move axis.
     result.move_axis[0] = move_axis[0] * min_dist;
     result.move_axis[1] = move_axis[1] * min_dist;
-    
+
     return result;
 }

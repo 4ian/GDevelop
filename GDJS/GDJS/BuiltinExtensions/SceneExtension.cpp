@@ -24,13 +24,13 @@ SceneExtension::SceneExtension()
         .SetFunctionName("gdjs.random");
 
     GetAllConditions()["DepartScene"].codeExtraInformation
-        .SetFunctionName("gdjs.runtimeSceneTools.sceneJustBegins");
+        .SetFunctionName("gdjs.evtTools.runtimeScene.sceneJustBegins");
     GetAllActions()["SceneBackground"].codeExtraInformation
-        .SetFunctionName("gdjs.runtimeSceneTools.setBackgroundColor");
+        .SetFunctionName("gdjs.evtTools.runtimeScene.setBackgroundColor");
     GetAllActions()["Scene"].codeExtraInformation
-        .SetFunctionName("gdjs.runtimeSceneTools.changeScene");
+        .SetFunctionName("gdjs.evtTools.runtimeScene.changeScene");
     GetAllActions()["Quit"].codeExtraInformation
-        .SetFunctionName("gdjs.runtimeSceneTools.stopGame");
+        .SetFunctionName("gdjs.evtTools.runtimeScene.stopGame");
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator

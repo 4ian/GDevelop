@@ -4,9 +4,9 @@
  */
 
  /**
- * @module gdjs
+ * @namespace gdjs
  */
-var gdjs = gdjs || {};
+var gdjs = gdjs || {objectsTypes:new Hashtable(), onInitFcts: [], evtTools:{}};
 
 /**
  * Convert a rgb color value to a hex value.
@@ -45,13 +45,39 @@ gdjs.toDegrees = function(angleInRadians) {
 }
 
 /**
- * Always return false.
- * @method returnFalse
- * @private
+ * Register the runtime objects that can be used in runtimeScene.<br>
+ * Objects must be part of gdjs and have their property "thisIsARuntimeObjectConstructor"
+ * defined and set to the name of the type of the object so as to be recognized.
+ * The name of the type of the object must be complete, with the namespace if any. For
+ * example, if you are providing a Text object in the TextObject extension, the full name
+ * of the type of the object is "TextObject::Text".
+ *
+ * @method registerObjects
  * @static
  */
-gdjs.returnFalse = function() {
-    return false;
+gdjs.registerObjects = function() {
+    for (var p in this) {
+        if (this.hasOwnProperty(p)) {
+            if ( gdjs[p].thisIsARuntimeObjectConstructor != undefined) {
+                gdjs.objectsTypes.put(gdjs[p].thisIsARuntimeObjectConstructor, gdjs[p]);
+            }
+        }
+    }
+}
+
+/**
+ * Get the constructor of an object.
+ *
+ * @method getObjectConstructor
+ * @static
+ * @param name {String} The name of the type of the object.
+ */
+gdjs.getObjectConstructor = function(name) {
+    if ( name != undefined && gdjs.objectsTypes.containsKey(name) )
+        return gdjs.objectsTypes.get(name);
+    
+    console.log("Object type \""+name+"\" was not found.");
+    return gdjs.objectsTypes.get(""); //Create a base empty runtime object.
 }
 
 Array.prototype.remove = function(from) {

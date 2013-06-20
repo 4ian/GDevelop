@@ -5,6 +5,7 @@
 
 /**
  * variable is an object storing a number or a string
+ * @namespace gdjs
  * @class variable
  */
 gdjs.variable = function(value)

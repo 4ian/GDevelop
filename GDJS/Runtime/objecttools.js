@@ -1,23 +1,27 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * @module gdjs.objectTools
+ * Tools related to objects, for events generated code.
+ * @namespace gdjs.evtTools
+ * @class object
+ * @static
  */
-gdjs.objectTools = gdjs.objectTools || {};
+gdjs.evtTools.object = gdjs.evtTools.object || {};
 
 /**
  * Do a test on two tables of objects so as to remove the objects for which the test is false.
  * If inverted == true, only the objects of the first table are filtered.
+ * @method TwoListsTest
  */
-gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inverted, extraParam) {
+gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2, inverted, extraParam) {
     var objects1 = [];
     var objects2 = [];
     var objects1Values = objectsLists1.values();
     var objects2Values = objectsLists2.values();
-    
+
     //Check if we're dealing with the same lists of objects
     var objects1Keys = objectsLists1.keys();
     var objects2Keys = objectsLists2.keys();
@@ -30,14 +34,14 @@ gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inv
             }
         }
     }
-    
+
     //Prepare list of objects to iterate over.
     //And remove these objects from the original tables.
     for(var i = 0, len = objects1Values.length;i<len;++i) {
         objects1.push.apply(objects1, objects1Values[i]);
         objects1Values[i].length = 0; //Be sure not to lose the reference to the original array
     }
-    
+
     if (sameObjectLists)
         objects2 = objects1.slice(0);
     else
@@ -47,52 +51,51 @@ gdjs.objectTools.TwoListsTest = function(func, objectsLists1, objectsLists2, inv
             objects2Values[i].length = 0; //Be sure not to lose the reference to the original array
         }
     }
-    
+
     //Iterate over the lists to do the test for each pair of objects.
     var isTrue = false;
     for(var i = 0, len1 = objects1.length;i<len1;++i) {
-    
+
         var atLeastOneObject = false;
         for(var j = (!sameObjectLists ? 0 : i+1), len2 = objects2.length;j<len2;++j) {
-        
-            if ( sameObjectLists || (objects1[i].getUniqueId() != objects2[j].getUniqueId()) ) {                
+
+            if ( sameObjectLists || (objects1[i].getUniqueId() != objects2[j].getUniqueId()) ) {
 
                 if ( func(objects1[i], objects2[j], extraParam) ) {
                     if ( !inverted ) {
                         isTrue = true;
-                        
+
                         //Pick the objects
                         var objList = objectsLists1.get(objects1[i].getName());
                         if ( objList.indexOf(objects1[i]) == -1) objList.push(objects1[i]);
-                        
+
                         objList = objectsLists2.get(objects2[j].getName());
                         if ( objList.indexOf(objects2[j]) == -1) objList.push(objects2[j]);
-                    } 
-                    
+                    }
+
                     atLeastOneObject = true;
                 }
-                
+
             }
-            
+
         }
         if ( !atLeastOneObject && inverted ) { //The object is not overlapping any other object.
             isTrue = true;
-            
+
             //We are sure that objects1[i] is not already in the list.
             //(As we are iterating over objects1 and only objects1 are added )
             objectsLists1.get(objects1[i].getName()).push(objects1[i]);
-        } 
-    
+        }
+
     }
-    
+
     return isTrue;
 }
 
-//TODO: Same object lists, inverted
-gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
+gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
 
     if ( inverted )
-        return gdjs.objectTools.TwoListsTest(gdjs.runtimeObject.collisionTest,
+        return gdjs.evtTools.object.TwoListsTest(gdjs.runtimeObject.collisionTest,
                                                      objectsLists1, objectsLists2, inverted);
 
     var objects1 = [];
@@ -101,8 +104,8 @@ gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2,
     var objects2NameId = [];
     var objects1Values = objectsLists1.values();
     var objects2Values = objectsLists2.values();
-    
-    
+
+
     //Check if we're dealing with the same lists of objects
     var objects1Keys = objectsLists1.keys();
     var objects2Keys = objectsLists2.keys();
@@ -115,7 +118,7 @@ gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2,
             }
         }
     }
-    
+
     //Prepare list of objects to iterate over.
     //And remove these objects from the original tables.
     for(var i = 0, len = objects1Values.length;i<len;++i) {
@@ -125,7 +128,7 @@ gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2,
             objects1Values[i].length = 0; //Be sure not to lose the reference to the original array
         }
     }
-    
+
     if (sameObjectLists) {
         objects2 = objects1.slice(0);
         objects2NameId = objects1NameId;
@@ -140,84 +143,84 @@ gdjs.objectTools.hitBoxesCollisionTest = function( objectsLists1, objectsLists2,
             }
         }
     }
-    
+
     var isTrue = false;
-    
+
     //Search all the pairs colliding.
     runtimeScene.updatePotentialCollidingObjects();
-    var pairs = runtimeScene.getPotentialCollidingObjects(objects1NameId, objects2NameId); 
-    
+    var pairs = runtimeScene.getPotentialCollidingObjects(objects1NameId, objects2NameId);
+
     for(var i = 0, len = pairs.length;i<len;++i) {
         if ( objects1.indexOf(pairs[i][0]) !== -1 && objects2.indexOf(pairs[i][1]) !== -1 ) {
-            
+
             var objList = objectsLists1.get(pairs[i][0].getName());
             if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
-            
+
             objList = objectsLists2.get(pairs[i][1].getName());
             if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
-            
+
             isTrue = true;
         }
         else if ( objects1.indexOf(pairs[i][1]) !== -1 && objects2.indexOf(pairs[i][0]) !== -1 ) {
-            
+
             var objList = objectsLists1.get(pairs[i][1].getName());
             if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
-            
+
             objList = objectsLists2.get(pairs[i][0].getName());
             if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
-            
+
             isTrue = true;
         }
     }
-    
+
     return isTrue;
-    
+
 }
 
-gdjs.objectTools.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
-    
+gdjs.evtTools.object.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
+
     distance *= distance;
-    return gdjs.objectTools.TwoListsTest(gdjs.runtimeObject.distanceTest, objectsLists1, 
+    return gdjs.evtTools.object.TwoListsTest(gdjs.runtimeObject.distanceTest, objectsLists1,
         objectsLists2, inverted, distance);
 }
 
 
-gdjs.objectTools.movesTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
-    
+gdjs.evtTools.object.movesTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
+
     var movesTowardTestInner = function(obj1, obj2) {
-    
+
         if ( obj1.hasNoForces() ) return false;
-        
+
         var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
                                   obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
         objAngle *= 180/3.14159;
-        
+
         console.log(Math.abs(objAngle-obj1.getAverageForce().getAngle()));
         return Math.abs(objAngle-obj1.getAverageForce().getAngle()) <= tolerance/2;
     }
 
-    return gdjs.objectTools.TwoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
+    return gdjs.evtTools.object.TwoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
 }
 
-gdjs.objectTools.turnedTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
-    
+gdjs.evtTools.object.turnedTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
+
     var turnedTowardTestInner = function(obj1, obj2) {
-    
+
         if ( obj1.hasNoForces() ) return false;
-        
+
         var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
                                   obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
         objAngle *= 180/3.14159;
-        
+
         console.log(Math.abs(objAngle-obj1.getAverageForce().getAngle()));
         return Math.abs(objAngle-obj1.getAngle()) <= tolerance/2;
     }
 
-    return gdjs.objectTools.TwoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
+    return gdjs.evtTools.object.TwoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
 }
 
-gdjs.objectTools.pickAllObjects = function(runtimeScene, objectsLists) {
-    
+gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
+
     var entries = objectsLists.entries();
     for(var i = 0, len = entries.length;i<len;++i) {
         var allObjects = runtimeScene.getObjects(entries[i][0]);
@@ -225,12 +228,12 @@ gdjs.objectTools.pickAllObjects = function(runtimeScene, objectsLists) {
         objectsList.length = 0;
         objectsList.push.apply(objectsList, allObjects);
     }
-    
+
     return true;
 }
 
-gdjs.objectTools.pickRandomObject = function(runtimeScene, objectsLists) {
-    
+gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
+
     //Create a list with all the objects
     //and clear the lists of picked objects.
     var objects = [];
@@ -239,74 +242,80 @@ gdjs.objectTools.pickRandomObject = function(runtimeScene, objectsLists) {
         objects.push.apply(objects, values[i]);
         values[i].length = 0; //Be sure not to lose the reference to the original array
     }
-    
+
     //Pick only one object
     if ( objects.length !== 0 ) {
         var id = Math.round(Math.random()*(objects.length-1));
         var theChosenOne = objects[id];
-    
+
         objectsLists.get(theChosenOne.getName()).push(theChosenOne);
     }
-    
+
     return true;
 }
 /**
  * Do the work of creating a new object
  * @private
  */
-gdjs.objectTools.doCreateObjectOnScene = function(runtimeScene, objectName, objectsLists, x, y, layer) {
+gdjs.evtTools.object.doCreateObjectOnScene = function(runtimeScene, objectName, objectsLists, x, y, layer) {
 
     //Find the object to create
     var obj = null;
-    $(runtimeScene.getInitialObjectsXml()).find("Objet").each( function() { 
-        if ( $(this).attr("nom") === objectName && $(this).attr("type") === "Sprite" /*TODO*/ ) {
-            obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
+    $(runtimeScene.getInitialObjectsXml()).find("Objet").each( function() {
+        if ( $(this).attr("nom") === objectName ) {
+            obj = gdjs.getObjectConstructor($(this).attr("type"))(runtimeScene, $(this));
             return false;
         }
     });
     if ( obj == null ) {
-        $(runtimeScene.getGame().getInitialObjectsXml()).find("Objet").each( function() { 
-            if ( $(this).attr("nom") === objectName && $(this).attr("type") === "Sprite" /*TODO*/ ) {
-                obj = gdjs.spriteRuntimeObject(runtimeScene, $(this));
+        $(runtimeScene.getGame().getInitialObjectsXml()).find("Objet").each( function() {
+            if ( $(this).attr("nom") === objectName ) {
+                obj = gdjs.getObjectConstructor($(this).attr("type"))(runtimeScene, $(this));
                 return false;
             }
         });
     }
-    
+
     //Add it to the scene
     if ( obj != null ) {
         obj.setPosition(x,y);
         obj.setLayer(layer);
         runtimeScene.addObject(obj);
-        
+
         //Let the new object be picked by next actions/conditions.
         if ( objectsLists.containsKey(objectName) ) {
             objectsLists.get(objectName).push(obj);
         }
-    } 
+    }
 }
 
 /**
  * Allows events to create a new object on a scene.
+ * @private
  */
-gdjs.objectTools.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
-    gdjs.objectTools.doCreateObjectOnScene(runtimeScene, objectsLists.keys()[0], objectsLists, x, y, layer);
+gdjs.evtTools.object.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
+    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectsLists.keys()[0], objectsLists, x, y, layer);
 }
 
 /**
  * Allows events to create a new object on a scene.
+ * @private
  */
-gdjs.objectTools.createObjectFromGroupOnScene = function(runtimeScene, objectsLists, objectName, x, y, layer) {
-    gdjs.objectTools.doCreateObjectOnScene(runtimeScene, objectName, objectsLists, x, y, layer);
+gdjs.evtTools.object.createObjectFromGroupOnScene = function(runtimeScene, objectsLists, objectName, x, y, layer) {
+    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectName, objectsLists, x, y, layer);
 }
 
-gdjs.objectTools.pickedObjectsCount = function(objectsLists) {
+/**
+ * Allows events to get the number of objects picked.
+ * @private
+ */
+gdjs.evtTools.object.pickedObjectsCount = function(objectsLists) {
 
     var size = 0;
     var values = objectsLists.values();
     for(var i = 0, len = values.length;i<len;++i) {
         size += values[i].length;
     }
-    
+
     return size;
 }

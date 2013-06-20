@@ -22,9 +22,9 @@ KeyboardExtension::KeyboardExtension()
     CloneExtension("Game Develop C++ platform", "BuiltinKeyboard");
 
     GetAllConditions()["KeyPressed"].codeExtraInformation
-        .SetFunctionName("gdjs.inputTools.isKeyPressed").SetIncludeFile("inputtools.h");
+        .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.h");
     GetAllConditions()["KeyFromTextPressed"].codeExtraInformation
-        .SetFunctionName("gdjs.inputTools.isKeyPressed").SetIncludeFile("inputtools.h");
+        .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.h");
     GetAllConditions()["AnyKeyPressed"].codeExtraInformation
-        .SetFunctionName("gdjs.inputTools.anyKeyPressed").SetIncludeFile("inputtools.h");
+        .SetFunctionName("gdjs.evtTools.input.anyKeyPressed").SetIncludeFile("inputtools.h");
 }

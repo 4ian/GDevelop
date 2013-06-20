@@ -33,7 +33,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     my.variables = gdjs.variablesContainer(objectXml ? $(objectXml).find("Variables") : undefined);
     my.forces = [];
     my.averageForce = gdjs.force(0,0,false); //A force returned by getAverageForce method.
-    my.forcesGarbage = [];
+    my.forcesGarbage = []; //Container for unused garbage, avoiding recreating forces each tick.
     
     //Common members functions related to the object and its runtimeScene :
     
@@ -681,6 +681,11 @@ gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
     return false;
 }
 
+/**
+ * Check the distance between two objects.
+ * @method distanceTest
+ * @static 
+ */
 gdjs.runtimeObject.distanceTest = function(obj1, obj2, distance) {
     var x = obj1.getX()+obj1.getCenterX()-(obj2.getX()+obj2.getCenterX());
     var y = obj1.getY()+obj1.getCenterY()-(obj2.getY()+obj2.getCenterY());
@@ -688,6 +693,13 @@ gdjs.runtimeObject.distanceTest = function(obj1, obj2, distance) {
     return x*x+y*y <= distance;
 }
 
+/**
+ * Get the identifier associated to an object name :<br>
+ * Some features may want to compare objects name a large number of time. In this case,
+ * it may be more efficient to compare objects name identifier ( see gdjs.runtimeObject.getNameId ).
+ * @method getNameIdentifier
+ * @static
+ */
 gdjs.runtimeObject.getNameIdentifier = function(name) {
     gdjs.runtimeObject.getNameIdentifier.identifiers = 
         gdjs.runtimeObject.getNameIdentifier.identifiers 
@@ -701,3 +713,6 @@ gdjs.runtimeObject.getNameIdentifier = function(name) {
     gdjs.runtimeObject.getNameIdentifier.identifiers.put(name, newKey);
     return newKey;
 }
+
+//Notify gdjs that the runtimeObject exists.
+gdjs.runtimeObject.thisIsARuntimeObjectConstructor = "";

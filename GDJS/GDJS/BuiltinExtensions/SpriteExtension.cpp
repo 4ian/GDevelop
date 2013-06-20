@@ -77,10 +77,10 @@ SpriteExtension::SpriteExtension()
     GetAllConditions()["Collision"]
         .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
         .codeExtraInformation //No pixel perfect collision for now on the JS platform.
-        .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
+        .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
 
     GetAllConditions()["EstTourne"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.turnedTowardTest");
+        .SetFunctionName("gdjs.evtTools.object.turnedTowardTest");
 
     spriteExpressions["X"].codeExtraInformation.
         SetFunctionName("getPointX");

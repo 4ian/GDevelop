@@ -1,4 +1,4 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -6,25 +6,26 @@
 /**
  * The runtimeGame object represents a game being played.
  *
- * @class runtimeGame 
+ * @namespace gdjs
+ * @class runtimeGame
  */
 gdjs.runtimeGame = function(xml)
 {
     var that = {};
     var my = {};
-    
+
     my.variables = gdjs.variablesContainer();
     my.xml = xml;
     my.imageManager = gdjs.imageManager(that);
     my.minFPS = xml ? parseInt($(xml).find("Info").find("FPSmin").attr("value")) : 15;
-    
+
     //Inputs :
     my.pressedKeys = new Hashtable();
     my.pressedMouseButtons = new Array(5);
     my.mouseX = 0;
     my.mouseY = 0;
     my.mouseWheelDelta = 0;
-    
+
     /**
      * Get the variables of the runtimeGame.
      * @method getVariables
@@ -33,11 +34,11 @@ gdjs.runtimeGame = function(xml)
     that.getVariables = function() {
         return my.variables;
     }
-    
+
     that.getImageManager = function() {
         return my.imageManager;
     }
-    
+
     /**
      * Get the XML structure associated to the game
      * @method getXml
@@ -46,7 +47,7 @@ gdjs.runtimeGame = function(xml)
     that.getXml = function() {
         return my.xml;
     }
-    
+
     /**
      * Get the XML structure associated to a scene.
      *
@@ -62,13 +63,13 @@ gdjs.runtimeGame = function(xml)
                 return false;
             }
         });
-        
+
         if ( scene == undefined )
             console.warn("The game has no scene called \""+sceneName+"\"");
-        
+
         return scene;
     }
-    
+
     /**
      * Check if a scene exists
      *
@@ -84,10 +85,10 @@ gdjs.runtimeGame = function(xml)
                 return false;
             }
         });
-        
+
         return isTrue;
     }
-    
+
     /**
      * Get the XML structure representing all the initial objects of the game.
      * @method getInitialObjectsXml
@@ -96,7 +97,7 @@ gdjs.runtimeGame = function(xml)
     that.getInitialObjectsXml = function() {
         return $(my.xml).find("Objets");
     }
-    
+
     /**
      * Should be called whenever a key is pressed
      * @method onKeyPressed
@@ -105,7 +106,7 @@ gdjs.runtimeGame = function(xml)
     that.onKeyPressed = function(keyCode) {
         my.pressedKeys.put(keyCode, true);
     }
-    
+
     /**
      * Should be called whenever a key is released
      * @method onKeyReleased
@@ -114,7 +115,7 @@ gdjs.runtimeGame = function(xml)
     that.onKeyReleased = function(keyCode) {
         my.pressedKeys.put(keyCode, false);
     }
-    
+
     /**
      * Return true if the key corresponding to keyCode is pressed.
      * @method isKeyPressed
@@ -123,23 +124,23 @@ gdjs.runtimeGame = function(xml)
     that.isKeyPressed = function(keyCode) {
         return my.pressedKeys.containsKey(keyCode) && my.pressedKeys.get(keyCode);
     }
-    
+
     /**
      * Return true if any key is pressed
      * @method anyKeyPressed
      */
     that.anyKeyPressed = function(keyCode) {
         var allKeys = my.pressedKeys.entries();
-        
+
         for(var i = 0, len = allKeys.length;i<len;++i) {
             if (allKeys[i][1]) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Should be called when the mouse is moved.<br>
      * Please note that the coordinates must be expressed relative to the view position.
@@ -152,7 +153,7 @@ gdjs.runtimeGame = function(xml)
         my.mouseX = x;
         my.mouseY = y;
     }
-    
+
     /**
      * Get the mouse X position
      *
@@ -162,7 +163,7 @@ gdjs.runtimeGame = function(xml)
     that.getMouseX = function() {
         return my.mouseX;
     }
-    
+
     /**
      * Get the mouse Y position
      *
@@ -172,7 +173,7 @@ gdjs.runtimeGame = function(xml)
     that.getMouseY = function() {
         return my.mouseY;
     }
-    
+
     /**
      * Should be called whenever a mouse button is pressed
      * @method onMouseButtonPressed
@@ -181,7 +182,7 @@ gdjs.runtimeGame = function(xml)
     that.onMouseButtonPressed = function(buttonCode) {
         my.pressedMouseButtons[buttonCode] = true;
     }
-    
+
     /**
      * Should be called whenever a mouse button is released
      * @method onMouseButtonReleased
@@ -190,7 +191,7 @@ gdjs.runtimeGame = function(xml)
     that.onMouseButtonReleased = function(buttonCode) {
         my.pressedMouseButtons[buttonCode] = false;
     }
-    
+
     /**
      * Return true if the mouse button corresponding to buttonCode is pressed.
      * @method isMouseButtonPressed
@@ -199,7 +200,7 @@ gdjs.runtimeGame = function(xml)
     that.isMouseButtonPressed = function(buttonCode) {
         return my.pressedMouseButtons[buttonCode] != undefined && my.pressedMouseButtons[buttonCode];
     }
-    
+
     /**
      * Should be called whenever the mouse wheel is used
      * @method onMouseWheel
@@ -208,7 +209,7 @@ gdjs.runtimeGame = function(xml)
     that.onMouseWheel = function(wheelDelta) {
         my.mouseWheelDelta = wheelDelta;
     }
-    
+
     /**
      * Return the mouse wheel delta
      * @method getMouseWheelDelta
@@ -216,7 +217,7 @@ gdjs.runtimeGame = function(xml)
     that.getMouseWheelDelta = function() {
         return my.mouseWheelDelta;
     }
-    
+
     /**
      * Return the minimal fps that must be guaranteed by the game.
      * ( Otherwise, game is slowed down ).
@@ -225,6 +226,6 @@ gdjs.runtimeGame = function(xml)
     that.getMinimalFramerate = function() {
         return my.minFPS;
     }
-    
+
     return that;
 }

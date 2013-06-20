@@ -109,30 +109,30 @@ BaseObjectExtension::BaseObjectExtension()
 
 
     GetAllActions()["Create"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.createObjectOnScene");
+        .SetFunctionName("gdjs.evtTools.object.createObjectOnScene");
     GetAllActions()["CreateByName"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.createObjectFromGroupOnScene");
+        .SetFunctionName("gdjs.evtTools.object.createObjectFromGroupOnScene");
     GetAllExpressions()["Count"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
+        .SetFunctionName("gdjs.evtTools.object.pickedObjectsCount");
     GetAllConditions()["NbObjet"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.pickedObjectsCount");
+        .SetFunctionName("gdjs.evtTools.object.pickedObjectsCount");
     GetAllConditions()["CollisionNP"]
         .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
         .codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.hitBoxesCollisionTest");
+        .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
     GetAllConditions()["Distance"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.distanceTest");
+        .SetFunctionName("gdjs.evtTools.object.distanceTest");
     GetAllConditions()["SeDirige"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.movesTowardTest");
+        .SetFunctionName("gdjs.evtTools.object.movesTowardTest");
 
     GetAllActions()["AjoutObjConcern"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.pickAllObjects");
+        .SetFunctionName("gdjs.evtTools.object.pickAllObjects");
     GetAllConditions()["AjoutObjConcern"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.pickAllObjects");
+        .SetFunctionName("gdjs.evtTools.object.pickAllObjects");
     GetAllActions()["AjoutHasard"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.pickRandomObject");
+        .SetFunctionName("gdjs.evtTools.object.pickRandomObject");
     GetAllConditions()["AjoutHasard"].codeExtraInformation
-        .SetFunctionName("gdjs.objectTools.pickRandomObject");
+        .SetFunctionName("gdjs.evtTools.object.pickRandomObject");
 
 
     {

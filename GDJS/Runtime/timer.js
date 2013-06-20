@@ -1,4 +1,4 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -7,17 +7,18 @@
  * Represents a timer which must be updated manually.
  *
  * @class timer
+ * @namespace gdjs
  * @constructor
  */
 gdjs.timer = function(name)
 {
     var that = {};
     var my = {};
-    
+
     my.name = name;
     my.time = 0;
     my.paused = false;
-    
+
     /**
      * Get the name of the timer
      * @method getName
@@ -26,7 +27,7 @@ gdjs.timer = function(name)
     that.getName = function() {
         return my.name;
     }
-    
+
     /**
      * Get the time elapsed
      * @method getTime
@@ -35,7 +36,7 @@ gdjs.timer = function(name)
     that.getTime = function() {
         return my.time;
     }
-    
+
     /**
      * Notify the timer that some time elapsed.
      * @method updateTime
@@ -43,7 +44,7 @@ gdjs.timer = function(name)
     that.updateTime = function(time) {
         if ( !my.paused ) my.time += time;
     }
-    
+
     /**
      * Change the time.
      * @method setTime
@@ -51,7 +52,7 @@ gdjs.timer = function(name)
     that.setTime = function(time) {
         my.time = time;
     }
-    
+
     /**
      * Set time to zero.
      * @method reset
@@ -59,7 +60,7 @@ gdjs.timer = function(name)
     that.reset = function(time) {
         that.setTime(0);
     }
-    
+
     /**
      * Set if the timer is paused.
      * @method setPaused
@@ -67,7 +68,7 @@ gdjs.timer = function(name)
     that.setPaused = function(enable) {
         my.paused = enable;
     }
-    
+
     /**
      * Check if the timer is paused.
      * @method isPaused
@@ -75,6 +76,6 @@ gdjs.timer = function(name)
     that.isPaused = function() {
         return my.paused;
     }
-    
+
     return that;
 }

@@ -18,51 +18,51 @@ CameraExtension::CameraExtension()
     CloneExtension("Game Develop C++ platform", "BuiltinCamera");
 
     GetAllActions()["CameraX"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.setCameraX").SetAssociatedGetter("gdjs.cameraTools.getCameraX");
+        .SetFunctionName("gdjs.evtTools.camera.setCameraX").SetAssociatedGetter("gdjs.evtTools.camera.getCameraX");
     GetAllActions()["CameraY"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.setCameraY").SetAssociatedGetter("gdjs.cameraTools.getCameraY");
+        .SetFunctionName("gdjs.evtTools.camera.setCameraY").SetAssociatedGetter("gdjs.evtTools.camera.getCameraY");
     GetAllConditions()["CameraX"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraX");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraX");
     GetAllConditions()["CameraY"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraY");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraY");
     GetAllConditions()["CameraWidth"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraWidth");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraWidth");
     GetAllConditions()["CameraHeight"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraHeight");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraHeight");
     GetAllActions()["ShowLayer"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.showLayer");
+        .SetFunctionName("gdjs.evtTools.camera.showLayer");
     GetAllActions()["HideLayer"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.hideLayer");
+        .SetFunctionName("gdjs.evtTools.camera.hideLayer");
     GetAllConditions()["LayerVisible"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.layerIsVisible");
+        .SetFunctionName("gdjs.evtTools.camera.layerIsVisible");
     GetAllConditions()["CameraAngle"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraRotation");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraRotation");
     GetAllActions()["RotateCamera"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.setCameraRotation").SetAssociatedGetter("gdjs.cameraTools.getCameraRotation");
+        .SetFunctionName("gdjs.evtTools.camera.setCameraRotation").SetAssociatedGetter("gdjs.evtTools.camera.getCameraRotation");
     GetAllActions()["ZoomCamera"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.setCameraZoom");
+        .SetFunctionName("gdjs.evtTools.camera.setCameraZoom");
 
     GetAllExpressions()["CameraX"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraX");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraX");
     GetAllExpressions()["VueX"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraX");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraX");
     GetAllExpressions()["CameraY"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraY");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraY");
     GetAllExpressions()["VueY"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraY");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraY");
     GetAllExpressions()["CameraRotation"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraRotation");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraRotation");
     GetAllExpressions()["VueRotation"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraRotation");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraRotation");
     GetAllExpressions()["CameraWidth"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraWidth");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraWidth");
     GetAllExpressions()["CameraHeight"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.getCameraHeight");
+        .SetFunctionName("gdjs.evtTools.camera.getCameraHeight");
 
     GetAllActions()["FixCamera"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.centerCameraWithinLimits");
+        .SetFunctionName("gdjs.evtTools.camera.centerCameraWithinLimits");
     GetAllActions()["CentreCamera"].codeExtraInformation
-        .SetFunctionName("gdjs.cameraTools.centerCamera");
+        .SetFunctionName("gdjs.evtTools.camera.centerCamera");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*

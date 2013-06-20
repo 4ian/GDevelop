@@ -21,11 +21,11 @@ CommonConversionsExtension::CommonConversionsExtension()
     CloneExtension("Game Develop C++ platform", "BuiltinCommonConversions");
 
     GetAllExpressions()["ToNumber"].codeExtraInformation
-        .SetFunctionName("gdjs.commonTools.toNumber").SetIncludeFile("commontools.js");
+        .SetFunctionName("gdjs.evtTools.common.toNumber").SetIncludeFile("commontools.js");
     GetAllExpressions()["ToString"].codeExtraInformation
-        .SetFunctionName("gdjs.commonTools.toString").SetIncludeFile("commontools.js");
+        .SetFunctionName("gdjs.evtTools.common.toString").SetIncludeFile("commontools.js");
     GetAllExpressions()["LargeNumberToString"].codeExtraInformation //TODO: Check if scientific notation is added or not by toString.
-        .SetFunctionName("gdjs.commonTools.toString").SetIncludeFile("commontools.js");
+        .SetFunctionName("gdjs.evtTools.common.toString").SetIncludeFile("commontools.js");
     GetAllExpressions()["ToRad"].codeExtraInformation
         .SetFunctionName("gdjs.toRad");
     GetAllExpressions()["ToDeg"].codeExtraInformation

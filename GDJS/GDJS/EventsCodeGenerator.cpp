@@ -462,7 +462,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     {
         std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
-        argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
+        argOutput += "gdjs.evtTools.common.clearEventsObjectsMap()";
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             context.ObjectsListNeeded(realObjects[i]);
@@ -475,7 +475,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     {
         std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
 
-        argOutput += "gdjs.commonTools.clearEventsObjectsMap()";
+        argOutput += "gdjs.evtTools.common.clearEventsObjectsMap()";
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             context.EmptyObjectsListNeeded(realObjects[i]);

@@ -1,38 +1,40 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * @module gdjs.commonTools
+ * @namespace gdjs.evtTools
+ * @class common
+ * @static
  */
-gdjs.commonTools = gdjs.commonTools || {eventsObjectsMap: new Hashtable()}
+gdjs.evtTools.common = gdjs.evtTools.common || {eventsObjectsMap: new Hashtable()}
 
 /**
  * Clear the map containing objects lists.
  * Should be used by events generated code only.
  */
-gdjs.commonTools.clearEventsObjectsMap = function() {
-    gdjs.commonTools.eventsObjectsMap.clear();
-    
-    return gdjs.commonTools;
+gdjs.evtTools.common.clearEventsObjectsMap = function() {
+    gdjs.evtTools.common.eventsObjectsMap.clear();
+
+    return gdjs.evtTools.common;
 }
 
 /**
  * Add an objects list to the objects lists map.
  * Should be used by events generated code only.
  */
-gdjs.commonTools.addObjectsToEventsMap = function(name, objectList) {
-    gdjs.commonTools.eventsObjectsMap.put(name, objectList);
-    return gdjs.commonTools;
+gdjs.evtTools.common.addObjectsToEventsMap = function(name, objectList) {
+    gdjs.evtTools.common.eventsObjectsMap.put(name, objectList);
+    return gdjs.evtTools.common;
 }
 
 /**
  * Return the objects lists map.
  * Should be used by events generated code only.
  */
-gdjs.commonTools.getEventsObjectsMap = function() {
-    return gdjs.commonTools.eventsObjectsMap.clone();
+gdjs.evtTools.common.getEventsObjectsMap = function() {
+    return gdjs.evtTools.common.eventsObjectsMap.clone();
 }
 
 /**
@@ -41,7 +43,7 @@ gdjs.commonTools.getEventsObjectsMap = function() {
  * @private
  * @static
  */
-gdjs.commonTools.toNumber = function(str) {
+gdjs.evtTools.common.toNumber = function(str) {
     return parseFloat(str);
 }
 
@@ -51,6 +53,16 @@ gdjs.commonTools.toNumber = function(str) {
  * @private
  * @static
  */
-gdjs.commonTools.toString = function(num) {
+gdjs.evtTools.common.toString = function(num) {
     return num.toString();
+}
+
+/**
+ * Always return false.
+ * @method returnFalse
+ * @private
+ * @static
+ */
+gdjs.evtTools.common.returnFalse = function() {
+    return false;
 }

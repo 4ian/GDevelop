@@ -1,91 +1,94 @@
-/**
+/*
  *  Game Develop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * @module runtimeSceneTools
+ * Tools related to runtime scene, for events generated code.
+ * @namesapce gdjs.evtTools
+ * @class runtimeScene
+ * @static
  * @private
  */
-gdjs.runtimeSceneTools = gdjs.runtimeSceneTools || {}
+gdjs.evtTools.runtimeScene = gdjs.evtTools.runtimeScene || {}
 
-gdjs.runtimeSceneTools.sceneJustBegins = function(runtimeScene) {
+gdjs.evtTools.runtimeScene.sceneJustBegins = function(runtimeScene) {
     return runtimeScene.isFirstFrame();
 }
 
-gdjs.runtimeSceneTools.setBackgroundColor = function(runtimeScene, color) {
-    
+gdjs.evtTools.runtimeScene.setBackgroundColor = function(runtimeScene, color) {
+
     colors = color.split(";");
     if ( colors.length < 3 ) return;
-    
+
     runtimeScene.setBackgroundColor(parseInt(colors[0]),
                                     parseInt(colors[1]),
                                     parseInt(colors[2]));
 }
 
-gdjs.runtimeSceneTools.getElapsedTimeInSeconds = function(runtimeScene) {
+gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds = function(runtimeScene) {
     return runtimeScene.getElapsedTime()/1000;
 }
 
-gdjs.runtimeSceneTools.setTimeScale = function(runtimeScene, timeScale) {
+gdjs.evtTools.runtimeScene.setTimeScale = function(runtimeScene, timeScale) {
     return runtimeScene.setTimeScale(timeScale);
 }
 
-gdjs.runtimeSceneTools.getTimeScale = function(runtimeScene) {
+gdjs.evtTools.runtimeScene.getTimeScale = function(runtimeScene) {
     return runtimeScene.getTimeScale();
 }
 
-gdjs.runtimeSceneTools.timerElapsedTime = function(runtimeScene, timeInSeconds, timerName) {
+gdjs.evtTools.runtimeScene.timerElapsedTime = function(runtimeScene, timeInSeconds, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) {
         runtimeScene.addTimer(timerName);
         return false;
     }
-    
+
     return runtimeScene.getTimer(timerName).getTime()/1000 >= timeInSeconds;
 }
 
-gdjs.runtimeSceneTools.timerPaused = function(runtimeScene, timerName) {
+gdjs.evtTools.runtimeScene.timerPaused = function(runtimeScene, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) return false;
-    
+
     return runtimeScene.getTimer(timerName).isPaused();
 }
 
-gdjs.runtimeSceneTools.resetTimer = function(runtimeScene, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) ) 
+gdjs.evtTools.runtimeScene.resetTimer = function(runtimeScene, timerName) {
+    if ( !runtimeScene.hasTimer(timerName) )
         runtimeScene.addTimer(timerName);
     else
         runtimeScene.getTimer(timerName).reset();
 }
 
-gdjs.runtimeSceneTools.pauseTimer = function(runtimeScene, timerName) {
+gdjs.evtTools.runtimeScene.pauseTimer = function(runtimeScene, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) runtimeScene.addTimer(timerName);
-    
+
     runtimeScene.getTimer(timerName).setPaused(true);
 }
 
-gdjs.runtimeSceneTools.unpauseTimer = function(runtimeScene, timerName) {
+gdjs.evtTools.runtimeScene.unpauseTimer = function(runtimeScene, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) runtimeScene.addTimer(timerName);
-    
+
     return runtimeScene.getTimer(timerName).setPaused(false);
 }
 
-gdjs.runtimeSceneTools.removeTimer = function(runtimeScene, timerName) {
+gdjs.evtTools.runtimeScene.removeTimer = function(runtimeScene, timerName) {
     if ( runtimeScene.hasTimer(timerName) ) runtimeScene.removeTimer(timerName);
 }
 
-gdjs.runtimeSceneTools.getTimerElapsedTimeInSeconds = function(runtimeScene, timerName) {
+gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSeconds = function(runtimeScene, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) return 0;
-    
+
     return runtimeScene.getTimer(timerName).getTime()/1000;
 }
 
-gdjs.runtimeSceneTools.getTimeFromStartInSeconds = function(runtimeScene) {
+gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds = function(runtimeScene) {
     return runtimeScene.getTimeFromStart()/1000;
 }
 
-gdjs.runtimeSceneTools.getTime = function(what) {
+gdjs.evtTools.runtimeScene.getTime = function(what) {
     var now = new Date();
-    
+
     if ( what === "hour" )
         return now.getHours();
     else if ( what === "min" )
@@ -106,15 +109,15 @@ gdjs.runtimeSceneTools.getTime = function(what) {
         var oneDay = 1000 * 60 * 60 * 24;
         return Math.floor(diff / oneDay);
     }
-        
+
     return 0;
 }
 
-gdjs.runtimeSceneTools.changeScene = function(currentScene, newSceneName) {
+gdjs.evtTools.runtimeScene.changeScene = function(currentScene, newSceneName) {
     if ( currentScene.getGame().getSceneXml(newSceneName) != undefined )
         currentScene.requestSceneChange(newSceneName);
 }
 
-gdjs.runtimeSceneTools.stopGame = function(currentScene) {
+gdjs.evtTools.runtimeScene.stopGame = function(currentScene) {
     currentScene.requestGameStop();
 }

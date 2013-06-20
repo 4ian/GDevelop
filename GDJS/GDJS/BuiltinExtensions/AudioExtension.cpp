@@ -21,32 +21,32 @@ AudioExtension::AudioExtension()
     CloneExtension("Game Develop C++ platform", "BuiltinAudio");
 
     GetAllActions()["PlaySound"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.playSound");
+        .SetFunctionName("gdjs.evtTools.sound.playSound");
     GetAllActions()["PlaySoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.playSoundOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.playSoundOnChannel");
     GetAllActions()["PlayMusic"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.playMusic");
+        .SetFunctionName("gdjs.evtTools.sound.playMusic");
     GetAllActions()["PlayMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.playMusicOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.playMusicOnChannel");
     GetAllActions()["StopSoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.stopSoundOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.stopSoundOnChannel");
     GetAllActions()["PauseSoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.pauseSoundOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.pauseSoundOnChannel");
     GetAllActions()["RePlaySoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.continueSoundOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.continueSoundOnChannel");
     GetAllActions()["StopMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.stopMusicOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.stopMusicOnChannel");
     GetAllActions()["PauseMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.pauseMusicOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.pauseMusicOnChannel");
     GetAllActions()["RePlayMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.continueMusicOnChannel");
+        .SetFunctionName("gdjs.evtTools.sound.continueMusicOnChannel");
 
     GetAllActions()["ModGlobalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.setGlobalVolume").SetAssociatedGetter("gdjs.soundTools.getGlobalVolume");
+        .SetFunctionName("gdjs.evtTools.sound.setGlobalVolume").SetAssociatedGetter("gdjs.evtTools.sound.getGlobalVolume");
     GetAllConditions()["GlobalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.getGlobalVolume");
+        .SetFunctionName("gdjs.evtTools.sound.getGlobalVolume");
     GetAllExpressions()["GlobalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.soundTools.getGlobalVolume");
+        .SetFunctionName("gdjs.evtTools.sound.getGlobalVolume");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
     /*

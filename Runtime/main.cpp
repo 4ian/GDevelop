@@ -70,7 +70,6 @@ int main( int argc, char *p_argv[] )
 
     //Load extensions
     gd::ExtensionsLoader::LoadAllExtensions(".", CppPlatform::Get());
-    std::cout << "a";
     //Load resource file
     gd::RessourcesLoader * resLoader = gd::RessourcesLoader::GetInstance();
     if ( !resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
@@ -78,14 +77,11 @@ int main( int argc, char *p_argv[] )
     {
         return AbortWithMessage("Unable to load resources. Aborting.");
     }
-    std::cout << "b";
 
     gd::Project game;
-    std::cout << "c";
 
     //Load game data
     {
-    std::cout << "d";
         cout << "Getting src file size..." << endl;
         int fsize = resLoader->GetBinaryFileSize( "src" );
 
@@ -118,12 +114,10 @@ int main( int argc, char *p_argv[] )
         game.LoadFromXml(hdl.FirstChildElement().Element());
 	}
 
-    std::cout << "e";
     if ( game.GetLayoutCount() == 0 )
     {
         return AbortWithMessage("No scene to be loaded. Aborting.");
     }
-    std::cout << "f";
 
     //Loading the code
     std::string codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;

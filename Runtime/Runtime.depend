@@ -1,1 +1,21 @@
 # depslib dependency file v1.0
+1367872215 source:d:\florian\programmation\gamedevelop2\runtime\compilationchecker.cpp
+	"CompilationChecker.h"
+	"GDCore/Tools/Version.h"
+	"GDCore/Tools/VersionWrapper.h"
+	"GDL/CommonTools.h"
+	<iostream>
+
+1324508352 d:\florian\programmation\gamedevelop2\runtime\compilationchecker.h
+
+1370023065 d:\florian\programmation\gamedevelop2\core\gdcore\tools\version.h
+
+1370023065 d:\florian\programmation\gamedevelop2\core\gdcore\tools\versionwrapper.h
+	<string>
+
+1357829332 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+	<string>
+	<sstream>
+	<vector>
+	<cmath>
+

@@ -25,8 +25,6 @@
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -36,70 +34,6 @@
 					<Add option="-lsfml-network-d" />
 					<Add option="-lsfml-window-d" />
 					<Add option="-lsfml-system-d" />
-					<Add option="-lLLVMJIT" />
-					<Add option="-lLLVMInterpreter" />
-					<Add option="-lLLVMX86CodeGen" />
-					<Add option="-lLLVMAsmParser" />
-					<Add option="-lLLVMBitReader" />
-					<Add option="-lLLVMBitWriter" />
-					<Add option="-lLLVMipo" />
-					<Add option="-lLLVMExecutionEngine" />
-					<Add option="-lLLVMAsmPrinter" />
-					<Add option="-lLLVMSelectionDAG" />
-					<Add option="-lLLVMX86AsmPrinter" />
-					<Add option="-lLLVMX86Info" />
-					<Add option="-lLLVMMCParser" />
-					<Add option="-lLLVMCodeGen" />
-					<Add option="-lLLVMX86Utils" />
-					<Add option="-lLLVMScalarOpts" />
-					<Add option="-lLLVMInstCombine" />
-					<Add option="-lLLVMTransformUtils" />
-					<Add option="-lLLVMipa" />
-					<Add option="-lLLVMAnalysis" />
-					<Add option="-lLLVMTarget" />
-					<Add option="-lLLVMCore" />
-					<Add option="-lLLVMMC" />
-					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
-					<Add option="-lLLVMInstrumentation" />
-					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
-					<Add option="-lLLVMBlackfinCodeGen" />
-					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
-					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
-					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
-					<Add option="-lLLVMX86AsmParser" />
-					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
-					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
-					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
-					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="mingw32" />
 					<Add library="opengl32" />
 					<Add library="Imm32" />
@@ -134,8 +68,6 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -179,8 +111,6 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />

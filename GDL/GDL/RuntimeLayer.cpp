@@ -38,7 +38,7 @@ RuntimeCamera::RuntimeCamera(gd::Camera & camera, const sf::View & defaultView) 
 
     if ( !camera.UseDefaultSize() ) {
         width = camera.GetWidth();
-        width = camera.GetHeight();
+        height = camera.GetHeight();
         sfmlView.setSize(sf::Vector2f(width, height));
     }
 }

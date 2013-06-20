@@ -119,6 +119,7 @@ void CppLayoutPreviewer::StopPreview()
     previewScene.running = false;
     if ( debugger ) previewScene.debugger = debugger.get();
     if ( debugger ) debugger->Pause();
+    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
 }
 
 void CppLayoutPreviewer::OnUpdate()

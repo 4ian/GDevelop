@@ -275,6 +275,10 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
         scene.game->SetMainWindowDefaultHeight( windowHeight );
     }
 
+    //Avoid recreating every tick a new window if the size has not changed!
+    if ( windowWidth == scene.renderWindow->getSize().x && windowHeight == scene.renderWindow->getSize().y )
+        return;
+
     if ( scene.RenderWindowIsFullScreen() )
     {
         scene.renderWindow->create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );

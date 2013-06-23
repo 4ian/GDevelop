@@ -173,6 +173,7 @@
                             <Parametre value="NouvelObjet1" />
                             <Parametre value="NouvelObjet" />
                             <Parametre value="" />
+                            <Parametre value="" />
                         </Condition>
                     </Conditions>
                     <Actions>

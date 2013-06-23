@@ -6,6 +6,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
+#include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/CommonTools.h"
 #include "GDJS/JsPlatform.h"
 #include "GDJS/Exporter.h"
@@ -118,6 +119,9 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new StringInstructionsExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AdvancedExtension));
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new ExternalLayoutsExtension));
+
+    //Add extensions adapted from GD C++ Platform:
+    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/TextObject.xgdwe", *this);
 };
 
 JsPlatform & JsPlatform::Get()

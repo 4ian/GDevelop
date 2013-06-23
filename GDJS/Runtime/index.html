@@ -126,10 +126,16 @@
             }
             console.log($(this).attr("file"));
         });
-        var assetLoader = new PIXI.AssetLoader(assets);
-        assetLoader.load();
-        assetLoader.onComplete = onAssetsLoaded;
-        assetLoader.onProgress = onAssetsLoadingProgress;
+        
+        if ( assets.length !== 0 ) {
+            var assetLoader = new PIXI.AssetLoader(assets);
+            assetLoader.load();
+            assetLoader.onComplete = onAssetsLoaded;
+            assetLoader.onProgress = onAssetsLoadingProgress;
+        }
+        else {
+            onAssetsLoaded();
+        }
         
         function onAssetsLoaded() {
             //Create the scene to be played

@@ -117,26 +117,18 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
-     * Update the list of the potentially colliding objects.
-     * @method updatePotentialCollidingObjects
-     */
-    that.updatePotentialCollidingObjects = function () {
-        my.collisionGrid.update();
-    }
-    
-    /**
-     * Get an array of potentially colliding objects having the specified name identifiers.<br>
-     * You need to call updatePotentialCollidingObjects method before calling this.
+     * Set the property "pick" of colliding objects having the specified name identifiers to true.<br>
      *
-     * @method getPotentialCollidingObjects
+     * @method setCollidingObjectsAsPicked
      * @param obj1NameId {Number} The number representing the first objects.
      * @param obj2NameId {Number} The number representing the second objects.
      */
-    that.getPotentialCollidingObjects = function(obj1NameId, obj2NameId) {
+    that.setCollidingObjectsAsPicked = function(obj1NameId, obj2NameId) {
         
-        var pairs = my.collisionGrid.queryForCollisionPairs(obj1NameId, obj2NameId,
-                                                            gdjs.runtimeObject.collisionTest);
-        return pairs;
+        my.collisionGrid.update();
+        my.collisionGrid.queryForCollisionPairs(obj1NameId, obj2NameId,
+                                                gdjs.runtimeObject.collisionTest);
+        
     }
     
     /**
@@ -288,10 +280,10 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         if ( my.instances.containsKey(obj.getName()) ) {
             
             my.collisionGrid.removeObject(obj);
-            var objId = obj.getUniqueId();
+            var objId = obj.id;
             var allInstances = my.instances.get(obj.getName());
             for(var i = 0, len = allInstances.length;i<len;++i) {
-                if (allInstances[i].getUniqueId() == objId) {
+                if (allInstances[i].id == objId) {
                     allInstances.remove(i);
                     return;
                 }

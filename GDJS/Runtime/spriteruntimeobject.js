@@ -165,6 +165,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         my.sprite.alpha = my.sprite.visible ? that.opacity/255 : 0; //TODO: Workaround not working property in PIXI.js
         my.sprite.scale.x = my.scaleX;
         my.sprite.scale.y = my.scaleY;
+        my.cachedWidth = my.sprite.width;
+        my.cachedHeight = my.sprite.height;
 
         my.spriteDirty = false;
     }
@@ -225,11 +227,13 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     //Animations :
 
     that.setAnimation = function(newAnimation) {
-        if ( newAnimation < my.animations.length ) {
+        if ( newAnimation < my.animations.length 
+             && my.currentAnimation !== newAnimation) {
             my.currentAnimation = newAnimation;
             my.currentFrame = 0;
             my.frameElapsedTime = 0;
             my.spriteDirty = true;
+            that.hitBoxesDirty = true;
         }
     }
 
@@ -245,19 +249,23 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         var anim = my.animations[my.currentAnimation];
         if ( !anim.hasMultipleDirections ) {
             that.angle = newValue;
-            my.spriteDirty = true;
+            my.sprite.rotation = gdjs.toRad(that.angle);
+            that.hitBoxesDirty = true;
         }
         else {
-            if (newValue === my.currentDirection ||
-                newValue >= anim.directions.length ||
-                anim.directions[newValue].frames.length === 0)
+            if (newValue === my.currentDirection
+                || newValue >= anim.directions.length
+                || anim.directions[newValue].frames.length === 0
+                || my.currentDirection === newValue )
                 return;
 
             my.currentDirection = newValue;
             my.currentFrame = 0;
             my.frameElapsedTime = 0;
+            that.angle = 0;
 
             my.spriteDirty = true;
+            that.hitBoxesDirty = true;
         }
     }
 
@@ -380,6 +388,16 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     that.getDrawableY = function() {
         return that.y - my.animationFrame.origin.y*Math.abs(my.scaleY);
     }
+    
+    that.getCenterX = function() {
+        //Just need to multiply by the scale as it is the center
+        return my.animationFrame.center.x*Math.abs(my.scaleX);
+    }
+    
+    that.getCenterY = function() {
+        //Just need to multiply by the scale as it is the center
+        return my.animationFrame.center.y*Math.abs(my.scaleY);
+    }
 
     that.setX = function(x) {
         that.x = x;
@@ -400,14 +418,14 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
 
         if ( !my.animations[my.currentAnimation].hasMultipleDirections ) {
             that.angle = angle;
+            my.sprite.rotation = gdjs.toRad(that.angle);
+            that.hitBoxesDirty = true;
         }
         else {
             angle = angle % 360;
             if ( angle < 0 ) angle += 360;
             that.setDirectionOrAngle(Math.round(angle/45) % 8);
         }
-
-        my.spriteDirty = true;
     }
 
     that.getAngle = function(angle) {
@@ -437,7 +455,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         if ( opacity > 255 ) opacity = 255;
 
         that.opacity = opacity;
-        my.spriteDirty = true;
+        //TODO: Workaround a not working property in PIXI.js:
+        my.sprite.alpha = my.sprite.visible ? that.opacity/255 : 0; 
     }
 
     that.getOpacity = function() {
@@ -447,6 +466,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     that.hide = function(enable) {
         my.hidden = enable;
         my.sprite.visible = !enable;
+        //TODO: Workaround a not working property in PIXI.js:
+        my.sprite.alpha = my.sprite.visible ? that.opacity/255 : 0; 
     }
 
     that.setLayer = function(name) {
@@ -476,12 +497,12 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
 
     that.getWidth = function() {
         if ( my.spriteDirty ) my.updatePIXISprite();
-        return my.sprite.width;
+        return my.cachedWidth;
     }
 
     that.getHeight = function() {
         if ( my.spriteDirty ) my.updatePIXISprite();
-        return my.sprite.height;
+        return my.cachedHeight;
     }
 
     that.setWidth = function(newWidth) {

@@ -48,17 +48,24 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     std::string globalObjectListsReset;
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
     {
+        std::string type = gd::GetTypeOfObject(project, scene, project.GetObject(i).GetName());
+        const gd::ObjectMetadata & metadata = gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
+        if ( !metadata.optionalIncludeFile.empty() ) includeFiles.insert(metadata.optionalIncludeFile);
+
         for (unsigned int j = 1;j<=maxDepthLevelReached;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
                                  +ManObjListName(project.GetObject(i).GetName())+gd::ToString(j) + "= [];\n";
             globalObjectListsReset += codeGenerator.GetCodeNamespace()
                                       +ManObjListName(project.GetObject(i).GetName())+gd::ToString(j) + ".length = 0;\n";
-
         }
     }
     for (unsigned int i = 0;i<scene.GetObjectsCount();++i)
     {
+        std::string type = gd::GetTypeOfObject(project, scene, scene.GetObject(i).GetName());
+        const gd::ObjectMetadata & metadata = gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
+        if ( !metadata.optionalIncludeFile.empty() ) includeFiles.insert(metadata.optionalIncludeFile);
+
         for (unsigned int j = 1;j<=maxDepthLevelReached;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
@@ -94,7 +101,7 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     output += "gdjs['"+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code']"
         +"= gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code;\n";
 
-    includeFiles = codeGenerator.GetIncludeFiles();
+    includeFiles.insert(codeGenerator.GetIncludeFiles().begin(), codeGenerator.GetIncludeFiles().end());
     return output;
 }
 

@@ -39,6 +39,7 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
 
     gd::RecursiveMkDir::MkDir(exportDir);
     gd::RecursiveMkDir::MkDir(exportDir+"/libs");
+    gd::RecursiveMkDir::MkDir(exportDir+"/Extensions");
     std::vector<std::string> includesFiles;
 
     //Generate events code
@@ -81,11 +82,15 @@ bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir, con
         std::string codeFilesIncludes;
         for (std::vector<std::string>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
         {
-            if ( !wxFileExists(exportDir+"/"+*it) ) continue;
+            if ( !wxFileExists(exportDir+"/"+*it) )
+            {
+                std::cout << "Warning: Unable to found " << exportDir+"/"+*it << "." << std::endl;
+                continue;
+            }
 
             wxFileName relativeFile = wxFileName::FileName(exportDir+"/"+*it);
             relativeFile.MakeRelativeTo(exportDir);
-            codeFilesIncludes += "<script src=\""+gd::ToString(relativeFile.GetFullPath(wxPATH_UNIX))+"\"></script>\n";
+            codeFilesIncludes += "\t<script src=\""+gd::ToString(relativeFile.GetFullPath(wxPATH_UNIX))+"\"></script>\n";
         }
 
         str = str.replace(pos, 24, codeFilesIncludes);
@@ -195,6 +200,8 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             {
                 if ( wxFileExists(jsPlatformDir+"Runtime/"+*include) )
                     allJsFiles += "\""+jsPlatformDir+"Runtime/"+*include+"\" ";
+                else if ( wxFileExists(jsPlatformDir+"Runtime/Extensions/"+*include) )
+                    allJsFiles += "\""+jsPlatformDir+"Runtime/Extensions/"+*include+"\" ";
                 else if ( wxFileExists(*include) )
                     allJsFiles += "\""+*include+"\" ";
             }
@@ -230,11 +237,17 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
     {
         for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
         {
+            std::cout << *include << std::endl;
             wxLogNull noLogPlease;
             if ( wxFileExists("./JsPlatform/Runtime/"+*include) )
             {
                 wxCopyFile("./JsPlatform/Runtime/"+*include, exportDir+"/"+*include);
                 //Ok, the filename is relative to the export dir.
+            }
+            else if ( wxFileExists("./JsPlatform/Runtime/Extensions/"+*include) )
+            {
+                wxCopyFile("./JsPlatform/Runtime/Extensions/"+*include, exportDir+"/Extensions/"+*include);
+                *include = "Extensions/"+*include; //Ensure filename is relative to the export dir.
             }
             else if ( wxFileExists(*include) )
             {
@@ -285,6 +298,7 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
     std::string exportDir = dialog.GetExportDir();
     gd::RecursiveMkDir::MkDir(exportDir);
     gd::RecursiveMkDir::MkDir(exportDir+"/libs");
+    gd::RecursiveMkDir::MkDir(exportDir+"/Extensions");
     std::vector<std::string> includesFiles;
 
     //TODO: Handle errors

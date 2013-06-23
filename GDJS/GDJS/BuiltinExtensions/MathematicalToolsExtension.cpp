@@ -22,6 +22,16 @@ MathematicalToolsExtension::MathematicalToolsExtension()
 
     GetAllExpressions()["cos"]
         .codeExtraInformation.SetFunctionName("Math.cos");
+    GetAllExpressions()["sin"]
+        .codeExtraInformation.SetFunctionName("Math.sin");
+    GetAllExpressions()["abs"]
+        .codeExtraInformation.SetFunctionName("Math.abs");
+    GetAllExpressions()["min"]
+        .codeExtraInformation.SetFunctionName("Math.min");
+    GetAllExpressions()["max"]
+        .codeExtraInformation.SetFunctionName("Math.max");
+    GetAllExpressions()["sqrt"]
+        .codeExtraInformation.SetFunctionName("Math.sqrt");
 
     StripUnimplementedInstructionsAndExpressions();
 /*
@@ -36,24 +46,6 @@ MathematicalToolsExtension::MathematicalToolsExtension()
         .AddParameter("expression", _("x ( as in x mod y )"))
         .AddParameter("expression", _("y ( as in x mod y )"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::mod").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
-
-
-    AddExpression("min", _("Minimum of two numbers"), _("Minimum of two numbers"), _("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", _("First expression"))
-        .AddParameter("expression", _("Second expression"))
-        .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::Minimal").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
-
-
-    AddExpression("max", _("Maximum of two numbers"), _("Maximum of two numbers"), _("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", _("First expression"))
-        .AddParameter("expression", _("Second expression"))
-        .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::Maximal").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
-
-
-    AddExpression("abs", _("Absolute value"), _("Absolute value"), _("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", _("Expression"))
-        .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::abs").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
-
 
     AddExpression("acos", _("Arccosine"), _("Arccosine"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"))
@@ -197,11 +189,6 @@ MathematicalToolsExtension::MathematicalToolsExtension()
     AddExpression("sinh", _("Hyperbolic sine"), _("Hyperbolic sine"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::sinh").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
-
-
-    AddExpression("sqrt", _("Square root of a number"), _("Square root of a number"), _("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", _("Expression"))
-        .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::sqrt").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
 
 
     AddExpression("tan", _("Tangent"), _("Tangent of a number"), _("Mathematical tools"), "res/mathfunction.png")

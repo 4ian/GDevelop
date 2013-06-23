@@ -16,7 +16,6 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     var that = {};
     var my = {};
     
-    that = {};
     that.name = $(objectXml).attr("nom") || "";
     my.nameId = gdjs.runtimeObject.getNameIdentifier(that.name);
     that.type = $(objectXml).attr("type") || "";
@@ -29,7 +28,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.hitBoxes = [];
     that.hitBoxes.push(gdjs.polygon.createRectangle(0,0));
     that.hitBoxesDirty = true;
-    my.id = runtimeScene.createNewUniqueId();
+    that.id = runtimeScene.createNewUniqueId();
     my.variables = gdjs.variablesContainer(objectXml ? $(objectXml).find("Variables") : undefined);
     my.forces = [];
     my.averageForce = gdjs.force(0,0,false); //A force returned by getAverageForce method.
@@ -80,13 +79,15 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     
     /**
      * Get the unique identifier of the object.<br>
-     * The identifier is set by the runtimeScene owning the object. 
+     * The identifier is set by the runtimeScene owning the object.<br>
+     * You can also use the id property ( myObject.id ) for increased efficiency instead of
+     * calling this method.
      *
      * @method getUniqueId
      * @return {Number} The object identifier
      */
     that.getUniqueId = function() {
-        return my.id;
+        return that.id;
     }
     
     /**
@@ -588,7 +589,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         
         //Check if their is a collision with each object
         for(var i = 0, len = objects.length;i<len;++i) {
-            if ( objects[i].getUniqueId() != that.getUniqueId() ) {
+            if ( objects[i].id != that.id ) {
                 var otherHitBoxes = objects[i].getHitBoxes();
                 
                 for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
@@ -660,14 +661,28 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
  */
 gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
 
-    
-    if ( obj1.getX() + obj1.getWidth() < obj2.getX()
-         || obj1.getX() > obj2.getX() + obj2.getWidth()
-         || obj1.getY() + obj1.getHeight() < obj2.getY()
-         || obj1.getY() > obj2.getY() + obj2.getHeight() )
-         return false;
-         
+    //First check if bounding circle are too far.
+    var o1w = obj1.getWidth();
+    var o1h = obj1.getHeight();
+    var o2w = obj2.getWidth();
+    var o2h = obj2.getHeight();
 
+    var x = obj1.getDrawableX()+obj1.getCenterX()-(obj2.getDrawableX()+obj2.getCenterX());
+    var y = obj1.getDrawableY()+obj1.getCenterY()-(obj2.getDrawableY()+obj2.getCenterY());
+    var obj1BoundingRadius = Math.sqrt(o1w*o1w+o1h*o1h)/2.0;
+    var obj2BoundingRadius = Math.sqrt(o2w*o2w+o2h*o2h)/2.0;
+    
+    if ( Math.sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
+        return false;
+        
+    //Or if in circle are colliding
+    var obj1MinEdge = Math.min(o1w, o1h)/2.0;
+    var obj2MinEdge = Math.min(o2w, o2h)/2.0;
+        
+    if ( x*x+y*y < obj1MinEdge*obj1MinEdge+2*obj1MinEdge*obj2MinEdge+obj2MinEdge*obj2MinEdge )
+        return true;
+
+    //Do a real check if necessary.
     var hitBoxes1 = obj1.getHitBoxes();
     var hitBoxes2 = obj2.getHitBoxes();
     for(var k = 0, lenBoxes1 = hitBoxes1.length;k<lenBoxes1;++k) {
@@ -687,8 +702,8 @@ gdjs.runtimeObject.collisionTest = function(obj1, obj2) {
  * @static 
  */
 gdjs.runtimeObject.distanceTest = function(obj1, obj2, distance) {
-    var x = obj1.getX()+obj1.getCenterX()-(obj2.getX()+obj2.getCenterX());
-    var y = obj1.getY()+obj1.getCenterY()-(obj2.getY()+obj2.getCenterY());
+    var x = obj1.getDrawableX()+obj1.getCenterX()-(obj2.getDrawableX()+obj2.getCenterX());
+    var y = obj1.getDrawableY()+obj1.getCenterY()-(obj2.getDrawableY()+obj2.getCenterY());
     
     return x*x+y*y <= distance;
 }

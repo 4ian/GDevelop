@@ -201,8 +201,7 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
 		,adjacentCell
 		,biggerGrid
 		,objAAABB
-		,objAHashInBiggerGrid
-		,possibleCollisions = []
+		,objAHashInBiggerGrid;
 	
 	// default broad test to internal aabb overlap test
 	broadOverlapTest = broadOverlapTestCallback || testAABBOverlap;
@@ -222,7 +221,8 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
                     for(l = k+1; l < cell.objectContainer.length; l++){
                         objB = cell.objectContainer[l];
                         if(obj2NameId.indexOf(objB.getNameId()) !== -1 &&broadOverlapTest(objA, objB) === true){
-                            possibleCollisions.push( [ objA, objB ] );
+                            objA.pick = true;
+                            objB.pick = true;
                         }
                     }
                 }
@@ -231,7 +231,8 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
                     for(l = k+1; l < cell.objectContainer.length; l++){
                         objB = cell.objectContainer[l];
                         if(obj1NameId.indexOf(objB.getNameId()) !== -1 &&broadOverlapTest(objA, objB) === true){
-                            possibleCollisions.push( [ objA, objB ] );
+                            objA.pick = true;
+                            objB.pick = true;
                         }
                     }
                 }
@@ -252,7 +253,8 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
                         for(l = 0; l < adjacentCell.objectContainer.length; l++){
                             objB = adjacentCell.objectContainer[l];
                             if(obj2NameId.indexOf(objB.getNameId()) !== -1 && broadOverlapTest(objA, objB) === true ){
-                                possibleCollisions.push( [ objA, objB ] );
+                                objA.pick = true;
+                                objB.pick = true;
                             }
                         }
                     }
@@ -261,7 +263,8 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
                         for(l = 0; l < adjacentCell.objectContainer.length; l++){
                             objB = adjacentCell.objectContainer[l];
                             if(obj1NameId.indexOf(objB.getNameId()) !== -1 && broadOverlapTest(objA, objB) === true ){
-                                possibleCollisions.push( [ objA, objB ] );
+                                objA.pick = true;
+                                objB.pick = true;
                             }
                         }
                     }
@@ -302,7 +305,8 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
                             objB = adjacentCell.objectContainer[l];
                             // test against object A
                             if(objBRequestId.indexOf(objB.getNameId()) !== -1 && broadOverlapTest(objA, objB) === true ){
-                                possibleCollisions.push( [ objA, objB ] );
+                                objA.pick = true;
+                                objB.pick = true;
                             }
                         }
                     }
@@ -311,9 +315,6 @@ HSHG.prototype.queryForCollisionPairs = function(obj1NameId, obj2NameId, broadOv
             }
 		}
 	}
-	
-	// return list of object pairs
-	return possibleCollisions;
 }
 
 HSHG.update_RECOMPUTE = update_RECOMPUTE;

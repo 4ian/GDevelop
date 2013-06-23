@@ -29,6 +29,14 @@ public:
     virtual std::string GetDescription() const { return gd::ToString(_("Allows to create 2D games which can be played in a web browser.")); }
     virtual std::string GetIcon() const { return "JsPlatform/icon32.png"; }
 
+    /** \brief The name of the function searched in an extension file to create the extension
+     */
+    virtual std::string GetExtensionCreateFunctionName() { return "CreateGDJSExtension"; }
+
+    /** \brief The name of the function searched in an extension file to destroy the extension
+     */
+    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDJSExtension"; }
+
     /**
      * \brief Expose the previewer to the IDE
      *

@@ -11,12 +11,97 @@
  */
 gdjs.evtTools.object = gdjs.evtTools.object || {};
 
+gdjs.pick = function() {
+}
+
 /**
  * Do a test on two tables of objects so as to remove the objects for which the test is false.
  * If inverted == true, only the objects of the first table are filtered.
  * @method TwoListsTest
  */
 gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2, inverted, extraParam) {
+    
+    var isTrue = false;
+    var objects1Values = objectsLists1.values();
+    var objects2Values = objectsLists2.values();
+    
+    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
+        var arr = objects1Values[i];
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            arr[k].pick = false;
+        }
+    }
+    for(var i = 0, leni = objects2Values.length;i<leni;++i) {
+        var arr = objects2Values[i];
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            arr[k].pick = false;
+        }
+    }
+    
+    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
+        var arr1 = objects1Values[i];
+        
+        for(var k = 0, lenk = arr1.length;k<lenk;++k) {
+            var atLeastOneObject = false;
+        
+            for(var j = 0, lenj = objects2Values.length;j<lenj;++j) {
+                var arr2 = objects2Values[j];
+                
+                for(var l = 0, lenl = arr2.length;l<lenl;++l) {
+                    
+                    if ( func(arr1[k], arr2[l], extraParam) ) {
+                        if ( !inverted ) {
+                            isTrue = true;
+
+                            //Pick the objects
+                            arr1[k].pick = true;
+                            arr2[l].pick = true;
+                        }
+
+                        atLeastOneObject = true;
+                    }
+                }
+            }
+            
+            if ( !atLeastOneObject && inverted ) { //The object is not overlapping any other object.
+                isTrue = true;
+                arr1[k].pick = true;
+            }
+        }
+    }
+    
+    //Trim not picked objects from arrays.
+    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
+        var arr = objects1Values[i];
+        var finalSize = 0;
+        
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            var obj = arr[k];
+            if ( arr[k].pick ) {
+                arr[finalSize] = obj;
+                finalSize++;
+            }
+        }
+        arr.length = finalSize;
+    }
+    
+    for(var i = 0, leni = objects2Values.length;i<leni;++i) {
+        var arr = objects2Values[i];
+        var finalSize = 0;
+        
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            var obj = arr[k];
+            if ( arr[k].pick ) {
+                arr[finalSize] = obj;
+                finalSize++;
+            }
+        }
+        arr.length = finalSize;
+    }
+    
+    return isTrue;
+    
+    /*
     var objects1 = [];
     var objects2 = [];
     var objects1Values = objectsLists1.values();
@@ -59,7 +144,7 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
         var atLeastOneObject = false;
         for(var j = (!sameObjectLists ? 0 : i+1), len2 = objects2.length;j<len2;++j) {
 
-            if ( sameObjectLists || (objects1[i].getUniqueId() != objects2[j].getUniqueId()) ) {
+            if ( sameObjectLists || (objects1[i].id != objects2[j].id) ) {
 
                 if ( func(objects1[i], objects2[j], extraParam) ) {
                     if ( !inverted ) {
@@ -89,7 +174,7 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
 
     }
 
-    return isTrue;
+    return isTrue;*/
 }
 
 gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
@@ -98,81 +183,71 @@ gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLis
         return gdjs.evtTools.object.TwoListsTest(gdjs.runtimeObject.collisionTest,
                                                      objectsLists1, objectsLists2, inverted);
 
-    var objects1 = [];
-    var objects2 = [];
     var objects1NameId = [];
     var objects2NameId = [];
     var objects1Values = objectsLists1.values();
     var objects2Values = objectsLists2.values();
-
-
-    //Check if we're dealing with the same lists of objects
-    var objects1Keys = objectsLists1.keys();
-    var objects2Keys = objectsLists2.keys();
-    var sameObjectLists = objects1Keys.length === objects2Keys.length;
-    if ( sameObjectLists ) {
-        for( var i = 0, len = objects1Keys.length;i<len;++i) {
-            if ( objects1Keys[i] !== objects2Keys[i] ) {
-                sameObjectLists = false;
-                break;
-            }
+    
+    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
+        var arr = objects1Values[i];
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            arr[k].pick = false;
         }
-    }
-
-    //Prepare list of objects to iterate over.
-    //And remove these objects from the original tables.
-    for(var i = 0, len = objects1Values.length;i<len;++i) {
+        
         if ( objects1Values[i].length !== 0 ) {
-            objects1.push.apply(objects1, objects1Values[i]);
             objects1NameId.push(objects1Values[i][0].getNameId());
-            objects1Values[i].length = 0; //Be sure not to lose the reference to the original array
         }
     }
-
-    if (sameObjectLists) {
-        objects2 = objects1.slice(0);
-        objects2NameId = objects1NameId;
-    }
-    else
-    {
-        for(var i = 0, len = objects2Values.length;i<len;++i) {
-            if ( objects2Values[i].length !== 0 ) {
-                objects2.push.apply(objects2, objects2Values[i]);
-                objects2NameId.push(objects2Values[i][0].getNameId());
-                objects2Values[i].length = 0; //Be sure not to lose the reference to the original array
-            }
+    
+    for(var i = 0, leni = objects2Values.length;i<leni;++i) {
+        var arr = objects2Values[i];
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            arr[k].pick = false;
+        }
+        
+        if ( objects2Values[i].length !== 0 ) {
+            objects2NameId.push(objects2Values[i][0].getNameId());
         }
     }
 
     var isTrue = false;
 
     //Search all the pairs colliding.
-    runtimeScene.updatePotentialCollidingObjects();
-    var pairs = runtimeScene.getPotentialCollidingObjects(objects1NameId, objects2NameId);
+    runtimeScene.setCollidingObjectsAsPicked(objects1NameId, objects2NameId);
 
-    for(var i = 0, len = pairs.length;i<len;++i) {
-        if ( objects1.indexOf(pairs[i][0]) !== -1 && objects2.indexOf(pairs[i][1]) !== -1 ) {
-
-            var objList = objectsLists1.get(pairs[i][0].getName());
-            if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
-
-            objList = objectsLists2.get(pairs[i][1].getName());
-            if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
-
-            isTrue = true;
+    //Trim not picked objects from arrays.
+    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
+        var arr = objects1Values[i];
+        var finalSize = 0;
+        
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            var obj = arr[k];
+            if ( arr[k].pick ) {
+                arr[finalSize] = obj;
+                finalSize++;
+            }
         }
-        else if ( objects1.indexOf(pairs[i][1]) !== -1 && objects2.indexOf(pairs[i][0]) !== -1 ) {
-
-            var objList = objectsLists1.get(pairs[i][1].getName());
-            if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
-
-            objList = objectsLists2.get(pairs[i][0].getName());
-            if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
-
-            isTrue = true;
-        }
+        arr.length = finalSize;
+        
+        if ( finalSize !== 0 ) isTrue = true;
     }
-
+    
+    for(var i = 0, leni = objects2Values.length;i<leni;++i) {
+        var arr = objects2Values[i];
+        var finalSize = 0;
+        
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            var obj = arr[k];
+            if ( arr[k].pick ) {
+                arr[finalSize] = obj;
+                finalSize++;
+            }
+        }
+        arr.length = finalSize;
+        
+        if ( finalSize !== 0 ) isTrue = true;
+    }
+    
     return isTrue;
 
 }

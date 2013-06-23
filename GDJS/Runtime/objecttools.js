@@ -11,9 +11,6 @@
  */
 gdjs.evtTools.object = gdjs.evtTools.object || {};
 
-gdjs.pick = function() {
-}
-
 /**
  * Do a test on two tables of objects so as to remove the objects for which the test is false.
  * If inverted == true, only the objects of the first table are filtered.

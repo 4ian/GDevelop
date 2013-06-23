@@ -117,19 +117,28 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
-     * Set the property "pick" of colliding objects having the specified name identifiers to true.<br>
+     * Update the list of the potentially colliding objects.
+     * @method updatePotentialCollidingObjects
+     */
+    that.updatePotentialCollidingObjects = function () {
+        my.collisionGrid.update();
+    }
+    
+    /**
+     * Get an array of potentially colliding objects having the specified name identifiers.<br>
+     * You need to call updatePotentialCollidingObjects method before calling this.
      *
-     * @method setCollidingObjectsAsPicked
+     * @method getPotentialCollidingObjects
      * @param obj1NameId {Number} The number representing the first objects.
      * @param obj2NameId {Number} The number representing the second objects.
      */
-    that.setCollidingObjectsAsPicked = function(obj1NameId, obj2NameId) {
+    that.getPotentialCollidingObjects = function(obj1NameId, obj2NameId) {
         
-        my.collisionGrid.update();
-        my.collisionGrid.queryForCollisionPairs(obj1NameId, obj2NameId,
-                                                gdjs.runtimeObject.collisionTest);
-        
+        var pairs = my.collisionGrid.queryForCollisionPairs(obj1NameId, obj2NameId,
+                                                            gdjs.runtimeObject.collisionTest);
+        return pairs;
     }
+    
     
     /**
      * Set the function called each time the runtimeScene is stepped.<br>

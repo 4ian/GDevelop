@@ -133,6 +133,13 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 
 void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform & platform)
 {
+    if ( platform.GetExtensionCreateFunctionName().empty() || platform.GetExtensionDestroyFunctionName().empty() )
+    {
+        cout << "Unable to load extension " << fullpath << ":" << endl;
+        cout << "The plaftorm does not support extensions creation/destruction." << endl;
+        return;
+    }
+
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
     {
@@ -148,8 +155,8 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         return;
     }
 
-    createExtension create_extension = (createExtension)GetSymbol(extensionHdl, "CreateGDExtension");
-    destroyExtension destroy_extension = (destroyExtension)GetSymbol(extensionHdl, "DestroyGDExtension");
+    createExtension create_extension = (createExtension)GetSymbol(extensionHdl, platform.GetExtensionCreateFunctionName().c_str());
+    destroyExtension destroy_extension = (destroyExtension)GetSymbol(extensionHdl, platform.GetExtensionDestroyFunctionName().c_str());
 
     if ( create_extension == NULL || destroy_extension == NULL )
     {

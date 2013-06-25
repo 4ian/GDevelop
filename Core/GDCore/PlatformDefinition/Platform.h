@@ -74,6 +74,24 @@ public:
     ///@{
 
     /**
+     * \brief Must return the name of the function that is used to create an extension for this platform.
+     *
+     * For example, GD C++ Platform uses "CreateGDExtension" and GD JS Platform "CreateGDJSExtension".
+     * \see gd::ExtensionsLoader
+     * \see GetExtensionDestroyFunctionName
+     */
+    virtual std::string GetExtensionCreateFunctionName() { return ""; }
+
+    /**
+     * \brief Must return the name of the function that is used to create an extension for this platform.
+     *
+     * For example, GD C++ Platform uses "CreateGDExtension" and GD JS Platform "CreateGDJSExtension".
+     * \see gd::ExtensionsLoader
+     * \see GetExtensionDestroyFunctionName
+     */
+    virtual std::string GetExtensionDestroyFunctionName() { return ""; }
+
+    /**
      * \brief Add an extension to the manager.
      * \note This method is virtual and can be redefined by platforms if they want to do special work when an extension is loaded.
      * \see gd::ExtensionsLoader

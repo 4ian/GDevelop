@@ -22,24 +22,31 @@
 namespace gd
 {
 
-void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object)
+void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displayedAfterInstanceProperties)
 {
     if ( grid == NULL ) return;
-
-    grid->Clear();
     if ( !object ) return;
 
+    if ( !displayedAfterInstanceProperties ) grid->Clear();
+
     //Update the grid
-    grid->Append( new wxPropertyCategory(_("General")) );
+    if ( !displayedAfterInstanceProperties )
+        grid->Append( new wxPropertyCategory(_("General")) );
+    else
+        grid->Append( new wxPropertyCategory(_("General object properties")) );
+
     grid->EnableProperty(grid->Append( new wxStringProperty(_("Object name"), wxPG_LABEL, object->GetName())), false);
     grid->Append( new wxStringProperty(_("Edit"), wxPG_LABEL, _("Click to edit...")) );
     grid->SetPropertyCell(_("Edit"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
     grid->SetPropertyReadOnly(_("Edit"));
 
-    grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::ToString(object->GetVariables().GetVariableCount()) + ")" ) );
-    grid->Append( new wxStringProperty(_("Variables"), wxPG_LABEL, _("Click to edit...")) );
-    grid->SetPropertyCell(_("Variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-    grid->SetPropertyReadOnly(_("Variables"));
+    if ( !displayedAfterInstanceProperties )
+    {
+        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::ToString(object->GetVariables().GetVariableCount()) + ")" ) );
+        grid->Append( new wxStringProperty(_("Variables"), wxPG_LABEL, _("Click to edit...")) );
+        grid->SetPropertyCell(_("Variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+        grid->SetPropertyReadOnly(_("Variables"));
+    }
 
     grid->Append( new wxPropertyCategory(_("Automatisms") + " (" + gd::ToString(object->GetAllAutomatisms().size()) + ")" , "AUTO") );
     grid->Append( new wxStringProperty(_("Add automatism"), "AUTO_ADD", _("Add...")) );
@@ -159,7 +166,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             gd::Automatism & automatism = object->GetAutomatism(autoName);
 
             std::string newName = ToString(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()));
-            if ( newName == automatism.GetName() || newName.empty() ) return false;
+            if ( newName == automatism.GetName() || object->HasAutomatismNamed(newName) || newName.empty() ) return false;
 
             std::string oldName = automatism.GetName();
             automatism.SetName(newName);
@@ -173,15 +180,11 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         {
             event.Veto();
             std::string autoName = gd::ToString(event.GetPropertyName().substr(5));
-            std::cout << "auot:" << autoName;
             if ( !object->HasAutomatismNamed(autoName)) return true;
 
-            std::cout << "AAA";
             gd::Automatism & automatism = object->GetAutomatism(autoName);
 
-            std::cout << "BBB";
             automatism.EditAutomatism(grid, project, layout, mainFrameWrapper);
-            std::cout << "CCC";
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismEdited(project, layout, *object, automatism);
         }

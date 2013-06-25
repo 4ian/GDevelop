@@ -27,7 +27,10 @@ sf::Font * RessourcesLoader::LoadFont(const string & filename)
 {
     sf::Font * font = new sf::Font();
     if (!font->loadFromFile(filename)) //Chargement depuis un fichier externe
+    {
         cout << "Failed to load a font: " << filename << endl;
+        return NULL;
+    }
 
     return font;
 }

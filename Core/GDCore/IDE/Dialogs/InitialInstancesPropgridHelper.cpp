@@ -36,7 +36,6 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     {
         if ( i == 0 )
         {
-            nameProperty = selectedInitialInstances[0]->GetObjectName();
             xProperty = ToString(selectedInitialInstances[0]->GetX());
             yProperty = ToString(selectedInitialInstances[0]->GetY());
             angleProperty = ToString(selectedInitialInstances[0]->GetAngle());
@@ -50,7 +49,6 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
         }
         else
         {
-            if ( selectedInitialInstances[i]->GetObjectName() != nameProperty ) nameProperty = _("(Multiples values)");
             if ( ToString(selectedInitialInstances[i]->GetX()) != xProperty ) xProperty = _("(Multiples values)");
             if ( ToString(selectedInitialInstances[i]->GetY()) != yProperty ) yProperty = _("(Multiples values)");
             if ( ToString(selectedInitialInstances[i]->GetAngle()) != angleProperty ) angleProperty = _("(Multiples values)");
@@ -79,20 +77,16 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     }
 
     //Update the grid
-    grid->Append( new wxPropertyCategory(_("General")) );
-    grid->EnableProperty(grid->Append( new wxStringProperty(_("Object name"), wxPG_LABEL, nameProperty)), false);
-    grid->Append( new wxStringProperty(_("X"), wxPG_LABEL, xProperty));
-    grid->Append( new wxStringProperty(_("Y"), wxPG_LABEL, yProperty));
-    grid->Append( new wxStringProperty(_("Angle"), wxPG_LABEL, angleProperty));
-    grid->Append( new wxStringProperty(_("Z Order"), wxPG_LABEL, zOrderProperty));
-    grid->Append( new wxStringProperty(_("Layer"), wxPG_LABEL, layerProperty));
-    grid->Append( new wxBoolProperty(_("Locked"), wxPG_LABEL, lockedProperty));
-    grid->Append( new wxPropertyCategory(_("Size")) );
-    grid->Append( new wxBoolProperty(_("Custom size?"), wxPG_LABEL, customSizeProperty));
-    grid->EnableProperty(grid->Append( new wxStringProperty(_("Width"), wxPG_LABEL, widthProperty)), customSizeProperty);
-    grid->EnableProperty(grid->Append( new wxStringProperty(_("Height"), wxPG_LABEL, heightProperty)), customSizeProperty);
-
-    if ( !customProperties.empty() ) grid->Append( new wxPropertyCategory(_("Specific properties")) );
+    grid->Append( new wxPropertyCategory(_("Instance properties")) );
+    grid->Append( new wxStringProperty(_("X"), "INSTANCE_X", xProperty));
+    grid->Append( new wxStringProperty(_("Y"), "INSTANCE_Y", yProperty));
+    grid->Append( new wxStringProperty(_("Angle"), "INSTANCE_ANGLE", angleProperty));
+    grid->Append( new wxStringProperty(_("Z Order"), "INSTANCE_Z", zOrderProperty));
+    grid->Append( new wxStringProperty(_("Layer"), "INSTANCE_LAYER", layerProperty));
+    grid->Append( new wxBoolProperty(_("Locked"), "INSTANCE_LOCKED", lockedProperty));
+    grid->Append( new wxBoolProperty(_("Custom size?"), "INSTANCE_CUSTOM_SIZE", customSizeProperty));
+    grid->EnableProperty(grid->AppendIn( "INSTANCE_CUSTOM_SIZE", new wxStringProperty(_("Width"), "INSTANCE_SIZE_WIDTH", widthProperty)), customSizeProperty);
+    grid->EnableProperty(grid->AppendIn( "INSTANCE_CUSTOM_SIZE", new wxStringProperty(_("Height"), "INSTANCE_SIZE_HEIGHT", heightProperty)), customSizeProperty);
     for (std::map<std::string, std::string>::iterator it = customProperties.begin(); it != customProperties.end();++it)
     {
         grid->Append( new wxStringProperty(it->first, wxPG_LABEL, it->second));
@@ -100,11 +94,10 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
 
     if ( selectedInitialInstances.size() == 1)
     {
-        grid->Append( new wxPropertyCategory(_("Instance variables") + " (" + gd::ToString(selectedInitialInstances[0]->GetVariables().GetVariableCount()) + ")" ) );
-        grid->Append( new wxStringProperty(_("Variables"), wxPG_LABEL, _("Click to edit...")) );
+        grid->Append( new wxStringProperty(_("Variables"), "INSTANCE_VARIABLES", _("Click to edit...")) );
 
-        grid->SetPropertyCell(_("Variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
-        grid->SetPropertyReadOnly(_("Variables"));
+        grid->SetPropertyCell("INSTANCE_VARIABLES", 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
+        grid->SetPropertyReadOnly("INSTANCE_VARIABLES");
     }
 
     grid->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
@@ -118,7 +111,7 @@ void InitialInstancesPropgridHelper::OnPropertySelected(const std::vector<gd::In
     {
         if ( selectedInitialInstances.empty() ) return;
 
-        if ( event.GetPropertyName() == _("Variables") )
+        if ( event.GetPropertyName() ==  "INSTANCE_VARIABLES" )
         {
             gd::ChooseVariableDialog dialog(NULL, selectedInitialInstances[0]->GetVariables(), true);
             dialog.ShowModal();
@@ -131,52 +124,52 @@ void InitialInstancesPropgridHelper::OnPropertyChanged(const std::vector<gd::Ini
     if ( grid == NULL ) return;
     if ( selectedInitialInstances.empty() ) return;
 
-    if ( event.GetPropertyName() == _("Custom size?") )
+    if ( event.GetPropertyName() == "INSTANCE_CUSTOM_SIZE" )
     {
-        bool hasCustomSize = grid->GetProperty(_("Custom size?"))->GetValue().GetBool();
+        bool hasCustomSize = grid->GetProperty("INSTANCE_CUSTOM_SIZE")->GetValue().GetBool();
 
-        grid->EnableProperty(_("Width"), hasCustomSize);
-        grid->EnableProperty(_("Height"), hasCustomSize);
+        grid->EnableProperty("INSTANCE_SIZE_WIDTH", hasCustomSize);
+        grid->EnableProperty("INSTANCE_SIZE_HEIGHT", hasCustomSize);
 
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetHasCustomSize(hasCustomSize);
     }
-    else if ( event.GetPropertyName() == _("Width") )
+    else if ( event.GetPropertyName() == "INSTANCE_SIZE_WIDTH" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetCustomWidth(event.GetValue().GetReal());
     }
-    else if ( event.GetPropertyName() == _("Height") )
+    else if ( event.GetPropertyName() == "INSTANCE_SIZE_HEIGHT" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetCustomHeight(event.GetValue().GetReal());
     }
-    else if ( event.GetPropertyName() == _("X") )
+    else if ( event.GetPropertyName() == "INSTANCE_X" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetX(event.GetValue().GetReal());
     }
-    else if ( event.GetPropertyName() == _("Y") )
+    else if ( event.GetPropertyName() == "INSTANCE_Y" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetY(event.GetValue().GetReal());
     }
-    else if ( event.GetPropertyName() == _("Angle") )
+    else if ( event.GetPropertyName() == "INSTANCE_ANGLE" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetAngle(event.GetValue().GetReal());
     }
-    else if ( event.GetPropertyName() == _("Z Order") )
+    else if ( event.GetPropertyName() == "INSTANCE_Z" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetZOrder(event.GetValue().GetInteger());
     }
-    else if ( event.GetPropertyName() == _("Layer") )
+    else if ( event.GetPropertyName() == "INSTANCE_LAYER" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetLayer(ToString(event.GetValue().GetString()));
     }
-    else if ( event.GetPropertyName() == _("Locked") )
+    else if ( event.GetPropertyName() == "INSTANCE_LOCKED" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetLocked(event.GetValue().GetBool());

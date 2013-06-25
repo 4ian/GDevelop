@@ -259,6 +259,7 @@ gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const std::string & ob
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second;
 
+    std::cout << "Warning: Object type \"" << objectType << "\" not found in an extension!" << std::endl;
     return badObjectMetadata;
 }
 
@@ -267,6 +268,7 @@ gd::AutomatismMetadata & PlatformExtension::GetAutomatismMetadata(const std::str
     if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
         return automatismsInfo.find(automatismType)->second;
 
+    std::cout << "Warning: Automatism type \"" << automatismType << "\" not found in an extension!" << std::endl;
     return badAutomatismMetadata;
 }
 

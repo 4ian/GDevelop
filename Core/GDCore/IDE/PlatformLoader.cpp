@@ -41,6 +41,7 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
 
     {
         boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.dll");
+        if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
     }
 }
 

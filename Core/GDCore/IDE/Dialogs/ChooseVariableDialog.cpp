@@ -6,7 +6,6 @@
 
 //(*InternalHeaders(ChooseVariableDialog)
 #include <wx/bitmap.h>
-#include <wx/settings.h>
 #include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
@@ -29,10 +28,6 @@ namespace gd
 {
 
 //(*IdInit(ChooseVariableDialog)
-const long ChooseVariableDialog::ID_STATICBITMAP1 = wxNewId();
-const long ChooseVariableDialog::ID_STATICTEXT6 = wxNewId();
-const long ChooseVariableDialog::ID_PANEL2 = wxNewId();
-const long ChooseVariableDialog::ID_STATICLINE1 = wxNewId();
 const long ChooseVariableDialog::ID_AUITOOLBAR1 = wxNewId();
 const long ChooseVariableDialog::ID_PANEL1 = wxNewId();
 const long ChooseVariableDialog::ID_LISTCTRL1 = wxNewId();
@@ -64,34 +59,14 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     associatedLayout(NULL)
 {
 	//(*Initialize(ChooseVariableDialog)
-	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Choose a variable"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(3);
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer3->AddGrowableCol(0);
-	FlexGridSizer3->AddGrowableRow(0);
-	Panel2 = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
-	Panel2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer12->AddGrowableCol(1);
-	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/var64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
-	FlexGridSizer12->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT6, _("Choose the variable to use.\nNote that you don\'t have to declare a variable in\nthe table so as to use it. Declaring a variable in this\ntable allow to assign it an initial value and to find it easily."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT6"));
-	FlexGridSizer12->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	Panel2->SetSizer(FlexGridSizer12);
-	FlexGridSizer12->Fit(Panel2);
-	FlexGridSizer12->SetSizeHints(Panel2);
-	FlexGridSizer3->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->AddGrowableRow(1);
 	toolbarPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
 	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
@@ -129,6 +104,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChooseVariableDialog::OnhelpBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseVariableDialog::OnokBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseVariableDialog::OncancelBtClick);
+	Connect(wxEVT_SIZE,(wxObjectEventFunction)&ChooseVariableDialog::OnResize);
 	//*)
 	Connect(idAddVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ChooseVariableDialog::OnAddVarSelected);
 	Connect(idDelVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ChooseVariableDialog::OnDelVarSelected);
@@ -193,8 +169,8 @@ void ChooseVariableDialog::Refresh()
     }
 
     //Resize columns with a little margin
-    variablesList->SetColumnWidth(0, variablesList->GetSize().GetWidth()/2-10);
-    variablesList->SetColumnWidth(1, variablesList->GetSize().GetWidth()/2-10);
+    variablesList->SetColumnWidth(0, variablesList->GetSize().GetWidth()/2-5);
+    variablesList->SetColumnWidth(1, variablesList->GetSize().GetWidth()/2-5);
 
     int bestHeight = 200+temporaryContainer->GetVariableCount()*10;
     bestHeight = (bestHeight < 200) ? 350 : bestHeight;
@@ -430,6 +406,13 @@ void ChooseVariableDialog::SetAssociatedLayout(const gd::Project * project, cons
 {
     associatedProject = project;
     associatedLayout = layout;
+}
+
+void ChooseVariableDialog::OnResize(wxSizeEvent& event)
+{
+    variablesList->SetColumnWidth(0, variablesList->GetSize().GetWidth()/2-5);
+    variablesList->SetColumnWidth(1, variablesList->GetSize().GetWidth()/2-5);
+    event.Skip();
 }
 
 }

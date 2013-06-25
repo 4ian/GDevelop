@@ -39,8 +39,9 @@ public:
     /**
      * \brief Refresh the property grid from an object
      * \param object The object to be displayed.
+     * \param displayedAfterInstanceProperties If set to true, it is assumed that the grid already contains properties of an instance of the object.
      */
-    void RefreshFrom(const gd::Object * object);
+    void RefreshFrom(const gd::Object * object, bool displayedAfterInstanceProperties = false);
 
     /**
      * \brief Call this when the event wxEVT_PG_SELECTED of wxPropertyGrid is triggered.

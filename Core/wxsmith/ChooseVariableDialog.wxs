@@ -4,53 +4,11 @@
 		<title>Choose a variable</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+		<handler function="OnResize" entry="EVT_SIZE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
-			<growablerows>3</growablerows>
-			<object class="sizeritem">
-				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
-					<cols>3</cols>
-					<growablecols>0</growablecols>
-					<growablerows>0</growablerows>
-					<object class="sizeritem">
-						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
-							<bg>wxSYS_COLOUR_WINDOW</bg>
-							<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
-								<cols>3</cols>
-								<growablecols>1</growablecols>
-								<object class="sizeritem">
-									<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
-										<bitmap>res/var64.png</bitmap>
-										<style>wxNO_BORDER</style>
-									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText4" member="yes">
-										<label>Choose the variable to use.&#x0A;Note that you don&apos;t have to declare a variable in&#x0A;the table so as to use it. Declaring a variable in this&#x0A;table allow to assign it an initial value and to find it easily.</label>
-										<style>wxALIGN_CENTRE</style>
-									</object>
-									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-							</object>
-						</object>
-						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<option>1</option>
-					</object>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
-			<object class="sizeritem">
-				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes" />
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
+			<growablerows>1</growablerows>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="toolbarPanel" member="yes">
 					<size>-1,26</size>

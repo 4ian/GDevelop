@@ -393,4 +393,40 @@ private:
 
 }
 
+
+#if defined(GD_IDE_ONLY)
+/** \brief Macro used by extensions in their constructor to declare how they have been compiled.
+ * \see gd::CompilationInfo
+ */
+#define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = false; \
+    compilationInfo.boostVersion = BOOST_VERSION; \
+    compilationInfo.sfmlMajorVersion = 2; \
+    compilationInfo.sfmlMinorVersion = 0; \
+    compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
+    compilationInfo.sizeOfpInt = sizeof(int*); \
+    compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION; \
+    compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION; \
+    compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER; \
+    compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER; \
+    compilationInfo.gccMajorVersion = __GNUC__; \
+    compilationInfo.gccMinorVersion = __GNUC_MINOR__; \
+    compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__; \
+    compilationInfo.informationCompleted = true;
+#else
+/** \brief Macro used by extensions in their constructor to declare how they have been compiled.
+ * \see gd::CompilationInfo
+ */
+#define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = true;\
+    compilationInfo.boostVersion = BOOST_VERSION; \
+    compilationInfo.sfmlMajorVersion = 2; \
+    compilationInfo.sfmlMinorVersion = 0; \
+    compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
+    compilationInfo.sizeOfpInt = sizeof(int*); \
+    compilationInfo.gccMajorVersion = __GNUC__; \
+    compilationInfo.gccMinorVersion = __GNUC_MINOR__; \
+    compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__; \
+    compilationInfo.informationCompleted = true;
+
+#endif
+
 #endif // GDCORE_PLATFORMEXTENSION_H

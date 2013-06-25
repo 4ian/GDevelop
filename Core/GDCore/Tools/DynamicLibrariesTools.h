@@ -38,6 +38,8 @@ void* GD_CORE_API GetSymbol(Handle library, const char* name);
 
 /**
  * \brief Close a raw C++ dynamic library
+ * \note Libraries are reference counted, so that the library will be really freed from memory
+ * when CloseLibrary will be called with the same amount of time OpenLibrary was called.
  */
 void GD_CORE_API CloseLibrary(Handle library);
 

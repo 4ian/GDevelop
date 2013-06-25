@@ -10,7 +10,6 @@
 //(*Headers(ChooseVariableDialog)
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
 #include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
@@ -75,24 +74,16 @@ public:
     wxStaticBitmap* StaticBitmap2;
     wxPanel* toolbarPanel;
     wxAuiToolBar* toolbar;
-    wxStaticBitmap* StaticBitmap1;
     wxListCtrl* variablesList;
     wxHyperlinkCtrl* HyperlinkCtrl1;
     wxButton* cancelBt;
     wxStaticLine* StaticLine2;
-    wxStaticLine* StaticLine1;
-    wxPanel* Panel2;
-    wxStaticText* StaticText4;
     wxButton* okBt;
     //*)
 
 protected:
 
     //(*Identifiers(ChooseVariableDialog)
-    static const long ID_STATICBITMAP1;
-    static const long ID_STATICTEXT6;
-    static const long ID_PANEL2;
-    static const long ID_STATICLINE1;
     static const long ID_AUITOOLBAR1;
     static const long ID_PANEL1;
     static const long ID_LISTCTRL1;
@@ -123,6 +114,7 @@ private:
     void OnvariablesListKeyDown(wxListEvent& event);
     void OnvariablesListEndLabelEdit(wxListEvent& event);
     void OnvariablesListBeginLabelEdit(wxListEvent& event);
+    void OnResize(wxSizeEvent& event);
     //*)
     void OnAddVarSelected(wxCommandEvent& event);
     void OnDelVarSelected(wxCommandEvent& event);

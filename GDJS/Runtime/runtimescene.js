@@ -98,6 +98,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
                 newObject.setZOrder(parseFloat($(this).attr("plan")));
                 newObject.setAngle(parseFloat($(this).attr("angle")));
                 newObject.setLayer($(this).attr("layer"));
+                newObject.getVariables().initFrom($(this).find("InitialVariables"));
                 newObject.extraInitializationFromInitialInstance($(this));
                 
                 that.addObject(newObject);

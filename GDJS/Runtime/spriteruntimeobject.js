@@ -568,7 +568,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
         var angle = Math.atan2(y - (that.getDrawableY()+that.getCenterY()),
                                x - (that.getDrawableX()+that.getCenterX()));
 
-        that.setAngle(angle);
+        that.setAngle(angle*180/3.14159);
     }
 
     /**

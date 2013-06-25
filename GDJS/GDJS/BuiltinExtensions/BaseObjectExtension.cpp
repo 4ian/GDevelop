@@ -83,10 +83,10 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
     objectActions["SeparateFromObjects"].codeExtraInformation
         .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
-    objectActions["Ecarter"].codeExtraInformation //Deprecated and emulated using separateFromObjects
-        .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
-    objectActions["Rebondir"].codeExtraInformation //Deprecated and emulated using separateFromObjects
-        .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
+    objectActions["Ecarter"].codeExtraInformation //Deprecated
+        .SetFunctionName("separateObjectsWithoutForces").SetIncludeFile("runtimeobject.js");
+    objectActions["Rebondir"].codeExtraInformation //Deprecated
+        .SetFunctionName("separateObjectsWithForces").SetIncludeFile("runtimeobject.js");
 
     objectExpressions["X"].codeExtraInformation.SetFunctionName("getX");
     objectExpressions["Y"].codeExtraInformation.SetFunctionName("getY");

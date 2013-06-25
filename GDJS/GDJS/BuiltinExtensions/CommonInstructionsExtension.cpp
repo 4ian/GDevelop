@@ -399,6 +399,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 gd::EventsCodeGenerationContext context;
                 context.InheritsFrom(parentContext);
 
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                    context.ObjectsListNeeded(realObjects[i]);
+
                 //Prepare conditions/actions codes
                 std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
                 std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);

@@ -607,7 +607,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     
     /**
      * Separate the object from others objects, using their hitboxes.
-     *
+     * @method separateFromObjects
      * @param objectsLists Tables of objects
      */
     that.separateFromObjects = function(objectsLists) {
@@ -685,6 +685,89 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.putAroundObject = function(obj,distance,angleInDegrees) {
         that.putAround(obj.getY()+obj.getCenterY(), obj.getX()+obj.getCenterX(),
                        distance, angleInDegrees);
+    }
+    
+    /**
+     * @method separateObjectsWithoutForces
+     * @deprecated
+     * @param objectsLists Tables of objects
+     */
+    that.separateObjectsWithoutForces = function(objectsLists) {
+            
+        //Prepare the list of objects to iterate over.
+        var objects = [];
+        var lists = objectsLists.values();
+        for(var i = 0, len = lists.length;i<len;++i) {
+            objects.push.apply(objects, lists[i]);
+        }
+        
+        for(var i = 0, len = objects.length;i<len;++i) {
+            if ( objects[i].id != that.id ) {
+                if ( that.getDrawableX() < objects[i].getDrawableX() ){
+                    that.setX( objects[i].getDrawableX() - that.getWidth() );
+                }
+                else if ( that.getDrawableX()+that.getWidth() > objects[i].getDrawableX()+objects[i].getWidth() ){
+                    that.setX( objects[i].getDrawableX()+objects[i].getWidth() );
+                }
+
+                if ( that.getDrawableY() < objects[i].getDrawableY() ){
+                    that.setY( objects[i].getDrawableY() - that.getHeight() );
+                }
+                else if ( that.getDrawableY()+that.getHeight() > objects[i].getDrawableY()+objects[i].getHeight() ){
+                    that.setY( objects[i].getDrawableY()+objects[i].getHeight() );
+                }
+            }
+        }
+    }
+    
+    /**
+     * @method SeparateObjectsWithForces
+     * @deprecated
+     * @param objectsLists Tables of objects
+     */
+    that.separateObjectsWithForces = function(objectsLists, len) {
+            
+        if ( len == undefined ) len = 10;
+            
+        //Prepare the list of objects to iterate over.
+        var objects = [];
+        var lists = objectsLists.values();
+        for(var i = 0, len = lists.length;i<len;++i) {
+            objects.push.apply(objects, lists[i]);
+        }
+        
+        for(var i = 0, len = objects.length;i<len;++i) {
+            if ( objects[i].id != that.id ) {
+                if ( that.getDrawableX()+that.getCenterX() < objects[i].getDrawableX()+objects[i].getCenterX() )
+                {
+                    var av = that.hasNoForces() ? 0 : that.getAverageForce().getX(); 
+                    that.addForce( -av - 10, 0, false );
+                }
+                else
+                {
+                    var av = that.hasNoForces() ? 0 : that.getAverageForce().getX(); 
+                    that.addForce( -av + 10, 0, false );
+                }
+
+                if ( that.getDrawableY()+that.getCenterY() < objects[i].getDrawableY()+objects[i].getCenterY() )
+                {
+                    var av = that.hasNoForces() ? 0 : that.getAverageForce().getY(); 
+                    that.addForce( 0, -av - 10, false );
+                }
+                else
+                {
+                    var av = that.hasNoForces() ? 0 : that.getAverageForce().getY(); 
+                    that.addForce( 0, -av + 10, false );
+                }
+            }
+        }
+        
+        /*
+        for(var i = 0, len = objects.length;i<len;++i) {
+            if ( objects[i].id != that.id ) {
+                that.addForceTowardObject(objects[i], -len, false);
+            }
+        }*/
     }
     
     return that;

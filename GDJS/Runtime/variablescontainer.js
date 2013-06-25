@@ -16,10 +16,14 @@ gdjs.variablesContainer = function(initialVariablesXml)
     var my = {};
 
     my.variables = new Hashtable();
-    my.unknownVariable = gdjs.variable();
-
-    if ( initialVariablesXml != undefined ) {
-        $(initialVariablesXml).find("Variable").each( function() {
+    
+    /**
+     * Initialize variables from a container stored in a xml structure.
+     * @method initFrom
+     * @param xmlStructure The XML structure to be used.
+     */
+    that.initFrom = function(xmlStructure) {
+        $(xmlStructure).find("Variable").each( function() {
 
             var variable = gdjs.variable();
             var initialValue = $(this).attr("Value")
@@ -28,13 +32,17 @@ gdjs.variablesContainer = function(initialVariablesXml)
             if(Math.round(initialValue) == initialValue) {  //Number
                 variable.setValue(parseFloat(initialValue));
             }
-            else { //We have a string.
-                variable.setValue(initialValue);
+            else { //We have a string ( Maybe empty ).
+                if ( initialValue.length === 0 )
+                    variable.setValue(0);
+                else
+                    variable.setValue(initialValue);
             }
 
             my.variables.put($(this).attr("Name"), variable);
         });
     }
+    if ( initialVariablesXml != undefined ) that.initFrom(initialVariablesXml);
 
     /**
      * Add a new variable.

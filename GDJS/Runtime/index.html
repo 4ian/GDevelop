@@ -115,9 +115,9 @@
         
         //Load all assets
         var loadingStage = new PIXI.Stage();
-        var text = new PIXI.Text("Loading...", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
+        var text = new PIXI.Text(" ", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
         loadingStage.addChild(text);
-        text.position.x = winWidth/2;
+        text.position.x = winWidth/2-50;
         text.position.y = winHeight/2;
         var loadingCount = 0;
         
@@ -170,7 +170,7 @@
         function onAssetsLoadingProgress() {
             renderer.render(loadingStage);
             loadingCount++;
-            text.setText(loadingCount/assets.length*100 + "%");
+            text.setText(Math.floor(loadingCount/assets.length*100) + "%");
         }
         
         function postGameScreen() {

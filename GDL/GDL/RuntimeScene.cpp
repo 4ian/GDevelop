@@ -573,7 +573,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     //Copy inherited scene
     Scene::operator=(scene);
-    std::cout << "profiler pend load:" << GetProfiler() << std::endl;
 
     //Clear RuntimeScene datas
     objectsInstances.Clear();

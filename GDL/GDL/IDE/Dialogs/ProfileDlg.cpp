@@ -279,6 +279,10 @@ void ProfileDlg::ParseProfileEvents()
             event->totalTimeDuringLastSession = sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation[i].GetTime();
             event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0;
         }
+        else
+        {
+            std::cout << "Unable to get originalEvent during profiling." << std::endl;
+        }
     }
 }
 

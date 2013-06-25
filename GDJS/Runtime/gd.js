@@ -6,7 +6,7 @@
  /**
  * @namespace gdjs
  */
-var gdjs = gdjs || {objectsTypes:new Hashtable(), onInitFcts: [], evtTools:{}};
+var gdjs = gdjs || {objectsTypes:new Hashtable(), automatismsTypes:new Hashtable(), evtTools:{}};
 
 /**
  * Convert a rgb color value to a hex value.
@@ -66,6 +66,27 @@ gdjs.registerObjects = function() {
 }
 
 /**
+ * Register the runtime automatisms that can be used bt runtimeObject.<br>
+ * Automatisms must be part of gdjs and have their property "thisIsARuntimeAutomatismConstructor"
+ * defined and set to the name of the type of the automatism so as to be recognized.
+ * The name of the type of the automatism must be complete, with the namespace if any. For
+ * example, if you are providing a Draggable automatism in the DraggableAutomatism extension, 
+ * the full name of the type of the automatism is "DraggableAutomatism::Draggable".
+ *
+ * @method registerAutomatisms
+ * @static
+ */
+gdjs.registerAutomatisms = function() {
+    for (var p in this) {
+        if (this.hasOwnProperty(p)) {
+            if ( gdjs[p].thisIsARuntimeAutomatismConstructor != undefined) {
+                gdjs.automatismsTypes.put(gdjs[p].thisIsARuntimeAutomatismConstructor, gdjs[p]);
+            }
+        }
+    }
+}
+
+/**
  * Get the constructor of an object.
  *
  * @method getObjectConstructor
@@ -76,8 +97,23 @@ gdjs.getObjectConstructor = function(name) {
     if ( name != undefined && gdjs.objectsTypes.containsKey(name) )
         return gdjs.objectsTypes.get(name);
     
-    console.log("Object type \""+name+"\" was not found.");
+    console.warn("Object type \""+name+"\" was not found.");
     return gdjs.objectsTypes.get(""); //Create a base empty runtime object.
+}
+
+/**
+ * Get the constructor of an automatism.
+ *
+ * @method getAutomatismConstructor
+ * @static
+ * @param name {String} The name of the type of the automatism.
+ */
+gdjs.getAutomatismConstructor = function(name) {
+    if ( name != undefined && gdjs.automatismsTypes.containsKey(name) )
+        return gdjs.automatismsTypes.get(name);
+    
+    console.warn("Automatism type \""+name+"\" was not found.");
+    return gdjs.automatismsTypes.get(""); //Create a base empty runtime automatism.
 }
 
 Array.prototype.remove = function(from) {

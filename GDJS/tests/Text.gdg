@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Project>
+    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
+    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
+        <Nom value="Projet" />
+        <Auteur value="" />
+        <Extensions>
+            <Extension name="BuiltinObject" />
+            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinVariables" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMouse" />
+            <Extension name="BuiltinKeyboard" />
+            <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinCamera" />
+            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinFile" />
+            <Extension name="BuiltinNetwork" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinAdvanced" />
+            <Extension name="Sprite" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinStringInstructions" />
+            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="BuiltinExternalLayouts" />
+            <Extension name="TextObject" />
+        </Extensions>
+        <Platforms current="Game Develop JS platform">
+            <Platform name="Game Develop JS platform" />
+            <Platform name="Game Develop C++ platform" />
+        </Platforms>
+        <WindowW value="800" />
+        <WindowH value="600" />
+        <Portable />
+        <LatestCompilationDirectory value="" />
+        <FPSmax value="60" />
+        <FPSmin value="10" />
+        <verticalSync value="false" />
+    </Info>
+    <Resources>
+        <Resources />
+        <ResourceFolders />
+    </Resources>
+    <Objects />
+    <ObjectGroups />
+    <Variables />
+    <Scenes firstScene="">
+        <Scene nom="Nouvelle scène" mangledName="Nouvelle_32sc__4524ne" r="209.000000" v="209.000000" b="209.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="true" associatedLayout="" />
+            <GroupesObjets />
+            <Objets>
+                <Objet nom="NouvelObjet" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
+                    <Variables />
+                    <String value="Heeello" />
+                    <Font value="BOD_CB.TTF" />
+                    <CharacterSize value="50" />
+                    <Color r="255" g="128" b="0" />
+                </Objet>
+            </Objets>
+            <Layers>
+                <Layer Name="" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+            </Layers>
+            <Variables />
+            <AutomatismsSharedDatas />
+            <Positions>
+                <Objet nom="NouvelObjet" x="297.000000" y="245.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+            </Positions>
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="MettreXY" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="=" />
+                            <Parametre value="300" />
+                            <Parametre value="=" />
+                            <Parametre value="300" />
+                        </Action>
+                        <Action>
+                            <Type value="TextObject::Angle" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="+" />
+                            <Parametre value="1" />
+                        </Action>
+                        <Action>
+                            <Type value="TextObject::Opacity" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="=" />
+                            <Parametre value="128+cos(TimeFromStart())*128" />
+                        </Action>
+                        <Action>
+                            <Type value="TextObject::Size" />
+                            <Parametre value="NouvelObjet" />
+                            <Parametre value="=" />
+                            <Parametre value="30+cos(TimeFromStart())*30" />
+                        </Action>
+                    </Actions>
+                </Event>
+            </Events>
+        </Scene>
+    </Scenes>
+    <ExternalEvents />
+    <ExternalLayouts />
+    <ExternalSourceFiles />
+</Project>

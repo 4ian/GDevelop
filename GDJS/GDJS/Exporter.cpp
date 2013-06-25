@@ -29,6 +29,40 @@ static void InsertUnique(std::vector<std::string> & container, std::string str)
         container.push_back(str);
 }
 
+static void ClearDirectory(wxString dir)
+{
+    wxString file = wxFindFirstFile( dir + "/*" );
+    while ( !file.empty() )
+    {
+        wxRemoveFile( file );
+        file = wxFindNextFile();
+    }
+}
+
+static void GenerateFontsDeclaration(const std::string & outputDir, std::string & css, std::string & html)
+{
+    wxString file = wxFindFirstFile( outputDir + "/*" );
+    while ( !file.empty() )
+    {
+        if ( file.Upper().EndsWith(".TTF") )
+        {
+            wxFileName relativeFile = wxFileName::FileName(file);
+            relativeFile.MakeRelativeTo(outputDir);
+            css += "@font-face{ font-family : \"gdjs_font_";
+            css += gd::ToString(relativeFile.GetFullPath());
+            css += "\"; src : url('";
+            css += gd::ToString(relativeFile.GetFullPath());
+            css +="') format('truetype'); }";
+
+            html += "<div style=\"font-family: 'gdjs_font_";
+            html += gd::ToString(relativeFile.GetFullPath());
+            html += "';\">.</div>";
+        }
+
+        file = wxFindNextFile();
+    }
+}
+
 Exporter::~Exporter()
 {
 }
@@ -38,6 +72,7 @@ bool Exporter::ExportLayoutForPreview(gd::Layout & layout, std::string exportDir
     if ( !project ) return false;
 
     gd::RecursiveMkDir::MkDir(exportDir);
+    ClearDirectory(exportDir);
     gd::RecursiveMkDir::MkDir(exportDir+"/libs");
     gd::RecursiveMkDir::MkDir(exportDir+"/Extensions");
     std::vector<std::string> includesFiles;
@@ -76,8 +111,34 @@ bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir, con
     buffer << t.rdbuf();
     std::string str = buffer.str();
 
-    size_t pos = str.find("<!-- GDJS_CODE_FILES -->");
-    if ( pos < str.length() ) {
+    //Generate custom declarations for font resources
+    std::string customCss;
+    std::string customHtml;
+    GenerateFontsDeclaration(exportDir, customCss, customHtml);
+
+    size_t pos = str.find("<!-- GDJS_CUSTOM_STYLE -->");
+    if ( pos < str.length() )
+        str = str.replace(pos, 26, customCss);
+    else
+    {
+        std::cout << "Unable to find <!-- GDJS_CUSTOM_STYLE --> in index file." << std::endl;
+        lastError = "Unable to find <!-- GDJS_CUSTOM_STYLE --> in index file.";
+        return false;
+    }
+
+    pos = str.find("<!-- GDJS_CUSTOM_HTML -->");
+    if ( pos < str.length() )
+        str = str.replace(pos, 25, customHtml);
+    else
+    {
+        std::cout << "Unable to find <!-- GDJS_CUSTOM_STYLE --> in index file." << std::endl;
+        lastError = "Unable to find <!-- GDJS_CUSTOM_STYLE --> in index file.";
+        return false;
+    }
+
+    pos = str.find("<!-- GDJS_CODE_FILES -->");
+    if ( pos < str.length() )
+    {
 
         std::string codeFilesIncludes;
         for (std::vector<std::string>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
@@ -95,7 +156,8 @@ bool Exporter::ExportIndexFile(gd::Project & project, std::string exportDir, con
 
         str = str.replace(pos, 24, codeFilesIncludes);
     }
-    else {
+    else
+    {
         std::cout << "Unable to find <!-- GDJS_CODE_FILES --> in index file." << std::endl;
         lastError = "Unable to find <!-- GDJS_CODE_FILES --> in index file.";
         return false;
@@ -139,6 +201,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "variable.js");
     InsertUnique(includesFiles, "variablescontainer.js");
     InsertUnique(includesFiles, "runtimescene.js");
+    InsertUnique(includesFiles, "runtimeautomatism.js");
     InsertUnique(includesFiles, "runtimeobject.js");
     InsertUnique(includesFiles, "spriteruntimeobject.js");
     InsertUnique(includesFiles, "soundmanager.js");
@@ -286,7 +349,7 @@ gd::Project Exporter::StripProject(const gd::Project & project, std::string layo
 
 void Exporter::ExportResources(gd::Project & project, std::string exportDir)
 {
-    gd::ProjectResourcesCopier::CopyAllResourcesTo(project, exportDir, true, NULL, false) ;
+    gd::ProjectResourcesCopier::CopyAllResourcesTo(project, exportDir, true, NULL, false);
 }
 
 void Exporter::ShowProjectExportDialog(gd::Project & project)
@@ -297,6 +360,7 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
     bool minify = dialog.RequestMinify();
     std::string exportDir = dialog.GetExportDir();
     gd::RecursiveMkDir::MkDir(exportDir);
+    ClearDirectory(exportDir);
     gd::RecursiveMkDir::MkDir(exportDir+"/libs");
     gd::RecursiveMkDir::MkDir(exportDir+"/Extensions");
     std::vector<std::string> includesFiles;

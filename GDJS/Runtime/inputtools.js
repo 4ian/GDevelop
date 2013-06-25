@@ -144,11 +144,11 @@ gdjs.evtTools.input.getMouseWheelDelta = function(runtimeScene) {
 }
 
 gdjs.evtTools.input.getMouseX = function(runtimeScene, layer, camera) {
-    var offset = runtimeScene.hasLayer(layer) ? runtimeScene.getLayer(layer).getCameraX() : 0;
-    return runtimeScene.getGame().getMouseX()+offset;
+    return runtimeScene.getLayer(layer).convertCoords(runtimeScene.getGame().getMouseX(), 
+        runtimeScene.getGame().getMouseY())[0];
 }
 
 gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
-    var offset = runtimeScene.hasLayer(layer) ? runtimeScene.getLayer(layer).getCameraY() : 0;
-    return runtimeScene.getGame().getMouseY()+offset;
+    return runtimeScene.getLayer(layer).convertCoords(runtimeScene.getGame().getMouseX(), 
+        runtimeScene.getGame().getMouseY())[1];
 }

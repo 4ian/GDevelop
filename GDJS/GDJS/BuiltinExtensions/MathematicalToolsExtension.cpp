@@ -16,7 +16,7 @@ MathematicalToolsExtension::MathematicalToolsExtension()
     SetExtensionInformation("BuiltinMathematicalTools",
                           _("Mathematical tools"),
                           _("Built-in extension providing mathematical tools"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "BuiltinMathematicalTools");
 

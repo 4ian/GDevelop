@@ -122,6 +122,7 @@ JsPlatform::JsPlatform() :
 
     //Add extensions adapted from GD C++ Platform:
     gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/TextObject.xgdwe", *this);
+    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/DraggableAutomatism.xgdwe", *this);
 };
 
 JsPlatform & JsPlatform::Get()

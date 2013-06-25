@@ -233,6 +233,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
             my.currentFrame = 0;
             my.frameElapsedTime = 0;
             my.spriteDirty = true;
+            my.textureDirty = true;
             that.hitBoxesDirty = true;
         }
     }
@@ -265,6 +266,7 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
             that.angle = 0;
 
             my.spriteDirty = true;
+            my.textureDirty = true;
             that.hitBoxesDirty = true;
         }
     }
@@ -464,7 +466,8 @@ gdjs.spriteRuntimeObject = function(runtimeScene, objectXml)
     }
 
     that.hide = function(enable) {
-        my.hidden = enable;
+        if ( enable == undefined ) enable = true;
+        that.hidden = enable;
         my.sprite.visible = !enable;
         //TODO: Workaround a not working property in PIXI.js:
         my.sprite.alpha = my.sprite.visible ? that.opacity/255 : 0; 

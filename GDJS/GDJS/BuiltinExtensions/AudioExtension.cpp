@@ -15,7 +15,7 @@ AudioExtension::AudioExtension()
     SetExtensionInformation("BuiltinAudio",
                           _("Audio"),
                           _("Builtin audio extension"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinAudio");

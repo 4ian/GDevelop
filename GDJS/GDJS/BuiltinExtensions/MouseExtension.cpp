@@ -16,7 +16,7 @@ MouseExtension::MouseExtension()
     SetExtensionInformation("BuiltinMouse",
                           _("Mouse features"),
                           _("Built-in extensions allowing to use the mouse"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "BuiltinMouse");
 

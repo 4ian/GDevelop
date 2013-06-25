@@ -164,9 +164,10 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.renderAndStep = function() {
         my.updateTime();
-        that.render();
+        my.updateObjectsPreEvents();
         my.eventsFunction(that);
         my.updateObjects();
+        that.render();
         
         my.firstFrame = false;
         
@@ -179,7 +180,6 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      */
     that.render = function(){    
         // render the PIXI stage   
-        my.pixiStage.position = PIXI.Point(150,300);
         my.pixiRenderer.render(my.pixiStage);
     }
     
@@ -205,6 +205,21 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
+     * Update the objects before launching the events.
+     * @method updateObjectsPreEvents
+     * @private
+     */
+    my.updateObjectsPreEvents = function() {
+        var allObjectsLists = my.instances.entries();
+        
+        for( var i = 0, len = allObjectsLists.length;i<len;++i) {
+            for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
+                allObjectsLists[i][1][j].stepAutomatismsPreEvents(that);
+            }
+        }
+    }
+    
+    /**
      * Update the objects (update positions, time management...)
      * @method updateObjects
      * @private
@@ -218,6 +233,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
             for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
                 var obj = allObjectsLists[i][1][j];
                 obj.updateTime(my.elapsedTime/1000);
+                obj.stepAutomatismsPostEvents(that);
             }
         }
     }
@@ -227,7 +243,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      * @method setBackgroundColor
      */
     that.setBackgroundColor = function(r,g,b) {
-        my.pixiStage.setBackgroundColor("0x"+gdjs.rgbToHex(r,g,b));
+        my.pixiStage.setBackgroundColor(gdjs.rgbToHex(r,g,b));
     }
     
     /**
@@ -359,7 +375,10 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     that.getLayer = function(name) {
-        return my.layers.get(name);
+        if ( my.layers.containsKey(name) )
+            return my.layers.get(name);
+        
+        return my.layers.get("");
     }
     
     that.hasLayer = function(name) {

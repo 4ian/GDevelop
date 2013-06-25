@@ -28,6 +28,7 @@
             text-decoration: none;
             border-bottom: 1px dotted rgb(148, 113, 183);
         }
+        <!-- GDJS_CUSTOM_STYLE -->
 	</style>
     <!-- Libs and GDJS core files : -->
 	<!-- GDJS_CODE_FILES -->
@@ -41,6 +42,7 @@
         <br>
         Uses a modern web browser like Google Chrome, Mozilla Firefox or Apple Safari to play the game. </div>
 
+    <!-- GDJS_CUSTOM_HTML -->
 	<script>
     
     $( document ).ready( function() {
@@ -53,6 +55,7 @@
         var isMSIE = /*@cc_on!@*/0;
 
         gdjs.registerObjects();
+        gdjs.registerAutomatisms();
 
         var game = gdjs.runtimeGame($(project).find("Project"));
     

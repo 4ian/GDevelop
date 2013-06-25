@@ -15,7 +15,7 @@ StringInstructionsExtension::StringInstructionsExtension()
     SetExtensionInformation("BuiltinStringInstructions",
                           _("Text manipulation"),
                           _("Built-in extension providing expressions related to strings."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
 

@@ -15,7 +15,7 @@ NetworkExtension::NetworkExtension()
     SetExtensionInformation("BuiltinNetwork",
                           _("Basic internet features"),
                           _("Built-in extension providing network features."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinNetwork");

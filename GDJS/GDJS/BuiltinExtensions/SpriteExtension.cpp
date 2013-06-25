@@ -17,7 +17,7 @@ SpriteExtension::SpriteExtension()
     SetExtensionInformation("Sprite",
                           _("Sprite"),
                           _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "Sprite");
 

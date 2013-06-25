@@ -13,7 +13,7 @@ AdvancedExtension::AdvancedExtension()
     SetExtensionInformation("BuiltinAdvanced",
                           _("Advanced control features"),
                           _("Built-in extension providing advanced control features."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinAdvanced");

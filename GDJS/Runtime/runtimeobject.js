@@ -23,7 +23,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.y = 0;
     that.angle = 0;
     that.zOrder = 0;
-    my.hidden = false;
+    that.hidden = false;
     that.layer = "";
     that.hitBoxes = [];
     that.hitBoxes.push(gdjs.polygon.createRectangle(0,0));
@@ -33,6 +33,16 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     my.forces = [];
     my.averageForce = gdjs.force(0,0,false); //A force returned by getAverageForce method.
     my.forcesGarbage = []; //Container for unused garbage, avoiding recreating forces each tick.
+    my.automatisms = [];
+    
+    my.initAutomatisms = function() {
+        $(objectXml).find("Automatism").each(function() {
+            var aut = gdjs.getAutomatismConstructor($(this).attr("Type"))(runtimeScene, $(this));
+            aut.setOwner(that);
+            my.automatisms.push(aut);
+        });
+    }
+    my.initAutomatisms();
     
     //Common members functions related to the object and its runtimeScene :
     
@@ -55,6 +65,15 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      */
     that.extraInitializationFromInitialInstance = function(initialInstanceXml) {
         //Nothing to do.
+    }
+    
+    /**
+     * Remove an object from a scene:
+     * Just clear the object name and let the scene destroy it after.
+     * @method deleteFromScene
+     */
+    that.deleteFromScene = function(runtimeScene) {
+        runtimeScene.markObjectForDeletion(that);
     }
     
     //Common properties:
@@ -285,7 +304,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @param enable {Boolean} Set it to true to hide the object, false to show it.
      */
     that.hide = function(enable) {
-        my.hidden = enable;
+        that.hidden = enable;
     }
     
     /**
@@ -294,7 +313,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @return {Boolean} true if the object is not hidden.
      */
     that.isVisible = function(enable) {
-        return !my.hidden;
+        return !that.hidden;
     }
     
     /**
@@ -303,7 +322,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
      * @return {Boolean} true if the object is hidden.
      */
     that.isHidden = function(enable) {
-        return my.hidden;
+        return that.hidden;
     }
     
     /**
@@ -339,6 +358,8 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     that.getCenterY = function() {
         return that.getHeight()/2;
     }
+    
+    //Forces : 
     
     /**
      * Get a force from the garbage, or create a new force is garbage is empty.<br>
@@ -498,36 +519,7 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         return Math.abs(angle-averageAngle) < toleranceInDegrees/2;
     }
     
-    /**
-     * Put the object around a position, with a specific distance and angle.<br>
-     * The distance is computed between the position and the center of the object.
-     *
-     * @method putAround
-     * @param x {Number} The x position of the target
-     * @param y {Number} The y position of the target
-     * @param distance {Number} The distance between the object and the target
-     * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
-     */
-    that.putAround = function(x,y,distance,angleInDegrees) {
-        var angle = angleInDegrees/180*3.14159;
-
-        that.setX( x + Math.cos(angle)*distance - that.getCenterX() );
-        that.setY( y + Math.sin(angle)*distance - that.getCenterY() );
-    }
-    
-    /**
-     * Put the object around another object, with a specific distance and angle.<br>
-     * The distance is computed between the centers of the objects.
-     *
-     * @method putAround
-     * @param obj The target object
-     * @param distance {Number} The distance between the object and the target
-     * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
-     */
-    that.putAroundObject = function(obj,distance,angleInDegrees) {
-        that.putAround(obj.getY()+obj.getCenterY(), obj.getX()+obj.getCenterX(),
-                       distance, angleInDegrees);
-    }
+    //Hit boxes and collision :
     
     /**
      * Get the hit boxes for the object.<br>
@@ -569,6 +561,49 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
             that.hitBoxes[0].rotate(that.getAngle()/180*3.14159);
             that.hitBoxes[0].move(that.getX()+that.getCenterX(), that.getY()+that.getCenterY());
     }
+    
+    //Experimental
+    that.getAABB = function() {
+        if ( that.hitBoxesDirty ) {
+            that.updateHitBoxes();
+            that.updateAABB();
+            that.hitBoxesDirty = false;
+        }
+        
+        return that.aabb;
+    }
+    
+    that.updateAABB = function() {
+        that.aabb.min[0] = that.getDrawableX();
+        that.aabb.min[1] = that.getDrawableY();
+        that.aabb.max[0] = that.getDrawableX()+that.getWidth();
+        that.aabb.max[1] = that.getDrawableY()+that.getHeight();
+    }
+    that.aabb = { min:[0,0], max:[0,0] };
+    
+    //Automatisms:
+    
+    /**
+     * Call each automatism stepPreEvents method.
+     * @method stepAutomatismsPreEvents
+     */
+    that.stepAutomatismsPreEvents = function(runtimeScene) {
+        for(var i = 0, len = my.automatisms.length;i<len;++i) {
+            my.automatisms[i].stepPreEvents(runtimeScene);
+        }
+    }
+
+    /**
+     * Call each automatism stepPostEvents method.
+     * @method stepAutomatismsPostEvents
+     */
+    that.stepAutomatismsPostEvents = function(runtimeScene) {
+        for(var i = 0, len = my.automatisms.length;i<len;++i) {
+            my.automatisms[i].stepPostEvents(runtimeScene);
+        }
+    }
+    
+    //Other :
     
     /**
      * Separate the object from others objects, using their hitboxes.
@@ -622,32 +657,35 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     }
     
     /**
-     * Remove an object from a scene:
-     * Just clear the object name and let the scene destroy it after.
-     * @method deleteFromScene
+     * Put the object around a position, with a specific distance and angle.<br>
+     * The distance is computed between the position and the center of the object.
+     *
+     * @method putAround
+     * @param x {Number} The x position of the target
+     * @param y {Number} The y position of the target
+     * @param distance {Number} The distance between the object and the target
+     * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
      */
-    that.deleteFromScene = function(runtimeScene) {
-        runtimeScene.markObjectForDeletion(that);
+    that.putAround = function(x,y,distance,angleInDegrees) {
+        var angle = angleInDegrees/180*3.14159;
+
+        that.setX( x + Math.cos(angle)*distance - that.getCenterX() );
+        that.setY( y + Math.sin(angle)*distance - that.getCenterY() );
     }
     
-    //Experimental
-    that.getAABB = function() {
-        if ( that.hitBoxesDirty ) {
-            that.updateHitBoxes();
-            that.updateAABB();
-            that.hitBoxesDirty = false;
-        }
-        
-        return that.aabb;
+    /**
+     * Put the object around another object, with a specific distance and angle.<br>
+     * The distance is computed between the centers of the objects.
+     *
+     * @method putAround
+     * @param obj The target object
+     * @param distance {Number} The distance between the object and the target
+     * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
+     */
+    that.putAroundObject = function(obj,distance,angleInDegrees) {
+        that.putAround(obj.getY()+obj.getCenterY(), obj.getX()+obj.getCenterX(),
+                       distance, angleInDegrees);
     }
-    
-    that.updateAABB = function() {
-        that.aabb.min[0] = that.getDrawableX();
-        that.aabb.min[1] = that.getDrawableY();
-        that.aabb.max[0] = that.getDrawableX()+that.getWidth();
-        that.aabb.max[1] = that.getDrawableY()+that.getHeight();
-    }
-    that.aabb = { min:[0,0], max:[0,0] };
     
     return that;
 }

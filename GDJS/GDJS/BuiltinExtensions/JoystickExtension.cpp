@@ -16,7 +16,7 @@ JoystickExtension::JoystickExtension()
     SetExtensionInformation("BuiltinJoystick",
                           _("Joysticks features"),
                           _("Built-in extension allowing to use joysticks"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinJoystick");

@@ -14,7 +14,7 @@ FileExtension::FileExtension()
     SetExtensionInformation("BuiltinFile",
                           _("Files"),
                           _("Built-in extension providing functions for manipulation files."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinFile");

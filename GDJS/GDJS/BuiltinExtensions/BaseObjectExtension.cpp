@@ -16,7 +16,7 @@ BaseObjectExtension::BaseObjectExtension()
     SetExtensionInformation("BuiltinObject",
                           _("Base object"),
                           _("Base object"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     CloneExtension("Game Develop C++ platform", "BuiltinObject");
 

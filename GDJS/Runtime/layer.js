@@ -224,6 +224,30 @@ gdjs.layer = function(name, runtimeScene)
         my.cameraRotation = rotation;
         my.updatePixiContainerPosition();
     }
+    
+    /**
+     * Convert a point from the canvas coordinates ( For example, the mouse position ) to the
+     * "world" coordinates.
+     *
+     * @method convertCoords
+     * @param x {Number} The x position, in canvas coordinates.
+     * @param y {Number} The y position, in canvas coordinates.
+     * @param cameraId The camera number. Currently ignored.
+     */
+    that.convertCoords = function(x,y, cameraId) {
+            
+        x -= that.getCameraWidth(cameraId)/2;
+        y -= that.getCameraHeight(cameraId)/2;
+        x /= Math.abs(my.pixiContainer.scale.x);
+        y /= Math.abs(my.pixiContainer.scale.y);
+
+        var tmp = x;
+        x = Math.cos(my.cameraRotation/180*3.14159)*x - Math.sin(my.cameraRotation/180*3.14159)*y;
+        y = Math.sin(my.cameraRotation/180*3.14159)*tmp + Math.cos(my.cameraRotation/180*3.14159)*y;
+
+        return [x+that.getCameraX(cameraId)+that.getCameraWidth(cameraId)/2, 
+                y+that.getCameraY(cameraId)+that.getCameraHeight(cameraId)/2];
+    }
 
     return that;
 }

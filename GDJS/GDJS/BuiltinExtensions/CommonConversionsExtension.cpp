@@ -15,7 +15,7 @@ CommonConversionsExtension::CommonConversionsExtension()
     SetExtensionInformation("BuiltinCommonConversions",
                           _("Standard Conversions"),
                           _("Built-in extension providing standard conversions expressions."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinCommonConversions");

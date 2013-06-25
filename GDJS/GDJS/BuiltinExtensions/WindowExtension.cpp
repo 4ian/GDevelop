@@ -15,7 +15,7 @@ WindowExtension::WindowExtension()
     SetExtensionInformation("BuiltinWindow",
                           _("Window features"),
                           _("Built-in extension allowing to manipulate the game's window"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinWindow");

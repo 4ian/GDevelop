@@ -12,7 +12,7 @@ CameraExtension::CameraExtension()
     SetExtensionInformation("BuiltinCamera",
                           _("Cameras and layers features"),
                           _("Builtin camera extension"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     CloneExtension("Game Develop C++ platform", "BuiltinCamera");

@@ -112,12 +112,16 @@ public:
     ///@{
 
     /**
-     * Generate the code event : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * \brief Generate the code event : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
      * which is then used to generate the code event ( gd::EventMetadata::codeGeneration member )
+     *
+     * \warning Even if this method is virtual, you should never redefine it: Always provide the code generation using gd::EventMetadata.
+     * This method is virtual as some platforms could have hidden events ( such as profiling events ) needing code generation without declaring
+     * the event as a part of an extension.
      *
      * \see gd::EventMetadata
      */
-    std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
+    virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
      * Called before events are compiled : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,

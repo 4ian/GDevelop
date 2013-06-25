@@ -128,18 +128,18 @@ void InitialInstancesPropgridHelper::OnPropertyChanged(const std::vector<gd::Ini
     {
         bool hasCustomSize = grid->GetProperty("INSTANCE_CUSTOM_SIZE")->GetValue().GetBool();
 
-        grid->EnableProperty("INSTANCE_SIZE_WIDTH", hasCustomSize);
-        grid->EnableProperty("INSTANCE_SIZE_HEIGHT", hasCustomSize);
+        grid->EnableProperty("INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_WIDTH", hasCustomSize);
+        grid->EnableProperty("INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_HEIGHT", hasCustomSize);
 
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetHasCustomSize(hasCustomSize);
     }
-    else if ( event.GetPropertyName() == "INSTANCE_SIZE_WIDTH" )
+    else if ( event.GetPropertyName() == "INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_WIDTH" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetCustomWidth(event.GetValue().GetReal());
     }
-    else if ( event.GetPropertyName() == "INSTANCE_SIZE_HEIGHT" )
+    else if ( event.GetPropertyName() == "INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_HEIGHT" )
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetCustomHeight(event.GetValue().GetReal());

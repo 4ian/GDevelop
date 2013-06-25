@@ -3,12 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
 FontManager *FontManager::_singleton = NULL;
-sf::Font * FontManager::defaultFont = NULL;
-
 
 FontManager::~FontManager()
 {

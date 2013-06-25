@@ -17,7 +17,7 @@ AudioExtension::AudioExtension()
     SetExtensionInformation("BuiltinAudio",
                           _("Audio"),
                           _("Builtin audio extension"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     #if defined(GD_IDE_ONLY)

@@ -118,6 +118,8 @@ void CppLayoutPreviewer::StopPreview()
     previewScene = newScene;
     previewScene.running = false;
     if ( debugger ) previewScene.debugger = debugger.get();
+    if ( profiler ) previewScene.SetProfiler(profiler.get());
+    if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
     if ( debugger ) debugger->Pause();
     SoundManager::GetInstance()->ClearAllSoundsAndMusics();
 }
@@ -178,6 +180,8 @@ void CppLayoutPreviewer::RefreshFromLayout()
     previewScene.running = false;
     playing = false;
     if ( debugger ) previewScene.debugger = debugger.get();
+    if ( profiler ) previewScene.SetProfiler(profiler.get());
+    if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(editor.GetLayout()) )
@@ -197,7 +201,6 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     //Switch the working directory as we are making calls to the runtime scene
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
-            std::cout << "CWDhi:" << wxGetCwd();
 
     //Load the scene ( compilation is done )
     std::cout << "Initializing RuntimeScene from layout..." << std::endl;
@@ -219,6 +222,7 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     if ( editor.GetProject().GetImageManager() ) editor.GetProject().GetImageManager()->EnableImagesUnloading();
 
     isReloading = false;
+    PlayPreview();
 }
 
 void CppLayoutPreviewer::PlayPreview()
@@ -226,30 +230,29 @@ void CppLayoutPreviewer::PlayPreview()
     playing = true;
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
-
+    std::cout << previewScene.GetProfiler() << "<-" << std::endl;
     previewScene.running = true;
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(&editor);
 
     if ( debugger ) debugger->Play();
-}
-
-void CppLayoutPreviewer::OnPreviewPlayBtClick( wxCommandEvent & event )
-{
-    PlayPreview();
 
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, false);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, true);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, true);
 }
+
+void CppLayoutPreviewer::OnPreviewPlayBtClick( wxCommandEvent & event )
+{
+    PlayPreview();
+}
 void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 {
+    PlayPreview();
+
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, true);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, true);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, false);
-
-    previewScene.running = true;
-    PlayPreview();
 
     if ( externalPreviewWindow )
     {
@@ -262,8 +265,6 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
         externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
         previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
     }
-
-    if ( debugger ) debugger->Play();
 }
 void CppLayoutPreviewer::ExternalWindowClosed()
 {
@@ -346,6 +347,7 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
         if ( !profiler )
         {
             profiler = boost::shared_ptr<ProfileDlg>(new ProfileDlg(editor.GetParentControl(), *this));
+            editor.GetLayout().SetProfiler(profiler.get());
             if ( !parentAuiManager->GetPane("PROFILER").IsOk() )
                 parentAuiManager->AddPane( profiler.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
             else

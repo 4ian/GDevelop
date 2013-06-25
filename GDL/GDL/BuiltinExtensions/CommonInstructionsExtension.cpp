@@ -37,7 +37,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     SetExtensionInformation("BuiltinCommonInstructions",
                           _("Standard events"),
                           _("Built-in extension providing standard events."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     #if defined(GD_IDE_ONLY)

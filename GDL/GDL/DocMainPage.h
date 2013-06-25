@@ -220,7 +220,7 @@ The declarations are made with macros so as to make these declarations easier. T
             SetExtensionInformation("TextObject",
                                   _("Text object"),
                                   _("Extension allowing to use an object displaying a text."),
-                                  "Compil Games",
+                                  "Florian Rival",
                                   "zlib/libpng License ( Open Source )");
  * \endcode
 

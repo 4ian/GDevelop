@@ -17,7 +17,7 @@ SceneExtension::SceneExtension()
     SetExtensionInformation("BuiltinScene",
                           _("Scene management features"),
                           _("Built-in extension allowing to manipulate scenes"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
 

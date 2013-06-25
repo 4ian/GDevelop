@@ -7,6 +7,8 @@
 using namespace std;
 
 FontManager *FontManager::_singleton = NULL;
+sf::Font * FontManager::defaultFont = NULL;
+
 
 FontManager::~FontManager()
 {
@@ -15,12 +17,28 @@ FontManager::~FontManager()
 
 void FontManager::UnloadAllFonts()
 {
-    //TODO: Delete defaultFont to avoid ati crash !
     //Need to explicit delete fonts
     for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
         delete (*it).second;
 
     fonts.clear();
+    if ( defaultFont ) delete defaultFont;
+    defaultFont = NULL;
+}
+
+void FontManager::EnsureDefaultFontIsLoaded()
+{
+    if ( !defaultFont )
+    {
+        static const char data[] =
+        {
+            #include "GDL/Arial.hpp"
+        };
+
+        defaultFont = new sf::Font;
+        if ( !defaultFont->loadFromMemory(data, sizeof(data)) )
+            std::cout << "ERROR: Failed to load the default font!" << std::endl;
+    }
 }
 
 const sf::Font * FontManager::GetFont(const string & fontName)
@@ -28,21 +46,8 @@ const sf::Font * FontManager::GetFont(const string & fontName)
     //Use default font if no font is specified
     if (fontName.empty())
     {
-        static sf::Font defaultFont;
-        static bool loaded = false;
-
-        if ( !loaded )
-        {
-            static const char data[] =
-            {
-                #include "GDL/Arial.hpp"
-            };
-
-            defaultFont.loadFromMemory(data, sizeof(data));
-            loaded = true;
-        }
-
-        return &defaultFont;
+        EnsureDefaultFontIsLoaded();
+        return defaultFont;
     }
 
     //Find an already loaded font
@@ -51,9 +56,16 @@ const sf::Font * FontManager::GetFont(const string & fontName)
 
     //Load an new font
     gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
-    fonts[fontName] = ressourcesLoader->LoadFont(fontName);
+    sf::Font * font = ressourcesLoader->LoadFont(fontName);
+    if ( font )
+    {
+        fonts[fontName] = font;
+        return font;
+    }
 
-    return fonts[fontName];
+    //Loading failed: Fall back to the default font.
+    EnsureDefaultFontIsLoaded();
+    return defaultFont;
 }
 
 void FontManager::DestroySingleton()

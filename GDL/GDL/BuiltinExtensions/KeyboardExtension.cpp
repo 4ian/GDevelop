@@ -11,7 +11,7 @@ KeyboardExtension::KeyboardExtension()
     SetExtensionInformation("BuiltinKeyboard",
                           _("Keyboard features"),
                           _("Built-in extensions allowing to use keyboard"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
 

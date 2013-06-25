@@ -551,7 +551,6 @@ void CodeCompiler::ClearOutputDirectory()
     wxString file = wxFindFirstFile( outputDir + "*" );
     while ( !file.empty() )
     {
-        wxFileName filename(file);
         if ( !wxRemoveFile( file ) )
             std::cout << _( "Unable to delete file" ) + file + _(" in compiler output directory.\n" );
 

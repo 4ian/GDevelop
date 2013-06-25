@@ -13,7 +13,7 @@ TimeExtension::TimeExtension()
     SetExtensionInformation("BuiltinTime",
                           _("Time"),
                           _("Built-in extension providing actions and conditions about the time."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
 

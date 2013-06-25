@@ -6,7 +6,7 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
     SetExtensionInformation("BuiltinExternalLayouts",
                           _("External layouts"),
                           _("Built-in extension providing actions and conditions related to external layouts"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     #if defined(GD_IDE_ONLY)

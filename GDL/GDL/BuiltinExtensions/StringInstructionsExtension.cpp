@@ -11,7 +11,7 @@ StringInstructionsExtension::StringInstructionsExtension()
     SetExtensionInformation("BuiltinStringInstructions",
                           _("Text manipulation"),
                           _("Built-in extension providing expressions for manipulating texts."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     #if defined(GD_IDE_ONLY)

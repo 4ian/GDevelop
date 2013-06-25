@@ -101,7 +101,7 @@ private:
  *
  * \ingroup GameEngine
  */
-class RuntimeLayer
+class GD_API RuntimeLayer
 {
 public:
     RuntimeLayer() : isVisible(true) {};
@@ -136,17 +136,17 @@ public:
     /**
      * Return a reference to a camera
      */
-    inline const RuntimeCamera & GetCamera(unsigned int n) const { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
+    inline const RuntimeCamera & GetCamera(unsigned int n) const { if ( n >= cameras.size() ) return badCamera; return cameras[n]; }
 
     /**
      * Return a reference to a camera
      */
-    inline RuntimeCamera & GetCamera(unsigned int n) { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
+    inline RuntimeCamera & GetCamera(unsigned int n) { if ( n >= cameras.size() ) return badCamera; return cameras[n]; }
 
     /**
      * Delete a specific camera.
      */
-    inline void DeleteCamera(unsigned int n) { if ( n >= GetCameraCount() ) return; cameras.erase(cameras.begin()+n); }
+    inline void DeleteCamera(unsigned int n) { if ( n < cameras.size() ) cameras.erase(cameras.begin()+n); }
 
     /**
      * Add an already existing camera.

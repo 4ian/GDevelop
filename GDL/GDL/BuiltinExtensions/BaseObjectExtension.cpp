@@ -8,7 +8,7 @@ BaseObjectExtension::BaseObjectExtension()
     SetExtensionInformation("BuiltinObject",
                           _("Base object"),
                           _("Base object"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
 
     DeclareExtensionFirstPart();

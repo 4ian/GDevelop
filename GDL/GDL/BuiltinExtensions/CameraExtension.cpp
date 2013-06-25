@@ -11,7 +11,7 @@ CameraExtension::CameraExtension()
     SetExtensionInformation("BuiltinCamera",
                           _("Cameras and layers features"),
                           _("Builtin camera extension"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
 

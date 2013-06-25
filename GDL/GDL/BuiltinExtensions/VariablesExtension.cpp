@@ -16,7 +16,7 @@ VariablesExtension::VariablesExtension()
     SetExtensionInformation("BuiltinVariables",
                           _("Variable features"),
                           _("Built-in extension allowing to manipulate variables"),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
     {

@@ -5,7 +5,7 @@ CommonConversionsExtension::CommonConversionsExtension()
     SetExtensionInformation("BuiltinCommonConversions",
                           _("Standard Conversions"),
                           _("Built-in extension providing standard conversions expressions."),
-                          "Compil Games",
+                          "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
 

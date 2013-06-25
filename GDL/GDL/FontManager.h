@@ -19,7 +19,8 @@ class GD_API FontManager
 public:
 
     /**
-     * Return a pointer to an SFML font.
+     * \brief Return a pointer to an SFML font.
+     *
      * Example :
      * \code
      * sfmlText.SetFont(*fontManager->GetFont(fontName));
@@ -28,12 +29,12 @@ public:
     const sf::Font * GetFont(const std::string & fontName);
 
     /**
-     * Unload all fonts from memory
+     * \brief Unload all fonts from memory
      */
     void UnloadAllFonts();
 
     /**
-     * Return a pointer to the global singleton class
+     * \brief Return a pointer to the global singleton class
      */
     static FontManager *GetInstance()
     {
@@ -46,18 +47,22 @@ public:
     }
 
     /**
-     * Destroy the global singleton class.
+     * \brief Destroy the global singleton class.
      */
     static void DestroySingleton();
 
 private:
 
-    std::map < std::string, sf::Font* > fonts;
+    void EnsureDefaultFontIsLoaded();
 
-    FontManager() {};
+    std::map < std::string, sf::Font* > fonts; ///< The font being loaded.
+    sf::Font * defaultFont; ///< The default font used when no font is specified. Initialized at first use.
+
+    FontManager() : defaultFont(NULL) {};
     virtual ~FontManager();
 
     static FontManager *_singleton;
+
 };
 
 #endif // FONTMANAGER_H

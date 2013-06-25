@@ -38,7 +38,7 @@ public:
     #endif
 
     /**
-     * Create a RuntimeObject from a gd::Object for a scene.
+     * \brief Create a RuntimeObject from a gd::Object for a scene.
      *
      * \param scene The scene the object is going to be used on.
      * \param scene The gd::Object the RuntimeObject must be based on.
@@ -46,16 +46,24 @@ public:
     boost::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, gd::Object & object);
 
     /**
-     * Our platform need to do a bit of extra work when adding an extension
+     * \brief Our platform need to do a bit of extra work when adding an extension
      * ( i.e : Storing pointers to creation/destruction functions ).
      */
     bool AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension);
+
+    /** \brief The name of the function searched in an extension file to create the extension
+     */
+    virtual std::string GetExtensionCreateFunctionName() { return "CreateGDExtension"; }
+
+    /** \brief The name of the function searched in an extension file to destroy the extension
+     */
+    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDExtension"; }
 
 #if defined(GD_IDE_ONLY)
     virtual std::string GetIcon() const { return "CppPlatform/icon32.png"; }
 
     /**
-     * We provide a specific ChangesNotifier to ensure that compilation jobs are done properly.
+     * \brief We provide a specific ChangesNotifier to ensure that compilation jobs are done properly.
      */
     virtual ChangesNotifier & GetChangesNotifier() const { return changesNotifier; };
 
@@ -70,13 +78,13 @@ public:
     virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
 
     /**
-     * When destroyed, our platform need to do ensure the destruction of some singletons.
+     * \brief When destroyed, our platform need to do ensure the destruction of some singletons.
      */
     virtual void OnIDEClosed();
 #endif
 
     /**
-     * Get access to the CppPlatform instance. ( CppPlatform is a singleton ).
+     * \brief Get access to the CppPlatform instance. ( CppPlatform is a singleton ).
      */
     static CppPlatform & Get();
 

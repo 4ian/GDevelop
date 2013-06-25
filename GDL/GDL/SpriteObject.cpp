@@ -793,18 +793,20 @@ void RuntimeSpriteObject::FlipY(bool flip)
 
 bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
-    for (unsigned int cameraIndex = 0;cameraIndex < scene.GetRuntimeLayer(layer).GetCameraCount();++cameraIndex)
-    {
-        int mouseXInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetRuntimeLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
-        int mouseYInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetRuntimeLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
+    RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
 
-        if  ( GetDrawableX() < mouseXInTheLayer &&
-            ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&
-              GetDrawableY() < mouseYInTheLayer &&
-            ( GetDrawableY() + GetHeight() ) > mouseYInTheLayer )
+    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    {
+        sf::Vector2f mousePos = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow),
+                                                                  theLayer.GetCamera(cameraIndex).GetSFMLView());
+
+        if  ( GetDrawableX() <= mousePos.x
+              && GetDrawableX() + GetWidth()  >= mousePos.x
+              && GetDrawableY() <= mousePos.y
+              && GetDrawableY() + GetHeight() >= mousePos.y )
         {
-            int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
-            int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
+            int ClicX = static_cast<int>( mousePos.x - GetDrawableX() );
+            int ClicY = static_cast<int>( mousePos.y - GetDrawableY() );
 
             return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel( ClicX , ClicY ).a != 0 );
         }

@@ -243,7 +243,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
      * @method setBackgroundColor
      */
     that.setBackgroundColor = function(r,g,b) {
-        my.pixiStage.setBackgroundColor(gdjs.rgbToHex(r,g,b));
+        my.pixiStage.setBackgroundColor(parseInt(gdjs.rgbToHex(r,g,b),16));
     }
     
     /**

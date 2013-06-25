@@ -71,7 +71,37 @@ LayoutEditorPropertiesPnl::~LayoutEditorPropertiesPnl()
 
 void LayoutEditorPropertiesPnl::Refresh()
 {
-    if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.RefreshFrom(layoutEditorCanvas->GetSelection());
+    if ( layoutEditorCanvas && displayInstancesProperties )
+    {
+        std::vector<gd::InitialInstance*> selection = layoutEditorCanvas->GetSelection();
+        instancesHelper.RefreshFrom(selection);
+        std::string objectName;
+        for (unsigned int i = 0;i<selection.size();++i)
+        {
+            if ( !selection[i] ) continue;
+            if ( i == 0 ) objectName = selection[i]->GetObjectName();
+            else if ( selection[i]->GetObjectName() != objectName )
+            {
+                objectName.clear();
+                break;
+            }
+        }
+
+        object = NULL;
+        if  ( layout.HasObjectNamed(objectName) )
+        {
+            object = &layout.GetObject(objectName);
+            objectLayout = &layout;
+        }
+        else if  ( project.HasObjectNamed(objectName) )
+        {
+            object = &project.GetObject(objectName);
+            objectLayout = NULL;
+        }
+
+        if ( object )
+            objectsHelper.RefreshFrom(object, /*has initial instance content=*/true);
+    }
     else if ( !displayInstancesProperties ) objectsHelper.RefreshFrom(object);
 
     grid->Refresh();
@@ -112,7 +142,7 @@ void LayoutEditorPropertiesPnl::SelectedObject(gd::Object * object_, gd::Layout 
 void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
 {
     if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
-    else if ( object && !displayInstancesProperties )
+    if ( object )
     {
         if ( objectsHelper.OnPropertySelected(object, objectLayout, event) )
             Refresh();
@@ -139,7 +169,7 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 
         instancesHelper.OnPropertyChanged(selectedInitialInstances, event);
     }
-    else if ( object && !displayInstancesProperties )
+    if ( object  )
     {
         if ( objectsHelper.OnPropertyChanged(object, objectLayout, event) )
             Refresh();

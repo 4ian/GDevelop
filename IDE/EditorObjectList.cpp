@@ -811,8 +811,14 @@ void EditorObjectList::OnobjectsListBeginDrag(wxTreeEvent& event)
  */
 void EditorObjectList::OnSetFocus(wxFocusEvent& event)
 {
+    std::cout << "Focus";
     mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();
+
+    std::string selectedObjectName = gd::ToString(objectsList->GetItemText(objectsList->GetFocusedItem()));
+    if ( propPnl ) propPnl->SelectedObject(objects.HasObjectNamed(selectedObjectName) ? &objects.GetObject(selectedObjectName) : NULL,
+                                           globalObjects ? NULL : layout);
+
 }
 
 /**

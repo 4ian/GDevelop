@@ -51,7 +51,7 @@ public:
      * Members functions related to displaying the properties of an object selected in a objects editor
      */
     ///@{
-    virtual void SelectedObject(gd::Object * object, gd::Layout * layout);
+    virtual void SelectedObject(gd::Object * object, gd::Layout * objectLayout);
     virtual void ObjectsUpdated() {};
     ///@}
 

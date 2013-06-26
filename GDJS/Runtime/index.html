@@ -132,9 +132,9 @@
         
         if ( assets.length !== 0 ) {
             var assetLoader = new PIXI.AssetLoader(assets);
-            assetLoader.load();
             assetLoader.onComplete = onAssetsLoaded;
             assetLoader.onProgress = onAssetsLoadingProgress;
+            assetLoader.load();
         }
         else {
             onAssetsLoaded();

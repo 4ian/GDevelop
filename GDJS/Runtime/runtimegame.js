@@ -18,6 +18,7 @@ gdjs.runtimeGame = function(xml)
     my.xml = xml;
     my.imageManager = gdjs.imageManager(that);
     my.minFPS = xml ? parseInt($(xml).find("Info").find("FPSmin").attr("value")) : 15;
+    my.variables.initFrom($(xml).find("Variables"));
 
     //Inputs :
     my.pressedKeys = new Hashtable();

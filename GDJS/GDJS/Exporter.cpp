@@ -304,11 +304,17 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             wxLogNull noLogPlease;
             if ( wxFileExists("./JsPlatform/Runtime/"+*include) )
             {
+                wxString path = wxFileName::FileName(exportDir+"/Extensions/"+*include).GetPath();
+                if ( !wxDirExists(path) ) gd::RecursiveMkDir::MkDir(path);
+
                 wxCopyFile("./JsPlatform/Runtime/"+*include, exportDir+"/"+*include);
                 //Ok, the filename is relative to the export dir.
             }
             else if ( wxFileExists("./JsPlatform/Runtime/Extensions/"+*include) )
             {
+                wxString path = wxFileName::FileName(exportDir+"/Extensions/"+*include).GetPath();
+                if ( !wxDirExists(path) ) gd::RecursiveMkDir::MkDir(path);
+
                 wxCopyFile("./JsPlatform/Runtime/Extensions/"+*include, exportDir+"/Extensions/"+*include);
                 *include = "Extensions/"+*include; //Ensure filename is relative to the export dir.
             }

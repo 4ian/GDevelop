@@ -26,11 +26,11 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     //Check if there are some resources with absolute filenames
     gd::ResourcesAbsolutePathChecker absolutePathChecker;
     originalProject.ExposeResources(absolutePathChecker);
-    bool copyAlsoResourcesWithAbsolutePath = ( absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
-                                               askAboutAbsoluteFilenames &&
+    bool copyAlsoResourcesWithAbsolutePath = ( !askAboutAbsoluteFilenames ||
+                                               (absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
                                                wxMessageBox(_("Some resources are using absolute filenames.\nDo you want them to be copied in the new folder of the project? If you choose No, they won't be modified."),
                                                             _("Some resources are using absolute filenames."),
-                                                            wxYES_NO | wxICON_QUESTION) == wxYES );
+                                                            wxYES_NO | wxICON_QUESTION) == wxYES ));
 
     //Get the resources to be copied
     gd::ResourcesMergingHelper resourcesMergingHelper;

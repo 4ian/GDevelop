@@ -38,7 +38,6 @@ void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
                 if ( !preserveAbsoluteFilenames ) //Just strip the filename to its file part if we do not want to preserve the absolute filenames.
                     resourcesNewFilename[resourceFullFilename] = std::string( wxFileNameFromPath(resourceFullFilename).mb_str() );
             }
-
         }
     }
 

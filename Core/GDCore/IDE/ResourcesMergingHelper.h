@@ -36,14 +36,14 @@ public:
     void SetBaseDirectory(const std::string & baseDirectory);
 
     /**
-     * Change the if the directories structure, starting from the base directory, must be preserved.
-     * For compilation, all resources must be in a single folder, so that the directories structure is not preserved.
+     * \brief Set if the directories structure, starting from the base directory, must be preserved.
+     *
+     * For compilation in GD C++ Platform, all resources must be in a single folder, so that the directories structure is not preserved.
      */
     void PreserveDirectoriesStructure(bool preserveDirectoriesStructure_ = true) {preserveDirectoriesStructure = preserveDirectoriesStructure_;};
 
     /**
-     * Change the if the directories structure, starting from the base directory, must be preserved.
-     * For compilation, all resources must be in a single folder, so that the directories structure is not preserved.
+     * \brief Set if the absolute filenames must be preserved.
      */
     void PreserveAbsoluteFilenames(bool preserveAbsoluteFilenames_ = true) {preserveAbsoluteFilenames = preserveAbsoluteFilenames_;};
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxFrame" name="MainFrame">
-		<title>Game Develop - New game</title>
+		<title>Game Develop</title>
 		<centered>1</centered>
 		<icon>res/icon16.png</icon>
 		<size>850,700</size>

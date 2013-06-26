@@ -141,7 +141,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem45;
 
-    Create(parent, wxID_ANY, _("Game Develop - New game"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
     	wxIcon FrameIcon;

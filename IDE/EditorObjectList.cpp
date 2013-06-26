@@ -689,11 +689,16 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     wxString name = object->GetName();
 
     //Add a number to the new name if necessary
-    unsigned int i = 2;
-    while ( objects.HasObjectNamed(ToString(name)) )
+    if ( objects.HasObjectNamed(ToString(name)) )
     {
-        name =  _( "CopyOf" ) + object->GetName()+ToString(i);
-        i++;
+        name =  _( "CopyOf" ) + object->GetName();
+        unsigned int i = 2;
+
+        while ( objects.HasObjectNamed(ToString(name)) )
+        {
+            name =  _( "CopyOf" ) + object->GetName()+ToString(i);
+            i++;
+        }
     }
 
     //Name the object
@@ -815,10 +820,12 @@ void EditorObjectList::OnSetFocus(wxFocusEvent& event)
     mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 
-    std::string selectedObjectName = gd::ToString(objectsList->GetItemText(objectsList->GetFocusedItem()));
-    if ( propPnl ) propPnl->SelectedObject(objects.HasObjectNamed(selectedObjectName) ? &objects.GetObject(selectedObjectName) : NULL,
-                                           globalObjects ? NULL : layout);
-
+    if ( objectsList->GetFocusedItem().IsOk() )
+    {
+        std::string selectedObjectName = gd::ToString(objectsList->GetItemText(objectsList->GetFocusedItem()));
+        if ( propPnl ) propPnl->SelectedObject(objects.HasObjectNamed(selectedObjectName) ? &objects.GetObject(selectedObjectName) : NULL,
+                                               globalObjects ? NULL : layout);
+    }
 }
 
 /**

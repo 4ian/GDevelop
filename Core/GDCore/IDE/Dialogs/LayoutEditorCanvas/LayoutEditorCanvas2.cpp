@@ -48,7 +48,6 @@ void LayoutEditorCanvas::OnUpdate()
         {
             if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
                 wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
-            std::cout << "CWDd:" << wxGetCwd();
 
             for (unsigned int i = 0;i<project.imagesChanged.size();++i)
                 project.GetImageManager()->ReloadImage(project.imagesChanged[i]);
@@ -314,29 +313,30 @@ void LayoutEditorCanvas::RenderEdittime()
         sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionView.getCenter().x+project.GetMainWindowDefaultWidth()/2,
                                                                   editionView.getCenter().y+project.GetMainWindowDefaultHeight()/2,
                                                                   editionView);
+        sf::Color maskColor((layout.GetBackgroundColorRed()+128)%255, (layout.GetBackgroundColorGreen()+128)%255, (layout.GetBackgroundColorBlue()+128)%255, 128);
 
         {
             sf::RectangleShape mask(sf::Vector2f(getSize().x, rectangleOrigin.y));
             mask.setPosition(0, 0);
-            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            mask.setFillColor(maskColor);
             draw(mask);
         }
         {
             sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, getSize().y-rectangleOrigin.y));
             mask.setPosition(0, rectangleOrigin.y);
-            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            mask.setFillColor(maskColor);
             draw(mask);
         }
         {
             sf::RectangleShape mask(sf::Vector2f(getSize().x-rectangleEnd.x, getSize().y-rectangleOrigin.y));
             mask.setPosition(rectangleEnd.x, rectangleOrigin.y);
-            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            mask.setFillColor(maskColor);
             draw(mask);
         }
         {
             sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, getSize().y-rectangleEnd.y));
             mask.setPosition(rectangleOrigin.x, rectangleEnd.y);
-            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            mask.setFillColor(maskColor);
             draw(mask);
         }
     }

@@ -673,6 +673,8 @@ void LayoutEditorCanvas::AddObject(const std::string & objectName, float x, floa
     for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
         (*it)->InitialInstancesUpdated();
     ChangesMade();
+
+    ReloadResources();
 }
 
 void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )

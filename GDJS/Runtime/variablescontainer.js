@@ -29,7 +29,7 @@ gdjs.variablesContainer = function(initialVariablesXml)
             var initialValue = $(this).attr("Value")
             //Try to guess the type of the value, as GD has no way ( for now ) to specify
             //the type of a variable.
-            if(Math.round(initialValue) == initialValue) {  //Number
+            if(!isNaN(initialValue)) {  //Number
                 variable.setValue(parseFloat(initialValue));
             }
             else { //We have a string ( Maybe empty ).

@@ -308,7 +308,7 @@ Automatism* PlatformExtension::CreateAutomatism(std::string type) const
 
 boost::shared_ptr<gd::AutomatismsSharedData> PlatformExtension::CreateAutomatismSharedDatas(std::string type) const
 {
-    if ( automatismsInfo.find(type) != automatismsInfo.end())
+    if ( automatismsInfo.find(type) != automatismsInfo.end() && automatismsInfo.find(type)->second.GetSharedDataInstance())
         return automatismsInfo.find(type)->second.GetSharedDataInstance()->Clone();
 
     return boost::shared_ptr<gd::AutomatismsSharedData>();

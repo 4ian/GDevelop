@@ -184,8 +184,11 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
         if ( automatismsInitialSharedDatas.find(allAutomatismsNames[i]) == automatismsInitialSharedDatas.end() )
         {
             boost::shared_ptr<gd::AutomatismsSharedData> automatismsSharedDatas = project.CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
-            automatismsSharedDatas->SetName(allAutomatismsNames[i]);
-            automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
+            if ( automatismsSharedDatas )
+            {
+                automatismsSharedDatas->SetName(allAutomatismsNames[i]);
+                automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
+            }
         }
     }
 

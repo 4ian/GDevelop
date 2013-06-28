@@ -38,6 +38,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.collisionGrid = new HSHG();
     my.isLoaded = false; // True if loadFromScene was called and the scene is being played.
     that.layers = my.layers;
+    my.postPoneObjectsDeletion = false; //If set to true, objects will only be removed when doObjectsDeletion will be called ( And not at markObjectForDeletion call ).
+    my.objectsToDestroy = []; //The objects to be destroyed when doObjectsDeletion is called.
     
     /**
      * Load the runtime scene from the given scene.
@@ -205,6 +207,13 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         my.timeFromStart += my.elapsedTime;
     }
     
+    my.doObjectsDeletion = function() {
+        for(var k =0, lenk=my.objectsToDestroy.length;k<lenk;++k)
+            my.removeObject(my.objectsToDestroy[k]);
+            
+        my.objectsToDestroy.length = 0;
+    }
+    
     /**
      * Update the objects before launching the events.
      * @method updateObjectsPreEvents
@@ -213,11 +222,14 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     my.updateObjectsPreEvents = function() {
         var allObjectsLists = my.instances.entries();
         
+        my.postPoneObjectsDeletion = true;
         for( var i = 0, len = allObjectsLists.length;i<len;++i) {
             for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
                 allObjectsLists[i][1][j].stepAutomatismsPreEvents(that);
             }
         }
+        my.postPoneObjectsDeletion = false;
+        my.doObjectsDeletion();
     }
     
     /**
@@ -230,6 +242,7 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
         
         that.updateObjectsForces(allObjectsLists);
         
+        my.postPoneObjectsDeletion = true;
         for( var i = 0, len = allObjectsLists.length;i<len;++i) {
             for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
                 var obj = allObjectsLists[i][1][j];
@@ -237,6 +250,8 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
                 obj.stepAutomatismsPostEvents(that);
             }
         }
+        my.postPoneObjectsDeletion = false;
+        my.doObjectsDeletion();
     }
     
     /**
@@ -298,23 +313,41 @@ gdjs.runtimeScene = function(runtimeGame, pixiRenderer)
     }
     
     /**
+     * Remove an object from the scene, deleting it from the list of instances.<br>
+     * Most of the time, do not call this method directly: Use markObjectForDeletion method
+     * which will remove the objects either directly or when it can be done safely.
+     *
+     * @method getObjects
+     * @param obj The object to be removed from the scene.
+     * @private
+     */
+    my.removeObject = function(obj) {
+        my.collisionGrid.removeObject(obj);
+        
+        if ( !my.instances.containsKey(obj.getName()) ) return;
+        
+        var objId = obj.id;
+        var allInstances = my.instances.get(obj.getName());
+        for(var i = 0, len = allInstances.length;i<len;++i) {
+            if (allInstances[i].id == objId) {
+                allInstances.remove(i);
+                return;
+            }
+        }
+    }
+    
+    /**
      * Must be called whenever an object must be removed from the scene.
      * @method markObjectForDeletion
      * @param object The object to be removed.
      */
     that.markObjectForDeletion = function(obj) {
-        if ( my.instances.containsKey(obj.getName()) ) {
-            
-            my.collisionGrid.removeObject(obj);
-            var objId = obj.id;
-            var allInstances = my.instances.get(obj.getName());
-            for(var i = 0, len = allInstances.length;i<len;++i) {
-                if (allInstances[i].id == objId) {
-                    allInstances.remove(i);
-                    return;
-                }
-            }
+        if ( my.postPoneObjectsDeletion ) {
+            if ( my.objectsToDestroy.indexOf(obj) === -1 ) my.objectsToDestroy.push(obj);
+            return;
         }
+    
+        my.removeObject(obj);
     }
     
     /**

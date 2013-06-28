@@ -33,13 +33,15 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     my.forces = [];
     my.averageForce = gdjs.force(0,0,false); //A force returned by getAverageForce method.
     my.forcesGarbage = []; //Container for unused garbage, avoiding recreating forces each tick.
-    my.automatisms = [];
+    my.automatisms = []; //Contains the automatisms of the object
+    my.automatismsTable = new Hashtable(); //Also contains the automatisms: Used when an automatism is accessed by its name ( see getAutomatism ).
     
     my.initAutomatisms = function() {
         $(objectXml).find("Automatism").each(function() {
             var aut = gdjs.getAutomatismConstructor($(this).attr("Type"))(runtimeScene, $(this));
             aut.setOwner(that);
             my.automatisms.push(aut);
+            my.automatismsTable.put($(this).attr("Name"), aut);
         });
     }
     my.initAutomatisms();
@@ -616,6 +618,16 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
         for(var i = 0, len = my.automatisms.length;i<len;++i) {
             my.automatisms[i].stepPostEvents(runtimeScene);
         }
+    }
+    
+    /** 
+     * Get an automatism from its name.<br>
+     * Be careful, the automatism must exists, no check is made on the name.
+     * @method getAutomatism
+     * @param name {String} The automatism name.
+     */
+    that.getAutomatism = function(name) {
+        return my.automatismsTable.get(name);
     }
     
     //Other :

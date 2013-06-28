@@ -156,11 +156,11 @@ gdjs.layer = function(name, runtimeScene)
     }
 
     that.getCameraWidth = function(cameraId) {
-        return my.pixiRenderer.width;
+        return +my.pixiRenderer.width;
     }
 
     that.getCameraHeight = function(cameraId) {
-        return my.pixiRenderer.height;
+        return +my.pixiRenderer.height;
     }
 
     that.show = function(enable) {

@@ -56,15 +56,15 @@ BaseObjectExtension::BaseObjectExtension()
     objectActions["MettreAutour"].codeExtraInformation
         .SetFunctionName("putAroundObject").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjet"].codeExtraInformation
-        .SetFunctionName("getVariableValue").SetIncludeFile("runtimeobject.js");
+        .SetFunctionName("getVariableAsNumber").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjetTxt"].codeExtraInformation
-        .SetFunctionName("getVariableValue").SetIncludeFile("runtimeobject.js");
+        .SetFunctionName("getVariableAsString").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjetDef"].codeExtraInformation
         .SetFunctionName("hasVariable").SetIncludeFile("runtimeobject.js");
     objectActions["ModVarObjet"].codeExtraInformation
-        .SetFunctionName("setVariableValue").SetAssociatedGetter("getVariableValue").SetIncludeFile("runtimeobject.js");
+        .SetFunctionName("setVariableNumber").SetAssociatedGetter("getVariableAsNumber").SetIncludeFile("runtimeobject.js");
     objectActions["ModVarObjetTxt"].codeExtraInformation
-        .SetFunctionName("setVariableValue").SetAssociatedGetter("getVariableValue").SetIncludeFile("runtimeobject.js");
+        .SetFunctionName("setVariableString").SetAssociatedGetter("getVariableAsString").SetIncludeFile("runtimeobject.js");
     objectActions["AddForceXY"].codeExtraInformation
         .SetFunctionName("addForce").SetIncludeFile("runtimeobject.js");
     objectActions["AddForceAL"].codeExtraInformation
@@ -96,8 +96,8 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Height"].codeExtraInformation.SetFunctionName("getHeight");
     objectExpressions["Largeur"].codeExtraInformation.SetFunctionName("getWidth"); //Deprecated
     objectExpressions["Hauteur"].codeExtraInformation.SetFunctionName("getHeight"); //Deprecated
-    objectExpressions["Variable"].codeExtraInformation.SetFunctionName("getVariableValue");
-    objectStrExpressions["VariableString"].codeExtraInformation.SetFunctionName("getVariableValue");
+    objectExpressions["Variable"].codeExtraInformation.SetFunctionName("getVariableAsNumber");
+    objectStrExpressions["VariableString"].codeExtraInformation.SetFunctionName("getVariableAsString");
     objectExpressions["ForceX"].codeExtraInformation.SetFunctionName("getAverageForce().getX()");
     objectExpressions["ForceY"].codeExtraInformation.SetFunctionName("getAverageForce().getY()");
     objectExpressions["ForceAngle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle");

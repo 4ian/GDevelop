@@ -44,9 +44,9 @@ VariablesExtension::VariablesExtension()
                 std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getAsNumber() === "+expressionCode+";";
                 else if ( op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" )
-                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getAsNumber() "+op+" "+expressionCode+";";
 
                 return "";
             };
@@ -71,9 +71,9 @@ VariablesExtension::VariablesExtension()
                 std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getAsString() === "+expressionCode+";";
                 else if ( op == "!=" )
-                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
+                    return boolean+" = runtimeScene.getVariables().get(\""+var+"\").getAsString() !== "+expressionCode+";";
 
                 return "";
             };
@@ -112,9 +112,15 @@ VariablesExtension::VariablesExtension()
                 std::string getCode = "runtimeScene.getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
-                    return getCode+".setValue("+expressionCode+");\n";
-                else if ( op == "+" || op == "-" || op == "/" || op == "*" )
-                    return getCode+".setValue("+getCode+".getValue() "+op+expressionCode+");\n";
+                    return getCode+".setNumber("+expressionCode+");\n";
+                else if ( op == "+" )
+                    return getCode+".add("+expressionCode+");\n";
+                else if ( op == "-" )
+                    return getCode+".sub("+expressionCode+");\n";
+                else if ( op == "*" )
+                    return getCode+".mul("+expressionCode+");\n";
+                else if ( op == "/" )
+                    return getCode+".div("+expressionCode+");\n";
 
                 return "";
             };
@@ -139,9 +145,9 @@ VariablesExtension::VariablesExtension()
                 std::string getCode = "runtimeScene.getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
-                    return getCode+".setValue("+expressionCode+");\n";
+                    return getCode+".setString("+expressionCode+");\n";
                 else if ( op == "+" )
-                    return getCode+".setValue("+getCode+".getValue() "+op+expressionCode+");\n";
+                    return getCode+".concatenate("+expressionCode+");\n";
 
                 return "";
             };
@@ -166,9 +172,9 @@ VariablesExtension::VariablesExtension()
                 std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getAsNumber() === "+expressionCode+";";
                 else if ( op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" )
-                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() "+op+" "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getAsNumber() "+op+" "+expressionCode+";";
 
                 return "";
             };
@@ -193,9 +199,9 @@ VariablesExtension::VariablesExtension()
                 std::string boolean = codeGenerator.GenerateBooleanFullName("conditionTrue", context)+".val";
 
                 if ( op == "=" || op.empty() )
-                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() === "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getAsString() === "+expressionCode+";";
                 else if ( op == "!=" )
-                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getValue() !== "+expressionCode+";";
+                    return boolean+" = runtimeScene.getGame().getVariables().get(\""+var+"\").getAsString() !== "+expressionCode+";";
 
                 return "";
             };
@@ -234,9 +240,15 @@ VariablesExtension::VariablesExtension()
                 std::string getCode = "runtimeScene.getGame().getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
-                    return getCode+".setValue("+expressionCode+");\n";
-                else if ( op == "+" || op == "-" || op == "/" || op == "*" )
-                    return getCode+".setValue("+getCode+".getValue() "+op+expressionCode+");\n";
+                    return getCode+".setNumber("+expressionCode+");\n";
+                else if ( op == "+" )
+                    return getCode+".add("+expressionCode+");\n";
+                else if ( op == "-" )
+                    return getCode+".sub("+expressionCode+");\n";
+                else if ( op == "*" )
+                    return getCode+".mul("+expressionCode+");\n";
+                else if ( op == "/" )
+                    return getCode+".div("+expressionCode+");\n";
 
                 return "";
             };
@@ -261,9 +273,9 @@ VariablesExtension::VariablesExtension()
                 std::string getCode = "runtimeScene.getGame().getVariables().get(\""+var+"\")";
 
                 if ( op == "=" )
-                    return getCode+".setValue("+expressionCode+");\n";
+                    return getCode+".setString("+expressionCode+");\n";
                 else if ( op == "+" )
-                    return getCode+".setValue("+getCode+".getValue() "+op+expressionCode+");\n";
+                    return getCode+".concatenate("+expressionCode+");\n";
 
                 return "";
             };
@@ -279,7 +291,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
-                return "runtimeScene.getVariables().get(\""+var+"\").getValue()";
+                return "runtimeScene.getVariables().get(\""+var+"\").getAsNumber()";
             };
         };
         gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator;
@@ -289,13 +301,12 @@ VariablesExtension::VariablesExtension()
     }
 
     {
-        //Implementation optimized for declared scene variables:
         class CodeGenerator : public gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
-                return "runtimeScene.getVariables().get(\""+var+"\").getValue()";
+                return "runtimeScene.getVariables().get(\""+var+"\").getAsString()";
             };
         };
         gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
@@ -309,7 +320,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
-                return "runtimeScene.getGame().getVariables().get(\""+var+"\").getValue()";
+                return "runtimeScene.getGame().getVariables().get(\""+var+"\").getAsNumber()";
             };
         };
         gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator;
@@ -325,7 +336,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string var = codeGenerator.ConvertToString(parameters[1].GetPlainString());
-                return "runtimeScene.getGame().getVariables().get(\""+var+"\").getValue()";
+                return "runtimeScene.getGame().getVariables().get(\""+var+"\").getAsString()";
             };
         };
         gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile

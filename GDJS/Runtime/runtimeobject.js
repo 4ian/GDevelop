@@ -271,22 +271,41 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     }
     
     /**
-     * Shortcut to get the value of a variable
-     * @method getVariableValue
+     * Shortcut to get the value of a variable considered as a number
+     * @method getVariableAsNumber
      * @return The value of the specified variable
      */
-    that.getVariableValue = function(name) {
-        return my.variables.get(name).getValue();
+    that.getVariableAsNumber = function(name) {
+        return my.variables.get(name).getAsNumber();
     }
     
     /**
-     * Shortcut to set the value of a variable
-     * @method setVariableValue
+     * Shortcut to get the value of a variable considered as a string
+     * @method getVariableAsString
+     * @return The value of the specified variable
+     */
+    that.getVariableAsString = function(name) {
+        return my.variables.get(name).getAsString();
+    }
+    
+    /**
+     * Shortcut to set the value of a variable considered as a number
+     * @method setVariableNumber
      * @param name {String} The variable to be changed
      * @param newValue {Any} The value to be set
      */
-    that.setVariableValue = function(name, newValue) {
-        return my.variables.get(name).setValue(newValue);
+    that.setVariableNumber = function(name, newValue) {
+        return my.variables.get(name).setNumber(newValue);
+    }
+    
+    /**
+     * Shortcut to set the value of a variable considered as a string
+     * @method setVariableNumber
+     * @param name {String} The variable to be changed
+     * @param newValue {Any} The value to be set
+     */
+    that.setVariableString = function(name, newValue) {
+        return my.variables.get(name).setString(newValue);
     }
     
     /**
@@ -479,16 +498,12 @@ gdjs.runtimeObject = function(runtimeScene, objectXml)
     }
     
     /**
-     * Return a force which is the average of all forces applied on the object.
+     * Return a force which is the sum of all forces applied on the object.
      *
      * @method getAverageForce
      * @return {force} A force object.
      */
     that.getAverageForce = function() {
-        if ( my.forces.length == 0 ) {
-            return null;
-        }
-    
         var averageX = 0;
         var averageY = 0;
         for(var i = 0, len = my.forces.length;i<len;++i) {

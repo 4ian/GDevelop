@@ -30,13 +30,13 @@ gdjs.variablesContainer = function(initialVariablesXml)
             //Try to guess the type of the value, as GD has no way ( for now ) to specify
             //the type of a variable.
             if(!isNaN(initialValue)) {  //Number
-                variable.setValue(parseFloat(initialValue));
+                variable.setNumber(parseFloat(initialValue));
             }
             else { //We have a string ( Maybe empty ).
                 if ( initialValue.length === 0 )
-                    variable.setValue(0);
+                    variable.setNumber(0);
                 else
-                    variable.setValue(initialValue);
+                    variable.setString(initialValue);
             }
 
             my.variables.put($(this).attr("Name"), variable);

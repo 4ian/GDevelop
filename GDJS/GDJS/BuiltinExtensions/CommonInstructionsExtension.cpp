@@ -11,6 +11,7 @@
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
@@ -100,6 +101,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
+                std::string codeNamespace = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(codeGenerator.GetLayout().GetName())+"Code.";
+
                 //Conditions code
                 std::string conditionsCode;
                 std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
@@ -130,7 +133,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     {
                         emptyListsNeeded.insert(*it);
                         std::string objList = codeGenerator.GetObjectListName(*it, context);
-                        std::string finalObjList = codeGenerator.GetObjectListName(*it, parentContext)+"final";
+                        std::string finalObjList = codeNamespace+ManObjListName(*it)+gd::ToString(parentContext.GetContextDepth())
+                            +"_"+gd::ToString(parentContext.GetCurrentConditionDepth())+"final";
                         conditionsCode += "    for(var j = 0, jLen = "+objList+".length;j<jLen;++j) {\n";
                         conditionsCode += "        if ( "+finalObjList+".indexOf("+objList+"[j]) === -1 )\n";
                         conditionsCode += "            "+finalObjList+".push("+objList+"[j]);\n";
@@ -150,7 +154,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     parentContext.EmptyObjectsListNeeded(*it);
                     //We need to duplicate the object lists : The "final" ones will be filled with objects by conditions,
                     //but they will have no incidence on further conditions, as conditions use "normal" ones.
-                    std::string finalObjList = codeGenerator.GetObjectListName(*it, parentContext)+"final";
+                    std::string finalObjList = codeNamespace+ManObjListName(*it)+gd::ToString(parentContext.GetContextDepth())+"_"
+                        +gd::ToString(parentContext.GetCurrentConditionDepth())+"final";
                     codeGenerator.AddGlobalDeclaration(finalObjList+" = [];\n");
                     declarationsCode += finalObjList+".length = 0;";
                 }
@@ -165,7 +170,11 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //When condition is finished, "final" objects lists become the "normal" ones.
                 code += "{\n";
                 for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
-                    code += codeGenerator.GetObjectListName(*it, parentContext)+".createFrom("+codeGenerator.GetObjectListName(*it, parentContext)+"final);\n";
+                {
+                    std::string finalObjList = codeNamespace+ManObjListName(*it)+gd::ToString(parentContext.GetContextDepth())+"_"
+                        +gd::ToString(parentContext.GetCurrentConditionDepth())+"final";
+                    code += codeGenerator.GetObjectListName(*it, parentContext)+".createFrom("+finalObjList+");\n";
+                }
                 code += "}\n";
 
                 return code;

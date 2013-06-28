@@ -55,6 +55,8 @@ public:
      */
     virtual std::string GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context);
 
+    std::string GetCodeNamespace();
+
 protected:
 
     virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
@@ -131,8 +133,6 @@ protected:
                                                    gd::EventsCodeGenerationContext & context);
 
     virtual std::string GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context);
-
-    std::string GetCodeNamespace();
 
     /**
      * \brief Construct a code generator for the specified project and layout.

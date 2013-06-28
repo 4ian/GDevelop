@@ -4,6 +4,7 @@
 	<Project>
 		<Option title="IDE" />
 		<Option pch_mode="2" />
+		<Option default_target="Release - Edittime" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;" />
 		<Build>
@@ -107,10 +108,10 @@
 			</Target>
 			<Target title="Release - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="bin/release/GDIDE" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/release/GDIDE" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin/release" />
 				<Option object_output="obj/release" />
-				<Option type="0" />
+				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option host_application="bin/release/GDEditor.exe" />
 				<Option run_host_application_in_terminal="0" />

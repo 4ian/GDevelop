@@ -9,6 +9,7 @@
 #include <wx/filename.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
+#include <wx/config.h>
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -282,7 +283,7 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
                 for (size_t i = 0;i<output.size();++i) std::cout << output[i] << std::endl;
                 for (size_t i = 0;i<errors.size();++i) std::cout << errors[i] << std::endl;
 
-                wxLogWarning(_("The exported script could not be minified : Check that the Java Runtime Environment is installed.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
+                wxLogWarning(_("The exported script could not be minified.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
                 minify = false;
             }
             else
@@ -361,7 +362,7 @@ void Exporter::ExportResources(gd::Project & project, std::string exportDir)
 void Exporter::ShowProjectExportDialog(gd::Project & project)
 {
     ProjectExportDialog dialog(NULL, project);
-    if ( dialog.ShowModal() == 0 ) return;
+    if ( dialog.ShowModal() != 1 ) return;
 
     bool minify = dialog.RequestMinify();
     std::string exportDir = dialog.GetExportDir();
@@ -415,7 +416,12 @@ std::string Exporter::GetProjectExportButtonLabel()
 std::string Exporter::GetJavaExecutablePath()
 {
     std::vector<std::string> guessPaths;
-    #if defined(WINDOWS)
+    wxString userPath;
+    if ( wxConfigBase::Get()->Read("Paths/Java" , &userPath) && !userPath.empty() )
+        guessPaths.push_back(gd::ToString(userPath));
+    else
+    {
+        #if defined(WINDOWS)
 
         //Try some common paths.
         guessPaths.push_back("C:/Program Files/java/jre7/bin/java.exe");
@@ -423,14 +429,15 @@ std::string Exporter::GetJavaExecutablePath()
         guessPaths.push_back("C:/Program Files (x86)/java/jre7/bin/java.exe");
         guessPaths.push_back("C:/Program Files (x86)/java/jre6/bin/java.exe");
 
-    #else
-        #warning Please complete this so as to return a path to the Java executable.
-    #endif
+        #else
+            #warning Please complete this so as to return a path to the Java executable.
+        #endif
+    }
 
     for (size_t i = 0;i<guessPaths.size();++i)
     {
-            if ( wxFileExists(guessPaths[i]) )
-                return guessPaths[i];
+        if ( wxFileExists(guessPaths[i]) )
+            return guessPaths[i];
     }
 
     return "";

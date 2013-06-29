@@ -478,7 +478,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectConditionsTree->AppendItem(extensionItem,
-                                                            _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
+                                                            wxString::Format(_("%s Object"), extensions[i]->GetObjectMetadata(objectType).GetFullName().c_str()),
                                                             0) :
                                     extensionItem;
 
@@ -501,7 +501,13 @@ void ChoixCondition::RefreshObjectConditionsList()
             {
                 groupItem = objectConditionsTree->GetNextSibling(groupItem);
             }
-            if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
+            if ( !groupItem.IsOk() )
+            {
+                if ( !it->second.GetGroup().empty() )
+                    groupItem = objectConditionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
+                else
+                    groupItem = objectTypeItem;
+            }
 
             //Add condition item
             int IDimage = 0;
@@ -527,7 +533,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectConditionsTree->AppendItem(extensionItem,
-                                                                _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
+                                                                wxString::Format(_("%s Automatism"), extensions[i]->GetAutomatismMetadata(automatismType).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -549,7 +555,13 @@ void ChoixCondition::RefreshObjectConditionsList()
                 {
                     groupItem = objectConditionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
+                if ( !groupItem.IsOk() )
+                {
+                    if ( !it->second.GetGroup().empty() )
+                        groupItem = objectConditionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
+                    else
+                        groupItem = automatismTypeItem;
+                }
 
                 //Add condition item
                 int IDimage = 0;

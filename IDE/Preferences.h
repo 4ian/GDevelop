@@ -77,6 +77,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText3;
 		wxTextCtrl* EditeurImageEdit;
 		wxPanel* inactiveTextColorPnl;
+		wxButton* browseJavaBt;
 		wxButton* newProjectFolderBrowseBt;
 		wxPanel* InactifColor2Pnl;
 		wxCheckBox* hidePageTabsCheck;
@@ -85,6 +86,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText21;
 		wxStaticLine* StaticLine2;
 		wxStaticText* StaticText23;
+		wxStaticText* StaticText24;
 		wxPanel* ActifColorPnl;
 		wxCheckBox* hideContextPanelsLabels;
 		wxPropertyGrid* eventsEditorParametersProperties;
@@ -96,6 +98,7 @@ class Preferences: public wxDialog
 		wxCheckBox* autosaveActivatedCheck;
 		wxStaticLine* StaticLine1;
 		wxButton* BrowseEditionImage;
+		wxTextCtrl* javaDirEdit;
 		wxStaticText* StaticText15;
 		wxStaticText* StaticText12;
 		wxButton* AnnulerBt;
@@ -147,6 +150,9 @@ class Preferences: public wxDialog
 		static const long ID_TEXTCTRL6;
 		static const long ID_BUTTON12;
 		static const long ID_CHECKBOX7;
+		static const long ID_STATICTEXT24;
+		static const long ID_TEXTCTRL8;
+		static const long ID_BUTTON15;
 		static const long ID_PANEL7;
 		static const long ID_STATICTEXT15;
 		static const long ID_CHOICE1;
@@ -243,6 +249,7 @@ class Preferences: public wxDialog
 		void OnlogCheckClick(wxCommandEvent& event);
 		void OnnewProjectFolderBrowseBtClick(wxCommandEvent& event);
 		void OneventsEditorFontBtClick(wxCommandEvent& event);
+		void OnbrowseJavaBtClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

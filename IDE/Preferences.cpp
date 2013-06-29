@@ -64,6 +64,9 @@ const long Preferences::ID_STATICTEXT21 = wxNewId();
 const long Preferences::ID_TEXTCTRL6 = wxNewId();
 const long Preferences::ID_BUTTON12 = wxNewId();
 const long Preferences::ID_CHECKBOX7 = wxNewId();
+const long Preferences::ID_STATICTEXT24 = wxNewId();
+const long Preferences::ID_TEXTCTRL8 = wxNewId();
+const long Preferences::ID_BUTTON15 = wxNewId();
 const long Preferences::ID_PANEL7 = wxNewId();
 const long Preferences::ID_STATICTEXT15 = wxNewId();
 const long Preferences::ID_CHOICE1 = wxNewId();
@@ -156,7 +159,9 @@ changesNeedRestart(false)
     wxStaticBoxSizer* StaticBoxSizer17;
     wxStaticBoxSizer* StaticBoxSizer13;
     wxStaticBoxSizer* StaticBoxSizer10;
+    wxStaticBoxSizer* StaticBoxSizer19;
     wxFlexGridSizer* FlexGridSizer29;
+    wxFlexGridSizer* FlexGridSizer34;
     wxStaticBoxSizer* StaticBoxSizer8;
     wxStaticBoxSizer* StaticBoxSizer3;
     wxStaticBoxSizer* StaticBoxSizer6;
@@ -301,6 +306,18 @@ changesNeedRestart(false)
     deleteTemporariesCheck->SetValue(true);
     StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer19 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("Java"));
+    FlexGridSizer34 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer34->AddGrowableCol(1);
+    StaticText24 = new wxStaticText(Panel3, ID_STATICTEXT24, _("Directory containing the Java executable:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT24"));
+    FlexGridSizer34->Add(StaticText24, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    javaDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL8, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
+    javaDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
+    FlexGridSizer34->Add(javaDirEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
+    browseJavaBt = new wxButton(Panel3, ID_BUTTON15, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON15"));
+    FlexGridSizer34->Add(browseJavaBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer19->Add(FlexGridSizer34, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer15->Add(StaticBoxSizer19, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel3->SetSizer(FlexGridSizer15);
     FlexGridSizer15->Fit(Panel3);
     FlexGridSizer15->SetSizeHints(Panel3);
@@ -529,6 +546,7 @@ changesNeedRestart(false)
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseDossierTempBtClick);
     Connect(ID_TEXTCTRL6,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&Preferences::OneventsCompilerTempDirEditText);
     Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseCompilationTempDirClick);
+    Connect(ID_BUTTON15,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseJavaBtClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OngdStyleBtClick);
     Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnofficeStyleBtClick);
     Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnradianceStyleBtClick);
@@ -813,6 +831,12 @@ changesNeedRestart(false)
     {
         codeCompilerThreadEdit->SetValue(eventsCompilerMaxThread);
     }
+
+    wxString javaDir;
+    if ( pConfig->Read("/Paths/Java", &javaDir) )
+    {
+        javaDirEdit->SetValue(javaDir);
+    }
 }
 
 Preferences::~Preferences()
@@ -968,6 +992,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/CodeCompiler/MaxThread", codeCompilerThreadEdit->GetValue() );
     CodeCompiler::GetInstance()->AllowMultithread(codeCompilerThreadEdit->GetValue() > 1, codeCompilerThreadEdit->GetValue());
+
+    pConfig->Write("/Paths/Java", javaDirEdit->GetValue() );
 
     EndModal( 1 );
 }
@@ -1302,9 +1328,7 @@ void Preferences::OnnewProjectFolderBrowseBtClick(wxCommandEvent& event)
     wxDirDialog dialog( this, _( "Choose the default folder for new projects" ), "");
 
     if ( dialog.ShowModal() != wxID_CANCEL )
-    {
         newProjectFolderEdit->ChangeValue(dialog.GetPath());
-    }
 }
 
 void Preferences::OnbrowseCompilationTempDirClick(wxCommandEvent& event)
@@ -1316,6 +1340,15 @@ void Preferences::OnbrowseCompilationTempDirClick(wxCommandEvent& event)
     {
         eventsCompilerTempDirEdit->ChangeValue(dialog.GetPath());
     }
+}
+
+
+void Preferences::OnbrowseJavaBtClick(wxCommandEvent& event)
+{
+    wxDirDialog dialog( this, _( "Choose the directory containing the java executable" ), "");
+
+    if ( dialog.ShowModal() != wxID_CANCEL )
+        javaDirEdit->ChangeValue(dialog.GetPath());
 }
 
 void Preferences::OnBrowseEditionImageClick(wxCommandEvent& event)

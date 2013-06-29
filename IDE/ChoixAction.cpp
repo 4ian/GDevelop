@@ -461,7 +461,7 @@ void ChoixAction::RefreshObjectActionsList()
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectActionsTree->AppendItem(extensionItem,
-                                                            _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
+                                                            wxString::Format(_("%s Object"), extensions[i]->GetObjectMetadata(objectType).GetFullName().c_str()),
                                                             0) :
                                     extensionItem;
 
@@ -484,7 +484,13 @@ void ChoixAction::RefreshObjectActionsList()
             {
                 groupItem = objectActionsTree->GetNextSibling(groupItem);
             }
-            if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
+            if ( !groupItem.IsOk() )
+            {
+                if ( !it->second.GetGroup().empty() )
+                    groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
+                else
+                    groupItem = objectTypeItem;
+            }
 
             //Add action item, if it is not hidden
             int IDimage = 0;
@@ -510,7 +516,7 @@ void ChoixAction::RefreshObjectActionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectActionsTree->AppendItem(extensionItem,
-                                                                _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
+                                                                wxString::Format(_("%s Automatism"), extensions[i]->GetAutomatismMetadata(automatismType).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -532,7 +538,14 @@ void ChoixAction::RefreshObjectActionsList()
                 {
                     groupItem = objectActionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
+                if ( !groupItem.IsOk() )
+                {
+                    std::cout << "Groupe:" << it->second.GetGroup() << std::endl;
+                    if ( !it->second.GetGroup().empty() )
+                        groupItem = objectActionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
+                    else
+                        groupItem = automatismTypeItem;
+                }
 
                 //Add action item
                 int IDimage = 0;

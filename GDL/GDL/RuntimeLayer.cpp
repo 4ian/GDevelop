@@ -32,7 +32,7 @@ RuntimeCamera::RuntimeCamera(gd::Camera & camera, const sf::View & defaultView) 
         sfmlView.setViewport(sf::FloatRect(camera.GetViewportX1(),
                                            camera.GetViewportY1(),
                                            camera.GetViewportX2()-camera.GetViewportX1(),
-                                           camera.GetViewportY2()-camera.GetViewportY2()));
+                                           camera.GetViewportY2()-camera.GetViewportY1()));
     }
 
 

@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="GDIDELauncher" />
+		<Option title="IDE Launcher" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -34,8 +34,8 @@
 					<Add library="D:\Florian\Programmation\GameDevelop2\ExtLibs\SFML\build-mingw-release\lib\libsfml-window.a" />
 				</Linker>
 			</Target>
-			<Target title="Dev - Edittime">
-				<Option output="bin/Dev/GDIDE" prefix_auto="1" extension_auto="1" />
+			<Target title="Development - Edittime">
+				<Option output="bin/Dev/GDIDE_Dev" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/IDELauncher_Dev/" />
 				<Option type="1" />
 				<Option compiler="gcc" />

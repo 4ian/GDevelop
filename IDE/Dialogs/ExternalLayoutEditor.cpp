@@ -48,16 +48,6 @@ externalLayout(externalLayout_),
 project(project_),
 mainFrameWrapper(mainFrameWrapper_)
 {
-    //TODO
-    try
-    {
-        gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
-    }
-    catch(...)
-    {
-        std::cout << "ERROR: ExternalLayoutEditor is not ready for arbitrary Platform. GD will crash";
-    }
-
     gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
 	//(*Initialize(ExternalLayoutEditor)
@@ -211,64 +201,57 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         layoutPanel->Show();
         helpPanel->Hide();
 
-        try
+        gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+
+        //Check if external editors already have been created
+        bool creatingEditorsForFirsttime = (objectsEditor == boost::shared_ptr<EditorObjets>() ||
+                                            layersEditor == boost::shared_ptr<gd::LayersEditorPanel>() ||
+                                            propertiesPnl == boost::shared_ptr<LayoutEditorPropertiesPnl>());
+
+        //(Re)create layout canvas
+        if ( layoutEditorCanvas ) delete layoutEditorCanvas;
+        layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+        layoutEditorCanvas->SetParentAuiManager( &m_mgr );
+        layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
+
+        //Creating external editors and linking them to the layout canvas
+        objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper));
+        layersEditor = boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
+        propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper) );
+        initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );
+
+        layoutEditorCanvas->AddAssociatedEditor(objectsEditor.get());
+        layoutEditorCanvas->AddAssociatedEditor(layersEditor.get());
+        layoutEditorCanvas->AddAssociatedEditor(propertiesPnl.get());
+        layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
+        layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
+
+        //Display editors in panes
+        if ( creatingEditorsForFirsttime )
         {
-            gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+            if ( !m_mgr.GetPane("EO").IsOk() )
+                m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+            if ( !m_mgr.GetPane("EL").IsOk() )
+                m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+            if ( !m_mgr.GetPane("PROPERTIES").IsOk() )
+                m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
+            if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
+                m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
 
-            //Check if external editors already have been created
-            bool creatingEditorsForFirsttime = (objectsEditor == boost::shared_ptr<EditorObjets>() ||
-                                                layersEditor == boost::shared_ptr<gd::LayersEditorPanel>() ||
-                                                propertiesPnl == boost::shared_ptr<LayoutEditorPropertiesPnl>());
-
-            //(Re)create layout canvas
-            if ( layoutEditorCanvas ) delete layoutEditorCanvas;
-            layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
-            layoutEditorCanvas->SetParentAuiManager( &m_mgr );
-            layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
-
-            //Creating external editors and linking them to the layout canvas
-            objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper));
-            layersEditor = boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
-            propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper) );
-            initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );
-
-            layoutEditorCanvas->AddAssociatedEditor(objectsEditor.get());
-            layoutEditorCanvas->AddAssociatedEditor(layersEditor.get());
-            layoutEditorCanvas->AddAssociatedEditor(propertiesPnl.get());
-            layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
-            layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
-
-            //Display editors in panes
-            if ( creatingEditorsForFirsttime )
-            {
-                if ( !m_mgr.GetPane("EO").IsOk() )
-                    m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-                if ( !m_mgr.GetPane("EL").IsOk() )
-                    m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-                if ( !m_mgr.GetPane("PROPERTIES").IsOk() )
-                    m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
-                if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
-                    m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
-
-                wxString perspective;
-                wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
-                m_mgr.LoadPerspective(perspective);
-            }
-            else
-            {
-                m_mgr.GetPane("EO").Window(objectsEditor.get());
-                m_mgr.GetPane("EL").Window(layersEditor.get());
-                m_mgr.GetPane("PROPERTIES").Window(propertiesPnl.get());
-                m_mgr.GetPane("InstancesBrowser").Window(initialInstancesBrowser.get());
-            }
-
-            m_mgr.Update();
-            ForceRefreshRibbonAndConnect();
+            wxString perspective;
+            wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
+            m_mgr.LoadPerspective(perspective);
         }
-        catch(...)
+        else
         {
-            std::cout << "ERROR: ExternalLayoutEditor is not ready for arbitrary Platform. GD will crash";
+            m_mgr.GetPane("EO").Window(objectsEditor.get());
+            m_mgr.GetPane("EL").Window(layersEditor.get());
+            m_mgr.GetPane("PROPERTIES").Window(propertiesPnl.get());
+            m_mgr.GetPane("InstancesBrowser").Window(initialInstancesBrowser.get());
         }
+
+        m_mgr.Update();
+        ForceRefreshRibbonAndConnect();
     }
 
     //Save the choice

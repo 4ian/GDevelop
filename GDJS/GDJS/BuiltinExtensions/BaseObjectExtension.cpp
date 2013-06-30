@@ -78,7 +78,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectConditions["Arret"].codeExtraInformation
         .SetFunctionName("hasNoForces").SetIncludeFile("runtimeobject.js");
     objectConditions["Vitesse"].codeExtraInformation
-        .SetFunctionName("getAverageForce().getLength()").SetIncludeFile("runtimeobject.js");
+        .SetFunctionName("getAverageForce().getLength").SetIncludeFile("runtimeobject.js");
     objectConditions["AngleOfDisplacement"].codeExtraInformation
         .SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
     objectActions["SeparateFromObjects"].codeExtraInformation

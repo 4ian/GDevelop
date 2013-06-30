@@ -87,7 +87,7 @@ SceneExtension::SceneExtension()
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("yesorno", _("Deactivate input when focus is lost"))
-        .codeExtraInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
         */
 
 }

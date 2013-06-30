@@ -272,6 +272,6 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Speed ( Degrees per second )"))
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 */
 }

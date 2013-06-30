@@ -51,7 +51,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse.png")
 
         .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
+        .codeExtraInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 
     AddAction("CentreSourisY",
                    _("Center mouse verticaly"),
@@ -62,7 +62,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse.png")
 
         .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursorVertically").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
+        .codeExtraInformation.SetFunctionName("CenterCursorVertically").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 
     AddAction("SetSourisXY",
                    _("Position the cursor of the mouse"),
@@ -75,7 +75,7 @@ MouseExtension::MouseExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("X position"))
         .AddParameter("expression", _("Y position"))
-        .codeExtraInformation.SetFunctionName("SetCursorPosition").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
+        .codeExtraInformation.SetFunctionName("SetCursorPosition").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 
     AddAction("CentreSouris",
                    _("Center the mouse"),
@@ -86,6 +86,6 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse.png")
 
         .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDL/BuiltinExtensions/MouseTools.h");
+        .codeExtraInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 */
 }

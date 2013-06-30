@@ -81,7 +81,7 @@ CameraExtension::CameraExtension()
         .AddParameter("expression", _("Render zone: Top left side: Y Position ( Between 0 and 1 )"), "",true)
         .AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",true)
         .AddParameter("expression", _("Render zone: Bottom right side: Y Position ( Between 0 and 1 )"), "",true)
-        .codeExtraInformation.SetFunctionName("AddCamera").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("AddCamera").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     AddAction("DeleteCamera",
                    _("Delete a camera of a layer"),
@@ -93,7 +93,7 @@ CameraExtension::CameraExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number"), "",false)
-        .codeExtraInformation.SetFunctionName("DeleteCamera").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("DeleteCamera").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     AddAction("CameraSize",
                    _("Modify the size of a camera"),
@@ -107,7 +107,7 @@ CameraExtension::CameraExtension()
         .AddParameter("expression", _("Camera number"), "",false)
         .AddParameter("expression", _("Width"), "",false)
         .AddParameter("expression", _("Height"), "",false)
-        .codeExtraInformation.SetFunctionName("SetCameraSize").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("SetCameraSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     AddAction("CameraViewport",
                    _("Modify the render zone of a camera"),
@@ -123,34 +123,34 @@ CameraExtension::CameraExtension()
         .AddParameter("expression", _("Render zone: Top left side: X Position ( Between 0 and 1 )"), "",false)
         .AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",false)
         .AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",false)
-        .codeExtraInformation.SetFunctionName("SetCameraViewport").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("SetCameraViewport").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     AddExpression("CameraViewportLeft", _("X position of the top left side point of a render zone"), _("X position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",false)
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0")
-        .codeExtraInformation.SetFunctionName("GetCameraViewportLeft").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("GetCameraViewportLeft").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
 
     AddExpression("CameraViewportTop", _("Y position of the top left side point of a render zone"), _("Y position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",false)
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0")
-        .codeExtraInformation.SetFunctionName("GetCameraViewportTop").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("GetCameraViewportTop").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
 
     AddExpression("CameraViewportRight", _("X position of the bottom right side point of a render zone"), _("X position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",false)
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0")
-        .codeExtraInformation.SetFunctionName("GetCameraViewportRight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("GetCameraViewportRight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
 
     AddExpression("CameraViewportBottom", _("Y position of the bottom right side point of a render zone"), _("Y position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",false)
         .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0")
-        .codeExtraInformation.SetFunctionName("GetCameraViewportBottom").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
+        .codeExtraInformation.SetFunctionName("GetCameraViewportBottom").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
 
 */

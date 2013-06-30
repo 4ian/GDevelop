@@ -123,7 +123,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("operator", _("Modification's sign"), "",false)
             .AddParameter("expression", _("Value"), "",false)
-            .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDCpp/SpriteObject.h");
 
         obj.AddCondition("BlendMode",
                        _("Blend mode"),
@@ -136,7 +136,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
             .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
-            .codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDCpp/SpriteObject.h");
 
         obj.AddAction("CopyImageOnImageOfSprite",
                        _("Copy an image on the current one of an object"),
@@ -152,7 +152,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("expression", _("X position"), "",false)
             .AddParameter("expression", _("Y position"), "",false)
             .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
-            .codeExtraInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/SpriteObject.h");
 
 
 
@@ -166,7 +166,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("color", _("Color to make transparent"), "",false)
-            .codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/SpriteObject.h");
 
 
         obj.AddAction("ChangeColor",
@@ -179,7 +179,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("color", _("Color"), "",false)
-            .codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("GDCpp/SpriteObject.h");
 
 
         obj.AddAction("ChangeBlendMode",
@@ -192,7 +192,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
-            .codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDCpp/SpriteObject.h");
         #endif
 
     }

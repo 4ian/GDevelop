@@ -33,7 +33,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("expression", _("Start position of the portion ( The first letter is at position 0 )"), "",false)
         .AddParameter("expression", _("Length of the portion"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
     AddStrExpression("StrAt",
                    _("Get a character from a text"),
@@ -43,7 +43,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("expression", _("Position of the character ( The first letter is at position 0 )"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
     AddExpression("StrLength",
                    _("Length of a text"),
@@ -52,7 +52,7 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 
 
@@ -64,7 +64,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("string", _("Text to search for"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFind").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFind").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 
 
@@ -76,7 +76,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("string", _("Text to search for"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 
 
@@ -89,7 +89,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("string", _("Text to search for"), "",false)
         .AddParameter("expression", _("Position from which searching must begin"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 
 
@@ -102,7 +102,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("string", _("Text to search for"), "",false)
         .AddParameter("expression", _("Position from which searching must begin"), "",false)
-        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDL/BuiltinExtensions/StringTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 
 */

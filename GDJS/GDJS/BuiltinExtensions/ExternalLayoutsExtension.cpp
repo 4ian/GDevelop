@@ -32,6 +32,6 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
         .AddParameter("string", _("Name of the external layout"), "",false)
         .AddParameter("expression", _("X position of the origin"), "",true).SetDefaultValue("0")
         .AddParameter("expression", _("Y position of the origin"), "",true).SetDefaultValue("0")
-        .codeExtraInformation.SetFunctionName("ExternalLayoutsTools::CreateObjectsFromExternalLayout").SetIncludeFile("GDL/BuiltinExtensions/ExternalLayoutsTools.h");
+        .codeExtraInformation.SetFunctionName("ExternalLayoutsTools::CreateObjectsFromExternalLayout").SetIncludeFile("GDCpp/BuiltinExtensions/ExternalLayoutsTools.h");
     */
 }

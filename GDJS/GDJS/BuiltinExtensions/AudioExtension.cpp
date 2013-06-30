@@ -62,7 +62,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetSoundVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetSoundVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SetSoundVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetSoundVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddAction("ModVolumeMusicCanal",
                    _("Volume of the music on a channel"),
@@ -75,7 +75,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetMusicVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetMusicVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SetMusicVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetMusicVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddAction("ModPitchSoundChannel",
                    _("Pitch of the sound of a channel"),
@@ -88,7 +88,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetSoundPitchOnChannel").SetAssociatedGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SetSoundPitchOnChannel").SetAssociatedGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
     AddAction("ModPitchMusicChannel",
@@ -102,7 +102,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetMusicPitchOnChannel").SetAssociatedGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SetMusicPitchOnChannel").SetAssociatedGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
     AddAction("ModPlayingOffsetSoundChannel",
@@ -116,7 +116,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetSoundPlayingOffsetOnChannel").SetAssociatedGetter("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SetSoundPlayingOffsetOnChannel").SetAssociatedGetter("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddAction("ModPlayingOffsetMusicChannel",
                    _("Playing offset of the music on a channel"),
@@ -129,7 +129,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetMusicPlayingOffsetOnChannel").SetAssociatedGetter("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SetMusicPlayingOffsetOnChannel").SetAssociatedGetter("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddCondition("MusicPlaying",
                    _("A music is being played"),
@@ -140,7 +140,7 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("MusicPlaying").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("MusicPlaying").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -153,7 +153,7 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("MusicPaused").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("MusicPaused").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -166,7 +166,7 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("MusicStopped").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("MusicStopped").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
     AddCondition("SoundPlaying",
@@ -178,7 +178,7 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("SoundPlaying").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SoundPlaying").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -191,7 +191,7 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("SoundPaused").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SoundPaused").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -204,7 +204,7 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("SoundStopped").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("SoundStopped").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -219,7 +219,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Volume to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -234,7 +234,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Volume to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -249,7 +249,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Pitch to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -264,7 +264,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Pitch to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -279,7 +279,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Position ( in seconds )"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -294,39 +294,39 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Position ( in seconds )"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
     AddExpression("SoundChannelPlayingOffset", _("Sound playing offset"), _("Sound playing offset"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("MusicChannelPlayingOffset", _("Music playing offset"), _("Music playing offset"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("SoundChannelVolume", _("Sound volume"), _("Sound volume"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetSoundVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("MusicChannelVolume", _("Music volume"), _("Music volume"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetMusicVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("SoundChannelPitch", _("Sound's pitch"), _("Sound's pitch"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("MusicChannelPitch", _("Music's pitch"), _("Music's pitch"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        .codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     */
 }

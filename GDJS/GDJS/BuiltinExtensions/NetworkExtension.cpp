@@ -37,7 +37,7 @@ NetworkExtension::NetworkExtension()
         .AddParameter("string", _("Data 4"), "",true)
         .AddParameter("string", _("Data 5"), "",true)
         .AddParameter("string", _("Data 6"), "",true)
-        .codeExtraInformation.SetFunctionName("SendDataToPhpWebPage").SetIncludeFile("GDL/BuiltinExtensions/NetworkTools.h");
+        .codeExtraInformation.SetFunctionName("SendDataToPhpWebPage").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
 
     AddAction("DownloadFile",
                    _("Download a file"),
@@ -49,6 +49,6 @@ NetworkExtension::NetworkExtension()
         .AddParameter("string", _("Host ( For example : http://www.website.com )"), "",false)
         .AddParameter("string", _("Path to file ( For example : /folder/file.txt )"), "",false)
         .AddParameter("string", _("Save as"), "",false)
-        .codeExtraInformation.SetFunctionName("DownloadFile").SetIncludeFile("GDL/BuiltinExtensions/NetworkTools.h");
+        .codeExtraInformation.SetFunctionName("DownloadFile").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
     */
 }

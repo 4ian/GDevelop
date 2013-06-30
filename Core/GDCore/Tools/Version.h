@@ -1,17 +1,17 @@
-#ifndef GDCORE_VERSION_H
-#define GDCORE_VERSION_H
+#ifndef VERSION_H
+#define VERSION_H
 
 namespace AutoVersion{
 	
 	//Date Version Types
-	static const char GDCore_DATE[] = "23";
-	static const char GDCore_MONTH[] = "04";
+	static const char GDCore_DATE[] = "30";
+	static const char GDCore_MONTH[] = "06";
 	static const char GDCore_YEAR[] = "2013";
-	static const char GDCore_UBUNTU_VERSION_STYLE[] = "13.04";
+	static const char GDCore_UBUNTU_VERSION_STYLE[] = "13.06";
 	
 	//Software Status
-	static const char GDCore_STATUS[] = "Beta";
-	static const char GDCore_STATUS_SHORT[] = "b";
+	static const char GDCore_STATUS[] = "Release";
+	static const char GDCore_STATUS_SHORT[] = "r";
 	
 	//Standard Version Type
 	static const long GDCore_MAJOR = 3;
@@ -20,7 +20,7 @@ namespace AutoVersion{
 	static const long GDCore_REVISION = 57008;
 	
 	//Miscellaneous Version Types
-	static const long GDCore_BUILDS_COUNT = 22266;
+	static const long GDCore_BUILDS_COUNT = 22270;
 	#define GDCore_RC_FILEVERSION 3,0,11297,57008
 	#define GDCore_RC_FILEVERSION_STRING "3, 0, 11297, 57008\0"
 	static const char GDCore_FULLVERSION_STRING[] = "3.0.11297.57008";
@@ -30,4 +30,4 @@ namespace AutoVersion{
 	
 
 }
-#endif //GDCORE_VERSION_H
+#endif //VERSION_H

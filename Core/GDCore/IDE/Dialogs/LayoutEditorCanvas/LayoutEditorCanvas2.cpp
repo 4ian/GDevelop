@@ -261,7 +261,7 @@ void LayoutEditorCanvas::RenderEdittime()
 
             pushGLStates();
 
-            layout.GetInitialInstances().IterateOverInstancesWithZOrdering(renderer, layout.GetLayer(layerIndex).GetName());
+            instances.IterateOverInstancesWithZOrdering(renderer, layout.GetLayer(layerIndex).GetName());
         }
     }
 

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,86 +24,146 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Version.h"
+#include "GDCpp/ExtensionBase.h"
+#include "GDCore/Tools/Version.h"
 #include <boost/version.hpp>
 #include "TimedEvent.h"
 #include "TimedEventsManager.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
 
 /**
  * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
-    public:
+public:
 
-        /**
-         * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
-         */
-        Extension()
+    /**
+     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     */
+    Extension()
+    {
+        SetExtensionInformation("TimedEvent",
+                              _("Timed events"),
+                              _("Event which launch its conditions and actions only after a amount of time is reached."),
+                              "Florian Rival",
+                              "zlib/libpng License ( Open Source )");
+
+        #if defined(GD_IDE_ONLY)
+
         {
-            DECLARE_THE_EXTENSION("TimedEvent",
-                                  _("Timed events"),
-                                  _("Event which launch its conditions and actions only after a amount of time is reached."),
-                                  "Compil Games",
-                                  "zlib/libpng License ( Open Source )")
+            class CodeGen : public gd::EventMetadata::CodeGenerator
+            {
+                virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
+                                             gd::EventsCodeGenerationContext & context)
+                {
+                    TimedEvent & event = dynamic_cast<TimedEvent&>(event_);
+                    const gd::Layout & scene = codeGenerator.GetLayout();
 
-            #if defined(GD_IDE_ONLY)
+                    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
-            DECLARE_EVENT("TimedEvent",
+                    //Notify parent timed event that they have a child
+                    for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
+                        TimedEvent::codeGenerationCurrentParents[i]->codeGenerationChildren.push_back(&event);
+
+                    //And register this event as potential parent
+                    TimedEvent::codeGenerationCurrentParents.push_back(&event);
+                    event.codeGenerationChildren.clear();
+
+                    //Prepare code for computing timeout
+                    std::string timeOutCode;
+                    gd::CallbacksForGeneratingExpressionCode callbacks(timeOutCode, codeGenerator, context);
+                    gd::ExpressionParser parser(event.GetTimeoutExpression());
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
+
+                    //Prepare name
+                    std::string codeName = !event.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(event.GetName()) : "GDTimedEvent_"+ToString(&event);
+
+                    std::string outputCode;
+
+                    outputCode += "if ( static_cast<double>(GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\"))/1000000.0 > "+timeOutCode+")";
+                    outputCode += "{";
+
+                    outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+
+                    std::string ifPredicat;
+                    for (unsigned int i = 0;i<event.GetConditions().size();++i)
+                    {
+                        if (i!=0) ifPredicat += " && ";
+                        ifPredicat += "condition"+ToString(i)+"IsTrue";
+                    }
+
+                    if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
+                    outputCode += "{\n";
+                    outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                    if ( event.HasSubEvents() ) //Sub events
+                    {
+                        outputCode += "\n{\n";
+                        outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+                        outputCode += "}\n";
+                    }
+
+                    outputCode += "}\n";
+
+                    outputCode += "}";
+
+                    //This event cannot be a parent of other TimedEvent anymore
+                    if (!TimedEvent::codeGenerationCurrentParents.empty())
+                        TimedEvent::codeGenerationCurrentParents.pop_back();
+                    else
+                        std::cout << "Error! CodeGenerationCurrentParents cannot be empty!";
+
+                    return outputCode;
+                }
+            };
+            gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+            AddEvent("TimedEvent",
                           _("Timed event"),
                           _("Event which launch its conditions and actions only after a amount of time is reached."),
                           "",
-                          "Extensions/timedevent16.png",
-                          TimedEvent)
+                          "CppPlatform/Extensions/timedevent16.png",
+                          boost::shared_ptr<gd::BaseEvent>(new TimedEvent))
+                .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+        }
 
-            DECLARE_END_EVENT()
-
-            DECLARE_ACTION("ResetTimedEvent",
-                           _("Reset a timed event"),
-                           _("Reset a timed event"),
-                           _("Reset the timed event(s) called _PARAM1_"),
-                           _("Timed events"),
-                           "Extensions/timedevent24.png",
-                           "Extensions/timedevent16.png");
-
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("", _("Name"), "", false);
-
-            class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        {
+            class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
                 {
                     codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
-                    std::string codeName = "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(instruction.GetParameter(1).GetPlainString());
+                    std::string codeName = "GDNamedTimedEvent_"+codeGenerator.ConvertToString(instruction.GetParameter(1).GetPlainString());
                     return "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
 
                     return "";
                 };
             };
-            gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+            gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-            DECLARE_END_ACTION()
-
-            DECLARE_ACTION("ResetTimedEventAndSubs",
-                           _("Reset a timed event and sub events"),
-                           _("Reset a timed events, as well as all of its sub events."),
-                           _("Reset timed events called _PARAM1_ and their sub events"),
+            AddAction("ResetTimedEvent",
+                           _("Reset a timed event"),
+                           _("Reset a timed event"),
+                           _("Reset the timed event(s) called _PARAM1_"),
                            _("Timed events"),
-                           "Extensions/timedevent24.png",
-                           "Extensions/timedevent16.png");
+                           "CppPlatform/Extensions/timedevent24.png",
+                           "CppPlatform/Extensions/timedevent16.png")
+                .AddCodeOnlyParameter("currentScene", "")
+                .AddParameter("", _("Name"))
+                .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+        }
 
-                instrInfo.AddParameter("", _("Name"), "", false);
-
-            class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        {
+            class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
                 {
                     codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
@@ -121,12 +181,12 @@ class Extension : public ExtensionBase
 
                             std::string code;
                             {
-                                std::string codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(timedEvent.GetName()) : "GDTimedEvent_"+ToString(&timedEvent);
+                                std::string codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.GetName()) : "GDTimedEvent_"+ToString(&timedEvent);
                                 code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                             }
                             for (unsigned int j = 0;j<timedEvent.codeGenerationChildren.size();++j)
                             {
-                                std::string codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
+                                std::string codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
                                 code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                             }
                             return code;
@@ -136,115 +196,82 @@ class Extension : public ExtensionBase
                     return "";
                 };
             };
-            gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+            gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-            instrInfo.cppCallingInformation.SetIncludeFile("TimedEvent/TimedEventTools.h");
+            AddAction("ResetTimedEventAndSubs",
+                           _("Reset a timed event and sub events"),
+                           _("Reset a timed events, as well as all of its sub events."),
+                           _("Reset timed events called _PARAM1_ and their sub events"),
+                           _("Timed events"),
+                           "CppPlatform/Extensions/timedevent24.png",
+                           "CppPlatform/Extensions/timedevent16.png")
 
-            DECLARE_END_ACTION()
-
-            #endif
-
-            CompleteCompilationInformation();
-        };
-        virtual ~Extension() {};
-
-        #if defined(GD_IDE_ONLY)
-        bool HasDebuggingProperties() const { return true; };
-
-        void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
-        {
-            unsigned int i = 0;
-            std::map < std::string, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
-            for (std::map < std::string, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
-            {
-                if ( propertyNb == i )
-                {
-                    name = iter->first;
-                    //Unmangle name
-                    if ( name.find("GDNamedTimedEvent_") == 0 && name.length() > 18 )
-                        name = name.substr(18, name.length());
-                    else
-                        name = _("No name");
-
-                    value = ToString(static_cast<double>(iter->second.GetTime())/1000.0)+"s";
-
-                    return;
-                }
-
-                ++i;
-            }
-        }
-
-        bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
-        {
-            unsigned int i = 0;
-            std::map < std::string, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
-            for (std::map < std::string, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
-            {
-                if ( propertyNb == i )
-                {
-                    iter->second.SetTime(ToFloat(newValue));
-
-                    return true;
-                }
-
-                ++i;
-            }
-
-            return false;
-        }
-
-        unsigned int GetNumberOfProperties(RuntimeScene & scene) const
-        {
-            return TimedEventsManager::managers[&scene].timedEvents.size();
+                .AddParameter("", _("Name"))
+                .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator))
+                .SetIncludeFile("TimedEvent/TimedEventTools.h");
         }
         #endif
 
-        void SceneLoaded(RuntimeScene & scene)
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+    };
+    virtual ~Extension() {};
+
+    #if defined(GD_IDE_ONLY)
+    bool HasDebuggingProperties() const { return true; };
+
+    void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+    {
+        unsigned int i = 0;
+        std::map < std::string, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
+        for (std::map < std::string, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
         {
-            TimedEventsManager::managers[&scene].timedEvents.clear();
+            if ( propertyNb == i )
+            {
+                name = iter->first;
+                //Unmangle name
+                if ( name.find("GDNamedTimedEvent_") == 0 && name.length() > 18 )
+                    name = name.substr(18, name.length());
+                else
+                    name = _("No name");
+
+                value = ToString(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
+
+                return;
+            }
+
+            ++i;
+        }
+    }
+
+    bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+    {
+        unsigned int i = 0;
+        std::map < std::string, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
+        for (std::map < std::string, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
+        {
+            if ( propertyNb == i )
+            {
+                iter->second.SetTime(ToDouble(newValue)*1000000.0);
+
+                return true;
+            }
+
+            ++i;
         }
 
-    protected:
-    private:
+        return false;
+    }
 
-        /**
-         * This function is called by Game Develop so
-         * as to complete information about how the extension was compiled ( which libs... )
-         * -- Do not need to be modified. --
-         */
-        void CompleteCompilationInformation()
-        {
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.runtimeOnly = false;
-            #else
-            compilationInfo.runtimeOnly = true;
-            #endif
+    unsigned int GetNumberOfProperties(RuntimeScene & scene) const
+    {
+        return TimedEventsManager::managers[&scene].timedEvents.size();
+    }
+    #endif
 
-            #if defined(__GNUC__)
-            compilationInfo.gccMajorVersion = __GNUC__;
-            compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-            compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-            #endif
-
-            compilationInfo.boostVersion = BOOST_VERSION;
-
-            compilationInfo.sfmlMajorVersion = 2;
-            compilationInfo.sfmlMinorVersion = 0;
-
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-            compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-            compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-            compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
-            #endif
-
-            compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-            compilationInfo.sizeOfpInt = sizeof(int*);
-
-            compilationInfo.informationCompleted = true;
-        }
+    void SceneLoaded(RuntimeScene & scene)
+    {
+        TimedEventsManager::managers[&scene].timedEvents.clear();
+    }
 };
 
 /**

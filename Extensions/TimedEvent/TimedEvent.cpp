@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,18 +26,20 @@ freely, subject to the following restrictions:
 */
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/Events/Serialization.h"
 #include "TimedEvent.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/Serialization.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
-#include "GDL/ExtensionsManager.h"
 #include "TimedEventEditorDlg.h"
+
+using namespace std;
 
 std::vector< TimedEvent* > TimedEvent::codeGenerationCurrentParents;
 
@@ -48,64 +50,6 @@ BaseEvent()
 
 TimedEvent::~TimedEvent()
 {
-}
-
-std::string TimedEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
-{
-    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
-
-    //Notify parent timed event that they have a child
-    for (unsigned int i = 0;i<codeGenerationCurrentParents.size();++i)
-        codeGenerationCurrentParents[i]->codeGenerationChildren.push_back(this);
-
-    //And register this event as potential parent
-    codeGenerationCurrentParents.push_back(this);
-    codeGenerationChildren.clear();
-
-    //Prepare code for computing timeout
-    std::string timeOutCode;
-    CallbacksForGeneratingExpressionCode callbacks(timeOutCode, game, scene, codeGenerator, context);
-    gd::ExpressionParser parser(timeout.GetPlainString());
-    if (!parser.ParseMathExpression(game, scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
-
-    //Prepare name
-    std::string codeName = !name.empty() ? "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(name) : "GDTimedEvent_"+ToString(this);
-
-    std::string outputCode;
-
-    outputCode += "if ( GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\")/1000.0 > "+timeOutCode+")";
-    outputCode += "{";
-
-    outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
-
-    std::string ifPredicat;
-    for (unsigned int i = 0;i<conditions.size();++i)
-    {
-        if (i!=0) ifPredicat += " && ";
-        ifPredicat += "condition"+ToString(i)+"IsTrue";
-    }
-
-    if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
-    outputCode += "{\n";
-    outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
-    if ( !events.empty() ) //Sub events
-    {
-        outputCode += "\n{\n";
-        outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
-        outputCode += "}\n";
-    }
-
-    outputCode += "}\n";
-
-    outputCode += "}";
-
-    //This event cannot be a parent of other TimedEvent anymore
-    if (!codeGenerationCurrentParents.empty())
-        codeGenerationCurrentParents.pop_back();
-    else
-        std::cout << "Error! CodeGenerationCurrentParents cannot be empty!";
-
-    return outputCode;
 }
 
 vector < vector<gd::Instruction>* > TimedEvent::GetAllConditionsVectors()
@@ -145,12 +89,12 @@ void TimedEvent::SaveToXml(TiXmlElement * eventElem) const
     //Les conditions
     TiXmlElement * conditionsElem = new TiXmlElement( "Conditions" );
     eventElem->LinkEndChild( conditionsElem );
-    OpenSaveGame::SaveConditions(conditions, conditionsElem);
+    gd::EventsListSerialization::SaveConditions(conditions, conditionsElem);
 
     //Les actions
     TiXmlElement * actionsElem = new TiXmlElement( "Actions" );
     eventElem->LinkEndChild( actionsElem );
-    OpenSaveGame::SaveActions(actions, actionsElem);
+    gd::EventsListSerialization::SaveActions(actions, actionsElem);
 
     //Sous évènements
     if ( !GetSubEvents().empty() )
@@ -159,11 +103,11 @@ void TimedEvent::SaveToXml(TiXmlElement * eventElem) const
         subeventsElem = new TiXmlElement( "Events" );
         eventElem->LinkEndChild( subeventsElem );
 
-        OpenSaveGame::SaveEvents(events, subeventsElem);
+        gd::EventsListSerialization::SaveEventsToXml(events, subeventsElem);
     }
 }
 
-void TimedEvent::LoadFromXml(const TiXmlElement * eventElem)
+void TimedEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
 {
     if ( eventElem->FirstChildElement( "Name" ) != NULL )
         name = eventElem->FirstChildElement("Name")->Attribute("value");
@@ -173,25 +117,25 @@ void TimedEvent::LoadFromXml(const TiXmlElement * eventElem)
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
-        OpenSaveGame::OpenConditions(conditions, eventElem->FirstChildElement( "Conditions" ));
+        gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
     else
         cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
-        OpenSaveGame::OpenActions(actions, eventElem->FirstChildElement( "Actions" ));
+        gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
     else
         cout << "Aucune informations sur les actions d'un évènement";
 
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
-        OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
+        gd::EventsListSerialization::LoadEventsFromXml(project, events, eventElem->FirstChildElement( "Events" ));
 }
 
 /**
  * Render the event in the bitmap
  */
-void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
@@ -209,21 +153,21 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.DrawText( _("Delayed execution after ")+timeout.GetPlainString()+_(" seconds.")+" "+nameTxt, x + 4, y + 3 );
 
     //Draw conditions rectangle
-    wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-functionTextHeight);
+    wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width, platform)-functionTextHeight);
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+functionTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, platform);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+functionTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
 }
 
-unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
+unsigned int TimedEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {
@@ -232,8 +176,8 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
         const int functionTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, platform);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, platform);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight)+border*2;
         eventHeightNeedUpdate = false;
@@ -242,7 +186,7 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, gd::MainFrameWrapper & mainFrameWrapper)
+gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, gd::Project & game, gd::Layout & scene, gd::MainFrameWrapper & mainFrameWrapper)
 {
     TimedEventEditorDlg dialog(parent, *this, game, scene);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
@@ -288,4 +232,3 @@ TimedEvent& TimedEvent::operator=(const TimedEvent & event)
 }
 
 #endif
-

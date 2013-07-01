@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -36,9 +36,9 @@ freely, subject to the following restrictions:
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/Scene.h"
+#include "GDCpp/CommonTools.h"
 
 //(*IdInit(TimedEventEditorDlg)
 const long TimedEventEditorDlg::ID_STATICBITMAP3 = wxNewId();
@@ -60,7 +60,7 @@ BEGIN_EVENT_TABLE(TimedEventEditorDlg,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-TimedEventEditorDlg::TimedEventEditorDlg(wxWindow* parent, TimedEvent & event_, Game & game_, Scene & scene_) :
+TimedEventEditorDlg::TimedEventEditorDlg(wxWindow* parent, TimedEvent & event_, gd::Project & game_, gd::Layout & scene_) :
 eventEdited(event_),
 game(game_),
 scene(scene_)
@@ -79,14 +79,15 @@ scene(scene_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("Extensions/timedevent64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
+	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("CppPlatform/Extensions/timedevent64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Conditions and actions wiill only be executed\nwhen the event is executed for a certain amount of time."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
+	FlexGridSizer6->Fit(Panel1);
 	FlexGridSizer6->SetSizeHints(Panel1);
 	FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -145,8 +146,8 @@ TimedEventEditorDlg::~TimedEventEditorDlg()
 
 void TimedEventEditorDlg::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetTimeoutExpression(string(timeoutEdit->GetValue().mb_str()));
-    eventEdited.SetName(string(nameEdit->GetValue().mb_str()));
+    eventEdited.SetTimeoutExpression(ToString(timeoutEdit->GetValue()));
+    eventEdited.SetName(ToString(nameEdit->GetValue()));
     EndModal(1);
 }
 

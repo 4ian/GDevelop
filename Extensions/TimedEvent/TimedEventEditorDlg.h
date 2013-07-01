@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -41,14 +41,14 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 #include "TimedEvent.h"
-class Game;
-class Scene;
+namespace gd { class Project; }
+namespace gd { class Layout; }
 
 class TimedEventEditorDlg: public wxDialog
 {
 	public:
 
-		TimedEventEditorDlg(wxWindow* parent, TimedEvent & event_, Game & game_, Scene & scene_);
+		TimedEventEditorDlg(wxWindow* parent, TimedEvent & event_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~TimedEventEditorDlg();
 
 		//(*Declarations(TimedEventEditorDlg)
@@ -93,8 +93,8 @@ class TimedEventEditorDlg: public wxDialog
 		void OnexpressionBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
-		Scene & scene;
+		gd::Project & game;
+		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()
 };

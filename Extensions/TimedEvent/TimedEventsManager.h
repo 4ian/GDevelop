@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,8 +28,8 @@ freely, subject to the following restrictions:
 #define TIMEDEVENTMANAGER_H
 #include <map>
 #include <string>
-#include "GDL/RuntimeScene.h"
-#include "GDL/ManualTimer.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/ManualTimer.h"
 
 class TimedEventsManager
 {

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -30,14 +30,14 @@ freely, subject to the following restrictions:
 #define TIMEDEVENT_H
 #include "GDCore/Events/Event.h"
 #include <map>
-#include "GDL/ManualTimer.h"
+#include "GDCpp/ManualTimer.h"
 class RuntimeScene;
 namespace gd { class Instruction; }
 class TiXmlElement;
 class EventsCodeGenerationContext;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class Scene;
+namespace gd { class Layout; }
 namespace gd { class MainFrameWrapper; }
 class wxWindow;
 
@@ -46,71 +46,69 @@ class wxWindow;
  */
 class GD_EXTENSION_API TimedEvent : public gd::BaseEvent
 {
-    public:
-        TimedEvent();
-        TimedEvent(const TimedEvent & event);
-        virtual ~TimedEvent();
+public:
+    TimedEvent();
+    TimedEvent(const TimedEvent & event);
+    virtual ~TimedEvent();
 
-        TimedEvent& operator=(const TimedEvent & event);
-        virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new TimedEvent(*this));}
+    TimedEvent& operator=(const TimedEvent & event);
+    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new TimedEvent(*this));}
 
-        virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+    virtual bool IsExecutable() const {return true;}
 
-        virtual bool CanHaveSubEvents() const {return true;}
-        virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
+    virtual bool CanHaveSubEvents() const {return true;}
+    virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
+    virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
+    void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
-        const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
-        std::vector < gd::Instruction > & GetConditions() { return conditions; };
-        void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
+    const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
+    std::vector < gd::Instruction > & GetConditions() { return conditions; };
+    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
-        const std::vector < gd::Instruction > & GetActions() const { return actions; };
-        std::vector < gd::Instruction > & GetActions() { return actions; };
-        void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
+    const std::vector < gd::Instruction > & GetActions() const { return actions; };
+    std::vector < gd::Instruction > & GetActions() { return actions; };
+    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
-        std::string GetName() const { return name; };
-        void SetName(std::string name_) { name = name_; };
+    std::string GetName() const { return name; };
+    void SetName(std::string name_) { name = name_; };
 
-        std::string GetTimeoutExpression() const { return timeout.GetPlainString(); };
-        void SetTimeoutExpression(std::string timeout_) { timeout = gd::Expression(timeout_); };
+    std::string GetTimeoutExpression() const { return timeout.GetPlainString(); };
+    void SetTimeoutExpression(std::string timeout_) { timeout = gd::Expression(timeout_); };
 
-        virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
-        virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
-        virtual std::vector < gd::Expression* > GetAllExpressions();
+    virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
+    virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
+    virtual std::vector < gd::Expression* > GetAllExpressions();
 
-        virtual void SaveToXml(TiXmlElement * eventElem) const;
-        virtual void LoadFromXml(const TiXmlElement * eventElem);
+    virtual void SaveToXml(TiXmlElement * eventElem) const;
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
+    /**
+     * Called by event editor to draw the event.
+     */
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
 
-        /**
-         * Called by event editor to draw the event.
-         */
-        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+    /**
+     * Must return the height of the event when rendered
+     */
+    virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const;
 
-        /**
-         * Must return the height of the event when rendered
-         */
-        virtual unsigned int GetRenderedHeight(unsigned int width) const;
+    /**
+     * Called when the user want to edit the event
+     */
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
-        /**
-         * Called when the user want to edit the event
-         */
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    static std::vector< TimedEvent* > codeGenerationCurrentParents;
+    std::vector< TimedEvent* > codeGenerationChildren;
 
-        static std::vector< TimedEvent* > codeGenerationCurrentParents;
-        std::vector< TimedEvent* > codeGenerationChildren;
+private:
+    void Init(const TimedEvent & event);
 
-    private:
-        void Init(const TimedEvent & event);
+    std::string name;
+    gd::Expression timeout;
+    std::vector < gd::Instruction > conditions;
+    std::vector < gd::Instruction > actions;
+    std::vector < gd::BaseEventSPtr > events;
 
-        std::string name;
-        gd::Expression timeout;
-        std::vector < gd::Instruction > conditions;
-        std::vector < gd::Instruction > actions;
-        std::vector < gd::BaseEventSPtr > events;
-
-        bool nameSelected;
+    bool nameSelected;
 };
 
 #endif // TIMEDEVENT_H

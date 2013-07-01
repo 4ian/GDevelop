@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -35,12 +35,12 @@ namespace TimedEvents
 {
 
 /**
- * Update timed event and return its time, in seconds.
+ * Update timed event and return its time, in microseconds.
  * \param scene Scene used
  * \param mangledTimedEventName Mangled timed event name
- * \return Time elapsed, in milliseconds, of the timed event
+ * \return Time elapsed, in microseconds, of the timed event
  */
-unsigned int GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string mangledTimedEventName);
+signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string mangledTimedEventName);
 
 /**
  * Reset a timed event.

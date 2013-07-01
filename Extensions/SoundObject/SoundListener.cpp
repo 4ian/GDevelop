@@ -29,71 +29,71 @@ freely, subject to the following restrictions:
 
 void GD_EXTENSION_API SetListenerX(const float & xpos)
 {
-    sf::Listener::SetPosition(xpos, sf::Listener::GetPosition().y, sf::Listener::GetPosition().z);
+    sf::Listener::setPosition(xpos, sf::Listener::getPosition().y, sf::Listener::getPosition().z);
 }
 
 void GD_EXTENSION_API SetListenerY(const float & ypos)
 {
-    sf::Listener::SetPosition(sf::Listener::GetPosition().x, ypos, sf::Listener::GetPosition().z);
+    sf::Listener::setPosition(sf::Listener::getPosition().x, ypos, sf::Listener::getPosition().z);
 }
 
 void GD_EXTENSION_API SetListenerZ(const float & zpos)
 {
-    sf::Listener::SetPosition(sf::Listener::GetPosition().x, sf::Listener::GetPosition().y, zpos);
+    sf::Listener::setPosition(sf::Listener::getPosition().x, sf::Listener::getPosition().y, zpos);
 }
 
 float GD_EXTENSION_API GetListenerX()
 {
-    return sf::Listener::GetPosition().x;
+    return sf::Listener::getPosition().x;
 }
 
 float GD_EXTENSION_API GetListenerY()
 {
-    return sf::Listener::GetPosition().y;
+    return sf::Listener::getPosition().y;
 }
 
 float GD_EXTENSION_API GetListenerZ()
 {
-    return sf::Listener::GetPosition().z;
+    return sf::Listener::getPosition().z;
 }
 
 void GD_EXTENSION_API SetListenerDirectionX(const float & xdir)
 {
-    sf::Listener::SetDirection(xdir, sf::Listener::GetDirection().y, sf::Listener::GetDirection().z);
+    sf::Listener::setDirection(xdir, sf::Listener::getDirection().y, sf::Listener::getDirection().z);
 }
 
 void GD_EXTENSION_API SetListenerDirectionY(const float & ydir)
 {
-    sf::Listener::SetDirection(sf::Listener::GetDirection().x, ydir, sf::Listener::GetDirection().z);
+    sf::Listener::setDirection(sf::Listener::getDirection().x, ydir, sf::Listener::getDirection().z);
 }
 
 void GD_EXTENSION_API SetListenerDirectionZ(const float & zdir)
 {
-    sf::Listener::SetDirection(sf::Listener::GetDirection().x, sf::Listener::GetDirection().y, zdir);
+    sf::Listener::setDirection(sf::Listener::getDirection().x, sf::Listener::getDirection().y, zdir);
 }
 
 float GD_EXTENSION_API GetListenerDirectionX()
 {
-    return sf::Listener::GetDirection().x;
+    return sf::Listener::getDirection().x;
 }
 
 float GD_EXTENSION_API GetListenerDirectionY()
 {
-    return sf::Listener::GetDirection().y;
+    return sf::Listener::getDirection().y;
 }
 
 float GD_EXTENSION_API GetListenerDirectionZ()
 {
-    return sf::Listener::GetDirection().z;
+    return sf::Listener::getDirection().z;
 }
 
 void GD_EXTENSION_API SetGlobalVolume(const float & globalVolume)
 {
-    sf::Listener::SetGlobalVolume(globalVolume);
+    sf::Listener::setGlobalVolume(globalVolume);
 }
 
 float GD_EXTENSION_API GetGlobalVolume()
 {
-    return sf::Listener::GetGlobalVolume();
+    return sf::Listener::getGlobalVolume();
 }
 

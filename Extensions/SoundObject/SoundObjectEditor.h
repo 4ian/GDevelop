@@ -42,14 +42,14 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 namespace gd { class MainFrameWrapper; }
-class Game;
+namespace gd { class Project; }
 class SoundObject;
 
 class SoundObjectEditor: public wxDialog
 {
 	public:
 
-		SoundObjectEditor( wxWindow* parent, Game & game_, SoundObject & object_ );
+		SoundObjectEditor( wxWindow* parent, gd::Project & game_, SoundObject & object_ );
 		virtual ~SoundObjectEditor();
 
 		//(*Declarations(SoundObjectEditor)
@@ -112,7 +112,7 @@ class SoundObjectEditor: public wxDialog
 		void OnButton2Click(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		SoundObject & object;
 
 		DECLARE_EVENT_TABLE()

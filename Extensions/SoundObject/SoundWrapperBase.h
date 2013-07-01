@@ -31,7 +31,7 @@ freely, subject to the following restrictions:
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Audio/Music.hpp>
 
-#include "GDL/RuntimeScene.h"
+#include "GDCpp/RuntimeScene.h"
 
 class SoundWrapperBase
 {

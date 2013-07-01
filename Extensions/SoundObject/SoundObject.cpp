@@ -28,16 +28,15 @@ freely, subject to the following restrictions:
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
 
-#include "GDL/ImageManager.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/Position.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/CommonTools.h"
 
 #include "SoundObject.h"
 #include "SoundWrapperBase.h"
-#include "SoundInitialPositionPanel.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
@@ -50,21 +49,55 @@ sf::Texture SoundObject::soundIcon;
 sf::Sprite SoundObject::soundSprite;
 #endif
 
+using namespace std;
+
 SoundObject::SoundObject(std::string name_) :
-Object(name_), m_type("Sound"), m_sound(0)
+    Object(name_),
+    type("Sound"),
+    zPos(0),
+    volume(100),
+    attenuation(1),
+    minDist(1),
+    loop(true),
+    pitch(1)
 {
-    SetSoundType(m_type);
-    SetPitch(1);
 }
 
-SoundObject::~SoundObject()
+RuntimeSoundObject::RuntimeSoundObject(RuntimeScene & scene_, const gd::Object & object) :
+    RuntimeObject(scene_, object),
+    m_sound(NULL)
 {
+    const SoundObject & soundObject = static_cast<const SoundObject&>(object);
+
+    SetSoundType(soundObject.GetSoundType());
+    SetSoundFileName(soundObject.GetSoundFileName());
+    SetVolume(soundObject.GetVolume());
+    SetAttenuation(soundObject.GetAttenuation());
+    SetLooping(soundObject.IsLooping());
+    SetMinDistance(soundObject.GetMinDistance());
+    SetPitch(soundObject.GetPitch());
+    SetZPos(soundObject.GetZPos());
+
+    ReloadSound(scene_);
     Stop();
-    if (m_sound != NULL) delete m_sound;
-    m_sound = 0;
 }
 
-void SoundObject::Init(const SoundObject &other)
+RuntimeSoundObject& RuntimeSoundObject::operator=(const RuntimeSoundObject &other)
+{
+    if ( &other != this )
+        Init(other);
+
+    return *this;
+}
+
+RuntimeSoundObject::RuntimeSoundObject(const RuntimeSoundObject &other) :
+    RuntimeObject(other),
+    m_sound(NULL)
+{
+    Init(other);
+}
+
+void RuntimeSoundObject::Init(const RuntimeSoundObject &other)
 {
     SetSoundType(other.m_type);
     SetSoundFileName(other.GetSoundFileName());
@@ -80,18 +113,13 @@ void SoundObject::Init(const SoundObject &other)
     Stop();
 }
 
-SoundObject::SoundObject(const SoundObject &other) : Object(other), m_sound(0)
+RuntimeSoundObject::~RuntimeSoundObject()
 {
-    Init(other);
+    Stop();
+    if (m_sound != NULL) delete m_sound;
 }
 
-SoundObject& SoundObject::operator=(const SoundObject &other)
-{
-    Init(other);
-    return *this;
-}
-
-void SoundObject::LoadFromXml(const TiXmlElement * elem)
+void SoundObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elem)
 {
     float zpos = 0;
     std::string type = "Sound";
@@ -198,11 +226,11 @@ void SoundObject::LoadFromXml(const TiXmlElement * elem)
 }
 
 #if defined(GD_IDE_ONLY)
-void SoundObject::SaveToXml(TiXmlElement * elem)
+void SoundObject::DoSaveToXml(TiXmlElement * elem)
 {
-    TiXmlElement * type = new TiXmlElement( "Type" );
-    elem->LinkEndChild( type );
-    type->SetAttribute("value", m_type.c_str());
+    TiXmlElement * typeElem = new TiXmlElement( "Type" );
+    elem->LinkEndChild( typeElem );
+    typeElem->SetAttribute("value", type.c_str());
 
     TiXmlElement * filename = new TiXmlElement( "Filename" );
     elem->LinkEndChild( filename );
@@ -234,61 +262,34 @@ void SoundObject::SaveToXml(TiXmlElement * elem)
 }
 #endif
 
-bool SoundObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
-{
-    return ReloadSound(scene);
-}
-
-bool SoundObject::Draw( sf::RenderTarget& renderTarget )
-{
-    return true;
-}
-
-bool SoundObject::InitializeFromInitialPosition(const InitialPosition & position)
-{
-    if ( position.floatInfos.find("z") != position.floatInfos.end() )
-        SetZPos(position.floatInfos.find("z")->second);
-
-    return true;
-}
-
 #if defined(GD_IDE_ONLY)
-/**
- * Render object at edittime
- */
-bool SoundObject::DrawEdittime( sf::RenderTarget& renderTarget )
+void SoundObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    soundSprite.SetPosition(GetX(), GetY());
-    renderTarget.Draw(soundSprite);
-
-    if(!IsStopped())
-        Stop();
-
-    return true;
+    soundSprite.setPosition(instance.GetX(), instance.GetY());
+    renderTarget.draw(soundSprite);
 }
 
 void SoundObject::LoadEdittimeIcon()
 {
-    soundIcon.LoadFromFile("Extensions/soundicon32.png");
-    soundSprite.SetTexture(soundIcon);
+    soundIcon.loadFromFile("CppPlatform/Extensions/soundicon32.png");
+    soundSprite.setTexture(soundIcon);
 }
 
-wxPanel * SoundObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+std::map<std::string, std::string> SoundObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
 {
-    SoundInitialPositionPanel * panel = new SoundInitialPositionPanel(parent);
+    std::map<std::string, std::string> properties;
+    properties[ToString(_("Z"))] = position.floatInfos.find("z") != position.floatInfos.end() ?
+                                   ToString(position.floatInfos.find("z")->second) :
+                                   "0";
 
-    if ( position.floatInfos.find("z") != position.floatInfos.end())
-        panel->zPositionTextCtrl->ChangeValue(ToString( position.floatInfos.find("z")->second));
-
-    return panel;
+    return properties;
 }
 
-void SoundObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
+bool SoundObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene)
 {
-    SoundInitialPositionPanel * soundPanel = dynamic_cast<SoundInitialPositionPanel*>(panel);
-    if (soundPanel == NULL) return;
+    if ( name == _("Z") ) position.floatInfos["z"] = ToFloat(value);
 
-    position.floatInfos["z"] = ToFloat(ToString(soundPanel->zPositionTextCtrl->GetValue()));
+    return true;
 }
 
 void SoundObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
@@ -298,17 +299,17 @@ void SoundObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool SoundObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/soundicon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/soundicon24.png", wxBITMAP_TYPE_ANY);
     return true;
 }
 
-void SoundObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void SoundObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     SoundObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 
-void SoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Sound level");                    value = ToString(GetVolume());}
     else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = ToString(GetMinDistance());}
@@ -317,7 +318,7 @@ void SoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name,
     else if ( propertyNb == 4 ) {name = _("Z Position");                          value = ToString(GetZPos());}
 }
 
-bool SoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if(propertyNb == 0) {SetVolume(ToFloat(newValue));}
     else if (propertyNb == 1) {SetMinDistance(ToFloat(newValue));}
@@ -327,79 +328,43 @@ bool SoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
     return true;
 }
 
-unsigned int SoundObject::GetNumberOfProperties() const
+unsigned int RuntimeSoundObject::GetNumberOfProperties() const
 {
     return 5;
 }
 #endif
 
-void SoundObject::OnPositionChanged()
+bool RuntimeSoundObject::ExtraInitializationFromInitialInstance(const gd::InitialInstance & instance)
+{
+    SetZPos(instance.floatInfos.find("z") != instance.floatInfos.end() ? instance.floatInfos.find("z")->second : 0);
+
+    return true;
+}
+
+void RuntimeSoundObject::OnPositionChanged()
 {
     m_sound->SetPosition(sf::Vector3f(GetX(), GetY(), GetZPos()));
 }
 
-float SoundObject::GetDrawableX() const
-{
-    return GetX();
-}
-
-float SoundObject::GetDrawableY() const
-{
-    return GetY();
-}
-
-float SoundObject::GetWidth() const
-{
-    return 32;
-}
-
-float SoundObject::GetHeight() const
-{
-    return 32;
-}
-
-float SoundObject::GetCenterX() const
-{
-    return 16;
-}
-
-float SoundObject::GetCenterY() const
-{
-    return 16;
-}
-
-void SoundObject::UpdateTime(float)
-{
-}
-
-void SoundObject::SetSoundFileName(const std::string & soundfilename)
+void RuntimeSoundObject::SetSoundFileName(const std::string & soundfilename)
 {
     fileName = soundfilename;
     if(m_sound)
         m_sound->SetFileName(fileName);
 }
 
-std::string SoundObject::GetSoundFileName() const
-{
-    return fileName;
-}
-
-float SoundObject::GetZPos() const
+float RuntimeSoundObject::GetZPos() const
 {
     return m_sound->GetPosition().z;
 }
 
-void SoundObject::SetZPos(float zpos)
+void RuntimeSoundObject::SetZPos(float zpos)
 {
-    m_sound->SetPosition(sf::Vector3f(m_sound->GetPosition().x, m_sound->GetPosition().y, zpos));
+    if (m_sound)
+        m_sound->SetPosition(sf::Vector3f(m_sound->GetPosition().x, m_sound->GetPosition().y, zpos));
 }
 
-void DestroySoundObject(Object * object)
-{
-    delete object;
-}
-
-void SoundObject::SetSoundType(const std::string &type)
+void RuntimeSoundObject::SetSoundType(const std::string &type)
 {
     if(type == "Sound")
     {
@@ -409,7 +374,7 @@ void SoundObject::SetSoundType(const std::string &type)
         m_sound = new SoundWrapper();
         m_type = type;
     }
-    else if(type == "Music")
+    else
     {
         if(m_sound)
             delete m_sound;
@@ -419,98 +384,113 @@ void SoundObject::SetSoundType(const std::string &type)
     }
 }
 
-std::string SoundObject::GetSoundType() const
+const std::string & RuntimeSoundObject::GetSoundType() const
 {
     return m_type;
 }
 
-bool SoundObject::ReloadSound(const RuntimeScene &scene)
+bool RuntimeSoundObject::ReloadSound(const RuntimeScene &scene)
 {
     return m_sound->LoadFromFile(m_sound->GetFileName(), scene);
 }
 
-void SoundObject::Play()
+void RuntimeSoundObject::Play()
 {
     m_sound->Play();
 }
 
-void SoundObject::Pause()
+void RuntimeSoundObject::Pause()
 {
     m_sound->Pause();
 }
 
-void SoundObject::Stop()
+void RuntimeSoundObject::Stop()
 {
     m_sound->Stop();
 }
 
-bool SoundObject::IsPlaying() const
+bool RuntimeSoundObject::IsPlaying() const
 {
     return m_sound->IsPlaying();
 }
 
-bool SoundObject::IsPaused() const
+bool RuntimeSoundObject::IsPaused() const
 {
     return m_sound->IsPausing();
 }
 
-bool SoundObject::IsStopped() const
+bool RuntimeSoundObject::IsStopped() const
 {
     return m_sound->IsStopped();
 }
 
-void SoundObject::SetVolume(float volume)
+void RuntimeSoundObject::SetVolume(float volume)
 {
     m_sound->SetVolume(volume);
 }
 
-float SoundObject::GetVolume() const
+float RuntimeSoundObject::GetVolume() const
 {
     return m_sound->GetVolume();
 }
 
-void SoundObject::SetAttenuation(float attenuation)
+void RuntimeSoundObject::SetAttenuation(float attenuation)
 {
     m_sound->SetAttenuation(attenuation);
 }
 
-float SoundObject::GetAttenuation() const
+float RuntimeSoundObject::GetAttenuation() const
 {
     return m_sound->GetAttenuation();
 }
 
-void SoundObject::SetMinDistance(float minDist)
+void RuntimeSoundObject::SetMinDistance(float minDist)
 {
     m_sound->SetMinDistance(minDist);
 }
 
-float SoundObject::GetMinDistance() const
+float RuntimeSoundObject::GetMinDistance() const
 {
     return m_sound->GetMinDistance();
 }
 
-void SoundObject::SetLooping(bool is)
+void RuntimeSoundObject::SetLooping(bool is)
 {
     m_sound->SetLooping(is);
 }
 
-bool SoundObject::IsLooping() const
+bool RuntimeSoundObject::IsLooping() const
 {
     return m_sound->IsLooping();
 }
 
-void SoundObject::SetPitch(float pitch)
+void RuntimeSoundObject::SetPitch(float pitch)
 {
     m_sound->SetPitch(pitch);
 }
 
-float SoundObject::GetPitch() const
+float RuntimeSoundObject::GetPitch() const
 {
     return m_sound->GetPitch();
 }
 
-Object * CreateSoundObject(std::string name)
+void DestroyRuntimeSoundObject(RuntimeObject * object)
+{
+    delete object;
+}
+
+RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object & object)
+{
+    return new RuntimeSoundObject(scene, object);
+}
+
+gd::Object * CreateSoundObject(std::string name)
 {
     return new SoundObject(name);
+}
+
+void DestroySoundObject(gd::Object * object)
+{
+    delete object;
 }
 

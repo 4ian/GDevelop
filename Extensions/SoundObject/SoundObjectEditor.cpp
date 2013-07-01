@@ -37,10 +37,10 @@ freely, subject to the following restrictions:
 #include <wx/filename.h>
 #include <wx/filedlg.h>
 
-#include "GDL/Game.h"
+#include "GDCpp/Project.h"
 #include "SoundObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 
 //(*IdInit(SoundObjectEditor)
 const long SoundObjectEditor::ID_RADIOBUTTON2 = wxNewId();
@@ -72,7 +72,7 @@ BEGIN_EVENT_TABLE(SoundObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SoundObjectEditor::SoundObjectEditor( wxWindow* parent, Game & game_, SoundObject & object_ ) :
+SoundObjectEditor::SoundObjectEditor( wxWindow* parent, gd::Project & game_, SoundObject & object_ ) :
 game(game_),
 object(object_)
 {

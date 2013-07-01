@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -45,7 +45,7 @@ freely, subject to the following restrictions:
 #include <wx/clrpicker.h>
 //*)
 #include <wx/aui/aui.h>
-class Game;
+namespace gd { class Project; }
 class ParticleEmitterObject;
 namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
@@ -54,7 +54,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 {
 	public:
 
-		ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, gd::MainFrameWrapper & mainFrameWrapper );
+		ParticleEmitterObjectEditor( wxWindow* parent, gd::Project & game_, ParticleEmitterObject & object_, gd::MainFrameWrapper & mainFrameWrapper );
 		virtual ~ParticleEmitterObjectEditor();
 
 		//(*Declarations(ParticleEmitterObjectEditor)
@@ -94,6 +94,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxTextCtrl* emitterAngleAEdit;
 		wxStaticText* StaticText40;
 		wxTextCtrl* angle2Edit;
+		wxCheckBox* destroyWhenNoParticlesCheck;
 		wxSpinCtrlDouble* blue2Edit;
 		wxRadioButton* alphaRenderingCheck;
 		wxSpinCtrlDouble* alpha2RandomnessEdit;
@@ -315,6 +316,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_TEXTCTRL8;
 		static const long ID_PANEL6;
 		static const long ID_NOTEBOOK3;
+		static const long ID_CHECKBOX2;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON3;
 		static const long ID_BUTTON1;
@@ -365,7 +367,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		void PrepareControlsForQuadRenderer();
 		void PrepareControlsForLineRenderer();
 
-		Game & game;
+		gd::Project & game;
 		ParticleEmitterObject & object;
 
 		wxAuiManager m_mgr; ///< Used to display the image bank editor

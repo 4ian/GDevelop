@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,24 +26,21 @@ freely, subject to the following restrictions:
 
 #ifndef EXTENSION_H_INCLUDED
 #define EXTENSION_H_INCLUDED
-
+namespace gd { class ObjectMetadata; }
 
 /**
  * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
-    public:
+public:
+    Extension();
+    virtual ~Extension() {};
 
-        Extension();
-        virtual ~Extension() {};
-
-    private:
-
-        void ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos);
-        void ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos);
-        void ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos);
-        void CompleteCompilationInformation();
+private:
+    void ExtensionSubDeclaration1(gd::ObjectMetadata & objInfos);
+    void ExtensionSubDeclaration2(gd::ObjectMetadata & objInfos);
+    void ExtensionSubDeclaration3(gd::ObjectMetadata & objInfos);
 };
 
 #endif // EXTENSION_H_INCLUDED

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,91 +29,100 @@ freely, subject to the following restrictions:
 #endif
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "GDL/Object.h"
-#include "GDL/ImageManager.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/FontManager.h"
-#include "GDL/Position.h"
-#include "GDL/XmlMacros.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/RuntimeGame.h"
-#include "GDL/Polygon.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/XmlMacros.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"
 #include <SPK.h>
 #include <SPK_GL.h>
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif
 
-#if defined(GD_IDE_ONLY)
-sf::Texture ParticleEmitterObject::edittimeIconImage;
-sf::Sprite ParticleEmitterObject::edittimeIcon;
-#endif
+using namespace std;
+
+ParticleEmitterBase::ParticleEmitterBase() :
+    rendererType(Point),
+    rendererParam1(3.0f),
+    rendererParam2(1.0f),
+    additive(true),
+    tank(-1),
+    flow(300),
+    emitterForceMin(25.0f),
+    emitterForceMax(65.0f),
+    emitterXDirection(0.0f),
+    emitterYDirection(1.0f),
+    emitterZDirection(0.0f),
+    emitterAngleA(0),
+    emitterAngleB(90),
+    zoneRadius(3.0f),
+    particleGravityX(0.0f),
+    particleGravityY(-100.0f),
+    particleGravityZ(0.0f),
+    friction(2.0f),
+    particleLifeTimeMin(0.5f),
+    particleLifeTimeMax(2.5f),
+    redParam(Enabled),
+    greenParam(Random),
+    blueParam(Random),
+    alphaParam(Mutable),
+    sizeParam(Mutable),
+    angleParam(Mutable),
+    particleRed1(255.0f),
+    particleRed2(255.0f),
+    particleGreen1(51),
+    particleGreen2(255),
+    particleBlue1(51),
+    particleBlue2(0.0f),
+    particleAlpha1(204),
+    particleAlpha2(0.0f),
+    particleSize1(100.0f),
+    particleSize2(100.0f),
+    particleAngle1(0.0f),
+    particleAngle2(0.0f),
+    particleAlphaRandomness1(0), particleAlphaRandomness2(0),
+    particleSizeRandomness1(0), particleSizeRandomness2(0), particleAngleRandomness1(0), particleAngleRandomness2(0),
+    maxParticleNb(5000),
+    destroyWhenNoParticles(true),
+    particleSystem(NULL)
+{
+
+}
 
 ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
-Object(name_),
-#if defined(GD_IDE_ONLY)
-particleEditionSimpleMode(true),
-emissionEditionSimpleMode(true),
-gravityEditionSimpleMode(true),
-#endif
-particleSystem(new ParticleSystemWrapper),
-rendererType(Point),
-rendererParam1(3.0f),
-rendererParam2(1.0f),
-additive(true),
-tank(-1),
-flow(300),
-emitterForceMin(25.0f),
-emitterForceMax(65.0f),
-emitterXDirection(0.0f),
-emitterYDirection(1.0f),
-emitterZDirection(0.0f),
-emitterAngleA(0),
-emitterAngleB(90),
-zoneRadius(3.0f),
-particleGravityX(0.0f),
-particleGravityY(-100.0f),
-particleGravityZ(0.0f),
-friction(2.0f),
-particleLifeTimeMin(0.5f),
-particleLifeTimeMax(2.5f),
-redParam(Enabled),
-greenParam(Random),
-blueParam(Random),
-alphaParam(Mutable),
-sizeParam(Mutable),
-angleParam(Mutable),
-particleRed1(255.0f),
-particleRed2(255.0f),
-particleGreen1(51),
-particleGreen2(255),
-particleBlue1(51),
-particleBlue2(0.0f),
-particleAlpha1(204),
-particleAlpha2(0.0f),
-particleSize1(100.0f),
-particleSize2(100.0f),
-particleAngle1(0.0f),
-particleAngle2(0.0f),
-particleAlphaRandomness1(0), particleAlphaRandomness2(0),
-particleSizeRandomness1(0), particleSizeRandomness2(0), particleAngleRandomness1(0), particleAngleRandomness2(0),
-maxParticleNb(5000),
-hasSomeParticles(true),
-opacity( 255 ),
-colorR( 255 ),
-colorG( 255 ),
-colorB( 255 )
+    Object(name_)
+    #if defined(GD_IDE_ONLY)
+    ,particleEditionSimpleMode(true),
+    emissionEditionSimpleMode(true),
+    gravityEditionSimpleMode(true)
+    #endif
 {
 }
 
-void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
+void ParticleEmitterObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elem)
+{
+    ParticleEmitterBase::LoadFromXml(elem);
+
+    #if defined(GD_IDE_ONLY)
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
+    #endif
+}
+
+void ParticleEmitterBase::LoadFromXml(const TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("tank", tank);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("flow", flow);
@@ -152,6 +161,8 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngleRandomness1", particleAngleRandomness1);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngleRandomness2", particleAngleRandomness2);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("additive", additive);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("destroyWhenNoParticles", destroyWhenNoParticles);
+    if ( elem->Attribute( "destroyWhenNoParticles" ) == NULL ) destroyWhenNoParticles = false;
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
 
     {
@@ -209,22 +220,19 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
         else if ( result == "Random") angleParam = Random;
         else angleParam = Nothing;
     }
-
-    int r,g,b;
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorR", r);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
-    colorR = r; colorG = g; colorB = b;
-
-    #if defined(GD_IDE_ONLY)
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
-    #endif
 }
 
 #if defined(GD_IDE_ONLY)
-void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
+void ParticleEmitterObject::DoSaveToXml(TiXmlElement * elem)
+{
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
+
+    ParticleEmitterBase::SaveToXml(elem);
+}
+
+void ParticleEmitterBase::SaveToXml(TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("tank", tank);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("flow", flow);
@@ -263,6 +271,7 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAngleRandomness1", particleAngleRandomness1);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAngleRandomness2", particleAngleRandomness2);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("additive", additive);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("destroyWhenNoParticles", destroyWhenNoParticles);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("maxParticleNb", maxParticleNb);
 
@@ -300,24 +309,14 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     if ( angleParam == Mutable ) angleParamStr = "Mutable";
     else if ( angleParam == Random ) angleParamStr = "Random";
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("angleParam", angleParamStr);
-
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", colorR);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", colorB);
-
-    #if defined(GD_IDE_ONLY)
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
-    #endif
 }
 #endif
 
-/**
- * Create particle system from parameters
- */
-void ParticleEmitterObject::CreateParticleSystem()
+void ParticleEmitterBase::CreateParticleSystem()
 {
+    if (particleSystem) delete particleSystem;
+    particleSystem = new ParticleSystemWrapper;
+
     int enabledFlag = 0;
     int mutableFlag = 0;
     int randomFlag = 0;
@@ -399,7 +398,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 	{
 	    SPK::GL::GLQuadRenderer * quadRenderer = new SPK::GL::GLQuadRenderer(rendererParam1,rendererParam2);
 
-        if ( particleSystem->openGLTextureParticle->GetOpenGLTexture() != 0 )
+        if ( particleSystem->openGLTextureParticle && particleSystem->openGLTextureParticle->GetOpenGLTexture() != 0 )
         {
             quadRenderer->setTexturingMode(SPK::TEXTURE_2D);
             quadRenderer->setTexture(particleSystem->openGLTextureParticle->GetOpenGLTexture());
@@ -423,7 +422,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 	particleSystem->renderer->enableRenderingHint(SPK::DEPTH_TEST,false); //No depth test for performance
 
 	// Create the zone
-	particleSystem->zone = SPK::Sphere::create(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0.0f), zoneRadius);
+	particleSystem->zone = SPK::Sphere::create(SPK::Vector3D(0, 0), zoneRadius);
 
 	// Create the emitter
 	particleSystem->emitter = SPK::SphericEmitter::create(SPK::Vector3D(emitterXDirection,-emitterYDirection,emitterZDirection), emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
@@ -444,33 +443,33 @@ void ParticleEmitterObject::CreateParticleSystem()
 	particleSystem->particleSystem->addGroup(particleSystem->group);
 }
 
-void ParticleEmitterObject::UpdateRedParameters()
+void ParticleEmitterBase::UpdateRedParameters()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
 	if ( redParam == Mutable || redParam == Random ) particleSystem->particleModel->setParam(SPK::PARAM_RED, particleRed1/255.0f,particleRed2/255.0f);
 	else particleSystem->particleModel->setParam(SPK::PARAM_RED, particleRed1/255.0f);
 }
 
-void ParticleEmitterObject::UpdateGreenParameters()
+void ParticleEmitterBase::UpdateGreenParameters()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
 	if ( greenParam == Mutable || greenParam == Random ) particleSystem->particleModel->setParam(SPK::PARAM_GREEN, particleGreen1/255.0f,particleGreen2/255.0f);
 	else particleSystem->particleModel->setParam(SPK::PARAM_GREEN, particleGreen1/255.0f);
 }
 
-void ParticleEmitterObject::UpdateBlueParameters()
+void ParticleEmitterBase::UpdateBlueParameters()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
 	if ( blueParam == Mutable || blueParam == Random ) particleSystem->particleModel->setParam(SPK::PARAM_BLUE, particleBlue1/255.0f,particleBlue2/255.0f);
 	else particleSystem->particleModel->setParam(SPK::PARAM_BLUE, particleBlue1/255.0f);
 }
 
-void ParticleEmitterObject::UpdateAlphaParameters()
+void ParticleEmitterBase::UpdateAlphaParameters()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
 	if ( alphaParam == Mutable ) particleSystem->particleModel->setParam(SPK::PARAM_ALPHA,
                                                                         (particleAlpha1-particleAlphaRandomness1/2.0f)/255.0f,
@@ -481,9 +480,9 @@ void ParticleEmitterObject::UpdateAlphaParameters()
 	else particleSystem->particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1/255.0f);
 }
 
-void ParticleEmitterObject::UpdateSizeParameters()
+void ParticleEmitterBase::UpdateSizeParameters()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
 	if ( sizeParam == Mutable ) particleSystem->particleModel->setParam(SPK::PARAM_SIZE,
                                                                        (particleSize1-particleSizeRandomness1/2.0f)/100.0f,
@@ -494,9 +493,9 @@ void ParticleEmitterObject::UpdateSizeParameters()
 	else particleSystem->particleModel->setParam(SPK::PARAM_SIZE, particleSize1/100.0f);
 }
 
-void ParticleEmitterObject::UpdateAngleParameters()
+void ParticleEmitterBase::UpdateAngleParameters()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
 	if ( angleParam == Mutable ) particleSystem->particleModel->setParam(SPK::PARAM_ANGLE,
                                                                         -(particleAngle1-particleAngleRandomness1/2.0f)/180.0f*3.14159f,
@@ -507,242 +506,227 @@ void ParticleEmitterObject::UpdateAngleParameters()
 	else particleSystem->particleModel->setParam(SPK::PARAM_ANGLE, -particleAngle1/180.0f*3.14159f);
 }
 
-void ParticleEmitterObject::UpdateLifeTime()
+void ParticleEmitterBase::UpdateLifeTime()
 {
-    if ( !particleSystem->particleModel ) return;
+    if ( !particleSystem || !particleSystem->particleModel ) return;
 
     particleSystem->particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
 }
 
-bool ParticleEmitterObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+RuntimeParticleEmitterObject::RuntimeParticleEmitterObject(RuntimeScene & scene_, const gd::Object & object):
+    RuntimeObject(scene_, object),
+    hasSomeParticles(true)
 {
-    //Get the texture if necessary
-    if ( rendererType == Quad ) particleSystem->openGLTextureParticle = imageMgr.GetOpenGLTexture(textureParticleName);
+    const ParticleEmitterObject & particleEmitterObject = static_cast<const ParticleEmitterObject&>(object);
+    ParticleEmitterBase::operator=(particleEmitterObject);
+
+    //Store a pointer to the scene
+    scene = &scene_;
 
 	CreateParticleSystem();
+    SetTexture(scene_, GetParticleTexture());
 
-    return true;
+    OnPositionChanged();
 }
 
-bool ParticleEmitterObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr)
-{
-    #if defined(GD_IDE_ONLY)
-    edittimeIconImage.LoadFromFile("Extensions/particleSystemSceneIcon.png");
-    edittimeIconImage.SetSmooth(false);
-    edittimeIcon.SetTexture(edittimeIconImage);
-    #endif
-
-    return true;
-}
-
-ParticleEmitterObject::~ParticleEmitterObject()
+ParticleEmitterBase::~ParticleEmitterBase()
 {
     if ( particleSystem ) delete particleSystem;
-}
-
-void ParticleEmitterObject::RecreateParticleSystem()
-{
-    if ( particleSystem ) delete particleSystem;
-    particleSystem = new ParticleSystemWrapper();
-
-	CreateParticleSystem();
-}
-
-/**
- * Update animation and direction from the inital position
- */
-bool ParticleEmitterObject::InitializeFromInitialPosition(const InitialPosition & position)
-{
-    return true;
 }
 
 /**
  * Render object at runtime
  */
-bool ParticleEmitterObject::Draw( sf::RenderTarget& renderTarget )
+bool RuntimeParticleEmitterObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    renderTarget.RestoreGLStates();
+    renderTarget.popGLStates();
 
-    float xView =  renderTarget.GetView().GetCenter().x*0.25f;
-    float yView = -renderTarget.GetView().GetCenter().y*0.25f;
+    float xView =  renderTarget.getView().getCenter().x*0.25f;
+    float yView = -renderTarget.getView().getCenter().y*0.25f;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glRotatef(renderTarget.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(-xView, -yView, -75.0f*(renderTarget.GetView().GetSize().y/600.0f));
+    glRotatef(renderTarget.getView().getRotation(), 0, 0, 1);
+    glTranslatef(-xView, -yView, -75.0f*(renderTarget.getView().getSize().y/600.0f));
 
 	SPK::GL::GLRenderer::saveGLStates();
-	particleSystem->particleSystem->render();
+
+	GetParticleSystem()->particleSystem->render();
 	SPK::GL::GLRenderer::restoreGLStates();
 
-    renderTarget.SaveGLStates();
+    renderTarget.pushGLStates();
 
     return true;
 }
 
-void ParticleEmitterObject::OnPositionChanged()
+void RuntimeParticleEmitterObject::OnPositionChanged()
 {
-    if ( particleSystem->zone )
-        particleSystem->zone->setPosition(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0));
+    if ( GetParticleSystem() && GetParticleSystem()->zone )
+        GetParticleSystem()->zone->setPosition(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0));
 }
 
 #if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
-bool ParticleEmitterObject::DrawEdittime(sf::RenderTarget& renderTarget)
+void ParticleEmitterObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    sf::Shape circle = sf::Shape::Circle(sf::Vector2f(GetX(), GetY()), 3, sf::Color(particleRed1, particleGreen1, particleBlue1));
+    sf::CircleShape circle(3);
+    circle.setPosition(sf::Vector2f(instance.GetX()-2, instance.GetY()-2));
+    circle.setFillColor(sf::Color(GetParticleRed1(), GetParticleGreen1(), GetParticleBlue1()));
 
-    float emitterAngle = atan2(emitterYDirection, emitterXDirection);
-    float line1Angle = emitterAngle-(emitterAngleB/2.0)/180.0*3.14159;
-    float line2Angle = emitterAngle+(emitterAngleB/2.0)/180.0*3.14159;
+    float emitterAngle = instance.GetAngle()/180.0*3.14159;
+    float line1Angle = emitterAngle-(GetEmitterAngleB()/2.0)/180.0*3.14159;
+    float line2Angle = emitterAngle+(GetEmitterAngleB()/2.0)/180.0*3.14159;
 
-    sf::Shape line1 = sf::Shape::Line(sf::Vector2f(GetX(), GetY()), sf::Vector2f(cos(line1Angle)*32+GetX(), sin(line1Angle)*32+GetY()), 1, sf::Color(particleRed2, particleGreen2, particleBlue2));
-    sf::Shape line2 = sf::Shape::Line(sf::Vector2f(GetX(), GetY()), sf::Vector2f(cos(line2Angle)*32+GetX(), sin(line2Angle)*32+GetY()), 1, sf::Color(particleRed2, particleGreen2, particleBlue2));
+    sf::Vertex line1[] = { sf::Vertex(sf::Vector2f(instance.GetX(), instance.GetY()),
+                                      sf::Color(GetParticleRed1(), GetParticleGreen1(), GetParticleBlue1())),
+                           sf::Vertex(sf::Vector2f(cos(line1Angle)*32+instance.GetX(), sin(line1Angle)*32+instance.GetY()),
+                                      sf::Color(GetParticleRed2(), GetParticleGreen2(), GetParticleBlue2())) };
 
-    renderTarget.Draw(circle);
-    renderTarget.Draw(line1);
-    renderTarget.Draw(line2);
+    sf::Vertex line2[] = { sf::Vertex(sf::Vector2f(instance.GetX(), instance.GetY()),
+                                      sf::Color(GetParticleRed1(), GetParticleGreen1(), GetParticleBlue1())),
+                           sf::Vertex(sf::Vector2f(cos(line2Angle)*32+instance.GetX(), sin(line2Angle)*32+instance.GetY()),
+                                      sf::Color(GetParticleRed2(), GetParticleGreen2(), GetParticleBlue2())) };
 
-    return true;
+
+    renderTarget.draw(circle);
+    renderTarget.draw(line1, 2, sf::Lines);
+    renderTarget.draw(line2, 2, sf::Lines);
 }
 
 void ParticleEmitterObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    worker.ExposeImage(textureParticleName);
+    std::string texture = GetParticleTexture();
+    worker.ExposeImage(texture);
+    SetParticleTexture(texture);
 }
 
 bool ParticleEmitterObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/particleSystemicon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/particleSystemicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void ParticleEmitterObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void ParticleEmitterObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     ParticleEmitterObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 }
 
-wxPanel * ParticleEmitterObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+void RuntimeParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    return NULL;
+    if ( !GetParticleSystem() || !GetParticleSystem()->particleSystem ) return;
+
+    if      ( propertyNb == 0 ) {name = _("Particles number");      value = ToString(GetParticleSystem()->particleSystem->getNbParticles());}
 }
 
-void ParticleEmitterObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
-{
-}
-
-void ParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
-{
-    if ( !particleSystem->particleSystem ) return;
-
-    if      ( propertyNb == 0 ) {name = _("Particles number");      value = ToString(particleSystem->particleSystem->getNbParticles());}
-}
-
-bool ParticleEmitterObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeParticleEmitterObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { return false; }
 
     return true;
 }
 
-unsigned int ParticleEmitterObject::GetNumberOfProperties() const
+unsigned int RuntimeParticleEmitterObject::GetNumberOfProperties() const
 {
     return 1;
 }
 #endif
 
-void ParticleEmitterObject::SetTank(float newValue)
+void ParticleEmitterBase::SetTank(float newValue)
 {
     tank = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setFlow(tank);
+    if ( particleSystem && particleSystem->emitter ) particleSystem->emitter->setFlow(tank);
 }
-void ParticleEmitterObject::SetFlow(float newValue)
+void ParticleEmitterBase::SetFlow(float newValue)
 {
     flow = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setFlow(flow);
+    if ( particleSystem &&particleSystem->emitter ) particleSystem->emitter->setFlow(flow);
 }
-void ParticleEmitterObject::SetEmitterForceMin(float newValue)
+void ParticleEmitterBase::SetEmitterForceMin(float newValue)
 {
     emitterForceMin = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setForce(emitterForceMin, emitterForceMax);
+    if ( particleSystem &&particleSystem->emitter ) particleSystem->emitter->setForce(emitterForceMin, emitterForceMax);
 }
-void ParticleEmitterObject::SetEmitterForceMax(float newValue)
+void ParticleEmitterBase::SetEmitterForceMax(float newValue)
 {
     emitterForceMax = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setForce(emitterForceMin, emitterForceMax);
+    if ( particleSystem &&particleSystem->emitter ) particleSystem->emitter->setForce(emitterForceMin, emitterForceMax);
 }
-void ParticleEmitterObject::SetParticleGravityX(float newValue)
+void ParticleEmitterBase::SetParticleGravityX(float newValue)
 {
     particleGravityX = newValue;
-    if ( particleSystem->group ) particleSystem->group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
+    if ( particleSystem &&particleSystem->group ) particleSystem->group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 }
-void ParticleEmitterObject::SetParticleGravityY(float newValue)
+void ParticleEmitterBase::SetParticleGravityY(float newValue)
 {
     particleGravityY = newValue;
-    if ( particleSystem->group ) particleSystem->group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
+    if ( particleSystem &&particleSystem->group ) particleSystem->group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 }
-void ParticleEmitterObject::SetParticleGravityZ(float newValue)
+void ParticleEmitterBase::SetParticleGravityZ(float newValue)
 {
     particleGravityZ = newValue;
-    if ( particleSystem->group ) particleSystem->group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
+    if ( particleSystem &&particleSystem->group ) particleSystem->group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 }
-void ParticleEmitterObject::SetFriction(float newValue)
+void ParticleEmitterBase::SetFriction(float newValue)
 {
     friction = newValue;
-    if ( particleSystem->group ) particleSystem->group->setFriction(friction);
+    if ( particleSystem &&particleSystem->group ) particleSystem->group->setFriction(friction);
 }
-void ParticleEmitterObject::SetEmitterXDirection(float newValue)
+void ParticleEmitterBase::SetEmitterXDirection(float newValue)
 {
     emitterXDirection = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
+    if ( particleSystem && particleSystem->emitter ) particleSystem->emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
-void ParticleEmitterObject::SetEmitterYDirection(float newValue)
+void ParticleEmitterBase::SetEmitterYDirection(float newValue)
 {
     emitterYDirection = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
+    if ( particleSystem && particleSystem->emitter ) particleSystem->emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
-void ParticleEmitterObject::SetEmitterZDirection(float newValue)
+void ParticleEmitterBase::SetEmitterZDirection(float newValue)
 {
     emitterZDirection = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
+    if ( particleSystem && particleSystem->emitter ) particleSystem->emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
-void ParticleEmitterObject::SetEmitterAngleA(float newValue)
+void ParticleEmitterBase::SetEmitterAngleA(float newValue)
 {
     emitterAngleA = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setAngles(emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
+    if ( particleSystem && particleSystem->emitter ) particleSystem->emitter->setAngles(emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
 }
-void ParticleEmitterObject::SetEmitterAngleB(float newValue)
+void ParticleEmitterBase::SetEmitterAngleB(float newValue)
 {
     emitterAngleB = newValue;
-    if ( particleSystem->emitter ) particleSystem->emitter->setAngles(emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
+    if ( particleSystem && particleSystem->emitter ) particleSystem->emitter->setAngles(emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
 }
-void ParticleEmitterObject::SetZoneRadius(float newValue)
+void ParticleEmitterBase::SetZoneRadius(float newValue)
 {
     zoneRadius = newValue;
-    if ( particleSystem->zone ) particleSystem->zone->setRadius(zoneRadius);
+    if ( particleSystem && particleSystem->zone ) particleSystem->zone->setRadius(zoneRadius);
 }
 
-void ParticleEmitterObject::UpdateTime(float deltaTime)
+void RuntimeParticleEmitterObject::UpdateTime(float deltaTime)
 {
-	hasSomeParticles = particleSystem->particleSystem->update (deltaTime);
+    if ( GetParticleSystem() )
+        hasSomeParticles = GetParticleSystem()->particleSystem->update(deltaTime);
+
+	if (GetDestroyWhenNoParticles() && !hasSomeParticles)
+        DeleteFromScene(const_cast<RuntimeScene&>(*scene)); //Ugly const cast
 }
 
-void ParticleEmitterObject::SetParticleGravityAngle( float newAngleInDegree )
+void ParticleEmitterBase::SetParticleGravityAngle( float newAngleInDegree )
 {
     float length = sqrt(GetParticleGravityY()*GetParticleGravityY()+GetParticleGravityX()*GetParticleGravityX());
 
     SetParticleGravityX(cos(newAngleInDegree/180.0f*3.14159f)*length);
     SetParticleGravityY(sin(newAngleInDegree/180.0f*3.14159f)*length);
 }
-void ParticleEmitterObject::SetParticleGravityLength( float length )
+void ParticleEmitterBase::SetParticleGravityLength( float length )
 {
     float angle = atan2(GetParticleGravityY(), GetParticleGravityX());
 
@@ -750,16 +734,16 @@ void ParticleEmitterObject::SetParticleGravityLength( float length )
     SetParticleGravityY(sin(angle)*length);
 }
 
-float ParticleEmitterObject::GetParticleGravityAngle() const
+float ParticleEmitterBase::GetParticleGravityAngle() const
 {
     return atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f;
 }
-float ParticleEmitterObject::GetParticleGravityLength() const
+float ParticleEmitterBase::GetParticleGravityLength() const
 {
     return sqrt(GetParticleGravityY()*GetParticleGravityY()+GetParticleGravityX()*GetParticleGravityX());
 }
 
-bool ParticleEmitterObject::SetAngle(float newAngleInDegrees)
+bool RuntimeParticleEmitterObject::SetAngle(float newAngleInDegrees)
 {
     SetEmitterXDirection(cos(newAngleInDegrees/180.0f*3.14159f));
     SetEmitterYDirection(sin(newAngleInDegrees/180.0f*3.14159f));
@@ -767,12 +751,12 @@ bool ParticleEmitterObject::SetAngle(float newAngleInDegrees)
     return true;
 }
 
-float ParticleEmitterObject::GetAngle() const
+float RuntimeParticleEmitterObject::GetAngle() const
 {
     return atan2f(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f;
 }
 
-void ParticleEmitterObject::SetParticleColor1( const std::string & color )
+void ParticleEmitterBase::SetParticleColor1( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
 
@@ -782,7 +766,7 @@ void ParticleEmitterObject::SetParticleColor1( const std::string & color )
     SetParticleBlue1(ToInt(colors[1]));
     SetParticleGreen1(ToInt(colors[2]));
 }
-void ParticleEmitterObject::SetParticleColor2( const std::string & color )
+void ParticleEmitterBase::SetParticleColor2( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
 
@@ -796,12 +780,13 @@ void ParticleEmitterObject::SetParticleColor2( const std::string & color )
 /**
  * Change the texture
  */
-void ParticleEmitterObject::SetTexture( RuntimeScene & scene, const std::string & textureParticleName )
+void ParticleEmitterBase::SetTexture( RuntimeScene & scene, const std::string & textureParticleName_ )
 {
-    if ( rendererType == Quad )
+    textureParticleName = textureParticleName_;
+    if ( particleSystem && rendererType == Quad )
     {
         //Load new texture
-        particleSystem->openGLTextureParticle = scene.game->imageManager->GetOpenGLTexture(textureParticleName);
+        particleSystem->openGLTextureParticle = scene.game->GetImageManager()->GetOpenGLTexture(textureParticleName);
 
 	    //Notify the renderer of the change
 	    SPK::GL::GLQuadRenderer * quadRenderer = dynamic_cast<SPK::GL::GLQuadRenderer*>(particleSystem->renderer);
@@ -815,49 +800,14 @@ void ParticleEmitterObject::SetTexture( RuntimeScene & scene, const std::string 
 }
 
 /**
- * Get the real X position of the object
- */
-float ParticleEmitterObject::GetDrawableX() const
-{
-    return GetX()-32;
-}
-
-/**
- * Get the real Y position of the object
- */
-float ParticleEmitterObject::GetDrawableY() const
-{
-    return GetY()-32;
-}
-
-float ParticleEmitterObject::GetWidth() const
-{
-    return 64;
-}
-
-float ParticleEmitterObject::GetHeight() const
-{
-    return 64;
-}
-
-float ParticleEmitterObject::GetCenterX() const
-{
-    return 32;
-}
-
-float ParticleEmitterObject::GetCenterY() const
-{
-    return 32;
-}
-
-/**
  * Used by copy constructor and assignment operator.
  * \warning Do not forget to update me if members were changed!
  */
-void ParticleEmitterObject::Init(const ParticleEmitterObject & other)
+void ParticleEmitterBase::Init(const ParticleEmitterBase & other)
 {
     if ( particleSystem ) delete particleSystem;
-    particleSystem = new ParticleSystemWrapper(*other.particleSystem);
+    if ( other.particleSystem) particleSystem = new ParticleSystemWrapper(*other.particleSystem);
+    else particleSystem = NULL;
 
     textureParticleName = other.textureParticleName;
     rendererType = other.rendererType;
@@ -905,11 +855,7 @@ void ParticleEmitterObject::Init(const ParticleEmitterObject & other)
     particleAngleRandomness1 = other.particleAngleRandomness1;
     particleAngleRandomness2 = other.particleAngleRandomness2;
     maxParticleNb = other.maxParticleNb;
-    hasSomeParticles = other.hasSomeParticles;
-    opacity = other.opacity;
-    colorR = other.colorR;
-    colorG = other.colorG;
-    colorB = other.colorB;
+    destroyWhenNoParticles = other.destroyWhenNoParticles;
 }
 
 /**
@@ -917,7 +863,7 @@ void ParticleEmitterObject::Init(const ParticleEmitterObject & other)
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyParticleEmitterObject(Object * object)
+void DestroyParticleEmitterObject(gd::Object * object)
 {
     delete object;
 }
@@ -926,9 +872,18 @@ void DestroyParticleEmitterObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateParticleEmitterObject(std::string name)
+gd::Object * CreateParticleEmitterObject(std::string name)
 {
     return new ParticleEmitterObject(name);
 }
 
+void DestroyRuntimeParticleEmitterObject(RuntimeObject * object)
+{
+    delete object;
+}
+
+RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object)
+{
+    return new RuntimeParticleEmitterObject(scene, object);
+}
 

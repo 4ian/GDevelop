@@ -1135,7 +1135,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
-										<cols>2</cols>
+										<cols>3</cols>
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer11" member="no">
@@ -1389,37 +1389,79 @@
 											<option>1</option>
 										</object>
 										<object class="sizeritem">
-											<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-												<label>Gravity</label>
+											<object class="wxFlexGridSizer" variable="FlexGridSizer32" member="no">
+												<cols>1</cols>
+												<growablecols>0</growablecols>
 												<object class="sizeritem">
-													<object class="wxNotebook" name="ID_NOTEBOOK3" variable="gravityNotebook" member="yes">
-														<object class="notebookpage">
-															<object class="wxPanel" name="ID_PANEL7" variable="Panel6" member="yes">
-																<object class="wxFlexGridSizer" variable="FlexGridSizer50" member="no">
-																	<cols>1</cols>
-																	<growablecols>0</growablecols>
-																	<object class="sizeritem">
-																		<object class="wxBoxSizer" variable="BoxSizer3" member="no">
+													<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
+														<label>Gravity</label>
+														<object class="sizeritem">
+															<object class="wxNotebook" name="ID_NOTEBOOK3" variable="gravityNotebook" member="yes">
+																<object class="notebookpage">
+																	<object class="wxPanel" name="ID_PANEL7" variable="Panel6" member="yes">
+																		<object class="wxFlexGridSizer" variable="FlexGridSizer50" member="no">
+																			<cols>1</cols>
+																			<growablecols>0</growablecols>
 																			<object class="sizeritem">
-																				<object class="wxFlexGridSizer" variable="FlexGridSizer52" member="no">
-																					<cols>3</cols>
-																					<growablecols>1</growablecols>
+																				<object class="wxBoxSizer" variable="BoxSizer3" member="no">
 																					<object class="sizeritem">
-																						<object class="wxStaticText" name="ID_STATICTEXT50" variable="StaticText47" member="yes">
-																							<label>Gravity :</label>
+																						<object class="wxFlexGridSizer" variable="FlexGridSizer52" member="no">
+																							<cols>3</cols>
+																							<growablecols>1</growablecols>
+																							<object class="sizeritem">
+																								<object class="wxStaticText" name="ID_STATICTEXT50" variable="StaticText47" member="yes">
+																									<label>Gravity :</label>
+																								</object>
+																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<border>5</border>
+																								<option>1</option>
+																							</object>
+																							<object class="sizeritem">
+																								<object class="wxTextCtrl" name="ID_TEXTCTRL23" variable="simpleGravityLengthEdit" member="yes">
+																									<size>62,21</size>
+																									<tooltip>Gravity on X axis</tooltip>
+																									<handler function="OnsimpleGravityAngleText" entry="EVT_TEXT" />
+																								</object>
+																								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<border>5</border>
+																								<option>1</option>
+																							</object>
 																						</object>
-																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																						<border>5</border>
+																						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<option>1</option>
 																					</object>
 																					<object class="sizeritem">
-																						<object class="wxTextCtrl" name="ID_TEXTCTRL23" variable="simpleGravityLengthEdit" member="yes">
-																							<size>62,21</size>
-																							<tooltip>Gravity on X axis</tooltip>
-																							<handler function="OnsimpleGravityAngleText" entry="EVT_TEXT" />
+																						<object class="wxFlexGridSizer" variable="FlexGridSizer51" member="no">
+																							<cols>3</cols>
+																							<growablecols>1</growablecols>
+																							<object class="sizeritem">
+																								<object class="wxStaticText" name="ID_STATICTEXT52" variable="StaticText49" member="yes">
+																									<label>Gravity angle :</label>
+																								</object>
+																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<border>5</border>
+																								<option>1</option>
+																							</object>
+																							<object class="sizeritem">
+																								<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="simpleGravityAngleEdit" member="yes">
+																									<size>62,21</size>
+																									<tooltip>Gravity on Z axis ( depth )</tooltip>
+																									<handler function="OnsimpleGravityAngleText" entry="EVT_TEXT" />
+																								</object>
+																								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<border>5</border>
+																								<option>1</option>
+																							</object>
+																							<object class="sizeritem">
+																								<object class="wxStaticText" name="ID_STATICTEXT53" variable="StaticText50" member="yes">
+																									<label>°</label>
+																								</object>
+																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<border>5</border>
+																								<option>1</option>
+																							</object>
 																						</object>
 																						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																						<border>5</border>
 																						<option>1</option>
 																					</object>
 																				</object>
@@ -1427,32 +1469,23 @@
 																				<option>1</option>
 																			</object>
 																			<object class="sizeritem">
-																				<object class="wxFlexGridSizer" variable="FlexGridSizer51" member="no">
+																				<object class="wxFlexGridSizer" variable="FlexGridSizer53" member="no">
 																					<cols>3</cols>
 																					<growablecols>1</growablecols>
 																					<object class="sizeritem">
-																						<object class="wxStaticText" name="ID_STATICTEXT52" variable="StaticText49" member="yes">
-																							<label>Gravity angle :</label>
+																						<object class="wxStaticText" name="ID_STATICTEXT51" variable="StaticText48" member="yes">
+																							<label>Friction :</label>
 																						</object>
-																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
 																						<option>1</option>
 																					</object>
 																					<object class="sizeritem">
-																						<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="simpleGravityAngleEdit" member="yes">
+																						<object class="wxTextCtrl" name="ID_TEXTCTRL26" variable="simpleFrictionEdit" member="yes">
 																							<size>62,21</size>
-																							<tooltip>Gravity on Z axis ( depth )</tooltip>
-																							<handler function="OnsimpleGravityAngleText" entry="EVT_TEXT" />
+																							<handler function="OnsimpleFrictionEditText" entry="EVT_TEXT" />
 																						</object>
 																						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																						<border>5</border>
-																						<option>1</option>
-																					</object>
-																					<object class="sizeritem">
-																						<object class="wxStaticText" name="ID_STATICTEXT53" variable="StaticText50" member="yes">
-																							<label>°</label>
-																						</object>
-																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
 																						<option>1</option>
 																					</object>
@@ -1461,15 +1494,58 @@
 																				<option>1</option>
 																			</object>
 																		</object>
-																		<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																		<option>1</option>
 																	</object>
-																	<object class="sizeritem">
-																		<object class="wxFlexGridSizer" variable="FlexGridSizer53" member="no">
-																			<cols>3</cols>
+																	<label>Simple setup</label>
+																</object>
+																<object class="notebookpage">
+																	<object class="wxPanel" name="ID_PANEL6" variable="Panel5" member="yes">
+																		<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+																			<cols>2</cols>
 																			<growablecols>1</growablecols>
 																			<object class="sizeritem">
-																				<object class="wxStaticText" name="ID_STATICTEXT51" variable="StaticText48" member="yes">
+																				<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+																					<label>Gravity applied to particles :</label>
+																				</object>
+																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																				<border>5</border>
+																				<option>1</option>
+																			</object>
+																			<object class="sizeritem">
+																				<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+																					<cols>3</cols>
+																					<object class="sizeritem">
+																						<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="gravityXEdit" member="yes">
+																							<size>62,21</size>
+																							<tooltip>Gravity on X axis</tooltip>
+																						</object>
+																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																						<border>5</border>
+																						<option>1</option>
+																					</object>
+																					<object class="sizeritem">
+																						<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="gravityYEdit" member="yes">
+																							<size>62,21</size>
+																							<tooltip>Gravity on Y axis</tooltip>
+																						</object>
+																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																						<border>5</border>
+																						<option>1</option>
+																					</object>
+																					<object class="sizeritem">
+																						<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="gravityZEdit" member="yes">
+																							<size>62,21</size>
+																							<tooltip>Gravity on Z axis ( depth )</tooltip>
+																						</object>
+																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																						<border>5</border>
+																						<option>1</option>
+																					</object>
+																				</object>
+																				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																				<option>1</option>
+																			</object>
+																			<object class="sizeritem">
+																				<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
 																					<label>Friction :</label>
 																				</object>
 																				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -1477,105 +1553,60 @@
 																				<option>1</option>
 																			</object>
 																			<object class="sizeritem">
-																				<object class="wxTextCtrl" name="ID_TEXTCTRL26" variable="simpleFrictionEdit" member="yes">
-																					<size>62,21</size>
-																					<handler function="OnsimpleFrictionEditText" entry="EVT_TEXT" />
+																				<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+																					<cols>3</cols>
+																					<growablecols>0</growablecols>
+																					<object class="sizeritem">
+																						<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="frictionEdit" member="yes">
+																							<size>62,21</size>
+																						</object>
+																						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																						<border>5</border>
+																						<option>1</option>
+																					</object>
 																				</object>
 																				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																				<border>5</border>
 																				<option>1</option>
 																			</object>
 																		</object>
-																		<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																		<option>1</option>
 																	</object>
+																	<label>Advanced setup</label>
 																</object>
 															</object>
-															<label>Simple setup</label>
-														</object>
-														<object class="notebookpage">
-															<object class="wxPanel" name="ID_PANEL6" variable="Panel5" member="yes">
-																<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
-																	<cols>2</cols>
-																	<growablecols>1</growablecols>
-																	<object class="sizeritem">
-																		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-																			<label>Gravity applied to particles :</label>
-																		</object>
-																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																		<border>5</border>
-																		<option>1</option>
-																	</object>
-																	<object class="sizeritem">
-																		<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
-																			<cols>3</cols>
-																			<object class="sizeritem">
-																				<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="gravityXEdit" member="yes">
-																					<size>62,21</size>
-																					<tooltip>Gravity on X axis</tooltip>
-																				</object>
-																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																				<border>5</border>
-																				<option>1</option>
-																			</object>
-																			<object class="sizeritem">
-																				<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="gravityYEdit" member="yes">
-																					<size>62,21</size>
-																					<tooltip>Gravity on Y axis</tooltip>
-																				</object>
-																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																				<border>5</border>
-																				<option>1</option>
-																			</object>
-																			<object class="sizeritem">
-																				<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="gravityZEdit" member="yes">
-																					<size>62,21</size>
-																					<tooltip>Gravity on Z axis ( depth )</tooltip>
-																				</object>
-																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																				<border>5</border>
-																				<option>1</option>
-																			</object>
-																		</object>
-																		<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																		<option>1</option>
-																	</object>
-																	<object class="sizeritem">
-																		<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
-																			<label>Friction :</label>
-																		</object>
-																		<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-																		<border>5</border>
-																		<option>1</option>
-																	</object>
-																	<object class="sizeritem">
-																		<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
-																			<cols>3</cols>
-																			<growablecols>0</growablecols>
-																			<object class="sizeritem">
-																				<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="frictionEdit" member="yes">
-																					<size>62,21</size>
-																				</object>
-																				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																				<border>5</border>
-																				<option>1</option>
-																			</object>
-																		</object>
-																		<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																		<option>1</option>
-																	</object>
-																</object>
-															</object>
-															<label>Advanced setup</label>
+															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<flag>wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+														<label>Miscellaneous</label>
+														<object class="sizeritem">
+															<object class="wxFlexGridSizer" variable="FlexGridSizer30" member="no">
+																<cols>3</cols>
+																<object class="sizeritem">
+																	<object class="wxCheckBox" name="ID_CHECKBOX2" variable="destroyWhenNoParticlesCheck" member="yes">
+																		<label>Destroy the object when no more particles are spayed</label>
+																	</object>
+																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<option>1</option>
+														</object>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
-											<border>5</border>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<option>1</option>
 										</object>
 									</object>
@@ -1636,10 +1667,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

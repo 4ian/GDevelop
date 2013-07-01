@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,84 +27,50 @@ freely, subject to the following restrictions:
 #ifndef PARTICLEEMITTEROBJECT_H
 #define PARTICLEEMITTEROBJECT_H
 
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 class ParticleSystemWrapper;
-namespace sf
-{
-    class Texture;
-    class Sprite;
-};
-class ImageManager;
 class RuntimeScene;
-class Object;
-class ImageManager;
-class InitialPosition;
+namespace gd { class ImageManager; }
+namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
- * \brief Particle Emitter Object
+ * \brief Base class containing the parameters of an emitter as well as the wrapper
+ * to this emitter if asked for.
  */
-class GD_EXTENSION_API ParticleEmitterObject : public Object
+class GD_EXTENSION_API ParticleEmitterBase
 {
-public :
-
-    ParticleEmitterObject(std::string name_);
-    virtual ~ParticleEmitterObject();
-    virtual Object * Clone() const { return new ParticleEmitterObject(*this);}
-    ParticleEmitterObject(const ParticleEmitterObject & other) : Object(other), particleSystem(NULL) { Init(other); };
-    ParticleEmitterObject & operator=(const ParticleEmitterObject & other) {  if ( &other != this ) Init(other); return *this; }
-
-    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
-
-    virtual bool Draw(sf::RenderTarget & renderTarget);
-
-    #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
-    #endif
+public:
+    ParticleEmitterBase();
+    virtual ~ParticleEmitterBase();
+    ParticleEmitterBase(const ParticleEmitterBase & other) : particleSystem(NULL) { Init(other); };
+    ParticleEmitterBase & operator=(const ParticleEmitterBase & other) {  if ( &other != this ) Init(other); return *this; }
 
     virtual void LoadFromXml(const TiXmlElement * elemScene);
     #if defined(GD_IDE_ONLY)
     virtual void SaveToXml(TiXmlElement * elemScene);
     #endif
 
-    virtual void UpdateTime(float timeElapsed);
+    /** Change texture at runtime
+     */
+    void SetTexture( RuntimeScene & scene, const std::string & textureParticleName );
 
-    virtual void OnPositionChanged();
-
-    virtual float GetWidth() const;
-    virtual float GetHeight() const;
-    virtual void SetWidth(float ) {};
-    virtual void SetHeight(float ) {};
-
-    virtual float GetDrawableX() const;
-    virtual float GetDrawableY() const;
-
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
+    /** Change texture name without changing it effectively at runtime
+     */
+    void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
+    std::string GetParticleTexture() const { return textureParticleName; };
 
     /**
-     * Changing object angle is equivalent to changing emission X/Y direction
+     * \brief Initialize the particle system with the current objects settings.
      */
-    virtual bool SetAngle(float newAngleInDegrees);
-    virtual float GetAngle() const;
+    void CreateParticleSystem();
 
     void UpdateRedParameters();
     void UpdateGreenParameters();
@@ -114,6 +80,8 @@ public :
     void UpdateAngleParameters();
     void UpdateLifeTime();
     void RecreateParticleSystem();
+    const ParticleSystemWrapper * GetParticleSystem() const { return particleSystem; }
+    ParticleSystemWrapper * GetParticleSystem() { return particleSystem; }
 
     //Getters/Setters
     void SetRendererParam1(float newValue) { rendererParam1 = newValue; };
@@ -168,6 +136,7 @@ public :
     void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; UpdateLifeTime();};
     void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; UpdateLifeTime();};
     void SetMaxParticleNb(unsigned int newValue) { maxParticleNb = newValue; };
+    void SetDestroyWhenNoParticles(bool enable = true) { destroyWhenNoParticles = enable; };
 
     float GetRendererParam1() const { return rendererParam1; };
     float GetRendererParam2() const { return rendererParam2; };
@@ -179,9 +148,9 @@ public :
     float GetEmitterYDirection() const { return emitterYDirection; };
     float GetEmitterZDirection() const { return emitterZDirection; };
     float GetEmitterAngleA() const { return emitterAngleA; };
-    float GetEmitterAngleB() const { return  emitterAngleB; };
+    float GetEmitterAngleB() const { return emitterAngleB; };
     float GetConeSprayAngle() const { return GetEmitterAngleB()*180.0f/3.14159f; };
-    float GetZoneRadius() const { return  zoneRadius; };
+    float GetZoneRadius() const { return zoneRadius; };
     float GetParticleGravityX() const { return particleGravityX; };
     float GetParticleGravityY() const { return particleGravityY; };
     float GetParticleGravityZ() const { return particleGravityZ; };
@@ -191,6 +160,7 @@ public :
     float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
     float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
     unsigned int GetMaxParticleNb() const { return maxParticleNb; };
+    bool GetDestroyWhenNoParticles() const { return destroyWhenNoParticles; };
 
     ParticleParameterType GetRedParameterType() const { return redParam; };
     ParticleParameterType GetGreenParameterType() const { return greenParam; };
@@ -226,40 +196,8 @@ public :
     void SetRenderingAdditive() { additive = true;};
     void SetRenderingAlpha() { additive = false;};
 
-    /** Change texture at runtime
-     */
-    void SetTexture( RuntimeScene & scene, const std::string & textureParticleName );
-
-    /** Change texture name without changing it effectively at runtime
-     */
-    void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
-    std::string GetParticleTexture() const { return textureParticleName; };
-
-    bool NoMoreParticles() const {return !hasSomeParticles;};
-
-    #if defined(GD_IDE_ONLY)
-    bool particleEditionSimpleMode; ///< User preference related to object's edition
-    bool emissionEditionSimpleMode; ///< User preference related to object's edition
-    bool gravityEditionSimpleMode; ///< User preference related to object's edition
-    #endif
-
-    const ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() const { return *particleSystem; };
-    ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() { return *particleSystem; };
-
 private:
-
-    /**
-     * Initialize the particle system with the current objects settings.
-     */
-    void CreateParticleSystem();
-
-    /**
-     * Used by copy constructor and assignment operator.
-     * \warning Do not forget to update me if members were changed!
-     */
-    void Init(const ParticleEmitterObject & other);
-
-    ParticleSystemWrapper * particleSystem; ///< Pointer to the class wrapping all the real particle engine related stuff. This pointer is managed by the object.
+    void Init(const ParticleEmitterBase & other);
 
     std::string textureParticleName;
     RendererType rendererType;
@@ -285,25 +223,91 @@ private:
     float particleAlphaRandomness1, particleAlphaRandomness2;
     float particleSizeRandomness1, particleSizeRandomness2, particleAngleRandomness1, particleAngleRandomness2;
     unsigned int maxParticleNb;
+    bool destroyWhenNoParticles; ///< If set to true, the object will removed itself from the scene when it has no more particles.
 
-    bool hasSomeParticles;
+    ParticleSystemWrapper * particleSystem; ///< Pointer to the class wrapping all the real particle engine related stuff. This pointer is managed by the object.
 
-    //Opacity
-    float opacity;
+};
 
-    //Color
-    unsigned int colorR;
-    unsigned int colorG;
-    unsigned int colorB;
+/**
+ * \brief Particle Emitter object used for storage and for the IDE.
+ */
+class GD_EXTENSION_API ParticleEmitterObject : public gd::Object, public ParticleEmitterBase
+{
+public :
+
+    ParticleEmitterObject(std::string name_);
+    virtual ~ParticleEmitterObject() {};
+    virtual gd::Object * Clone() const { return new ParticleEmitterObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    static sf::Texture edittimeIconImage;
-    static sf::Sprite edittimeIcon;
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const {return sf::Vector2f(32,32);};
+    virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const {return sf::Vector2f(16,16);};
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+
+    bool particleEditionSimpleMode; ///< User preference related to object's edition
+    bool emissionEditionSimpleMode; ///< User preference related to object's edition
+    bool gravityEditionSimpleMode; ///< User preference related to object's edition
+    #endif
+
+private:
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
     #endif
 };
 
-void DestroyParticleEmitterObject(Object * object);
-Object * CreateParticleEmitterObject(std::string name);
+/**
+ * \brief Particle Emitter object used by the game engine.
+ */
+class GD_EXTENSION_API RuntimeParticleEmitterObject : public RuntimeObject, public ParticleEmitterBase
+{
+public :
+
+    RuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeParticleEmitterObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeParticleEmitterObject(*this);}
+
+    virtual bool Draw(sf::RenderTarget & renderTarget);
+
+    virtual void OnPositionChanged();
+
+    virtual float GetWidth() const {return 32;};
+    virtual float GetHeight() const {return 32;};
+
+    virtual void UpdateTime(float timeElapsed);
+
+    bool NoMoreParticles() const {return !hasSomeParticles;};
+
+    /**
+     * Changing object angle is equivalent to changing emission X/Y direction
+     */
+    virtual bool SetAngle(float newAngleInDegrees);
+    virtual float GetAngle() const;
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
+
+    const ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() const { return *GetParticleSystem(); };
+    ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() { return *GetParticleSystem(); };
+
+private:
+
+    bool hasSomeParticles;
+    const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
+};
+
+void DestroyParticleEmitterObject(gd::Object * object);
+gd::Object * CreateParticleEmitterObject(std::string name);
+
+void DestroyRuntimeParticleEmitterObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // PARTICLEEMITTEROBJECT_H
 

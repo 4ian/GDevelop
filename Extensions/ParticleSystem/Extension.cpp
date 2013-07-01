@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,9 +24,9 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Version.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDCpp/ExtensionBase.h"
+#include "GDCore/Tools/Version.h"
+#include "GDCpp/AutomatismsSharedData.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleObstacleAutomatism.h"
 #include "ExtensionSubDeclaration1.h"
@@ -40,42 +40,45 @@ freely, subject to the following restrictions:
  */
 Extension::Extension()
 {
-    DECLARE_THE_EXTENSION("ParticleSystem",
+    SetExtensionInformation("ParticleSystem",
                           _("Particle system"),
                           _("Extension allowing to display a large number of small particles."),
-                          "Compil Games",
-                          "zlib/libpng License ( Open Source )")
+                          "Florian Rival",
+                          "zlib/libpng License ( Open Source )");
 
     //Declaration of all objects available
-    DECLARE_OBJECT("ParticleEmitter",
+    {
+        gd::ObjectMetadata & obj = AddObject("ParticleEmitter",
                    _("Particles emitter"),
-                   _("Object displaying a large number of small particles"),
-                   "Extensions/particleSystemicon.png",
+                   _("Displays a large number of small particles to create visual effects"),
+                   "CppPlatform/Extensions/particleSystemicon.png",
                    &CreateParticleEmitterObject,
-                   &DestroyParticleEmitterObject,
-                   "ParticleEmitterObject");
+                   &DestroyParticleEmitterObject);
+
+        AddRuntimeObject(obj, "RuntimeParticleEmitterObject", CreateRuntimeParticleEmitterObject, DestroyRuntimeParticleEmitterObject);
         #if defined(GD_IDE_ONLY)
 
-        objInfos.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
         //Declaration is too big to be compiled by GCC in one file, unless you have 4GB+ ram. :/
-        ExtensionSubDeclaration2(objInfos);
-        ExtensionSubDeclaration1(objInfos);
-        ExtensionSubDeclaration3(objInfos);
+        ExtensionSubDeclaration1(obj);
+        ExtensionSubDeclaration2(obj);
+        ExtensionSubDeclaration3(obj);
 
         #endif
 
-    DECLARE_END_OBJECT()
+    }
 
-/* Work in progress
-    DECLARE_AUTOMATISM("ParticleObstacleAutomatism",
+    /* Work in progress
+    {
+    gd::AutomatismMetadata & aut = AddAutomatism("ParticleObstacleAutomatism",
               _("Obstacle"),
               _("ParticleObstacle"),
               _("Automatisme permettant de repousser les particules"),
               "",
               "res/path32.png",
               ParticleObstacleAutomatism,
-              AutomatismsSharedDatas)
+              AutomatismsSharedData)
 
         #if defined(GD_IDE_ONLY)
 
@@ -83,48 +86,11 @@ Extension::Extension()
 
         #endif
 
-    DECLARE_END_AUTOMATISM()
-*/
+    }
+    */
 
-    CompleteCompilationInformation();
+    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
 };
-
-/**
- * This function is called by Game Develop so
- * as to complete information about how the extension was compiled ( which libs... )
- * -- Do not need to be modified. --
- */
-void Extension::CompleteCompilationInformation()
-{
-    #if defined(GD_IDE_ONLY)
-    compilationInfo.runtimeOnly = false;
-    #else
-    compilationInfo.runtimeOnly = true;
-    #endif
-
-    #if defined(__GNUC__)
-    compilationInfo.gccMajorVersion = __GNUC__;
-    compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-    compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-    #endif
-
-    compilationInfo.boostVersion = BOOST_VERSION;
-
-    compilationInfo.sfmlMajorVersion = 2;
-    compilationInfo.sfmlMinorVersion = 0;
-
-    #if defined(GD_IDE_ONLY)
-    compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-    compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-    compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-    compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
-    #endif
-
-    compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-    compilationInfo.sizeOfpInt = sizeof(int*);
-
-    compilationInfo.informationCompleted = true;
-}
 
 /**
  * Used by Game Develop to create the extension class

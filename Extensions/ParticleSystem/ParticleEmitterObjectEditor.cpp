@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -39,11 +39,13 @@ freely, subject to the following restrictions:
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
 
-#include "GDL/Game.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
+
+using namespace std;
 
 //(*IdInit(ParticleEmitterObjectEditor)
 const long ParticleEmitterObjectEditor::ID_STATICTEXT7 = wxNewId();
@@ -169,6 +171,7 @@ const long ParticleEmitterObjectEditor::ID_STATICTEXT8 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_TEXTCTRL8 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_PANEL6 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_NOTEBOOK3 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_CHECKBOX2 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICLINE1 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_BUTTON3 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_BUTTON1 = wxNewId();
@@ -181,7 +184,7 @@ BEGIN_EVENT_TABLE(ParticleEmitterObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ParticleEmitterObjectEditor::ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, gd::MainFrameWrapper & mainFrameWrapper ) :
+ParticleEmitterObjectEditor::ParticleEmitterObjectEditor( wxWindow* parent, gd::Project & game_, ParticleEmitterObject & object_, gd::MainFrameWrapper & mainFrameWrapper ) :
 game(game_),
 object(object_)
 {
@@ -241,6 +244,7 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer36;
 	wxFlexGridSizer* FlexGridSizer6;
+	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer46;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer33;
@@ -249,12 +253,14 @@ object(object_)
 	wxBoxSizer* BoxSizer3;
 	wxFlexGridSizer* FlexGridSizer17;
 	wxStaticBoxSizer* StaticBoxSizer5;
+	wxFlexGridSizer* FlexGridSizer32;
 	wxFlexGridSizer* FlexGridSizer31;
 	wxFlexGridSizer* FlexGridSizer40;
 	wxFlexGridSizer* FlexGridSizer39;
 	wxFlexGridSizer* FlexGridSizer28;
 	wxFlexGridSizer* FlexGridSizer26;
 	wxFlexGridSizer* FlexGridSizer60;
+	wxFlexGridSizer* FlexGridSizer30;
 
 	Create(parent, wxID_ANY, _("Edit the particle emitter"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -563,7 +569,7 @@ object(object_)
 	FlexGridSizer31->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer4->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer33->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer5 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5->AddGrowableRow(0);
 	StaticBoxSizer11 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Zone and direction of emission"));
 	FlexGridSizer45 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -645,6 +651,8 @@ object(object_)
 	FlexGridSizer45->Add(emissionNotebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer11->Add(FlexGridSizer45, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5->Add(StaticBoxSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer32 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer32->AddGrowableCol(0);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Gravity"));
 	gravityNotebook = new wxNotebook(Core, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
 	Panel6 = new wxPanel(gravityNotebook, ID_PANEL7, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL7"));
@@ -709,7 +717,15 @@ object(object_)
 	gravityNotebook->AddPage(Panel6, _("Simple setup"), false);
 	gravityNotebook->AddPage(Panel5, _("Advanced setup"), false);
 	StaticBoxSizer2->Add(gravityNotebook, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer5->Add(StaticBoxSizer2, 1, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
+	FlexGridSizer32->Add(StaticBoxSizer2, 1, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Miscellaneous"));
+	FlexGridSizer30 = new wxFlexGridSizer(0, 3, 0, 0);
+	destroyWhenNoParticlesCheck = new wxCheckBox(Core, ID_CHECKBOX2, _("Destroy the object when no more particles are spayed"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	destroyWhenNoParticlesCheck->SetValue(false);
+	FlexGridSizer30->Add(destroyWhenNoParticlesCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer1->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer32->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
+	FlexGridSizer5->Add(FlexGridSizer32, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer33->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2->Add(FlexGridSizer33, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(Core, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
@@ -803,6 +819,7 @@ object(object_)
     lifeTimeMaxEdit->SetValue(ToString(object.GetParticleLifeTimeMax()));
     zoneRadiusEdit->SetValue(ToString(object.GetZoneRadius()));
     maxParticleNbEdit->SetValue(ToString(object.GetMaxParticleNb()));
+    destroyWhenNoParticlesCheck->SetValue(object.GetDestroyWhenNoParticles());
 
     red1Edit->SetValue(ToString(object.GetParticleRed1()));
     red2Edit->SetValue(ToString(object.GetParticleRed2()));
@@ -931,7 +948,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     unsigned int particleNb = ToInt(string(maxParticleNbEdit->GetValue().mb_str())) > 0 ? ToInt(string(maxParticleNbEdit->GetValue().mb_str())) : 0;
     if ( particleNb > 30000 )
     {
-        if ( wxMessageBox(_("The number of particles is big. A number too important could crash the game.\nAre you sure you wan to continue\?"), _("Maximum Particles number"), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_("The number of particles is huge. A number too important could crash the game.\nAre you sure you wan to continue\?"), _("Maximum Particles number"), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -961,6 +978,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetZoneRadius(ToFloat(string(zoneRadiusEdit->GetValue().mb_str())));
     object.SetFriction(ToFloat(string(frictionEdit->GetValue().mb_str())));
     object.SetMaxParticleNb(particleNb);
+    object.SetDestroyWhenNoParticles(destroyWhenNoParticlesCheck->GetValue());
 
     object.SetParticleRed1(red1Edit->GetValue());
     object.SetParticleRed2(red2Edit->GetValue());

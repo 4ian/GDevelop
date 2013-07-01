@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -61,6 +61,7 @@ ParticleSystemWrapper::~ParticleSystemWrapper()
 
 void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
 {
+    openGLTextureParticle = other.openGLTextureParticle;
     if ( particleSystem ) delete particleSystem;
     if ( particleModel ) delete particleModel;
     if ( emitter ) delete emitter;

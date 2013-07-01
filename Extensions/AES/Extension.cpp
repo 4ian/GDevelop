@@ -1,7 +1,7 @@
 /**
 
 Game Develop - AES Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Version.h"
+#include "GDCpp/ExtensionBase.h"
+#include "GDCore/Tools/Version.h"
 #include <boost/version.hpp>
 
 /**
@@ -33,99 +33,55 @@ freely, subject to the following restrictions:
  */
 class Extension : public ExtensionBase
 {
-    public:
+public:
 
-        /**
-         * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
-         */
-        Extension()
-        {
-            DECLARE_THE_EXTENSION("AES",
-                                  _("AES encryption algorithm"),
-                                  _("Extension to encrypt files with AES algorithm."),
-                                  "Compil Games",
-                                  "zlib/libpng License ( Open Source )")
+    /**
+     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     */
+    Extension()
+    {
+        SetExtensionInformation("AES",
+                              _("AES encryption algorithm"),
+                              _("Extension to encrypt files with AES algorithm."),
+                              "Florian Rival",
+                              "zlib/libpng License ( Open Source )");
 
-            #if defined(GD_IDE_ONLY)
+        #if defined(GD_IDE_ONLY)
 
-            DECLARE_ACTION("EncryptFile",
-                           _("Crypt a file"),
-                           _("Crypt a file with AES."),
-                           _("Crypt file _PARAM0_ to _PARAM1_ with AES"),
-                           _("Encryption"),
-                           "Extensions/AESicon24.png",
-                           "Extensions/AESicon16.png");
+        AddAction("EncryptFile",
+                       _("Crypt a file"),
+                       _("Crypt a file with AES."),
+                       _("Crypt file _PARAM0_ to _PARAM1_ with AES"),
+                       _("Encryption"),
+                       "CppPlatform/Extensions/AESicon24.png",
+                       "CppPlatform/Extensions/AESicon16.png")
 
-                instrInfo.AddParameter("file", _("Source file"), "", false);
-                instrInfo.AddParameter("file", _("Destination file"), "", false);
-                instrInfo.AddParameter("string", _("Password ( 24 characters )"), "", false);
+            .AddParameter("file", _("Source file"))
+            .AddParameter("file", _("Destination file"))
+            .AddParameter("string", _("Password ( 24 characters )"))
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
+            .codeExtraInformation.SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
 
 
-            DECLARE_END_ACTION()
+        AddAction("DecryptFile",
+                       _("Decrypt a file"),
+                       _("Decrypt a file with AES."),
+                       _("Decrypt file _PARAM0_ to _PARAM1_ with AES"),
+                       _("Encryption"),
+                       "CppPlatform/Extensions/AESicon24.png",
+                       "CppPlatform/Extensions/AESicon16.png")
 
-            DECLARE_ACTION("DecryptFile",
-                           _("Decrypt a file"),
-                           _("Decrypt a file with AES."),
-                           _("Decrypt file _PARAM0_ to _PARAM1_ with AES"),
-                           _("Encryption"),
-                           "Extensions/AESicon24.png",
-                           "Extensions/AESicon16.png");
+            .AddParameter("file", _("Source file"))
+            .AddParameter("file", _("Destination file"))
+            .AddParameter("string", _("Password ( 24 characters )"))
 
-                instrInfo.AddParameter("file", _("Source file"), "", false);
-                instrInfo.AddParameter("file", _("Destination file"), "", false);
-                instrInfo.AddParameter("string", _("Password ( 24 characters )"), "", false);
+            .codeExtraInformation.SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
+        #endif
 
-            DECLARE_END_ACTION()
-
-            #endif
-
-            CompleteCompilationInformation();
-        };
-        virtual ~Extension() {};
-
-    protected:
-    private:
-
-        /**
-         * This function is called by Game Develop so
-         * as to complete information about how the extension was compiled ( which libs... )
-         * -- Do not need to be modified. --
-         */
-        void CompleteCompilationInformation()
-        {
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.runtimeOnly = false;
-            #else
-            compilationInfo.runtimeOnly = true;
-            #endif
-
-            #if defined(__GNUC__)
-            compilationInfo.gccMajorVersion = __GNUC__;
-            compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-            compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-            #endif
-
-            compilationInfo.boostVersion = BOOST_VERSION;
-
-            compilationInfo.sfmlMajorVersion = 2;
-            compilationInfo.sfmlMinorVersion = 0;
-
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-            compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-            compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-            compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
-            #endif
-
-            compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-            compilationInfo.sizeOfpInt = sizeof(int*);
-
-            compilationInfo.informationCompleted = true;
-        }
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+    };
+    virtual ~Extension() {};
 };
 
 /**

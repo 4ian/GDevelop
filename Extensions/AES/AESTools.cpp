@@ -1,7 +1,7 @@
 /**
 
 Game Develop - AES Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/Tools/AES.h"
+#include "GDCpp/Tools/AES.h"
 #include <iostream>
 #include <fstream>
 #include <string>

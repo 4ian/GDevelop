@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -34,12 +34,15 @@ freely, subject to the following restrictions:
 #include <wx/string.h>
 //*)
 #include <wx/log.h>
-#include "GDL/Game.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
 
 #include "Box3DObject.h"
+
+using namespace std;
 
 //(*IdInit(Box3DObjectEditor)
 const long Box3DObjectEditor::ID_STATICTEXT7 = wxNewId();
@@ -78,7 +81,7 @@ BEGIN_EVENT_TABLE(Box3DObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-Box3DObjectEditor::Box3DObjectEditor( wxWindow* parent, Game & game_, Box3DObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+Box3DObjectEditor::Box3DObjectEditor( wxWindow* parent, gd::Project & game_, Box3DObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 game(game_),
 mainFrameWrapper(mainFrameWrapper_),
 object(object_)
@@ -216,6 +219,7 @@ object(object_)
     m_mgr.AddPane( resourcesEditor, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
+    gd::SkinHelper::ApplyCurrentSkin(m_mgr);
     m_mgr.Update();
 }
 
@@ -333,6 +337,8 @@ void Box3DObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 
     m_mgr.GetPane( resourcesEditor ).Show();
     m_mgr.Update();
+    resourcesEditor->wxWindow::Refresh();
+    resourcesEditor->Update();
 }
 
 #endif

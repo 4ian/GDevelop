@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,66 +27,89 @@ freely, subject to the following restrictions:
 #ifndef BOX3DOBJECT_H
 #define BOX3DOBJECT_H
 
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 #include <boost/shared_ptr.hpp>
 class SFMLTextureWrapper;
-class ImageManager;
+namespace gd { class ImageManager; }
 class RuntimeScene;
-class Object;
-class ImageManager;
-class InitialPosition;
+namespace gd { class Object; }
+namespace gd { class ImageManager; }
+namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 #endif
 
 /**
- * Text Object
+ * \brief 3D Box object
  */
-class GD_EXTENSION_API Box3DObject : public Object
+class GD_EXTENSION_API Box3DObject : public gd::Object
 {
 public :
 
     Box3DObject(std::string name_);
     virtual ~Box3DObject();
-    virtual Object * Clone() const { return new Box3DObject(*this);}
-
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
-
-    virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual gd::Object * Clone() const { return new Box3DObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene);
     #endif
 
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    virtual float GetWidth() const { return width; };
+    virtual float GetHeight() const { return height; };
+
+    virtual inline void SetWidth(float newWidth) {width = newWidth;};
+    virtual inline void SetHeight(float newHeight) {height = newHeight;};
+
+    float GetDepth() const { return depth; }
+    void SetDepth(float depth_) { depth = depth_; }
+
+    std::string frontTextureName;
+    std::string topTextureName;
+    std::string bottomTextureName;
+    std::string leftTextureName;
+    std::string rightTextureName;
+    std::string backTextureName;
+
+private:
+
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
     #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
     #endif
 
-    virtual void OnPositionChanged() {};
+    float width;
+    float height;
+    float depth;
 
-    virtual float GetDrawableX() const;
-    virtual float GetDrawableY() const;
+    boost::shared_ptr<SFMLTextureWrapper> frontTexture;
+    boost::shared_ptr<SFMLTextureWrapper> topTexture;
+    boost::shared_ptr<SFMLTextureWrapper> bottomTexture;
+    boost::shared_ptr<SFMLTextureWrapper> leftTexture;
+    boost::shared_ptr<SFMLTextureWrapper> rightTexture;
+    boost::shared_ptr<SFMLTextureWrapper> backTexture;
+};
 
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
+class GD_EXTENSION_API RuntimeBox3DObject : public RuntimeObject
+{
+public :
 
-    inline void SetZPosition(float newZ) {zPosition = newZ;};
-    inline float GetZPosition() const {return zPosition;};
+    RuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeBox3DObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeBox3DObject(*this);}
+
+    virtual bool ExtraInitializationFromInitialInstance(const gd::InitialInstance & position);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
     virtual inline bool SetAngle(float newAngle) { yaw = newAngle; return true;};
     virtual inline float GetAngle() const {return yaw;};
@@ -95,16 +118,17 @@ public :
     float GetRoll() const { return roll; }
     void SetRoll(float roll_) { roll = roll_; }
 
-    virtual float GetWidth() const;
-    virtual float GetHeight() const;
+    virtual float GetWidth() const { return width; };
+    virtual float GetHeight() const { return height; };
 
     virtual inline void SetWidth(float newWidth) {width = newWidth;};
     virtual inline void SetHeight(float newHeight) {height = newHeight;};
 
+    inline void SetZPosition(float newZ) {zPosition = newZ;};
+    inline float GetZPosition() const {return zPosition;};
+
     float GetDepth() const { return depth; }
     void SetDepth(float depth_) { depth = depth_; }
-
-    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     std::string frontTextureName;
     std::string topTextureName;
@@ -112,6 +136,12 @@ public :
     std::string leftTextureName;
     std::string rightTextureName;
     std::string backTextureName;
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
 private:
 
@@ -131,8 +161,11 @@ private:
     boost::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
-void DestroyBox3DObject(Object * object);
-Object * CreateBox3DObject(std::string name);
+void DestroyRuntimeBox3DObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);
+
+void DestroyBox3DObject(gd::Object * object);
+gd::Object * CreateBox3DObject(std::string name);
 
 #endif // BOX3DOBJECT_H
 

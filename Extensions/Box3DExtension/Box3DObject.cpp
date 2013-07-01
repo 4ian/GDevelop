@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -31,36 +31,35 @@ freely, subject to the following restrictions:
 #include "Box3DObject.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "GDL/Object.h"
-#include "GDL/ImageManager.h"
-#include "GDL/FontManager.h"
-#include "GDL/Position.h"
-#include "GDL/Polygon.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/tinyxml/tinyxml.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "Box3DObjectEditor.h"
-#include "Box3DInitialPositionPanel.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #endif
 
+using namespace std;
+
 Box3DObject::Box3DObject(std::string name_) :
-Object(name_),
-frontTextureName(""),
-topTextureName(""),
-bottomTextureName(""),
-leftTextureName(""),
-rightTextureName(""),
-backTextureName(""),
-width(32),
-height(32),
-depth(32),
-zPosition(0),
-yaw(0),
-pitch(0),
-roll(0)
+    Object(name_),
+    frontTextureName(""),
+    topTextureName(""),
+    bottomTextureName(""),
+    leftTextureName(""),
+    rightTextureName(""),
+    backTextureName(""),
+    width(32),
+    height(32),
+    depth(32)
 {
 }
 
@@ -68,7 +67,7 @@ Box3DObject::~Box3DObject()
 {
 }
 
-void Box3DObject::LoadFromXml(const TiXmlElement * object)
+void Box3DObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * object)
 {
     if ( object->FirstChildElement( "frontTexture" ) == NULL ||
          object->FirstChildElement( "frontTexture" )->Attribute("value") == NULL )
@@ -144,7 +143,7 @@ void Box3DObject::LoadFromXml(const TiXmlElement * object)
 }
 
 #if defined(GD_IDE_ONLY)
-void Box3DObject::SaveToXml(TiXmlElement * object)
+void Box3DObject::DoSaveToXml(TiXmlElement * object)
 {
     {
         TiXmlElement * elem = new TiXmlElement( "frontTexture" );
@@ -192,24 +191,22 @@ void Box3DObject::SaveToXml(TiXmlElement * object)
         elem->SetAttribute("value", depth);
     }
 }
-#endif
 
-bool Box3DObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+void Box3DObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    frontTexture =  imageMgr.GetSFMLTexture(frontTextureName);
-    topTexture =    imageMgr.GetSFMLTexture(topTextureName);
-    bottomTexture = imageMgr.GetSFMLTexture(bottomTextureName) ;
-    leftTexture =   imageMgr.GetSFMLTexture(leftTextureName);
-    rightTexture =  imageMgr.GetSFMLTexture(rightTextureName);
-    backTexture =   imageMgr.GetSFMLTexture(backTextureName);
-
-    return true;
+    frontTexture =  project.GetImageManager()->GetSFMLTexture(frontTextureName);
+    topTexture =    project.GetImageManager()->GetSFMLTexture(topTextureName);
+    bottomTexture = project.GetImageManager()->GetSFMLTexture(bottomTextureName) ;
+    leftTexture =   project.GetImageManager()->GetSFMLTexture(leftTextureName);
+    rightTexture =  project.GetImageManager()->GetSFMLTexture(rightTextureName);
+    backTexture =   project.GetImageManager()->GetSFMLTexture(backTextureName);
 }
+#endif
 
 /**
  * Update from the inital position
  */
-bool Box3DObject::InitializeFromInitialPosition(const InitialPosition & position)
+bool RuntimeBox3DObject::ExtraInitializationFromInitialInstance(const gd::InitialInstance & position)
 {
     if ( position.floatInfos.find("z") != position.floatInfos.end() )
         zPosition = position.floatInfos.find("z")->second;
@@ -226,22 +223,22 @@ bool Box3DObject::InitializeFromInitialPosition(const InitialPosition & position
 /**
  * Render object at runtime
  */
-bool Box3DObject::Draw( sf::RenderTarget& window )
+bool RuntimeBox3DObject::Draw( sf::RenderTarget& window )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    window.RestoreGLStates();
+    window.popGLStates();
 
-    float xView =  window.GetView().GetCenter().x*0.25f;
-    float yView = -window.GetView().GetCenter().y*0.25f;
+    float xView =  window.getView().getCenter().x*0.25f;
+    float yView = -window.getView().getCenter().y*0.25f;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     //Position
-    glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(GetX()*0.25f - xView, -GetY()*0.25f - yView, zPosition*0.25f - 75.0f*(window.GetView().GetSize().y/600.0f));
+    glRotatef(window.getView().getRotation(), 0, 0, 1);
+    glTranslatef(GetX()*0.25f - xView, -GetY()*0.25f - yView, zPosition*0.25f - 75.0f*(window.getView().getSize().y/600.0f));
 
     float sizeWidth  =  width*0.25f;
     float sizeHeight = -height*0.25f;
@@ -256,9 +253,10 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
 
     //Render the box
     glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    backTexture->texture.Bind();
+    backTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            0);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   0);
@@ -266,7 +264,7 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            0);
     glEnd();
 
-    frontTexture->texture.Bind();
+    frontTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            sizeDepth);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   sizeDepth);
@@ -274,7 +272,7 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    leftTexture->texture.Bind();
+    leftTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0,       0,              0);
         glTexCoord2f(0, 1); glVertex3f(0,       sizeHeight,     0);
@@ -282,7 +280,7 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 0); glVertex3f(0,       0,              sizeDepth);
     glEnd();
 
-    rightTexture->texture.Bind();
+    rightTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(sizeWidth, 0,            0);
         glTexCoord2f(0, 1); glVertex3f(sizeWidth, sizeHeight,   0);
@@ -290,7 +288,7 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    bottomTexture->texture.Bind();
+    bottomTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           0,          sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           0,          0);
@@ -298,7 +296,7 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   0,          sizeDepth);
     glEnd();
 
-    topTexture->texture.Bind();
+    topTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           sizeHeight, sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           sizeHeight, 0);
@@ -306,28 +304,72 @@ bool Box3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   sizeHeight, sizeDepth);
     glEnd();
 
-    window.SaveGLStates();
+    window.pushGLStates();
 
     return true;
+}
+
+RuntimeBox3DObject::RuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object) :
+    RuntimeObject(scene, object),
+    zPosition(0),
+    yaw(0),
+    pitch(0),
+    roll(0)
+{
+    const Box3DObject & box3DObject = static_cast<const Box3DObject&>(object);
+
+    SetWidth(box3DObject.GetWidth());
+    SetHeight(box3DObject.GetHeight());
+    SetDepth(box3DObject.GetDepth());
+
+    //Load resources
+    frontTextureName =  box3DObject.frontTextureName;
+    topTextureName =    box3DObject.topTextureName;
+    bottomTextureName = box3DObject.bottomTextureName;
+    leftTextureName =   box3DObject.leftTextureName;
+    rightTextureName =  box3DObject.rightTextureName;
+    backTextureName =   box3DObject.backTextureName;
+    frontTexture =  scene.game->GetImageManager()->GetSFMLTexture(frontTextureName);
+    topTexture =    scene.game->GetImageManager()->GetSFMLTexture(topTextureName);
+    bottomTexture = scene.game->GetImageManager()->GetSFMLTexture(bottomTextureName) ;
+    leftTexture =   scene.game->GetImageManager()->GetSFMLTexture(leftTextureName);
+    rightTexture =  scene.game->GetImageManager()->GetSFMLTexture(rightTextureName);
+    backTexture =   scene.game->GetImageManager()->GetSFMLTexture(backTextureName);
 }
 
 #if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
-bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
+void Box3DObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    window.RestoreGLStates();
+    if ( !topTexture || !bottomTexture || ! rightTexture || !leftTexture || !frontTexture || !backTexture ) return;
 
-    float xView =  window.GetView().GetCenter().x*0.25f;
-    float yView = -window.GetView().GetCenter().y*0.25f;
+    renderTarget.popGLStates();
+
+    float width = instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultSize(instance, project, layout).x;
+    float height = instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultSize(instance, project, layout).y;
+    float xView =  renderTarget.getView().getCenter().x*0.25f;
+    float yView = -renderTarget.getView().getCenter().y*0.25f;
+    float zPosition = instance.floatInfos.find("z") != instance.floatInfos.end() ?
+                                   instance.floatInfos.find("z")->second :
+                                   0;
+
+    float pitch = instance.floatInfos.find("pitch") != instance.floatInfos.end() ?
+                                   instance.floatInfos.find("pitch")->second :
+                                   0;
+
+    float roll = instance.floatInfos.find("roll") != instance.floatInfos.end() ?
+                                   instance.floatInfos.find("roll")->second :
+                                   0;
+    float yaw = instance.GetAngle();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     //Position
-    glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(GetX()*0.25f - xView, -GetY()*0.25f - yView, zPosition*0.25f - 75.0f*(window.GetView().GetSize().y/600.0f));
+    glRotatef(renderTarget.getView().getRotation(), 0, 0, 1);
+    glTranslatef(instance.GetX()*0.25f - xView, -instance.GetY()*0.25f - yView, zPosition*0.25f - 75.0f*(renderTarget.getView().getSize().y/600.0f));
 
     float sizeWidth  =  width*0.25f;
     float sizeHeight = -height*0.25f;
@@ -342,9 +384,10 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
 
     //Render the box
     glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    backTexture->texture.Bind();
+    backTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            0);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   0);
@@ -352,7 +395,7 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            0);
     glEnd();
 
-    frontTexture->texture.Bind();
+    frontTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            sizeDepth);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   sizeDepth);
@@ -360,7 +403,7 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    leftTexture->texture.Bind();
+    leftTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0,       0,              0);
         glTexCoord2f(0, 1); glVertex3f(0,       sizeHeight,     0);
@@ -368,7 +411,7 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
         glTexCoord2f(1, 0); glVertex3f(0,       0,              sizeDepth);
     glEnd();
 
-    rightTexture->texture.Bind();
+    rightTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(sizeWidth, 0,            0);
         glTexCoord2f(0, 1); glVertex3f(sizeWidth, sizeHeight,   0);
@@ -376,7 +419,7 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    bottomTexture->texture.Bind();
+    bottomTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           0,          sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           0,          0);
@@ -384,7 +427,7 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   0,          sizeDepth);
     glEnd();
 
-    topTexture->texture.Bind();
+    topTexture->texture.bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           sizeHeight, sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           sizeHeight, 0);
@@ -392,9 +435,12 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   sizeHeight, sizeDepth);
     glEnd();
 
-    window.SaveGLStates();
+    renderTarget.pushGLStates();
+}
 
-    return true;
+sf::Vector2f Box3DObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(width, height);
 }
 
 void Box3DObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
@@ -409,47 +455,45 @@ void Box3DObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool Box3DObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/Box3Dicon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/Box3Dicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void Box3DObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void Box3DObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     Box3DObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 }
 
-wxPanel * Box3DObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+std::map<std::string, std::string> Box3DObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
 {
-    Box3DInitialPositionPanel * panel = new Box3DInitialPositionPanel(parent);
+    std::map<std::string, std::string> properties;
+    properties[ToString(_("Z"))] = position.floatInfos.find("z") != position.floatInfos.end() ?
+                                   ToString(position.floatInfos.find("z")->second) :
+                                   "0";
 
-    if ( position.floatInfos.find("z") != position.floatInfos.end())
-        panel->zEdit->ChangeValue(ToString( position.floatInfos.find("z")->second));
+    properties[ToString(_("Pitch"))] = position.floatInfos.find("pitch") != position.floatInfos.end() ?
+                                   ToString(position.floatInfos.find("pitch")->second) :
+                                   "0";
 
-    panel->yawEdit->ChangeValue(ToString(position.GetAngle()));
+    properties[ToString(_("Roll"))] = position.floatInfos.find("roll") != position.floatInfos.end() ?
+                                   ToString(position.floatInfos.find("roll")->second) :
+                                   "0";
 
-    if ( position.floatInfos.find("pitch") != position.floatInfos.end())
-        panel->pitchEdit->ChangeValue(ToString(position.floatInfos.find("pitch")->second));
-
-    if ( position.floatInfos.find("roll") != position.floatInfos.end())
-        panel->rollEdit->ChangeValue(ToString(position.floatInfos.find("roll")->second));
-
-    return panel;
+    return properties;
 }
 
-void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
+bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene)
 {
-    Box3DInitialPositionPanel * box3DPanel = dynamic_cast<Box3DInitialPositionPanel*>(panel);
-    if (box3DPanel == NULL) return;
+    if ( name == _("Z") ) position.floatInfos["z"] = ToFloat(value);
+    if ( name == _("Pitch") ) position.floatInfos["pitch"] = ToFloat(value);
+    if ( name == _("Roll") ) position.floatInfos["roll"] = ToFloat(value);
 
-    position.floatInfos["z"] = ToFloat(string(box3DPanel->zEdit->GetValue().mb_str()));
-    position.SetAngle(ToFloat(string(box3DPanel->yawEdit->GetValue().mb_str())));
-    position.floatInfos["pitch"] = ToFloat(string(box3DPanel->pitchEdit->GetValue().mb_str()));
-    position.floatInfos["roll"] = ToFloat(string(box3DPanel->rollEdit->GetValue().mb_str()));
+    return true;
 }
 
-void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
     else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
@@ -460,7 +504,7 @@ void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name,
     else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
 }
 
-bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) {width = ToInt(newValue);}
     else if ( propertyNb == 1 ) {height = ToInt(newValue);}
@@ -473,80 +517,29 @@ bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
     return true;
 }
 
-unsigned int Box3DObject::GetNumberOfProperties() const
+unsigned int RuntimeBox3DObject::GetNumberOfProperties() const
 {
     return 7;
 }
 #endif
 
-/**
- * Box3D object provides a basic bounding box.
- */
-std::vector<Polygon2d> Box3DObject::GetHitBoxes() const
+void DestroyRuntimeBox3DObject(RuntimeObject * object)
 {
-    std::vector<Polygon2d> mask;
-    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
-    rectangle.Rotate(GetAngle()/180*3.14159);
-    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
-
-    mask.push_back(rectangle);
-    return mask;
+    delete object;
 }
 
-/**
- * Get the real X position of the box
- */
-float Box3DObject::GetDrawableX() const
+RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object)
 {
-    return GetX();
+    return new RuntimeBox3DObject(scene, object);
 }
 
-/**
- * Get the real Y position of the box
- */
-float Box3DObject::GetDrawableY() const
-{
-    return GetY();
-}
-
-/**
- * Width is the width of the current sprite.
- */
-float Box3DObject::GetWidth() const
-{
-    return width;
-}
-
-/**
- * Height is the height of the current sprite.
- */
-float Box3DObject::GetHeight() const
-{
-    return height;
-}
-
-/**
- * X center
- */
-float Box3DObject::GetCenterX() const
-{
-    return width/2;
-}
-
-/**
- * Y center
- */
-float Box3DObject::GetCenterY() const
-{
-    return height/2;
-}
 
 /**
  * Function destroying an extension Object.
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyBox3DObject(Object * object)
+void DestroyBox3DObject(gd::Object * object)
 {
     delete object;
 }
@@ -555,7 +548,7 @@ void DestroyBox3DObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateBox3DObject(std::string name)
+gd::Object * CreateBox3DObject(std::string name)
 {
     return new Box3DObject(name);
 }

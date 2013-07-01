@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 #include <wx/aui/aui.h>
-class Game;
+namespace gd { class Project; }
 class Box3DObject;
 namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
@@ -48,7 +48,7 @@ class Box3DObjectEditor: public wxDialog
 {
 	public:
 
-		Box3DObjectEditor( wxWindow* parent, Game & game_, Box3DObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
+		Box3DObjectEditor( wxWindow* parent, gd::Project & game_, Box3DObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~Box3DObjectEditor();
 
 		//(*Declarations(Box3DObjectEditor)
@@ -132,7 +132,7 @@ class Box3DObjectEditor: public wxDialog
 		void OnimageBankBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		gd::MainFrameWrapper & mainFrameWrapper;
 		Box3DObject & object;
 

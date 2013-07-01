@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,14 +38,16 @@ freely, subject to the following restrictions:
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDL/Game.h"
+#include "GDCpp/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Scene.h"
 #include "PhysicsAutomatism.h"
 #include "ScenePhysicsDatas.h"
 
 #include "CustomPolygonDialog.h"
+
+using namespace std;
 
 //(*IdInit(PhysicsAutomatismEditor)
 const long PhysicsAutomatismEditor::ID_STATICTEXT11 = wxNewId();
@@ -86,7 +88,7 @@ BEGIN_EVENT_TABLE(PhysicsAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-PhysicsAutomatismEditor::PhysicsAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, PhysicsAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+PhysicsAutomatismEditor::PhysicsAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene_, PhysicsAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 automatism(automatism_),
 game(game_),
 scene(scene_)

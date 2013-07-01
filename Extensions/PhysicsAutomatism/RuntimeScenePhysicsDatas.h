@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,19 +29,19 @@ freely, subject to the following restrictions:
 
 class b2World;
 class b2Body;
-#include "GDL/AutomatismsRuntimeSharedDatas.h"
+#include "GDCpp/AutomatismsRuntimeSharedData.h"
 class ScenePhysicsDatas;
 class ContactListener;
 
 /**
  * Datas shared by Physics Automatism at runtime
  */
-class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedDatas
+class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedData
 {
     public:
         RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas);
         virtual ~RuntimeScenePhysicsDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePhysicsDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePhysicsDatas(*this));}
 
         b2World * world;
         ContactListener * contactListener;

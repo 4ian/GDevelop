@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,29 +27,29 @@ freely, subject to the following restrictions:
 #ifndef SCENEPHYSICSDATAS_H
 #define SCENEPHYSICSDATAS_H
 
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDCpp/AutomatismsSharedData.h"
 #include "RuntimeScenePhysicsDatas.h"
 
 /**
  * Datas shared by Physics Automatism
  */
-class ScenePhysicsDatas : public AutomatismsSharedDatas
+class ScenePhysicsDatas : public gd::AutomatismsSharedData
 {
     public:
-        ScenePhysicsDatas(std::string typeName) : AutomatismsSharedDatas(typeName), gravityX(0), gravityY(0), scaleX(100), scaleY(100)
+        ScenePhysicsDatas() : AutomatismsSharedData(), gravityX(0), gravityY(0), scaleX(100), scaleY(100)
         {
         };
         virtual ~ScenePhysicsDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePhysicsDatas(*this));}
+        virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new ScenePhysicsDatas(*this));}
 
         float gravityX;
         float gravityY;
         float scaleX;
         float scaleY;
 
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
         {
-            return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePhysicsDatas(*this));
+            return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePhysicsDatas(*this));
         }
 
         #if defined(GD_IDE_ONLY)

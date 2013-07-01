@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 #include <wx/textdlg.h>
 #include <wx/numdlg.h>
 
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include <string>
 #include <cmath>

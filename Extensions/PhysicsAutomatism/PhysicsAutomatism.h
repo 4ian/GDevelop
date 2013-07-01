@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,13 +27,15 @@ freely, subject to the following restrictions:
 #ifndef PHYSICAUTOMATISM_H
 #define PHYSICAUTOMATISM_H
 
-#include "GDL/Automatism.h"
-#include "GDL/Object.h"
+#include "GDCpp/Automatism.h"
+#include "GDCpp/Object.h"
 #include "SFML/Config.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <map>
 #include <set>
 #include <vector>
+namespace gd { class Project; }
+namespace gd { class Layout; }
 class TiXmlElement;
 class RuntimeScene;
 class b2Body;
@@ -50,7 +52,7 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
 friend class PhysicsAutomatismEditor;
 
 public:
-    PhysicsAutomatism(std::string automatismTypeName);
+    PhysicsAutomatism();
     virtual ~PhysicsAutomatism();
     virtual Automatism * Clone() const { return new PhysicsAutomatism(*this);}
 
@@ -72,7 +74,7 @@ public:
     /**
      * Called when user wants to edit the automatism.
      */
-    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_ );
     #endif
 
     /**
@@ -81,8 +83,8 @@ public:
     virtual void OnDeActivate();
 
     b2Body * GetBox2DBody(const RuntimeScene & scene) { if (!body) CreateBody(scene); return body; }
-    inline Object * GetObject() {return object;};
-    inline const Object * GetObject() const {return object;};
+    inline RuntimeObject * GetObject() {return object;};
+    inline const RuntimeObject * GetObject() const {return object;};
 
     std::set<PhysicsAutomatism*> currentContacts; ///< List of other bodies that are in contact with this body.
 
@@ -105,10 +107,10 @@ public:
     void SetAngularVelocity( double angularVelocity, RuntimeScene & scene );
     void SetLinearDamping( float linearDamping_ , RuntimeScene & scene );
     void SetAngularDamping( float angularDamping_ , RuntimeScene & scene );
-    void AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene, float xPosRelativeToMassCenter, float yPosRelativeToMassCenter );
+    void AddRevoluteJointBetweenObjects( RuntimeObject * object, RuntimeScene & scene, float xPosRelativeToMassCenter, float yPosRelativeToMassCenter );
     void AddRevoluteJoint( float xPosition, float yPosition, RuntimeScene & scene);
     void SetGravity( float xGravity, float yGravity, RuntimeScene & scene);
-    void AddGearJointBetweenObjects( const std::string &, float ratio, Object * object, RuntimeScene & scene );
+    void AddGearJointBetweenObjects( RuntimeObject * object, float ratio, RuntimeScene & scene );
 
     void SetLinearVelocityX( double xVelocity, RuntimeScene & scene );
     void SetLinearVelocityY( double yVelocity, RuntimeScene & scene );
@@ -149,7 +151,7 @@ public:
     */
     static std::vector<sf::Vector2f> GetCoordsVectorFromString(const std::string &str, char coordsSep = '\n', char composantSep = ';');
 
-    bool CollisionWith( const std::string & , std::map <std::string, std::vector<Object*> *> otherObjectsLists, RuntimeScene & scene);
+    bool CollisionWith( std::map <std::string, std::vector<RuntimeObject*> *> otherObjectsLists, RuntimeScene & scene);
 
 private:
 

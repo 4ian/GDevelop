@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,28 +28,31 @@ freely, subject to the following restrictions:
 #include <string>
 #include "Box2D/Box2D.h"
 #include "Triangulation/triangulate.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/XmlMacros.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/XmlMacros.h"
 #include "PhysicsAutomatismEditor.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/Scene.h"
 #include "RuntimeScenePhysicsDatas.h"
 
 #undef GetObject
 
-PhysicsAutomatism::PhysicsAutomatism(std::string automatismTypeName) :
-Automatism(automatismTypeName),
-shapeType(Box),
-dynamic(true),
-fixedRotation(false),
-isBullet(false),
-massDensity(1),
-averageFriction(0.8),
-averageRestitution(0),
-linearDamping(0.1),
-angularDamping(0.1),
-body(NULL),
-runtimeScenesPhysicsDatas(NULL)
+PhysicsAutomatism::PhysicsAutomatism() :
+    Automatism(),
+    shapeType(Box),
+    dynamic(true),
+    fixedRotation(false),
+    isBullet(false),
+    massDensity(1),
+    averageFriction(0.8),
+    averageRestitution(0),
+    linearDamping(0.1),
+    angularDamping(0.1),
+    body(NULL),
+    runtimeScenesPhysicsDatas(NULL)
 {
     polygonHeight = 200;
     polygonWidth = 200;
@@ -66,9 +69,9 @@ PhysicsAutomatism::~PhysicsAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
+void PhysicsAutomatism::EditAutomatism( wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
-    PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainFrameWrapper_);
+    PhysicsAutomatismEditor editor(parent, dynamic_cast<Game&>(project_), dynamic_cast<Scene*>(layout_), *this, mainFrameWrapper_);
     editor.ShowModal();
 }
 #endif
@@ -83,7 +86,7 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     if ( !runtimeScenesPhysicsDatas->stepped ) //Simulate the world, once at each frame
     {
-        runtimeScenesPhysicsDatas->StepWorld(static_cast<float>(scene.GetElapsedTime())/1000.0, 6, 10);
+        runtimeScenesPhysicsDatas->StepWorld(static_cast<double>(scene.GetElapsedTime())/1000000.0, 6, 10);
         runtimeScenesPhysicsDatas->stepped = true;
     }
 
@@ -105,8 +108,19 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
-    if ( objectOldWidth != object->GetWidth() || objectOldHeight != object->GetHeight() )
+
+    //Note: Strange bug here, using SpriteObject, the tests objectOldWidth != newWidth
+    //and objectOldHeight != newHeight keeps being true even if the two values were exactly the same.
+    //Maybe a floating point round error ( the values were integer yet in my tests! ) so we cast the values
+    //to int to ensure that the body is not continuously recreated.
+    float newWidth = object->GetWidth();
+    float newHeight = object->GetHeight();
+    if ( (int)objectOldWidth != (int)newWidth || (int)objectOldHeight != (int)newHeight )
     {
+            /*std::cout << "Changed:" << (int)objectOldWidth << "!=" << (int)newWidth << std::endl;
+            std::cout << "Changed:" << (int)objectOldHeight << "!=" << (int)newHeight << std::endl;
+            std::cout << "( Object name:" << object->GetName() << std::endl;*/
+
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
         CreateBody(scene);
     }
@@ -411,7 +425,7 @@ void PhysicsAutomatism::SetAngularDamping( float angularDamping_ , RuntimeScene 
 /**
  * Add an hinge between two objects
  */
-void PhysicsAutomatism::AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene, float xPosRelativeToMassCenter, float yPosRelativeToMassCenter )
+void PhysicsAutomatism::AddRevoluteJointBetweenObjects( RuntimeObject * object, RuntimeScene & scene, float xPosRelativeToMassCenter, float yPosRelativeToMassCenter )
 {
     if ( !body ) CreateBody(scene);
 
@@ -458,7 +472,7 @@ void PhysicsAutomatism::SetGravity( float xGravity, float yGravity, RuntimeScene
 /**
  * Add a gear joint between two objects
  */
-void PhysicsAutomatism::AddGearJointBetweenObjects( const std::string &, float ratio, Object * object, RuntimeScene & scene )
+void PhysicsAutomatism::AddGearJointBetweenObjects( RuntimeObject * object, float ratio, RuntimeScene & scene )
 {
     if ( !body ) CreateBody(scene);
 
@@ -539,13 +553,13 @@ double PhysicsAutomatism::GetAngularDamping( const RuntimeScene & scene)
 /**
  * Test if there is a contact with another object
  */
-bool PhysicsAutomatism::CollisionWith( const std::string & , std::map <std::string, std::vector<Object*> *> otherObjectsLists, RuntimeScene & scene)
+bool PhysicsAutomatism::CollisionWith( std::map <std::string, std::vector<RuntimeObject*> *> otherObjectsLists, RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
     //Getting a list of all objects which are tested
-    std::vector<Object*> objects;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = otherObjectsLists.begin();it!=otherObjectsLists.end();++it)
+    std::vector<RuntimeObject*> objects;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = otherObjectsLists.begin();it!=otherObjectsLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -555,8 +569,8 @@ bool PhysicsAutomatism::CollisionWith( const std::string & , std::map <std::stri
     }
 
     //Test if an object of the list is in collision with our object.
-	std::vector<Object*>::const_iterator obj_end = objects.end();
-    for (std::vector<Object*>::iterator obj = objects.begin(); obj != obj_end; ++obj )
+	std::vector<RuntimeObject*>::const_iterator obj_end = objects.end();
+    for (std::vector<RuntimeObject*>::iterator obj = objects.begin(); obj != obj_end; ++obj )
     {
         std::set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
         std::set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();

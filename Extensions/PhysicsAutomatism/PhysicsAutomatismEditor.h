@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -49,17 +49,17 @@ freely, subject to the following restrictions:
 #include <wx/msw/winundef.h>
 #endif
 #include <boost/shared_ptr.hpp>
-class Game;
+namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class PhysicsAutomatism;
-class Scene;
+namespace gd { class Layout; }
 class ScenePhysicsDatas;
 
 class PhysicsAutomatismEditor: public wxDialog
 {
 	public:
 
-		PhysicsAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, PhysicsAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ );
+		PhysicsAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene, PhysicsAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~PhysicsAutomatismEditor();
 
 		//(*Declarations(PhysicsAutomatismEditor)
@@ -145,8 +145,8 @@ class PhysicsAutomatismEditor: public wxDialog
 		void OnpolygonBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
-        Scene * scene;
+		gd::Project & game;
+        gd::Layout * scene;
         boost::shared_ptr<ScenePhysicsDatas> sharedDatas;
 
 		std::vector<sf::Vector2f> coordsVector;

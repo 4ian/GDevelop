@@ -84,7 +84,7 @@ std::string CodeCompilerCall::GetFullCall() const
         #elif defined(MAC)
         #endif
 
-        standardsIncludeDirs.push_back("CppPlatform/include/GDL");
+        standardsIncludeDirs.push_back("CppPlatform/include/GDCpp");
         standardsIncludeDirs.push_back("CppPlatform/include/Core");
         standardsIncludeDirs.push_back("CppPlatform/include/boost");
         standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");

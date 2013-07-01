@@ -28,7 +28,6 @@
 #include "GDCpp/Scene.h"
 #include "GDCpp/Object.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
-#include "GDCpp/OpenSaveLoadingScreen.h"
 #include "GDCpp/SceneNameMangler.h"
 #include "GDCpp/Tools/AES.h"
 #include "GDCpp/CommonTools.h"

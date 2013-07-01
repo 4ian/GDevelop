@@ -45,12 +45,12 @@ public:
     static std::string FullString();
 
     /**
-     * Get GDL status ( Alpha/Beta/Release Candidate/Release )
+     * Get GDCore status ( Alpha/Beta/Release Candidate/Release )
      */
     static std::string Status();
 
     /**
-     * Return true if GDL is compiled with edittime support.
+     * Return true if GDCpp is compiled with edittime support.
      */
     static bool CompiledForEdittime();
 

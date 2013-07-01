@@ -1,7 +1,7 @@
 /**
 
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,15 +26,16 @@ freely, subject to the following restrictions:
 
 #include "AStarAutomatism.h"
 #include "AStarAutomatismEditor.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/Scene.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/XmlMacros.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Scene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/XmlMacros.h"
 #include "MapSearchNode.h"
 #include "RuntimeSceneAStarDatas.h"
+#include <cmath>
 
-AStarAutomatism::AStarAutomatism(std::string automatismTypeName) :
-    Automatism(automatismTypeName),
+AStarAutomatism::AStarAutomatism() :
+    Automatism(),
     leftBorder(0),
     rightBorder(0),
     topBorder(0),
@@ -74,7 +75,7 @@ void AStarAutomatism::EnterSegment(unsigned int segmentNumber)
 }
 
 #if defined(GD_IDE_ONLY)
-void AStarAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
+void AStarAutomatism::EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
     AStarAutomatismEditor editor(parent, game_, scene, *this);
     editor.ShowModal();
@@ -94,7 +95,7 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //  add to the current time along the path
-    timeOnSegment += static_cast<double>(scene.GetElapsedTime())/1000.0 * speed;
+    timeOnSegment += static_cast<double>(scene.GetElapsedTime())/1000000.0 * speed;
 
     //  if I reached the end of this segment, move to a new segment
     if (timeOnSegment >= totalSegmentTime && currentSegment < path.size())

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,17 +38,17 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 #include <boost/shared_ptr.hpp>
-class Game;
+namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class AStarAutomatism;
-class Scene;
+namespace gd { class Layout; }
 class SceneAStarDatas;
 
 class AStarAutomatismEditor: public wxDialog
 {
 	public:
 
-		AStarAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, AStarAutomatism & automatism_ );
+		AStarAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene, AStarAutomatism & automatism_ );
 		virtual ~AStarAutomatismEditor();
 
 		//(*Declarations(AStarAutomatismEditor)
@@ -100,8 +100,8 @@ class AStarAutomatismEditor: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
-        Scene * scene;
+		gd::Project & game;
+        gd::Layout * scene;
         boost::shared_ptr<SceneAStarDatas> sharedDatas;
 
 		DECLARE_EVENT_TABLE()

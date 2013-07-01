@@ -1,7 +1,7 @@
 /**
 
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,13 +33,13 @@ freely, subject to the following restrictions:
 #include <wx/string.h>
 //*)
 #include <wx/log.h>
-#include "GDL/Game.h"
+#include "GDCpp/Project.h"
 #include "AStarAutomatism.h"
 #include "SceneAStarDatas.h"
 #include "RuntimeSceneAStarDatas.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Scene.h"
 
 //(*IdInit(AStarAutomatismEditor)
 const long AStarAutomatismEditor::ID_STATICTEXT1 = wxNewId();
@@ -60,12 +60,14 @@ const long AStarAutomatismEditor::ID_BUTTON1 = wxNewId();
 const long AStarAutomatismEditor::ID_BUTTON2 = wxNewId();
 //*)
 
+using namespace std;
+
 BEGIN_EVENT_TABLE(AStarAutomatismEditor,wxDialog)
 	//(*EventTable(AStarAutomatismEditor)
 	//*)
 END_EVENT_TABLE()
 
-AStarAutomatismEditor::AStarAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, AStarAutomatism & automatism_ ) :
+AStarAutomatismEditor::AStarAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene_, AStarAutomatism & automatism_ ) :
 automatism(automatism_),
 game(game_),
 scene(scene_)

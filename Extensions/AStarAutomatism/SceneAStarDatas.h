@@ -1,7 +1,7 @@
 /**
 
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,33 +27,33 @@ freely, subject to the following restrictions:
 #ifndef SCENEASTARDATAS_H
 #define SCENEASTARDATAS_H
 
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDCpp/AutomatismsSharedData.h"
 #include "RuntimeSceneAStarDatas.h"
 
 /**
- * Datas shared by A Star Automatism
+ * \brief Data common to all A star automatisms of a scene.
  */
-class GD_EXTENSION_API SceneAStarDatas : public AutomatismsSharedDatas
+class GD_EXTENSION_API SceneAStarDatas : public gd::AutomatismsSharedData
 {
-    public:
-        SceneAStarDatas(std::string typeName) : AutomatismsSharedDatas(typeName), gridWidth(20), gridHeight(20), diagonalMove(true) {};
-        virtual ~SceneAStarDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new SceneAStarDatas(*this));}
+public:
+    SceneAStarDatas() : gridWidth(20), gridHeight(20), diagonalMove(true) {};
+    virtual ~SceneAStarDatas() {};
+    virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new SceneAStarDatas(*this));}
 
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
-        {
-            return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneAStarDatas(*this));
-        }
+    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
+    {
+        return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneAStarDatas(*this));
+    }
 
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * eventElem) const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * eventElem);
+    virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-        float gridWidth;
-        float gridHeight;
-        bool diagonalMove;
+    float gridWidth;
+    float gridHeight;
+    bool diagonalMove;
 };
 
 #endif // SCENEASTARDATAS_H

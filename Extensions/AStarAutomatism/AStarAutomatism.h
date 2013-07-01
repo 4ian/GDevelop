@@ -4,7 +4,7 @@
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 arising from the use of this software.
 
 Permission is granted to anyone to use this software for any purpose,
@@ -27,14 +27,14 @@ freely, subject to the following restrictions:
 #ifndef ASTARAUTOMATISM_H
 #define ASTARAUTOMATISM_H
 
-#include "GDL/Automatism.h"
-#include "GDL/Object.h"
+#include "GDCpp/Automatism.h"
+#include "GDCpp/RuntimeObject.h"
 #include <SFML/System/Vector2.hpp>
 #include <map>
 #include <set>
 class RuntimeScene;
 class TiXmlElement;
-class Scene;
+namespace gd { class Layout; }
 class AStarAutomatismEditor;
 class RuntimeSceneAStarDatas;
 
@@ -46,7 +46,7 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism
 friend class AStarAutomatismEditor;
 
 public:
-    AStarAutomatism(std::string automatismTypeName);
+    AStarAutomatism();
     virtual ~AStarAutomatism();
     virtual Automatism* Clone() const { return new AStarAutomatism(*this);}
 
@@ -66,18 +66,18 @@ public:
     /**
      * Called when user wants to edit the automatism.
      */
-    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
     #endif
 
     /**
      * Access to the object owning the automatism
      */
-    inline Object * GetObject() {return object;};
+    inline RuntimeObject * GetObject() {return object;};
 
     /**
      * Access to the object owning the automatism
      */
-    inline const Object * GetObject() const {return object;};
+    inline const RuntimeObject * GetObject() const {return object;};
 
     /**
      * Reset path

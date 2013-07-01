@@ -1,7 +1,7 @@
 /**
 
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,19 +29,19 @@ freely, subject to the following restrictions:
 
 #include <boost/weak_ptr.hpp>
 #include <vector>
-#include "GDL/AutomatismsRuntimeSharedDatas.h"
+#include "GDCpp/AutomatismsRuntimeSharedData.h"
 class SceneAStarDatas;
 class AStarAutomatism;
 
 /**
  * Datas shared by A Star Automatism at runtime
  */
-class GD_EXTENSION_API RuntimeSceneAStarDatas : public AutomatismsRuntimeSharedDatas
+class GD_EXTENSION_API RuntimeSceneAStarDatas : public AutomatismsRuntimeSharedData
 {
     public:
         RuntimeSceneAStarDatas(const SceneAStarDatas & automatismSharedDatas);
         virtual ~RuntimeSceneAStarDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneAStarDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneAStarDatas(*this));}
 
         std::vector < AStarAutomatism* > objects; ///< Each object using the automatism add itself to this list, used to compute obstacles
 

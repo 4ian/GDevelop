@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,17 +38,17 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 #include <boost/shared_ptr.hpp>
-class Game;
+namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class NetworkAutomatism;
-class Scene;
+namespace gd { class Layout; }
 class ScenePhysicsDatas;
 
 class NetworkAutomatismEditor: public wxDialog
 {
 	public:
 
-		NetworkAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, NetworkAutomatism & automatism_ );
+		NetworkAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene, NetworkAutomatism & automatism_ );
 		virtual ~NetworkAutomatismEditor();
 
 		//(*Declarations(NetworkAutomatismEditor)
@@ -92,8 +92,8 @@ class NetworkAutomatismEditor: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
-        Scene * scene;
+		gd::Project & game;
+        gd::Layout * scene;
 
 		DECLARE_EVENT_TABLE()
 };

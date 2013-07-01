@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,70 +27,70 @@ freely, subject to the following restrictions:
 #ifndef NETWORKAUTOMATISM_H
 #define NETWORKAUTOMATISM_H
 
-#include "GDL/Automatism.h"
-#include "GDL/Object.h"
+#include "GDCpp/Automatism.h"
+#include "GDCpp/Object.h"
 #include "SceneNetworkDatas.h"
 #include <map>
 class TiXmlElement;
-class Scene;
+namespace gd { class Layout; }
 class NetworkAutomatismEditor;
 
 class GD_EXTENSION_API NetworkAutomatism : public Automatism
 {
-    friend class NetworkAutomatismEditor;
+friend class NetworkAutomatismEditor;
 
-    public:
-        NetworkAutomatism(std::string automatismTypeName);
-        virtual ~NetworkAutomatism();
-        virtual Automatism * Clone() const { return (new NetworkAutomatism(*this));}
+public:
+    NetworkAutomatism();
+    virtual ~NetworkAutomatism();
+    virtual Automatism * Clone() const { return (new NetworkAutomatism(*this));}
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Save Automatism to XML
-         */
-        virtual void SaveToXml(TiXmlElement * elem) const;
-        #endif
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Save Automatism to XML
+     */
+    virtual void SaveToXml(TiXmlElement * elem) const;
+    #endif
 
-        /**
-         * Load Automatism from XML
-         */
-        virtual void LoadFromXml(const TiXmlElement * elem);
+    /**
+     * Load Automatism from XML
+     */
+    virtual void LoadFromXml(const TiXmlElement * elem);
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Called when user wants to edit the automatism.
-         */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
-        #endif
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Called when user wants to edit the automatism.
+     */
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
+    #endif
 
-        static std::map < const Scene* , SceneNetworkDatas > scenesNetworkDatas; ///< Static map associating scene to datas
+    static std::map < const gd::Layout* , SceneNetworkDatas > scenesNetworkDatas; ///< Static map associating scene to datas
 
-        std::string dataPrefix;
-        bool xPosition; ///< True if X position must be send/updated
-        bool yPosition; ///< True if Y position must be send/updated
-        bool angle; ///< True if agnle must be send/updated
-        bool width; ///< True if width must be send/updated
-        bool height; ///< True if height must be send/updated
+    std::string dataPrefix;
+    bool xPosition; ///< True if X position must be send/updated
+    bool yPosition; ///< True if Y position must be send/updated
+    bool angle; ///< True if agnle must be send/updated
+    bool width; ///< True if width must be send/updated
+    bool height; ///< True if height must be send/updated
 
-        void SetAsSender() {sending=true;};
-        void SetAsReceiver() {sending=false;};
-        void SetIdentifier(unsigned int identifier) {objectNetworkId = identifier;};
-        unsigned int GetIdentifier() const { return objectNetworkId; }
+    void SetAsSender() {sending=true;};
+    void SetAsReceiver() {sending=false;};
+    void SetIdentifier(unsigned int identifier) {objectNetworkId = identifier;};
+    unsigned int GetIdentifier() const { return objectNetworkId; }
 
-        /**
-         * Generate a unique identifier for all objects of list, using automatism named automatismName.
-         */
-        static void GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::map <std::string, std::vector<Object*> *> objectsLists);
+    /**
+     * Generate a unique identifier for all objects of list, using automatism named automatismName.
+     */
+    static void GenerateObjectNetworkIdentifier(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists, const std::string & automatismName);
 
-    private:
+private:
 
-        virtual void DoStepPreEvents(RuntimeScene & scene);
-        virtual void DoStepPostEvents(RuntimeScene & scene);
+    virtual void DoStepPreEvents(RuntimeScene & scene);
+    virtual void DoStepPostEvents(RuntimeScene & scene);
 
-        bool sending;
-        unsigned int objectNetworkId;
+    bool sending;
+    unsigned int objectNetworkId;
 
-        boost::shared_ptr<RuntimeSceneNetworkDatas> runtimeScenesNetworkDatas;
+    boost::shared_ptr<RuntimeSceneNetworkDatas> runtimeScenesNetworkDatas;
 };
 
 #endif // NETWORKAUTOMATISM_H

@@ -1,7 +1,7 @@
 #include "NetworkManager.h"
 #include "ReceivedDataManager.h"
 #include "ErrorManager.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 
 NetworkManager * NetworkManager::_singleton = NULL;
 
@@ -11,7 +11,7 @@ void NetworkManager::ReceivePackets()
     sf::IpAddress address;
     short unsigned int port;
 
-    while ( socket.Receive(packet, address, port) == sf::Socket::Done)
+    while ( socket.receive(packet, address, port) == sf::Socket::Done)
     {
         //Be sure the sender is not blocked
         if ( find(blockedList.begin(), blockedList.end(), address) == blockedList.end())

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,18 +28,18 @@ freely, subject to the following restrictions:
 #define RUNTIMESCENENETWORKDATAS_H
 
 #include <iostream>
-#include "GDL/AutomatismsRuntimeSharedDatas.h"
+#include "GDCpp/AutomatismsRuntimeSharedData.h"
 class SceneNetworkDatas;
 
 /**
  * Datas shared by Network Automatism at runtime ( i.e. Nothing )
  */
-class GD_EXTENSION_API RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedDatas
+class GD_EXTENSION_API RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedData
 {
     public:
         RuntimeSceneNetworkDatas(const SceneNetworkDatas & automatismSharedDatas);
         virtual ~RuntimeSceneNetworkDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneNetworkDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));}
 
     private:
 };

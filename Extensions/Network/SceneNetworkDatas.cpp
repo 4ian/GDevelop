@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@ freely, subject to the following restrictions:
 */
 
 #include "SceneNetworkDatas.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/XmlMacros.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/XmlMacros.h"
 #include <iostream>
 
 #if defined(GD_IDE_ONLY)

@@ -14,7 +14,7 @@ public:
     void ListenToPort(unsigned int port)
     {
         StopListening();
-        socket.Bind(port);
+        socket.bind(port);
     }
 
     /**
@@ -22,7 +22,7 @@ public:
      */
     void StopListening()
     {
-        socket.Unbind();
+        socket.unbind();
     }
 
     /**
@@ -52,7 +52,7 @@ public:
     void Send(sf::Packet & packet)
     {
         for (unsigned int i = 0;i<recipientsList.size();++i)
-            socket.Send(packet, recipientsList[i].first, recipientsList[i].second);
+            socket.send(packet, recipientsList[i].first, recipientsList[i].second);
     }
 
     /**
@@ -95,7 +95,7 @@ public:
         }
     }
 private:
-    NetworkManager() {socket.SetBlocking(false);};
+    NetworkManager() {socket.setBlocking(false);};
     virtual ~NetworkManager() {};
 
     sf::UdpSocket socket;

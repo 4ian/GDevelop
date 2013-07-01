@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,25 +27,25 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <vector>
 #include <SFML/Network.hpp>
-#include "GDL/Scene.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/XmlMacros.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Scene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/XmlMacros.h"
+#include "GDCpp/CommonTools.h"
 #include "ReceivedDataManager.h"
 #include "NetworkAutomatismEditor.h"
 #include "NetworkAutomatism.h"
 #include "NetworkManager.h"
 
-NetworkAutomatism::NetworkAutomatism(std::string automatismTypeName) :
-Automatism(automatismTypeName),
-dataPrefix("Object"),
-xPosition(true),
-yPosition(true),
-angle(true),
-width(false),
-height(false),
-sending(true),
-objectNetworkId(0)
+NetworkAutomatism::NetworkAutomatism() :
+    dataPrefix("Object"),
+    xPosition(true),
+    yPosition(true),
+    angle(true),
+    width(false),
+    height(false),
+    sending(true),
+    objectNetworkId(0)
 {
 }
 
@@ -54,7 +54,7 @@ NetworkAutomatism::~NetworkAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void NetworkAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
+void NetworkAutomatism::EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
     NetworkAutomatismEditor editor(parent, game_, scene, *this);
     editor.ShowModal();
@@ -133,10 +133,10 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
 /**
  * Generate an object network identifier, unique for each object.
  */
-void NetworkAutomatism::GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::map <std::string, std::vector<Object*> *> objectsLists1)
+void NetworkAutomatism::GenerateObjectNetworkIdentifier( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, const std::string & automatismName)
 {
-    std::vector<Object*> objects1;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    std::vector<RuntimeObject*> objects1;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {

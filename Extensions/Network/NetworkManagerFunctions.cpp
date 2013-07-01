@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/RuntimeScene.h"
+#include "GDCpp/RuntimeScene.h"
 #include "NetworkManager.h"
 #include "ErrorManager.h"
 #include "ReceivedDataManager.h"
@@ -113,12 +113,12 @@ std::string GD_EXTENSION_API GetLastError()
 
 std::string GD_EXTENSION_API GetPublicAddress(float timeoutInSeconds)
 {
-    return sf::IpAddress::GetPublicAddress(timeoutInSeconds*1000).ToString();
+    return sf::IpAddress::getPublicAddress(sf::seconds(timeoutInSeconds)).toString();
 }
 
 std::string GD_EXTENSION_API GetLocalAddress()
 {
-    return sf::IpAddress::GetLocalAddress().ToString();
+    return sf::IpAddress::getLocalAddress().toString();
 }
 
 }

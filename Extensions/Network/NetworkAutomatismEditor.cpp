@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -31,11 +31,11 @@ freely, subject to the following restrictions:
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDL/Game.h"
+#include "GDCpp/Project.h"
 #include "NetworkAutomatism.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Scene.h"
 
 //(*IdInit(NetworkAutomatismEditor)
 const long NetworkAutomatismEditor::ID_RADIOBOX1 = wxNewId();
@@ -57,7 +57,7 @@ BEGIN_EVENT_TABLE(NetworkAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-NetworkAutomatismEditor::NetworkAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, NetworkAutomatism & automatism_ ) :
+NetworkAutomatismEditor::NetworkAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene_, NetworkAutomatism & automatism_ ) :
 automatism(automatism_),
 game(game_),
 scene(scene_)
@@ -170,7 +170,7 @@ void NetworkAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.width = widthCheck->GetValue();
     automatism.height = heightCheck->GetValue();
 
-    automatism.dataPrefix = string(dataPrefixEdit->GetValue().mb_str());
+    automatism.dataPrefix = ToString(dataPrefixEdit->GetValue());
 
     EndModal(1);
 }

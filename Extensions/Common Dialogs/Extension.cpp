@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Version.h"
+#include "GDCpp/ExtensionBase.h"
+#include "GDCore/Tools/Version.h"
 #include <boost/version.hpp>
 
 /**
@@ -33,132 +33,84 @@ freely, subject to the following restrictions:
  */
 class Extension : public ExtensionBase
 {
-    public:
+public:
 
-        /**
-         * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
-         */
-        Extension()
-        {
-            DECLARE_THE_EXTENSION("CommonDialogs",
-                                  _("Common dialogs"),
-                                  _("Extension allowing to display common dialogs ( Message box, open file dialog... )"),
-                                  "Compil Games",
-                                  "zlib/libpng License ( Open Source )")
-            #if defined(GD_IDE_ONLY)
+    /**
+     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     */
+    Extension()
+    {
+        SetExtensionInformation("CommonDialogs",
+                              _("Common dialogs"),
+                              _("Extension allowing to display common dialogs ( Message box, open file dialog... )"),
+                              "Florian Rival",
+                              "zlib/libpng License ( Open Source )");
+        #if defined(GD_IDE_ONLY)
 
-            DECLARE_ACTION("ShowMsgBox",
-                           _("Show a message box"),
-                           _("Display a message box with specified text, and a Ok button."),
-                           _("Display message \"_PARAM1_\" with title \"_PARAM2_\""),
-                           _("Interfaces"),
-                           "res/actions/msgbox24.png",
-                           "res/actions/msgbox.png");
+        AddAction("ShowMsgBox",
+                       _("Show a message box"),
+                       _("Display a message box with specified text, and a Ok button."),
+                       _("Display message \"_PARAM1_\" with title \"_PARAM2_\""),
+                       _("Interfaces"),
+                       "res/actions/msgbox24.png",
+                       "res/actions/msgbox.png")
 
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("string", _("Message"), "", false);
-                instrInfo.AddParameter("string", _("Title"), "", false);
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("string", _("Message"))
+            .AddParameter("string", _("Title"))
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
+            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
-            DECLARE_END_ACTION()
+        AddAction("ShowOpenFile",
+                       _("Show a window to choose a file"),
+                       _("Display a window allowing to choose a file.\nThe name and the directory of the file will be saved in the specified variable."),
+                       _("Open a window so as to choose a file, and save the result in _PARAM1_"),
+                       _("Interfaces"),
+                       "res/actions/openfile24.png",
+                       "res/actions/openfile.png")
 
-            DECLARE_ACTION("ShowOpenFile",
-                           _("Show a window to choose a file"),
-                           _("Display a window allowing to choose a file.\nThe name and the directory of the file will be saved in the specified variable."),
-                           _("Open a window so as to choose a file, and save the result in _PARAM1_"),
-                           _("Interfaces"),
-                           "res/actions/openfile24.png",
-                           "res/actions/openfile.png");
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("scenevar", _("Save result to scene variable"))
+            .AddParameter("string", _("Title"))
+            .AddParameter("string", _("Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windows only ) "))
 
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("scenevar", _("Save result to scene variable"), "", false);
-                instrInfo.AddParameter("string", _("Title"), "", false);
-                instrInfo.AddParameter("string", _("Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windows only ) "), "", false);
+            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("Common Dialogs/CommonDialogs.h");
+        AddAction("ShowTextInput",
+                       _("Show a window to enter a text"),
+                       _("Show a window allowing to enter a text.\nThe text will be saved in the specified scene variable."),
+                       _("Open a text input dialog, and save the result in _PARAM1_"),
+                       _("Interfaces"),
+                       "res/actions/textenter24.png",
+                       "res/actions/textenter.png")
 
-            DECLARE_END_ACTION()
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("scenevar", _("Save result to scene variable"))
+            .AddParameter("string", _("Message"))
+            .AddParameter("string", _("Title"))
 
-            DECLARE_ACTION("ShowTextInput",
-                           _("Show a window to enter a text"),
-                           _("Show a window allowing to enter a text.\nThe text will be saved in the specified scene variable."),
-                           _("Open a text input dialog, and save the result in _PARAM1_"),
-                           _("Interfaces"),
-                           "res/actions/textenter24.png",
-                           "res/actions/textenter.png");
+            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("scenevar", _("Save result to scene variable"), "", false);
-                instrInfo.AddParameter("string", _("Message"), "", false);
-                instrInfo.AddParameter("string", _("Title"), "", false);
+        AddAction("ShowYesNoMsgBox",
+                       _("Display a Yes/No message box"),
+                       _("Open a message box allowing to choose Yes or No.\nThe answer ( \"yes\"/\"no\" ) will be saved in the specified variable."),
+                       _("Open a Yes/No message box, and save the result in _PARAM1_"),
+                       _("Interfaces"),
+                       "res/actions/msgbox24.png",
+                       "res/actions/msgbox.png")
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("Common Dialogs/CommonDialogs.h");
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("scenevar", _("Save result to scene variable"))
+            .AddParameter("string", _("Message"))
+            .AddParameter("string", _("Title"))
 
-            DECLARE_END_ACTION()
+            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
-            DECLARE_ACTION("ShowYesNoMsgBox",
-                           _("Display a Yes/No message box"),
-                           _("Open a message box allowing to choose Yes or No.\nThe answer ( \"yes\"/\"no\" ) will be saved in the specified variable."),
-                           _("Open a Yes/No message box, and save the result in _PARAM1_"),
-                           _("Interfaces"),
-                           "res/actions/msgbox24.png",
-                           "res/actions/msgbox.png");
+        #endif
 
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("scenevar", _("Save result to scene variable"), "", false);
-                instrInfo.AddParameter("string", _("Message"), "", false);
-                instrInfo.AddParameter("string", _("Title"), "", false);
-
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
-
-            DECLARE_END_ACTION()
-
-            #endif
-
-            CompleteCompilationInformation();
-        };
-        virtual ~Extension() {};
-
-    protected:
-    private:
-
-        /**
-         * This function is called by Game Develop so
-         * as to complete information about how the extension was compiled ( which libs... )
-         * -- Do not need to be modified. --
-         */
-        void CompleteCompilationInformation()
-        {
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.runtimeOnly = false;
-            #else
-            compilationInfo.runtimeOnly = true;
-            #endif
-
-            #if defined(__GNUC__)
-            compilationInfo.gccMajorVersion = __GNUC__;
-            compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-            compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-            #endif
-
-            compilationInfo.boostVersion = BOOST_VERSION;
-
-            compilationInfo.sfmlMajorVersion = 2;
-            compilationInfo.sfmlMinorVersion = 0;
-
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-            compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-            compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-            compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
-            #endif
-
-            compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-            compilationInfo.sizeOfpInt = sizeof(int*);
-
-            compilationInfo.informationCompleted = true;
-        }
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+    };
+    virtual ~Extension() {};
 };
 
 /**

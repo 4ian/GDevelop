@@ -31,8 +31,8 @@ freely, subject to the following restrictions:
 #include <vector>
 #include <algorithm>
 
-#include "GDL/Object.h"
-#include "GDL/RuntimeScene.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeScene.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
 #endif

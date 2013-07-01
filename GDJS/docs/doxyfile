@@ -11,7 +11,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Game Develop JS Platform"
 PROJECT_NUMBER         = 
-PROJECT_BRIEF          = "Javascript platform for Game Develop"
+PROJECT_BRIEF          = "Platform for developing HTML5/Javascript based games with Game Develop"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = "Platform documentation"
 CREATE_SUBDIRS         = YES

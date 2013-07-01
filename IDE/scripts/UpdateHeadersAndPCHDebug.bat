@@ -7,7 +7,7 @@ echo -Copying files...
 rem del ..\Bin\Debug\CppPlatform\include\*.* /S /Q
 
 rem Game Develop C++ Implementation headers
-xcopy ..\..\GDL\*.h ..\Bin\Debug\CppPlatform\include\GDL\*.h /S /Y /D
+xcopy ..\..\GDCpp\*.h ..\Bin\Debug\CppPlatform\include\GDCpp\*.h /S /Y /D
 xcopy ..\..\Core\*.h ..\Bin\Debug\CppPlatform\include\Core\*.h /S /Y /D
 
 rem Boost (shared_ptr and dependencies) headers

@@ -13,7 +13,7 @@
 #include <wx/process.h>
 #include <wx/txtstrm.h>
 #include "GDCore/CommonTools.h"
-#include "GDL/IDE/CodeCompiler.h"
+#include "GDCpp/IDE/CodeCompiler.h"
 
 //(*IdInit(BuildProgressPnl)
 const long BuildProgressPnl::ID_STATICTEXT1 = wxNewId();

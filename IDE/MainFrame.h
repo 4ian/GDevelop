@@ -36,7 +36,7 @@
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDL/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
 #include "EditorScene.h"
 #include "RecentList.h"
 namespace gd { class Project; }

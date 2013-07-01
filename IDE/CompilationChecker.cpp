@@ -7,7 +7,7 @@
 using namespace std;
 using namespace gd;
 
-bool CompilationChecker::EnsureCorrectGDLVersion()
+bool CompilationChecker::EnsureCorrectGDVersion()
 {
     string versionString =  ToString(VersionWrapper::Major()) + ", " + ToString(VersionWrapper::Minor()) + ", " +
                             ToString(VersionWrapper::Build()) + ", " + ToString(VersionWrapper::Revision());
@@ -17,8 +17,8 @@ bool CompilationChecker::EnsureCorrectGDLVersion()
         char beep = 7;
         cout << endl;
         cout << "-- WARNING ! --" << beep << endl;
-        cout << "Compiled with a different version of GDL." << endl;
-        cout << "GDL DLL Version :" << versionString << endl;
+        cout << "Compiled with a different version of GDCpp." << endl;
+        cout << "GDCpp DLL Version :" << versionString << endl;
         cout << "Compiled with version :" << GDCore_RC_FILEVERSION_STRING << endl;
         cout << "---------------" << endl;
 
@@ -30,8 +30,8 @@ bool CompilationChecker::EnsureCorrectGDLVersion()
         char beep = 7;
         std::cout << std::endl;
         std::cout << "-- ERROR ! --" << beep << std::endl;
-        std::cout << "GDL build mismatch:" << std::endl;
-        std::cout << "IDE is using GDL without edittime support!" << std::endl;
+        std::cout << "GDCpp build mismatch:" << std::endl;
+        std::cout << "IDE is using GDCpp without edittime support!" << std::endl;
         std::cout << "---------------" << std::endl;
 
         return false;

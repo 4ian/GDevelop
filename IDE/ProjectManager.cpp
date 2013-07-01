@@ -38,7 +38,7 @@
 #include "CodeEditor.h"
 #include "ExternalEventsEditor.h"
 #include "EditPropScene.h"
-#include "GDL/IDE/CodeCompiler.h"
+#include "GDCpp/IDE/CodeCompiler.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>

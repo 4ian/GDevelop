@@ -8,7 +8,7 @@ echo -Copying files...
 rem del ..\Bin\Dev\CppPlatform\include\*.* /S /Q
 
 rem Game Develop C++ Implementation and Game Develop Core headers
-xcopy ..\..\GDL\*.h ..\Bin\Dev\CppPlatform\include\GDL\*.h /S /Y /D
+xcopy ..\..\GDCpp\*.h ..\Bin\Dev\CppPlatform\include\GDCpp\*.h /S /Y /D
 xcopy ..\..\Core\*.h ..\Bin\Dev\CppPlatform\include\Core\*.h /S /Y /D
 
 rem Boost (shared_ptr and dependencies) headers
@@ -41,7 +41,7 @@ echo.
 :PCH
 if "%1"=="noPCH" GOTO END
 echo -Precompiling headers
-..\bin\dev\CppPlatform\MinGW32\bin\g++.exe -DGD_API=__declspec(dllimport) -DGD_CORE_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -DBOOST_DISABLE_ASSERTS -I..\Bin\Dev\CppPlatform\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\CppPlatform\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\CppPlatform\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\CppPlatform\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\CppPlatform\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\CppPlatform\include/llvm/include -I..\Bin\Dev\CppPlatform\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\CppPlatform\include/GDL -I..\Bin\Dev\CppPlatform\include/Core -I..\Bin\Dev\CppPlatform\include/boost -I..\Bin\Dev\CppPlatform\include\SFML/include -x c++-header ..\Bin\Dev\CppPlatform\include/GDL/GDL/EventsPrecompiledHeader.h -o ..\Bin\Dev\CppPlatform\include/GDL/GDL/EventsPrecompiledHeader.h.pch
+..\bin\dev\CppPlatform\MinGW32\bin\g++.exe -DGD_API=__declspec(dllimport) -DGD_CORE_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -DBOOST_DISABLE_ASSERTS -I..\Bin\Dev\CppPlatform\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\CppPlatform\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\CppPlatform\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\CppPlatform\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\CppPlatform\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\CppPlatform\include/llvm/include -I..\Bin\Dev\CppPlatform\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\CppPlatform\include/GDCpp -I..\Bin\Dev\CppPlatform\include/Core -I..\Bin\Dev\CppPlatform\include/boost -I..\Bin\Dev\CppPlatform\include\SFML/include -x c++-header ..\Bin\Dev\CppPlatform\include/GDCpp/GDCpp/EventsPrecompiledHeader.h -o ..\Bin\Dev\CppPlatform\include/GDCpp/GDCpp/EventsPrecompiledHeader.h.pch
 
 :END
 echo 

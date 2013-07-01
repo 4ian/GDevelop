@@ -6,12 +6,12 @@
  */
 class CompilationChecker
 {
-    public:
-        /**
-         * Return false if the IDE wasn't compiled for the current version of GDL, and display
-         * an error message in the console.
-         */
-        static bool EnsureCorrectGDLVersion();
+public:
+    /**
+     * Return false if the IDE wasn't compiled for the current version of GDL, and display
+     * an error message in the console.
+     */
+    static bool EnsureCorrectGDVersion();
 };
 
 #endif // COMPILATIONCHECKER_H

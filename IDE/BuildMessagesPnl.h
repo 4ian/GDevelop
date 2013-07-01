@@ -14,7 +14,7 @@
 namespace gd { class Project; }
 class ProjectManager;
 #include <vector>
-#include "GDL/IDE/CompilerMessagesParser.h"
+#include "GDCpp/IDE/CompilerMessagesParser.h"
 
 class BuildMessagesPnl: public wxPanel
 {

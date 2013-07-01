@@ -8,7 +8,7 @@ echo -Copying files...
 # rm ../bin/release/CppPlatform/include/*.* -r
 
 # Game Develop C++ Implementation headers
-rsync -r -u --include=*.h --include=*/ --exclude=* ../../GDL/  ../bin/release/CppPlatform/include/GDL/
+rsync -r -u --include=*.h --include=*/ --exclude=* ../../GDCpp/  ../bin/release/CppPlatform/include/GDCpp/
 
 # Game Develop Core headers
 rsync -r -u --include=*.h --include=*/ --exclude=* ../../Core/  ../bin/release/CppPlatform/include/Core/

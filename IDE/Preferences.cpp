@@ -26,7 +26,7 @@
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "LogFileManager.h"
 #include <wx/listctrl.h>
-#include "GDL/IDE/CodeCompiler.h"
+#include "GDCpp/IDE/CodeCompiler.h"
 
 #include <string>
 #include <vector>

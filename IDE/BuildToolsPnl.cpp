@@ -7,7 +7,7 @@
 #include "ProjectManager.h"
 #include "BuildProgressPnl.h"
 #include "BuildMessagesPnl.h"
-#include "GDL/IDE/CodeCompiler.h"
+#include "GDCpp/IDE/CodeCompiler.h"
 
 //(*IdInit(BuildToolsPnl)
 const long BuildToolsPnl::ID_NOTEBOOK1 = wxNewId();

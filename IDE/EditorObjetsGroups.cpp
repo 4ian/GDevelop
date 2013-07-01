@@ -25,7 +25,7 @@
 #include "EditObjectGroup.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/Events/CodeCompilationHelpers.h"
+#include "GDCpp/Events/CodeCompilationHelpers.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 
 #ifdef __WXMSW__

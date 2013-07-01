@@ -56,7 +56,7 @@
 					<Add option="-lfreetype" />
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29ud_xrc" />
 					<Add option="-lwxmsw29ud_stc" />
 					<Add option="-lwxmsw29ud_propgrid" />
@@ -152,7 +152,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_webview" />
@@ -251,7 +251,7 @@
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_propgrid" />
@@ -333,7 +333,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -383,7 +383,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -411,14 +411,14 @@
 			<Add option="-Wall" />
 			<Add option="-DWXMAKINGDLL_STEDIT" />
 			<Add directory="../Core" />
-			<Add directory="../GDL" />
+			<Add directory="../GDCpp" />
 			<Add directory="../ExtLibs/SFML/include" />
 			<Add directory="../ExtLibs/boost" />
 			<Add directory="CppUnitLite/" />
 			<Add directory="wxstedit/include" />
 		</Compiler>
 		<ResourceCompiler>
-			<Add directory="../GDL" />
+			<Add directory="../GDCpp" />
 			<Add directory="../Core" />
 		</ResourceCompiler>
 		<Unit filename="BugReport.cpp">

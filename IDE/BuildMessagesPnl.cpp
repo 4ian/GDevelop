@@ -11,8 +11,8 @@
 //*)
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/CommonTools.h"
-#include "GDL/IDE/CodeCompiler.h"
-#include "GDL/IDE/CompilerMessagesParser.h"
+#include "GDCpp/IDE/CodeCompiler.h"
+#include "GDCpp/IDE/CompilerMessagesParser.h"
 #include "ProjectManager.h"
 
 using namespace GDpriv;

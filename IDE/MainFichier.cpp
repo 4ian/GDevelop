@@ -24,7 +24,7 @@
 #include "Fusion.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
-#include "GDL/IDE/CodeCompiler.h"
+#include "GDCpp/IDE/CodeCompiler.h"
 
 using namespace gd;
 

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - TextEntry Object Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,68 +27,64 @@ freely, subject to the following restrictions:
 #ifndef TEXTENTRYOBJECT_H
 #define TEXTENTRYOBJECT_H
 
-#include "GDL/Object.h"
-class ImageManager;
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 class RuntimeScene;
-class Object;
 class ImageManager;
-class InitialPosition;
+namespace gd { class InitialInstance; }
+namespace gd { class ImageManager; }
 #if defined(GD_IDE_ONLY)
 namespace sf
 {
     class Texture;
     class Sprite;
 };
+namespace gd { class Project; }
 class wxBitmap;
-class Game;
-class wxWindow;
-namespace gd { class MainFrameWrapper; }
-namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
  * \brief Simple object which stores user keyboard input.
  */
-class GD_EXTENSION_API TextEntryObject : public Object
+class GD_EXTENSION_API TextEntryObject : public gd::Object
+{
+public :
+    TextEntryObject(std::string name_);
+    virtual ~TextEntryObject() {};
+    virtual gd::Object * Clone() const { return new TextEntryObject(*this); }
+
+    #if defined(GD_IDE_ONLY)
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    static void LoadEdittimeIcon();
+    #endif
+
+private:
+    #if defined(GD_IDE_ONLY)
+    static sf::Texture edittimeIconImage;
+    static sf::Sprite edittimeIcon;
+    #endif
+};
+
+
+class GD_EXTENSION_API RuntimeTextEntryObject : public RuntimeObject
 {
 public :
 
-    TextEntryObject(std::string name_);
-    virtual ~TextEntryObject() {};
-    virtual Object * Clone() const { return new TextEntryObject(*this); }
-
-    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
-
-    virtual bool Draw(sf::RenderTarget & renderTarget);
-
-    virtual void UpdateTime(float);
+    RuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeTextEntryObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeTextEntryObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
-    static void LoadEdittimeIcon();
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
-
     virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
     virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
-    virtual float GetWidth() const;
-    virtual float GetHeight() const;
-
-    virtual float GetDrawableX() const;
-    virtual float GetDrawableY() const;
-
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
+    virtual void UpdateTime(float);
 
     inline void SetString(std::string str) { text = str; };
-    const std::string & GetString() const;
+    const std::string & GetString() const { return text; };
 
     void Activate( bool activate = true ) { activated = activate; };
     bool IsActivated() const { return activated; };
@@ -98,15 +94,13 @@ private:
     std::string text;
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
     bool activated;
-
-    #if defined(GD_IDE_ONLY)
-    static sf::Texture edittimeIconImage;
-    static sf::Sprite edittimeIcon;
-    #endif
 };
 
-void DestroyTextEntryObject(Object * object);
-Object * CreateTextEntryObject(std::string name);
+void DestroyTextEntryObject(gd::Object * object);
+gd::Object * CreateTextEntryObject(std::string name);
+
+void DestroyRuntimeTextEntryObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTENTRYOBJECT_H
 

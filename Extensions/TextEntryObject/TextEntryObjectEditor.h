@@ -1,7 +1,7 @@
 /**
 
 Game Develop - TextEntry Object Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -35,7 +35,7 @@ freely, subject to the following restrictions:
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-class Game;
+namespace gd { class Project; }
 class TextEntryObject;
 namespace gd { class MainFrameWrapper; }
 
@@ -43,7 +43,7 @@ class TextEntryObjectEditor: public wxDialog
 {
 	public:
 
-		TextEntryObjectEditor( wxWindow* parent, Game & game_, TextEntryObject & object_ );
+		TextEntryObjectEditor( wxWindow* parent, gd::Project & game_, TextEntryObject & object_ );
 		virtual ~TextEntryObjectEditor();
 
 		//(*Declarations(TextEntryObjectEditor)
@@ -68,7 +68,7 @@ class TextEntryObjectEditor: public wxDialog
 		void OncancelBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		TextEntryObject & object;
 
 		DECLARE_EVENT_TABLE()

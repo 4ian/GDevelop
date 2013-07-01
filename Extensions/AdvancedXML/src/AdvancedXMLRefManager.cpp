@@ -26,8 +26,8 @@ Copyright (C) 2012 Victor Levasseur
 #include <algorithm>
 #include <vector>
 
-#include "GDL/CommonTools.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/tinyxml/tinyxml.h"
 
 namespace AdvancedXML
 {

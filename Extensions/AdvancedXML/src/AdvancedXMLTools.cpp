@@ -22,8 +22,8 @@ Copyright (C) 2012 Victor Levasseur
 */
 
 #include "AdvancedXMLTools.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
 #include "AdvancedXMLRefManager.h"
 
 #include <iostream>

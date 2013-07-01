@@ -1,3 +1,8 @@
+/*
+ * Game Develop JS Platform
+ * Copyright 2008-2013 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
+ */
 #ifndef SCENEEXTENSION_H
 #define SCENEEXTENSION_H
 #include "GDCore/PlatformDefinition/PlatformExtension.h"

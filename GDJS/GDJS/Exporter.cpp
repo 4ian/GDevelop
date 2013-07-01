@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop JS Platform
+ * Copyright 2008-2013 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #include <sstream>
 #include <fstream>
@@ -425,8 +426,8 @@ std::string Exporter::GetJavaExecutablePath()
 
         //Try some common paths.
         guessPaths.push_back("C:/Program Files/java/jre7/bin/java.exe");
-        guessPaths.push_back("C:/Program Files/java/jre6/bin/java.exe");
         guessPaths.push_back("C:/Program Files (x86)/java/jre7/bin/java.exe");
+        guessPaths.push_back("C:/Program Files/java/jre6/bin/java.exe");
         guessPaths.push_back("C:/Program Files (x86)/java/jre6/bin/java.exe");
 
         #else

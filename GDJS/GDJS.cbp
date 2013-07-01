@@ -211,6 +211,7 @@
 		<Unit filename="GDJS/BuiltinExtensions/WindowExtension.h" />
 		<Unit filename="GDJS/Dialogs/ProjectExportDialog.cpp" />
 		<Unit filename="GDJS/Dialogs/ProjectExportDialog.h" />
+		<Unit filename="GDJS/DocMainPage.h" />
 		<Unit filename="GDJS/EventsCodeGenerator.cpp" />
 		<Unit filename="GDJS/EventsCodeGenerator.h" />
 		<Unit filename="GDJS/Exporter.cpp" />
@@ -234,6 +235,15 @@
 					<wxDialog wxs="wxsmith/ProjectExportDialog.wxs" src="GDJS\Dialogs\ProjectExportDialog.cpp" hdr="GDJS\Dialogs\ProjectExportDialog.h" fwddecl="0" i18n="1" name="ProjectExportDialog" language="CPP" />
 				</resources>
 			</wxsmith>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project output_directory="docs\Platform documentation" />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

@@ -1,3 +1,8 @@
+/*
+ * Game Develop JS Platform
+ * Copyright 2008-2013 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
+ */
 #ifndef EVENTSCODEGENERATOR_H
 #define EVENTSCODEGENERATOR_H
 #include <vector>
@@ -10,6 +15,11 @@ namespace gd { class AutomatismMetadata; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class EventsCodeGenerationContext; }
 
+/**
+ * \brief The class being responsible for generating Javascript code from events.
+ *
+ * See also gd::EventsCodeGenerator.
+ */
 class EventsCodeGenerator : public gd::EventsCodeGenerator
 {
 public:

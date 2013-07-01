@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -54,8 +54,8 @@ Mac :
 
 */
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Version.h"
+#include "GDCpp/ExtensionBase.h"
+#include "GDCore/Tools/Version.h"
 #include "VideoObject.h"
 #include <boost/version.hpp>
 
@@ -64,370 +64,247 @@ Mac :
  */
 class Extension : public ExtensionBase
 {
-    public:
+public:
 
-        /**
-         * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
-         */
-        Extension()
+    /**
+     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     */
+    Extension()
+    {
+        SetExtensionInformation("VideoObject",
+                              _("Video Object"),
+                              _("Extension allowing to use an object displaying a video."),
+                              "Florian Rival",
+                              "zlib/libpng License ( Open Source )");
+
+        //Declaration of all objects available
         {
-            DECLARE_THE_EXTENSION("VideoObject",
-                                  _("Video Object"),
-                                  _("Extension allowing to use an object displaying a video."),
-                                  "Compil Games",
-                                  "zlib/libpng License ( Open Source )")
+            gd::ObjectMetadata & obj = AddObject("Video",
+                       _("Video"),
+                       _("Displays a video"),
+                       "CppPlatform/Extensions/videoicon.png",
+                       &CreateVideoObject,
+                       &DestroyVideoObject,
+                       "VideoObject");
 
-            //Declaration of all objects available
-            DECLARE_OBJECT("Video",
+            AddRuntimeObject(obj, "RuntimeVideoObject", CreateRuntimeVideoObject, DestroyRuntimeVideoObject);
+
+            #if defined(GD_IDE_ONLY)
+
+            obj.SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("LoadVideo",
+                           _("Load and play a video"),
+                           _("Load the video and play it."),
+                           _("Load and play _PARAM1_"),
                            _("Video"),
-                           _("Object displaying a video without sound."),
-                           "Extensions/videoicon.png",
-                           &CreateVideoObject,
-                           &DestroyVideoObject,
-                           "VideoObject");
+                           "res/starticon24.png",
+                           "res/starticon.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("file", _("Video"))
+                .codeExtraInformation.SetFunctionName("LoadAndPlayVideo").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("SetPause",
+                           _("De/activate pause"),
+                           _("Pause or unpause video."),
+                           _("Set the pause of _PARAM0_ : _PARAM1_"),
+                           _("Video"),
+                           "res/pauseicon24.png",
+                           "res/pauseicon.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("yesorno", _("Activate pause \?"))
+                .codeExtraInformation.SetFunctionName("SetPause").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("SetLooping",
+                           _("De/activate automatic restart"),
+                           _("Set or unset automatic restart."),
+                           _("Restart _PARAM0_ automatically : _PARAM1_"),
+                           _("Video"),
+                           "res/actions/rotate24.png",
+                           "res/actions/rotate.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("yesorno", _("Activate automatic restart \?"))
+                .codeExtraInformation.SetFunctionName("SetLooping").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("Restart",
+                           _("Restart the video"),
+                           _("Restart video from beginning."),
+                           _("Restart _PARAM0_"),
+                           _("Video"),
+                           "res/actions/rotate24.png",
+                           "res/actions/rotate.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddCodeOnlyParameter("inlineCode", "0")
+                .codeExtraInformation.SetFunctionName("Seek").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("Seek",
+                           _("Go to a position in video"),
+                           _("Modify the current position in the video."),
+                           _("Go to position _PARAM1_ in video of _PARAM0_"),
+                           _("Video"),
+                           "res/conditions/time24.png",
+                           "res/conditions/time.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("expression", _("Position ( in seconds )"))
+                .codeExtraInformation.SetFunctionName("Seek").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddCondition("Paused",
+                           _("Video paused"),
+                           _("Return true if video is paused."),
+                           _("_PARAM0_ is paused"),
+                           _("Video"),
+                           "res/pauseicon24.png",
+                           "res/pauseicon.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("IsPaused").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddCondition("Looping",
+                           _("Automatic restart"),
+                           _("Return true if the video automatically restart."),
+                           _("_PARAM0_ automatically restart"),
+                           _("Video"),
+                           "res/actions/rotate24.png",
+                           "res/actions/rotate.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetLooping").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddCondition("TimePosition",
+                           _("Position in video"),
+                           _("Test the current position in video."),
+                           _("Current position in the video of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Video"),
+                           "res/conditions/time24.png",
+                           "res/conditions/time.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Position ( in seconds ) to test"))
+                .codeExtraInformation.SetFunctionName("GetTimePosition").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("ChangeColor",
+                           _("Change the color of a Video object"),
+                           _("Change the global color of video. The default color is white."),
+                           _("Change color of _PARAM0_ to _PARAM1_"),
+                           _("Effects"),
+                           "res/actions/color24.png",
+                           "res/actions/color.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("color", _("Color"))
+                .codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("Opacity",
+                           _("Change object's opacity"),
+                           _("Change transparency of a Video object."),
+                           _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
+                           _("Visibility"),
+                           "res/actions/opacity24.png",
+                           "res/actions/opacity.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+
+            obj.AddCondition("Opacity",
+                           _("Object opacity"),
+                           _("Test the opacity of video."),
+                           _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Visibility"),
+                           "res/conditions/opacity24.png",
+                           "res/conditions/opacity.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+
+            obj.AddAction("Angle",
+                           _("Modify the angle of a Video object."),
+                           _("Modify the angle of a Video object."),
+                           _("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
+                           _("Rotation"),
+                           "res/actions/rotate24.png",
+                           "res/actions/rotate.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetAngle").SetAssociatedGetter("GetAngle").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+
+            obj.AddCondition("Angle",
+                           _("Angle of a Video object"),
+                           _("Test the value of the angle of a Video object."),
+                           _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Rotation"),
+                           "res/conditions/rotate24.png",
+                           "res/conditions/rotate.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddAction("Volume",
+                           _("Modify the audio volume of a video object"),
+                           _("Modify the audio volume of a video object."),
+                           _("Do _PARAM1__PARAM2_ to the audio volume of _PARAM0_"),
+                           _("Sound"),
+                           "res/actions/volume24.png",
+                           "res/actions/volume.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetVolume").SetAssociatedGetter("GetVolume").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddCondition("Volume",
+                           _("Audio volume of a video object"),
+                           _("Test the value of the audio volume of a Video object."),
+                           _("Audio volule of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                           _("Sound"),
+                           "res/conditions/volume24.png",
+                           "res/conditions/volume.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetVolume").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddExpression("Opacity", _("Opacity"), _("Opacity"), _("Opacity"), "res/actions/opacity.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetOpacity").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddExpression("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetAngle").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddExpression("TimePosition", _("Current position in video"), _("Current position in the video, in seconds."), _("Video"), "res/conditions/time.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetTimePosition").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddExpression("Duration", _("Length"), _("Length of the video in seconds"), _("Video"), "res/conditions/time.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetDuration").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddExpression("Volume", _("Sound level"), _("Video's audio volume"), _("Sound"), "res/conditions/volume.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetVolume").SetIncludeFile("VideoObject/VideoObject.h");
+
+            obj.AddStrExpression("VideoFile", _("Video file"), _("Video file"), _("Video file"), "res/conditions/fichier.png")
+                .AddParameter("object", _("Object"), "Video", false);
+                .codeExtraInformation.SetFunctionName("GetVideoFile").SetIncludeFile("VideoObject/VideoObject.h");
 
-                #if defined(GD_IDE_ONLY)
-
-                objInfos.SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_OBJECT_ACTION("LoadVideo",
-                               _("Load and play a video"),
-                               _("Load the video and play it."),
-                               _("Load and play _PARAM1_"),
-                               _("Video"),
-                               "res/starticon24.png",
-                               "res/starticon.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("file", _("Video"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("LoadAndPlayVideo").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_ACTION("SetPause",
-                               _("De/activate pause"),
-                               _("Pause or unpause video."),
-                               _("Set the pause of _PARAM0_ : _PARAM1_"),
-                               _("Video"),
-                               "res/pauseicon24.png",
-                               "res/pauseicon.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("yesorno", _("Activate pause \?"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetPause").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_ACTION("SetLooping",
-                               _("De/activate automatic restart"),
-                               _("Set or unset automatic restart."),
-                               _("Restart _PARAM0_ automatically : _PARAM1_"),
-                               _("Video"),
-                               "res/actions/rotate24.png",
-                               "res/actions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("yesorno", _("Activate automatic restart \?"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetLooping").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_ACTION("Restart",
-                               _("Restart the video"),
-                               _("Restart video from beginning."),
-                               _("Restart _PARAM0_"),
-                               _("Video"),
-                               "res/actions/rotate24.png",
-                               "res/actions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddCodeOnlyParameter("inlineCode", "0");
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("Seek").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_ACTION("Seek",
-                               _("Go to a position in video"),
-                               _("Modify the current position in the video."),
-                               _("Go to position _PARAM1_ in video of _PARAM0_"),
-                               _("Video"),
-                               "res/conditions/time24.png",
-                               "res/conditions/time.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Position ( in seconds )"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("Seek").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Paused",
-                               _("Video paused"),
-                               _("Return true if video is paused."),
-                               _("_PARAM0_ is paused"),
-                               _("Video"),
-                               "res/pauseicon24.png",
-                               "res/pauseicon.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("IsPaused").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_CONDITION("Looping",
-                               _("Automatic restart"),
-                               _("Return true if the video automatically restart."),
-                               _("_PARAM0_ automatically restart"),
-                               _("Video"),
-                               "res/actions/rotate24.png",
-                               "res/actions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetLooping").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_CONDITION("TimePosition",
-                               _("Position in video"),
-                               _("Test the current position in video."),
-                               _("Current position in the video of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Video"),
-                               "res/conditions/time24.png",
-                               "res/conditions/time.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Position ( in seconds ) to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetTimePosition").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("ChangeColor",
-                               _("Change the color of a Video object"),
-                               _("Change the global color of video. The default color is white."),
-                               _("Change color of _PARAM0_ to _PARAM1_"),
-                               _("Effects"),
-                               "res/actions/color24.png",
-                               "res/actions/color.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("color", _("Color"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_ACTION("Opacity",
-                               _("Change object's opacity"),
-                               _("Change transparency of a Video object."),
-                               _("Do _PARAM2__PARAM1_ to the opacity of _PARAM0_"),
-                               _("Visibility"),
-                               "res/actions/opacity24.png",
-                               "res/actions/opacity.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Opacity",
-                               _("Object opacity"),
-                               _("Test the opacity of video."),
-                               _("The opacity of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Visibility"),
-                               "res/conditions/opacity24.png",
-                               "res/conditions/opacity.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("Angle",
-                               _("Modify the angle of a Video object."),
-                               _("Modify the angle of a Video object."),
-                               _("Do _PARAM2__PARAM1_ to the angle of _PARAM0_"),
-                               _("Rotation"),
-                               "res/actions/rotate24.png",
-                               "res/actions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetAssociatedGetter("GetAngle").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Angle",
-                               _("Angle of a Video object"),
-                               _("Test the value of the angle of a Video object."),
-                               _("The angle of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Rotation"),
-                               "res/conditions/rotate24.png",
-                               "res/conditions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("Volume",
-                               _("Modify the audio volume of a video object"),
-                               _("Modify the audio volume of a video object."),
-                               _("Do _PARAM2__PARAM1_ to the audio volume of _PARAM0_"),
-                               _("Sound"),
-                               "res/actions/volume24.png",
-                               "res/actions/volume.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetVolume").SetAssociatedGetter("GetVolume").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Volume",
-                               _("Audio volume of a video object"),
-                               _("Test the value of the audio volume of a Video object."),
-                               _("Audio volule of _PARAM0_ is _PARAM2_ _PARAM1_"),
-                               _("Sound"),
-                               "res/conditions/volume24.png",
-                               "res/conditions/volume.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetVolume").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_EXPRESSION("Opacity", _("Opacity"), _("Opacity"), _("Opacity"), "res/actions/opacity.png")
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetIncludeFile("VideoObject/VideoObject.h");
-                DECLARE_END_OBJECT_EXPRESSION()
-
-                DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png")
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetIncludeFile("VideoObject/VideoObject.h");
-                DECLARE_END_OBJECT_EXPRESSION()
-
-                DECLARE_OBJECT_EXPRESSION("TimePosition", _("Current position in video"), _("Current position in the video, in seconds."), _("Video"), "res/conditions/time.png")
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetTimePosition").SetIncludeFile("VideoObject/VideoObject.h");
-                DECLARE_END_OBJECT_EXPRESSION()
-
-                DECLARE_OBJECT_EXPRESSION("Duration", _("Length"), _("Length of the video in seconds"), _("Video"), "res/conditions/time.png")
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetDuration").SetIncludeFile("VideoObject/VideoObject.h");
-                DECLARE_END_OBJECT_EXPRESSION()
-
-                DECLARE_OBJECT_EXPRESSION("Volume", _("Sound level"), _("Video's audio volume"), _("Sound"), "res/conditions/volume.png")
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetVolume").SetIncludeFile("VideoObject/VideoObject.h");
-                DECLARE_END_OBJECT_EXPRESSION()
-
-                DECLARE_OBJECT_STR_EXPRESSION("VideoFile", _("Video file"), _("Video file"), _("Video file"), "res/conditions/fichier.png")
-                    instrInfo.AddParameter("object", _("Object"), "Video", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetVideoFile").SetIncludeFile("VideoObject/VideoObject.h");
-                DECLARE_END_OBJECT_STR_EXPRESSION()
-
-                #endif
-
-            DECLARE_END_OBJECT()
-
-            #if defined(GD_IDE_ONLY)
-            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libogg-0.dll"));
-            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoradec-1.dll"));
-            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoraplayer.dll"));
-            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libvorbis-0.dll"));
-            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libtheoradec.so.1"));
             #endif
 
-
-            CompleteCompilationInformation();
-        };
-        virtual ~Extension() {};
-
-    protected:
-    private:
-
-        /**
-         * This function is called by Game Develop so
-         * as to complete information about how the extension was compiled ( which libs... )
-         * -- Do not need to be modified. --
-         */
-        void CompleteCompilationInformation()
-        {
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.runtimeOnly = false;
-            #else
-            compilationInfo.runtimeOnly = true;
-            #endif
-
-            #if defined(__GNUC__)
-            compilationInfo.gccMajorVersion = __GNUC__;
-            compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-            compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-            #endif
-
-            compilationInfo.boostVersion = BOOST_VERSION;
-
-            compilationInfo.sfmlMajorVersion = 2;
-            compilationInfo.sfmlMinorVersion = 0;
-
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-            compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-            compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-            compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
-            #endif
-
-            compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-            compilationInfo.sizeOfpInt = sizeof(int*);
-
-            compilationInfo.informationCompleted = true;
         }
+
+        #if defined(GD_IDE_ONLY)
+        supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libogg-0.dll"));
+        supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoradec-1.dll"));
+        supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoraplayer.dll"));
+        supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libvorbis-0.dll"));
+        supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libtheoradec.so.1"));
+        #endif
+
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+    };
+    virtual ~Extension() {};
 };
 
 /**

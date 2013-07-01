@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 
 #include "VideoWrapper.h"
 #include <SFML/Graphics.hpp>
-#include <GDL/RessourcesLoader.h>
+#include <GDCpp/RessourcesLoader.h>
 #include <TheoraPlayer.h>
 #include <TheoraVideoManager.h>
 #include "OpenAL_AudioInterface.h"
@@ -94,8 +94,8 @@ bool VideoWrapper::Load(std::string filename)
         #if defined(GD_IDE_ONLY)
         clip = TheoraVideoManager::getSingletonPtr()->createVideoClip(filename, TH_RGBA);
         #else
-        TheoraMemoryLoader *memLoad = new TheoraMemoryLoader(filename, (unsigned char*)RessourcesLoader::GetInstance()->LoadBinaryFile(filename),
-                                                                       RessourcesLoader::GetInstance()->GetBinaryFileSize(filename));
+        TheoraMemoryLoader *memLoad = new TheoraMemoryLoader(filename, (unsigned char*)gd::RessourcesLoader::GetInstance()->LoadBinaryFile(filename),
+                                                                       gd::RessourcesLoader::GetInstance()->GetBinaryFileSize(filename));
         clip = TheoraVideoManager::getSingletonPtr()->createVideoClip(memLoad, TH_RGBA);
         #endif
     }
@@ -108,7 +108,7 @@ bool VideoWrapper::Load(std::string filename)
     {
         clip->setAutoRestart(1);
         clip->setAudioGain(static_cast<float>(volume) / 100);
-        currentFrameImage->Create(clip->getWidth(), clip->getHeight());
+        currentFrameImage->create(clip->getWidth(), clip->getHeight());
 
         valid = true;
     }
@@ -137,7 +137,7 @@ const sf::Texture & VideoWrapper::GetNextFrameImage()
         TheoraVideoFrame* f=clip->getNextFrame();
         if (f)
         {
-            currentFrameImage->Update((sf::Uint8*)f->getBuffer(), (unsigned int)f->getWidth(),  (unsigned int)f->getHeight(),0,0);
+            currentFrameImage->update((sf::Uint8*)f->getBuffer(), (unsigned int)f->getWidth(),  (unsigned int)f->getHeight(),0,0);
 
             clip->popFrame();
         }

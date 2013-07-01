@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-class Game;
+namespace gd { class Project; }
 class VideoObject;
 namespace gd { class MainFrameWrapper; }
 
@@ -47,7 +47,7 @@ class VideoObjectEditor: public wxDialog
 {
 	public:
 
-		VideoObjectEditor( wxWindow* parent, Game & game_, VideoObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
+		VideoObjectEditor( wxWindow* parent, gd::Project & game_, VideoObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~VideoObjectEditor();
 
 		//(*Declarations(VideoObjectEditor)
@@ -91,7 +91,7 @@ class VideoObjectEditor: public wxDialog
 		void OnconverterBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		VideoObject & object;
 
 		DECLARE_EVENT_TABLE()

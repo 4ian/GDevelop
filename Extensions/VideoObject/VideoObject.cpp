@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,15 +28,15 @@ freely, subject to the following restrictions:
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
 
-#include "GDL/ImageManager.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/FontManager.h"
-#include "GDL/Position.h"
-#include "GDL/XmlMacros.h"
-#include "GDL/Polygon.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/XmlMacros.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/CommonTools.h"
 #include "VideoObject.h"
 
 #if defined(GD_IDE_ONLY)
@@ -61,7 +61,7 @@ VideoObject::~VideoObject()
 {
 }
 
-void VideoObject::LoadFromXml(const TiXmlElement * elem)
+void VideoObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("videoFile", videoFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("looping", looping);
@@ -81,7 +81,7 @@ void VideoObject::LoadFromXml(const TiXmlElement * elem)
 }
 
 #if defined(GD_IDE_ONLY)
-void VideoObject::SaveToXml(TiXmlElement * elem)
+void VideoObject::DoSaveToXml(TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("videoFile", videoFile);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("looping", looping);
@@ -93,13 +93,7 @@ void VideoObject::SaveToXml(TiXmlElement * elem)
 }
 #endif
 
-bool VideoObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
-{
-    ReloadVideo();
-    return true;
-}
-
-bool VideoObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+bool VideoObject::LoadRuntimeResources(const RuntimeScene & scene, const gd::ImageManager & imageMgr )
 {
     ReloadVideo();
     return true;
@@ -110,13 +104,13 @@ void VideoObject::ReloadVideo()
     video.Load(videoFile);
     video.SetLooping(looping);
     video.SetPause(paused);
-    video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
-    video.GetRenderSprite().SetOrigin(video.GetRenderSprite().GetSize().x/2, video.GetRenderSprite().GetSize().y/2);
+    video.GetRenderSprite().setTexture(video.GetNextFrameImage(), true);
+    video.GetRenderSprite().setOrigin(video.GetRenderSprite().getLocalBounds().width/2, video.GetRenderSprite().getLocalBounds().height/2);
 }
 bool VideoObject::SetAngle(float newAngle)
 {
     angle = newAngle;
-    video.GetRenderSprite().SetRotation(angle);
+    video.GetRenderSprite().setRotation(angle);
     return true;
 };
 double VideoObject::GetTimePosition() const
@@ -169,7 +163,7 @@ void VideoObject::SetVolume(unsigned int vol)
 /**
  * Update animation and direction from the inital position
  */
-bool VideoObject::InitializeFromInitialPosition(const InitialPosition & position)
+bool VideoObject::InitializeFromInitialInstance(const gd::InitialInstance & position)
 {
     return true;
 }
@@ -182,8 +176,8 @@ bool VideoObject::Draw( sf::RenderTarget& renderTarget )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-	video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
-    renderTarget.Draw( video.GetRenderSprite() );
+	video.GetRenderSprite().setTexture(video.GetNextFrameImage(), true);
+    renderTarget.draw( video.GetRenderSprite() );
 
     return true;
 }
@@ -200,25 +194,26 @@ bool VideoObject::DrawEdittime(sf::RenderTarget& renderTarget)
         static sf::Texture badVideoIcon;
         if ( !badImageLoaded )
         {
-            badVideoIcon.LoadFromFile("Extensions/badVideo.png");
+            badVideoIcon.loadFromFile("CppPlatform/Extensions/badVideo.png");
             badImageLoaded = true;
         }
-        video.GetRenderSprite().SetTexture(badVideoIcon, true);
+        video.GetRenderSprite().setTexture(badVideoIcon, true);
     }
     else
     {
-        sf::Shape rectangle = sf::Shape::Rectangle(0, 0, video.GetRenderSprite().GetSize().x, video.GetRenderSprite().GetSize().y, sf::Color(0,0,0));
-        rectangle.SetOrigin(video.GetRenderSprite().GetSize().x/2, video.GetRenderSprite().GetSize().y/2);
-        rectangle.SetPosition(GetX(), GetY());
-        rectangle.SetRotation(video.GetRenderSprite().GetRotation());
-        renderTarget.Draw(rectangle);
+        sf::RectangleShape rectangle(sf::Vector2f(video.GetRenderSprite().getLocalBounds().width, video.GetRenderSprite().getLocalBounds().height));
+        rectangle.setFillColor(sf::Color(0,0,0));
+        rectangle.setOrigin(video.GetRenderSprite().getLocalBounds().width/2, video.GetRenderSprite().getLocalBounds().height/2);
+        rectangle.setPosition(GetX(), GetY());
+        rectangle.setRotation(video.GetRenderSprite().getRotation());
+        renderTarget.draw(rectangle);
 
         //Display first frame
         video.Seek(0.1);
-        video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
+        video.GetRenderSprite().setTexture(video.GetNextFrameImage(), true);
     }
 
-    renderTarget.Draw( video.GetRenderSprite() );
+    renderTarget.draw( video.GetRenderSprite() );
 
     return true;
 }
@@ -230,24 +225,15 @@ void VideoObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool VideoObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/videoicon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/videoicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void VideoObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void VideoObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     VideoObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
-}
-
-wxPanel * VideoObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
-{
-    return NULL;
-}
-
-void VideoObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
-{
 }
 
 void VideoObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
@@ -306,8 +292,7 @@ unsigned int VideoObject::GetNumberOfProperties() const
 
 void VideoObject::OnPositionChanged()
 {
-    video.GetRenderSprite().SetX( GetX() );
-    video.GetRenderSprite().SetY( GetY() );
+    video.GetRenderSprite().setPosition( GetX(), GetY() );
 }
 
 /**
@@ -329,7 +314,7 @@ std::vector<Polygon2d> VideoObject::GetHitBoxes() const
  */
 float VideoObject::GetDrawableX() const
 {
-    return video.GetRenderSprite().GetPosition().x-video.GetRenderSprite().GetOrigin().x;
+    return video.GetRenderSprite().getPosition().x-video.GetRenderSprite().getOrigin().x;
 }
 
 /**
@@ -337,7 +322,7 @@ float VideoObject::GetDrawableX() const
  */
 float VideoObject::GetDrawableY() const
 {
-    return video.GetRenderSprite().GetPosition().y-video.GetRenderSprite().GetOrigin().y;
+    return video.GetRenderSprite().getPosition().y-video.GetRenderSprite().getOrigin().y;
 }
 
 /**
@@ -345,7 +330,7 @@ float VideoObject::GetDrawableY() const
  */
 float VideoObject::GetWidth() const
 {
-    return video.GetRenderSprite().GetSize().x;
+    return video.GetRenderSprite().getLocalBounds().width;
 }
 
 /**
@@ -353,7 +338,7 @@ float VideoObject::GetWidth() const
  */
 float VideoObject::GetHeight() const
 {
-    return video.GetRenderSprite().GetSize().y;
+    return video.GetRenderSprite().getLocalBounds().height;
 }
 
 /**
@@ -361,7 +346,7 @@ float VideoObject::GetHeight() const
  */
 float VideoObject::GetCenterX() const
 {
-    return video.GetRenderSprite().GetSize().x/2;
+    return video.GetRenderSprite().getLocalBounds().width/2;
 }
 
 /**
@@ -369,7 +354,7 @@ float VideoObject::GetCenterX() const
  */
 float VideoObject::GetCenterY() const
 {
-    return video.GetRenderSprite().GetSize().y/2;
+    return video.GetRenderSprite().getLocalBounds().height/2;
 }
 
 /**
@@ -388,7 +373,7 @@ void VideoObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
     colorR = r;
     colorG = g;
     colorB = b;
-    video.GetRenderSprite().SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    video.GetRenderSprite().setColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 void VideoObject::SetOpacity(float val)
@@ -399,7 +384,17 @@ void VideoObject::SetOpacity(float val)
         val = 0;
 
     opacity = val;
-    video.GetRenderSprite().SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    video.GetRenderSprite().setColor(sf::Color(colorR, colorG, colorB, opacity));
+}
+
+void DestroyRuntimeVideoObject(RuntimeObject * object)
+{
+    delete object;
+}
+
+RuntimeObject * CreateRuntimeVideoObject(RuntimeScene & scene, const gd::Object & object)
+{
+    return new RuntimeVideoObject(scene, object);
 }
 
 /**
@@ -407,7 +402,7 @@ void VideoObject::SetOpacity(float val)
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyVideoObject(Object * object)
+void DestroyVideoObject(gd::Object * object)
 {
     delete object;
 }
@@ -416,7 +411,7 @@ void DestroyVideoObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateVideoObject(std::string name)
+gd::Object * CreateVideoObject(std::string name)
 {
     return new VideoObject(name);
 }

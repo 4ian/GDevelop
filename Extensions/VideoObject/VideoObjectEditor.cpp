@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 #include <wx/filename.h>
 #include <wx/filedlg.h>
 
-#include "GDL/Game.h"
+#include "GDCpp/Project.h"
 #include "VideoObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include <wx/progdlg.h>
@@ -61,7 +61,7 @@ BEGIN_EVENT_TABLE(VideoObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-VideoObjectEditor::VideoObjectEditor( wxWindow* parent, Game & game_, VideoObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+VideoObjectEditor::VideoObjectEditor( wxWindow* parent, gd::Project & game_, VideoObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 game(game_),
 object(object_)
 {

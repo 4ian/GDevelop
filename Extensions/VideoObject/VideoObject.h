@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,17 +27,16 @@ freely, subject to the following restrictions:
 #ifndef VIDEOOBJECT_H
 #define VIDEOOBJECT_H
 
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
 #include "VideoWrapper.h"
-class ImageManager;
+namespace gd { class ImageManager; }
 class RuntimeScene;
-class Object;
 class ObjectsConcerned;
 class ImageManager;
-class InitialPosition;
+namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
@@ -46,17 +45,16 @@ namespace gd {class ResourcesMergingHelper;}
 /**
  * Video Object
  */
-class GD_EXTENSION_API VideoObject : public Object
+class GD_EXTENSION_API VideoObject : public gd::Object
 {
 public :
 
     VideoObject(std::string name_);
     virtual ~VideoObject();
-    virtual Object * Clone() const { return new VideoObject(*this);}
+    virtual gd::Object * Clone() const { return new VideoObject(*this);}
 
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const gd::ImageManager & imageMgr );
+    virtual bool InitializeFromInitialInstance(const gd::InitialInstance & position);
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
@@ -65,18 +63,11 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
 
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
 
     virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
     virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
     virtual unsigned int GetNumberOfProperties() const;
-    #endif
-
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
-    #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
     #endif
 
     virtual void UpdateTime(float timeElapsed);
@@ -151,6 +142,11 @@ public :
 
 private:
 
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
+    #endif
+
     std::string videoFile;
     VideoWrapper video;
 
@@ -168,8 +164,8 @@ private:
     float angle;
 };
 
-void DestroyVideoObject(Object * object);
-Object * CreateVideoObject(std::string name);
+void DestroyVideoObject(gd::Object * object);
+gd::Object * CreateVideoObject(std::string name);
 
 #endif // VIDEOOBJECT_H
 

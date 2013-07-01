@@ -26,21 +26,23 @@ freely, subject to the following restrictions:
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/Events/Serialization.h"
 #include "FunctionEvent.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/XmlMacros.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCpp/XmlMacros.h"
+#include "GDCpp/tinyxml/tinyxml.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
-#include "GDL/ExtensionsManager.h"
 #include "FunctionEventEditorDlg.h"
 #include <wx/textdlg.h>
+namespace gd { class Project; }
+
+using namespace std;
 
 FunctionEvent::FunctionEvent() :
 BaseEvent(),
@@ -51,72 +53,6 @@ nameSelected(false)
 
 //Functions need some additionals "tools"
 const std::string FunctionEvent::globalDeclaration = "std::vector<std::string> * currentFunctionParameters;\n";
-
-std::string FunctionEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & /* The function has nothing to do with the current context */ )
-{
-    //Declaring the pointer to the function parameters
-    codeGenerator.AddGlobalDeclaration(globalDeclaration);
-
-    //Declaring function prototype.
-    codeGenerator.AddGlobalDeclaration("void "+MangleFunctionName(*this)+"(RuntimeContext *, std::map <std::string, std::vector<Object*> *>);\n");
-
-    //Generating function code:
-    std::string functionCode;
-    functionCode += "\nvoid "+MangleFunctionName(*this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> objectsListsMap)\n{\n";
-
-    EventsCodeGenerationContext callerContext;
-    {
-        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), GetObjectsPassedAsArgument()));
-        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), GetObjectsPassedAsArgument()));
-
-        std::vector<std::string> realObjects;
-        if ( globalGroup != game.GetObjectGroups().end() )
-            realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.GetObjectGroups().end() )
-            realObjects = (*sceneGroup).GetAllObjectsNames();
-        else
-            realObjects.push_back(GetObjectsPassedAsArgument());
-
-        for (unsigned int i = 0;i<realObjects.size();++i)
-        {
-            callerContext.EmptyObjectsListNeeded(realObjects[i]);
-            functionCode += "std::vector<Object*> "+ManObjListName(realObjects[i]) + ";\n";
-            functionCode += "if ( objectsListsMap[\""+realObjects[i]+"\"] != NULL ) "+ManObjListName(realObjects[i])+" = *objectsListsMap[\""+realObjects[i]+"\"];\n";
-        }
-    }
-    functionCode += "{";
-
-    EventsCodeGenerationContext context;
-    context.InheritsFrom(callerContext);
-
-    //Generating function body code
-    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
-    std::string subeventsCode = codeGenerator.GenerateEventsListCode(game, scene, events, context);
-
-    functionCode += context.GenerateObjectsDeclarationCode();
-    std::string ifPredicat = "true";
-    for (unsigned int i = 0;i<conditions.size();++i)
-        ifPredicat += " && condition"+ToString(i)+"IsTrue";
-
-    functionCode += conditionsCode;
-    functionCode += "if (" +ifPredicat+ ")\n";
-    functionCode += "{\n";
-    functionCode += actionsCode;
-    if ( !events.empty() ) //Sub events
-    {
-        functionCode += "\n{\n";
-        functionCode += subeventsCode;
-        functionCode += "}\n";
-    }
-    functionCode += "}\n";
-
-    functionCode += "}\n"; //Context end
-    functionCode += "}\n"; //Function end
-    codeGenerator.AddCustomCodeOutsideMain(functionCode);
-
-    return "";
-}
 
 vector < vector<gd::Instruction>* > FunctionEvent::GetAllConditionsVectors()
 {
@@ -143,12 +79,12 @@ void FunctionEvent::SaveToXml(TiXmlElement * elem) const
     //Les conditions
     TiXmlElement * conditionsElem = new TiXmlElement( "Conditions" );
     elem->LinkEndChild( conditionsElem );
-    OpenSaveGame::SaveConditions(conditions, conditionsElem);
+    gd::EventsListSerialization::SaveConditions(conditions, conditionsElem);
 
     //Les actions
     TiXmlElement * actionsElem = new TiXmlElement( "Actions" );
     elem->LinkEndChild( actionsElem );
-    OpenSaveGame::SaveActions(actions, actionsElem);
+    gd::EventsListSerialization::SaveActions(actions, actionsElem);
 
     //Sous évènements
     if ( !GetSubEvents().empty() )
@@ -157,32 +93,32 @@ void FunctionEvent::SaveToXml(TiXmlElement * elem) const
         subeventsElem = new TiXmlElement( "Events" );
         elem->LinkEndChild( subeventsElem );
 
-        OpenSaveGame::SaveEvents(events, subeventsElem);
+        gd::EventsListSerialization::SaveEventsToXml(events, subeventsElem);
     }
 
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("objectsPassedAsArgument", objectsPassedAsArgument);
 }
 
-void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
+void FunctionEvent::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
 {
     if ( elem->FirstChildElement( "Name" ) != NULL )
         name = elem->FirstChildElement("Name")->Attribute("value");
 
     //Conditions
     if ( elem->FirstChildElement( "Conditions" ) != NULL )
-        OpenSaveGame::OpenConditions(conditions, elem->FirstChildElement( "Conditions" ));
+        gd::EventsListSerialization::OpenConditions(project, conditions, elem->FirstChildElement( "Conditions" ));
     else
         cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
     if ( elem->FirstChildElement( "Actions" ) != NULL )
-        OpenSaveGame::OpenActions(actions, elem->FirstChildElement( "Actions" ));
+        gd::EventsListSerialization::OpenActions(project, actions, elem->FirstChildElement( "Actions" ));
     else
         cout << "Aucune informations sur les actions d'un évènement";
 
     //Subevents
     if ( elem->FirstChildElement( "Events" ) != NULL )
-        OpenSaveGame::OpenEvents(events, elem->FirstChildElement( "Events" ));
+        gd::EventsListSerialization::LoadEventsFromXml(project, events, elem->FirstChildElement( "Events" ));
 
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("objectsPassedAsArgument", objectsPassedAsArgument);
 }
@@ -190,7 +126,7 @@ void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
 /**
  * Render the event in the bitmap
  */
-void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
@@ -208,21 +144,21 @@ void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     dc.DrawText( caption, x + 4, y + 3 );
 
     //Draw conditions rectangle
-    wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-functionTextHeight);
+    wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width, platform)-functionTextHeight);
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+functionTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, platform);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+functionTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
 }
 
-unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
+unsigned int FunctionEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {
@@ -231,8 +167,8 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
         const int functionTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, platform);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, platform);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight)+border*2;
         eventHeightNeedUpdate = false;
@@ -241,7 +177,7 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     FunctionEventEditorDlg dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

@@ -20,7 +20,7 @@ class FunctionEventEditorDlg: public wxDialog
 {
 	public:
 
-		FunctionEventEditorDlg(wxWindow* parent, FunctionEvent & event_, Game & game_, Scene & scene_);
+		FunctionEventEditorDlg(wxWindow* parent, FunctionEvent & event_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~FunctionEventEditorDlg();
 
 		//(*Declarations(FunctionEventEditorDlg)
@@ -69,8 +69,8 @@ class FunctionEventEditorDlg: public wxDialog
 		void OnobjectBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
-		Scene & scene;
+		gd::Project & game;
+		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()
 };

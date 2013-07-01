@@ -10,9 +10,9 @@
 #include <wx/string.h>
 //*)
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/Scene.h"
 #include "FunctionEvent.h"
 
 //(*IdInit(FunctionEventEditorDlg)
@@ -37,7 +37,7 @@ BEGIN_EVENT_TABLE(FunctionEventEditorDlg,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-FunctionEventEditorDlg::FunctionEventEditorDlg(wxWindow* parent, FunctionEvent & event_, Game & game_, Scene & scene_) :
+FunctionEventEditorDlg::FunctionEventEditorDlg(wxWindow* parent, FunctionEvent & event_, gd::Project & game_, gd::Layout & scene_) :
 eventEdited(event_),
 game(game_),
 scene(scene_)

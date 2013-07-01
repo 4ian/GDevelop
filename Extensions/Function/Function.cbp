@@ -18,6 +18,7 @@
 					<Add option="-g" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -25,7 +26,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -63,7 +64,7 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29ud_xrc" />
 					<Add option="-lwxmsw29ud_richtext" />
 					<Add option="-lwxmsw29ud_ribbon" />
@@ -118,6 +119,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -126,7 +128,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -164,7 +166,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -219,6 +221,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -227,7 +230,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -265,7 +268,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -321,6 +324,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -329,7 +333,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -373,7 +377,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -416,7 +420,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -448,6 +452,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -455,7 +460,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -485,6 +490,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DMAC" />
@@ -495,7 +501,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -509,7 +515,7 @@
 					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/Function.xgdm" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/release/Function.xgdm" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/Function.xgdm" />
 				</ExtraCommands>
 			</Target>
@@ -526,6 +532,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
@@ -536,7 +543,7 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-pg -g" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-window-d" />
@@ -550,13 +557,13 @@
 					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/Function.xgdm" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/debug/Function.xgdm" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/Function.xgdm" />
 				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add directory="../../GDL" />
+			<Add directory="../../GDCpp" />
 			<Add directory="../../ExtLibs/SFML/include" />
 			<Add directory="../../ExtLibs/boost" />
 			<Add directory="../../Core" />

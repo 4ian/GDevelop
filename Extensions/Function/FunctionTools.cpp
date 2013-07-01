@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 #include "FunctionTools.h"
-#include "GDL/profile.h"
+#include "GDCpp/profile.h"
 
 namespace GDpriv
 {

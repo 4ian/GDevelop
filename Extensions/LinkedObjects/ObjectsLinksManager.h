@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -31,8 +31,7 @@ freely, subject to the following restrictions:
 #include <vector>
 #include <set>
 #include <boost/weak_ptr.hpp>
-class Object;
-class Scene;
+class RuntimeObject;
 class RuntimeScene;
 
 namespace GDpriv
@@ -50,28 +49,28 @@ public:
     /**
      * Link two object
      */
-    void LinkObjects(Object * a, Object * b);
+    void LinkObjects(RuntimeObject * a, RuntimeObject * b);
 
     /**
      * Remove link between a and b
      */
-    void RemoveLinkBetween(Object * a, Object * b);
+    void RemoveLinkBetween(RuntimeObject * a, RuntimeObject * b);
 
     /**
      * Remove all links concerning the object
      */
-    void RemoveAllLinksOf(Object * object);
+    void RemoveAllLinksOf(RuntimeObject * object);
 
     /**
      * Get a list of all (raw pointers to) objects linked with the object
      */
-    std::vector<Object*> GetAllRawPointersToObjectsLinkedWith(Object * object);
+    std::vector<RuntimeObject*> GetAllRawPointersToObjectsLinkedWith(RuntimeObject * object);
 
 
     /**
      * Get a list of (raw pointers to) objects, with the specified name, linked with the object
      */
-    std::vector<Object*> GetRawPointersToObjectsLinkedWith(Object * object, std::string linkedName);
+    std::vector<RuntimeObject*> GetRawPointersToObjectsLinkedWith(RuntimeObject * object, std::string linkedName);
 
     /**
      * Delete all links
@@ -81,7 +80,7 @@ public:
     static std::map < RuntimeScene* , ObjectsLinksManager > managers; //List of managers associated with scenes.
 
 private:
-    std::map < Object *, std::set< Object * > > links;
+    std::map < RuntimeObject *, std::set< RuntimeObject * > > links;
 };
 
 }

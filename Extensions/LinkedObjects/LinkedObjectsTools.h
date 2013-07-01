@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #include <string>
 #include <map>
 #include <vector>
-class Object;
+class RuntimeObject;
 class RuntimeScene;
 
 namespace GDpriv
@@ -38,10 +38,10 @@ namespace GDpriv
 namespace LinkedObjects
 {
 
-void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & );
-void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & );
-void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, Object * object);
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, const std::string &);
+void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, RuntimeObject * a, RuntimeObject * b );
+void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, RuntimeObject * a, RuntimeObject * b);
+void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, RuntimeObject * object);
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectsLists, RuntimeObject * object);
 
 }
 

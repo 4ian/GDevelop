@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -31,8 +31,8 @@ freely, subject to the following restrictions:
 #include <string>
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include "GDL/Object.h"
-#include "GDL/RuntimeScene.h"
+#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/RuntimeScene.h"
 
 using namespace std;
 
@@ -41,50 +41,50 @@ namespace GDpriv
 namespace LinkedObjects
 {
 
-void ObjectsLinksManager::LinkObjects(Object * a, Object * b)
+void ObjectsLinksManager::LinkObjects(RuntimeObject * a, RuntimeObject * b)
 {
     {
-        std::set< Object * > & objectLinks = links[a];
+        std::set< RuntimeObject * > & objectLinks = links[a];
         objectLinks.insert(b);
     }
     {
-        std::set< Object * > & objectLinks = links[b];
+        std::set< RuntimeObject * > & objectLinks = links[b];
         objectLinks.insert(a);
     }
 }
 
-void ObjectsLinksManager::RemoveLinkBetween(Object * a, Object * b)
+void ObjectsLinksManager::RemoveLinkBetween(RuntimeObject * a, RuntimeObject * b)
 {
     {
-        std::set< Object * > & objectLinks = links[a];
+        std::set< RuntimeObject * > & objectLinks = links[a];
         objectLinks.erase(b);
     }
     {
-        std::set< Object * > & objectLinks = links[b];
+        std::set< RuntimeObject * > & objectLinks = links[b];
         objectLinks.erase(a);
     }
 }
 
-void ObjectsLinksManager::RemoveAllLinksOf(Object * object)
+void ObjectsLinksManager::RemoveAllLinksOf(RuntimeObject * object)
 {
-    std::set< Object * > & objectLinks = links[object];
-    for (std::set< Object * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
+    std::set< RuntimeObject * > & objectLinks = links[object];
+    for (std::set< RuntimeObject * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
     {
-        std::set< Object * > & linkedObjectLinks = links[*linkedObj];
+        std::set< RuntimeObject * > & linkedObjectLinks = links[*linkedObj];
         linkedObjectLinks.erase(object);
     }
 
     links.erase(object); //Remove all links of object
 }
 
-std::vector< Object* > ObjectsLinksManager::GetAllRawPointersToObjectsLinkedWith(Object * object)
+std::vector< RuntimeObject* > ObjectsLinksManager::GetAllRawPointersToObjectsLinkedWith(RuntimeObject * object)
 {
     //Get links of object
-    const std::set< Object * > & objectLinks = links[object];
-    std::vector< Object* > list; list.reserve(objectLinks.size());
+    const std::set< RuntimeObject * > & objectLinks = links[object];
+    std::vector< RuntimeObject* > list; list.reserve(objectLinks.size());
 
     //Create the list, avoiding dead links or links to just deleted objects
-    for (std::set< Object * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
+    for (std::set< RuntimeObject * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
     {
         if ( !(*linkedObj)->GetName().empty() )
             list.push_back((*linkedObj));
@@ -93,14 +93,14 @@ std::vector< Object* > ObjectsLinksManager::GetAllRawPointersToObjectsLinkedWith
     return list;
 }
 
-std::vector< Object* > ObjectsLinksManager::GetRawPointersToObjectsLinkedWith(Object * object, std::string linkedName)
+std::vector< RuntimeObject* > ObjectsLinksManager::GetRawPointersToObjectsLinkedWith(RuntimeObject * object, std::string linkedName)
 {
     //Get links of object
-    const std::set< Object * > & objectLinks = links[object];
-    std::vector< Object* > list; list.reserve(objectLinks.size());
+    const std::set< RuntimeObject * > & objectLinks = links[object];
+    std::vector< RuntimeObject* > list; list.reserve(objectLinks.size());
 
     //Create the list
-    for (std::set< Object * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
+    for (std::set< RuntimeObject * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
     {
         if ( (*linkedObj)->GetName() == linkedName)
             list.push_back((*linkedObj));

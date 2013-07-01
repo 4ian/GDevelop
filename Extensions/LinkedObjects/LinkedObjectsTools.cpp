@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,8 +29,8 @@ freely, subject to the following restrictions:
 #include <string>
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include "GDL/Object.h"
-#include "GDL/RuntimeScene.h"
+#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/RuntimeScene.h"
 #include "ObjectsLinksManager.h"
 
 using namespace std;
@@ -42,15 +42,17 @@ namespace LinkedObjects
 
 std::map < RuntimeScene* , ObjectsLinksManager > ObjectsLinksManager::managers;
 
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int , const std::string &, Object * object, const std::string &)
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene,
+                                          std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectsLists,
+                                          RuntimeObject * object)
 {
     bool objectsHaveBeenPicked = false;;
 
     //We use pickedObjectsLists to find the name of the objects to be picked ( We could use the last argument, but it can be a group name )
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectsLists.begin();it!=pickedObjectsLists.end();++it)
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectsLists.begin();it!=pickedObjectsLists.end();++it)
     {
         //Get a list of all objects with the desired name linked to our object
-        std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object, it->first);
+        std::vector<RuntimeObject*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object, it->first);
         if ( !objectsHaveBeenPicked && !linkedObjects.empty() ) objectsHaveBeenPicked = true;
 
         //Then pick all of these objects
@@ -71,17 +73,17 @@ bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::s
     return objectsHaveBeenPicked;
 }
 
-void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & )
+void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, RuntimeObject * a, RuntimeObject * b)
 {
     ObjectsLinksManager::managers[&scene].LinkObjects(a, b);
 }
 
-void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & )
+void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, RuntimeObject * a, RuntimeObject * b )
 {
     ObjectsLinksManager::managers[&scene].RemoveLinkBetween(a, b);
 }
 
-void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, Object * object)
+void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, RuntimeObject * object)
 {
     ObjectsLinksManager::managers[&scene].RemoveAllLinksOf(object);
 }

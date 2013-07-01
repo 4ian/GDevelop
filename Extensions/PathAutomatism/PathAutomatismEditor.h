@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Path Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -50,10 +50,10 @@ freely, subject to the following restrictions:
 //*)
 #include <wx/menu.h>
 #include <boost/shared_ptr.hpp>
-class Game;
+namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class PathAutomatism;
-class Scene;
+namespace gd { class Layout; }
 class ScenePathDatas;
 
 ///Class storing datas about a path for the editor (only used by the editor, not by the runtime game).
@@ -68,7 +68,7 @@ class PathAutomatismEditor: public wxDialog
 {
 	public:
 
-		PathAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, PathAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ );
+		PathAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene, PathAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~PathAutomatismEditor();
 
 		//(*Declarations(PathAutomatismEditor)
@@ -195,8 +195,8 @@ class PathAutomatismEditor: public wxDialog
 
 		std::string GetNameWithoutPrefix(std::string name);
 
-		Game & game;
-        Scene * scene;
+		gd::Project & game;
+        gd::Layout * scene;
         boost::shared_ptr<ScenePathDatas> sharedDatas;
 		gd::MainFrameWrapper & mainFrameWrapper;
 

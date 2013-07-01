@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\PathAutomatism.xgdw" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\PathAutomatism.xgdw" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -26,7 +26,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -38,7 +38,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\PathAutomatism.xgdwe" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\CppPlatform\Extensions\PathAutomatism.xgdwe" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -64,7 +64,7 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29ud_xrc" />
 					<Add option="-lwxmsw29ud_richtext" />
 					<Add option="-lwxmsw29ud_ribbon" />
@@ -109,7 +109,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\PathAutomatism.xgdw" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\PathAutomatism.xgdw" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -128,7 +128,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -140,7 +140,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\PathAutomatism.xgdwe" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\CppPlatform\Extensions\PathAutomatism.xgdwe" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -165,7 +165,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -210,7 +210,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\PathAutomatism.xgdw" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\PathAutomatism.xgdw" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -229,7 +229,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -241,7 +241,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\PathAutomatism.xgdwe" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\CppPlatform\Extensions\PathAutomatism.xgdwe" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -266,7 +266,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -311,7 +311,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\PathAutomatism.xgdl" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\PathAutomatism.xgdl" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -331,7 +331,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -350,7 +350,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\PathAutomatism.xgdle" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\CppPlatform\Extensions\PathAutomatism.xgdle" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -375,7 +375,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -395,7 +395,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\PathAutomatism.xgdle" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\CppPlatform\Extensions\PathAutomatism.xgdle" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -418,7 +418,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -438,7 +438,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\PathAutomatism.xgdl" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\PathAutomatism.xgdl" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -458,7 +458,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -477,7 +477,7 @@
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\PathAutomatism" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\PathAutomatism" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -499,7 +499,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -513,12 +513,12 @@
 					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/PathAutomatism.xgdm" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/release/PathAutomatism.xgdm" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/PathAutomatism.xgdm" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\PathAutomatism" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\PathAutomatism" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -541,7 +541,7 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-pg -g" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-window-d" />
@@ -555,13 +555,13 @@
 					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/PathAutomatism.xgdm" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/debug/PathAutomatism.xgdm" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/PathAutomatism.xgdm" />
 				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add directory="..\..\GDL" />
+			<Add directory="..\..\GDCpp" />
 			<Add directory="..\..\ExtLibs\SFML\include" />
 			<Add directory="..\..\ExtLibs\boost" />
 			<Add directory="..\..\Core" />

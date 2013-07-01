@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Path Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,15 +27,15 @@ freely, subject to the following restrictions:
 #include <boost/shared_ptr.hpp>
 #include "PathAutomatism.h"
 #include "PathAutomatismEditor.h"
-#include "GDL/Scene.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/XmlMacros.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Scene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/XmlMacros.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/CommonTools.h"
 #include "RuntimeScenePathDatas.h"
 
-PathAutomatism::PathAutomatism(std::string automatismTypeName) :
-    Automatism(automatismTypeName),
+PathAutomatism::PathAutomatism() :
     speed(200),
     timeOnSegment(0),
     totalSegmentTime(0),
@@ -54,7 +54,7 @@ PathAutomatism::PathAutomatism(std::string automatismTypeName) :
     ChangeCurrentPath("Object main path");
 }
 
-PathAutomatism::PathAutomatism(const PathAutomatism &cl) : Automatism(cl.type)
+PathAutomatism::PathAutomatism(const PathAutomatism &cl) : Automatism(cl)
 {
     Init(cl);
 }
@@ -116,7 +116,7 @@ PathAutomatism::~PathAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void PathAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
+void PathAutomatism::EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
     PathAutomatismEditor editor(parent, game_, scene, *this, mainFrameWrapper_);
     editor.ShowModal();
@@ -137,7 +137,7 @@ void PathAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //  add to the current time along the path
-    timeOnSegment += static_cast<double>(scene.GetElapsedTime())/1000.0*speed;
+    timeOnSegment += static_cast<double>(scene.GetElapsedTime())/1000000.0*speed;
 
     //  if I reached the end of this segment, move to a new segment
     if (timeOnSegment >= totalSegmentTime && currentSegment < path.size())

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Path Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -46,11 +46,11 @@ freely, subject to the following restrictions:
 #include <wx/numdlg.h>
 #include <wx/filedlg.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Scene.h"
 #include "ScenePathDatas.h"
 #include "PathAutomatism.h"
 
@@ -102,7 +102,7 @@ BEGIN_EVENT_TABLE(PathAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, PathAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene_, PathAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
     automatism(automatism_),
     game(game_),
     scene(scene_),

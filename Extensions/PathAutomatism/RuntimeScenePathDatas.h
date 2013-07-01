@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Path Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 
 #ifndef RUNTIMESCENEPATHDATAS_H
 #define RUNTIMESCENEPATHDATAS_H
-#include "GDL/AutomatismsRuntimeSharedDatas.h"
+#include "GDCpp/AutomatismsRuntimeSharedData.h"
 #include <map>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
@@ -37,12 +37,12 @@ class ContactListener;
 /**
  * Datas shared by Path Automatism at runtime
  */
-class GD_EXTENSION_API RuntimeScenePathDatas : public AutomatismsRuntimeSharedDatas
+class GD_EXTENSION_API RuntimeScenePathDatas : public AutomatismsRuntimeSharedData
 {
     public:
         RuntimeScenePathDatas(const ScenePathDatas & automatismSharedDatas);
         virtual ~RuntimeScenePathDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePathDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePathDatas(*this));}
 
         std::map<std::string, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
 

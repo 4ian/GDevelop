@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Path Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #ifndef SCENEPATHDATAS_H
 #define SCENEPATHDATAS_H
 
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDCpp/AutomatismsSharedData.h"
 #include "RuntimeScenePathDatas.h"
 #include <SFML/System/Vector2.hpp>
 #include <map>
@@ -36,27 +36,27 @@ freely, subject to the following restrictions:
 /**
  * Datas shared by Path Automatism
  */
-class GD_EXTENSION_API ScenePathDatas : public AutomatismsSharedDatas
+class GD_EXTENSION_API ScenePathDatas : public gd::AutomatismsSharedData
 {
-    public:
-        ScenePathDatas(std::string typeName) : AutomatismsSharedDatas(typeName) {};
-        virtual ~ScenePathDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePathDatas(*this));}
+public:
+    ScenePathDatas() {};
+    virtual ~ScenePathDatas() {};
+    virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new ScenePathDatas(*this));}
 
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
-        {
-            return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePathDatas(*this));
-        }
+    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
+    {
+        return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePathDatas(*this));
+    }
 
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * eventElem) const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * eventElem);
+    virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-        std::map<std::string, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
+    std::map<std::string, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
 
-    private:
+private:
 };
 
 #endif // SCENEPATHDATAS_H

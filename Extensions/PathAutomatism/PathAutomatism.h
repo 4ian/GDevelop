@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Path Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,13 +27,13 @@ freely, subject to the following restrictions:
 #ifndef PATHAUTOMATISM_H
 #define PATHAUTOMATISM_H
 
-#include "GDL/Automatism.h"
-#include "GDL/Object.h"
+#include "GDCpp/Automatism.h"
+#include "GDCpp/Object.h"
 #include <SFML/System/Vector2.hpp>
 #include <map>
 class RuntimeScene;
 class TiXmlElement;
-class Scene;
+namespace gd { class Layout; }
 class PathAutomatismEditor;
 class RuntimeScenePathDatas;
 
@@ -45,7 +45,7 @@ class GD_EXTENSION_API PathAutomatism : public Automatism
 friend class PathAutomatismEditor;
 
 public:
-    PathAutomatism(std::string automatismTypeName);
+    PathAutomatism();
     PathAutomatism(const PathAutomatism &cl);
     PathAutomatism& operator=(const PathAutomatism &cl);
     void Init(const PathAutomatism &cl);
@@ -72,7 +72,7 @@ public:
     /**
      * Called when user wants to edit the automatism.
      */
-    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
     #endif
 
     void Reset();
@@ -144,11 +144,11 @@ private:
 
     float GetAngleOfSegment(sf::Vector2f &seg);
 
-    //sf::Vector2f has been choosen to represent position, but any simple vector2 class would do the job.
+    //sf::Vector2f has been chosen to represent position, but any simple vector2 class would do the job.
     std::string pathName; ///< Name of the current path (the path may be not loaded, especially in Edit mode)
-    std::vector<sf::Vector2f> path; ///< Copie of current path (used for movement to allow the automatism to reverse it)
+    std::vector<sf::Vector2f> path; ///< Copy of current path (used for movement to allow the automatism to reverse it)
 
-    sf::Vector2f offset; ///< Offset of the path ralative to the scene's origin
+    sf::Vector2f offset; ///< Offset of the path relative to the scene's origin
     float speed;
     float timeOnSegment;
     float totalSegmentTime;

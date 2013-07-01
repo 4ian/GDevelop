@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\TextObject.xgdw" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Debug\" />
+				<Option output="../../Runtime/bin/debug/TextObject.xgdw" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -18,6 +18,7 @@
 					<Add option="-g" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -25,7 +26,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -33,12 +34,12 @@
 					<Add option="-lsfml-system-d" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="../../Runtime/bin/debug" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\TextObject.xgdwe" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Debug Edittime\" />
+				<Option output="../../IDE/bin/debug/CppPlatform/Extensions/TextObject.xgdwe" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -48,8 +49,8 @@
 					<Add option="-g" />
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -57,13 +58,13 @@
 					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
-					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../../ExtLibs/wxwidgets/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29ud_xrc" />
 					<Add option="-lwxmsw29ud_richtext" />
 					<Add option="-lwxmsw29ud_ribbon" />
@@ -102,14 +103,14 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="../../IDE/bin/debug" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\TextObject.xgdw" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Release\" />
+				<Option output="../../Runtime/bin/release/TextObject.xgdw" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -118,6 +119,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -126,7 +128,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -134,12 +136,12 @@
 					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="../../Runtime/bin/release" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\TextObject.xgdwe" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Release Edittime\" />
+				<Option output="../../IDE/bin/release/CppPlatform/Extensions/TextObject.xgdwe" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -158,13 +160,13 @@
 					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -203,14 +205,14 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="../../IDE/bin/release" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/" />
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\TextObject.xgdw" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Dev\" />
+				<Option output="../../Runtime/bin/dev/TextObject.xgdw" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Dev/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -219,6 +221,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -227,7 +230,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -235,12 +238,12 @@
 					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add directory="..\..\Runtime\bin\dev" />
+					<Add directory="../../Runtime/bin/dev" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\TextObject.xgdwe" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Dev Edittime\" />
+				<Option output="../../IDE/bin/dev/CppPlatform/Extensions/TextObject.xgdwe" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Dev Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -259,13 +262,13 @@
 					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -304,14 +307,14 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add directory="..\..\IDE\bin\dev" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="../../IDE/bin/dev" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\TextObject.xgdl" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Release\" />
+				<Option output="../../Runtime/bin/release/TextObject.xgdl" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -321,6 +324,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -329,7 +333,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -343,13 +347,13 @@
 					<Add option="-lFLAC" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
-					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
+					<Add directory="../../Runtime/bin/release" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\TextObject.xgdle" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Release Edittime\" />
+				<Option output="../../IDE/bin/release/CppPlatform/Extensions/TextObject.xgdle" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -362,8 +366,8 @@
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -373,7 +377,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -388,13 +392,13 @@
 					<Add option="-lFLAC" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
-					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
+					<Add directory="../../IDE/bin/release" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\TextObject.xgdle" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Debug Edittime\" />
+				<Option output="../../IDE/bin/debug/CppPlatform/Extensions/TextObject.xgdle" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -416,7 +420,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -431,13 +435,13 @@
 					<Add option="-lFLAC" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
-					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
+					<Add directory="../../IDE/bin/debug" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\TextObject.xgdl" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Debug\" />
+				<Option output="../../Runtime/bin/debug/TextObject.xgdl" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -448,6 +452,7 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -455,7 +460,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -469,13 +474,13 @@
 					<Add option="-lFLAC" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
-					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
+					<Add directory="../../Runtime/bin/debug" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\TextObject.xgdm" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Release\" />
+				<Option output="../../Runtime/bin/release/TextObject.xgdm" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -485,17 +490,18 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\ExtLibs\boost" />
-					<Add directory="..\..\ExtLibs\SFML\include" />
+					<Add directory="../../ExtLibs/boost" />
+					<Add directory="../../ExtLibs/SFML/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -505,17 +511,17 @@
 					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
+					<Add directory="../../Runtime/bin/release" />
+					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/TextObject.xgdm" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/release/TextObject.xgdm" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/TextObject.xgdm" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\TextObject.xgdm" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj\Debug\" />
+				<Option output="../../Runtime/bin/debug/TextObject.xgdm" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -526,17 +532,18 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="..\..\ExtLibs\boost" />
-					<Add directory="..\..\ExtLibs\SFML\include" />
+					<Add directory="../../ExtLibs/boost" />
+					<Add directory="../../ExtLibs/SFML/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-pg -g" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-window-d" />
@@ -546,26 +553,27 @@
 					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
+					<Add directory="../../Runtime/bin/debug" />
+					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/TextObject.xgdm" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/debug/TextObject.xgdm" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/TextObject.xgdm" />
 				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add directory="..\..\GDL" />
-			<Add directory="..\..\ExtLibs\SFML\include" />
-			<Add directory="..\..\ExtLibs\boost" />
-			<Add directory="..\..\Core" />
+			<Add directory="../../GDCpp" />
+			<Add directory="../../ExtLibs/SFML/include" />
+			<Add directory="../../ExtLibs/boost" />
+			<Add directory="../../Core" />
 		</Compiler>
 		<Linker>
-			<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
-			<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
+			<Add directory="../../ExtLibs/SFML/build-mingw-debug/lib" />
+			<Add directory="../../ExtLibs/SFML/build-mingw-release/lib" />
 		</Linker>
 		<Unit filename="Extension.cpp" />
+		<Unit filename="JsExtension.cpp" />
 		<Unit filename="TextObject.cpp" />
 		<Unit filename="TextObject.h" />
 		<Unit filename="TextObjectEditor.cpp" />

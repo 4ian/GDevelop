@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,15 +28,15 @@ freely, subject to the following restrictions:
 #include "TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
 
-#include "GDL/ImageManager.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/FontManager.h"
-#include "GDL/Position.h"
-#include "GDL/Polygon.h"
-#include "GDL/CommonTools.h"
-#include "GDL/XmlMacros.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/XmlMacros.h"
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)
@@ -44,46 +44,39 @@ freely, subject to the following restrictions:
 namespace gd { class MainFrameWrapper; }
 #endif
 
+using namespace std;
+
 TextObject::TextObject(std::string name_) :
-Object(name_),
-opacity( 255 ),
-smoothed(true),
-colorR( 255 ),
-colorG( 255 ),
-colorB( 255 ),
-angle(0)
+    Object(name_),
+    text("Text"),
+    characterSize(20),
+    fontName(""),
+    smoothed(true),
+    bold(false),
+    italic(false),
+    underlined(false),
+    colorR( 255 ),
+    colorG( 255 ),
+    colorB( 255 )
+    #if defined(GD_IDE_ONLY)
+    ,font(NULL)
+    #endif
 {
-    SetString("Text");
 }
 
-void TextObject::LoadFromXml(const TiXmlElement * elem)
+TextObject::~TextObject()
 {
-    if ( elem->FirstChildElement( "String" ) == NULL ||
-         elem->FirstChildElement( "String" )->Attribute("value") == NULL )
-    {
-        cout << "Les informations concernant le texte d'un objet Text manquent.";
-    }
-    else
-    {
+};
+
+void TextObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elem)
+{
+    if ( elem->FirstChildElement( "String" ) && elem->FirstChildElement( "String" )->Attribute("value")  )
         SetString(elem->FirstChildElement("String")->Attribute("value"));
-    }
 
-    if ( elem->FirstChildElement( "Font" ) == NULL ||
-         elem->FirstChildElement( "Font" )->Attribute("value") == NULL )
-    {
-        cout << "Les informations concernant la police d'un objet Text manquent.";
-    }
-    else
-    {
+    if ( elem->FirstChildElement( "Font" ) && elem->FirstChildElement( "Font" )->Attribute("value") )
         SetFontFilename(elem->FirstChildElement("Font")->Attribute("value"));
-    }
 
-    if ( elem->FirstChildElement( "CharacterSize" ) == NULL ||
-         elem->FirstChildElement( "CharacterSize" )->Attribute("value") == NULL )
-    {
-        cout << "Les informations concernant la taille du texte d'un objet Text manquent.";
-    }
-    else
+    if ( elem->FirstChildElement( "CharacterSize" ) && elem->FirstChildElement( "CharacterSize" )->Attribute("value")  )
     {
         float size = 20;
         elem->FirstChildElement("CharacterSize")->QueryFloatAttribute("value", &size);
@@ -91,14 +84,8 @@ void TextObject::LoadFromXml(const TiXmlElement * elem)
         SetCharacterSize(size);
     }
 
-    if ( elem->FirstChildElement( "Color" ) == NULL ||
-         elem->FirstChildElement( "Color" )->Attribute("r") == NULL ||
-         elem->FirstChildElement( "Color" )->Attribute("g") == NULL ||
-         elem->FirstChildElement( "Color" )->Attribute("b") == NULL )
-    {
-        cout << "Les informations concernant la couleur du texte d'un objet Text manquent.";
-    }
-    else
+    if ( elem->FirstChildElement( "Color" ) && elem->FirstChildElement( "Color" )->Attribute("r") &&
+         elem->FirstChildElement( "Color" )->Attribute("g") && elem->FirstChildElement( "Color" )->Attribute("b") )
     {
         int r = 255;
         int g = 255;
@@ -110,25 +97,62 @@ void TextObject::LoadFromXml(const TiXmlElement * elem)
         SetColor(r,g,b);
     }
 
-    if ( elem->FirstChildElement( "Style" ) == NULL ||
-         elem->FirstChildElement( "Style" )->Attribute("value") == NULL )
-    {
-        cout << "Les informations concernant le style du texte manquent.";
-    }
-    else
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("smoothed", smoothed);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("bold", bold);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("italic", italic);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("underlined", underlined);
+
+    //Backward compatibility
+    if ( elem->FirstChildElement( "Style" ) && elem->FirstChildElement( "Style" )->Attribute("value")  )
     {
         int style = 0;
         elem->FirstChildElement("Style")->QueryIntAttribute("value", &style);
 
-        SetFontStyle(style);
+        SetBold( (sf::Text::Bold & style) != 0 );
+        SetUnderlined( (sf::Text::Underlined & style) != 0 );
+        SetItalic( (sf::Text::Italic & style) != 0 );
     }
-
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("smoothed", smoothed);
-    SetSmooth(smoothed);
 }
 
 #if defined(GD_IDE_ONLY)
-void TextObject::SaveToXml(TiXmlElement * elem)
+void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
+{
+    sf::Text sfText;
+    sfText.setString(text);
+    sfText.setCharacterSize(characterSize);
+    sfText.setStyle((bold ? sf::Text::Bold : 0) |
+                 (IsItalic() ? sf::Text::Italic : 0) |
+                 (IsUnderlined() ? sf::Text::Underlined : 0) );
+    if ( font ) sfText.setFont(*font);
+    else sfText.setFont(*FontManager::GetInstance()->GetFont(""));
+    sfText.setOrigin(sfText.getLocalBounds().width/2, sfText.getLocalBounds().height/2);
+    sfText.setPosition( instance.GetX()+sfText.getOrigin().x, instance.GetY()+sfText.getOrigin().y );
+    sfText.setRotation( instance.GetAngle() );
+    sfText.setColor(sf::Color(colorR, colorG, colorB));
+
+    renderTarget.draw(sfText);
+}
+
+sf::Vector2f TextObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    sf::Text sfText;
+    sfText.setString(text);
+    sfText.setCharacterSize(characterSize);
+    sfText.setStyle((bold ? sf::Text::Bold : 0) |
+                 (IsItalic() ? sf::Text::Italic : 0) |
+                 (IsUnderlined() ? sf::Text::Underlined : 0) );
+    if ( font ) sfText.setFont(*font);
+    else sfText.setFont(*FontManager::GetInstance()->GetFont(""));
+
+    return sf::Vector2f(sfText.getLocalBounds().width, sfText.getLocalBounds().height+ sfText.getLocalBounds().top);
+}
+
+void TextObject::LoadResources(gd::Project & project, gd::Layout & layout)
+{
+    font = FontManager::GetInstance()->GetFont(fontName);
+}
+
+void TextObject::DoSaveToXml(TiXmlElement * elem)
 {
     TiXmlElement * str = new TiXmlElement( "String" );
     elem->LinkEndChild( str );
@@ -148,51 +172,10 @@ void TextObject::SaveToXml(TiXmlElement * elem)
     color->SetAttribute("g", GetColorG());
     color->SetAttribute("b", GetColorB());
 
-    TiXmlElement * style = new TiXmlElement( "Style" );
-    style->SetAttribute("value", GetFontStyle());
-    elem->LinkEndChild( style );
-
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("smoothed", smoothed);
-}
-#endif
-
-bool TextObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
-{
-    ReloadFont();
-
-    return true;
-}
-
-/**
- * Update animation and direction from the inital position
- */
-bool TextObject::InitializeFromInitialPosition(const InitialPosition & position)
-{
-    return true;
-}
-
-/**
- * Render object at runtime
- */
-bool TextObject::Draw( sf::RenderTarget& renderTarget )
-{
-    //Don't draw anything if hidden
-    if ( hidden ) return true;
-
-    renderTarget.Draw( text );
-
-    return true;
-}
-
-#if defined(GD_IDE_ONLY)
-/**
- * Render object at edittime
- */
-bool TextObject::DrawEdittime( sf::RenderTarget& renderTarget )
-{
-    renderTarget.Draw( text );
-
-    return true;
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("bold", bold);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("italic", italic);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("underlined", underlined);
 }
 
 void TextObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
@@ -202,27 +185,199 @@ void TextObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool TextObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/texticon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/texticon.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void TextObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void TextObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     TextObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 }
+#endif
 
-wxPanel * TextObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+/* RuntimeTextObject : */
+
+RuntimeTextObject::RuntimeTextObject(RuntimeScene & scene, const gd::Object & object) :
+    RuntimeObject(scene, object),
+    opacity(255),
+    angle(0)
 {
-    return NULL;
+    const TextObject & textObject = static_cast<const TextObject&>(object);
+
+    ChangeFont(textObject.GetFontFilename());
+    SetSmooth(textObject.IsSmoothed());
+    SetColor(textObject.GetColorR(), textObject.GetColorG(), textObject.GetColorB());
+    SetString(textObject.GetString());
+    SetCharacterSize(textObject.GetCharacterSize());
+    SetAngle(0);
+    SetBold(textObject.IsBold());
+    SetItalic(textObject.IsItalic());
+    SetUnderlined(textObject.IsUnderlined());
 }
 
-void TextObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
+bool RuntimeTextObject::Draw( sf::RenderTarget& renderTarget )
 {
+    if ( hidden ) return true; //Don't draw anything if hidden
+
+    renderTarget.draw( text );
+    return true;
 }
 
-void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeTextObject::OnPositionChanged()
+{
+    text.setPosition( GetX()+text.getOrigin().x, GetY()+text.getOrigin().y );
+}
+
+/**
+ * RuntimeTextObject provides a basic bounding box.
+ */
+std::vector<Polygon2d> RuntimeTextObject::GetHitBoxes() const
+{
+    std::vector<Polygon2d> mask;
+    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
+    rectangle.Rotate(GetAngle()/180*3.14159);
+    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
+
+    mask.push_back(rectangle);
+    return mask;
+}
+
+/**
+ * Get the real X position of the sprite
+ */
+float RuntimeTextObject::GetDrawableX() const
+{
+    return text.getPosition().x-text.getOrigin().x;
+}
+
+/**
+ * Get the real Y position of the text
+ */
+float RuntimeTextObject::GetDrawableY() const
+{
+    return text.getPosition().y-text.getOrigin().y;
+}
+
+/**
+ * Width is the width of the current sprite.
+ */
+float RuntimeTextObject::GetWidth() const
+{
+    return text.getLocalBounds().width;
+}
+
+/**
+ * Height is the height of the current sprite.
+ */
+float RuntimeTextObject::GetHeight() const
+{
+    return text.getLocalBounds().height + text.getLocalBounds().top;
+}
+
+/**
+ * Change the color filter of the sprite object
+ */
+void RuntimeTextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
+{
+    text.setColor(sf::Color(r, g, b, opacity));
+}
+
+void RuntimeTextObject::SetColor(const std::string & colorStr)
+{
+    std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
+
+    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+
+    SetColor(  ToInt(colors[0]),
+               ToInt(colors[1]),
+               ToInt(colors[2]) );
+}
+
+void RuntimeTextObject::SetOpacity(float val)
+{
+    if ( val > 255 ) val = 255;
+    else if ( val < 0 ) val = 0;
+
+    opacity = val;
+    const sf::Color & currentColor = text.getColor();
+    text.setColor(sf::Color(currentColor.r, currentColor.g, currentColor.b, opacity));
+}
+
+void RuntimeTextObject::ChangeFont(const std::string & fontName_)
+{
+    if ( !text.getFont() || fontName_ != fontName )
+    {
+        fontName = fontName_;
+        text.setFont(*FontManager::GetInstance()->GetFont(fontName));
+        text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2);
+        OnPositionChanged();
+        SetSmooth(smoothed); //Ensure texture smoothing is up to date.
+    }
+}
+
+void RuntimeTextObject::SetFontStyle(int style)
+{
+    text.setStyle(style);
+}
+
+int RuntimeTextObject::GetFontStyle()
+{
+    return text.getStyle();
+}
+
+bool RuntimeTextObject::HasFontStyle(sf::Text::Style style)
+{
+    return (text.getStyle() & style) != 0;
+}
+
+bool RuntimeTextObject::IsBold()
+{
+    return HasFontStyle(sf::Text::Bold);
+}
+
+void RuntimeTextObject::SetBold(bool bold)
+{
+    SetFontStyle((bold ? sf::Text::Bold : 0) |
+                 (IsItalic() ? sf::Text::Italic : 0) |
+                 (IsUnderlined() ? sf::Text::Underlined : 0) );
+}
+
+bool RuntimeTextObject::IsItalic()
+{
+    return HasFontStyle(sf::Text::Italic);
+}
+
+void RuntimeTextObject::SetItalic(bool italic)
+{
+    SetFontStyle((IsBold() ? sf::Text::Bold : 0) |
+                 (italic ? sf::Text::Italic : 0) |
+                 (IsUnderlined() ? sf::Text::Underlined : 0) );
+}
+
+bool RuntimeTextObject::IsUnderlined()
+{
+    return HasFontStyle(sf::Text::Underlined);
+}
+
+void RuntimeTextObject::SetUnderlined(bool underlined)
+{
+    SetFontStyle((IsBold() ? sf::Text::Bold : 0) |
+                 (IsItalic() ? sf::Text::Italic : 0) |
+                 (underlined ? sf::Text::Underlined : 0) );
+}
+
+void RuntimeTextObject::SetSmooth(bool smooth)
+{
+    smoothed = smooth;
+
+    if ( text.getFont() )
+        const_cast<sf::Texture&>(text.getFont()->getTexture(GetCharacterSize())).setSmooth(smooth);
+}
+
+#if defined(GD_IDE_ONLY)
+void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
@@ -232,10 +387,10 @@ void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, 
     else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
 }
 
-bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
-    else if ( propertyNb == 1 ) { SetFontFilename(newValue); }
+    else if ( propertyNb == 1 ) { ChangeFont(newValue); }
     else if ( propertyNb == 2 ) { SetCharacterSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
     {
@@ -268,193 +423,20 @@ bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
     return true;
 }
 
-unsigned int TextObject::GetNumberOfProperties() const
+unsigned int RuntimeTextObject::GetNumberOfProperties() const
 {
     return 6;
 }
 #endif
 
-void TextObject::OnPositionChanged()
+void DestroyRuntimeTextObject(RuntimeObject * object)
 {
-    text.SetX( GetX()+text.GetRect().Width/2 );
-    text.SetY( GetY()+text.GetRect().Height/2 );
+    delete object;
 }
 
-/**
- * TextObject provides a basic bounding box.
- */
-std::vector<Polygon2d> TextObject::GetHitBoxes() const
+RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object)
 {
-    std::vector<Polygon2d> mask;
-    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
-    rectangle.Rotate(GetAngle()/180*3.14159);
-    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
-
-    mask.push_back(rectangle);
-    return mask;
-}
-
-/**
- * Get the real X position of the sprite
- */
-float TextObject::GetDrawableX() const
-{
-    return text.GetPosition().x-text.GetOrigin().x;
-}
-
-/**
- * Get the real Y position of the text
- */
-float TextObject::GetDrawableY() const
-{
-    return text.GetPosition().y-text.GetOrigin().y;
-}
-
-/**
- * Width is the width of the current sprite.
- */
-float TextObject::GetWidth() const
-{
-    return text.GetRect().Width;
-}
-
-/**
- * Height is the height of the current sprite.
- */
-float TextObject::GetHeight() const
-{
-    return text.GetRect().Height;
-}
-
-/**
- * X center is computed with text rectangle
- */
-float TextObject::GetCenterX() const
-{
-    return text.GetRect().Width/2;
-}
-
-/**
- * Y center is computed with text rectangle
- */
-float TextObject::GetCenterY() const
-{
-    return text.GetRect().Height/2;
-}
-
-/**
- * Nothing to do when updating time
- */
-void TextObject::UpdateTime(float)
-{
-}
-
-/**
- * Change the color filter of the sprite object
- */
-void TextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
-{
-    colorR = r;
-    colorG = g;
-    colorB = b;
-    text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
-}
-
-void TextObject::SetColor(const std::string & colorStr)
-{
-    vector < string > colors = SplitString<string>(colorStr, ';');
-
-    if ( colors.size() < 3 ) return; //La couleur est incorrecte
-
-    SetColor(  ToInt(colors[0]),
-               ToInt(colors[1]),
-               ToInt(colors[2]) );
-}
-
-void TextObject::SetOpacity(float val)
-{
-    if ( val > 255 )
-        val = 255;
-    else if ( val < 0 )
-        val = 0;
-
-    opacity = val;
-    text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
-}
-
-void TextObject::SetFontFilename(const std::string & fontName_)
-{
-    fontName = fontName_;
-}
-
-void TextObject::ChangeFont(const std::string & fontName_)
-{
-    SetFontFilename(fontName_);
-    ReloadFont();
-}
-
-void TextObject::ReloadFont()
-{
-    text.SetFont(*FontManager::GetInstance()->GetFont(fontName));
-    text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
-}
-
-void TextObject::SetFontStyle(int style)
-{
-    text.SetStyle(style);
-}
-
-int TextObject::GetFontStyle()
-{
-    return text.GetStyle();
-}
-
-bool TextObject::HasFontStyle(sf::Text::Style style)
-{
-    return (text.GetStyle() & style) != 0;
-}
-
-bool TextObject::IsBold()
-{
-    return HasFontStyle(sf::Text::Bold);
-}
-
-void TextObject::SetBold(bool bold)
-{
-    SetFontStyle((bold ? sf::Text::Bold : 0) |
-                 (IsItalic() ? sf::Text::Italic : 0) |
-                 (IsUnderlined() ? sf::Text::Underlined : 0) );
-}
-
-bool TextObject::IsItalic()
-{
-    return HasFontStyle(sf::Text::Italic);
-}
-
-void TextObject::SetItalic(bool italic)
-{
-    SetFontStyle((IsBold() ? sf::Text::Bold : 0) |
-                 (italic ? sf::Text::Italic : 0) |
-                 (IsUnderlined() ? sf::Text::Underlined : 0) );
-}
-
-bool TextObject::IsUnderlined()
-{
-    return HasFontStyle(sf::Text::Underlined);
-}
-
-void TextObject::SetUnderlined(bool underlined)
-{
-    SetFontStyle((IsBold() ? sf::Text::Bold : 0) |
-                 (IsItalic() ? sf::Text::Italic : 0) |
-                 (underlined ? sf::Text::Underlined : 0) );
-}
-
-void TextObject::SetSmooth(bool smooth)
-{
-    smoothed = smooth;
-
-    const_cast<sf::Texture&>(text.GetFont().GetTexture(GetCharacterSize())).SetSmooth(smooth);
+    return new RuntimeTextObject(scene, object);
 }
 
 /**
@@ -462,7 +444,7 @@ void TextObject::SetSmooth(bool smooth)
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyTextObject(Object * object)
+void DestroyTextObject(gd::Object * object)
 {
     delete object;
 }
@@ -471,7 +453,7 @@ void DestroyTextObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateTextObject(std::string name)
+gd::Object * CreateTextObject(std::string name)
 {
     return new TextObject(name);
 }

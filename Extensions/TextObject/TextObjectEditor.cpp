@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -37,8 +37,9 @@ freely, subject to the following restrictions:
 #include <wx/filename.h>
 #include <wx/filedlg.h>
 
-#include "GDL/Game.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/CommonTools.h"
 #include "TextObject.h"
 
 //(*IdInit(TextObjectEditor)
@@ -64,7 +65,7 @@ BEGIN_EVENT_TABLE(TextObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-TextObjectEditor::TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, gd::MainFrameWrapper & mainFrameWrapper_) :
+TextObjectEditor::TextObjectEditor( wxWindow* parent, gd::Project & game_, TextObject & object_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
 object(object_),
 mainFrameWrapper(mainFrameWrapper_)
@@ -155,9 +156,9 @@ mainFrameWrapper(mainFrameWrapper_)
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
 	smoothCheck->SetValue(object.IsSmoothed());
 
-	boldToggleButton->SetValue(object.HasFontStyle(sf::Text::Bold));
-	italicToggleButton->SetValue(object.HasFontStyle(sf::Text::Italic));
-	underlineToggleButton->SetValue(object.HasFontStyle(sf::Text::Underlined));
+	boldToggleButton->SetValue(object.IsBold());
+	italicToggleButton->SetValue(object.IsItalic());
+	underlineToggleButton->SetValue(object.IsUnderlined());
 }
 
 TextObjectEditor::~TextObjectEditor()
@@ -179,23 +180,17 @@ void TextObjectEditor::AdaptFontColor(wxButton *button)
 
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    object.SetString(string(textEdit->GetValue().mb_str()));
+    object.SetString(gd::ToString(textEdit->GetValue()));
     object.SetCharacterSize(sizeEdit->GetValue());
     object.SetSmooth(smoothCheck->GetValue());
-    object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()), static_cast<int>(colorBt->GetBackgroundColour().Green()), static_cast<int>(colorBt->GetBackgroundColour().Blue()));
+    object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()),
+                    static_cast<int>(colorBt->GetBackgroundColour().Green()),
+                    static_cast<int>(colorBt->GetBackgroundColour().Blue()));
 
-    object.SetFontStyle((boldToggleButton->GetValue() ? sf::Text::Bold : 0) |
-                        (italicToggleButton->GetValue() ? sf::Text::Italic : 0) |
-                        (underlineToggleButton->GetValue() ? sf::Text::Underlined : 0) );
-
-    //Text object is going to reload its font: Switch the working directory
-    if ( wxDirExists(wxFileName::FileName(game.GetProjectFile()).GetPath()))
-        wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath());
-
-    object.ChangeFont(string(fontEdit->GetValue().mb_str()));
-
-    //Switch back to IDE working directory
-    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+    object.SetBold(boldToggleButton->GetValue());
+    object.SetItalic(italicToggleButton->GetValue());
+    object.SetUnderlined(underlineToggleButton->GetValue());
+    object.SetFontFilename(std::string(fontEdit->GetValue().mb_str()));
 
     EndModal(1);
 }

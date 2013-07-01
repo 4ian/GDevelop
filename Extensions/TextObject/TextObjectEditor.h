@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -40,7 +40,7 @@ freely, subject to the following restrictions:
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-class Game;
+namespace gd { class Project; }
 class TextObject;
 namespace gd { class MainFrameWrapper; }
 
@@ -48,7 +48,7 @@ class TextObjectEditor: public wxDialog
 {
 	public:
 
-		TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, gd::MainFrameWrapper & mainFrameWrapper_);
+		TextObjectEditor( wxWindow* parent, gd::Project & game_, TextObject & object_, gd::MainFrameWrapper & mainFrameWrapper_);
 		virtual ~TextObjectEditor();
 
 		void AdaptFontColor(wxButton *button);
@@ -101,7 +101,7 @@ class TextObjectEditor: public wxDialog
 		void OncancelBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		TextObject & object;
 		gd::MainFrameWrapper & mainFrameWrapper;
 

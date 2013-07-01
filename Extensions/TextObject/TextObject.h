@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,15 +28,16 @@ freely, subject to the following restrictions:
 #define TEXTOBJECT_H
 
 #include <SFML/Graphics/Text.hpp>
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 class ImageManager;
 class RuntimeScene;
-class Object;
-class ImageManager;
-class InitialPosition;
+namespace gd { class Object; }
+namespace gd { class ImageManager; }
+namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
@@ -45,92 +46,116 @@ namespace gd {class ResourcesMergingHelper;}
 /**
  * Text Object
  */
-class GD_EXTENSION_API TextObject : public Object
+class GD_EXTENSION_API TextObject : public gd::Object
 {
 public :
 
     TextObject(std::string name_);
-    virtual ~TextObject() {};
-    virtual Object * Clone() const { return new TextObject(*this); }
-
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
-
-    virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual ~TextObject();
+    virtual gd::Object * Clone() const { return new TextObject(*this); }
 
     #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
     #endif
 
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    /** \brief Change the text.
+     */
+    inline void SetString(const std::string & str) { text = str; };
+
+    /** \brief Get the text.
+     */
+    inline std::string GetString() const { return text; };
+
+    /** \brief Change the character size.
+     */
+    inline void SetCharacterSize(float size) { characterSize = size; };
+
+    /** \brief Get the character size.
+     */
+    inline float GetCharacterSize() const { return characterSize; };
+
+    /** \brief Return the font filename.
+     */
+    inline std::string GetFontFilename() const {return fontName; };
+
+    /** \brief Change the font filename.
+     */
+    void SetFontFilename(const std::string & fontFilename) { fontName = fontFilename; };
+
+    bool IsBold() const { return bold; };
+    void SetBold(bool enable) { bold = enable; };
+    bool IsItalic() const { return italic; };
+    void SetItalic(bool enable) { italic = enable; };
+    bool IsUnderlined() const { return underlined; };
+    void SetUnderlined(bool enable) { underlined = enable; };
+
+    void SetSmooth(bool smooth) { smoothed = smooth; };
+    bool IsSmoothed() const {return smoothed;};
+
+    void SetColor(unsigned int r, unsigned int g, unsigned int b) { colorR = r; colorG = g; colorB = b; };
+    unsigned int GetColorR() const { return colorR; };
+    unsigned int GetColorG() const { return colorG; };
+    unsigned int GetColorB() const { return colorB; };
+
+private:
+
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
     #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
     #endif
 
-    virtual void UpdateTime(float timeElapsed);
+    std::string text;
+    float characterSize;
+    std::string fontName;
+    bool smoothed;
+    bool bold, italic, underlined;
+    unsigned int colorR;
+    unsigned int colorG;
+    unsigned int colorB;
+    #if defined(GD_IDE_ONLY)
+    const sf::Font * font; ///< The font used to render the object in the IDE. This is just a pointer to a font stored in the FontManager.
+    #endif
+};
+
+class GD_EXTENSION_API RuntimeTextObject : public RuntimeObject
+{
+public :
+
+    RuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeTextObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeTextObject(*this);}
+
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
     virtual void OnPositionChanged();
 
     virtual float GetWidth() const;
     virtual float GetHeight() const;
-    virtual void SetWidth(float ) {};
-    virtual void SetHeight(float ) {};
 
     virtual float GetDrawableX() const;
     virtual float GetDrawableY() const;
 
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
-
-    virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(angle); return true;};
+    virtual bool SetAngle(float newAngle) { angle = newAngle; text.setRotation(angle); return true;};
     virtual float GetAngle() const {return angle;};
 
-    inline void SetString(const std::string & str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
-    inline std::string GetString() const {return text.GetString();};
+    inline void SetString(const std::string & str) { text.setString(str); text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); };
+    inline std::string GetString() const {return text.getString();};
 
-    inline void SetCharacterSize(float size) { text.SetCharacterSize(size); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
-    inline float GetCharacterSize() const { return text.GetCharacterSize(); };
+    inline void SetCharacterSize(float size) { text.setCharacterSize(size); text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); };
+    inline float GetCharacterSize() const { return text.getCharacterSize(); };
 
-    /**
-     * Change the text object font filename.
-     * Call ReloadFont to make the change effective
-     */
-    void SetFontFilename(const std::string & fontFilename);
-
-    /**
-     * Change the text object font filename and reload the font
+    /** \brief Change the text object font filename and reload the font
      */
     void ChangeFont(const std::string & fontFilename);
 
-    /**
-     * Load the font according to font filename stored in the object.
-     * \see SetFontFilename
-     */
-    void ReloadFont();
-
-    /**
-     * Return the font file name.
+    /** \brief Return the font file name.
      */
     inline std::string GetFontFilename() const {return fontName; };
-
-    void SetOpacity(float val);
-    inline float GetOpacity() const {return opacity;};
-
-    void SetColor(unsigned int r,unsigned int v,unsigned int b);
-    inline unsigned int GetColorR() const { return colorR; };
-    inline unsigned int GetColorG() const { return colorG; };
-    inline unsigned int GetColorB() const { return colorB; };
-    void SetColor(const std::string & colorStr);
 
     void SetFontStyle(int style);
     int GetFontStyle();
@@ -146,28 +171,36 @@ public :
     void SetSmooth(bool smooth);
     bool IsSmoothed() const {return smoothed;};
 
-    virtual std::vector<Polygon2d> GetHitBoxes() const;
-private:
+    void SetOpacity(float val);
+    float GetOpacity() const { return opacity; };
 
-    //The text to display
+    void SetColor(unsigned int r, unsigned int g, unsigned int b);
+    void SetColor(const std::string & colorStr);
+    unsigned int GetColorR() const { return text.getColor().r; };
+    unsigned int GetColorG() const { return text.getColor().g; };
+    unsigned int GetColorB() const { return text.getColor().b; };
+
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
+
+private:
     sf::Text text;
     std::string fontName;
-
-    //Opacity
     float opacity;
-
     bool smoothed;
-
-    //Color
-    unsigned int colorR;
-    unsigned int colorG;
-    unsigned int colorB;
-
     float angle;
 };
 
-void DestroyTextObject(Object * object);
-Object * CreateTextObject(std::string name);
+void DestroyTextObject(gd::Object * object);
+gd::Object * CreateTextObject(std::string name);
+
+void DestroyRuntimeTextObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTOBJECT_H
 

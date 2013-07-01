@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-class Game;
+namespace gd { class Project; }
 class DrawerObject;
 namespace gd { class MainFrameWrapper; }
 
@@ -49,7 +49,7 @@ class DrawerObjectEditor: public wxDialog
 {
 	public:
 
-		DrawerObjectEditor( wxWindow* parent, Game & game_, DrawerObject & object_ );
+		DrawerObjectEditor( wxWindow* parent, gd::Project & game_, DrawerObject & object_ );
 		virtual ~DrawerObjectEditor();
 
 		//(*Declarations(DrawerObjectEditor)
@@ -97,7 +97,7 @@ class DrawerObjectEditor: public wxDialog
 		void OnoutlineColorBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		DrawerObject & object;
 
 		DECLARE_EVENT_TABLE()

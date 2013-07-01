@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 //*)
 #include <wx/colordlg.h>
 
-#include "GDL/Game.h"
+#include "GDCpp/Project.h"
 #include "DrawerObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
@@ -60,7 +60,7 @@ BEGIN_EVENT_TABLE(DrawerObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-DrawerObjectEditor::DrawerObjectEditor( wxWindow* parent, Game & game_, DrawerObject & object_ ) :
+DrawerObjectEditor::DrawerObjectEditor( wxWindow* parent, gd::Project & game_, DrawerObject & object_ ) :
 game(game_),
 object(object_)
 {

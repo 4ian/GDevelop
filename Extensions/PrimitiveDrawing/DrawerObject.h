@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,82 +27,54 @@ freely, subject to the following restrictions:
 #ifndef DRAWEROBJECT_H
 #define DRAWEROBJECT_H
 
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 #include <vector>
-#include <SFML/Graphics/Shape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 namespace sf
 {
     class Sprite;
     class Texture;
 }
-class ImageManager;
 class RuntimeScene;
-class Object;
-class ImageManager;
-class InitialPosition;
+namespace gd { class ImageManager; }
+namespace gd { class Object; }
+namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 #endif
 
 /**
- * Drawer object can draw primitive shapes
+ * \brief Internal class to define a shape to be drawn
  */
-class GD_EXTENSION_API DrawerObject : public Object
+class GD_EXTENSION_API DrawingCommand
+{
+public:
+    DrawingCommand(const sf::RectangleShape & rectangleShape_) : rectangleShape(rectangleShape_) {};
+    DrawingCommand(const sf::CircleShape & circleShape_) : circleShape(circleShape_) {};
+
+    sf::RectangleShape rectangleShape;
+    sf::CircleShape circleShape;
+};
+
+
+/**
+ * \brief Base object storing the setup of a drawer object.
+ */
+class GD_EXTENSION_API DrawerObjectBase
 {
 public :
+    DrawerObjectBase();
+    virtual ~DrawerObjectBase() {};
 
-    DrawerObject(std::string name_);
-    virtual ~DrawerObject() {};
-    virtual Object * Clone() const { return new DrawerObject(*this); }
-
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
-
-    virtual bool Draw(sf::RenderTarget & renderTarget);
-
-    #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
-    static void LoadEdittimeIcon();
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
-    #endif
-
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
     #if defined(GD_IDE_ONLY)
     virtual void SaveToXml(TiXmlElement * elemScene);
     #endif
-
-    virtual void UpdateTime(float timeElapsed);
-
-    virtual void OnPositionChanged() {};
-
-    virtual float GetWidth() const;
-    virtual float GetHeight() const;
-
-    virtual float GetDrawableX() const;
-    virtual float GetDrawableY() const;
-
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
-
-    virtual bool SetAngle(float newAngle) {return false;};
-    virtual float GetAngle() const {return 0;};
-
-    virtual void SetWidth(float ) {};
-    virtual void SetHeight(float ) {};
-
-    void DrawRectangle( float x, float y, float x2, float y2 );
-    void DrawLine( float x, float y, float x2, float y2, float thickness );
-    void DrawCircle( float x, float y, float radius );
 
     inline void SetOutlineSize(float size) { outlineSize = size; };
     inline float GetOutlineSize() const { return outlineSize; };
@@ -114,6 +86,7 @@ public :
     inline unsigned int GetOutlineColorR() const { return outlineColorR; };
     inline unsigned int GetOutlineColorG() const { return outlineColorG; };
     inline unsigned int GetOutlineColorB() const { return outlineColorB; };
+
     /** Used by GD events generated code : Prefer using original SetOutlineColor
      */
     void SetOutlineColor( const std::string & color );
@@ -133,11 +106,7 @@ public :
     inline void SetCoordinatesAbsolute() { absoluteCoordinates = true; }
     inline void SetCoordinatesRelative() { absoluteCoordinates = false; }
     inline bool AreCoordinatesAbsolute() { return absoluteCoordinates; }
-
 private:
-
-    std::vector < sf::Shape > shapesToDraw;
-
     //Fill color
     unsigned int fillColorR;
     unsigned int fillColorG;
@@ -153,14 +122,71 @@ private:
 
     bool absoluteCoordinates;
 
+};
+
+/**
+ * \brief The Drawer object used for storage and by the IDE.
+ */
+class GD_EXTENSION_API DrawerObject : public gd::Object, public DrawerObjectBase
+{
+public :
+    DrawerObject(std::string name_);
+    virtual ~DrawerObject() {};
+    virtual gd::Object * Clone() const { return new DrawerObject(*this); }
+
     #if defined(GD_IDE_ONLY)
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const {return sf::Vector2f(32,32);};
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    static void LoadEdittimeIcon();
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    #endif
+
+private:
+
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
+
     static sf::Texture edittimeIconImage;
     static sf::Sprite edittimeIcon;
     #endif
 };
 
-void DestroyDrawerObject(Object * object);
-Object * CreateDrawerObject(std::string name);
+class GD_EXTENSION_API RuntimeDrawerObject : public RuntimeObject, public DrawerObjectBase
+{
+public :
+    RuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeDrawerObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeDrawerObject(*this);}
+
+    virtual bool Draw(sf::RenderTarget & renderTarget);
+
+    virtual float GetWidth() const {return 32;};
+    virtual float GetHeight() const {return 32;};
+
+    virtual bool SetAngle(float newAngle) {return false;};
+    virtual float GetAngle() const {return 0;};
+
+    void DrawRectangle( float x, float y, float x2, float y2 );
+    void DrawLine( float x, float y, float x2, float y2, float thickness );
+    void DrawCircle( float x, float y, float radius );
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
+
+private:
+    std::vector < DrawingCommand > shapesToDraw;
+};
+
+void DestroyRuntimeDrawerObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object);
+
+void DestroyDrawerObject(gd::Object * object);
+gd::Object * CreateDrawerObject(std::string name);
 
 #endif // DRAWEROBJECT_H
 

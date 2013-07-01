@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,18 +29,18 @@ freely, subject to the following restrictions:
 #endif
 #include "DrawerObject.h"
 #include <SFML/Graphics.hpp>
-#include "GDL/Object.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/RuntimeGame.h"
-#include "GDL/ImageManager.h"
-#include "GDL/Polygon.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/FontManager.h"
-#include "GDL/Position.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "DrawerObjectEditor.h"
 #endif
@@ -50,22 +50,35 @@ sf::Texture DrawerObject::edittimeIconImage;
 sf::Sprite DrawerObject::edittimeIcon;
 #endif
 
-DrawerObject::DrawerObject(std::string name_) :
-Object(name_),
-fillColorR( 255 ),
-fillColorG( 255 ),
-fillColorB( 255 ),
-fillOpacity( 255 ),
-outlineSize(1),
-outlineColorR(0),
-outlineColorG(0),
-outlineColorB(0),
-outlineOpacity(255),
-absoluteCoordinates(true)
+using namespace std;
+
+DrawerObjectBase::DrawerObjectBase() :
+    fillColorR( 255 ),
+    fillColorG( 255 ),
+    fillColorB( 255 ),
+    fillOpacity( 255 ),
+    outlineSize(1),
+    outlineColorR(0),
+    outlineColorG(0),
+    outlineColorB(0),
+    outlineOpacity(255),
+    absoluteCoordinates(true)
 {
 }
 
-void DrawerObject::LoadFromXml(const TiXmlElement * object)
+DrawerObject::DrawerObject(std::string name_) :
+    gd::Object(name_)
+{
+}
+
+RuntimeDrawerObject::RuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object) :
+    RuntimeObject(scene, object)
+{
+    const DrawerObject & drawerObject = static_cast<const DrawerObject&>(object);
+    DrawerObjectBase::operator=(drawerObject);
+}
+
+void DrawerObjectBase::LoadFromXml(gd::Project & project, const TiXmlElement * object)
 {
     if ( object->FirstChildElement( "FillColor" ) == NULL ||
          object->FirstChildElement( "FillColor" )->Attribute("r") == NULL ||
@@ -149,8 +162,14 @@ void DrawerObject::LoadFromXml(const TiXmlElement * object)
             absoluteCoordinates = false;
     }
 }
+
+void DrawerObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * object)
+{
+    DrawerObjectBase::LoadFromXml(project, object);
+}
+
 #if defined(GD_IDE_ONLY)
-void DrawerObject::SaveToXml(TiXmlElement * object)
+void DrawerObjectBase::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * fillOpacityElem = new TiXmlElement( "FillOpacity" );
     object->LinkEndChild( fillOpacityElem );
@@ -183,20 +202,17 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
     else
         absoluteCoordinatesElem->SetAttribute("value", "false");
 }
-#endif
 
-/**
- * Update animation and direction from the inital position
- */
-bool DrawerObject::InitializeFromInitialPosition(const InitialPosition & position)
+void DrawerObject::DoSaveToXml(TiXmlElement * object)
 {
-    return true;
+    DrawerObjectBase::SaveToXml(object);
 }
+#endif
 
 /**
  * Render object at runtime
  */
-bool DrawerObject::Draw( sf::RenderTarget& renderTarget )
+bool RuntimeDrawerObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden )
@@ -206,7 +222,10 @@ bool DrawerObject::Draw( sf::RenderTarget& renderTarget )
     }
 
     for (unsigned int i = 0;i<shapesToDraw.size();++i)
-    	renderTarget.Draw(shapesToDraw[i]);
+    {
+    	renderTarget.draw(shapesToDraw[i].rectangleShape);
+    	renderTarget.draw(shapesToDraw[i].circleShape);
+    }
 
     shapesToDraw.clear();
 
@@ -217,52 +236,41 @@ bool DrawerObject::Draw( sf::RenderTarget& renderTarget )
 /**
  * Render object at edittime
  */
-bool DrawerObject::DrawEdittime(sf::RenderTarget& renderTarget)
+void DrawerObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    edittimeIcon.SetPosition(GetX(), GetY());
-    renderTarget.Draw(edittimeIcon);
-
-    return true;
+    edittimeIcon.setPosition(instance.GetX(), instance.GetY());
+    renderTarget.draw(edittimeIcon);
 }
 
 void DrawerObject::LoadEdittimeIcon()
 {
-    edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");
-    edittimeIcon.SetTexture(edittimeIconImage);
+    edittimeIconImage.loadFromFile("CppPlatform/Extensions/primitivedrawingicon.png");
+    edittimeIcon.setTexture(edittimeIconImage);
 }
 
 bool DrawerObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/primitivedrawingicon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void DrawerObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void DrawerObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     DrawerObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 
-wxPanel * DrawerObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+void RuntimeDrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    return NULL;
+    if      ( propertyNb == 0 ) {name = _("Fill color");    value = ToString(GetFillColorR())+";"+ToString(GetFillColorG())+";"+ToString(GetFillColorB());}
+    else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = ToString(GetFillOpacity());}
+    else if ( propertyNb == 2 ) {name = _("Outline size");         value = ToString(GetOutlineSize());}
+    else if ( propertyNb == 3 ) {name = _("Outline color");        value = ToString(GetOutlineColorR())+";"+ToString(GetOutlineColorG())+";"+ToString(GetOutlineColorB());}
+    else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = ToString(GetOutlineOpacity());}
 }
 
-void DrawerObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
-{
-}
-
-void DrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
-{
-    if      ( propertyNb == 0 ) {name = _("Fill color");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
-    else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = ToString(fillOpacity);}
-    else if ( propertyNb == 2 ) {name = _("Outline size");         value = ToString(outlineSize);}
-    else if ( propertyNb == 3 ) {name = _("Outline color");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
-    else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = ToString(outlineOpacity);}
-}
-
-bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeDrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 )
     {
@@ -321,78 +329,23 @@ bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
     return true;
 }
 
-unsigned int DrawerObject::GetNumberOfProperties() const
+unsigned int RuntimeDrawerObject::GetNumberOfProperties() const
 {
     return 5;
 }
 #endif
 
 /**
- * Get the real X position of the sprite
- */
-float DrawerObject::GetDrawableX() const
-{
-    return GetX();
-}
-
-/**
- * Get the real Y position of the text
- */
-float DrawerObject::GetDrawableY() const
-{
-    return GetY();
-}
-
-/**
- * Width
- */
-float DrawerObject::GetWidth() const
-{
-    return 32;
-}
-
-/**
- * Height
- */
-float DrawerObject::GetHeight() const
-{
-    return 32;
-}
-
-/**
- * X center is computed with text rectangle
- */
-float DrawerObject::GetCenterX() const
-{
-    return 16;
-}
-
-/**
- * Y center is computed with text rectangle
- */
-float DrawerObject::GetCenterY() const
-{
-    return 16;
-}
-
-/**
- * Nothing to do when updating time
- */
-void DrawerObject::UpdateTime(float)
-{
-}
-
-/**
  * Change the color filter of the sprite object
  */
-void DrawerObject::SetFillColor( unsigned int r, unsigned int g, unsigned int b )
+void DrawerObjectBase::SetFillColor( unsigned int r, unsigned int g, unsigned int b )
 {
     fillColorR = r;
     fillColorG = g;
     fillColorB = b;
 }
 
-void DrawerObject::SetFillOpacity(float val)
+void DrawerObjectBase::SetFillOpacity(float val)
 {
     if ( val > 255 )
         val = 255;
@@ -405,14 +358,14 @@ void DrawerObject::SetFillOpacity(float val)
 /**
  * Change the color filter of the sprite object
  */
-void DrawerObject::SetOutlineColor( unsigned int r, unsigned int g, unsigned int b )
+void DrawerObjectBase::SetOutlineColor( unsigned int r, unsigned int g, unsigned int b )
 {
     outlineColorR = r;
     outlineColorG = g;
     outlineColorB = b;
 }
 
-void DrawerObject::SetOutlineOpacity(float val)
+void DrawerObjectBase::SetOutlineOpacity(float val)
 {
     if ( val > 255 )
         val = 255;
@@ -425,7 +378,7 @@ void DrawerObject::SetOutlineOpacity(float val)
 /**
  * Change the fill color
  */
-void DrawerObject::SetFillColor( const std::string & color )
+void DrawerObjectBase::SetFillColor( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
 
@@ -439,7 +392,7 @@ void DrawerObject::SetFillColor( const std::string & color )
 /**
  * Change the color of the outline
  */
-void DrawerObject::SetOutlineColor( const std::string & color )
+void DrawerObjectBase::SetOutlineColor( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
 
@@ -450,44 +403,60 @@ void DrawerObject::SetOutlineColor( const std::string & color )
     outlineColorB = ToInt(colors[2]);
 }
 
-void DrawerObject::DrawRectangle( float x, float y, float x2, float y2 )
+void RuntimeDrawerObject::DrawRectangle( float x, float y, float x2, float y2 )
 {
-    float Xgap = absoluteCoordinates ? 0 : GetX();
-    float Ygap = absoluteCoordinates ? 0 : GetY();
+    float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
+    float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Rectangle(x+Xgap,
-                                                y+Ygap,
-                                                x2-x+Xgap,
-                                                y2-y+Ygap,
-                                                sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
-                                                outlineSize,
-                                                sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
+    DrawingCommand command(sf::RectangleShape(sf::Vector2f(x2-x+Xgap, y2-y+Ygap)));
+    command.rectangleShape.setPosition(x+Xgap, y+Ygap);
+    command.rectangleShape.setFillColor(sf::Color(GetFillColorR(), GetFillColorG(), GetFillColorB(), GetFillOpacity()));
+    command.rectangleShape.setOutlineThickness(GetOutlineSize());
+    command.rectangleShape.setOutlineColor(sf::Color(GetOutlineColorR(), GetOutlineColorG(), GetOutlineColorB(), GetOutlineOpacity()));
+
+    shapesToDraw.push_back(command);
 }
 
-void DrawerObject::DrawLine( float x, float y, float x2, float y2, float thickness )
+void RuntimeDrawerObject::DrawLine( float x, float y, float x2, float y2, float thickness )
 {
-    float Xgap = absoluteCoordinates ? 0 : GetX();
-    float Ygap = absoluteCoordinates ? 0 : GetY();
+    float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
+    float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Line(x+Xgap,
-                                                y+Ygap,
-                                                x2+Xgap,
-                                                y2+Ygap,
-                                                thickness,
-                                                sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
-                                                outlineSize,
-                                                sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
+    float length = sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2));
+    DrawingCommand command(sf::RectangleShape(sf::Vector2f(length, thickness)));
+    command.rectangleShape.setPosition((x+x2)/2+Xgap, (y+y2)/2+Ygap);
+    command.rectangleShape.setOrigin(length/2, thickness/2);
+    command.rectangleShape.setRotation(atan2(y2-y,x2-x)*180/3.14159);
+    command.rectangleShape.setFillColor(sf::Color(GetFillColorR(), GetFillColorG(), GetFillColorB(), GetFillOpacity()));
+    command.rectangleShape.setOutlineThickness(GetOutlineSize());
+    command.rectangleShape.setOutlineColor(sf::Color(GetOutlineColorR(), GetOutlineColorG(), GetOutlineColorB(), GetOutlineOpacity()));
+
+    shapesToDraw.push_back(command);
 }
 
-void DrawerObject::DrawCircle( float x, float y, float radius )
+void RuntimeDrawerObject::DrawCircle( float x, float y, float radius )
 {
-    float Xgap = absoluteCoordinates ? 0 : GetX();
-    float Ygap = absoluteCoordinates ? 0 : GetY();
+    float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
+    float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Circle(x+Xgap, y+Ygap, radius,
-                                             sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
-                                             outlineSize,
-                                             sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
+    sf::CircleShape circle(radius);
+    DrawingCommand command(circle);
+    command.circleShape.setPosition(x+Xgap, y+Ygap);
+    command.rectangleShape.setFillColor(sf::Color(GetFillColorR(), GetFillColorG(), GetFillColorB(), GetFillOpacity()));
+    command.rectangleShape.setOutlineThickness(GetOutlineSize());
+    command.rectangleShape.setOutlineColor(sf::Color(GetOutlineColorR(), GetOutlineColorG(), GetOutlineColorB(), GetOutlineOpacity()));
+
+    shapesToDraw.push_back(command);
+}
+
+void DestroyRuntimeDrawerObject(RuntimeObject * object)
+{
+    delete object;
+}
+
+RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object)
+{
+    return new RuntimeDrawerObject(scene, object);
 }
 
 /**
@@ -495,7 +464,7 @@ void DrawerObject::DrawCircle( float x, float y, float radius )
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyDrawerObject(Object * object)
+void DestroyDrawerObject(gd::Object * object)
 {
     delete object;
 }
@@ -504,7 +473,7 @@ void DestroyDrawerObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateDrawerObject(std::string name)
+gd::Object * CreateDrawerObject(std::string name)
 {
     return new DrawerObject(name);
 }

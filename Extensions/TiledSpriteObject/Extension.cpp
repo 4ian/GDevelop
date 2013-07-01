@@ -28,8 +28,8 @@ freely, subject to the following restrictions:
  * Florian Rival ( Minor changes, added offsets )
  */
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Version.h"
+#include "GDCpp/ExtensionBase.h"
+#include "GDCore/Tools/Version.h"
 #include "TiledSpriteObject.h"
 #include <boost/version.hpp>
 
@@ -38,242 +38,165 @@ freely, subject to the following restrictions:
  */
 class Extension : public ExtensionBase
 {
-    public:
+public:
 
-        /**
-         * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
-         */
-        Extension()
+    /**
+     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     */
+    Extension()
+    {
+        SetExtensionInformation("TiledSpriteObject",
+                              _("Tiled Sprite Object"),
+                              _("Extension allowing to use tiled sprite objects."),
+                              "Victor Levasseur",
+                              "zlib/libpng License ( Open Source )");
+
         {
-            DECLARE_THE_EXTENSION("TiledSpriteObject",
-                                  _("Tiled Sprite Object"),
-                                  _("Extension allowing to use tiled sprite objects."),
-                                  "Victor Levasseur",
-                                  "zlib/libpng License ( Open Source )")
+            gd::ObjectMetadata & obj = AddObject("TiledSprite",
+                       _("Tiled Sprite"),
+                       _("Displays an image repeated over an area"),
+                       "CppPlatform/Extensions/TiledSpriteIcon.png",
+                       &CreateTiledSpriteObject,
+                       &DestroyTiledSpriteObject);
 
-            DECLARE_OBJECT("TiledSprite",
-                           _("Tiled Sprite"),
-                           _("Object displaying a tiled sprite."),
-                           "CppPlatform/Extensions/TiledSpriteIcon.png",
-                           &CreateTiledSpriteObject,
-                           &DestroyTiledSpriteObject,
-                           "TiledSpriteObject");
-                #if defined(GD_IDE_ONLY)
-
-                objInfos.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-                DECLARE_OBJECT_ACTION("Width",
-                               _("Width"),
-                               _("Modify the width of a Tiled Sprite."),
-                               _("Do _PARAM2__PARAM1_ to the width of _PARAM0_"),
-                               _("Size and angle"),
-                               "res/actions/scaleWidth24.png",
-                               "res/actions/scaleWidth.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Width",
-                               _("Width"),
-                               _("Test the width of a Tiled Sprite."),
-                               _("The width of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Size and angle"),
-                               "res/conditions/scaleWidth24.png",
-                               "res/conditions/scaleWidth.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("Height",
-                               _("Height"),
-                               _("Modify the height of a Tiled Sprite."),
-                               _("Do _PARAM2__PARAM1_ to the height of _PARAM0_"),
-                               _("Size and angle"),
-                               "res/actions/scaleHeight24.png",
-                               "res/actions/scaleHeight.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Height",
-                               _("Height"),
-                               _("Test the height of a Tiled Sprite."),
-                               _("The height of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Size and angle"),
-                               "res/conditions/scaleHeight24.png",
-                               "res/conditions/scaleHeight.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("Angle",
-                               _("Angle"),
-                               _("Modify the angle of a Tiled Sprite."),
-                               _("Do _PARAM2__PARAM1_ to the angle of _PARAM0_"),
-                               _("Size and angle"),
-                               "res/actions/rotate24.png",
-                               "res/actions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Angle",
-                               _("Angle"),
-                               _("Test the angle of a Tiled Sprite."),
-                               _("The angle of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Size and angle"),
-                               "res/conditions/rotate24.png",
-                               "res/conditions/rotate.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("XOffset",
-                               _("Image X Offset"),
-                               _("Modify the offset used on the X axis when displaying the image."),
-                               _("Do _PARAM2__PARAM1_ to the X offset of _PARAM0_"),
-                               _("Image offset"),
-                               "res/conditions/scaleWidth24.png",
-                               "res/conditions/scaleWidth.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetXOffset").SetManipulatedType("number").SetAssociatedGetter("GetXOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("XOffset",
-                               _("Image X Offset"),
-                               _("Test the offset used on the X axis when displaying the image."),
-                               _("The X offset of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Image offset"),
-                               "res/conditions/scaleWidth24.png",
-                               "res/conditions/scaleWidth.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_ACTION("YOffset",
-                               _("Image Y Offset"),
-                               _("Modify the offset used on the Y axis when displaying the image."),
-                               _("Do _PARAM2__PARAM1_ to the Y offset of _PARAM0_"),
-                               _("Image offset"),
-                               "res/conditions/scaleWidth24.png",
-                               "res/conditions/scaleWidth.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value"), "", false);
-                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetYOffset").SetManipulatedType("number").SetAssociatedGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("YOffset",
-                               _("Image Y Offset"),
-                               _("Test the offset used on the Y axis when displaying the image."),
-                               _("The Y offset of _PARAM0_ is _PARAM2__PARAM1_"),
-                               _("Image offset"),
-                               "res/conditions/scaleWidth24.png",
-                               "res/conditions/scaleWidth.png");
-
-                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
-                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
-
-                    instrInfo.cppCallingInformation.SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-                DECLARE_END_OBJECT_CONDITION()
-                #endif
-
-            DECLARE_END_OBJECT()
-
-            CompleteCompilationInformation();
-        };
-        virtual ~Extension() {};
-
-    protected:
-    private:
-
-        /**
-         * This function is called by Game Develop so
-         * as to complete information about how the extension was compiled ( which libs... )
-         * -- Do not need to be modified. --
-         */
-        void CompleteCompilationInformation()
-        {
-            #if defined(GD_IDE_ONLY)
-            compilationInfo.runtimeOnly = false;
-            #else
-            compilationInfo.runtimeOnly = true;
-            #endif
-
-            #if defined(__GNUC__)
-            compilationInfo.gccMajorVersion = __GNUC__;
-            compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-            compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-            #endif
-
-            compilationInfo.boostVersion = BOOST_VERSION;
-
-            compilationInfo.sfmlMajorVersion = 2;
-            compilationInfo.sfmlMinorVersion = 0;
+            AddRuntimeObject(obj, "RuntimeTiledSpriteObject", CreateRuntimeTiledSpriteObject, DestroyRuntimeTiledSpriteObject);
 
             #if defined(GD_IDE_ONLY)
-            compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-            compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-            compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-            compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
+
+            obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+            obj.AddAction("Width",
+                           _("Width"),
+                           _("Modify the width of a Tiled Sprite."),
+                           _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                           _("Size and angle"),
+                           "res/actions/scaleWidth24.png",
+                           "res/actions/scaleWidth.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+            obj.AddCondition("Width",
+                           _("Width"),
+                           _("Test the width of a Tiled Sprite."),
+                           _("The width of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Size and angle"),
+                           "res/conditions/scaleWidth24.png",
+                           "res/conditions/scaleWidth.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+            obj.AddAction("Height",
+                           _("Height"),
+                           _("Modify the height of a Tiled Sprite."),
+                           _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                           _("Size and angle"),
+                           "res/actions/scaleHeight24.png",
+                           "res/actions/scaleHeight.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+            obj.AddCondition("Height",
+                           _("Height"),
+                           _("Test the height of a Tiled Sprite."),
+                           _("The height of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Size and angle"),
+                           "res/conditions/scaleHeight24.png",
+                           "res/conditions/scaleHeight.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+            obj.AddAction("Angle",
+                           _("Angle"),
+                           _("Modify the angle of a Tiled Sprite."),
+                           _("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
+                           _("Size and angle"),
+                           "res/actions/rotate24.png",
+                           "res/actions/rotate.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+            obj.AddCondition("Angle",
+                           _("Angle"),
+                           _("Test the angle of a Tiled Sprite."),
+                           _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Size and angle"),
+                           "res/conditions/rotate24.png",
+                           "res/conditions/rotate.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+            obj.AddAction("XOffset",
+                           _("Image X Offset"),
+                           _("Modify the offset used on the X axis when displaying the image."),
+                           _("Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"),
+                           _("Image offset"),
+                           "res/conditions/scaleWidth24.png",
+                           "res/conditions/scaleWidth.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetXOffset").SetManipulatedType("number").SetAssociatedGetter("GetXOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+            obj.AddCondition("XOffset",
+                           _("Image X Offset"),
+                           _("Test the offset used on the X axis when displaying the image."),
+                           _("The X offset of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Image offset"),
+                           "res/conditions/scaleWidth24.png",
+                           "res/conditions/scaleWidth.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+            obj.AddAction("YOffset",
+                           _("Image Y Offset"),
+                           _("Modify the offset used on the Y axis when displaying the image."),
+                           _("Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"),
+                           _("Image offset"),
+                           "res/conditions/scaleWidth24.png",
+                           "res/conditions/scaleWidth.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("operator", _("Modification's sign"))
+                .AddParameter("expression", _("Value"))
+                .codeExtraInformation.SetFunctionName("SetYOffset").SetManipulatedType("number").SetAssociatedGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+            obj.AddCondition("YOffset",
+                           _("Image Y Offset"),
+                           _("Test the offset used on the Y axis when displaying the image."),
+                           _("The Y offset of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Image offset"),
+                           "res/conditions/scaleWidth24.png",
+                           "res/conditions/scaleWidth.png")
+                .AddParameter("object", _("Object"), "TiledSprite", false)
+                .AddParameter("relationalOperator", _("Sign of the test"))
+                .AddParameter("expression", _("Value to test"))
+                .codeExtraInformation.SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
             #endif
 
-            compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-            compilationInfo.sizeOfpInt = sizeof(int*);
-
-            compilationInfo.informationCompleted = true;
         }
+
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+    };
+    virtual ~Extension() {};
 };
 
 /**

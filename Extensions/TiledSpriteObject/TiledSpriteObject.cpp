@@ -30,43 +30,43 @@ freely, subject to the following restrictions:
 #endif
 #include "TiledSpriteObject.h"
 #include <SFML/Graphics.hpp>
-#include "GDL/Object.h"
-#include "GDL/ImageManager.h"
-#include "GDL/FontManager.h"
-#include "GDL/Position.h"
-#include "GDL/Polygon.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "TiledSpriteObjectEditor.h"
-#include "TiledSpriteInitialPositionPanel.h"
 #endif
+
+using namespace std;
 
 TiledSpriteObject::TiledSpriteObject(std::string name_) :
     Object(name_),
     textureName(""),
     width(32),
-    height(32),
-    angle(0),
-    xOffset(0),
-    yOffset(0)
+    height(32)
 {
 }
 
-void TiledSpriteObject::LoadFromXml(const TiXmlElement * object)
+void TiledSpriteObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * object)
 {
     if (!object) return;
 
     textureName = object->Attribute("texture") ? std::string(object->Attribute("texture")) : "";
-    width = object->Attribute("width") ? ToFloat(object->Attribute("texture")) : 128;
-    height = object->Attribute("height") ? ToFloat(object->Attribute("texture")) : 128;
+    width = object->Attribute("width") ? ToFloat(object->Attribute("width")) : 128;
+    height = object->Attribute("height") ? ToFloat(object->Attribute("height")) : 128;
 }
 
 #if defined(GD_IDE_ONLY)
-void TiledSpriteObject::SaveToXml(TiXmlElement * object)
+void TiledSpriteObject::DoSaveToXml(TiXmlElement * object)
 {
     if (!object) return;
 
@@ -74,14 +74,12 @@ void TiledSpriteObject::SaveToXml(TiXmlElement * object)
     object->SetAttribute("width", width);
     object->SetAttribute("height", height);
 }
-#endif
 
-bool TiledSpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+void TiledSpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    texture =  imageMgr.GetSFMLTexture(textureName);
-
-    return true;
+    texture = project.GetImageManager()->GetSFMLTexture(textureName);
 }
+#endif
 
 namespace
 {
@@ -99,10 +97,33 @@ namespace
     }
 }
 
+RuntimeTiledSpriteObject::RuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object) :
+    RuntimeObject(scene, object),
+    width(32),
+    height(32),
+    xOffset(0),
+    yOffset(),
+    angle(0)
+{
+    const TiledSpriteObject & panelSpriteObject = static_cast<const TiledSpriteObject&>(object);
+
+    SetWidth(panelSpriteObject.GetWidth());
+    SetHeight(panelSpriteObject.GetHeight());
+
+    textureName = panelSpriteObject.textureName;
+    ChangeAndReloadImage(textureName, scene);
+}
+
+void RuntimeTiledSpriteObject::ChangeAndReloadImage(const std::string &txtName, const RuntimeScene &scene)
+{
+    textureName = txtName;
+    texture = scene.game->GetImageManager()->GetSFMLTexture(textureName);
+}
+
 /**
  * Render object at runtime
  */
-bool TiledSpriteObject::Draw( sf::RenderTarget& window )
+bool RuntimeTiledSpriteObject::Draw( sf::RenderTarget& window )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
@@ -123,12 +144,33 @@ bool TiledSpriteObject::Draw( sf::RenderTarget& window )
 }
 
 #if defined(GD_IDE_ONLY)
+sf::Vector2f TiledSpriteObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(width,height);
+}
+
 /**
  * Render object at edittime
  */
-bool TiledSpriteObject::DrawEdittime(sf::RenderTarget& window)
+void TiledSpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    return Draw(window);
+    if(!texture) return;
+
+    float width = instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultSize(instance, project, layout).x;
+    float height = instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultSize(instance, project, layout).y;
+    float xOffset = 0;
+    float yOffset = 0;
+
+    sf::Vector2f centerPosition = sf::Vector2f(instance.GetX()+width/2, instance.GetY()+height/2);
+    float angleInRad = instance.GetAngle()*3.14159/180.0;
+    texture->texture.setRepeated(true);
+    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
+                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
+                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset)),
+                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset))};
+
+    renderTarget.draw(vertices, 4, sf::Quads, &texture->texture);
+    texture->texture.setRepeated(false);
 }
 
 void TiledSpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
@@ -143,92 +185,42 @@ bool TiledSpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap 
     return true;
 }
 
-void TiledSpriteObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void TiledSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     TiledSpriteObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 }
 
-void TiledSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeTiledSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
     else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = _("Angle");       value = ToString(angle);}
 }
 
-bool TiledSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeTiledSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) {width = ToFloat(newValue);}
     else if ( propertyNb == 1 ) {height = ToFloat(newValue);}
+    else if ( propertyNb == 2 ) {angle = ToFloat(newValue);}
 
     return true;
 }
 
-unsigned int TiledSpriteObject::GetNumberOfProperties() const
+unsigned int RuntimeTiledSpriteObject::GetNumberOfProperties() const
 {
-    return 2;
+    return 3;
 }
 #endif
 
-/**
- * TiledSprite object provides a basic bounding box.
- */
-std::vector<Polygon2d> TiledSpriteObject::GetHitBoxes() const
+void DestroyRuntimeTiledSpriteObject(RuntimeObject * object)
 {
-    std::vector<Polygon2d> mask;
-    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
-    rectangle.Rotate(GetAngle()/180*3.14159);
-    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
-
-    mask.push_back(rectangle);
-    return mask;
+    delete object;
 }
 
-/**
- * Get the real X position of the box
- */
-float TiledSpriteObject::GetDrawableX() const
+RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object)
 {
-    return GetX();
-}
-
-/**
- * Get the real Y position of the box
- */
-float TiledSpriteObject::GetDrawableY() const
-{
-    return GetY();
-}
-
-/**
- * Width is the width of the current sprite.
- */
-float TiledSpriteObject::GetWidth() const
-{
-    return width;
-}
-
-/**
- * Height is the height of the current sprite.
- */
-float TiledSpriteObject::GetHeight() const
-{
-    return height;
-}
-
-/**
- * X center
- */
-float TiledSpriteObject::GetCenterX() const
-{
-    return width/2;
-}
-
-/**
- * Y center
- */
-float TiledSpriteObject::GetCenterY() const
-{
-    return height/2;
+    return new RuntimeTiledSpriteObject(scene, object);
 }
 
 /**
@@ -236,7 +228,7 @@ float TiledSpriteObject::GetCenterY() const
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyTiledSpriteObject(Object * object)
+void DestroyTiledSpriteObject(gd::Object * object)
 {
     delete object;
 }
@@ -245,7 +237,7 @@ void DestroyTiledSpriteObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateTiledSpriteObject(std::string name)
+gd::Object * CreateTiledSpriteObject(std::string name)
 {
     return new TiledSpriteObject(name);
 }

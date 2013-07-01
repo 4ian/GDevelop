@@ -26,17 +26,16 @@ freely, subject to the following restrictions:
 
 #ifndef TILEDSPRITEOBJECT_H
 #define TILEDSPRITEOBJECT_H
-#include "GDL/Object.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 #include <boost/shared_ptr.hpp>
 class SFMLTextureWrapper;
-class ImageManager;
 class RuntimeScene;
-class Object;
-class ImageManager;
-class InitialPosition;
+namespace gd { class ImageManager; }
+namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 #endif
@@ -44,56 +43,76 @@ namespace gd { class MainFrameWrapper; }
 /**
  * TiledSprite Object
  */
-class GD_EXTENSION_API TiledSpriteObject : public Object
+class GD_EXTENSION_API TiledSpriteObject : public gd::Object
 {
 public :
 
     TiledSpriteObject(std::string name_);
     virtual ~TiledSpriteObject() {};
-    virtual Object * Clone() const { return new TiledSpriteObject(*this);}
+    virtual gd::Object * Clone() const { return new TiledSpriteObject(*this);}
 
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    #if defined(GD_IDE_ONLY)
+    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    #endif
+
+    virtual float GetWidth() const { return width; };
+    virtual float GetHeight() const { return height; };
+
+    virtual void SetWidth(float newWidth) { width = newWidth; };
+    virtual void SetHeight(float newHeight) { height = newHeight; };
+
+    std::string textureName;
+
+private:
+
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
+    #endif
+
+    float width;
+    float height;
+    bool smooth;
+
+    boost::shared_ptr<SFMLTextureWrapper> texture;
+};
+
+class GD_EXTENSION_API RuntimeTiledSpriteObject : public RuntimeObject
+{
+public :
+
+    RuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeTiledSpriteObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeTiledSpriteObject(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
-    #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
-    #endif
-
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
-    #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
-    #endif
-
-    virtual float GetDrawableX() const;
-    virtual float GetDrawableY() const;
-
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
-
-    virtual float GetWidth() const;
-    virtual float GetHeight() const;
+    virtual float GetWidth() const { return width; };
+    virtual float GetHeight() const { return height; };
 
     virtual float GetAngle() const {return angle;};
     virtual bool SetAngle(float ang) {angle = ang; return true;};
 
-    virtual inline void SetWidth(float newWidth) { width = newWidth; };
-    virtual inline void SetHeight(float newHeight) { height = newHeight; };
+    virtual void SetWidth(float newWidth) { width = newWidth; };
+    virtual void SetHeight(float newHeight) { height = newHeight; };
 
     void SetXOffset(float xOffset_) { xOffset = xOffset_; };
     float GetXOffset() const { return xOffset; };
     void SetYOffset(float yOffset_) { yOffset = yOffset_; };
     float GetYOffset() const { return yOffset; };
 
-    virtual std::vector<Polygon2d> GetHitBoxes() const;
+    void ChangeAndReloadImage(const std::string &texture, const RuntimeScene &scene);
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
     std::string textureName;
 
@@ -109,8 +128,12 @@ private:
     boost::shared_ptr<SFMLTextureWrapper> texture;
 };
 
-void DestroyTiledSpriteObject(Object * object);
-Object * CreateTiledSpriteObject(std::string name);
+void DestroyTiledSpriteObject(gd::Object * object);
+gd::Object * CreateTiledSpriteObject(std::string name);
+
+void DestroyRuntimeTiledSpriteObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object);
+
 
 #endif // TILEDSPRITEOBJECT_H
 

@@ -33,9 +33,9 @@ freely, subject to the following restrictions:
 //*)
 #include <wx/log.h>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/Game.h"
-#include "GDL/CommonTools.h"
-#include "GDL/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
 #include "TiledSpriteObjectEditor.h"
 #include "TiledSpriteObject.h"
 
@@ -59,7 +59,7 @@ BEGIN_EVENT_TABLE(TiledSpriteObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-TiledSpriteObjectEditor::TiledSpriteObjectEditor( wxWindow* parent, Game & game_, TiledSpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+TiledSpriteObjectEditor::TiledSpriteObjectEditor( wxWindow* parent, gd::Project & game_, TiledSpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 game(game_),
 mainFrameWrapper(mainFrameWrapper_),
 object(object_)

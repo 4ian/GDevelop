@@ -40,7 +40,7 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 #include <wx/aui/aui.h>
-class Game;
+namespace gd { class Project; }
 class TiledSpriteObject;
 namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
@@ -49,7 +49,7 @@ class TiledSpriteObjectEditor: public wxDialog
 {
 	public:
 
-		TiledSpriteObjectEditor( wxWindow* parent, Game & game_, TiledSpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
+		TiledSpriteObjectEditor( wxWindow* parent, gd::Project & game_, TiledSpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~TiledSpriteObjectEditor();
 
 		//(*Declarations(TiledSpriteObjectEditor)
@@ -94,7 +94,7 @@ class TiledSpriteObjectEditor: public wxDialog
 		void OnimageBankBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		gd::MainFrameWrapper & mainFrameWrapper;
 		TiledSpriteObject & object;
 

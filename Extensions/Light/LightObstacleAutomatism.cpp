@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,14 +27,15 @@ freely, subject to the following restrictions:
 #include "LightObstacleAutomatism.h"
 #include "LightObstacleAutomatismEditor.h"
 #include "LightObject.h"
-#include "GDL/Scene.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/XmlMacros.h"
+#include "GDCpp/Scene.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/XmlMacros.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <cmath>
 
-LightObstacleAutomatism::LightObstacleAutomatism(std::string automatismTypeName) :
-    Automatism(automatismTypeName),
+LightObstacleAutomatism::LightObstacleAutomatism() :
+    Automatism(),
     disabled(false)
 {
 }
@@ -52,7 +53,7 @@ LightObstacleAutomatism::~LightObstacleAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void LightObstacleAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
+void LightObstacleAutomatism::EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
     /*LightObstacleAutomatismEditor editor(parent, game_, scene, *this, gd::MainFrameWrapper_);
     editor.ShowModal();*/
@@ -75,13 +76,13 @@ sf::Vector2f LightObstacleAutomatism::RotatePoint( const sf::Vector2f& Point, fl
 void LightObstacleAutomatism::DoStepPostEvents(RuntimeScene & scene)
 {
     //Get a manager for the scene
-    if ( LightObject::lightManagersList[&scene].expired() )
+    if ( RuntimeLightObject::lightManagersList[&scene].expired() )
     {
         manager = boost::shared_ptr<Light_Manager>(new Light_Manager);
-        LightObject::lightManagersList[&scene] = manager;
+        RuntimeLightObject::lightManagersList[&scene] = manager;
     }
     else
-        manager = LightObject::lightManagersList[&scene].lock();
+        manager = RuntimeLightObject::lightManagersList[&scene].lock();
 
     if ( disabled || (objectOldX == object->GetX() && objectOldY == object->GetY() && objectOldAngle == object->GetAngle() &&
          objectOldHeight == object->GetHeight() && objectOldWidth == object->GetWidth()) )
@@ -143,14 +144,3 @@ void LightObstacleAutomatism::OnActivate()
     if ( object )
         objectOldX = object->GetX()-42; //Force refreshing walls.
 }
-
-#if defined(GD_IDE_ONLY)
-void LightObstacleAutomatism::SaveToXml(TiXmlElement * elem) const
-{
-}
-#endif
-
-void LightObstacleAutomatism::LoadFromXml(const TiXmlElement * elem)
-{
-}
-

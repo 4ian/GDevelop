@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,12 +27,13 @@ freely, subject to the following restrictions:
 #ifndef LightObject_H
 #define LightObject_H
 
-#include "GDL/Object.h"
-#include "LightManager.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
+#include "Light.h"
 namespace sf
 {
     class Sprite;
@@ -40,72 +41,86 @@ namespace sf
     class Shader;
     class RenderTexture;
 }
-class ImageManager;
+namespace gd { class ImageManager; }
 class RuntimeScene;
-class Object;
-class Scene;
-class ImageManager;
-class InitialPosition;
+namespace gd { class Object; }
+namespace gd { class Layout; }
+namespace gd { class ImageManager; }
+namespace gd { class InitialInstance; }
 class RuntimeSceneLightObstacleDatas;
+class Light_Manager;
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
+namespace gd { class Project; }
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
 #endif
 
-/**
- * Light Object
+/** \brief Light Object used for storage and the IDE
  */
-class GD_EXTENSION_API LightObject : public Object
+class GD_EXTENSION_API LightObject : public gd::Object
 {
 public :
 
     LightObject(std::string name_);
     virtual ~LightObject() {};
-    virtual Object * Clone() const { return new LightObject(*this);}
+    virtual gd::Object * Clone() const { return new LightObject(*this);}
 
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr);
-    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    #if defined(GD_IDE_ONLY)
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    static void LoadEdittimeIcon();
+    #endif
+
+    float GetIntensity() const { return light.GetIntensity(); };
+    float GetRadius() const { return light.GetRadius(); };
+    int GetQuality() const { return light.GetQuality(); };
+    sf::Color GetColor() const { return light.GetColor(); };
+
+    void SetIntensity(float intensity) { light.SetIntensity(intensity); };
+    void SetRadius(float radius) { light.SetRadius(radius); };
+    void SetQuality(int quality) { light.SetQuality(quality); };
+    void SetColor(const sf::Color & color) { light.SetColor(color); };
+
+    bool IsGlobalLight() const { return globalLight; };
+    void SetGlobalLight(bool global) { globalLight = global; };
+    sf::Color GetGlobalColor() const { return globalLightColor; };
+    void SetGlobalColor(const sf::Color & color) { globalLightColor = color; };
+
+private:
+    Light light; ///< Light object used to store the parameters. This object is *never* rendered.
+
+    bool globalLight;
+    sf::Color globalLightColor;
+
+    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSaveToXml(TiXmlElement * elemScene);
+
+    static sf::Texture edittimeIconImage;
+    static sf::Sprite edittimeIcon;
+    #endif
+};
+
+/** \brief Light object used by the game engine.
+ */
+class GD_EXTENSION_API RuntimeLightObject : public RuntimeObject
+{
+public :
+
+    RuntimeLightObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeLightObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeLightObject(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
-    #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
-    static void LoadEdittimeIcon();
-
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
-    #endif
-
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
-    #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
-    #endif
-
-    virtual void UpdateTime(float timeElapsed);
-
     virtual void OnPositionChanged();
 
-    virtual float GetWidth() const;
-    virtual float GetHeight() const;
-    virtual void SetWidth(float ) {};
-    virtual void SetHeight(float ) {};
-
-    virtual float GetDrawableX() const;
-    virtual float GetDrawableY() const;
-
-    virtual float GetCenterX() const;
-    virtual float GetCenterY() const;
+    virtual float GetWidth() const { return 32; };
+    virtual float GetHeight() const { return 32; };
 
     virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
     virtual float GetAngle() const {return angle;};
@@ -135,12 +150,15 @@ public :
      */
     void SetColor(const std::string & color);
 
-    virtual std::vector<Polygon2d> GetHitBoxes() const;
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-    static std::map<const Scene*, boost::weak_ptr<Light_Manager> > lightManagersList;
+    static std::map<const gd::Layout*, boost::weak_ptr<Light_Manager> > lightManagersList;
 
 private:
-
     void UpdateGlobalLightMembers();
 
     float angle;
@@ -153,18 +171,13 @@ private:
     bool globalLight;
     boost::shared_ptr<sf::RenderTexture> globalLightImage;
     sf::Color globalLightColor;
-
-    static sf::Shader commonBlurEffect;
-    static bool commonBlurEffectLoaded;
-
-    #if defined(GD_IDE_ONLY)
-    static sf::Texture edittimeIconImage;
-    static sf::Sprite edittimeIcon;
-    #endif
 };
 
-void DestroyLightObject(Object * object);
-Object * CreateLightObject(std::string name);
+void DestroyLightObject(gd::Object * object);
+gd::Object * CreateLightObject(std::string name);
+
+void DestroyRuntimeLightObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // LightObject_H
 

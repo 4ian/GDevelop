@@ -14,19 +14,18 @@ Light::Light()
 Light::Light(sf::Vector2f position, float intensity, float radius, int quality, sf::Color color)
  : m_position(position), m_intensity(intensity), m_radius(radius), m_color(color), m_quality(quality)
 {
+    shapes.setPrimitiveType(sf::Triangles);
 }
 
 Light::~Light()
 {
-    m_shape.clear();
+    shapes.clear();
 }
 
 
 void Light::Draw(sf::RenderTarget *App)
 {
-    // On boucle sur m_shape pour afficher tous les triangles.
-    for(int i=0;i<(int)m_shape.size();i++)
-        App->Draw(m_shape[i]);
+    App->draw(shapes, sf::BlendAdd);
 }
 
 sf::Vector2f Intersect(sf::Vector2f p1, sf::Vector2f p2, sf::Vector2f q1, sf::Vector2f q2)
@@ -97,6 +96,10 @@ void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std:
         sf::Vector2f l1((*IterWall)->pt1.x-m_position.x, (*IterWall)->pt1.y-m_position.y);
         sf::Vector2f l2((*IterWall)->pt2.x-m_position.x, (*IterWall)->pt2.y-m_position.y);
 
+        //Discard walls that are too far.
+        if( (l1.x * l1.x + l1.y * l1.y + l2.x * l2.x + l2.y * l2.y)/2 > (m_radius * m_radius)*1.5)
+            continue;
+
         if(l1.x * l1.x + l1.y * l1.y < m_radius * m_radius)
         {
             sf::Vector2f i = Intersect(pt1,pt2,sf::Vector2f (0,0),l1);
@@ -140,35 +143,31 @@ void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std:
     float intensity;
 
     // On ajoute un shape
-    m_shape.push_back(sf::Shape ());
-
     // On lui donne comme point de départ (0,0), le centre de la lumière, avec la couleur et intensité maximal
-    m_shape.back().AddPoint(0, 0,  sf::Color((int)(m_intensity*m_color.r/255),
-                                             (int)(m_intensity*m_color.g/255),
-                                             (int)(m_intensity*m_color.b/255)),sf::Color(255,255,255));
+    shapes.append(sf::Vertex(m_position, sf::Color((int)(m_intensity*m_color.r/255),
+                                                   (int)(m_intensity*m_color.g/255),
+                                                   (int)(m_intensity*m_color.b/255))));
 
     // On calcul ou l'on se trouve par rapport au centre, pour savoir à quel intensité on est
     intensity=m_intensity-sqrt(pt1.x*pt1.x + pt1.y*pt1.y)*m_intensity/m_radius;
     // Et on ajoute un  point au shape
-    m_shape.back().AddPoint(pt1.x, pt1.y,  sf::Color((int)(intensity*m_color.r/255),
-                                                     (int)(intensity*m_color.g/255),
-                                                     (int)(intensity*m_color.b/255)),sf::Color(255,255,255));
+    shapes.append(sf::Vertex(sf::Vector2f(pt1.x,pt1.y)+m_position,
+                             sf::Color((int)(intensity*m_color.r/255),
+                                       (int)(intensity*m_color.g/255),
+                                       (int)(intensity*m_color.b/255))));
 
     // Idem
     intensity=m_intensity-sqrt(pt2.x*pt2.x + pt2.y*pt2.y)*m_intensity/m_radius;
-    m_shape.back().AddPoint(pt2.x, pt2.y,  sf::Color((int)(intensity*m_color.r/255),
-                                                     (int)(intensity*m_color.g/255),
-                                                     (int)(intensity*m_color.b/255)),sf::Color(255,255,255));
-
-    // On met que le shape soit en Add et on lui donne sa position
-    m_shape.back().SetBlendMode(sf::Blend::Add);
-    m_shape.back().SetPosition(m_position);
+    shapes.append(sf::Vertex(sf::Vector2f(pt2.x,pt2.y)+m_position,
+                             sf::Color((int)(intensity*m_color.r/255),
+                                       (int)(intensity*m_color.g/255),
+                                       (int)(intensity*m_color.b/255))));
 }
 
 void Light::Generate(std::vector <Wall*> &m_wall)
 {
     // On vide la mémoire
-    m_shape.clear();
+    shapes.clear();
 
     // buf est l'angle de chaque triangle, c'est donc 2pi divisé par le nombre de triangles
     float buf=(M_PI*2)/(float)m_quality;

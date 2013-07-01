@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,19 +27,19 @@ freely, subject to the following restrictions:
 #ifndef RUNTIMESCENELIGHTOBSTACLEDATAS_H
 #define RUNTIMESCENELIGHTOBSTACLEDATAS_H
 #include <vector>
-#include "GDL/AutomatismsRuntimeSharedDatas.h"
+#include "GDCpp/AutomatismsRuntimeSharedData.h"
 class SceneLightObstacleDatas;
 class LightObstacleAutomatism;
 
 /**
  * Datas shared by A Star Automatism at runtime
  */
-class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public AutomatismsRuntimeSharedDatas
+class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public AutomatismsRuntimeSharedData
 {
 public:
     RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas);
     virtual ~RuntimeSceneLightObstacleDatas();
-    virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneLightObstacleDatas(*this));}
+    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneLightObstacleDatas(*this));}
 
     float gridWidth;
     float gridHeight;

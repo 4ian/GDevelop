@@ -22,7 +22,7 @@ Directional_light::~Directional_light()
 
 void Directional_light::Generate(std::vector<Wall*> &m_wall)
 {
-    m_shape.clear();
+    shapes.clear();
 
     float angle     = m_angle * M_PI / 180;
     float o_angle   = m_opening_angle * M_PI / 180;

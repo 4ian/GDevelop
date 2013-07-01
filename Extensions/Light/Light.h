@@ -4,10 +4,10 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Shape.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 namespace sf
 {
-    class Shape;
+    class ConvexShape;
     class RenderTarget;
 }
 
@@ -68,7 +68,8 @@ class GD_EXTENSION_API Light
 
 
     //Tableau dynamique de Shape, ce sont ces shapes de type triangle qui compose la lumière
-    std::vector <sf::Shape> m_shape;
+    sf::VertexArray shapes; ///< The vertices composing the light
+    //std::vector <sf::Vertex> m_shape;
 
     private :
 

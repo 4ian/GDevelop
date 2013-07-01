@@ -4,7 +4,7 @@
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
 Game Develop - Light Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 arising from the use of this software.
 
 Permission is granted to anyone to use this software for any purpose,
@@ -27,15 +27,15 @@ freely, subject to the following restrictions:
 #ifndef LIGHTOBSTACLEAUTOMATISM_H
 #define LIGHTOBSTACLEAUTOMATISM_H
 
-#include "GDL/Automatism.h"
-#include "GDL/Object.h"
+#include "GDCpp/Automatism.h"
+#include "GDCpp/RuntimeObject.h"
 #include "Light.h"
 #include "LightManager.h"
 #include <map>
 #include <set>
-#include "GDL/RuntimeScene.h"
+#include "GDCpp/RuntimeScene.h"
 class TiXmlElement;
-class Scene;
+namespace gd { class Layout; }
 class LightObstacleAutomatismEditor;
 
 /**
@@ -43,64 +43,52 @@ class LightObstacleAutomatismEditor;
  */
 class GD_EXTENSION_API LightObstacleAutomatism : public Automatism
 {
-    friend class LightObstacleAutomatismEditor;
+friend class LightObstacleAutomatismEditor;
 
-    public:
-        LightObstacleAutomatism(std::string automatismTypeName);
-        virtual ~LightObstacleAutomatism();
-        virtual Automatism* Clone() const { return new LightObstacleAutomatism(*this);}
+public:
+    LightObstacleAutomatism();
+    virtual ~LightObstacleAutomatism();
+    virtual Automatism* Clone() const { return new LightObstacleAutomatism(*this);}
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Save Automatism to XML
-         */
-        virtual void SaveToXml(TiXmlElement * elem) const;
-        #endif
+    /**
+     * Access to the object owning the automatism
+     */
+    inline RuntimeObject * GetObject() {return object;};
 
-        /**
-         * Load Automatism from XML
-         */
-        virtual void LoadFromXml(const TiXmlElement * elem);
+    /**
+     * Access to the object owning the automatism
+     */
+    inline const RuntimeObject * GetObject() const {return object;};
 
-        /**
-         * Access to the object owning the automatism
-         */
-        inline Object * GetObject() {return object;};
+    virtual void OnDeActivate();
+    virtual void OnActivate();
 
-        /**
-         * Access to the object owning the automatism
-         */
-        inline const Object * GetObject() const {return object;};
+private:
 
-        virtual void OnDeActivate();
-        virtual void OnActivate();
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Called when user wants to edit the automatism.
+     */
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
+    #endif
 
-    private:
+    virtual void DoStepPostEvents(RuntimeScene & scene);
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Called when user wants to edit the automatism.
-         */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
-        #endif
+    /**
+     * Tool function
+     */
+    sf::Vector2f RotatePoint( const sf::Vector2f& point, float angle );
 
-        virtual void DoStepPostEvents(RuntimeScene & scene);
+    std::vector <Wall*> wallsOfObject;
+    float objectOldX;
+    float objectOldY;
+    float objectOldAngle;
+    float objectOldWidth;
+    float objectOldHeight;
 
-        /**
-         * Tool function
-         */
-        sf::Vector2f RotatePoint( const sf::Vector2f& point, float angle );
+    bool disabled;
 
-        std::vector <Wall*> wallsOfObject;
-        float objectOldX;
-        float objectOldY;
-        float objectOldAngle;
-        float objectOldWidth;
-        float objectOldHeight;
-
-        bool disabled;
-
-        boost::shared_ptr<Light_Manager> manager;
+    boost::shared_ptr<Light_Manager> manager;
 };
 
 #endif // LIGHTOBSTACLEAUTOMATISM_H

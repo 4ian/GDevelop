@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -35,10 +35,12 @@ freely, subject to the following restrictions:
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Project.h"
 #include "LightObject.h"
 #include "SceneLightObstacleDatas.h"
+
+using namespace std;
 
 //(*IdInit(LightObjectEditor)
 const long LightObjectEditor::ID_STATICTEXT1 = wxNewId();
@@ -63,7 +65,7 @@ BEGIN_EVENT_TABLE(LightObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-LightObjectEditor::LightObjectEditor( wxWindow* parent, Game & game_, LightObject & object_ ) :
+LightObjectEditor::LightObjectEditor( wxWindow* parent, gd::Project & game_, LightObject & object_ ) :
 game(game_),
 object(object_)
 {

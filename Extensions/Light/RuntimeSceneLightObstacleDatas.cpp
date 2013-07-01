@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,10 +28,7 @@ freely, subject to the following restrictions:
 #include "SceneLightObstacleDatas.h"
 #include <iostream>
 
-RuntimeSceneLightObstacleDatas::RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas) :
-gridWidth(automatismSharedDatas.gridWidth),
-gridHeight(automatismSharedDatas.gridHeight),
-diagonalMove(automatismSharedDatas.diagonalMove)
+RuntimeSceneLightObstacleDatas::RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas)
 {
 }
 

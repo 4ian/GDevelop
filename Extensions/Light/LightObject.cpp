@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,43 +28,42 @@ freely, subject to the following restrictions:
 #include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
-#include "GDL/Object.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/ImageManager.h"
-#include "GDL/tinyxml/tinyxml.h"
-#include "GDL/FontManager.h"
-#include "GDL/XmlMacros.h"
-#include "GDL/Position.h"
-#include "GDL/Polygon.h"
-#include "GDL/CommonTools.h"
+#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/XmlMacros.h"
+#include "GDCpp/Position.h"
+#include "GDCpp/Polygon.h"
+#include "GDCpp/CommonTools.h"
 #include "LightObject.h"
 #include "LightManager.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/CommonTools.h"
+#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "LightObjectEditor.h"
 #endif
 
-std::map<const Scene*, boost::weak_ptr<Light_Manager> >  LightObject::lightManagersList;
-sf::Shader LightObject::commonBlurEffect;
-bool LightObject::commonBlurEffectLoaded = false;
+using namespace std;
+
+std::map<const gd::Layout*, boost::weak_ptr<Light_Manager> >  RuntimeLightObject::lightManagersList;
 #if defined(GD_IDE_ONLY)
 sf::Texture LightObject::edittimeIconImage;
 sf::Sprite LightObject::edittimeIcon;
 #endif
 
 LightObject::LightObject(std::string name_) :
-Object(name_),
-angle(0),
-light(sf::Vector2f(GetX(),GetY()), 150, 128, 16, sf::Color(255,255,255)),
-globalLight(false),
-globalLightColor(128,128,128,150)
+    Object(name_),
+    light(sf::Vector2f(0,0)/*(Useless)*/, 150, 128, 16, sf::Color(255,255,255)),
+    globalLight(false),
+    globalLightColor(128,128,128,150)
 {
 }
 
-void LightObject::LoadFromXml(const TiXmlElement * elem)
+void LightObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elem)
 {
     {
         float intensity = 255;
@@ -109,7 +108,7 @@ void LightObject::LoadFromXml(const TiXmlElement * elem)
 }
 
 #if defined(GD_IDE_ONLY)
-void LightObject::SaveToXml(TiXmlElement * elem)
+void LightObject::DoSaveToXml(TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_DOUBLE("intensity", GetIntensity());
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_DOUBLE("radius", GetRadius());
@@ -127,13 +126,16 @@ void LightObject::SaveToXml(TiXmlElement * elem)
 }
 #endif
 
-bool LightObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr)
+RuntimeLightObject::RuntimeLightObject(RuntimeScene & scene, const gd::Object & object) :
+    RuntimeObject(scene, object),
+    angle(0)
 {
-    return true;
-}
+    const LightObject & lightObject = static_cast<const LightObject&>(object);
 
-bool LightObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
-{
+    globalLight = lightObject.IsGlobalLight();
+    globalLightColor = lightObject.GetGlobalColor();
+    light = Light(sf::Vector2f(GetX(),GetY()), lightObject.GetIntensity(), lightObject.GetRadius(), lightObject.GetQuality(), lightObject.GetColor());
+
     //Get a manager for the scene
     if ( lightManagersList[&scene].expired() )
     {
@@ -143,21 +145,20 @@ bool LightObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageMa
     else
         manager = lightManagersList[&scene].lock();
 
-    //Load ( only once during program use ) the common blur effect, shared by all lights.
-    if ( !commonBlurEffectLoaded )
+    //Load ( only once for each scene ) the common blur effect, shared by all lights.
+    if ( !manager->commonBlurEffectLoaded )
     {
-        commonBlurEffect.LoadFromMemory("uniform sampler2D texture;\nuniform float offset;\n\nvoid main()\n{\n	vec2 offx = vec2(offset, 0.0);\n	vec2 offy = vec2(0.0, offset);\n\n	vec4 pixel = texture2D(texture, gl_TexCoord[0].xy)               * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy - offy)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy + offy)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx - offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx + offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx - offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx + offy) * 1;\n\n	gl_FragColor =  gl_Color * (pixel / 13.0);\n}\n");
-        commonBlurEffect.SetCurrentTexture("texture");
+        manager->commonBlurEffect.loadFromMemory("uniform sampler2D texture;\nuniform float offset;\n\nvoid main()\n{\n	vec2 offx = vec2(offset, 0.0);\n	vec2 offy = vec2(0.0, offset);\n\n	vec4 pixel = texture2D(texture, gl_TexCoord[0].xy)               * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy - offy)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy + offy)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx - offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx + offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx - offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx + offy) * 1;\n\n	gl_FragColor =  gl_Color * (pixel / 13.0);\n}\n",
+                                        sf::Shader::Fragment);
+        manager->commonBlurEffect.setParameter("texture", sf::Shader::CurrentTexture);
 
-        commonBlurEffectLoaded = true;
+        manager->commonBlurEffectLoaded = true;
     }
 
     UpdateGlobalLightMembers();
-
-    return true;
 }
 
-void LightObject::UpdateGlobalLightMembers()
+void RuntimeLightObject::UpdateGlobalLightMembers()
 {
     if ( globalLight )
     {
@@ -173,51 +174,44 @@ void LightObject::UpdateGlobalLightMembers()
 }
 
 /**
- * Update animation and direction from the inital position
- */
-bool LightObject::InitializeFromInitialPosition(const InitialPosition & position)
-{
-    return true;
-}
-
-/**
  * Render object at runtime
  */
-bool LightObject::Draw( sf::RenderTarget& window )
+bool RuntimeLightObject::Draw( sf::RenderTarget& window )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
     if ( !manager ) return false;
 
-    if ( updateClock.GetElapsedTime() > 25 ) //Update each 25 milliseconds
+    if ( updateClock.getElapsedTime().asMilliseconds() > 25 )
     {
         light.Generate(manager->walls);
-        updateClock.Reset();
+        updateClock.restart(); //Update each 25 milliseconds
     }
 
     if ( globalLight )
     {
         //Create render image
-        if ( globalLightImage->GetWidth() != window.GetWidth() || globalLightImage->GetHeight() != window.GetHeight() )
-            globalLightImage->Create(window.GetWidth(), window.GetHeight());
+        if ( globalLightImage->getSize().x != window.getSize().x || globalLightImage->getSize().y != window.getSize().y )
+            globalLightImage->create(window.getSize().x, window.getSize().y);
 
         //Render light on an intermediate image
-        globalLightImage->Clear(globalLightColor);
-        globalLightImage->SetView(window.GetView());
-        //light.SetPosition(sf::Vector2f(light.GetPosition().x-(window.GetView().GetCenter().x-window.GetView().GetSize().x/2), light.GetPosition().y-(window.GetView().GetCenter().y-window.GetView().GetSize().y/2)));
+        globalLightImage->clear(globalLightColor);
+        globalLightImage->setView(window.getView());
         light.Draw(globalLightImage.get());
-        globalLightImage->Display();
+        globalLightImage->display();
 
         //Display the intermediate image
         sf::Sprite sprite;
-        sprite.SetTexture(globalLightImage->GetTexture());
-        sprite.SetBlendMode(sf::Blend::Multiply);
-        commonBlurEffect.SetParameter("offset",0.005 * 1);
+        sprite.setTexture(globalLightImage->getTexture());
+        manager->commonBlurEffect.setParameter("offset",0.005 * 1);
 
-        window.SetView(sf::View(sf::FloatRect(0,0,window.GetWidth(), window.GetHeight())));
-        window.Draw(sprite, commonBlurEffect);
-        window.SetView(globalLightImage->GetView());
+        window.setView(sf::View(sf::FloatRect(0,0,window.getSize().x, window.getSize().y)));
+        sf::RenderStates renderStates;
+        renderStates.blendMode = sf::BlendMultiply;
+        renderStates.shader = &manager->commonBlurEffect;
+        window.draw(sprite, renderStates);
+        window.setView(globalLightImage->getView());
     }
     else
     {
@@ -228,58 +222,45 @@ bool LightObject::Draw( sf::RenderTarget& window )
     /*for (unsigned int i = 0;i<manager->walls.size();++i)
     {
         sf::Shape shape = sf::Shape::Line(manager->walls[i]->pt1, manager->walls[i]->pt2, 1, sf::Color(255,0,0));
-        window.Draw(shape);
+        window.draw(shape);
     }*/
 
     return true;
 }
 
 #if defined(GD_IDE_ONLY)
-/**
- * Render object at edittime
- */
-bool LightObject::DrawEdittime(sf::RenderTarget& renderWindow)
+void LightObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    edittimeIcon.SetPosition(GetX(), GetY());
-    renderWindow.Draw(edittimeIcon);
+    edittimeIcon.setPosition(instance.GetX(), instance.GetY());
+    renderTarget.draw(edittimeIcon);
+}
 
-    return true;
+sf::Vector2f LightObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(32,32);
 }
 
 void LightObject::LoadEdittimeIcon()
 {
-    edittimeIconImage.LoadFromFile("Extensions/lightIcon32.png");
-    edittimeIconImage.SetSmooth(false);
-    edittimeIcon.SetTexture(edittimeIconImage);
-}
-
-void LightObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
-{
+    edittimeIconImage.loadFromFile("CppPlatform/Extensions/lightIcon32.png");
+    edittimeIconImage.setSmooth(false);
+    edittimeIcon.setTexture(edittimeIconImage);
 }
 
 bool LightObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/lightIcon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/lightIcon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void LightObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void LightObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
     LightObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 
-wxPanel * LightObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
-{
-    return NULL;
-}
-
-void LightObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
-{
-}
-
-void LightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if ( propertyNb == 0 ) {name = _("Color");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
     else if ( propertyNb == 1 ) {name = _("Intensity");       value = ToString(GetIntensity());}
@@ -287,7 +268,7 @@ void LightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name,
     else if ( propertyNb == 2 ) {name = _("Quality");       value = ToString(GetQuality());}
 }
 
-bool LightObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -321,18 +302,18 @@ bool LightObject::ChangeProperty(unsigned int propertyNb, string newValue)
     return true;
 }
 
-unsigned int LightObject::GetNumberOfProperties() const
+unsigned int RuntimeLightObject::GetNumberOfProperties() const
 {
     return 2;
 }
 #endif
 
-void LightObject::OnPositionChanged()
+void RuntimeLightObject::OnPositionChanged()
 {
     light.SetPosition(sf::Vector2f(GetX(),GetY()));
 }
 
-void LightObject::SetColor(const std::string & colorStr)
+void RuntimeLightObject::SetColor(const std::string & colorStr)
 {
     vector < string > colors = SplitString<string>(colorStr, ';');
 
@@ -341,7 +322,7 @@ void LightObject::SetColor(const std::string & colorStr)
     SetColor(sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]) ));
 }
 
-void LightObject::SetGlobalColor(const std::string & colorStr)
+void RuntimeLightObject::SetGlobalColor(const std::string & colorStr)
 {
     vector < string > colors = SplitString<string>(colorStr, ';');
 
@@ -350,73 +331,14 @@ void LightObject::SetGlobalColor(const std::string & colorStr)
     SetGlobalColor(sf::Color( ToInt(colors[0]),ToInt(colors[1]),ToInt(colors[2]) ));
 }
 
-/**
- * LightObject provides a basic bounding box.
- */
-std::vector<Polygon2d> LightObject::GetHitBoxes() const
+void DestroyRuntimeLightObject(RuntimeObject * object)
 {
-    std::vector<Polygon2d> mask;
-    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
-    rectangle.Rotate(GetAngle()/180*3.14159);
-    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
-
-    mask.push_back(rectangle);
-    return mask;
+    delete object;
 }
 
-/**
- * Get the real X position of the sprite
- */
-float LightObject::GetDrawableX() const
+RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object)
 {
-    return GetX();
-}
-
-/**
- * Get the real Y position of the text
- */
-float LightObject::GetDrawableY() const
-{
-    return GetY();
-}
-
-/**
- * Width is the width of the current sprite.
- */
-float LightObject::GetWidth() const
-{
-    return 32;
-}
-
-/**
- * Height is the height of the current sprite.
- */
-float LightObject::GetHeight() const
-{
-    return 32;
-}
-
-/**
- * X center is computed with text rectangle
- */
-float LightObject::GetCenterX() const
-{
-    return 16;
-}
-
-/**
- * Y center is computed with text rectangle
- */
-float LightObject::GetCenterY() const
-{
-    return 16;
-}
-
-/**
- * Nothing to do when updating time
- */
-void LightObject::UpdateTime(float)
-{
+    return new RuntimeLightObject(scene, object);
 }
 
 /**
@@ -424,7 +346,7 @@ void LightObject::UpdateTime(float)
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroyLightObject(Object * object)
+void DestroyLightObject(gd::Object * object)
 {
     delete object;
 }
@@ -433,7 +355,7 @@ void DestroyLightObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateLightObject(std::string name)
+gd::Object * CreateLightObject(std::string name)
 {
     return new LightObject(name);
 }

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Light Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -40,7 +40,7 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
 //*)
-class Game;
+namespace gd { class Project; }
 class LightObject;
 namespace gd { class MainFrameWrapper; }
 
@@ -48,7 +48,7 @@ class LightObjectEditor: public wxDialog
 {
 	public:
 
-		LightObjectEditor( wxWindow* parent, Game & game_, LightObject & object_ );
+		LightObjectEditor( wxWindow* parent, gd::Project & game_, LightObject & object_ );
 		virtual ~LightObjectEditor();
 
 		//(*Declarations(LightObjectEditor)
@@ -96,7 +96,7 @@ class LightObjectEditor: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		LightObject & object;
 
 		DECLARE_EVENT_TABLE()

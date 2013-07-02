@@ -10,7 +10,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/IDE/MetadataProvider.h"
-#include "GDCore/CommonTOols.h"
+#include "GDCore/CommonTools.h"
 
 using namespace std;
 

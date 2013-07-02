@@ -34,7 +34,7 @@ public:
      *
      * \param dir The directory where platforms must be searched for.
      *
-     * \todo For now, only gdl.dll is loaded ( Assumed to be in CppPlatform directory ).
+     * \todo For now, only GDCpp.dll and GDJS.dll are loaded.
      */
     static void LoadAllPlatformsInManager(std::string dir);
 

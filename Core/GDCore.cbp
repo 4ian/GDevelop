@@ -204,6 +204,7 @@
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-network" />
 					<Add option="-lsfml-system" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -231,6 +232,7 @@
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-network" />
 					<Add option="-lsfml-system" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 		</Build>

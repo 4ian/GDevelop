@@ -26,7 +26,7 @@ class GD_CORE_API Resource
 {
 public:
     Resource() {};
-    ~Resource() {};
+    virtual ~Resource() {};
     virtual Resource* Clone() const { return new Resource(*this);}
 
     /** \brief Change the name of the resource with the name passed as parameter.
@@ -145,7 +145,7 @@ class GD_CORE_API ImageResource : public Resource
 {
 public:
     ImageResource() : Resource(), smooth(true), alwaysLoaded(false) { SetKind("image"); };
-    ~ImageResource() {};
+    virtual ~ImageResource() {};
     virtual ImageResource* Clone() const { return new ImageResource(*this);}
 
     /**

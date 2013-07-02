@@ -2,12 +2,12 @@
  *  Game Develop
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
-#include "GDcore/IDE/MetadataProvider.h"
-#include "GDcore/PlatformDefinition/Platform.h"
-#include "GDcore/PlatformDefinition/PlatformExtension.h"
-#include "GDcore/Events/InstructionMetadata.h"
-#include "GDcore/Events/AutomatismMetadata.h"
-#include "GDcore/Events/ObjectMetadata.h"
+#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/ObjectMetadata.h"
 #include <string>
 
 using namespace std;

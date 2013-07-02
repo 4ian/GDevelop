@@ -131,6 +131,7 @@ public:
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
         ExtraInformation() : accessType(Reference) {};
+        virtual ~ExtraInformation() {};
 
         /**
          * Set the C++ function name which will be used when generating the C++ code.

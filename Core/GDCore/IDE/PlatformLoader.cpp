@@ -35,12 +35,24 @@ PlatformLoader::PlatformLoader()
 void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
 {
     {
-        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("gdl.dll");
+        #if defined(WINDOWS)
+        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("GDCpp.dll");
+        #elif defined(LINUX)
+        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.so");
+        #else
+        #warning Add the appropriate filename here for the C++ Platform!
+        #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform);
     }
 
     {
+        #if defined(WINDOWS)
         boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.dll");
+        #elif defined(LINUX)
+        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.so");
+        #else
+        #warning Add the appropriate filename here for the Js Platform!
+        #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
     }
 }

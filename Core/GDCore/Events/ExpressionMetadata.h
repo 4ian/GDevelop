@@ -64,6 +64,8 @@ public:
     class ExtraInformation
     {
     public:
+        virtual ~ExtraInformation() {};
+
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
@@ -170,6 +172,8 @@ public:
     class ExtraInformation
     {
     public:
+        virtual ~ExtraInformation() {};
+
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */

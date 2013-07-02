@@ -463,8 +463,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "CppPlatform/Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable gdl.dll"+_(" in compilation directory.\n" )));
+            if ( wxCopyFile( "CppPlatform/Runtime/GDCpp.dll", tempDir + "/GDCpp.dll", true ) == false )
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"GDCpp.dll"+_(" in compilation directory.\n" )));
 
         }
         //Fichiers pour linux
@@ -476,16 +476,16 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "CppPlatform/Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "CppPlatform/Runtime/libgdl.so", tempDir + "/libgdl.so", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libgdl.so"+_(" in compilation directory.\n" )));
+            if ( wxCopyFile( "CppPlatform/Runtime/libgdl.so", tempDir + "/libGDCpp.so", true ) == false )
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libGDCpp.so"+_(" in compilation directory.\n" )));
         }
         if ( macTarget )
         {
             if ( wxCopyFile( "CppPlatform/MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "CppPlatform/MacRuntime/libgdl.dylib", tempDir + "/libgdl.dylib", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libgdl.dylib"+_(" in compilation directory.\n" )));
+            if ( wxCopyFile( "CppPlatform/MacRuntime/libGDCpp.dylib", tempDir + "/libGDCpp.dylib", true ) == false )
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libGDCpp.dylib"+_(" in compilation directory.\n" )));
         }
 
         //Copie du tout dans le répertoire final
@@ -506,8 +506,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/internalstart.exe", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "CppPlatform/Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable gdl.dll"+_(" in compilation directory.\n" )));
+            if ( wxCopyFile( "CppPlatform/Runtime/GDCpp.dll", tempDir + "/GDCpp.dll", true ) == false )
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"GDCpp.dll"+_(" in compilation directory.\n" )));
 
             //Use 7zip to create a single archive
             diagnosticManager.OnMessage( gd::ToString( _("Exporting game... ( Compressing )") ) );

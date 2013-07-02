@@ -28,7 +28,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -71,7 +71,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -114,7 +114,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -160,7 +160,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -203,7 +203,7 @@
 					<Add directory="../ExtLibs/llvm/build/include" />
 				</Compiler>
 				<Linker>
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -250,7 +250,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -264,7 +264,7 @@
 					<Add directory="../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/release/MacExe" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../Runtime/bin/release/MacExe" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/release/MacExe" />
 				</ExtraCommands>
 			</Target>
@@ -289,7 +289,7 @@
 					<Add directory="../ExtLibs/llvm/build/include" />
 				</Compiler>
 				<Linker>
-					<Add option="-lgdl" />
+					<Add option="-lGDCpp" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -305,14 +305,14 @@
 					<Add directory="../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/debug/MacExe" />
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../Runtime/bin/debug/MacExe" />
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/debug/MacExe" />
 				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-fexceptions" />
-			<Add directory="../GDL" />
+			<Add directory="../GDCpp" />
 			<Add directory="../ExtLibs/boost" />
 			<Add directory="../ExtLibs/SFML/include" />
 			<Add directory="../Core" />

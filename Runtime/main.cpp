@@ -13,22 +13,21 @@
 #include <unistd.h>
 #endif
 
-#include "GDL/CommonTools.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/RessourcesLoader.h"
-#include "GDL/FontManager.h"
-#include "GDL/SoundManager.h"
-#include "GDL/OpenSaveLoadingScreen.h"
-#include "GDL/SceneNameMangler.h"
-#include "GDL/Project.h"
-#include "GDL/ImageManager.h"
-#include "GDL/CodeExecutionEngine.h"
-#include "GDL/CppPlatform.h"
-#include "GDL/ExtensionsLoader.h"
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/FontManager.h"
+#include "GDCpp/SoundManager.h"
+#include "GDCpp/SceneNameMangler.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/ImageManager.h"
+#include "GDCpp/CodeExecutionEngine.h"
+#include "GDCpp/CppPlatform.h"
+#include "GDCpp/ExtensionsLoader.h"
 #include "CompilationChecker.h"
-#include "GDL/Log.h"
-#include "GDL/Tools/AES.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCpp/Log.h"
+#include "GDCpp/Tools/AES.h"
+#include "GDCpp/tinyxml/tinyxml.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -65,8 +64,8 @@ int main( int argc, char *p_argv[] )
         #error Please update this part to support your target system.
     #endif
 
-    //Check GDL version
-    CompilationChecker::EnsureCorrectGDLVersion();
+    //Check GDCpp version
+    CompilationChecker::EnsureCorrectGDVersion();
 
     //Load extensions
     gd::ExtensionsLoader::LoadAllExtensions(".", CppPlatform::Get());

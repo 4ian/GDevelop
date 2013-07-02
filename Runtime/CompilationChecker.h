@@ -2,12 +2,12 @@
 #define COMPILATIONCHECKER_H
 
 /**
- * Class used to ensure that the main executable is using a correct version of gdl.[dll/so].
+ * Class used to ensure that the main executable is using a correct version of GDCpp.[dll/so].
  */
 class CompilationChecker
 {
     public:
-        static bool EnsureCorrectGDLVersion();
+        static bool EnsureCorrectGDVersion();
 };
 
 #endif // COMPILATIONCHECKER_H

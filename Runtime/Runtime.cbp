@@ -144,7 +144,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-fno-stack-protector" />
+					
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -189,7 +189,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-fno-stack-protector" />
+					
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -235,7 +235,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-fno-stack-protector" />
+					
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -276,7 +276,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-fno-stack-protector" />
+					
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />

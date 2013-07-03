@@ -264,6 +264,8 @@ void NewProjectDialog::OnResize(wxSizeEvent& event)
 
 void NewProjectDialog::UpdateListColumnsWidth()
 {
+    if ( templateList->GetColumnCount() <= 1 ) return; //The dialog is not ready ( Can sometimes happens on Linux ).
+
     templateList->SetColumnWidth(0, templateList->GetSize().GetWidth()*2.0/5.0-5);
     templateList->SetColumnWidth(1, templateList->GetSize().GetWidth()*3.0/5.0-5);
     platformList->SetColumnWidth(0, platformList->GetSize().GetWidth()-10);

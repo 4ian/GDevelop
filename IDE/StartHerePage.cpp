@@ -111,11 +111,11 @@ mainEditor(mainEditor_)
 	FlexGridSizer3->Add(newProjectLink, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap9 = new wxStaticBitmap(this, ID_STATICBITMAP9, wxBitmap(wxImage(_T("res/modesimpleicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP9"));
 	FlexGridSizer3->Add(StaticBitmap9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl6 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL18, _("Read Getting Started Guide"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL18"));
+	HyperlinkCtrl6 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL18, _("Read the Getting Started page"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL18"));
 	FlexGridSizer3->Add(HyperlinkCtrl6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap10 = new wxStaticBitmap(this, ID_STATICBITMAP10, wxBitmap(wxImage(_T("res/tutoicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP10"));
 	FlexGridSizer3->Add(StaticBitmap10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl7 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL19, _("Read the tutorial"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL19"));
+	HyperlinkCtrl7 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL19, _("Read the tutorials"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL19"));
 	FlexGridSizer3->Add(HyperlinkCtrl7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(384,9,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -333,7 +333,7 @@ void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials"));
 }
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)

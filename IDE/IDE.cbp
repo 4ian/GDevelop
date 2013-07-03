@@ -316,8 +316,6 @@
 					<Add option="-O3" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-finput-charset=iso-8859-1" />
-					<Add option="-fno-stack-protector" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
@@ -368,8 +366,6 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-m32" />
-					<Add option="-finput-charset=iso-8859-1" />
-					<Add option="-fno-stack-protector" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
@@ -600,6 +596,8 @@
 		<Unit filename="GeneratePassword.h">
 			<Option virtualFolder="Editeurs/Editeur Scene/EditorEvents/Edition evenement/Choix/" />
 		</Unit>
+		<Unit filename="Dialogs/ReminderDialog.cpp" />
+		<Unit filename="Dialogs/ReminderDialog.h" />
 		<Unit filename="ImageEditor.cpp" />
 		<Unit filename="ImageEditor.h" />
 		<Unit filename="ImportImage.cpp">
@@ -701,6 +699,7 @@
 		<Unit filename="wxsmith/LayoutEditorPropertiesPnl.wxs" />
 		<Unit filename="wxsmith/NewProjectDialog.wxs" />
 		<Unit filename="wxsmith/ProjectPropertiesPnl.wxs" />
+		<Unit filename="wxsmith/ReminderDialog.wxs" />
 		<Unit filename="wxstedit/include/wx/stedit/pairarr.h" />
 		<Unit filename="wxstedit/include/wx/stedit/setup.h" />
 		<Unit filename="wxstedit/include/wx/stedit/setup0.h" />
@@ -798,6 +797,7 @@
 					<wxDialog wxs="wxsmith/NewProjectDialog.wxs" src="Dialogs\NewProjectDialog.cpp" hdr="Dialogs\NewProjectDialog.h" fwddecl="0" i18n="1" name="NewProjectDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/HelpViewerDlg.wxs" src="Dialogs\HelpViewerDlg.cpp" hdr="Dialogs\HelpViewerDlg.h" fwddecl="0" i18n="1" name="HelpViewerDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/LayoutEditorPropertiesPnl.wxs" src="Dialogs\LayoutEditorPropertiesPnl.cpp" hdr="Dialogs\LayoutEditorPropertiesPnl.h" fwddecl="0" i18n="1" name="LayoutEditorPropertiesPnl" language="CPP" />
+					<wxDialog wxs="wxsmith/ReminderDialog.wxs" src="Dialogs\ReminderDialog.cpp" hdr="Dialogs\ReminderDialog.h" fwddecl="0" i18n="1" name="ReminderDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

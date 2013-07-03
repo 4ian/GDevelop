@@ -82,7 +82,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL18" variable="HyperlinkCtrl6" member="yes">
-													<label>Read Getting Started Guide</label>
+													<label>Read the Getting Started page</label>
 													<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 													<handler function="OnguideBtClick" entry="EVT_HYPERLINK" />
 												</object>
@@ -101,7 +101,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL19" variable="HyperlinkCtrl7" member="yes">
-													<label>Read the tutorial</label>
+													<label>Read the tutorials</label>
 													<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 													<handler function="OntutoBtClick" entry="EVT_HYPERLINK" />
 												</object>

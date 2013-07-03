@@ -50,6 +50,7 @@
 #include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
+#include "Dialogs/ReminderDialog.h"
 
 using namespace gd;
 
@@ -356,6 +357,24 @@ bool Game_Develop_EditorApp::OnInit()
             }
         }
     }
+
+    //Pay what you want reminder
+    {
+        int result = 3;
+        Config->Read( "Startup/Reminder", &result );
+        if ( result > 0 )
+        {
+            result--;
+            Config->Write( "Startup/Reminder", result);
+        }
+        if ( result == 0 )
+        {
+            ReminderDialog dialog(mainEditor);
+            dialog.ShowModal();
+        }
+
+    }
+
 
     return true;
 

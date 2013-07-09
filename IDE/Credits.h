@@ -51,7 +51,6 @@ class Credits: public wxDialog
 		wxPanel* Panel4;
 		wxStaticText* StaticText6;
 		wxStaticBitmap* StaticBitmap1;
-		wxBitmapButton* BitmapButton9;
 		wxBitmapButton* BitmapButton10;
 		wxHyperlinkCtrl* HyperlinkCtrl5;
 		wxStaticText* StaticText8;
@@ -104,7 +103,6 @@ class Credits: public wxDialog
 		static const long ID_BITMAPBUTTON3;
 		static const long ID_STATICTEXT6;
 		static const long ID_BITMAPBUTTON1;
-		static const long ID_BITMAPBUTTON4;
 		static const long ID_BITMAPBUTTON5;
 		static const long ID_PANEL4;
 		static const long ID_NOTEBOOK1;

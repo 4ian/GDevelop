@@ -47,7 +47,6 @@ const long Credits::ID_BITMAPBUTTON12 = wxNewId();
 const long Credits::ID_BITMAPBUTTON3 = wxNewId();
 const long Credits::ID_STATICTEXT6 = wxNewId();
 const long Credits::ID_BITMAPBUTTON1 = wxNewId();
-const long Credits::ID_BITMAPBUTTON4 = wxNewId();
 const long Credits::ID_BITMAPBUTTON5 = wxNewId();
 const long Credits::ID_PANEL4 = wxNewId();
 const long Credits::ID_NOTEBOOK1 = wxNewId();
@@ -170,15 +169,12 @@ Credits::Credits(wxWindow* parent)
 	BitmapButton7->SetDefault();
 	GridSizer1->Add(BitmapButton7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText6 = new wxStaticText(Panel4, ID_STATICTEXT6, _("The Web platform is written in Javascript and uses jQuery and Pixi.js"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText6 = new wxStaticText(Panel4, ID_STATICTEXT6, _("The Web platform is written in Javascript and uses Pixi.js"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer12->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	GridSizer3 = new wxGridSizer(0, 3, 0, 0);
+	GridSizer3 = new wxGridSizer(0, 2, 0, 0);
 	BitmapButton8 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/powered-js.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
 	BitmapButton8->SetDefault();
 	GridSizer3->Add(BitmapButton8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BitmapButton9 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON4, wxBitmap(wxImage(_T("res/powered-jquery.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON4"));
-	BitmapButton9->SetDefault();
-	GridSizer3->Add(BitmapButton9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton10 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON5, wxBitmap(wxImage(_T("res/powered-pixijs.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON5"));
 	BitmapButton10->SetDefault();
 	GridSizer3->Add(BitmapButton10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -207,7 +203,6 @@ Credits::Credits(wxWindow* parent)
 	Connect(ID_BITMAPBUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnWxBtClick);
 	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnTinyXmlBtClick);
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnJSBtClick);
-	Connect(ID_BITMAPBUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnJQueryBtClick);
 	Connect(ID_BITMAPBUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnPixiJsBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnOkBtClick);
 	//*)

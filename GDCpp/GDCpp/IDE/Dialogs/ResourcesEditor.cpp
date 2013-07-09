@@ -1099,7 +1099,7 @@ void ResourcesEditor::OnpreviewPanelPaint(wxPaintEvent& event)
         dc.SetBrush(wxColour(255,255,255));
         dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-        wxString text = _("Choose a resource in the\nlist on the left to display it.\n\n");
+        wxString text = _("Choose a resource in the\nlist to display it.\n\n");
         text += useRibbon ? _("You can add and\nmodify resources using the ribbon.") : _("You can add and\nmodify resources using the toolbar");
         dc.DrawLabel(text, wxRect(wxPoint(0,0), size),wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
     }

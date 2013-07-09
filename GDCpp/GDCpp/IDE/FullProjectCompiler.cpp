@@ -476,7 +476,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "CppPlatform/Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "CppPlatform/Runtime/libgdl.so", tempDir + "/libGDCpp.so", true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/libGDCpp.so", tempDir + "/libGDCpp.so", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libGDCpp.so"+_(" in compilation directory.\n" )));
         }
         if ( macTarget )

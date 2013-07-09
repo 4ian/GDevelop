@@ -49,9 +49,9 @@ std::string CodeCompilerCall::GetFullCall() const
 
     std::vector<std::string> args;
     args.push_back("-m32");
+    #if defined(WINDOWS)
     args.push_back("-nostdinc");
     args.push_back("-nostdinc++");
-    #if defined(WINDOWS)
     args.push_back("-B\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin\"");
     #else
     args.push_back("--sysroot=\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/include/linux\"");
@@ -158,7 +158,11 @@ std::string CodeCompilerCall::GetFullCall() const
             args.push_back("-L\""+baseDir+"\"");
             args.push_back("-L\""+baseDir+"CppPlatform/Runtime/\"");
             args.push_back("-L\""+baseDir+"CppPlatform/Extensions/Runtime/\"");
+            #if defined(WINDOWS)
             args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.a\"");
+            #else
+            args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.so\"");
+            #endif
         }
 
         args.push_back("-lstdc++");

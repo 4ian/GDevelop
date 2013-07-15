@@ -60,7 +60,6 @@ void ChangesNotifier::OnObjectGroupDeleted(gd::Project & project, gd::Layout * l
 
 void ChangesNotifier::OnObjectsDeleted(gd::Project & project, gd::Layout * layout, const std::vector<std::string> & deletedObjects) const
 {
-    RequestAutomatismsSharedDataUpdate(project, layout);
     RequestFullRecompilation(project, layout);
 }
 
@@ -77,19 +76,16 @@ void ChangesNotifier::OnAutomatismEdited(gd::Project & game, gd::Layout * scene,
 
 void ChangesNotifier::OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const
 {
-    RequestAutomatismsSharedDataUpdate(project, layout);
     RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const
 {
-    RequestAutomatismsSharedDataUpdate(project, layout);
     RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const
 {
-    RequestAutomatismsSharedDataUpdate(project, layout);
     RequestFullRecompilation(project, layout);
 }
 
@@ -239,17 +235,6 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
         {
             game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
         }
-    }
-}
-
-void ChangesNotifier::RequestAutomatismsSharedDataUpdate(gd::Project & game, gd::Layout * scene) const
-{
-    if ( scene )
-        scene->UpdateAutomatismsSharedData(game);
-    else //Scene pointer is NULL: Update shared data of all scenes
-    {
-        for (unsigned int i = 0;i<game.GetLayoutCount();++i)
-            game.GetLayout(i).UpdateAutomatismsSharedData(game);
     }
 }
 

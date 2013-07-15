@@ -4,52 +4,38 @@
 FileExtension::FileExtension()
 {
     SetExtensionInformation("BuiltinFile",
-                          _("Files"),
-                          _("Built-in extension providing functions for manipulation files."),
+                          _("Storage and files"),
+                          _("Built-in extension providing functions to store data and manipulate files."),
                           "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
 
-    AddCondition("FileExists",
-                   _("A file exists"),
-                   _("Test if the file exists."),
-                   _("The file _PARAM0_ exists"),
-                   _("Files"),
-                   "res/conditions/fichier24.png",
-                   "res/conditions/fichier.png")
-        .AddParameter("file", _("Filename"), "",false)
-        .codeExtraInformation.SetFunctionName("FileExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
-
-
-
     AddCondition("GroupExists",
                    _("Existence of a group"),
-                   _("Test if a group ( Example : Root/Level/3 ) exists in the file.\nWarning ! Spaces are forbidden in group's names."),
-                   _("The group _PARAM1_ exists in file _PARAM0_"),
-                   _("XML Files"),
+                   _("Test if an element ( Example : PlayerState/CurrentLevel ) exists in the file.\nWarning! Spaces are forbidden in element's names."),
+                   _("_PARAM1_ exists in file _PARAM0_"),
+                   _("Storage"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
         .AddParameter("string", _("Group"), "",false)
         .codeExtraInformation.SetFunctionName("GroupExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
-
-
     AddAction("LoadFile",
-                   _("Load a XML file in memory"),
-                   _("This action load the xml file in memory, so as to write and read it.\nYou can open and write without using this action, but it will be slower.\nIf you use this action, do not forget to unload the file from memory."),
-                   _("Load XML File _PARAM0_ in memory"),
-                   _("XML Files"),
+                   _("Load a structured file in memory"),
+                   _("This action load the structured file in memory, so as to write and read it.\nYou can open and write without using this action, but it will be slower.\nIf you use this action, do not forget to unload the file from memory.\n\nFor the native platform, the file format is XML."),
+                   _("Load structured file _PARAM0_ in memory"),
+                   _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
         .codeExtraInformation.SetFunctionName("LoadFileInMemory").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
     AddAction("UnloadFile",
-                   _("Close a XML file loaded in memory"),
-                   _("This action close the XML file previously loaded in memory, saving all changes made."),
-                   _("Close XML File _PARAM0_"),
-                   _("XML Files"),
+                   _("Close a structured file"),
+                   _("This action close the structured file previously loaded in memory, saving all changes made."),
+                   _("Close structured file _PARAM0_"),
+                   _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
@@ -57,9 +43,9 @@ FileExtension::FileExtension()
 
     AddAction("EcrireFichierExp",
                    _("Write a value"),
-                   _("This action write the result of the expression in the file, in the specified group.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in group's names."),
+                   _("Write the result of the expression in the file, in the specified element.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
                    _("Write _PARAM2_ in _PARAM1_ of file _PARAM0_"),
-                   _("XML Files"),
+                   _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
@@ -69,9 +55,9 @@ FileExtension::FileExtension()
 
     AddAction("EcrireFichierTxt",
                    _("Write a text"),
-                   _("This action write the text in the file, in the specified group.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in group's names."),
+                   _("Write the text in the file, in the specified element.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
                    _("Write _PARAM2_ in _PARAM1_ of file _PARAM0_"),
-                   _("XML Files"),
+                   _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
@@ -81,9 +67,9 @@ FileExtension::FileExtension()
 
     AddAction("LireFichierExp",
                    _("Read a value"),
-                   _("This action read the value saved in the specified group and\nsave it in a variable.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)^nWarning ! Spaces are forbidden in group's names."),
-                   _("Read group _PARAM1_ from file _PARAM0_ and save value in _PARAM3_"),
-                   _("XML Files"),
+                   _("Read the value saved in the specified element and\nstore it in a variable.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Read _PARAM1_ from file _PARAM0_ and store value in _PARAM3_"),
+                   _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
@@ -94,9 +80,9 @@ FileExtension::FileExtension()
 
     AddAction("LireFichierTxt",
                    _("Read a text"),
-                   _("This action read the text saved in the specified group and\nsave it in a variable.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)^nWarning ! Spaces are forbidden in group's names."),
-                   _("Read group _PARAM1_ from file _PARAM0_ and save text in _PARAM3_"),
-                   _("XML Files"),
+                   _("ead the text saved in the specified element and\nstore it in a variable.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Read _PARAM1_ from file _PARAM0_ and store as text in _PARAM3_"),
+                   _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
@@ -104,6 +90,17 @@ FileExtension::FileExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Scene variables"), "",false)
         .codeExtraInformation.SetFunctionName("ReadStringFromFile").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
+
+    AddAction("DeleteGroupFichier",
+                   _("Delete an element"),
+                   _("This action delete the specified element from the structured file.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Delete _PARAM1_ from the file _PARAM0_"),
+                   _("Storage"),
+                   "res/actions/delete24.png",
+                   "res/actions/delete.png")
+        .AddParameter("file", _("Filename"), "",false)
+        .AddParameter("string", _("Group"), "",false)
+        .codeExtraInformation.SetFunctionName("DeleteGroupFromFile").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
     AddAction("DeleteFichier",
                    _("Delete a file"),
@@ -115,16 +112,15 @@ FileExtension::FileExtension()
         .AddParameter("file", _("Filename"), "",false)
         .codeExtraInformation.SetFunctionName("GDDeleteFile").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
-    AddAction("DeleteGroupFichier",
-                   _("Delete a group"),
-                   _("This action delete the specified group from the XML file.\nIndicate the structure leading to the group by separing elements with / (Example : Root/Level/Current)"),
-                   _("Delete the group _PARAM1_ from the file _PARAM0_"),
-                   _("XML Files"),
-                   "res/actions/delete24.png",
-                   "res/actions/delete.png")
+    AddCondition("FileExists",
+                   _("A file exists"),
+                   _("Test if the file exists."),
+                   _("The file _PARAM0_ exists"),
+                   _("Files"),
+                   "res/conditions/fichier24.png",
+                   "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
-        .AddParameter("string", _("Group"), "",false)
-        .codeExtraInformation.SetFunctionName("DeleteGroupFromFile").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("FileExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
     AddAction("LaunchFile",
                    _("Launch a file"),

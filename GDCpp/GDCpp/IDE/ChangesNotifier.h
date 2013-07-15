@@ -59,12 +59,6 @@ private:
      * to be compiled, as well as its dependencies.
      */
     void RequestFullRecompilation(gd::Project & project, gd::Layout * layout) const;
-
-    /**
-     * A common task when a changes have been made is to update the shared data of automatisms,
-     * which are stored in scenes.
-     */
-    void RequestAutomatismsSharedDataUpdate(gd::Project & project, gd::Layout * layout) const;
 };
 
 #endif // CHANGESNOTIFIER_H

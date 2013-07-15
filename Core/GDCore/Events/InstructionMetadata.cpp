@@ -7,7 +7,9 @@
 namespace gd
 {
 InstructionMetadata::InstructionMetadata() :
-    sentence(gd::ToString(_("Unknown or unsupported instruction")))
+    sentence(gd::ToString(_("Unknown or unsupported instruction"))),
+    canHaveSubInstructions(false),
+    hidden(true)
 {
 }
 

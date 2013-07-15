@@ -81,13 +81,24 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 {
     if ( !grid || !object ) return false;
 
+    //Check if the object is global
+    bool globalObject = false;
+    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    {
+        if ( &project.GetObject(i) == object )
+        {
+            globalObject = true;
+            break;
+        }
+    }
+
     if ( event.GetColumn() == 1) //Manage button-like properties
     {
         if ( event.GetPropertyName() == _("Edit") )
         {
             object->EditObject(grid, project, mainFrameWrapper);
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, layout, *object);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : layout, *object);
 
             //Reload resources : Do not forget to switch the working directory.
             wxString oldWorkingDir = wxGetCwd();
@@ -104,7 +115,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             if ( dialog.ShowModal() == 1 )
             {
                 for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectVariablesChanged(project, layout, *object);
+                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectVariablesChanged(project, globalObject ? NULL : layout, *object);
 
                 return true;
             }
@@ -131,8 +142,9 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
                     autoName = metadata.GetDefaultName()+ToString(j);
 
                 object->AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
+                UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
                 for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, layout, *object, object->GetAutomatism(autoName));
+                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, globalObject ? NULL : layout, *object, object->GetAutomatism(autoName));
 
                 return true;
             }
@@ -151,9 +163,10 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             if ( selection == -1 ) return false;
 
             object->RemoveAutomatism(automatisms[selection]);
+            UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismDeleted(project, layout, *object, automatisms[selection]);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismDeleted(project, globalObject ? NULL : layout, *object, automatisms[selection]);
 
             return true;
         }
@@ -170,9 +183,10 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 
             std::string oldName = automatism.GetName();
             automatism.SetName(newName);
+            UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismRenamed(project, layout, *object, automatism, oldName);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismRenamed(project, globalObject ? NULL : layout, *object, automatism, oldName);
 
             return true;
         }
@@ -184,9 +198,9 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 
             gd::Automatism & automatism = object->GetAutomatism(autoName);
 
-            automatism.EditAutomatism(grid, project, layout, mainFrameWrapper);
+            automatism.EditAutomatism(grid, project, layout, mainFrameWrapper); //EditAutomatism always need a valid layout!
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismEdited(project, layout, *object, automatism);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismEdited(project, globalObject ? NULL : layout, *object, automatism);
         }
     }
 
@@ -197,9 +211,20 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
 {
     if ( !grid || !object ) return false;
 
+    //Check if the object is global
+    bool globalObject = false;
+    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    {
+        if ( &project.GetObject(i) == object )
+        {
+            globalObject = true;
+            break;
+        }
+    }
+
     if ( event.GetPropertyName() == _("Object name") )
     {
-        std::string oldName = object->GetName();
+        /*std::string oldName = object->GetName();
         std::string newName = gd::ToString(event.GetPropertyValue().GetString());
 
         //Be sure the name is valid
@@ -213,12 +238,12 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
             return false;
         }
 
-        if ( (layout && layout->HasObjectNamed(newName)) ||
-             (!layout && project.HasObjectNamed(newName)) ) return false;
+        if ( (!globalObject && layout && layout->HasObjectNamed(newName)) ||
+             (globalObject && project.HasObjectNamed(newName)) ) return false;
 
         object->SetName( newName );
 
-        if ( layout ) //Change the object name in the layout.
+        if ( !globalObject && layout ) //Change the object name in the layout.
         {
             gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, *layout, layout->GetEvents(), oldName, newName);
             layout->GetInitialInstances().RenameInstancesOfObject(oldName, newName);
@@ -231,13 +256,54 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
                 }
             }
         }
-        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, layout, *object, oldName);
+        else if ( globalObject ) //Change the object name in all layouts
+        {
+            for (unsigned int g = 0;g<project.GetObjectGroups().size();++g)
+            {
+                if ( project.GetObjectGroups()[g].Find(oldName))
+                {
+                    project.GetObjectGroups()[g].RemoveObject(oldName);
+                    project.GetObjectGroups()[g].AddObject(newName);
+                }
+            }
 
-        return true;
+            for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+            {
+                gd::Layout & layout = project.GetLayout(i);
+                if ( layout.HasObjectNamed(oldName) ) continue;
+
+                gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), oldName, newName);
+                layout.GetInitialInstances().RenameInstancesOfObject(oldName, newName);
+                for (unsigned int g = 0;g<layout.GetObjectGroups().size();++g)
+                {
+                    if ( layout.GetObjectGroups()[g].Find(oldName))
+                    {
+                        layout.GetObjectGroups()[g].RemoveObject(oldName);
+                        layout.GetObjectGroups()[g].AddObject(newName);
+                    }
+                }
+
+            }
+        }
+
+        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObject ? NULL : layout, *object, oldName);
+
+        return true;*/
     }
 
     return false;
+}
+
+void ObjectsPropgridHelper::UpdateAutomatismsSharedData(gd::Project & project, gd::Layout * scene) const
+{
+    if ( scene )
+        scene->UpdateAutomatismsSharedData(project);
+    else //Scene pointer is NULL: Update shared data of all scenes
+    {
+        for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+            project.GetLayout(i).UpdateAutomatismsSharedData(project);
+    }
 }
 
 }

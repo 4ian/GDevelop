@@ -186,8 +186,6 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
-					
-					
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
@@ -216,8 +214,6 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-g" />
-					
-					
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
@@ -525,7 +521,7 @@
 			</wxsmith>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDCore\Tools\Version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDCore\Tools\Version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="GDCore" />
 			</AutoVersioning>

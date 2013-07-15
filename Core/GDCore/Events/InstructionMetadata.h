@@ -92,6 +92,15 @@ public:
     }
 
     /**
+     * \brief Set the group of the instruction in the IDE.
+     */
+    InstructionMetadata & SetGroup(const std::string & str)
+    {
+        group = str;
+        return *this;
+    }
+
+    /**
      * \brief Return true if the instruction must be hidden in the IDE.
      */
     bool IsHidden() const { return hidden; }

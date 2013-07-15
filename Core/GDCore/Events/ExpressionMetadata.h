@@ -31,9 +31,18 @@ public:
     virtual ~ExpressionMetadata() {};
 
     /**
-     * When called, the expression will not be displayed in the editor
+     * \brief Set the expression as not shown in the IDE.
      */
     ExpressionMetadata & SetHidden();
+
+    /**
+     * \brief Set the group of the instruction in the IDE.
+     */
+    ExpressionMetadata & SetGroup(const std::string & str)
+    {
+        group = str;
+        return *this;
+    }
 
     std::vector < gd::ParameterMetadata > parameters;
 
@@ -106,7 +115,7 @@ public:
 
     /** Don't use this constructor. Only here to fullfil std::map requirements
      */
-    ExpressionMetadata() {};
+    ExpressionMetadata() : shown(false) {};
 
     bool IsShown() const { return shown; }
     const std::string & GetFullName() const { return fullname; }
@@ -139,9 +148,18 @@ public:
     virtual ~StrExpressionMetadata() {};
 
     /**
-     * When called, the expression will not be displayed in the editor
+     * \brief Set the expression as not shown in the IDE.
      */
     StrExpressionMetadata & SetHidden();
+
+    /**
+     * \brief Set the group of the instruction in the IDE.
+     */
+    StrExpressionMetadata & SetGroup(const std::string & str)
+    {
+        group = str;
+        return *this;
+    }
 
     std::vector < gd::ParameterMetadata > parameters;
 
@@ -214,7 +232,7 @@ public:
 
     /** Don't use this constructor. Only here to fulfill std::map requirements
      */
-    StrExpressionMetadata() {};
+    StrExpressionMetadata() : shown(false) {};
 
     bool IsShown() const { return shown; }
     const std::string & GetFullName() const { return fullname; }

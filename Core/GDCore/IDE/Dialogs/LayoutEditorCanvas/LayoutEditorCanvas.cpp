@@ -745,16 +745,6 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
 
 void LayoutEditorCanvas::OnRightUp( wxMouseEvent &event )
 {
-    #if defined(LINUX) //Simulate click on linux
-    sf::Event myEvent;
-    myEvent.type = sf::Event::MouseButtonReleased;
-    myEvent.mouseButton.x = event.GetX();
-    myEvent.mouseButton.y = event.GetY();
-    myEvent.mouseButton.button = sf::Mouse::Right;
-
-    layout.GetRenderTargetEvents().push_back(myEvent);
-    #endif
-
     if ( !editing ) return;
 
 
@@ -867,16 +857,6 @@ private:
 
 void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
 {
-    #if defined(LINUX) //Simulate click on linux
-    sf::Event myEvent;
-    myEvent.type = sf::Event::MouseButtonReleased;
-    myEvent.mouseButton.x = event.GetX();
-    myEvent.mouseButton.y = event.GetY();
-    myEvent.mouseButton.button = sf::Mouse::Left;
-
-    layout.GetRenderTargetEvents().push_back(myEvent);
-    #endif
-
     if ( !editing ) return;
 
     if ( !currentDraggableBt.empty() ) //First check if we were dragging a button.

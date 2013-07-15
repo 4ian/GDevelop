@@ -569,7 +569,7 @@ void EditorObjectList::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
 {
     if ( objectsList->GetItemText( event.GetItem() ) != _( "All objects" ) )
     {
-        ancienNom = objectsList->GetItemText( event.GetItem() );
+        oldName = objectsList->GetItemText( event.GetItem() );
         return;
     }
 
@@ -603,25 +603,54 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         return;
     }
 
-    if ( !objects.HasObjectNamed(ancienNom) ) return;
+    if ( !objects.HasObjectNamed(oldName) ) return;
 
-    objects.GetObject(ancienNom).SetName( newName );
+    objects.GetObject(oldName).SetName( newName );
 
-    if ( layout ) //Change the object name in the layout.
+    if ( !globalObjects && layout ) //Change the object name in the layout.
     {
-        gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, *layout, layout->GetEvents(), ancienNom, newName);
-        layout->GetInitialInstances().RenameInstancesOfObject(ancienNom, newName);
+        gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, *layout, layout->GetEvents(), oldName, newName);
+        layout->GetInitialInstances().RenameInstancesOfObject(oldName, newName);
         for (unsigned int g = 0;g<layout->GetObjectGroups().size();++g)
         {
-            if ( layout->GetObjectGroups()[g].Find(ancienNom))
+            if ( layout->GetObjectGroups()[g].Find(oldName))
             {
-                layout->GetObjectGroups()[g].RemoveObject(ancienNom);
+                layout->GetObjectGroups()[g].RemoveObject(oldName);
                 layout->GetObjectGroups()[g].AddObject(newName);
             }
         }
     }
+    else if ( globalObjects ) //Change the object name in all layouts
+    {
+        for (unsigned int g = 0;g<project.GetObjectGroups().size();++g)
+        {
+            if ( project.GetObjectGroups()[g].Find(oldName))
+            {
+                project.GetObjectGroups()[g].RemoveObject(oldName);
+                project.GetObjectGroups()[g].AddObject(newName);
+            }
+        }
+
+        for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+        {
+            gd::Layout & layout = project.GetLayout(i);
+            if ( layout.HasObjectNamed(oldName) ) continue;
+
+            gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), oldName, newName);
+            layout.GetInitialInstances().RenameInstancesOfObject(oldName, newName);
+            for (unsigned int g = 0;g<layout.GetObjectGroups().size();++g)
+            {
+                if ( layout.GetObjectGroups()[g].Find(oldName))
+                {
+                    layout.GetObjectGroups()[g].RemoveObject(oldName);
+                    layout.GetObjectGroups()[g].AddObject(newName);
+                }
+            }
+        }
+    }
+
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObjects ? NULL : layout, objects.GetObject(newName), ancienNom);
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObjects ? NULL : layout, objects.GetObject(newName), oldName);
 
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     if ( propPnl ) propPnl->SelectedObject(&objects.GetObject(newName), globalObjects ? NULL : layout);

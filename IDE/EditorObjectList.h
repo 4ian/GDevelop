@@ -166,7 +166,7 @@ private:
     std::vector < std::pair<long, std::string> > idForAutomatism;
 
     wxTreeItemId item; ///< Selected item in the list
-    std::string ancienNom;
+    std::string oldName;
 
     DECLARE_EVENT_TABLE()
 };

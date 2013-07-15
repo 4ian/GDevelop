@@ -144,7 +144,7 @@ void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
     if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
     if ( object )
     {
-        if ( objectsHelper.OnPropertySelected(object, objectLayout, event) )
+        if ( objectsHelper.OnPropertySelected(object, &layout, event) )
             Refresh();
     }
 }
@@ -169,9 +169,9 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 
         instancesHelper.OnPropertyChanged(selectedInitialInstances, event);
     }
-    if ( object  )
+    if ( object )
     {
-        if ( objectsHelper.OnPropertyChanged(object, objectLayout, event) )
+        if ( objectsHelper.OnPropertyChanged(object, &layout, event) )
             Refresh();
     }
 }

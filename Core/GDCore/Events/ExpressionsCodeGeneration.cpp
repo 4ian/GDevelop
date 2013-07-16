@@ -131,7 +131,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(codeGenerator.GetPlatform(), objectType);
 
         //Build string to access the object
-        codeGenerator.AddIncludeFile(objInfo.optionalIncludeFile);
+        codeGenerator.AddIncludeFiles(objInfo.includeFiles);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
             output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
@@ -174,7 +174,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(codeGenerator.GetPlatform(), objectType);
 
         //Build string to access the object
-        codeGenerator.AddIncludeFile(objInfo.optionalIncludeFile);
+        codeGenerator.AddIncludeFiles(objInfo.includeFiles);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
             output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
@@ -218,7 +218,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(codeGenerator.GetPlatform(), automatismType);
 
         //Build string to access the automatism
-        codeGenerator.AddIncludeFile(autoInfo.optionalIncludeFile);
+        codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
             output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else
@@ -262,7 +262,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(codeGenerator.GetPlatform(), automatismType);
 
         //Build string to access the automatism
-        codeGenerator.AddIncludeFile(autoInfo.optionalIncludeFile);
+        codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
         if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
             output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
         else

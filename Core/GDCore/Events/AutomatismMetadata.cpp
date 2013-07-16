@@ -139,7 +139,16 @@ AutomatismMetadata & AutomatismMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 AutomatismMetadata & AutomatismMetadata::SetIncludeFile(const std::string & includeFile)
 {
 #if defined(GD_IDE_ONLY)
-    optionalIncludeFile = includeFile;
+    includeFiles.clear();
+    includeFiles.push_back(includeFile);
+#endif
+    return *this;
+}
+AutomatismMetadata & AutomatismMetadata::AddIncludeFile(const std::string & includeFile)
+{
+#if defined(GD_IDE_ONLY)
+    if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
+        includeFiles.push_back(includeFile);
 #endif
     return *this;
 }

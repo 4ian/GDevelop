@@ -185,8 +185,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
 
     gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, condition.GetType());
 
-    if ( !instrInfos.codeExtraInformation.optionalIncludeFile.empty() )
-        AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
+    AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
     maxConditionsListsSize = std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
     if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
@@ -258,7 +257,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
         {
             //Set up the context
             const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(platform, objectType);
-            AddIncludeFile(objInfo.optionalIncludeFile);
+            AddIncludeFiles(objInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
@@ -279,7 +278,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
         {
             //Setup context
             const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(platform, automatismType);
-            AddIncludeFile(autoInfo.optionalIncludeFile);
+            AddIncludeFiles(autoInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
@@ -340,8 +339,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 
     gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, action.GetType());
 
-    if ( !instrInfos.codeExtraInformation.optionalIncludeFile.empty() )
-        AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
+    AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
 
     if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
     {
@@ -400,7 +398,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
         {
             //Setup context
             const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(platform, objectType);
-            AddIncludeFile(objInfo.optionalIncludeFile);
+            AddIncludeFiles(objInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
@@ -421,7 +419,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
         {
             //Setup context
             const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(platform, automatismType);
-            AddIncludeFile(autoInfo.optionalIncludeFile);
+            AddIncludeFiles(autoInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 

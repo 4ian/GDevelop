@@ -33,14 +33,6 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
     destroyFunPtr = destroyFunPtrP;
 }
 
-ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
-{
-#if defined(GD_IDE_ONLY)
-    optionalIncludeFile = includeFile;
-#endif
-    return *this;
-}
-
 gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
                                        const std::string & fullname,
                                        const std::string & description,
@@ -117,6 +109,23 @@ ObjectMetadata & ObjectMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
 #if defined(GD_IDE_ONLY)
     icon = bitmap_;
+#endif
+    return *this;
+}
+
+ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
+{
+#if defined(GD_IDE_ONLY)
+    includeFiles.clear();
+    includeFiles.push_back(includeFile);
+#endif
+    return *this;
+}
+ObjectMetadata & ObjectMetadata::AddIncludeFile(const std::string & includeFile)
+{
+#if defined(GD_IDE_ONLY)
+    if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
+        includeFiles.push_back(includeFile);
 #endif
     return *this;
 }

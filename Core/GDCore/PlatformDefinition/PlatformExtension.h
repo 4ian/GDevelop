@@ -254,7 +254,14 @@ public:
      */
     AutomatismMetadata & GetAutomatismMetadata(const std::string & automatismType);
 
+    /**
+     * \brief Return a map containing all the events provided by the extension
+     */
     std::map<std::string, gd::EventMetadata > & GetAllEvents();
+
+    /**
+     * \brief Return a map containing all the automatisms provided by the extension
+     */
     std::map<std::string, gd::AutomatismMetadata > & GetAllAutomatisms();
 
     #if defined(GD_IDE_ONLY)

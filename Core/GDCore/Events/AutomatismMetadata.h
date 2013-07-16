@@ -88,7 +88,18 @@ public:
     AutomatismMetadata & SetDescription(const std::string & description_);
     AutomatismMetadata & SetGroup(const std::string & group_);
     AutomatismMetadata & SetBitmapIcon(const wxBitmap & bitmap_);
+
+    /**
+     * \brief Erase any existing include file and add the specified include.
+     * \note The requirement may vary depending on the platform: Most of the time, the include
+     * file contains the declaration of the automatism.
+     */
     AutomatismMetadata & SetIncludeFile(const std::string & includeFile);
+
+    /**
+     * \brief Add a file to the already existing include files.
+     */
+    AutomatismMetadata & AddIncludeFile(const std::string & includeFile);
 
 #if defined(GD_IDE_ONLY)
     const std::string & GetFullName() const { return fullname; }
@@ -106,7 +117,7 @@ public:
     std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
     std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
 
-    std::string optionalIncludeFile;
+    std::vector<std::string> includeFiles;
     std::string className;
 #endif
 private:

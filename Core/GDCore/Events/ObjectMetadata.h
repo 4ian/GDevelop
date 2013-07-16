@@ -109,10 +109,16 @@ public:
 #endif
 
     /**
-     * Set that the object is located in a specific include file
-     * \note This method does nothing when used for GD C++ runtime.
+     * \brief Erase any existing include file and add the specified include.
+     * \note The requirement may vary depending on the platform: Most of the time, the include
+     * file contains the declaration of the object.
      */
     ObjectMetadata & SetIncludeFile(const std::string & includeFile);
+
+    /**
+     * \brief Add a file to the already existing include files.
+     */
+    ObjectMetadata & AddIncludeFile(const std::string & includeFile);
 
 #if defined(GD_IDE_ONLY)
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
@@ -120,7 +126,7 @@ public:
     std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
     std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
 
-    std::string optionalIncludeFile;
+    std::vector<std::string> includeFiles;
     std::string className;
 #endif
     CreateFunPtr createFunPtr;

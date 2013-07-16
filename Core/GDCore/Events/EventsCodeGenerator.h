@@ -162,8 +162,17 @@ public:
 
     /**
      * \brief Declare an include file to be added
+     * \note The way includes files are used may vary depending on the platform:
+     *  - On GD C++ Platform, the includes files are added in the #include directives of the generated code.
+     *  - On GD JS Platform, the includes files are added in the list of JS files in the index file.
      */
     void AddIncludeFile(std::string file) { if ( !file.empty() ) includeFiles.insert(file); };
+
+    /**
+     * \brief Declare a list of include files to be added
+     * \see gd::EventsCodeGenerator::AddIncludeFile
+     */
+    void AddIncludeFiles(std::vector<std::string> files) { for(unsigned int i = 0;i<files.size();++i) AddIncludeFile(files[i]); };
 
     /**
      * \brief Add a declaration which will be inserted after includes

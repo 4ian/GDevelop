@@ -76,34 +76,36 @@ public :
     void AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun, DestroyRuntimeObjectFunPtr destroyFun);
 
     /**
-     * Return a function to create the runtime object if the type is handled by the extension
+     * \brief Return a function to create the runtime object if the type is handled by the extension
      */
     CreateRuntimeObjectFunPtr        GetRuntimeObjectCreationFunctionPtr(std::string objectType) const;
 
     /**
-     * Make sure that the runtime object from an extension is deleted by the same extension.
+     * \brief Return the function to destroy the runtime object, if the type is handled by the extension.
+     *
+     * Used to make sure that the runtime object from an extension is deleted by the same extension.
      */
     DestroyRuntimeObjectFunPtr       GetDestroyRuntimeObjectFunction(std::string objectType) const;
 
     /**
-     * Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
+     * \brief Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
      */
     virtual void SceneLoaded(RuntimeScene & scene) {};
 
     /**
-     * Called when a scene is unloaded: Useful to destroy some extensions specific objects related to scene
+     * \brief Called when a scene is unloaded: Useful to destroy some extensions specific objects related to scene
      */
     virtual void SceneUnloaded(RuntimeScene & scene) {};
 
     /**
-     * Redefine this method to return true if you want the method ObjectDeletedFromScene to be called by RuntimeScene when
+     * \brief Redefine this method to return true if you want the method ObjectDeletedFromScene to be called by RuntimeScene when
      *
      * \see ExtensionBase::ToBeNotifiedOnObjectDeletion
      */
     virtual bool ToBeNotifiedOnObjectDeletion() { return false; }
 
     /**
-     * Called by RuntimeScene, if ToBeNotifiedOnObjectDeletion() returns true, when an object is about to be deleted.
+     * \brief Called by RuntimeScene, if ToBeNotifiedOnObjectDeletion() returns true, when an object is about to be deleted.
      *
      * \see ExtensionBase::ObjectDeletedFromScene
      */
@@ -112,24 +114,24 @@ public :
     #if defined(GD_IDE_ONLY)
 
     /**
-     * Must return true if the extension has something to display in debugger.
+     * \brief Must return true if the extension has something to display in debugger.
      */
     virtual bool HasDebuggingProperties() const { return false; };
 
     /**
-     * Called by the debugger so as to get a property value and name.
-     * \see Object::GetPropertyForDebugger
+     * \brief Called by the debugger so as to get a property value and name.
+     * \see RuntimeObject::GetPropertyForDebugger
      */
     virtual void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const {};
 
     /**
-     * Called by the debugger so as to update a property
-     * \see Object::ChangeProperty
+     * \brief Called by the debugger so as to update a property
+     * \see RuntimeObject::ChangeProperty
      */
     virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue) { return false; };
 
     /**
-     * Must return the number of available properties for the debugger
+     * \brief Must return the number of available properties for the debugger
      */
     virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
 
@@ -140,7 +142,7 @@ public :
 
 protected :
 
-    #if defined(GD_IDE_ONLY) //Information available only at edittime
+    #if defined(GD_IDE_ONLY)
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
     std::vector < std::string > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
     std::vector < std::string > supplementaryLibFiles; ///<Supplementary libraries files to be used when compiling events with this extension. Files must be in CppPlatform/Extensions and CppPlatform/Extensions/Runtime directories. The filename will be completed with lib and .a.

@@ -650,16 +650,7 @@ std::string EventsCodeGenerator::ConvertToString(std::string plainString)
 {
     for (size_t i = 0;i<plainString.length();++i)
     {
-        if ( plainString[i] == '\n')
-        {
-            plainString.erase(plainString.begin()+i);
-
-            if ( i < plainString.length() )
-                plainString.insert(i, "\\n");
-            else
-                plainString += ("\\n");
-        }
-        else if ( plainString[i] == '\\' )
+        if ( plainString[i] == '\\' )
         {
             if ( i+1 >= plainString.length() || plainString[i+1] != '\"' )
             {
@@ -677,6 +668,10 @@ std::string EventsCodeGenerator::ConvertToString(std::string plainString)
             ++i;
         }
     }
+
+    while ( plainString.find('\n') != std::string::npos)
+        plainString.replace(plainString.find('\n'), 1, "\\n");
+
 
     return plainString;
 }

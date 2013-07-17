@@ -81,7 +81,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     if ( functionName.empty() )
     {
         if ( parameters.empty() ) return;
-        plainExpression += codeGenerator.ConvertToStringExplicit(codeGenerator.ConvertToString(parameters[0].GetPlainString()));
+        plainExpression += codeGenerator.ConvertToStringExplicit(parameters[0].GetPlainString());
 
         return;
     }

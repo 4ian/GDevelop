@@ -136,8 +136,6 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddParameter("expression", _("Value to test"))
         .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 
-
-
     AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
                    _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
@@ -150,6 +148,18 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("conditionInverted", "")
         .codeExtraInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 
+    AddCondition("EstTourne",
+                      _("An object is turned toward another"),
+                      _("Test if an object is turned toward another"),
+                      _("_PARAM0_ is rotated towards _PARAM1_"),
+                      _("Angle"),
+                      "res/conditions/estTourne24.png",
+                      "res/conditions/estTourne.png")
+        .AddParameter("objectList", _("Name of the object"), "", false)
+        .AddParameter("objectList", _("Name of the second object"))
+        .AddParameter("expression", _("Angle of tolerance, in degrees (0: minimum tolerance)"), "",false)
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .codeExtraInformation.SetFunctionName("ObjectsTurnedToward").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 
 
     AddExpression("Count", _("Number of objects"), _("Count the number of specified objects currently concerned"), _("Objects"), "res/conditions/nbObjet.png")

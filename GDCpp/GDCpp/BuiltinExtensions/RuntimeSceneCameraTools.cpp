@@ -11,25 +11,25 @@
 float GD_API GetCameraX(RuntimeScene & scene, const std::string & layer, unsigned int camera)
 {
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
-    return view.getCenter().x-view.getSize().x/2;
+    return view.getCenter().x;
 }
 
 float GD_API GetCameraY(RuntimeScene & scene, const std::string & layer, unsigned int camera)
 {
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
-    return view.getCenter().y-view.getSize().y/2;
+    return view.getCenter().y;
 }
 
 void GD_API SetCameraX(RuntimeScene & scene, float x, const std::string & layer, unsigned int cameraId)
 {
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraId);
-    camera.SetViewCenter(sf::Vector2f(x+camera.GetWidth()/2, camera.GetViewCenter().y));
+    camera.SetViewCenter(sf::Vector2f(x, camera.GetViewCenter().y));
 }
 
 void GD_API SetCameraY(RuntimeScene & scene, float y, const std::string & layer, unsigned int cameraId)
 {
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraId);
-    camera.SetViewCenter(sf::Vector2f(camera.GetViewCenter().x, y+camera.GetHeight()/2));
+    camera.SetViewCenter(sf::Vector2f(camera.GetViewCenter().x, y));
 }
 
 double GD_API GetCameraAngle(RuntimeScene & scene, const std::string & layer, unsigned int camera)

@@ -16,6 +16,13 @@ StringInstructionsExtension::StringInstructionsExtension()
 
     #if defined(GD_IDE_ONLY)
 
+    AddStrExpression("NewLine",
+                   _("Insert a new line"),
+                   _("Insert a new line"),
+                   _("Manipulation on text"),
+                   "res/conditions/toujours24.png")
+        .codeExtraInformation.SetFunctionName("GDpriv::StringTools::NewLine").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+
     AddStrExpression("SubStr",
                    _("Get a portion of text from a text"),
                    _("Get a portion of text from a text"),

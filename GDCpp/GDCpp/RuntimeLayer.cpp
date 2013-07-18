@@ -13,8 +13,8 @@ RuntimeLayer::RuntimeLayer(gd::Layer & layer, const sf::View & defaultView) :
 }
 
 RuntimeCamera::RuntimeCamera(sf::View & view) :
-    width(view.getSize().x),
-    height(view.getSize().y),
+    originalWidth(view.getSize().x),
+    originalHeight(view.getSize().y),
     angle(0),
     zoomFactor(1)
 {
@@ -22,8 +22,8 @@ RuntimeCamera::RuntimeCamera(sf::View & view) :
 }
 
 RuntimeCamera::RuntimeCamera(gd::Camera & camera, const sf::View & defaultView) :
-    width(defaultView.getSize().x),
-    height(defaultView.getSize().y),
+    originalWidth(defaultView.getSize().x),
+    originalHeight(defaultView.getSize().y),
     angle(0),
     zoomFactor(1)
 {
@@ -37,9 +37,9 @@ RuntimeCamera::RuntimeCamera(gd::Camera & camera, const sf::View & defaultView) 
 
 
     if ( !camera.UseDefaultSize() ) {
-        width = camera.GetWidth();
-        height = camera.GetHeight();
-        sfmlView.setSize(sf::Vector2f(width, height));
+        originalWidth = camera.GetWidth();
+        originalHeight = camera.GetHeight();
+        sfmlView.setSize(sf::Vector2f(originalWidth, originalHeight));
     }
 }
 
@@ -48,7 +48,7 @@ void RuntimeCamera::SetZoom(float newZoom)
     if (newZoom == 0) return;
 
     zoomFactor = newZoom;
-    sfmlView.setSize(sf::Vector2f(width/zoomFactor, height/zoomFactor));
+    sfmlView.setSize(sf::Vector2f(originalWidth/zoomFactor, originalHeight/zoomFactor));
 }
 
 void RuntimeCamera::SetRotation(float newAngle)
@@ -64,9 +64,10 @@ void RuntimeCamera::SetViewCenter(const sf::Vector2f & newCenter)
 
 void RuntimeCamera::SetSize(float width_, float height_)
 {
-    width = width_;
-    height = height_;
-    sfmlView.setSize(width, height);
+    originalWidth = width_;
+    originalHeight = height_;
+    sfmlView.setSize(originalWidth, originalHeight);
+    zoomFactor = 1;
 }
 
 void RuntimeCamera::SetViewport(float x1, float y1, float x2, float y2)

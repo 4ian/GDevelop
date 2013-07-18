@@ -16,8 +16,8 @@ CameraExtension::CameraExtension()
     #if defined(GD_IDE_ONLY)
 
     AddCondition("CameraX",
-                   _("Camera X position"),
-                   _("Test the X position of a camera."),
+                   _("Camera center X position"),
+                   _("Compare the X position of a the center of a camera."),
                    _("X position of camera _PARAM4_ is _PARAM1__PARAM2_ ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
@@ -32,8 +32,8 @@ CameraExtension::CameraExtension()
 
 
     AddCondition("CameraY",
-                   _("Camera Y position"),
-                   _("Test the Y position of a camera."),
+                   _("Camera center Y position"),
+                   _("Compare the Y position of a the center of a camera."),
                    _("The Y position of camera _PARAM4_ is _PARAM1__PARAM2_  ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
@@ -48,8 +48,8 @@ CameraExtension::CameraExtension()
 
 
     AddAction("CameraX",
-                   _("Camera X position"),
-                   _("Change X position of the specified camera."),
+                   _("Camera center X position"),
+                   _("Change X position of the center of the specified camera."),
                    _("Do _PARAM1__PARAM2_ to X position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
@@ -62,8 +62,8 @@ CameraExtension::CameraExtension()
         .codeExtraInformation.SetFunctionName("SetCameraX").SetManipulatedType("number").SetAssociatedGetter("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     AddAction("CameraY",
-                   _("Camera Y position"),
-                   _("Change Y position of the specified camera."),
+                   _("Camera center Y position"),
+                   _("Change Y position of the center of the specified camera."),
                    _("Do _PARAM1__PARAM2_ to Y position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",

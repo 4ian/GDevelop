@@ -18,7 +18,7 @@ public:
      *
      * \warning This constructor should not be used: See the two other alternatives.
      */
-    RuntimeCamera() : width(0), height(0),angle(0), zoomFactor(1) {};
+    RuntimeCamera() : originalWidth(0), originalHeight(0),angle(0), zoomFactor(1) {};
 
     /**
      * Construct a runtime camera from a sf::View ( The SFML equivalent of a camera ).
@@ -68,18 +68,19 @@ public:
 
     /**
      * Change the size of the rendered area of the scene.
+     * Zoom is reset to 1.
      */
     void SetSize(float width, float height);
 
     /**
      * Get the width of the rendered area
      */
-    float GetWidth() const { return width; };
+    float GetWidth() const { return zoomFactor != 0 ? originalWidth*1.0/zoomFactor : 0; };
 
     /**
      * Get the height of the rendered area
      */
-    float GetHeight() const { return height; };
+    float GetHeight() const { return zoomFactor != 0 ? originalHeight*1.0/zoomFactor : 0; };
 
     /**
      * Change the position of the view on the scene.
@@ -88,8 +89,8 @@ public:
 
 private:
 
-    float width;
-    float height;
+    float originalWidth;
+    float originalHeight;
     float angle; ///< Angle of the camera
     float zoomFactor; ///< Zoom factor of the camera
 

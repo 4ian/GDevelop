@@ -472,6 +472,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	Layout();
 	SetSize(900,600);
 
+	if ( game.GetCurrentPlatform().GetName() == "Game Develop JS platform" )
+    {
+        toolbar->EnableTool(ID_MASKITEM, false);
+    }
+
 	toolbar->Realize(); //Toolbars need to be realized again under Linux.
 	animationToolbar->Realize();
 	maskToolbar->Realize();
@@ -640,6 +645,8 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
 
         spritePosX = (size.GetWidth() - bmp.GetWidth() - xScrollBar->GetThumbPosition()) / 2;
         spritePosY = (size.GetHeight() - bmp.GetHeight() - yScrollBar->GetThumbPosition()) / 2;
+        spriteWidth = bmp.GetWidth();
+        spriteHeight = bmp.GetHeight();
 
         //Draw border rectangle and the sprite
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
@@ -1356,8 +1363,10 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
         {
             if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
             {
-                mask[selectedPolygon].vertices[selectedPolygonPoint].x = event.GetX()-spritePosX+xSelectionOffset;
-                mask[selectedPolygon].vertices[selectedPolygonPoint].y = event.GetY()-spritePosY+ySelectionOffset;
+                mask[selectedPolygon].vertices[selectedPolygonPoint].x =
+                    max((float)0.0, min(spriteWidth, event.GetX()-spritePosX+xSelectionOffset));
+                mask[selectedPolygon].vertices[selectedPolygonPoint].y =
+                    max((float)0.0, min(spriteHeight, event.GetY()-spritePosY+ySelectionOffset));
             }
         }
         sprites[0]->SetCollisionMaskAutomatic(false);
@@ -1390,6 +1399,7 @@ void SpriteObjectEditor::OnAddMaskClick(wxCommandEvent& event)
 
     Polygon2d newRectangle = Polygon2d::CreateRectangle(width, height);
     newRectangle.Rotate(angle*3.14159/180);
+    newRectangle.Move(spriteWidth/2.0, spriteHeight/2.0);
     mask.push_back(newRectangle);
 
     for (unsigned int i = 0;i<sprites.size();++i)

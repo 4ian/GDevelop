@@ -244,6 +244,8 @@ private:
     std::string selectedPoint;
     float spritePosX; ///< Used to remember the position where the sprite have been drawn.
     float spritePosY; ///< Used to remember the position where the sprite have been drawn.
+    float spriteWidth; ///< Used to remember the width of the current sprite.
+    float spriteHeight; ///< Used to remember the height of the current sprite.
 
     bool editingMask;
     bool editingPoint;

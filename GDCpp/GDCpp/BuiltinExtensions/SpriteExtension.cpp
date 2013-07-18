@@ -445,20 +445,6 @@ SpriteExtension::SpriteExtension()
     }
 
     #if defined(GD_IDE_ONLY)
-    //Declaration of all conditions available
-    AddCondition("EstTourne",
-                      _("An object is turned toward another"),
-                      _("Test if an object is turned toward another"),
-                      _("_PARAM0_ is rotated towards _PARAM1_"),
-                      _("Direction"),
-                      "res/conditions/estTourne24.png",
-                      "res/conditions/estTourne.png")
-        .AddParameter("objectList", _("Name of the object"), "Sprite", false)
-        .AddParameter("objectList", _("Name of the second object"))
-        .AddParameter("expression", _("Angle of tolerance (0: minimum tolerance)"), "",false)
-        .AddCodeOnlyParameter("conditionInverted", "")
-        .codeExtraInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
-
     AddCondition("Collision",
                       _("Collision ( Pixel perfect )"),
                       _("The condition is true if there is a collision between the two objects.\nThe test is pixel-perfect."),

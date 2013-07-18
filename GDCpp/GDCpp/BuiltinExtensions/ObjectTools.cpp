@@ -20,305 +20,207 @@ double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObje
     return size;
 }
 
-bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1,
+                               std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2,
+                               bool conditionInverted,
+                               TwoObjectsListsTestFunc functor, float extraParameter )
 {
-    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
-    if ( sameObjectLists ) //Make sure that objects lists are really the same
-    {
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
-             it1 != objectsLists1.end() && it2 != objectsLists2.end();
-             ++it1, ++it2)
-        {
-            if ( it1->second != it2->second )
-            {
-                sameObjectLists = false;
-                break;
-            }
-        }
-    }
-
-    vector<RuntimeObject*> objects1;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
-    {
-        if ( it->second != NULL )
-        {
-            objects1.reserve(objects1.size()+it->second->size());
-            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects1));
-            it->second->clear();
-        }
-    }
-
-    vector<RuntimeObject*> objects2;
-    if ( sameObjectLists )
-        objects2 = objects1;
-    else
-    {
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
-        {
-            if ( it->second != NULL )
-            {
-                objects2.reserve(objects2.size()+it->second->size());
-                std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-                it->second->clear();
-            }
-        }
-    }
-
     bool isTrue = false;
 
-    //Test each object against each other objects
-	for(unsigned int i = 0;i<objects1.size();++i)
+    //Create a boolean for each object
+    std::vector < std::vector<bool> > pickedList1;
+    std::vector < std::vector<bool> > pickedList2;
+
+    for(std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();
+        it != objectsLists1.end();++it)
     {
-        bool AuMoinsUnObjet = false;
-        for(unsigned int j = (!sameObjectLists ? 0 : i+1);j<objects2.size();++j)
-        {
-            if ( objects1[i] != objects2[j] )
+        std::vector<bool> arr;
+        arr.assign(it->second->size(), false);
+        pickedList1.push_back(arr);
+    }
+    for(std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();
+        it != objectsLists2.end();++it)
+    {
+        std::vector<bool> arr;
+        arr.assign(it->second->size(), false);
+        pickedList2.push_back(arr);
+    }
+
+    //Launch the function each object of the first list with each object
+    //of the second list.
+    unsigned int i = 0;
+    for(std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();
+        it != objectsLists1.end();++it, ++i)
+    {
+        if ( !it->second ) continue;
+        const std::vector<RuntimeObject*> & arr1 = *it->second;
+
+        for(unsigned int k = 0;k<arr1.size();++k) {
+            bool atLeastOneObject = false;
+
+            unsigned int j = 0;
+            for(std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it2 = objectsLists2.begin();
+                it2 != objectsLists2.end();++it2, ++j)
             {
-                bool collision = false;
+                if ( !it2->second ) continue;
+                const std::vector<RuntimeObject*> & arr2 = *it2->second;
 
-                vector<Polygon2d> objHitboxes = objects1[i]->GetHitBoxes();
-                vector<Polygon2d> obj2Hitboxes = objects2[j]->GetHitBoxes();
-                for (unsigned int k = 0;k<objHitboxes.size();++k)
-                {
-                    for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
-                    {
-                        if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
-                        {
-                            collision = true;
-                            break;
+                for(unsigned int l = 0;l<arr2.size();++l) {
+
+                    if ( arr1[k] != arr2[l] && functor(arr1[k], arr2[l], extraParameter) ) {
+                        if ( !conditionInverted ) {
+                            isTrue = true;
+
+                            //Pick the objects
+                            pickedList1[i][k] = true;
+                            pickedList2[j][l] = true;
                         }
+
+                        atLeastOneObject = true;
                     }
-
-                    if ( collision ) break;
-                }
-
-                if ( collision )
-                {
-                    if ( !conditionInverted )
-                    {
-                        isTrue = true;
-                        std::vector<RuntimeObject*> * objList = objectsLists1[objects1[i]->GetName()];
-                        if ( find(objList->begin(), objList->end(), objects1[i]) == objList->end() ) objList->push_back(objects1[i]);
-
-                        objList = objectsLists2[objects2[j]->GetName()];
-                        if ( find(objList->begin(), objList->end(), objects2[j]) == objList->end() ) objList->push_back(objects2[j]);
-                    }
-                    AuMoinsUnObjet = true;
                 }
             }
+
+            if ( !atLeastOneObject && conditionInverted ) { //The object is not overlapping any other object.
+                isTrue = true;
+                pickedList1[i][k] = true;
+            }
         }
-        //Si l'objet n'est en collision avec AUCUN autre objets
-        if ( AuMoinsUnObjet == false && conditionInverted)
+    }
+
+    //Trim not picked objects from arrays.
+    i = 0;
+    for(std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();
+        it != objectsLists1.end();++it, ++i)
+    {
+        size_t finalSize = 0;
+        if ( !it->second ) continue;
+        std::vector<RuntimeObject*> & arr = *it->second;
+
+        for(unsigned int k = 0;k<arr.size();++k)
         {
-            isTrue = true;
-            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+            RuntimeObject * obj = arr[k];
+            if ( pickedList1[i][k] )
+            {
+                arr[finalSize] = obj;
+                finalSize++;
+            }
+        }
+        arr.resize(finalSize);
+    }
+
+    if ( !conditionInverted ) {
+        unsigned int i = 0;
+        for(std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();
+            it != objectsLists2.end();++it, ++i)
+        {
+            size_t finalSize = 0;
+            if ( !it->second ) continue;
+            std::vector<RuntimeObject*> & arr = *it->second;
+
+            for(unsigned int k = 0;k<arr.size();++k)
+            {
+                RuntimeObject * obj = arr[k];
+                if ( pickedList2[i][k] )
+                {
+                    arr[finalSize] = obj;
+                    finalSize++;
+                }
+            }
+            arr.resize(finalSize);
         }
     }
 
     return isTrue;
+}
+
+static bool HitBoxesInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float )
+{
+    //First check if bounding circle are too far.
+    float o1w = obj1->GetWidth();
+    float o1h = obj1->GetHeight();
+    float o2w = obj2->GetWidth();
+    float o2h = obj2->GetHeight();
+
+    float x = obj1->GetDrawableX()+obj1->GetCenterX()-(obj2->GetDrawableX()+obj2->GetCenterX());
+    float y = obj1->GetDrawableY()+obj1->GetCenterY()-(obj2->GetDrawableY()+obj2->GetCenterY());
+    float obj1BoundingRadius = sqrt(o1w*o1w+o1h*o1h)/2.0;
+    float obj2BoundingRadius = sqrt(o2w*o2w+o2h*o2h)/2.0;
+
+    if ( sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
+        return false;
+
+    //Or if in circle are colliding
+    float obj1MinEdge = min(o1w, o1h)/2.0;
+    float obj2MinEdge = min(o2w, o2h)/2.0;
+
+    if ( x*x+y*y < obj1MinEdge*obj1MinEdge+2*obj1MinEdge*obj2MinEdge+obj2MinEdge*obj2MinEdge )
+        return true;
+
+    //Do a real check if necessary.
+    vector<Polygon2d> objHitboxes = obj1->GetHitBoxes();
+    vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes();
+    for (unsigned int k = 0;k<objHitboxes.size();++k)
+    {
+        for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
+        {
+            if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+{
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, &HitBoxesInnerTest, 0);
+}
+
+static bool TurnedTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float tolerance )
+{
+    if ( obj1->TotalForceLength() == 0 ) return false;
+
+    double objAngle = atan2(obj2->GetDrawableY()+obj2->GetCenterY() - (obj1->GetDrawableY()+obj1->GetCenterY()),
+                              obj2->GetDrawableX()+obj2->GetCenterX() - (obj1->GetDrawableX()+obj1->GetCenterX()));
+    objAngle *= 180.0/3.14159;
+
+    return abs(objAngle-obj1->GetAngle()) <= tolerance/2;
+}
+
+bool GD_API ObjectsTurnedToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
+{
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, TurnedTowardInnerTest, tolerance);
+}
+
+static bool DistanceInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float squaredLength)
+{
+    float X = obj1->GetDrawableX()+obj1->GetCenterX() - (obj2->GetDrawableX()+obj2->GetCenterX());
+    float Y = obj1->GetDrawableY()+obj1->GetCenterY() - (obj2->GetDrawableY()+obj2->GetCenterY());
+
+    return (X*X+Y*Y) <= squaredLength;
 }
 
 float GD_API DistanceBetweenObjects( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, bool conditionInverted)
 {
     length *= length;
-
-    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
-    if ( sameObjectLists ) //Make sure that objects lists are really the same
-    {
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
-             it1 != objectsLists1.end() && it2 != objectsLists2.end();
-             ++it1, ++it2)
-        {
-            if ( it1->second != it2->second )
-            {
-                sameObjectLists = false;
-                break;
-            }
-        }
-    }
-
-    vector<RuntimeObject*> objects1;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
-    {
-        if ( it->second != NULL )
-        {
-            objects1.reserve(objects1.size()+it->second->size());
-            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects1));
-            it->second->clear();
-        }
-    }
-
-    vector<RuntimeObject*> objects2;
-    if ( sameObjectLists )
-        objects2 = objects1;
-    else
-    {
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
-        {
-            if ( it->second != NULL )
-            {
-                objects2.reserve(objects2.size()+it->second->size());
-                std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-                it->second->clear();
-            }
-        }
-    }
-
-    bool isTrue = false;
-
-    //Test each object against each other objects
-	for(unsigned int i = 0;i<objects1.size();++i)
-    {
-        for(unsigned int j = (!sameObjectLists ? 0 : i+1);j<objects2.size();++j)
-        {
-            if ( objects1[i] != objects2[j] )
-            {
-                float X = objects1[i]->GetDrawableX()+objects1[i]->GetCenterX() - (objects2[j]->GetDrawableX()+objects2[j]->GetCenterX());
-                float Y = objects1[i]->GetDrawableY()+objects1[i]->GetCenterY() - (objects2[j]->GetDrawableY()+objects2[j]->GetCenterY());
-
-                if ( (X*X+Y*Y) <= length )
-                {
-                    if ( !conditionInverted )
-                    {
-                        isTrue = true;
-                        if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
-
-                        if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                            objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
-                    }
-                }
-                else
-                {
-                    if ( conditionInverted )
-                    {
-                        isTrue = true;
-                        if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
-
-                        if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                            objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
-                    }
-                }
-            }
-        }
-    }
-
-    return isTrue;
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, DistanceInnerTest, length);
 }
+
+static bool MovesTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float tolerance)
+{
+    if ( obj1->TotalForceLength() == 0 ) return false;
+
+    double objAngle = atan2(obj2->GetDrawableY()+obj2->GetCenterY() - (obj1->GetDrawableY()+obj1->GetCenterY()),
+                              obj2->GetDrawableX()+obj2->GetCenterX() - (obj1->GetDrawableX()+obj1->GetCenterX()));
+    objAngle *= 180.0/3.14159;
+
+    return abs(objAngle-obj1->TotalForceAngle()) <= tolerance/2;
+}
+
 
 bool GD_API MovesToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
-    bool sameObjectLists = objectsLists1.size() == objectsLists2.size();
-    if ( sameObjectLists ) //Make sure that objects lists are really the same
-    {
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it1 = objectsLists1.begin(), it2 = objectsLists2.begin();
-             it1 != objectsLists1.end() && it2 != objectsLists2.end();
-             ++it1, ++it2)
-        {
-            if ( it1->second != it2->second )
-            {
-                sameObjectLists = false;
-                break;
-            }
-        }
-    }
-
-    vector<RuntimeObject*> objects1;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
-    {
-        if ( it->second != NULL )
-        {
-            objects1.reserve(objects1.size()+it->second->size());
-            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects1));
-            it->second->clear();
-        }
-    }
-
-    vector<RuntimeObject*> objects2;
-    if ( sameObjectLists )
-        objects2 = objects1;
-    else
-    {
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
-        {
-            if ( it->second != NULL )
-            {
-                objects2.reserve(objects2.size()+it->second->size());
-                std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-                it->second->clear();
-            }
-        }
-    }
-
-    bool isTrue = false;
-
-    //Test each object against each other objects
-	for(unsigned int i = 0;i<objects1.size();++i)
-    {
-        if ( objects1[i]->TotalForceLength() != 0 )
-        {
-            for(unsigned int j = (!sameObjectLists ? 0 : i+1);j<objects2.size();++j)
-            {
-                if ( objects1[i] != objects2[j] )
-                {
-                    Force force;
-                    //Les comparaisons sont faites de centre à centre
-                    force.SetX( ( objects2[j]->GetDrawableX() + objects2[j]->GetCenterX() ) - ( objects1[i]->GetDrawableX() + objects1[i]->GetCenterX() ) );
-                    force.SetY( ( objects2[j]->GetDrawableY() + objects2[j]->GetCenterY() ) - ( objects1[i]->GetDrawableY() + objects1[i]->GetCenterY() ) );
-
-                    float angle = force.GetAngle(); //On récupère l'angle entre les deux objets
-
-                    float objectAngle = objects1[i]->TotalForceAngle();
-
-                    //Compute difference between two angles
-                    float diff = objectAngle - angle;
-                    while ( diff>180 )
-                        diff -= 360;
-                    while ( diff<-180 )
-                        diff += 360;
-
-                    if ( fabs( diff ) <= tolerance / 2 )
-                    {
-                        if ( !conditionInverted )
-                        {
-                            isTrue = true;
-
-                            if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                                objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
-
-                            if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                                objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
-                        }
-                    }
-                    else
-                    {
-                        if ( conditionInverted )
-                        {
-                            isTrue = true;
-
-                            if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                                objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
-
-                            if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                                objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            if ( conditionInverted )
-            {
-                isTrue = true;
-
-                if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
-                    objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
-            }
-        }
-    }
-
-    return isTrue;
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, MovesTowardInnerTest, tolerance);
 }
 

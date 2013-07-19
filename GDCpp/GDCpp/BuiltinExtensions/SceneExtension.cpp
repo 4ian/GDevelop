@@ -121,7 +121,7 @@ SceneExtension::SceneExtension()
         AddCondition("Egal",
                    _("Compare two expressions"),
                    _("Test the two expression"),
-                   _("_PARAM0_ _PARAM2_ _PARAM1_"),
+                   _("_PARAM0_ _PARAM1_ _PARAM2_"),
                    _("Other"),
                    "res/conditions/egal24.png",
                    "res/conditions/egal.png")

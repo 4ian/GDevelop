@@ -141,10 +141,9 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 	SetSize(640,480);
 
     platformList->InsertColumn(0,_("Platform"), wxLIST_FORMAT_LEFT, 640);
-    RefreshPlatformList();
-
     templateList->InsertColumn(0,_("Template"), wxLIST_FORMAT_LEFT, 640);
     templateList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 640);
+    RefreshPlatformList();
     RefreshTemplateList();
 
     UpdateListColumnsWidth();
@@ -157,7 +156,7 @@ void NewProjectDialog::RefreshPlatformList()
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
-    for (unsigned int i = platforms.size()-1;i<platforms.size();--i)
+    for (unsigned int i = 0;i<platforms.size();++i)
     {
         platformList->InsertItem(0, platforms[i]->GetFullName(), 0);
         gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName());
@@ -173,10 +172,10 @@ void NewProjectDialog::RefreshPlatformList()
             }
         }
 
-        if (i == 0)
+        if (i == platforms.size()-1)
         {
             chosenTemplatePlatform = platforms[i]->GetName();
-            platformList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE);
+            platformList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
         }
     }
 }

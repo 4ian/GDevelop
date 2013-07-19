@@ -74,6 +74,7 @@ class ProjectManager: public wxPanel
 		wxMenuItem* modVarSceneMenuI;
 		wxMenuItem* MenuItem10;
 		wxMenuItem* MenuItem12;
+		wxMenuItem* MenuItem24;
 		wxMenu externalEventsContextMenu;
 		wxMenu externalLayoutContextMenu;
 		wxMenuItem* MenuItem3;
@@ -117,6 +118,7 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM2;
 		static const long ID_MENUITEM3;
 		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM28;
 		static const long ID_MENUITEM5;
 		static const long ID_MENUITEM6;
 		static const long ID_MENUITEM7;
@@ -201,6 +203,7 @@ class ProjectManager: public wxPanel
 		void OnCutExternalLayoutSelected(wxCommandEvent& event);
 		void OnPasteExternalLayoutSelected(wxCommandEvent& event);
 		void OnprojectsTreeKeyDown(wxTreeEvent& event);
+		void OnOpenProjectFolderSelected(wxCommandEvent& event);
 		//*)
 
 		bool GetGameOfSelectedItem(gd::Project *& game, gdTreeItemProjectData *& data);

@@ -109,6 +109,12 @@
 				<handler function="OneditNameGameMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM28" variable="MenuItem24" member="yes">
+				<label>Open the folder of the project</label>
+				<bitmap>res/foldericon.png</bitmap>
+				<handler function="OnOpenProjectFolderSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="closeGameBt" member="yes">
 				<label>Close this project</label>
 				<handler function="OncloseGameBtSelected" entry="EVT_MENU" />

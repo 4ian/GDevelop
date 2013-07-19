@@ -61,6 +61,7 @@ const long ProjectManager::ID_MENUITEM1 = wxNewId();
 const long ProjectManager::ID_MENUITEM2 = wxNewId();
 const long ProjectManager::ID_MENUITEM3 = wxNewId();
 const long ProjectManager::ID_MENUITEM4 = wxNewId();
+const long ProjectManager::ID_MENUITEM28 = wxNewId();
 const long ProjectManager::ID_MENUITEM5 = wxNewId();
 const long ProjectManager::ID_MENUITEM6 = wxNewId();
 const long ProjectManager::ID_MENUITEM7 = wxNewId();
@@ -168,6 +169,10 @@ mainEditor(mainEditor_)
 	editNameGameMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	gameContextMenu.Append(editNameGameMenuItem);
 	gameContextMenu.AppendSeparator();
+	MenuItem24 = new wxMenuItem((&gameContextMenu), ID_MENUITEM28, _("Open the folder of the project"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem24->SetBitmap(wxBitmap(wxImage(_T("res/foldericon.png"))));
+	gameContextMenu.Append(MenuItem24);
+	gameContextMenu.AppendSeparator();
 	closeGameBt = new wxMenuItem((&gameContextMenu), ID_MENUITEM5, _("Close this project"), wxEmptyString, wxITEM_NORMAL);
 	gameContextMenu.Append(closeGameBt);
 	MenuItem2 = new wxMenuItem((&emptyExternalEventsContextMenu), ID_MENUITEM6, _("Add external events"), wxEmptyString, wxITEM_NORMAL);
@@ -262,6 +267,7 @@ mainEditor(mainEditor_)
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditPropGameMenuItemSelected);
 	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditGblVarMenuItemSelected);
 	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditNameGameMenuItemSelected);
+	Connect(ID_MENUITEM28,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnOpenProjectFolderSelected);
 	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OncloseGameBtSelected);
 	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalEventsSelected);
 	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnEditExternalEventsSelected);
@@ -1207,6 +1213,22 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
         for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnVariablesModified(*game);
     }
+}
+
+void ProjectManager::OnOpenProjectFolderSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    std::string dir = gd::ToString(wxFileName::FileName(game->GetProjectFile()).GetPath());
+    #if defined(WINDOWS)
+    wxExecute("explorer.exe \""+dir+"\"");
+    #elif defined(LINUX)
+    system(std::string("xdg-open \""+dir).c_str());
+    #elif defined(MAC)
+    system(std::string("open \""+dir).c_str());
+    #endif
 }
 
 /**

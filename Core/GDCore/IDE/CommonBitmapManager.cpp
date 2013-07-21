@@ -72,6 +72,7 @@ CommonBitmapManager::CommonBitmapManager()
     gdFileIcon32.LoadFile("res/gdFile32.png", wxBITMAP_TYPE_ANY);
     error48.LoadFile( "res/error48.png", wxBITMAP_TYPE_ANY );
     help16.LoadFile( "res/helpicon.png", wxBITMAP_TYPE_ANY );
+    group24.LoadFile( "res/group24.png", wxBITMAP_TYPE_ANY );
 
     layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
     undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);

@@ -30,6 +30,7 @@ public:
     void SetObject( const gd::Object * object );
     gd::Object * GetObject();
     bool HasObject() { return hasObject; };
+    void ForgetObject() { hasObject = false; };
 
     void SetEvents( const std::vector<gd::BaseEventSPtr> & event );
     std::vector<gd::BaseEventSPtr> GetEvents();
@@ -57,6 +58,7 @@ public:
     void SetObjectGroup( const gd::ObjectGroup & group );
     gd::ObjectGroup GetObjectGroup();
     bool HasObjectGroup() { return hasObjectGroup; };
+    void ForgetObjectGroup() { hasObjectGroup = false; };
 
     void SetInstances( std::vector < boost::shared_ptr<InitialInstance> > instances );
     std::vector < boost::shared_ptr<InitialInstance> > GetInstances() { return instancesCopied; };

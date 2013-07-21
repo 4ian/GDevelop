@@ -400,11 +400,8 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
 
     //Find a new unique name for the object
     std::string name = ToString(_("NewObject"));
-    for (unsigned int i = 0;layout.HasObjectNamed(name);)
-    {
-        ++i;
+    for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
         name =  _("NewObject")+ToString(i);
-    }
 
     //Add a new object of selected type to objects list
     layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, layout.GetObjectsCount());

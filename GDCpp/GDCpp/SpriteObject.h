@@ -61,7 +61,7 @@ public :
     virtual gd::Object * Clone() const { return new SpriteObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );

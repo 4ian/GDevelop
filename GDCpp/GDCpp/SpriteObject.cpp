@@ -195,7 +195,7 @@ sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instan
                         associatedSprite->GetOrigine().GetY()*abs(scaleY));
 }
 
-bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
+bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
     //Generate a thumbnail from the first animation
     if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )

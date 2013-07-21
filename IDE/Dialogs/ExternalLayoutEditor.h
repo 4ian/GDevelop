@@ -21,7 +21,7 @@ namespace gd { class Project; }
 namespace gd { class ExternalLayout; }
 namespace gd { class LayersEditorPanel; }
 namespace gd { class LayoutEditorCanvas; }
-class EditorObjets;
+namespace gd { class ObjectsEditor; }
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
 
@@ -94,7 +94,7 @@ private:
     gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* layoutPanel;
     //*)
-    boost::shared_ptr<EditorObjets> objectsEditor;
+    boost::shared_ptr<gd::ObjectsEditor> objectsEditor;
     boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
     boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
     boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;

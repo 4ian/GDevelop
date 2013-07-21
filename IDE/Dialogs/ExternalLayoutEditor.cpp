@@ -16,7 +16,7 @@
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"
 #include "LayoutEditorPropertiesPnl.h"
-#include "../EditorObjets.h"
+#include "ObjectsEditor.h"
 #include "../MainFrame.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
@@ -204,7 +204,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
         //Check if external editors already have been created
-        bool creatingEditorsForFirsttime = (objectsEditor == boost::shared_ptr<EditorObjets>() ||
+        bool creatingEditorsForFirsttime = (objectsEditor == boost::shared_ptr<ObjectsEditor>() ||
                                             layersEditor == boost::shared_ptr<gd::LayersEditorPanel>() ||
                                             propertiesPnl == boost::shared_ptr<LayoutEditorPropertiesPnl>());
 
@@ -215,7 +215,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
         //Creating external editors and linking them to the layout canvas
-        objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper));
+        objectsEditor = boost::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, &layout, mainFrameWrapper));
         layersEditor = boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
         propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper) );
         initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );

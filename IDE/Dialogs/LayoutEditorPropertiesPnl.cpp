@@ -89,15 +89,9 @@ void LayoutEditorPropertiesPnl::Refresh()
 
         object = NULL;
         if  ( layout.HasObjectNamed(objectName) )
-        {
             object = &layout.GetObject(objectName);
-            objectLayout = &layout;
-        }
         else if  ( project.HasObjectNamed(objectName) )
-        {
             object = &project.GetObject(objectName);
-            objectLayout = NULL;
-        }
 
         if ( object )
             objectsHelper.RefreshFrom(object, /*has initial instance content=*/true);
@@ -131,11 +125,10 @@ void LayoutEditorPropertiesPnl::InitialInstancesUpdated()
     Refresh();
 }
 
-void LayoutEditorPropertiesPnl::SelectedObject(gd::Object * object_, gd::Layout * objectLayout_)
+void LayoutEditorPropertiesPnl::SelectedObject(gd::Object * object_)
 {
     displayInstancesProperties = false;
     object = object_;
-    objectLayout = objectLayout_;
     Refresh();
 }
 

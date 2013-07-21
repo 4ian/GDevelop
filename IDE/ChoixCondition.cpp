@@ -461,7 +461,9 @@ void ChoixCondition::RefreshList()
 void ChoixCondition::RefreshObjectsLists()
 {
     gd::ObjectListDialogsHelper objectListsHelper(game, scene);
-    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", string(objectsSearchCtrl->GetValue().mb_str()));
+    objectListsHelper.SetSearchText(ToString(objectsSearchCtrl->GetValue()));
+    objectListsHelper.SetAllowedObjectType("");
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups);
 }
 
 void ChoixCondition::RefreshObjectConditionsList()

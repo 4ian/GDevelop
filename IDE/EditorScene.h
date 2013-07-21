@@ -25,8 +25,8 @@ namespace gd {class Layout;}
 namespace gd {class Project;}
 namespace gd {class LayoutEditorCanvas;}
 namespace gd {class LayersEditorPanel;}
+namespace gd {class ObjectsEditor;}
 class CppLayoutPreviewer;
-class EditorObjets;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
@@ -98,7 +98,7 @@ private:
     wxAuiNotebook* notebook;
     wxScrollBar* vScrollbar;
     //*)
-    boost::shared_ptr<EditorObjets> objectsEditor;
+    boost::shared_ptr<gd::ObjectsEditor> objectsEditor;
     boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
     boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
     boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;

@@ -44,7 +44,7 @@
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "EditorObjets.h"
+#include "Dialogs/ObjectsEditor.h"
 #include "EventsEditor.h"
 #include "EditorScene.h"
 #include "CodeEditor.h"
@@ -420,11 +420,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Objects"));
-        EditorObjectList::CreateRibbonPage(ribbonEditorPage);
-    }
-    {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Groups"));
-        EditorObjetsGroups::CreateRibbonPage(ribbonEditorPage);
+        gd::ObjectsEditor::CreateRibbonPage(ribbonEditorPage);
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Code"));

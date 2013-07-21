@@ -51,7 +51,7 @@ public:
      * Members functions related to displaying the properties of an object selected in a objects editor
      */
     ///@{
-    virtual void SelectedObject(gd::Object * object, gd::Layout * objectLayout);
+    virtual void SelectedObject(gd::Object * object);
     virtual void ObjectsUpdated() {};
     ///@}
 
@@ -77,7 +77,6 @@ private:
     gd::Layout & layout;
     gd::LayoutEditorCanvas * layoutEditorCanvas; ///< Optional pointer to the LayoutEditorCanvas which is using this editor to display instances properties
     gd::Object * object; ///< The object being selected, if any, in the objects list editor using the property grid.
-    gd::Layout * objectLayout; ///< The layout of the selected object : NULL if object is global. Otherwise, should be equal to the other layout member.
 
     gd::InitialInstancesPropgridHelper instancesHelper; ///< The class managing the property grid when a gd::InitialInstance is selected.
     gd::ObjectsPropgridHelper objectsHelper; ///< The class managing the property grid when a gd::Object is selected.

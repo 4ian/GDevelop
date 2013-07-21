@@ -31,9 +31,12 @@ std::string ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenera
 
     ProfileLink profileLink;
     profileLink.originalEvent = originalEvent;
-    scene.GetProfiler()->profileEventsInformation.push_back(profileLink);
-    index = scene.GetProfiler()->profileEventsInformation.size()-1;
-
+    std::cout << scene.GetProfiler() << std::endl;
+    if ( scene.GetProfiler() ) //Should always be not NULL
+    {
+        scene.GetProfiler()->profileEventsInformation.push_back(profileLink);
+        index = scene.GetProfiler()->profileEventsInformation.size()-1;
+    }
     std::string code;
 
     if ( previousProfileEvent )

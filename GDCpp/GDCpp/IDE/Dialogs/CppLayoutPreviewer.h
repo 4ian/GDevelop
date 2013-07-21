@@ -29,7 +29,7 @@ class GD_API CppLayoutPreviewer : public gd::LayoutEditorPreviewer
 {
 public:
     CppLayoutPreviewer(gd::LayoutEditorCanvas & editor);
-    virtual ~CppLayoutPreviewer() {};
+    virtual ~CppLayoutPreviewer();
 
     /**
      * \brief Return a reference to the scene used for preview inside the editor.

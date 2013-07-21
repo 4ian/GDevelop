@@ -69,6 +69,11 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());
 }
 
+CppLayoutPreviewer::~CppLayoutPreviewer()
+{
+    editor.GetLayout().SetProfiler(NULL);
+};
+
 /**
  * Go in preview mode
  */

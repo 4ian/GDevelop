@@ -10,7 +10,6 @@
 #include <vector>
 //(*Headers(ChooseObjectDialog)
 #include <wx/treectrl.h>
-#include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/menu.h>
 #include <wx/textctrl.h>
@@ -67,19 +66,14 @@ public:
     wxMenu Menu2;
     wxMenu Menu1;
     wxSearchCtrl* searchCtrl;
-    wxNotebook* Notebook1;
-    wxTreeCtrl* globalObjectGroups;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem4;
-    wxButton* AucunBt;
+    wxTreeCtrl* objectsList;
     wxButton* ChoisirBt;
     wxMenuItem* editGroupMenuItem;
-    wxTreeCtrl* ObjetsList;
     wxStaticLine* StaticLine1;
-    wxTreeCtrl* globalObjectsList;
     wxButton* AnnulerBt;
     wxMenuItem* editMenuItem;
-    wxTreeCtrl* GroupesList;
     //*)
 
 
@@ -87,15 +81,10 @@ protected:
 
     //(*Identifiers(ChooseObjectDialog)
     static const long ID_TREECTRL1;
-    static const long ID_TREECTRL2;
-    static const long ID_TREECTRL3;
-    static const long ID_TREECTRL4;
-    static const long ID_NOTEBOOK1;
     static const long ID_TEXTCTRL1;
     static const long ID_STATICLINE1;
     static const long ID_BUTTON1;
     static const long ID_BUTTON2;
-    static const long ID_BUTTON3;
     static const long ID_MENUITEM2;
     static const long ID_MENUITEM1;
     static const long ID_MENUITEM3;

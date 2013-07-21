@@ -10,91 +10,22 @@
 			<growablecols>0</growablecols>
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
-				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-					<object class="notebookpage">
-						<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ObjetsList" member="yes">
-							<image_list></image_list>
-							<tree_items>
-								<item>ObjetsList</item>
-								<item></item>
-							</tree_items>
-							<items_text>
-								<item2>ObjetsList</item2>
-								<item2></item2>
-							</items_text>
-							<pos>-71,-11</pos>
-							<tooltip>Choose an object in the list</tooltip>
-							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
-							<handler function="OnObjetsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
-							<handler function="OnObjetsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
-							<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
-						</object>
-						<label>Objects</label>
-					</object>
-					<object class="notebookpage">
-						<object class="wxTreeCtrl" name="ID_TREECTRL2" variable="GroupesList" member="yes">
-							<image_list></image_list>
-							<tree_items>
-								<item>GroupesList</item>
-								<item></item>
-							</tree_items>
-							<items_text>
-								<item2>GroupesList</item2>
-								<item2></item2>
-							</items_text>
-							<pos>-71,-11</pos>
-							<tooltip>Choose an object in the list</tooltip>
-							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
-							<handler function="OnGroupesListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
-							<handler function="OnGroupesListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
-							<handler function="OnGroupesListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
-						</object>
-						<label>Objects groups</label>
-					</object>
-					<object class="notebookpage">
-						<object class="wxTreeCtrl" name="ID_TREECTRL3" variable="globalObjectsList" member="yes">
-							<image_list></image_list>
-							<tree_items>
-								<item>globalObjectsList</item>
-								<item></item>
-							</tree_items>
-							<items_text>
-								<item2>globalObjectsList</item2>
-								<item2></item2>
-							</items_text>
-							<pos>-71,-11</pos>
-							<tooltip>Choose an object in the list</tooltip>
-							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
-							<handler function="OnglobalObjectsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
-							<handler function="OnglobalObjectsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
-							<handler function="OnglobalObjectsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
-						</object>
-						<label>Global objects</label>
-					</object>
-					<object class="notebookpage">
-						<object class="wxTreeCtrl" name="ID_TREECTRL4" variable="globalObjectGroups" member="yes">
-							<image_list></image_list>
-							<tree_items>
-								<item>globalObjectGroups</item>
-								<item></item>
-							</tree_items>
-							<items_text>
-								<item2>globalObjectGroups</item2>
-								<item2></item2>
-							</items_text>
-							<pos>-71,-11</pos>
-							<tooltip>Choose an object in the list</tooltip>
-							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
-							<handler function="OnglobalObjectGroupsItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
-							<handler function="OnglobalObjectGroupsItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
-							<handler function="OnglobalObjectGroupsSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
-						</object>
-						<label>Global groups</label>
-					</object>
+				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="objectsList" member="yes">
+					<image_list></image_list>
+					<tree_items>
+						<item>objectsList</item>
+						<item></item>
+					</tree_items>
+					<items_text>
+						<item2>objectsList</item2>
+						<item2></item2>
+					</items_text>
+					<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+					<handler function="OnObjetsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
+					<handler function="OnObjetsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
+					<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
-				<option>1</option>
+				<flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 			</object>
 			<object class="sizeritem">
 				<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
@@ -102,7 +33,6 @@
 					<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
@@ -130,15 +60,6 @@
 							<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
-						<option>1</option>
-					</object>
-					<object class="sizeritem">
-						<object class="wxButton" name="ID_BUTTON3" variable="AucunBt" member="yes">
-							<label>None</label>
-							<handler function="OnAucunBtClick" entry="EVT_BUTTON" />
-						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>

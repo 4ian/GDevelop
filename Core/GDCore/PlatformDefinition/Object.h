@@ -170,7 +170,7 @@ public:
      * \brief Must update \a thumbnail bitmap with a 24*24 bitmap.
      * \return true if thumbnail was successfully updated.
      */
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) {return false;};
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const {return false;};
     ///@}
     #endif
 

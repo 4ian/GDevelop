@@ -1,6 +1,6 @@
 @echo off
 echo.
-echo Tool for updating include directory for Dev target.
+echo Tool for updating include directory for Release target.
 echo.
 
 echo -Copying files...

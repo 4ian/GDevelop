@@ -48,7 +48,6 @@
 #include "EventsEditor.h"
 #include "EditorScene.h"
 #include "CodeEditor.h"
-#include "EditorObjectList.h"
 #include "DnDFileEditor.h"
 #include "ConsoleManager.h"
 #include "ProjectManager.h"

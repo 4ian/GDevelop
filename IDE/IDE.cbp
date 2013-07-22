@@ -550,24 +550,6 @@
 		<Unit filename="EditPropScene.h">
 			<Option virtualFolder="Editeur principal/Autres/" />
 		</Unit>
-		<Unit filename="EditorObjectList.cpp">
-			<Option virtualFolder="Editeurs/Editeur Scene/Editeur objets/" />
-		</Unit>
-		<Unit filename="EditorObjectList.h">
-			<Option virtualFolder="Editeurs/Editeur Scene/Editeur objets/" />
-		</Unit>
-		<Unit filename="EditorObjets.cpp">
-			<Option virtualFolder="Editeurs/Editeur Scene/Editeur objets/" />
-		</Unit>
-		<Unit filename="EditorObjets.h">
-			<Option virtualFolder="Editeurs/Editeur Scene/Editeur objets/" />
-		</Unit>
-		<Unit filename="EditorObjetsGroups.cpp">
-			<Option virtualFolder="Editeurs/Editeur Scene/Editeur objets/" />
-		</Unit>
-		<Unit filename="EditorObjetsGroups.h">
-			<Option virtualFolder="Editeurs/Editeur Scene/Editeur objets/" />
-		</Unit>
 		<Unit filename="EditorScene.cpp">
 			<Option virtualFolder="Editeurs/Editeur Scene/" />
 		</Unit>
@@ -746,7 +728,6 @@
 				<gui name="wxWidgets" src="Game_Develop_EditorApp.cpp" main="-- None --" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxFrame wxs="wxsmith/MainFrame.wxs" src="MainFrame.cpp" hdr="MainFrame.h" fwddecl="0" i18n="1" name="MainFrame" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" fwddecl="0" i18n="1" name="EditorObjets" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" fwddecl="0" i18n="1" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" fwddecl="0" i18n="1" name="ChoixAction" language="CPP" />
 					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" fwddecl="0" i18n="1" name="EditOptionsPosition" language="CPP" />
@@ -766,7 +747,6 @@
 					<wxDialog wxs="wxsmith/CreateTemplate.wxs" src="CreateTemplate.cpp" hdr="CreateTemplate.h" fwddecl="0" i18n="1" name="CreateTemplate" language="CPP" />
 					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" fwddecl="0" i18n="1" name="GeneratePassword" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorScene.wxs" src="EditorScene.cpp" hdr="EditorScene.h" fwddecl="0" i18n="1" name="EditorScene" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" fwddecl="0" i18n="1" name="EditorObjetsGroups" language="CPP" />
 					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" fwddecl="0" i18n="1" name="EditObjectGroup" language="CPP" />
 					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" fwddecl="0" i18n="1" name="ImportImage" language="CPP" />
 					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" fwddecl="0" i18n="1" name="ImageEditor" language="CPP" />
@@ -779,7 +759,6 @@
 					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="DebuggerGUI.cpp" hdr="DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoiceJoyAxis.wxs" src="ChoiceJoyAxis.cpp" hdr="ChoiceJoyAxis.h" fwddecl="0" i18n="1" name="ChoiceJoyAxis" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoiceFile.wxs" src="ChoiceFile.cpp" hdr="ChoiceFile.h" fwddecl="0" i18n="1" name="ChoiceFile" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorObjectList.wxs" src="EditorObjectList.cpp" hdr="EditorObjectList.h" fwddecl="0" i18n="1" name="EditorObjectList" language="CPP" />
 					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" fwddecl="0" i18n="1" name="ConsoleFrame" language="CPP" />
 					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" fwddecl="0" i18n="1" name="SpriteInitialPositionPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" fwddecl="0" i18n="1" name="TextObjectEditor" language="CPP" />

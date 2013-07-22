@@ -19,6 +19,7 @@
 						<item2>&lt;none&gt;</item2>
 					</items_text>
 					<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_ROW_LINES|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+					<handler function="OnobjectsListBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
 					<handler function="OnobjectsListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 					<handler function="OnobjectsListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
 					<handler function="OnobjectsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />

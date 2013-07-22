@@ -169,6 +169,7 @@ private:
     void OnsearchCtrlText(wxCommandEvent& event);
     void OnSetGlobalSelected(wxCommandEvent& event);
     void OnSetFocus(wxFocusEvent& event);
+    void OnobjectsListBeginDrag(wxTreeEvent& event);
     //*)
     void OnHelpSelected(wxCommandEvent& event);
     wxTreeItemId AddObjectsToList(gd::ClassWithObjects & objects, bool globalObject);

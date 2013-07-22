@@ -20,6 +20,8 @@
 #include <wx/choicdlg.h>
 #include <wx/imaglist.h>
 #include <wx/richtooltip.h>
+#include <wx/dataobj.h>
+#include <wx/dnd.h>
 #include <boost/algorithm/string.hpp>
 
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
@@ -189,6 +191,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListBeginDrag);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListBeginLabelEdit);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListEndLabelEdit);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemActivated);
@@ -1224,6 +1227,24 @@ void ObjectsEditor::OnSetFocus(wxFocusEvent& event)
         UpdateAssociatedPropertiesPanel();
     }
 }
+
+void ObjectsEditor::OnobjectsListBeginDrag(wxTreeEvent& event)
+{
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
+    if (!data) return;
+
+    if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
+    {
+        gd::Object * object = GetSelectedObject();
+        if ( !object ) return;
+
+        wxTextDataObject objectName(object->GetName());
+        wxDropSource dragSource( this );
+        dragSource.SetData( objectName );
+        dragSource.DoDragDrop( true );
+    }
+}
+
 
 void ObjectsEditor::UpdateAssociatedPropertiesPanel()
 {

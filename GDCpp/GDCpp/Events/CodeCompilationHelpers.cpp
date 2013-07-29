@@ -230,12 +230,14 @@ namespace
             boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
             if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
-            if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".a") )
+            if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".a") ||
+                 wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".dll.a") )
                 task.compilerCall.extraLibFiles.push_back(extension->GetName());
 
             for (unsigned int j =0;j<extension->GetSupplementaryLibFiles().size();++j)
             {
-                if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") )
+                if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") ||
+                     wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".dll.a"))
                     task.compilerCall.extraLibFiles.push_back(extension->GetSupplementaryLibFiles()[j]);
             }
         }

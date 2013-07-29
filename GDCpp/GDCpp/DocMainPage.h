@@ -24,11 +24,12 @@
  * Follow these three step to be able to compile extensions for %Game Develop:
  * -# \subpage installWinLibs
  * -# \subpage installWinCompiler
- * -# \subpage installWinCB
+ * -# \subpage installAndUseCMake
  * <br>
  *
  * <b>GNU/Linux</b>
  * -# \subpage installLinux
+ * -# \subpage installAndUseCMake
  */
 
 /**
@@ -83,12 +84,9 @@
  */
 
 /**
- *  \page installWinCB (Windows) Download and install Code::Blocks
+ *  \page installAndUseCMake (All) Install and use Cmake
  *
- * Projects files provided with the SDK are Code::Blocks projects.<br>
- * <br>
- * You can download Code::Blocks on the official website : www.codeblocks.org.<br>
- * Note that the last released version can be a bit old, you can download a recent version ( "Nighty build" ) on the forum : http://forums.codeblocks.org/index.php/board,20.0.html
+ * TODO
  */
 
 /**
@@ -127,9 +125,8 @@
  * sudo make install
  * \endcode
  *
- * \subsection codeBlocks Install Code::Blocks
- * You'll need the Code::Blocks IDE to open %Game Develop Extensions project files.
- * Code::Blocks is generally available for your distribution thanks to the usual package manager.
+ * \subsection codeBlocks Install CMake
+ * You'll need CMake to build the extensions.
  *
  * \section copyFiles Copy some files
 

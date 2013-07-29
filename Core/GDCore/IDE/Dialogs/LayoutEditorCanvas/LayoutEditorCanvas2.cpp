@@ -413,8 +413,17 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
     AddObject(name, oldMouseX, oldMouseY);
 
     //Edit now the object
-    layout.GetObject(name).EditObject(this, project, mainFrameWrapper);
+    gd::Object & object = layout.GetObject(name);
+    object.EditObject(this, project, mainFrameWrapper);
     project.GetCurrentPlatform().GetChangesNotifier().OnObjectEdited(project, &layout, layout.GetObject(name));
+
+    //Reload resources
+    if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+        wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+
+    object.LoadResources(project, layout);
+
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 }
 
 void LayoutEditorCanvas::OnLockSelected(wxCommandEvent & event)

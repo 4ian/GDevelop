@@ -68,7 +68,7 @@ gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, gd
 /**
  * Render the event
  */
-void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform &)
+void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform &)
 {
     x += 1; //Small border
 

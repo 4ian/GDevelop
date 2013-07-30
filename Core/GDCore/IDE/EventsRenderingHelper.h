@@ -12,8 +12,8 @@
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
 namespace gd { class Platform; }
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
+namespace gd { class EventsEditorItemsAreas; }
+namespace gd { class EventsEditorSelection; }
 namespace gd { class InstructionMetadata;}
 namespace gd {class InstructionsMetadataHolder;}
 
@@ -27,7 +27,7 @@ namespace gd
  * Class providing default colors, fonts and drawing functions so as to
  * render events using wxWidgets toolkit.
  *
- * \ingroup IDE
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API EventsRenderingHelper
 {
@@ -54,14 +54,14 @@ class GD_CORE_API EventsRenderingHelper
          * \return Height used for the drawing
          */
         int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
-                               EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
+                               gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
         /**
          * \brief Draw the specified action list
          * \see gd::EventsRenderingHelper::DrawConditionsList
          */
         int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
-                            EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
+                            gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
         /**
          * \brief Get the height taken by drawing a condition list
@@ -107,7 +107,7 @@ class GD_CORE_API EventsRenderingHelper
         int DrawInstruction(gd::Instruction & instruction,
                             const gd::InstructionMetadata & instructionMetadata,
                             bool isCondition, wxDC & dc, wxPoint point, int freeWidth,
-                            gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+                            gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.

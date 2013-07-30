@@ -148,7 +148,7 @@ gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::P
 /**
  * Render the event in the bitmap
  */
-void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
+void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
     dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );

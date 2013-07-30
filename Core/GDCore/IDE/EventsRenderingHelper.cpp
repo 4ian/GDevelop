@@ -137,7 +137,7 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
 }
 
 int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
-                                              EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
+                                              gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     int initialYPosition = y;
 
@@ -176,7 +176,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         if ( j != 0 ) y += separationBetweenInstructions;
 
         const gd::InstructionMetadata & instructionMetadata = MetadataProvider::GetConditionMetadata(platform, conditions[j].GetType());
-        InstructionItem accessor(&conditions[j], /*isCondition=*/true, &conditions, j, event);
+        gd::InstructionItem accessor(&conditions[j], /*isCondition=*/true, &conditions, j, event);
 
         //Get the width available
         int leftIconsWidth = conditions[j].IsInverted() ? iconWidth*2 : iconWidth;
@@ -238,7 +238,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
 }
 
 int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
-                                           EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
+                                           gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     int initialYPosition = y;
 
@@ -277,7 +277,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         if ( j != 0 ) y += separationBetweenInstructions;
 
         const gd::InstructionMetadata & instructionMetadata = MetadataProvider::GetActionMetadata(platform, actions[j].GetType());
-        InstructionItem accessor(&actions[j], /*isCondition=*/false, &actions, j, event);
+        gd::InstructionItem accessor(&actions[j], /*isCondition=*/false, &actions, j, event);
 
         //Get the width available
         int freeWidth = width - iconWidth;
@@ -394,7 +394,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 }
 
 int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & instructionMetadata, bool isCondition,
-                                           wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+                                           wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection)
 {
     std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? ConditionSentenceFormatter::GetAsFormattedText(instruction, instructionMetadata) :
                                                                                         ActionSentenceFormatter::GetInstance()->GetAsFormattedText(instruction, instructionMetadata);

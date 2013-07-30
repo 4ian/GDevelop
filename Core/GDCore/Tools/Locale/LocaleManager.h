@@ -13,7 +13,7 @@ namespace gd
 {
 
 /**
- * \brief Class allowing to use a common wxLocale object for GD IDE as well as for extensions.
+ * \brief Class allowing to use a common wxLocale object for the IDE as well as for extensions.
  *
  * You may want to use this class if you have a custom translation catalog to add. See LocaleManager::AddCatalog
  *
@@ -21,36 +21,50 @@ namespace gd
  */
 class GD_CORE_API LocaleManager
 {
-    public:
-        wxLocale * locale; ///< wxWidgets locale object
-        bool SetLanguage(int languageWxWidgetsId);
-        void AddCatalog(std::string catalogName);
+public:
+    wxLocale * locale; ///< wxWidgets locale object
+    bool SetLanguage(int languageWxWidgetsId);
+    
+    /**
+     * \brief Add a catalog name.
+     *
+     * If catalog name is GD, then the file must be named GD.mo and located
+     * in a search path. ( locale directory for example or xxxPlatform/Extensions/locale ).
+     * \param catalogName The name of the translation catalog.
+     */
+    void AddCatalog(std::string catalogName);
 
-        static LocaleManager *GetInstance()
+    /**
+     * \brief Add a path where catalog are searched. 
+     * \param path The path, relative to the Game Develop directory.
+     */
+    void AddPath(std::string path);
+
+    static LocaleManager *GetInstance()
+    {
+        if ( !_singleton )
         {
-            if ( !_singleton )
-            {
-                _singleton = new LocaleManager;
-            }
-
-            return ( static_cast<LocaleManager*>( _singleton ) );
+            _singleton = new LocaleManager;
         }
 
-        static void DestroySingleton()
+        return ( static_cast<LocaleManager*>( _singleton ) );
+    }
+
+    static void DestroySingleton()
+    {
+        if ( _singleton )
         {
-            if ( _singleton )
-            {
-                delete _singleton;
-                _singleton = 0;
-            }
+            delete _singleton;
+            _singleton = 0;
         }
+    }
 
-    private:
+private:
 
-        LocaleManager() : locale(NULL) {};
-        virtual ~LocaleManager() {};
+    LocaleManager() : locale(NULL) {};
+    virtual ~LocaleManager() {};
 
-        static LocaleManager *_singleton;
+    static LocaleManager *_singleton;
 };
 
 }

@@ -20,7 +20,6 @@ bool LocaleManager::SetLanguage(int languageWxWidgetsId)
     wxLocale::AddCatalogLookupPathPrefix(wxT("."));
     wxLocale::AddCatalogLookupPathPrefix(wxT(".."));
     wxLocale::AddCatalogLookupPathPrefix(_T("locale"));
-    wxLocale::AddCatalogLookupPathPrefix(_T("Extensions"));
     locale->AddCatalog(_T("wxstd"));   //wxWidgets specific translations
     locale->AddCatalog(_T("GD"));      //Application translations
 
@@ -33,6 +32,12 @@ void LocaleManager::AddCatalog(std::string catalogName)
 {
     if ( locale )
         locale->AddCatalog(catalogName);
+}
+
+void LocaleManager::AddPath(std::string path)
+{
+    wxLogNull noLog;
+    wxLocale::AddCatalogLookupPathPrefix(path);
 }
 
 }

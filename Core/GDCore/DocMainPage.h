@@ -1,17 +1,22 @@
 /**
- * \mainpage %Game Develop Core
+ * \mainpage Game Develop Core
  * \image html images/gdlogo.png
  * \section welcome Welcome
  * The <b>Game Develop Core</b> library contains the main concepts, classes and tools that are used by the platforms and the Game Develop IDE.<br>
  * This ensures that the IDE, or any tool based on Game Develop Core, is able to work with projects based on any arbitrary platform.
  *
- * Two officials platforms are available for Game Develop: The C++ Platform ( GDCpp ) and the JS Platform ( GDJS ).<br>
+ * Two official platforms are available for Game Develop: 
+ *  - The C++ Platform ( GDCpp ) 
+ *  - The JS Platform ( GDJS )
  *
  * \section aboutdoc About this documentation
  *
  * If you want to improve a platform or implement a new one, you should refer to this documentation.<br>
  * If you want to develop an extension for an already existing platform ( like the C++ %Platform or the JS %Platform ), read <b>the documentation
  * of this platform</b>. You can however refer to this documentation when you need to work with something defined by Game Develop Core.
+ *
+ *  - [Open Game Develop C++ Platform documentation](../../../GDCpp/doc/Documentation/index.html) 
+ *  - [Open Game Develop JS Platform documentation](../../../GDJS/docs/Platform Documentation/index.html) 
  *
  * If you never used Game Develop Core before, take a look at \subpage platformAndExtensionsStructure.
  */
@@ -29,7 +34,7 @@
  * "DestroyGDPlatform". These symbols must exists and must create ( or destroy ) the platform class.<br>
  * You can refer to the documentation of gd::Platform to see what services a platform should offer.<br>
  * <br>
- * The platform dynamic library file is often located inside <i>Game Develop directory</i>/*Platform ( * being replaced by the platform acronym ). <br>
+ * The platform dynamic library file is often located inside <i>Game Develop directory</i>/xxxPlatform ( xxx being replaced by the platform acronym ). <br>
  * In this folder, the platform can store basically anything it needs. For example, both GDJS and GDCpp are storing a folder called <b>"Runtime"</b> containing
  * the game engine.<br>
  * If there is a sub directory called <b>"Extensions"</b>, the gd::PlatformLoader tries to load the extensions contained inside ( see below ).
@@ -53,20 +58,131 @@
 
 /**
  * \defgroup PlatformDefinition Platform Definition ( Classes defining the common concepts used by all platforms )
+ *
+ * Classes defining the common concepts used by all platforms
  */
 
 /**
  * \defgroup IDE IDE Classes ( Classes to be used to implement a development environment )
+ *
+ * Classes to be used to implement a development environment
  */
 
 /**
  * \defgroup IDEDialogs IDE Dialogs ( Pre-made dialogs to be used to implement a development environment )
+ *
+ * Pre-made dialogs to be used to implement a development environment 
+ */
+
+/**
+ * \defgroup IDEDialogsEventsEditor Events Editor related classes
+ *
+ * Classes and tools used to implement an events editor.
+ * \ingroup IDEDialogs
  */
 
 /**
  * \defgroup Events Events ( Classes defining the event system and some tools associated with events )
+ *
+ * Classes defining the event system and some tools associated with events
  */
 
 /**
  * \defgroup CommonProgrammingTools Common programming tools
+ * 
+ * Common functions and tools for programming.
  */
+
+/**
+ * \defgroup TinyXml Integrated TinyXml library
+ * 
+ * See the full documentation of TinyXml [here](http://www.grinninglizard.com/tinyxmldocs/index.html).
+ */
+
+/**
+ * \class TiXmlAttribute
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlAttributeSet
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlBase
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlComment
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlCursor
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlDeclaration
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlDocument
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlElement
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlHandle
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlNode
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlOutStream
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlParsingData
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlPrinter
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlString
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlText
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlUnknown
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlVisitor
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+
+

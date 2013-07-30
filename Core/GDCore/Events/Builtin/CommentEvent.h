@@ -12,8 +12,8 @@ namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
 class wxWindow;
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
+namespace gd { class EventsEditorItemsAreas; }
+namespace gd { class EventsEditorSelection; }
 
 namespace gd
 {
@@ -45,7 +45,7 @@ public:
     /**
      * Called by event editor to draw the event.
      */
-    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & );
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & );
 
     /**
      * Must return the height of the event when rendered

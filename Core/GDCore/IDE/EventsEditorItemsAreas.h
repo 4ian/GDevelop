@@ -14,10 +14,14 @@ namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
 namespace gd { class Expression; }
 
+namespace gd
+{
+
 /**
  * \brief Tool class to store information about an event.
  *
- * Used  by events editor to indicate to EventsEditorItemsAreas that an event is displayed somewhere.
+ * Used by events editor to indicate to EventsEditorItemsAreas that an event is displayed somewhere.
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API EventItem
 {
@@ -26,16 +30,17 @@ public:
     EventItem();
     ~EventItem() {};
 
-    bool operator==(const EventItem & other) const;
+    bool operator==(const gd::EventItem & other) const;
 
     boost::shared_ptr<gd::BaseEvent> event;
     std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList;
     unsigned int positionInList;
 };
-size_t hash_value(const EventItem & a);
+size_t hash_value(const gd::EventItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that an instruction is displayed somewhere
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API InstructionItem
 {
@@ -47,7 +52,7 @@ public:
     InstructionItem();
     ~InstructionItem() {};
 
-    bool operator==(const InstructionItem & other) const;
+    bool operator==(const gd::InstructionItem & other) const;
 
     gd::Instruction * instruction;
     bool isCondition;
@@ -55,10 +60,11 @@ public:
     unsigned int positionInList;
     gd::BaseEvent * event;
 };
-size_t hash_value(const InstructionItem & a);
+size_t hash_value(const gd::InstructionItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that an instruction list is displayed somewhere
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API InstructionListItem
 {
@@ -80,6 +86,7 @@ size_t hash_value(const InstructionListItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that a parameter is displayed somewhere
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API ParameterItem
 {
@@ -97,6 +104,7 @@ size_t hash_value(const ParameterItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that a fold/unfold button is displayed somewhere
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API FoldingItem
 {
@@ -113,129 +121,132 @@ size_t hash_value(const FoldingItem & a);
 
 /**
  * \brief Allow events to indicate where is displayed an instruction or parameter.
+ *
  * Events editor also uses this internally to indicate where events are displayed.
+ * \ingroup IDEDialogsEventsEditor
  */
 class GD_CORE_API EventsEditorItemsAreas
 {
 public:
 
     /**
-     * Notify the editor there is an instruction in this area
+     * \brief Notify the editor there is an instruction in this area
      */
-    void AddInstructionArea(wxRect area, InstructionItem & instruction);
+    void AddInstructionArea(wxRect area, gd::InstructionItem & instruction);
 
     /**
-     * Notify the editor there is a parameter in this area
+     * \brief Notify the editor there is a parameter in this area
      */
     void AddParameterArea(wxRect area, ParameterItem & parameter);
 
     /**
-     * Notify the editor there is an event in this area
+     * \brief Notify the editor there is an event in this area
      */
-    void AddEventArea(wxRect area, EventItem & event);
+    void AddEventArea(wxRect area, gd::EventItem & event);
 
     /**
-     * Notify the editor there is a folding button in this area
+     * \brief Notify the editor there is a folding button in this area
      */
     void AddFoldingItem(wxRect area, FoldingItem & event);
 
     /**
-     * Notify the editor there is a list in this area
+     * \brief Notify the editor there is a list in this area
      */
     void AddInstructionListArea(wxRect area, InstructionListItem & item);
 
     /**
-     * True if a point is on an event.
+     * \brief True if a point is on an event.
      */
     bool IsOnEvent(int x, int y);
 
     /**
-     * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
+     * \brief Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
      */
     EventItem GetEventAt(int x, int y);
 
     /**
-     * Return the rectangle used by the event at point(x,y).
+     * \brief Return the rectangle used by the event at point(x,y).
      */
     wxRect GetAreaOfEventAt(int x, int y);
 
     /**
-     * True if a point is on an instruction.
+     * \brief True if a point is on an instruction.
      */
     bool IsOnInstruction(int x, int y);
 
     /**
-     * Return event at point (x,y). Be sure there is an event here using IsOnInstruction(x,y);
+     * \brief Return event at point (x,y). Be sure there is an event here using IsOnInstruction(x,y);
      */
-    InstructionItem GetInstructionAt(int x, int y);
+    gd::InstructionItem GetInstructionAt(int x, int y);
 
     /**
-     * True if a point is on an instruction list.
+     * \brief True if a point is on an instruction list.
      */
     bool IsOnInstructionList(int x, int y);
 
     /**
-     * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
+     * \brief Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
      */
     InstructionListItem GetInstructionListAt(int x, int y);
 
     /**
-     * Return the rectangle used by the instruction at point(x,y).
+     * \brief Return the rectangle used by the instruction at point(x,y).
      */
     wxRect GetAreaOfInstructionAt(int x, int y);
 
     /**
-     * Return the rectangle used by the list at point(x,y).
+     * \brief Return the rectangle used by the list at point(x,y).
      */
     wxRect GetAreaOfInstructionListAt(int x, int y);
 
     /**
-     * True if a point is on an event.
+     * \brief True if a point is on an event.
      */
     bool IsOnParameter(int x, int y);
 
     /**
-     * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
+     * \brief Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
      */
     ParameterItem GetParameterAt(int x, int y);
 
     /**
-     * Return the rectangle used by the parameter at point(x,y).
+     * \brief Return the rectangle used by the parameter at point(x,y).
      */
     wxRect GetAreaOfParameterAt(int x, int y);
 
     /**
-     * True if a point is on an event.
+     * \brief True if a point is on an event.
      */
     bool IsOnFoldingItem(int x, int y);
 
     /**
-     * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
+     * \brief Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
      */
     FoldingItem GetFoldingItemAt(int x, int y);
 
     /**
-     * Clear all areas ( typically before redraw )
+     * \brief Clear all areas ( typically before redraw )
      */
     void Clear();
 
     /**
-     * Default constructor doing nothing.
+     * \brief Default constructor doing nothing.
      */
     EventsEditorItemsAreas() {};
 
     /**
-     * Default destructor doing nothing.
+     * \brief Default destructor doing nothing.
      */
     virtual ~EventsEditorItemsAreas() {};
 
     std::vector< std::pair<wxRect, EventItem > > eventsAreas;
-    std::vector< std::pair<wxRect, InstructionItem > > instructionsAreas;
+    std::vector< std::pair<wxRect, gd::InstructionItem > > instructionsAreas;
     std::vector< std::pair<wxRect, ParameterItem > > parametersAreas;
     std::vector< std::pair<wxRect, FoldingItem > > foldingAreas;
     std::vector< std::pair<wxRect, InstructionListItem > > instructionListsAreas;
 
 private:
 };
-
+   
+}
 #endif // EVENTSEDITORITEMSAREAS_H

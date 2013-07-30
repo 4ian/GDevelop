@@ -85,14 +85,10 @@ void RepeatEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventE
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
         gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
-    else
-        cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
         gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
-    else
-        cout << "Aucune informations sur les actions d'un évènement";
 
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
@@ -102,7 +98,7 @@ void RepeatEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventE
 /**
  * Render the event in the bitmap
  */
-void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
+void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
@@ -176,8 +172,8 @@ void RepeatEvent::Init(const RepeatEvent & event)
  * Custom copy operator
  */
 RepeatEvent::RepeatEvent(const RepeatEvent & event) :
-BaseEvent(event),
-repeatNumberExpression("")
+    BaseEvent(event),
+    repeatNumberExpression("")
 {
     Init(event);
 }

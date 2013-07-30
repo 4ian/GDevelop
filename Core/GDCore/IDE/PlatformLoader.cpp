@@ -41,19 +41,25 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.so");
         #else
         #warning Add the appropriate filename here for the C++ Platform!
+        boost::shared_ptr<gd::Platform> platform;
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform);
+        gd::LocaleManager::GetInstance()->AddPath("./CppPlatform/Extensions/locale");
+
     }
 
     {
         #if defined(WINDOWS)
         boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.dll");
         #elif defined(LINUX)
-        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.so");
+        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/libGDJS.so");
         #else
         #warning Add the appropriate filename here for the Js Platform!
+        boost::shared_ptr<gd::Platform> platform;
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
+        gd::LocaleManager::GetInstance()->AddPath("./JsPlatform/Extensions/locale");
+
     }
 }
 
@@ -67,7 +73,7 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
 
         cout << "fail." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
-        wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\n") + error);
+        wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\n") + error);
         wxMessageBox(userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
     }
     else
@@ -80,7 +86,7 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
             cout << "fail ( no valid create/destroy functions )." << endl;
 
             CloseLibrary(platformHdl);
-            wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\nNo valid create/destroy functions." ));
+            wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\nNo valid create/destroy functions." ));
             wxMessageBox(userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
         }
         else

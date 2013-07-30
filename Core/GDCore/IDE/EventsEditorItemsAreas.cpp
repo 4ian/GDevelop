@@ -9,6 +9,8 @@
 #include <map>
 #include "GDCore/Events/Event.h"
 
+namespace gd {
+
 bool EventsEditorItemsAreas::IsOnEvent(int x, int y)
 {
     for (unsigned int i = 0;i<eventsAreas.size();++i)
@@ -68,7 +70,7 @@ InstructionItem EventsEditorItemsAreas::GetInstructionAt(int x, int y)
 
     std::cout << "WARNING, RETURNING DUMMY Instruction";
 
-    InstructionItem dummy;
+    gd::InstructionItem dummy;
     return dummy;
 }
 
@@ -210,7 +212,7 @@ void EventsEditorItemsAreas::Clear()
     foldingAreas.clear();
 }
 
-void EventsEditorItemsAreas::AddInstructionArea(wxRect area, InstructionItem & instruction)
+void EventsEditorItemsAreas::AddInstructionArea(wxRect area, gd::InstructionItem & instruction)
 {
     instructionsAreas.push_back(std::make_pair(area, instruction));
 }
@@ -220,7 +222,7 @@ void EventsEditorItemsAreas::AddParameterArea(wxRect area, ParameterItem & param
     parametersAreas.push_back(std::make_pair(area, parameter));
 }
 
-void EventsEditorItemsAreas::AddEventArea(wxRect area, EventItem & event)
+void EventsEditorItemsAreas::AddEventArea(wxRect area, gd::EventItem & event)
 {
     eventsAreas.push_back(std::make_pair(area, event));
 }
@@ -236,11 +238,11 @@ void EventsEditorItemsAreas::AddInstructionListArea(wxRect area, InstructionList
 }
 
 //EventItem stuff :
-bool EventItem::operator==(const EventItem & other) const
+bool EventItem::operator==(const gd::EventItem & other) const
 {
     return (event == other.event && eventsList == other.eventsList && positionInList == other.positionInList);
 }
-size_t hash_value(const EventItem & a)
+size_t hash_value(const gd::EventItem & a)
 {
     std::size_t seed = 0;
     boost::hash_combine(seed, a.event.get());
@@ -265,11 +267,11 @@ EventItem::EventItem() :
 }
 
 //InstructionItem stuff :
-bool InstructionItem::operator==(const InstructionItem & other) const
+bool gd::InstructionItem::operator==(const gd::InstructionItem & other) const
 {
     return (instruction == other.instruction && isCondition == other.isCondition && instructionList == other.instructionList && positionInList == other.positionInList && event == other.event);
 }
-size_t hash_value(const InstructionItem & a)
+size_t hash_value(const gd::InstructionItem & a)
 {
     std::size_t seed = 0;
     boost::hash_combine(seed, a.instruction);
@@ -370,5 +372,7 @@ FoldingItem::FoldingItem(gd::BaseEvent * event_) :
 FoldingItem::FoldingItem() :
     event(NULL)
 {
+}
+
 }
 #endif

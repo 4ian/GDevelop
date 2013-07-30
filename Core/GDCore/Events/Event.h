@@ -19,8 +19,8 @@ namespace gd { class EventsCodeGenerator; }
 namespace gd { class EventsCodeGenerationContext; }
 namespace gd { class Platform; }
 class wxWindow;
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
+namespace gd { class EventsEditorItemsAreas; }
+namespace gd { class EventsEditorSelection; }
 namespace gd { class Instruction; }
 class TiXmlElement;
 class wxDC;
@@ -208,7 +208,7 @@ public:
      * \see EventsEditorSelection
      * \see EventsEditorItemsAreas
      */
-    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform) {return;}
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform) {return;}
 
     /**
      * Must return the height of the event when rendered.

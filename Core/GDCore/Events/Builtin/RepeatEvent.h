@@ -10,8 +10,8 @@ namespace gd { class Instruction; }
 namespace gd { class Project; }
 class RuntimeScene;
 class TiXmlElement;
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
+namespace gd { class EventsEditorItemsAreas; }
+namespace gd { class EventsEditorSelection; }
 
 namespace gd
 {
@@ -58,7 +58,7 @@ public:
     /**
      * Called by event editor to draw the event.
      */
-    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
     /**
      * Must return the height of the event when rendered

@@ -12,6 +12,8 @@
 #include <map>
 #include <list>
 
+namespace gd {
+
 void EventsEditorSelection::ClearSelection(bool refresh)
 {
     eventsSelected.clear();
@@ -20,7 +22,7 @@ void EventsEditorSelection::ClearSelection(bool refresh)
     if ( refresh ) eventsEditorCallback.Refresh();
 }
 
-void EventsEditorSelection::AddEvent(const EventItem & eventSelection)
+void EventsEditorSelection::AddEvent(const gd::EventItem & eventSelection)
 {
     if ( eventSelection.event == boost::shared_ptr<gd::BaseEvent>() || eventSelection.eventsList == NULL )
     {
@@ -38,12 +40,12 @@ void EventsEditorSelection::AddEvent(const EventItem & eventSelection)
 /**
  * True if an event is selected
  */
-bool EventsEditorSelection::EventSelected(const EventItem & event)
+bool EventsEditorSelection::EventSelected(const gd::EventItem & event)
 {
     return eventsSelected.find(event) != eventsSelected.end();
 }
 
-void EventsEditorSelection::AddInstruction(const InstructionItem & instr)
+void EventsEditorSelection::AddInstruction(const gd::InstructionItem & instr)
 {
     if ( instr.instruction == NULL || instr.instructionList == NULL )
     {
@@ -97,10 +99,10 @@ std::vector < EventItem > EventsEditorSelection::GetAllSelectedEventsWithoutSubE
 /**
  * Return a vector with all selected instructions
  */
-std::vector < InstructionItem > EventsEditorSelection::GetAllSelectedInstructions()
+std::vector < gd::InstructionItem > EventsEditorSelection::GetAllSelectedInstructions()
 {
-    std::vector < InstructionItem > results;
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    std::vector < gd::InstructionItem > results;
+    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         results.push_back(*it);
 
     return results;
@@ -108,7 +110,7 @@ std::vector < InstructionItem > EventsEditorSelection::GetAllSelectedInstruction
 
 bool EventsEditorSelection::HasSelectedActions()
 {
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         if ( !it->isCondition ) return true;
 
     return false;
@@ -116,22 +118,22 @@ bool EventsEditorSelection::HasSelectedActions()
 
 bool EventsEditorSelection::HasSelectedConditions()
 {
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         if ( it->isCondition ) return true;
 
     return false;
 }
 
-bool EventsEditorSelection::InstructionSelected(const InstructionItem & instr)
+bool EventsEditorSelection::InstructionSelected(const gd::InstructionItem & instr)
 {
     return instructionsSelected.find(instr) != instructionsSelected.end();
 }
 
-void EventsEditorSelection::SetHighlighted(const EventItem & eventSelection)
+void EventsEditorSelection::SetHighlighted(const gd::EventItem & eventSelection)
 {
     eventHighlighted = eventSelection;
 }
-void EventsEditorSelection::SetHighlighted(const InstructionItem & instructionSelection)
+void EventsEditorSelection::SetHighlighted(const gd::InstructionItem & instructionSelection)
 {
     instructionHighlighted = instructionSelection;
 }
@@ -243,7 +245,7 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
     //Be sure we do not try to drag inside an instruction selected
     if (instructionHighlighted.instruction != NULL)
     {
-        for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+        for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         {
             if ( (*it).instruction == NULL )
             {
@@ -264,7 +266,7 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
 
     //Copy dragged instructions
     std::vector<gd::Instruction> draggedInstructions;
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).instruction != NULL )
             draggedInstructions.push_back(*(*it).instruction);
@@ -282,12 +284,12 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
     if ( deleteDraggedInstruction )
     {
         //Update selection as some selected instruction can have become invalid
-        boost::unordered_set< InstructionItem > newInstructionsSelected;
-        for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+        boost::unordered_set< gd::InstructionItem > newInstructionsSelected;
+        for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         {
             if ((*it).instructionList == instructionHighlighted.instructionList && (*it).positionInList > instructionHighlighted.positionInList)
             {
-                InstructionItem newItem = (*it);
+                gd::InstructionItem newItem = (*it);
                 newItem.instruction = NULL;
                 newItem.positionInList += draggedInstructions.size();
                 newInstructionsSelected.insert(newItem);
@@ -319,7 +321,7 @@ void EventsEditorSelection::DeleteAllInstructionSelected()
 {
     //1) Construct a map with their list and their index in the list
     std::map< std::vector<gd::Instruction>*, std::list<unsigned int> > mapOfDeletionsRequest;
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).event != NULL ) (*it).event->eventHeightNeedUpdate = true;
         if ( (*it).instructionList != NULL)
@@ -337,7 +339,7 @@ void EventsEditorSelection::DeleteAllInstructionSelected()
     }
 }
 
-EventsEditorSelection::EventsEditorSelection(GDpriv::EventsEditorRefreshCallbacks & eventsEditorCallback_) :
+EventsEditorSelection::EventsEditorSelection(gd::EventsEditorRefreshCallbacks & eventsEditorCallback_) :
     dragging(false),
     draggingInstruction(false),
     eventsEditorCallback(eventsEditorCallback_)
@@ -366,6 +368,8 @@ bool EventsEditorSelection::FindInInstructionsAndSubInstructions(std::vector<gd:
     }
 
     return false;
+}
+
 }
 
 #endif

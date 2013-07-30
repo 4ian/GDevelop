@@ -99,7 +99,7 @@ std::string CppCodeEvent::GenerateAssociatedFileCode() const
 /**
  * Render the event in the bitmap
  */
-void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
+void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     const int titleTextHeight = 20;

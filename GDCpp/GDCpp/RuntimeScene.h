@@ -175,7 +175,7 @@ public:
 
     /**
      * Notify the scene that something ( Like an open file dialog ) stopped scene rendering for a certain amount of time.
-     * \param Pause duration, in microseconds.
+     * \param pauseTime_ Pause duration, in microseconds.
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
 

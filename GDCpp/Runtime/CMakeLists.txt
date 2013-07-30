@@ -43,8 +43,11 @@ link_directories(${GDCpp_lib_dir})
 ###
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG) 
 	add_definitions( -DDEBUG )
-ELSE()
+ELSEIF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	add_definitions( -DRELEASE )
+	add_definitions( -DBOOST_DISABLE_ASSERTS )
+ELSE()
+	add_definitions( -DDEV )
 	add_definitions( -DBOOST_DISABLE_ASSERTS )
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG) 
 

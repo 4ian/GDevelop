@@ -14,13 +14,13 @@ class SFMLTextureWrapper;
 #undef LoadImage //prevent windows.h to be polluting everything
 
 /**
- * \brief Describe a sprite to be included in a Direction and to display on the screen
+ * \brief Represents a sprite to be included in a Direction and to display on the screen
  *
  * A sprite contains a SFML sprite to be displayed, some points, and can also have its own image ( rather than a image from ImageManager ).
  *
  * \see Direction
  * \see SpriteObject
- * \ingroup SpriteObjectExtension.
+ * \ingroup SpriteObjectExtension
  */
 class GD_API Sprite
 {

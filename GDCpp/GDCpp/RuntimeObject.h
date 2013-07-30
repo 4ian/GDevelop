@@ -33,7 +33,6 @@ class RuntimeScene;
  * \see gd::Object
  *
  * \ingroup GameEngine
- * \ingroup PlatformDefinition
  */
 class GD_API RuntimeObject
 {

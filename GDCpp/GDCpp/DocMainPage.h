@@ -1,19 +1,21 @@
 /**
- * \mainpage %Game Develop C++ Platform SDK
+ * \mainpage Game Develop C++ Platform
  * \image html images/gdlogo.png
  * \section welcome Welcome
  * This is the help file for the Game Develop C++ Platform, which contains a reference of all the features provided
  * by the C++ Platform and explains how to create extensions for this platform.<br>
- * Creating extensions need some knowledge in C++ language. Moreover, %Game Develop use mainly SFML, Boost and wxWidgets libraries.<br>
- * <br>
- * \section aboutdoc About this documentation
+ * Creating extensions need some knowledge in C++ language. Moreover, %Game Develop use mainly SFML, Boost and wxWidgets libraries.
+ *
+ * ### Game Develop Core documentation
+ * Some classes and features are provided by the *Game Develop Core Library* : Read [this page](\ref AboutGDCore) to get a quick introduction
+ * to this library, or read the [full documentation here](..\..\..\Core\doc\Documentation\index.html).
+ *
+ * \section gettingstarted Getting started
  * First, please refer to these pages to install the required tools and to get help about setting up a basic extension:<br>
  *
  * -# \subpage setupDevEnv
  * -# \subpage GetFamiliarizedWithGDSDK
  * -# \subpage WritingANewExtension
- *
- * You can also read \subpage AboutGDCore.
  */
 
 /**
@@ -24,7 +26,7 @@
  * Follow these three step to be able to compile extensions for %Game Develop:
  * -# \subpage installWinLibs
  * -# \subpage installWinCompiler
- * -# \subpage installAndUseCMake
+ * -# \ref installAndUseCMake
  * <br>
  *
  * <b>GNU/Linux</b>
@@ -59,34 +61,85 @@
  * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %Game Develop and
  * the compiler used by the extensions, %Game Develop require the extensions and the platforms to use the same version of TDM-GCC.<br>
  *
- * \section download Download
+ * \section installWinCompiler_download Download
  *
- * The current version of the compiler used by %Game Develop can be found and downloaded on the website : http://www.en.compilgames.net
+ * The current version of the compiler used by %Game Develop can be found and downloaded on the website : http://www.compilgames.net
  *
- * \section install Installation
+ * \section installWinCompiler_install Installation
  *
  * The installation is fairly simple :<br>
  * <br>
- * -Launch the installer.<br>
- * -Choose Create.<br>
+ * - Launch the installer.<br>
+ * - Choose Create.<br>
 
  \image html images/compilerInstall1.png
 
- * -Choose an installation directory.<br>
+ * - Choose an installation directory.<br>
 
  \image html images/compilerInstall2.png
 
- * -Choose the components to be installed. You don't have to change anything, the default options are good enough.<br>
+ * - Choose the components to be installed. You don't have to change anything, the default options are good enough.<br>
 
  \image html images/compilerInstall3.png
 
- * -Click on install so as to launch the installation process. When the process is over, the compiler is installed, and can be used with Code::Blocks.<br>
+ * - Click on install so as to launch the installation process.<br>
  */
 
 /**
  *  \page installAndUseCMake (All) Install and use Cmake
  *
- * TODO
+ * Building is done using CMake: It is open-source build system that can generate build files for lots of IDE and build tools ( Makefiles... ).
+ *
+ * \section installAndUseCMake_download Download and install CMake
+ *
+ * First, install CMake: <br>
+ * Download it [here](http://www.cmake.org/cmake/resources/software.html) or get it using your package manager if you're
+ * using a Linux distribution.
+ *
+ * \section installAndUseCMake_use Using CMake to generate the build files
+ *
+ * \subsection installAndUseCMake_use_gui Using the GUI
+ *
+ * - Start the CMake user interface ( _cmake-gui_ ). Choose the GDSDK directory as the source directory, and Binaries/.build as the directory where to build the binaries:
+
+ \image html images/usecmake1.png
+
+ * - Click on *Configure*. If asked to create the build directory, answer yes. Choose then your favorite generator: *MinGW Makefiles* (on Windows) or *Unix Makefiles* (on Linux) generate a traditional Makefile that can be built using the
+ * *mingw32-make* ( on Windows) or *make* ( on Linux ) command. You can also choose the *Ninja* generator to use the [Ninja build system](http://martine.github.io/ninja/).
+
+  \image html images/usecmake2.png
+
+ * - When you click on Finish, CMake do a first configuration. Adjust any variable if necessary ( no changes is needed by default ), then click on Generate.
+
+  \image html images/usecmake3.png
+
+ * - You can then launch a terminal/command prompt, go to the *.build* folder ( `cd SDKFolder/Binaries/.build` ) and launch the build 
+ * using the generator you've choosen: `mingw32-make`, or `make` on Linux.
+ *
+ * Binaries are created into *Binaries/Output/Release* folder.
+ * 
+ * \subsection installAndUseCMake_use_cmd Using the command line
+ *
+ * Using the commandline with CMake is also easy:
+ * 
+ * ~~~~~~~~~~~~~~~~~~~~~
+ * cd SDKFolder/Binaries
+ * mkdir .build
+ * cd .build
+ * cmake .. -G "MinGW Makefiles"
+ * mingw32-make
+ * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * or using the fast [Ninja build system](http://martine.github.io/ninja/) :
+ * ~~~~~~~~~~~~~~~~~~~~~
+ * cd SDKFolder/Binaries
+ * mkdir .build
+ * cd .build
+ * cmake .. -G "Ninja"
+ * ninja
+ * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Binaries are of course also created into *Binaries/Output/Release* folder.
  */
 
 /**
@@ -130,9 +183,9 @@
  *
  * \section copyFiles Copy some files
 
- * Finally, go to the %Game Develop directory, locate the file "libGDCpp.so" and copy it to (SDK folder)/<b>IDE</b>/bin/release.<br>
- * Then, locate the file "libGDCpp.so" into the folder (%Game Develop folder)/<b>Runtime</b>
- * and copy it to (SDK folder)/<b>Runtime</b>/bin/release.<br>
+ * Finally, go to the %Game Develop directory, locate the files "libGDCpp.so" and "libGDCore.so" and copy them to (SDK folder)/Binaries/Output/release.<br>
+ * Then, locate the file "libGDCpp.so" into the folder (%Game Develop folder)/CppPlatform/<b>Runtime</b>
+ * and copy it to (SDK folder)/Binaries/Output/CppPlatform/<b>Runtime</b>
  */
 
 /**
@@ -199,12 +252,13 @@
  *
  * The SDK is composed of some directories :<br>
 
- * - GDCpp contains the headers of %Game Develop C++ Platform.
- * - IDE contains the %Game Develop C++ Platform compiled for an <i>edittime</i> use ( in the IDE ). The extensions binaries are also put here by default.
- * - Runtime contains the %Game Develop C++ Platform compiled for an use at <i>runtime</i> ( without everything being related to edition ).
- * The extensions binaries are also put here by default when being built for <i>runtime</i>.
- * - Extensions contains the extensions. The official extensions are not provided directly in this SDK: Just download them from
+ * - *Core* contains the headers of Game Develop Core, the main library used to develop platforms and tools for Game Develop.
+ * - *GDCpp* contains the headers of %Game Develop C++ Platform.
+ * - *GDJS* contains the Game Develop JS Platform ( Not provided with the SDK, download it from https://github.com/4ian/gdjs ).
+ * - *Extensions* contains the extensions. The official extensions are not provided directly in this SDK: Just download them from
  * https://github.com/4ian/gd-extensions.
+ * - *Binaries* is where platforms and extensions files are built.
+ * - *ExtLibs* is where external libraries should be put.
 
  * \section filestructure Structure of an extension
 
@@ -217,7 +271,7 @@
  *
  * If objects need to have an editor ( when double clicking on them in the objects editor ), it is common to use a file like <i><ObjectName>Editor.cpp</i> with its associated .h.<br>
  * \image html images/extensiondir.png
- * The <i>wxsmith</i> directory is used by Code::Blocks to save the files used so as to create the user interfaces, like the editor of an object.
+ * Sometime, there is a <i>wxsmith</i> directory which used by the *Code::Blocks* IDE to save the files used so as to create the user interfaces, like the editor of an object.
  *
  * Some others files may be present, like <i>JsExtension.cpp</i> and a <i>*.js</i> file when the extension is compatible with the Game Develop JS Platform.
  */
@@ -445,7 +499,7 @@ extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
  * if you're only writing extensions, you should not need to open often the documentation of GDCore.
  *
  * Theoretically, the C++ platform would be totally independent from Game Develop Core when compiled for Runtime. This is the case ( The
- * <i>GDCpp.dll/so</i> dynamic library has no dependencies toward GDCore.dll/.so ) but in practice, the C++ platform include some classes
+ * <i>GDCpp.dll/so</i> dynamic library used for exported games has no dependencies toward GDCore.dll/.so ) but in practice, the C++ platform include some classes
  * belonging to Game Develop Core even when compiled for Runtime: For example, the <b>gd::Project</b> class is always available, as it is used
  * for storing a game in memory.
  *
@@ -454,36 +508,30 @@ extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
 /**
  * \page WritingANewExtension Writing a new extension
  *
- * \section createNewExtension Create a new extension
+ * \section WritingANewExtension_createNewExtension Create a new extension
  *
  * Creating a new extension can be made by following these steps :<br>
  *
- * -Copy the directory of an extension and rename it:
+ * - Copy the directory of an extension and rename it:
  * \image html images/createnew1.png
- * -Rename then the sources files :
+ * - Rename then the sources files :
  * \image html images/createnew2.png
- * -Open the Code::Blocks project.<br>
- * -Delete the non existing source files from the Code::Blocks project:
- * \image html images/createnew3.png
- * -Add then the recently renamed files ( Right click > Add files ):
- * \image html images/createnew4.png
- * -Rename the title of the project ( Project > Properties ) and modify the name of the output files ( Project > Properties > Build targets > Output filenames for each build targets ).
- * \image html images/createnew5.png
- * \image html images/createnew6.png
+ * - Open the *CMakeLists.txt* file and replace every occurrence of the extension old name with the new name.<br>
+ * - Open all the source files and again, replace every occurrence of the extension old name with the new name.<br>
+ * - In the Extensions directory, open the *CMakeLists.txt* file and add a line such as 'ADD_SUBDIRECTORY(MyExtension)'.
  * You can then start to modify the extension.<br>
- * If your extension is fairly simple, you can create it from the AES Extension. If your extension need an object, you can use for instance the Text Object Extension as a starting point.<br>
+ * If your extension is fairly simple, you can create it from the AES Extension. <br>
+ * If your extension need an object, you can use for instance the TextObject Extension as a starting point.<br>
  * <br>
- * You can compile your extension with the appropriate buttons:
- * \image html images/createnew7.png
+ * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake).
  *
- * \section installExtension Use the extension with Game Develop
+ * \section WritingANewExtension_installExtension Use the extension with Game Develop
  *
  * To make your extension usable with %Game Develop, you have to:
- * -# <b>Copy the generated file</b> ( yourExtension.xgdw for example ) inside %Game Develop "Extensions" folder. ( CppPlatform/Extensions/yourExtension.xgdw )<br>
- *  You can change the output directory in the Code::Blocks project to automatically create the extension file inside %Game Develop "Extensions" folder.<br><br>
- * -# Copy <b>all needed include file</b> inside a folder with the name of your extension located in GD "CppPlatform/Extensions/include" subfolder. ( Extensions/include/yourExtension/ )<br>
- *  You can use a <b>small script</b> ( batch file on Windows ) to copy all the needed includes files to %Game Develop "CppPlatform/Extensions/include" subfolder.<br><br>
- * -# <b>Translations catalog files</b> must be put into Extensions/locale/<language>/yourExtension.mo ( Example : CppPlatform/Extensions/locale/fr_FR/yourExtension.mo )
+ * -# **Copy the files** generated in *Binaries/Output/Release* into your *Game Develop folder*.
+ * -# Copy **all needed include file** inside a folder with the name of your extension located into <i>(Game Develop folder)/CppPlatform/Extensions/include</i>.<br>
+ *  You can use a *small script* ( batch file on Windows ) to copy all the needed includes files.<br>
+ * -# <b>Translations catalog files</b> must be put into xxxPlatform/Extensions/locale/<b>language</b>/myExtension.mo ( Example : CppPlatform/Extensions/locale/fr_FR/myExtension.mo )
  */
 
 //Group definitions:
@@ -507,10 +555,6 @@ extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
 
 /**
  * \defgroup Tools Tools classes
- */
-
-/**
- * \defgroup PlatformDefinition Classes defining main concepts ( also found in Game engine )
  */
 
 /**

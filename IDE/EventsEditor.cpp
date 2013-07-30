@@ -117,10 +117,10 @@ EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & s
     conditionColumnWidth(350),
     isResizingColumns(false),
     leftMargin(20),
+    selection(refreshCallback),
     foldBmp("res/fold.png", wxBITMAP_TYPE_ANY),
     unfoldBmp("res/unfold.png", wxBITMAP_TYPE_ANY),
     hideContextPanelsLabels(false),
-    selection(refreshCallback),
     ctrlKeyDown(false),
     profilingActivated(false),
     refreshCallback(this)
@@ -772,7 +772,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
     //gd::Instruction selection?
     else if ( itemsAreas.IsOnInstruction(x, y) )
     {
-        InstructionItem item = itemsAreas.GetInstructionAt(x, y);
+        gd::InstructionItem item = itemsAreas.GetInstructionAt(x, y);
 
         if ( !ctrlKeyDown && !selection.InstructionSelected(item) ) selection.ClearSelection();
         selection.AddInstruction(item);
@@ -819,7 +819,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
     //gd::Instruction selection?
     if ( itemsAreas.IsOnInstruction(event.GetX(), event.GetY()) )
     {
-        InstructionItem item = itemsAreas.GetInstructionAt(event.GetX(), event.GetY());
+        gd::InstructionItem item = itemsAreas.GetInstructionAt(event.GetX(), event.GetY());
 
         if (item.instruction == NULL || item.instructionList == NULL || item.event == NULL) return;
 
@@ -864,7 +864,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
     }
     else if (itemsAreas.IsOnInstructionList(event.GetX(), event.GetY()) )
     {
-        InstructionListItem item = itemsAreas.GetInstructionListAt(event.GetX(), event.GetY());
+        gd::InstructionListItem item = itemsAreas.GetInstructionListAt(event.GetX(), event.GetY());
 
         if ( item.instructionList == NULL || item.event == NULL) return;
 
@@ -937,9 +937,9 @@ void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
     //Reset highlighted items.
     ParameterItem dummy;
     selection.SetHighlighted(dummy);
-    InstructionListItem dummy2;
+    gd::InstructionListItem dummy2;
     selection.SetHighlighted(dummy2);
-    InstructionItem dummy3;
+    gd::InstructionItem dummy3;
     selection.SetHighlighted(dummy3);
     EventItem dummy4;
     selection.SetHighlighted(dummy4);
@@ -1201,7 +1201,7 @@ void EventsEditor::OnliveEditText(wxCommandEvent& event)
 
 void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 {
-    InstructionListItem listHighlighted = selection.GetHighlightedInstructionList();
+    gd::InstructionListItem listHighlighted = selection.GetHighlightedInstructionList();
     if ( listHighlighted.instructionList == NULL ) return;
 
     if ( listHighlighted.isConditionList )
@@ -1240,7 +1240,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 /**
  * Add an event
  */
-void EventsEditor::AddEvent(EventItem & previousEventItem)
+void EventsEditor::AddEvent(gd::EventItem & previousEventItem)
 {
     gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
@@ -1268,7 +1268,7 @@ void EventsEditor::AddEvent(EventItem & previousEventItem)
 
 void EventsEditor::OnaddEventBtClick(wxCommandEvent& event)
 {
-    EventItem & highlightedEvent = selection.GetHighlightedEvent();
+    gd::EventItem & highlightedEvent = selection.GetHighlightedEvent();
     if ( highlightedEvent.event == boost::shared_ptr<gd::BaseEvent>() ) return;
 
     AddEvent(highlightedEvent);
@@ -1321,7 +1321,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
 /**
  * Add a sub event
  */
-void EventsEditor::AddSubEvent(EventItem & parentEventItem)
+void EventsEditor::AddSubEvent(gd::EventItem & parentEventItem)
 {
     gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
@@ -1340,7 +1340,7 @@ void EventsEditor::AddSubEvent(EventItem & parentEventItem)
 
 void EventsEditor::OnaddSubEventBtClick(wxCommandEvent& event)
 {
-    EventItem & highlightedEvent = selection.GetHighlightedEvent();
+    gd::EventItem & highlightedEvent = selection.GetHighlightedEvent();
     if ( highlightedEvent.event == boost::shared_ptr<gd::BaseEvent>() || !highlightedEvent.event->CanHaveSubEvents() ) return;
 
     AddSubEvent(highlightedEvent);
@@ -1356,7 +1356,7 @@ void EventsEditor::OnRibbonAddSubEventSelected(wxRibbonButtonBarEvent& evt)
 /**
  * Add event of selected type
  */
-void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previousEventItem)
+void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem)
 {
     //Retrieve event type
     string eventType;
@@ -1449,7 +1449,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
 {
     if ( selection.HasSelectedConditions())
     {
-        std::vector < InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
+        std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
         std::vector < gd::Instruction > instructionsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
@@ -1461,7 +1461,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     }
     else if ( selection.HasSelectedActions())
     {
-        std::vector < InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
+        std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
         std::vector < gd::Instruction > instructionsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
@@ -1642,7 +1642,7 @@ void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
     if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL )
     {
-        wxLogMessage("Selectionnez un évènement où insérer le modèle puis recliquez sur le bouton.");
+        wxLogMessage(_("Please select an event before adding a template."));
         return;
     }
 
@@ -1703,7 +1703,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
 
     if ( liveEditedAssociatedInstruction.instruction == NULL ) return;
 
-    InstructionItem & item = liveEditedAssociatedInstruction;
+    gd::InstructionItem & item = liveEditedAssociatedInstruction;
 
     if (item.instruction == NULL || item.instructionList == NULL || item.event == NULL) return;
 

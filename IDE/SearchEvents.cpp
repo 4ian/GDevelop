@@ -247,7 +247,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
     if ( !onlySelectedEventCheck->GetValue() && events == NULL ) return;
     if ( onlySelectedEventCheck->GetValue() )
     {
-        std::vector < EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
+        std::vector < gd::EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
         for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
         {
             if ( selectedEventsInfo[i].event != boost::shared_ptr<gd::BaseEvent>() )
@@ -310,7 +310,7 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
 
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
-    parent->GetSelection().AddEvent(EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
+    parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
     parent->ScrollToEvent(event);
 }
@@ -328,7 +328,7 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
 
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
-    parent->GetSelection().AddEvent(EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
+    parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
     parent->ScrollToEvent(event);
 }

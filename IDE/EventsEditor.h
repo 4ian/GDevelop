@@ -37,7 +37,7 @@ class EventsEditor;
 /**
  * \brief Lightweight internal class to get refresh order
  */
-class InternalEventsEditorRefreshCallbacks : public GDpriv::EventsEditorRefreshCallbacks
+class InternalEventsEditorRefreshCallbacks : public gd::EventsEditorRefreshCallbacks
 {
 public:
     InternalEventsEditorRefreshCallbacks(EventsEditor * editor_) : editor(editor_) {};
@@ -88,7 +88,7 @@ public:
     /**
      * Return a reference to the class used to manage selection.
      */
-    EventsEditorSelection & GetSelection() { return selection; };
+    gd::EventsEditorSelection & GetSelection() { return selection; };
 
     static void CreateRibbonPage(wxRibbonPage * page);
     void ConnectEvents();
@@ -265,9 +265,9 @@ private:
 
     void RecreateCustomEventsMenu();
 
-    void AddEvent(EventItem & previousEventItem);
-    void AddSubEvent(EventItem & parentEventItem);
-    void AddCustomEventFromMenu(unsigned int menuID, EventItem & previousEventItem);
+    void AddEvent(gd::EventItem & previousEventItem);
+    void AddSubEvent(gd::EventItem & parentEventItem);
+    void AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem);
 
     void RecomputeAllEventsWidth(std::vector < boost::shared_ptr<gd::BaseEvent> > & eventsToRefresh);
     void DeleteSelection();
@@ -301,8 +301,8 @@ private:
     std::map<long, std::string> idForPlatformsMenu;
     wxMenu platformsMenu; ///< Used to display and allow the user to choose the plaform being used to edit the events.
 
-    EventsEditorItemsAreas itemsAreas; ///< Areas management
-    EventsEditorSelection selection; ///<Selection management and input
+    gd::EventsEditorItemsAreas itemsAreas; ///< Areas management
+    gd::EventsEditorSelection selection; ///<Selection management and input
 
     unsigned int conditionColumnWidth; ///< Size of the conditions column
     bool isResizingColumns; ///< True if user is resizeing column
@@ -312,8 +312,8 @@ private:
     wxBitmap unfoldBmp;
     bool hideContextPanelsLabels;
 
-    ParameterItem liveEditedParameter; ///< Filled with information about parameter which is currently edited, if any.
-    InstructionItem liveEditedAssociatedInstruction; ///< Filled with information about instruction of parameter which is currently edited, if any.
+    gd::ParameterItem liveEditedParameter; ///< Filled with information about parameter which is currently edited, if any.
+    gd::InstructionItem liveEditedAssociatedInstruction; ///< Filled with information about instruction of parameter which is currently edited, if any.
     bool liveEditingChangesMade; ///< Used to known if user changed something when live editing the parmameter.
 
     bool ctrlKeyDown;

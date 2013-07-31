@@ -963,16 +963,17 @@ void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-        if (!itemData) continue;
-
-        if (objectsList->GetItemText( item ) == name
-            && itemData->GetString() == dataStr
-            && itemData->GetSecondString() == dataStr2)
+        if (itemData) 
         {
-            objectsList->SelectItem(item);
-            return;
-        }
-        item = objectsList->GetPrevSibling(item);
+	        if (objectsList->GetItemText( item ) == name
+	            && itemData->GetString() == dataStr
+	            && itemData->GetSecondString() == dataStr2)
+	        {
+	            objectsList->SelectItem(item);
+	            return;
+	        }
+    	}
+	    item = objectsList->GetPrevSibling(item);
     }
 }
 
@@ -1004,16 +1005,17 @@ void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-        if (!itemData) continue;
-
-        if (objectsList->GetItemText( item ) == name
-            && itemData->GetString() == dataStr
-            && itemData->GetSecondString() == dataStr2)
+        if (itemData)
         {
-            objectsList->SelectItem(item);
-            return;
+	        if (objectsList->GetItemText( item ) == name
+	            && itemData->GetString() == dataStr
+	            && itemData->GetSecondString() == dataStr2)
+	        {
+	            objectsList->SelectItem(item);
+	            return;
+	        }
         }
-        item = objectsList->GetPrevSibling(item);
+	    item = objectsList->GetPrevSibling(item);
     }
 }
 

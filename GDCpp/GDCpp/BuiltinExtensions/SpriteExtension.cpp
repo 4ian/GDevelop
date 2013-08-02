@@ -360,6 +360,27 @@ SpriteExtension::SpriteExtension()
             .AddParameter("yesorno", _("Activate flipping"), "",false)
             .codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDCpp/SpriteObject.h");
 
+        obj.AddCondition("FlippedX",
+                       _("Horizontally flipped"),
+                       _("Return true if the object is horizontally flipped"),
+                       _("_PARAM0_ is horizontally flipped"),
+                       _("Effects"),
+                       "res/actions/flipX24.png",
+                       "res/actions/flipX.png")
+
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("IsFlippedX").SetIncludeFile("GDCpp/SpriteObject.h");
+
+        obj.AddCondition("FlippedY",
+                       _("Vertically flipped"),
+                       _("Return true if the object is vertically flipped"),
+                       _("_PARAM0_ is vertically flipped"),
+                       _("Effects"),
+                       "res/actions/flipY24.png",
+                       "res/actions/flipY.png")
+
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .codeExtraInformation.SetFunctionName("IsFlippedY").SetIncludeFile("GDCpp/SpriteObject.h");
 
         obj.AddAction("TourneVers",
                        _("Rotate an object toward another"),

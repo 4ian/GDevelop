@@ -509,13 +509,15 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         GDMinorVersion = minor;
         if ( GDMajorVersion > gd::VersionWrapper::Major() )
         {
-            wxLogWarning( _( "The version of the editor used to create this game seems to be a new version.\nThe game can not open, or datas may be missing.\nYou should check if a new version of Game Develop is available." ) );
+            wxLogWarning( _( "The version of Game Develop used to create this game seems to be a new version.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
         }
         else
         {
-            if ( GDMajorVersion == gd::VersionWrapper::Major() && (build > gd::VersionWrapper::Build() || GDMinorVersion > gd::VersionWrapper::Minor() || revision > gd::VersionWrapper::Revision()) )
+            if ( (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion >  gd::VersionWrapper::Minor()) ||
+                 (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build >  gd::VersionWrapper::Build()) ||
+                 (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build == gd::VersionWrapper::Build() && revision > gd::VersionWrapper::Revision()) )
             {
-                wxLogWarning( _( "The version of the editor used to create this game seems to be greater.\nThe game can not open, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+                wxLogWarning( _( "The version of Game Develop used to create this game seems to be greater.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
             }
         }
 

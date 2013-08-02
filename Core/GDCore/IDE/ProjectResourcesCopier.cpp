@@ -21,7 +21,8 @@ namespace gd
 {
 
 bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, std::string destinationDirectory, bool updateOriginalProject,
-                                                wxProgressDialog * optionalProgressDialog, bool askAboutAbsoluteFilenames)
+                                                wxProgressDialog * optionalProgressDialog, bool askAboutAbsoluteFilenames,
+                                                bool preserveDirectoryStructure)
 {
     //Check if there are some resources with absolute filenames
     gd::ResourcesAbsolutePathChecker absolutePathChecker;
@@ -35,7 +36,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     //Get the resources to be copied
     gd::ResourcesMergingHelper resourcesMergingHelper;
     resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(originalProject.GetProjectFile()).GetPath()));
-    resourcesMergingHelper.PreserveDirectoriesStructure(true);
+    resourcesMergingHelper.PreserveDirectoriesStructure(preserveDirectoryStructure);
     resourcesMergingHelper.PreserveAbsoluteFilenames(!copyAlsoResourcesWithAbsolutePath);
 
     if ( updateOriginalProject )

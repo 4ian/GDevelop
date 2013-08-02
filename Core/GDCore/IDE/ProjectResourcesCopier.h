@@ -28,11 +28,14 @@ public:
      * \param optionalProgressDialog An optional pointer to a wxProgressDialog. Can be NULL.
      * \param askAboutAbsoluteFilenames If set to false, the users won't be asked anything and the files
      * with absolutes filenames will be copied into the destination directory and their filenames updated.
+     * \param preserveDirectoryStructure If set to true (default), the directories of the resources will be preserved
+     * when copying. Otherwise, everything will be send in the destinationDirectory.
      *
      * \return true if no error happened
      */
     static bool CopyAllResourcesTo(gd::Project & project, std::string destinationDirectory, bool updateOriginalProject,
-                                   wxProgressDialog * optionalProgressDialog = NULL, bool askAboutAbsoluteFilenames = true);
+                                   wxProgressDialog * optionalProgressDialog = NULL, bool askAboutAbsoluteFilenames = true, 
+                                   bool preserveDirectoryStructure = true);
 };
 
 }

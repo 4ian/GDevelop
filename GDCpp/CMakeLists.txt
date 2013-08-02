@@ -101,7 +101,7 @@ file(GLOB_RECURSE exe_source_files Runtime/*)
 
 add_library(GDCpp SHARED ${source_files})
 add_library(GDCpp_Runtime SHARED ${source_files})
-add_executable(GDCpp_Runtime_exe ${exe_source_files})
+add_executable(GDCpp_Runtime_exe WIN32 ${exe_source_files})
 set_target_properties(GDCpp PROPERTIES COMPILE_DEFINITIONS "${GDCpp_extra_definitions}")
 set_target_properties(GDCpp_Runtime PROPERTIES COMPILE_DEFINITIONS "${GDCpp_Runtime_extra_definitions}")
 set_target_properties(GDCpp_Runtime_exe PROPERTIES COMPILE_DEFINITIONS "${GDCpp_Runtime_exe_extra_definitions}")

@@ -8,6 +8,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include "GDCpp/RuntimeContext.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/RuntimeObject.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/SourceFileCommonTools.h"

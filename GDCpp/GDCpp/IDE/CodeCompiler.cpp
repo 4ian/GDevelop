@@ -159,7 +159,7 @@ std::string CodeCompilerCall::GetFullCall() const
             args.push_back("-L\""+baseDir+"CppPlatform/Runtime/\"");
             args.push_back("-L\""+baseDir+"CppPlatform/Extensions/Runtime/\"");
             #if defined(WINDOWS)
-            args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.a\"");
+            args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.dll.a\"");
             #else
             args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.so\"");
             #endif

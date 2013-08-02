@@ -74,13 +74,13 @@ void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
         if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
         if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") ||
-             wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+"dll..a"))
+             wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".dll.a"))
             task.compilerCall.extraLibFiles.push_back(extension->GetName());
 
         for (unsigned int j =0;j<extension->GetSupplementaryLibFiles().size();++j)
         {
             if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") ||
-                 wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+"dll..a") )
+                 wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".dll.a") )
                 task.compilerCall.extraLibFiles.push_back(extension->GetSupplementaryLibFiles()[j]);
         }
     }

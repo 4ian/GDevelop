@@ -200,13 +200,13 @@ class FullProjectCompilerDialogDiagnosticManager : public GDpriv::FullProjectCom
 public:
     FullProjectCompilerDialogDiagnosticManager(wxStaticText * staticText1_, wxStaticText * staticText2_,wxGauge * gauge_, wxString destinationDirectory_) : staticText1(staticText1_), staticText2(staticText2_), gauge(gauge_), destinationDirectory(destinationDirectory_) {}
 
-    virtual void OnProjectExportDialogFailed()
+    virtual void OnCompilationFailed()
     {
         CompilationErrorDialog dialog( NULL, GetErrors() );
         dialog.ShowModal();
     }
 
-    virtual void OnProjectExportDialogSuccessed()
+    virtual void OnCompilationSuccessed()
     {
         staticText1->SetLabel(_("Compilation finished")); staticText2->SetLabel(_("Compiled project is now available in the export folder."));
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"), _("Compilation finished"), wxYES_NO) == wxYES )

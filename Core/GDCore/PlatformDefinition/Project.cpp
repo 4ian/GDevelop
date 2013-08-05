@@ -693,6 +693,22 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
             SetVerticalSyncActivatedByDefault(true);
     }
 
+    if ( elem->FirstChildElement( "Extensions" ) != NULL )
+    {
+        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
+        while (extensionsElem)
+        {
+            if ( extensionsElem->Attribute("name") )
+            {
+                std::string extensionName = extensionsElem->Attribute("name");
+                if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
+                    GetUsedExtensions().push_back(extensionName);
+            }
+
+            extensionsElem = extensionsElem->NextSiblingElement();
+        }
+    }
+
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Auteur" ) != NULL ) { SetAuthor( elem->FirstChildElement( "Auteur" )->Attribute( "value" ) ); }
     if ( elem->FirstChildElement( "LatestCompilationDirectory" ) != NULL && elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) != NULL )
@@ -723,22 +739,6 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
         //Compatibility with GD2.x
         platforms.push_back(gd::PlatformManager::GetInstance()->GetPlatform("Game Develop C++ platform"));
         currentPlatform = platforms.back();
-    }
-
-    if ( elem->FirstChildElement( "Extensions" ) != NULL )
-    {
-        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
-        while (extensionsElem)
-        {
-            if ( extensionsElem->Attribute("name") )
-            {
-                std::string extensionName = extensionsElem->Attribute("name");
-                if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
-                    GetUsedExtensions().push_back(extensionName);
-            }
-
-            extensionsElem = extensionsElem->NextSiblingElement();
-        }
     }
 
     if ( elem->Attribute("winExecutableFilename") ) winExecutableFilename = elem->Attribute("winExecutableFilename");

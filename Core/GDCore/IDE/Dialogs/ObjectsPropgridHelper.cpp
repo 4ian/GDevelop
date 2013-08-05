@@ -42,7 +42,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
 
     if ( !displayedAfterInstanceProperties )
     {
-        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::ToString(object->GetVariables().GetVariableCount()) + ")" ) );
+        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::ToString(object->GetVariables().GetVariableCount()) + ")", "OBJECT_VARIABLES_CATEGORY" ) );
         grid->Append( new wxStringProperty(_("Variables"), wxPG_LABEL, _("Click to edit...")) );
         grid->SetPropertyCell(_("Variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(_("Variables"));
@@ -117,7 +117,10 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
                 for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                     project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectVariablesChanged(project, globalObject ? NULL : layout, *object);
 
-                return true;
+                //Update the grid:
+                if ( grid->GetProperty("OBJECT_VARIABLES_CATEGORY") != NULL)
+                    grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY", 
+                        _("Object variables") + " (" + gd::ToString(object->GetVariables().GetVariableCount()) + ")");
             }
         }
         else if ( event.GetPropertyName() == "AUTO_ADD" )

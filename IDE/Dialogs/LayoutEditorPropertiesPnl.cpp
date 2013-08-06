@@ -138,7 +138,7 @@ void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
     if ( object )
     {
         if ( objectsHelper.OnPropertySelected(object, &layout, event) )
-            Refresh();
+            ;//Refresh(); No refreshing, can trigger a crash
     }
 }
 
@@ -165,7 +165,7 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
     if ( object )
     {
         if ( objectsHelper.OnPropertyChanged(object, &layout, event) )
-            Refresh();
+            ;//Refresh(); No refreshing, can trigger a crash
     }
 }
 

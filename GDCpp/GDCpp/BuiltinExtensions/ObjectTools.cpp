@@ -150,13 +150,6 @@ static bool HitBoxesInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float 
     if ( sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
         return false;
 
-    //Or if in circle are colliding
-    float obj1MinEdge = min(o1w, o1h)/2.0;
-    float obj2MinEdge = min(o2w, o2h)/2.0;
-
-    if ( x*x+y*y < obj1MinEdge*obj1MinEdge+2*obj1MinEdge*obj2MinEdge+obj2MinEdge*obj2MinEdge )
-        return true;
-
     //Do a real check if necessary.
     vector<Polygon2d> objHitboxes = obj1->GetHitBoxes();
     vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes();

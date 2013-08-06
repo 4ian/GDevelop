@@ -124,7 +124,7 @@ SpriteExtension::SpriteExtension()
 
 
         obj.AddAction("ChangeScale",
-                       _("Modify the scale of an object"),
+                       _("Scale"),
                        _("Modify the scale of the specified object."),
                        _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
                        _("Size"),
@@ -138,7 +138,7 @@ SpriteExtension::SpriteExtension()
 
 
         obj.AddAction("ChangeScaleWidth",
-                       _("Modify the scale on X axis"),
+                       _("Scale on X axis"),
                        _("Modify the scale of the width of an object."),
                        _("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
                        _("Size"),
@@ -152,7 +152,7 @@ SpriteExtension::SpriteExtension()
 
 
         obj.AddAction("ChangeScaleHeight",
-                       _("Modify the scale on Y axis"),
+                       _("Scale on Y axis"),
                        _("Modify the scale of the height of an object."),
                        _("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
                        _("Size"),
@@ -227,8 +227,8 @@ SpriteExtension::SpriteExtension()
             .codeExtraInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDCpp/SpriteObject.h");
 
         obj.AddCondition("ScaleWidth",
-                       _("Scale of the width of an object"),
-                       _("Test the scale of the width of an object."),
+                       _("Scale on X axis"),
+                       _("Compare the scale of the width of an object."),
                        _("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Size"),
                        "res/conditions/scaleWidth24.png",
@@ -240,8 +240,8 @@ SpriteExtension::SpriteExtension()
             .codeExtraInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/SpriteObject.h");
 
         obj.AddCondition("ScaleHeight",
-                       _("Scale of the height of an object"),
-                       _("Test the scale of the height of an object."),
+                       _("Scale on Y axis"),
+                       _("Compare the scale of the height of an object."),
                        _("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Size"),
                        "res/conditions/scaleHeight24.png",
@@ -254,7 +254,7 @@ SpriteExtension::SpriteExtension()
 
         obj.AddCondition("Opacity",
                        _("Opacity"),
-                       _("Test the opacity of an object"),
+                       _("Compare the opacity of an object"),
                        _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                        _("Visibility"),
                        "res/conditions/opacity24.png",
@@ -310,7 +310,7 @@ SpriteExtension::SpriteExtension()
 
 
         obj.AddAction("ChangeColor",
-                       _("Change the global color"),
+                       _("Global color"),
                        _("Change the global color of an object. The default color is white."),
                        _("Change color of _PARAM0_ to _PARAM1_"),
                        _("Effects"),
@@ -323,7 +323,7 @@ SpriteExtension::SpriteExtension()
 
 
         obj.AddAction("ChangeBlendMode",
-                       _("Change Blend mode"),
+                       _("Blend mode"),
                        _("Change the number of the blend mode of an object.\nThe default blend mode is 0 ( Alpha )."),
                        _("Change Blend mode of _PARAM0_ to _PARAM1_"),
                        _("Effects"),

@@ -163,7 +163,7 @@ MathematicalToolsExtension::MathematicalToolsExtension()
 
     AddExpression("pow", _("Power"), _("Raise a number to power n"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Number"))
-        .AddParameter("expression", _("N"))
+        .AddParameter("expression", _("The exponent ( n in x^n )"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::pow").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
 

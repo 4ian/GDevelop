@@ -2,6 +2,7 @@
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon.h"
 #include "GDCpp/PolygonCollision.h"
+#include "MathematicalTools.h"
 #include <cmath>
 
 using namespace std;
@@ -172,13 +173,11 @@ bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*
 
 static bool TurnedTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float tolerance )
 {
-    if ( obj1->TotalForceLength() == 0 ) return false;
-
     double objAngle = atan2(obj2->GetDrawableY()+obj2->GetCenterY() - (obj1->GetDrawableY()+obj1->GetCenterY()),
                               obj2->GetDrawableX()+obj2->GetCenterX() - (obj1->GetDrawableX()+obj1->GetCenterX()));
     objAngle *= 180.0/3.14159;
 
-    return abs(objAngle-obj1->GetAngle()) <= tolerance/2;
+    return abs(GDpriv::MathematicalTools::angleDifference(obj1->GetAngle(), objAngle)) <= tolerance/2;
 }
 
 bool GD_API ObjectsTurnedToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
@@ -208,7 +207,7 @@ static bool MovesTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, flo
                               obj2->GetDrawableX()+obj2->GetCenterX() - (obj1->GetDrawableX()+obj1->GetCenterX()));
     objAngle *= 180.0/3.14159;
 
-    return abs(objAngle-obj1->TotalForceAngle()) <= tolerance/2;
+    return abs(GDpriv::MathematicalTools::angleDifference(obj1->TotalForceAngle(), objAngle)) <= tolerance/2;
 }
 
 

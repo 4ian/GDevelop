@@ -153,7 +153,7 @@ double GD_API mod(double x, double y)
 
 double GD_API angleDifference(double angle1, double angle2)
 {
-    return mod(angle1+180-angle2,360)-180;
+    return mod(mod(angle1 - angle2, 360.0) + 180.0, 360.0) - 180.0;
 }
 
 

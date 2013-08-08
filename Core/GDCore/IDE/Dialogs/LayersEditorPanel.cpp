@@ -229,6 +229,7 @@ void LayersEditorPanel::OnAddSelected(wxCommandEvent& event)
     }
 
     layout.InsertNewLayer(ToString(name), layout.GetLayersCount()-1);
+    layout.GetLayer(ToString(name)).SetCameraCount(1);
 
     Refresh();
 }

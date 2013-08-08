@@ -41,6 +41,13 @@ public:
      */
     static void LoadExtension(const std::string & fullpath, gd::Platform & platform);
 
+    /**
+     * \brief To be called when extensions loading is done.
+     *
+     * This is necessary on Linux to make symbols exported by extensions available.
+     */
+    static void ExtensionsLoadingDone();
+
 private:
     ExtensionsLoader() {};
     virtual ~ExtensionsLoader() {};

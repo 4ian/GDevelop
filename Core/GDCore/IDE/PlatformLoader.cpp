@@ -61,6 +61,8 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         gd::LocaleManager::GetInstance()->AddPath("./JsPlatform/Extensions/locale");
 
     }
+
+    gd::ExtensionsLoader::ExtensionsLoadingDone("./CppPlatform/Extensions/");
 }
 
 boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string fullpath)

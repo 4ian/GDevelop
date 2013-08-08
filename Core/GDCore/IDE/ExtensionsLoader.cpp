@@ -59,7 +59,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 
     if ( rep == NULL )
     {
-        cout << "Unable to open Extensions directory." << endl;
+        cout << "Unable to open Extensions ("<< directory <<") directory." << endl;
         return;
     }
 
@@ -92,14 +92,6 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 
     closedir( rep );
 
-    #if defined(LINUX) || defined (MAC)
-    //Libraries are loaded using dlopen(.., ..|RTLD_LOCAL) meaning that their symbols are not available for other libraries
-    //nor for LLVM/Clang. We then reload set them as global to make their symbols available for LLVM/Clang. We couldn't mark them
-    //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
-    for (unsigned int i = 0;i<librariesLoaded.size();++i)
-        SetLibraryGlobal(librariesLoaded[i].c_str());
-    #endif
-
 	#elif defined(_MSC_VER)
 	WIN32_FIND_DATA f;
 	string dirPart = "/*.xgd";
@@ -129,6 +121,61 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 	#else
 		#warning Compiler not supported ( but might support one style of directory listing, update defines if necessary ) for dynamic libraries loading
 	#endif
+}
+
+void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
+{
+    string suffix = "";
+
+    #if defined(WINDOWS)
+        suffix += "w";
+    #elif defined(LINUX)
+        suffix += "l";
+    #elif defined(MAC)
+        suffix += "m";
+    #else
+        #warning No target system defined.
+    #endif
+
+    #if defined(GD_IDE_ONLY)
+        suffix += "e";
+    #endif
+
+    #if defined(LINUX) || defined (MAC)
+
+    //List all extensions loaded
+    struct dirent *lecture;
+    DIR *rep;
+    rep = opendir( directory.c_str() );
+    int l = 0;
+
+    if ( rep == NULL )
+    {
+        cout << "Unable to open Extensions ("<< directory <<") directory." << endl;
+        return;
+    }
+
+    std::vector<std::string> librariesLoaded;
+    while ( (lecture = readdir( rep )) )
+    {
+        string lec = lecture->d_name;
+        if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
+        {
+            librariesLoaded.push_back(directory+"/"+lec);
+            l++;
+        }
+    }
+
+    closedir( rep );
+
+    //Libraries are loaded using dlopen(.., ..|RTLD_LOCAL) meaning that their symbols are not available for other libraries
+    //nor for LLVM/Clang. We then reload set them as global to make their symbols available for LLVM/Clang. We couldn't mark them
+    //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
+    for (unsigned int i = 0;i<librariesLoaded.size();++i)
+        SetLibraryGlobal(librariesLoaded[i].c_str());
+    #else
+    //Nothing to do on Windows.
+    #endif
 }
 
 void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform & platform)

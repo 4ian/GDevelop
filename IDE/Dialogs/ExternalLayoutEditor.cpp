@@ -225,6 +225,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         layoutEditorCanvas->AddAssociatedEditor(propertiesPnl.get());
         layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
         layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
+        objectsEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
 
         //Display editors in panes
         if ( creatingEditorsForFirsttime )

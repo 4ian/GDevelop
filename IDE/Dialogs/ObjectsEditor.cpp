@@ -763,8 +763,10 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
 
 void ObjectsEditor::OnMenuPropertiesSelected(wxCommandEvent& event)
 {
-    if ( propPnl && propPnlManager ) propPnlManager->GetPane("PROPERTIES").Show();
-    propPnlManager->Update();
+    if ( propPnl && propPnlManager ) {
+    	propPnlManager->GetPane("PROPERTIES").Show();
+    	propPnlManager->Update();
+	}    	
 }
 
 void ObjectsEditor::OnMenuRenameSelected(wxCommandEvent& event)

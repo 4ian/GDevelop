@@ -45,8 +45,9 @@ public:
      * \brief To be called when extensions loading is done.
      *
      * This is necessary on Linux to make symbols exported by extensions available.
+     * \param directory The directory where extensions have been loaded from.
      */
-    static void ExtensionsLoadingDone();
+    static void ExtensionsLoadingDone(const std::string & directory);
 
 private:
     ExtensionsLoader() {};

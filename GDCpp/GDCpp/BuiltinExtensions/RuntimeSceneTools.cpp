@@ -12,7 +12,7 @@
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CppPlatform.h"
 #include "GDCpp/ObjectHelpers.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/RuntimeGame.h"
 #include "GDCpp/profile.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Variable.h"
@@ -176,33 +176,33 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
 
 gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName)
 {
-    return scene.GetVariables().ObtainVariable(variableName);
+    return scene.GetVariables().Get(variableName);
 }
 
 gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
 {
 
-    return scene.game->GetVariables().ObtainVariable(variableName);
+    return scene.game->GetVariables().Get(variableName);
 }
 
 gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int index)
 {
-    return scene.GetVariables().GetVariable(index);
+    return scene.GetVariables().Get(index);
 }
 
 gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int index)
 {
-    return scene.game->GetVariables().GetVariable(index);
+    return scene.game->GetVariables().Get(index);
 }
 
 bool GD_API SceneVariableDefined(RuntimeScene & scene, const std::string & variableName)
 {
-    return scene.GetVariables().HasVariableNamed(variableName);
+    return scene.GetVariables().Has(variableName);
 }
 
 bool GD_API GlobalVariableDefined(RuntimeScene & scene, const std::string & variableName)
 {
-    return scene.game->GetVariables().HasVariableNamed(variableName);
+    return scene.game->GetVariables().Has(variableName);
 }
 
 double GD_API GetSceneVariableValue( const RuntimeScene & scene, const std::string & variableName)
@@ -227,28 +227,28 @@ const std::string & GD_API GetGlobalVariableString( const RuntimeScene & scene, 
 
 double GD_API IndexGetSceneVariableValue( const RuntimeScene & scene, unsigned int index)
 {
-    return scene.GetVariables().GetVariablesVector()[index].GetValue();
+    return scene.GetVariables().Get(index).GetValue();
 }
 
 const std::string & GD_API IndexGetSceneVariableString( const RuntimeScene & scene, unsigned int index)
 {
-    return scene.GetVariables().GetVariable(index).GetString();
+    return scene.GetVariables().Get(index).GetString();
 }
 
 double GD_API IndexGetGlobalVariableValue( const RuntimeScene & scene, unsigned int index)
 {
-    return scene.game->GetVariables().GetVariable(index).GetValue();
+    return scene.game->GetVariables().Get(index).GetValue();
 }
 
 const std::string & GD_API IndexGetGlobalVariableString( const RuntimeScene & scene, unsigned int index)
 {
-    return scene.game->GetVariables().GetVariable(index).GetString();
+    return scene.game->GetVariables().Get(index).GetString();
 }
 
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 {
     //Retrieve the image
-    boost::shared_ptr<SFMLTextureWrapper> image = scene.game->GetImageManager()->GetSFMLTexture(imageName);
+    boost::shared_ptr<SFMLTextureWrapper> image = scene.GetImageManager()->GetSFMLTexture(imageName);
     if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
         return;
 

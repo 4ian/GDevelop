@@ -1,7 +1,7 @@
 #include "ExternalLayoutsTools.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project.h"
 #include "GDCpp/ExternalLayout.h"
+#include "GDCpp/RuntimeGame.h"
 
 namespace ExternalLayoutsTools
 {

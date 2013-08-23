@@ -28,6 +28,7 @@
 #include "GDCpp/Log.h"
 #include "GDCpp/Tools/AES.h"
 #include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/RuntimeGame.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -150,7 +151,10 @@ int main( int argc, char *p_argv[] )
     window.setFramerateLimit( game.GetMaximumFPS() );
     window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
 
-    RuntimeScene scenePlayed(&window, &game);
+    RuntimeGame runtimeGame;
+    runtimeGame.LoadFromProject(game);
+
+    RuntimeScene scenePlayed(&window, &runtimeGame);
     if ( !scenePlayed.LoadFromScene( game.GetLayout(0) ) )
         return AbortWithMessage("Unable to load the first scene \"" + game.GetLayout(0).GetName() + "\". Aborting.");
 
@@ -174,7 +178,7 @@ int main( int argc, char *p_argv[] )
             scenePlayed.running = false;
         else if ( returnCode != -1 && returnCode < game.GetLayoutCount()) //Change the scene being played
         {
-            RuntimeScene emptyScene(&window, &game);
+            RuntimeScene emptyScene(&window, &runtimeGame);
             scenePlayed = emptyScene; //Clear the scene
 
             if ( !scenePlayed.LoadFromScene( game.GetLayout(returnCode) ) )

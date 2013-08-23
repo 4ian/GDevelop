@@ -240,7 +240,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("number");
 
 
         obj.AddAction("ModVarObjetTxt",
@@ -255,7 +255,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("string", _("Text"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("string");
 
 
 
@@ -380,7 +380,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("number");
 
         obj.AddCondition("VarObjetTxt",
                        _("Text of variable of an object"),
@@ -394,7 +394,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("string", _("Text to test"))
-            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("string");
 
         obj.AddCondition("VarObjetDef",
                        _("Variable defined"),
@@ -406,7 +406,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().HasVariableNamed");
+            .codeExtraInformation.SetFunctionName("GetVariables().Has");
 
         obj.AddCondition("AutomatismActivated",
                        _("Automatism activated"),

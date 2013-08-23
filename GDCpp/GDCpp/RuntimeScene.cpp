@@ -13,6 +13,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Project.h"
@@ -49,7 +50,7 @@ RuntimeLayer RuntimeScene::badRuntimeLayer;
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
 
-RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, gd::Project * game_) :
+RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
     renderWindow(renderWindow_),
     game(game_),
     #if defined(GD_IDE_ONLY)
@@ -134,6 +135,11 @@ RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
     }
 
     return *this;
+}
+
+boost::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
+{
+    return game->GetImageManager();
 }
 
 void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
@@ -529,11 +535,7 @@ public:
             }
 
             //Substitute initial variables specific to that object instance.
-            const std::vector<gd::Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
-            for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
-            {
-                newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
-            }
+            newObject->GetVariables().Merge(initialInstance.GetVariables());
 
             scene.objectsInstances.AddObject(newObject);
         }

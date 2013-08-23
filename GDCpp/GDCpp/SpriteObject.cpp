@@ -75,7 +75,7 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
             {
                 Sprite & sprite = anim.GetDirectionToModify(k).GetSprite(l);
 
-                sprite.LoadImage(scene.game->GetImageManager()->GetSFMLTexture(sprite.GetImageName()));
+                sprite.LoadImage(scene.GetImageManager()->GetSFMLTexture(sprite.GetImageName()));
             }
         }
     }
@@ -433,7 +433,7 @@ void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, 
     if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->texture.getSize().y) return;
 
     //Update texture and pixel perfect collision mask
-    dest->image.copy(scene.game->GetImageManager()->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
+    dest->image.copy(scene.GetImageManager()->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
     dest->texture.loadFromImage(dest->image);
 }
 

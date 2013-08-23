@@ -39,8 +39,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableGetCode = "GetSceneVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = scene.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < scene.GetVariables().GetVariableCount() )
+                    unsigned int index = scene.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < scene.GetVariables().Count() )
                         variableGetCode = "IndexGetSceneVariableValue(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -97,8 +97,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableGetCode = "GetSceneVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = scene.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < scene.GetVariables().GetVariableCount() )
+                    unsigned int index = scene.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < scene.GetVariables().Count() )
                         variableGetCode = "IndexGetSceneVariableString(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -159,8 +159,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableGetCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = project.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < project.GetVariables().GetVariableCount() )
+                    unsigned int index = project.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < project.GetVariables().Count() )
                         variableGetCode = "IndexGetGlobalVariableValue(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -217,8 +217,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableGetCode = "GetGlobalVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = project.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < project.GetVariables().GetVariableCount() )
+                    unsigned int index = project.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < project.GetVariables().Count() )
                         variableGetCode = "IndexGetGlobalVariableString(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -282,8 +282,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = scene.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < scene.GetVariables().GetVariableCount() )
+                    unsigned int index = scene.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < scene.GetVariables().Count() )
                         variableObtainCode = "IndexGetSceneVariable(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -339,8 +339,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = scene.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < scene.GetVariables().GetVariableCount() )
+                    unsigned int index = scene.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < scene.GetVariables().Count() )
                         variableObtainCode = "IndexGetSceneVariable(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -389,8 +389,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = project.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < project.GetVariables().GetVariableCount() )
+                    unsigned int index = project.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < project.GetVariables().Count() )
                         variableObtainCode = "IndexGetGlobalVariable(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -445,8 +445,8 @@ VariablesExtension::VariablesExtension()
                 std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known:
                 {
-                    unsigned int index = project.GetVariables().GetVariablePosition(instruction.GetParameters()[1].GetPlainString());
-                    if ( index < project.GetVariables().GetVariableCount() )
+                    unsigned int index = project.GetVariables().GetPosition(instruction.GetParameters()[1].GetPlainString());
+                    if ( index < project.GetVariables().Count() )
                         variableObtainCode = "IndexGetGlobalVariable(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
@@ -484,13 +484,10 @@ VariablesExtension::VariablesExtension()
                 codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToString(parameters[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known.
-                for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
-                    if ( scene.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
-                    {
-                        variableObtainCode = "IndexGetSceneVariableValue(*runtimeContext->scene, "+ToString(i)+")";
-                        break;
-                    }
+                    unsigned int index = scene.GetVariables().GetPosition(parameters[1].GetPlainString());
+                    if ( index < scene.GetVariables().Count() )
+                        variableObtainCode = "IndexGetSceneVariableValue(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
                 return variableObtainCode;
@@ -516,13 +513,10 @@ VariablesExtension::VariablesExtension()
                 codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToString(parameters[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known.
-                for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
-                    if ( scene.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
-                    {
-                        variableObtainCode = "IndexGetSceneVariableString(*runtimeContext->scene, "+ToString(i)+")";
-                        break;
-                    }
+                    unsigned int index = scene.GetVariables().GetPosition(parameters[1].GetPlainString());
+                    if ( index < scene.GetVariables().Count() )
+                        variableObtainCode = "IndexGetSceneVariableString(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
                 return variableObtainCode;
@@ -546,13 +540,10 @@ VariablesExtension::VariablesExtension()
                 codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToString(parameters[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known.
-                for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
-                    if ( project.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
-                    {
-                        variableObtainCode = "IndexGetGlobalVariableValue(*runtimeContext->scene, "+ToString(i)+")";
-                        break;
-                    }
+                    unsigned int index = project.GetVariables().GetPosition(parameters[1].GetPlainString());
+                    if ( index < project.GetVariables().Count() )
+                        variableObtainCode = "IndexGetGlobalVariableValue(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
                 return variableObtainCode;
@@ -576,13 +567,10 @@ VariablesExtension::VariablesExtension()
                 codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToString(parameters[1].GetPlainString())+"\")";
                 //Try to optimize the call when the variable position is known.
-                for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
-                    if ( project.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
-                    {
-                        variableObtainCode = "IndexGetGlobalVariableString(*runtimeContext->scene, "+ToString(i)+")";
-                        break;
-                    }
+                    unsigned int index = project.GetVariables().GetPosition(parameters[1].GetPlainString());
+                    if ( index < project.GetVariables().Count() )
+                        variableObtainCode = "IndexGetGlobalVariableString(*runtimeContext->scene, "+ToString(index)+")";
                 }
 
                 return variableObtainCode;

@@ -175,8 +175,10 @@ void CppLayoutPreviewer::RefreshFromLayout()
     SoundManager::GetInstance()->ClearAllSoundsAndMusics();
     if ( editor.GetProject().GetImageManager() ) editor.GetProject().GetImageManager()->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
 
-    //Reset editor.GetProject()
-    previewGame = editor.GetProject();
+    //Reset game
+    RuntimeGame newGame;
+    previewGame = newGame;
+    previewGame.LoadFromProject(editor.GetProject());
     previewGame.SetImageManager(editor.GetProject().GetImageManager()); //Use same image manager.
 
     //Reset scene

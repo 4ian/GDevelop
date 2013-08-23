@@ -7,6 +7,7 @@
 #define RUNTIMESCENE_H
 
 #include "GDCpp/Scene.h" //This include must be placed first
+#include "GDCpp/RuntimeVariablesContainer.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -17,8 +18,10 @@ namespace sf { class RenderWindow; }
 namespace sf { class Event; }
 namespace gd { class Project; }
 namespace gd { class Object; }
+namespace gd { class ImageManager; }
 class CppPlatform;
 class RuntimeLayer;
+class RuntimeGame;
 class AutomatismsRuntimeSharedData;
 class ExtensionBase;
 class Text;
@@ -34,8 +37,8 @@ class BaseProfiler;
 /**
  * \brief Represents a scene being played.
  *
- * A RuntimeScene is used when a game is played.
- * It contains everything a- scene provide, but also specific
+ * A RuntimeScene is used when a game is played.<br>
+ * It contains everything a scene provide, but also specific
  * functions and members for runtime ( Render functions, objects instances, variables... )
  *
  * \ingroup GameEngine
@@ -43,14 +46,14 @@ class BaseProfiler;
 class GD_API RuntimeScene : public Scene
 {
 public:
-    RuntimeScene(sf::RenderWindow * renderWindow_, gd::Project * game_);
+    RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
     virtual ~RuntimeScene();
 
     RuntimeScene& operator=(const RuntimeScene & scene);
     RuntimeScene(const RuntimeScene & scene);
 
-    sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
-    gd::Project *                           game; ///< Pointer to the game the scene is linked to
+    sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display.
+    RuntimeGame *                       game; ///< Pointer to the game the scene is linked to.
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
@@ -59,14 +62,20 @@ public:
     bool                                    running; ///< True if the scene is being played
 
     /**
-     * Provide access to the gd::VariablesContainer member containing the variables
+     * \brief Provide access to the variables container
      */
-    inline const gd::VariablesContainer & GetVariables() const { return variables; }
+    inline const RuntimeVariablesContainer & GetVariables() const { return variables; }
 
     /**
-     * Provide access to the gd::VariablesContainer member containing the variables
+     * \brief Provide access to the variables container
      */
-    inline gd::VariablesContainer & GetVariables() { return variables; }
+    inline RuntimeVariablesContainer & GetVariables() { return variables; }
+
+    /**
+     * \brief Shortcut for game.GetImageManager()
+     * \return The image manager of the game.
+     */
+    boost::shared_ptr<gd::ImageManager> GetImageManager() const;
 
     /**
      * Get the layer with specified name.
@@ -239,7 +248,7 @@ protected:
     signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
     signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
     int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
-    gd::VariablesContainer                  variables; ///<List of the scene variables
+    RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.

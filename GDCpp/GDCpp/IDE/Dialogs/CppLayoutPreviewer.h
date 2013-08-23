@@ -10,6 +10,7 @@
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/RuntimeGame.h"
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -88,7 +89,7 @@ private:
     void RenderCompilationScreen();
 
     //Members used during preview or compilation
-    gd::Project previewGame; ///< Runtime game used during preview.
+    RuntimeGame previewGame; ///< Runtime game used during preview.
     RuntimeScene previewScene; ///< Runtime scene used to render or preview the scene.
     static sf::Texture reloadingIconImage;
     static sf::Sprite reloadingIconSprite;

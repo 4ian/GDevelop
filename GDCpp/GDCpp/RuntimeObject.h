@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "GDCore/PlatformDefinition/VariablesContainer.h"
+#include "GDCpp/RuntimeVariablesContainer.h"
 #include "GDCpp/Force.h"
 namespace gd { class Automatism; }
 namespace gd { class InitialInstance; }
@@ -96,14 +96,14 @@ public:
     ///@{
 
     /**
-     * \brief Provide access to the gd::VariablesContainer member containing the object variables.
+     * \brief Provide access to variables of the object.
      */
-    inline const gd::VariablesContainer & GetVariables() const { return objectVariables; }
+    inline const RuntimeVariablesContainer & GetVariables() const { return objectVariables; }
 
     /**
-     * \brief Provide access to the gd::VariablesContainer member containing the object variables.
+     * \brief Provide access to variables of the object.
      */
-    inline gd::VariablesContainer & GetVariables() { return objectVariables; }
+    inline RuntimeVariablesContainer & GetVariables() { return objectVariables; }
 
     ///@}
 
@@ -400,7 +400,7 @@ protected:
     bool                                                    hidden; ///<True to prevent the object from being rendered.
     std::string                                             layer; ///<Name of the layer on which the object is.
     std::map<std::string, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
-    gd::VariablesContainer                                  objectVariables; ///<List of the variables of the object
+    RuntimeVariablesContainer                               objectVariables; ///<List of the variables of the object
     std::vector < Force >                                   forces; ///< Forces applied to the object
 
     /**

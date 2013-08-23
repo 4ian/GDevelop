@@ -35,86 +35,82 @@ public:
     ///@{
 
     /**
-     * Must return true if variable called "name" exists.
+     * \brief Return true if the specified variable is in the container
      */
-    virtual bool HasVariableNamed(const std::string & name) const
-    {
-        std::vector < Variable >::const_iterator end = variables.end();
-        for (std::vector < Variable >::const_iterator i = variables.begin();i != end;++i)
-        {
-            if ( i->GetName() == name)
-                return true;
-        }
-
-        return false;
-    }
+    bool Has(const std::string & name) const;
 
     /**
-     * Must return a reference to the variable called "name".
+     * \brief Return a reference to the variable called \a name.
      */
-    virtual Variable & GetVariable(const std::string & name);
+    Variable & Get(const std::string & name);
 
     /**
-     * Must return a reference to the variable called "name".
+     * \brief Return a reference to the variable called \a name.
      */
-    virtual const Variable & GetVariable(const std::string & name) const;
+    const Variable & Get(const std::string & name) const;
 
     /**
-     * Return a reference to the variable at the @ index position in the list.
-     * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
-     * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
+     * \brief Return a pair containing the name and the variable at position \index in the container.
+     * 
+     * \note If index is invalid, an empty variable is returned.
      */
-    inline Variable & GetVariable(unsigned int index) { return variables[index]; }
+    std::pair<std::string, gd::Variable> & Get(unsigned int index);
 
     /**
-     * Return a reference to the variable at the @ index position in the list.
-     * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
-     * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
+     * \brief Return a pair containing the name and the variable at position \index in the container.
+     * 
+     * \note If index is invalid, an empty variable is returned.
      */
-    inline const Variable & GetVariable(unsigned int index) const { return variables[index]; }
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Must return the position of the variable called "name" in the variable list
-     */
-    virtual unsigned int GetVariablePosition(const std::string & name) const;
-
-    /**
-     * Must return the number of variables.
-     */
-    virtual unsigned int GetVariableCount() const;
-
-    /**
-     * Must add a new empty variable called "name" at the specified position in the variable list.
-     */
-    virtual void InsertNewVariable(const std::string & name, unsigned int position);
+    const std::pair<std::string, gd::Variable> & Get(unsigned int index) const;
 
     /**
      * Must add a new variable constructed from the variable passed as parameter.
      * \note No pointer or reference must be kept on the variable passed as parameter.
-     * \param variable The variable that must be copied and inserted into the project
-     * \param position Insertion position. Even if the position is invalid, the variable must be inserted at the end of the variable list.
+     * \param variable The variable that must be copied and inserted into the container
+     * \param position Insertion position. If the position is invalid, the variable is inserted at the end of the variable list.
+     * \return Reference to the newly added variable
      */
-    virtual void InsertVariable(const Variable & variable, unsigned int position);
+    Variable & Insert(const std::string & name, const Variable & variable, unsigned int position);
 
     /**
-     * Must delete variable named "name".
+     * \brief Return the number of variables.
      */
-    virtual void RemoveVariable(const std::string & name);
+    unsigned int Count() const { return variables.size(); };
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief return the position of the variable called "name" in the variable list
+     */
+    unsigned int GetPosition(const std::string & name) const;
 
     /**
-     * Must swap the position of the specified variables.
+     * \brief Add a new empty variable at the specified position in the container.
+     * \param name The new variable name
+     * \param position Insertion position. If the position is invalid, the variable is inserted at the end of the variable list.
+     * \return Reference to the newly added variable
      */
-    virtual void SwapVariables(unsigned int firstVariableIndex, unsigned int secondVariableIndex);
+    Variable & InsertNew(const std::string & name, unsigned int position);
+
+    /**
+     * \brief Remove the specified variable from the container.
+     */
+    void Remove(const std::string & name);
+
+    /**
+     * \brief Rename a variable
+     */
+    void Rename(const std::string & oldName, const std::string & newName);
+
+    /**
+     * \brief Swap the position of the specified variables.
+     */
+    void Swap(unsigned int firstVariableIndex, unsigned int secondVariableIndex);
     #endif
 
     /**
-     * Clear all variables of the list.
+     * \brief Clear all variables of the container.
      */
-    inline void Clear()
-    {
-        variables.clear();
-    }
+    inline void Clear() { variables.clear(); }
     ///@}
 
     /** \name Saving and loading
@@ -135,77 +131,10 @@ public:
     virtual void LoadFromXml(const TiXmlElement * element);
     ///@}
 
-    /** \name C++ Platform specific methods
-     */
-    ///@{
-
-    /**
-     * Get the text of a variable
-     */
-    inline const std::string & GetVariableString(const std::string & varName) const
-    {
-        for (unsigned int i = 0;i<variables.size();++i)
-        {
-            if ( variables[i].GetName() == varName)
-                return variables[i].GetString();
-        }
-
-        return badVariable.GetString();
-    }
-
-    /**
-     * Get the value of a variable
-     */
-    inline double GetVariableValue(const std::string & varName) const
-    {
-        std::vector < Variable >::const_iterator end = variables.end();
-        for (std::vector < Variable >::const_iterator i = variables.begin();i != end;++i)
-        {
-            if ( i->GetName() == varName)
-                return i->GetValue();
-        }
-
-        return badVariable.GetValue();
-    }
-
-    /**
-     * Return the internal vector containing the variables.
-     */
-    inline const std::vector<Variable> & GetVariablesVector() const
-    {
-        return variables;
-    }
-
-    /**
-     * Return the internal vector containing the variables.
-     */
-    inline std::vector<Variable> & GetVariablesVector()
-    {
-        return variables;
-    }
-
-    /**
-     * Return a reference to the variable with the name indicated.
-     * Add the variable if it doesn't exist.
-     */
-    inline Variable & ObtainVariable(const std::string & varName)
-    {
-        std::vector < Variable >::const_iterator end = variables.end();
-        for (std::vector < Variable >::iterator i = variables.begin();i != end;++i)
-        {
-            if ( i->GetName() == varName)
-                return *i;
-        }
-
-        variables.push_back(Variable(varName));
-        return variables.back();
-    }
-    ///@}
-
 private:
 
-    std::vector < gd::Variable > variables;
-    static Variable badVariable;
+    std::vector < std::pair<std::string, gd::Variable> > variables;
+    static std::pair<std::string, Variable> badVariable;
 };
 
 }

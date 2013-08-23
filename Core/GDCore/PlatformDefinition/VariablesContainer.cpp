@@ -4,6 +4,7 @@
  */
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
@@ -11,88 +12,124 @@
 namespace gd
 {
 
-Variable VariablesContainer::badVariable("badVariable");
+std::pair<std::string, Variable> VariablesContainer::badVariable;
+
+namespace { 
+
+//Tool functor used below
+class VariableHasName
+{
+public:
+    VariableHasName(std::string const& name_) : name(name_) { }
+
+    bool operator () (const std::pair<std::string, gd::Variable> & p)
+    {
+        return (p.first == name);
+    }
+
+    std::string name;
+};
+
+}
 
 VariablesContainer::VariablesContainer()
 {
 }
 
-Variable & VariablesContainer::GetVariable(const std::string & name)
+bool VariablesContainer::Has(const std::string & name) const 
+{ 
+    std::vector < std::pair<std::string, gd::Variable> >::const_iterator i = 
+        std::find_if(variables.begin(), variables.end(), VariableHasName(name));
+    return (i != variables.end());
+}
+
+std::pair<std::string, gd::Variable> & VariablesContainer::Get(unsigned int index)
 {
-    for (unsigned int i = 0;i<variables.size();++i)
-    {
-        if ( variables[i].GetName() == name)
-            return variables[i];
-    }
+    if ( index < variables.size() )
+        return variables[index];
 
     return badVariable;
 }
 
-const Variable & VariablesContainer::GetVariable(const std::string & name) const
+const std::pair<std::string, gd::Variable> & VariablesContainer::Get(unsigned int index) const
 {
-    for (unsigned int i = 0;i<variables.size();++i)
-    {
-        if ( variables[i].GetName() == name)
-            return variables[i];
-    }
+    if ( index < variables.size() )
+        return variables[index];
 
     return badVariable;
+}
+
+Variable & VariablesContainer::Get(const std::string & name)
+{
+    std::vector < std::pair<std::string, gd::Variable> >::iterator i = 
+        std::find_if(variables.begin(), variables.end(), VariableHasName(name));
+    if (i != variables.end())
+        return i->second;
+
+    return badVariable.second;
+}
+
+const Variable & VariablesContainer::Get(const std::string & name) const
+{
+    std::vector < std::pair<std::string, gd::Variable> >::const_iterator i = 
+        std::find_if(variables.begin(), variables.end(), VariableHasName(name));
+    if (i != variables.end())
+        return i->second;
+
+    return badVariable.second;
+}
+
+Variable & VariablesContainer::Insert(const std::string & name, const gd::Variable & variable, unsigned int position)
+{
+    if (position<variables.size())
+    {
+        variables.insert(variables.begin()+position, std::make_pair(name, variable));
+        return variables[position].second;
+    }
+    else 
+    {
+        variables.push_back(std::make_pair(name, variable));
+        return variables.back().second;
+    }
 }
 
 #if defined(GD_IDE_ONLY)
-inline void VariablesContainer::RemoveVariable(const std::string & varName)
+void VariablesContainer::Remove(const std::string & varName)
 {
-    std::vector < Variable >::const_iterator end = variables.end();
-    for (std::vector < Variable >::iterator i = variables.begin();i != end;++i)
-    {
-        if ( i->GetName() == varName)
-        {
-            variables.erase(i);
-            return;
-        }
-    }
-
-    return;
+    variables.erase(std::remove_if(variables.begin(), variables.end(), 
+        VariableHasName(varName)), variables.end() );
 }
-unsigned int VariablesContainer::GetVariablePosition(const std::string & name) const
+
+unsigned int VariablesContainer::GetPosition(const std::string & name) const
 {
-    for (unsigned int i =0;i<variables.size();++i)
+    for(unsigned int i = 0;i<variables.size();++i)
     {
-        if ( variables[i].GetName() == name )
+        if ( variables[i].first == name )
             return i;
     }
+
     return std::string::npos;
 }
 
-unsigned int VariablesContainer::GetVariableCount() const
+Variable & VariablesContainer::InsertNew(const std::string & name, unsigned int position)
 {
-    return variables.size();
+    Variable newVariable;
+    return Insert(name, newVariable, position);
 }
 
-void VariablesContainer::InsertNewVariable(const std::string & name, unsigned int position)
+void VariablesContainer::Rename(const std::string & oldName, const std::string & newName)
 {
-    Variable newVariable(name);
-
-    if (position<variables.size())
-        variables.insert(variables.begin()+position, newVariable);
-    else
-        variables.push_back(newVariable);
+    std::vector < std::pair<std::string, gd::Variable> >::iterator i = 
+        std::find_if(variables.begin(), variables.end(), VariableHasName(oldName));
+    if (i != variables.end()) i->first = newName;
 }
 
-void VariablesContainer::InsertVariable(const gd::Variable & variable, unsigned int position)
-{
-    if (position<variables.size())
-        variables.insert(variables.begin()+position, variable);
-    else
-        variables.push_back(variable);
-}
-
-void VariablesContainer::SwapVariables(unsigned int firstVariableIndex, unsigned int secondVariableIndex)
+void VariablesContainer::Swap(unsigned int firstVariableIndex, unsigned int secondVariableIndex)
 {
     if ( firstVariableIndex >= variables.size() || secondVariableIndex >= variables.size() )
         return;
 
-    Variable temp = variables[firstVariableIndex];
+    std::pair<std::string, gd::Variable> temp = variables[firstVariableIndex];
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
 }
@@ -104,14 +141,13 @@ void VariablesContainer::LoadFromXml(const TiXmlElement * rootElement)
 
     Clear();
     const TiXmlElement * element = rootElement->FirstChildElement();
-
     while ( element )
     {
-        std::string name = element->Attribute( "Name" ) != NULL ? element->Attribute( "Name" ) : "";
-        Variable variable(name);
+        Variable variable;
         if ( element->Attribute( "Value" ) != NULL ) variable.SetString(element->Attribute( "Value" ));
 
-        variables.push_back(variable);
+        std::string name = element->Attribute( "Name" ) != NULL ? element->Attribute( "Name" ) : "";
+        Insert(name, variable, -1);
         element = element->NextSiblingElement();
     }
 }
@@ -126,8 +162,8 @@ void VariablesContainer::SaveToXml(TiXmlElement * element) const
         TiXmlElement * variable = new TiXmlElement( "Variable" );
         element->LinkEndChild( variable );
 
-        variable->SetAttribute("Name", variables[j].GetName().c_str());
-        variable->SetAttribute("Value", variables[j].GetString().c_str());
+        variable->SetAttribute("Name", variables[j].first.c_str());
+        variable->SetAttribute("Value", variables[j].second.GetString().c_str());
     }
 }
 #endif

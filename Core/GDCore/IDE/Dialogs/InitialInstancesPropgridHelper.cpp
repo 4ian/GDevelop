@@ -94,7 +94,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
 
     if ( selectedInitialInstances.size() == 1)
     {
-        grid->Append( new wxStringProperty(_("Variables") + " (" + gd::ToString(selectedInitialInstances[0]->GetVariables().GetVariableCount()) 
+        grid->Append( new wxStringProperty(_("Variables") + " (" + gd::ToString(selectedInitialInstances[0]->GetVariables().Count()) 
             + ")", "INSTANCE_VARIABLES", _("Click to edit...")) );
 
         grid->SetPropertyCell("INSTANCE_VARIABLES", 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
@@ -118,7 +118,7 @@ void InitialInstancesPropgridHelper::OnPropertySelected(const std::vector<gd::In
             dialog.ShowModal();
 
             grid->SetPropertyLabel("INSTANCE_VARIABLES", _("Variables") + " (" 
-                + gd::ToString(selectedInitialInstances[0]->GetVariables().GetVariableCount()) + ")");
+                + gd::ToString(selectedInitialInstances[0]->GetVariables().Count()) + ")");
         }
     }
 }

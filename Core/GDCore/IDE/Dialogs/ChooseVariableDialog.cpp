@@ -162,17 +162,17 @@ void ChooseVariableDialog::Refresh()
 {
     variablesList->DeleteAllItems();
 
-    for (unsigned int i = 0;i<temporaryContainer->GetVariableCount();++i)
+    for (unsigned int i = 0;i<temporaryContainer->Count();++i)
     {
-    	variablesList->InsertItem(i, temporaryContainer->GetVariable(i).GetName());
-    	variablesList->SetItem(i, 1, temporaryContainer->GetVariable(i).GetString());
+    	variablesList->InsertItem(i, temporaryContainer->Get(i).first);
+    	variablesList->SetItem(i, 1, temporaryContainer->Get(i).second.GetString());
     }
 
     //Resize columns with a little margin
     variablesList->SetColumnWidth(0, variablesList->GetSize().GetWidth()/2-5);
     variablesList->SetColumnWidth(1, variablesList->GetSize().GetWidth()/2-5);
 
-    int bestHeight = 200+temporaryContainer->GetVariableCount()*10;
+    int bestHeight = 200+temporaryContainer->Count()*10;
     bestHeight = (bestHeight < 200) ? 350 : bestHeight;
     bestHeight = (bestHeight > 500) ? 500 : bestHeight;
 
@@ -204,15 +204,15 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
     //Find a new unique name
     std::string newName = ToString(_("NewVariable"));
     unsigned int tries = 2;
-    while ( temporaryContainer->HasVariableNamed(newName) )
+    while ( temporaryContainer->Has(newName) )
     {
         newName = ToString(_("NewVariable"))+ToString(tries);
         tries++;
     }
 
     //Insert the new variable in the list and begin editing its name
-    unsigned int listInsertPosition = temporaryContainer->HasVariableNamed(selectedVariable) ? temporaryContainer->GetVariablePosition(selectedVariable) : 0;
-    temporaryContainer->InsertNewVariable(newName, listInsertPosition);
+    unsigned int listInsertPosition = temporaryContainer->Has(selectedVariable) ? temporaryContainer->GetPosition(selectedVariable) : 0;
+    temporaryContainer->InsertNew(newName, listInsertPosition);
     variablesList->InsertItem(listInsertPosition, newName);
     variablesList->SetItem(listInsertPosition, 1, "0");
     variablesList->EditLabel(listInsertPosition);
@@ -223,11 +223,11 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
  */
 void ChooseVariableDialog::OnDelVarSelected(wxCommandEvent& event)
 {
-    if ( !temporaryContainer->HasVariableNamed(selectedVariable) )
+    if ( !temporaryContainer->Has(selectedVariable) )
         return;
 
     variablesList->DeleteItem(variablesList->FindItem(-1, selectedVariable));
-    temporaryContainer->RemoveVariable(selectedVariable);
+    temporaryContainer->Remove(selectedVariable);
 }
 
 /**
@@ -235,7 +235,7 @@ void ChooseVariableDialog::OnDelVarSelected(wxCommandEvent& event)
  */
 void ChooseVariableDialog::OnRenameVarSelected(wxCommandEvent& event)
 {
-    if ( !temporaryContainer->HasVariableNamed(selectedVariable) )
+    if ( !temporaryContainer->Has(selectedVariable) )
         return;
 
     variablesList->EditLabel(variablesList->FindItem(-1, selectedVariable));
@@ -246,16 +246,16 @@ void ChooseVariableDialog::OnRenameVarSelected(wxCommandEvent& event)
  */
 void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
-    for (unsigned int i = 1;i<temporaryContainer->GetVariableCount();++i)
+    for (unsigned int i = 1;i<temporaryContainer->Count();++i)
     {
-        if ( temporaryContainer->GetVariable(i).GetName() == selectedVariable)
+        if ( temporaryContainer->Get(i).first == selectedVariable)
         {
             long variableIdInList = variablesList->FindItem(-1, selectedVariable);
             variablesList->DeleteItem(variableIdInList);
-            variablesList->InsertItem(variableIdInList-1, temporaryContainer->GetVariable(i).GetName());
-            variablesList->SetItem(variableIdInList-1, 1, temporaryContainer->GetVariable(i).GetString());
+            variablesList->InsertItem(variableIdInList-1, temporaryContainer->Get(i).first);
+            variablesList->SetItem(variableIdInList-1, 1, temporaryContainer->Get(i).second.GetString());
 
-            temporaryContainer->SwapVariables(i, i-1);
+            temporaryContainer->Swap(i, i-1);
 
             return;
         }
@@ -267,16 +267,16 @@ void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
  */
 void ChooseVariableDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 {
-    for (unsigned int i = 0;i<temporaryContainer->GetVariableCount()-1;++i)
+    for (unsigned int i = 0;i<temporaryContainer->Count()-1;++i)
     {
-        if ( temporaryContainer->GetVariable(i).GetName() == selectedVariable)
+        if ( temporaryContainer->Get(i).first == selectedVariable)
         {
             long variableIdInList = variablesList->FindItem(-1, selectedVariable);
             variablesList->DeleteItem(variableIdInList);
-            variablesList->InsertItem(variableIdInList+1, temporaryContainer->GetVariable(i).GetName());
-            variablesList->SetItem(variableIdInList+1, 1, temporaryContainer->GetVariable(i).GetString());
+            variablesList->InsertItem(variableIdInList+1, temporaryContainer->Get(i).first);
+            variablesList->SetItem(variableIdInList+1, 1, temporaryContainer->Get(i).second.GetString());
 
-            temporaryContainer->SwapVariables(i, i+1);
+            temporaryContainer->Swap(i, i+1);
 
             return;
         }
@@ -288,12 +288,12 @@ void ChooseVariableDialog::OnMoveDownVarSelected(wxCommandEvent& event)
  */
 void ChooseVariableDialog::OnEditVarSelected(wxCommandEvent& event)
 {
-    if ( !temporaryContainer->HasVariableNamed(selectedVariable) )
+    if ( !temporaryContainer->Has(selectedVariable) )
         return;
 
-    std::string value = std::string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", temporaryContainer->GetVariable(selectedVariable).GetString()).mb_str());
+    std::string value = ToString(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", gd::ToString(temporaryContainer->Get(selectedVariable).GetString())));
 
-    temporaryContainer->GetVariable(selectedVariable).SetString(value);
+    temporaryContainer->Get(selectedVariable).SetString(value);
     variablesList->SetItem(variablesList->FindItem(-1, selectedVariable), 1, value);
 }
 
@@ -348,7 +348,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
     wxArrayString variablesNotDeclared;
     for (std::set<std::string>::const_iterator it = allVariables.begin();it!=allVariables.end();++it)
     {
-        if ( !temporaryContainer->HasVariableNamed(*it) )
+        if ( !temporaryContainer->Has(*it) )
             variablesNotDeclared.push_back(*it);
     }
 
@@ -359,7 +359,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
     //Add selection
     wxArrayInt selection = dialog.GetSelections();
     for (unsigned int i = 0;i<selection.size();++i)
-        temporaryContainer->InsertNewVariable(ToString(variablesNotDeclared[selection[i]]),temporaryContainer->GetVariableCount());
+        temporaryContainer->InsertNew(ToString(variablesNotDeclared[selection[i]]),temporaryContainer->Count());
 
     if ( !selection.empty() ) Refresh();
 }
@@ -372,8 +372,8 @@ void ChooseVariableDialog::OnvariablesListEndLabelEdit(wxListEvent& event)
     std::string newName = ToString(event.GetLabel());
     if ( newName != oldName )
     {
-        if ( !temporaryContainer->HasVariableNamed(newName))
-            temporaryContainer->GetVariable(oldName).SetName(newName);
+        if ( !temporaryContainer->Has(newName))
+            temporaryContainer->Rename(oldName, newName);
         else
         {
             wxLogWarning(_("A variable with this name already exists."));

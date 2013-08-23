@@ -20,30 +20,22 @@ namespace gd
 class GD_CORE_API Variable
 {
 public:
-    Variable() : name(""), value(0), isNumber(true) {};
-    Variable(std::string name_) : name(name_), value(0), isNumber(true) {};
+
+    /**
+     * \brief Default constructor creating a variable with 0 as value.
+     */
+    Variable() : value(0), isNumber(true) {};
     virtual ~Variable() {};
-
-    /**
-     * \brief Get name of the variable
-     * \brief Change the content of the variable, considered as a string.
-     */
-    const std::string & GetName() const { return name; }
-
-    /**
-     * \brief Change name of the variable
-     */
-    void SetName(const std::string & newName) { name = newName; }
 
     /**
      * \brief Return the content of the variable, considered as a string.
      */
-    virtual const std::string & GetString() const;
+    const std::string & GetString() const;
 
     /**
      * \brief Change the content of the variable, considered as a string.
      */
-    virtual void SetString(const std::string & newStr)
+    void SetString(const std::string & newStr)
     {
         str = newStr;
         isNumber = false;
@@ -85,7 +77,6 @@ public:
     bool operator!=(const std::string & val) const { return GetString() != val;};
 
 private:
-    std::string name;
     mutable double value;
     mutable std::string str;
     mutable bool isNumber;

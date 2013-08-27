@@ -61,6 +61,13 @@ public:
      * Some instructions names have been changed as well as parameters since GD 3.
      */
     static void UpdateInstructionsFromGD2x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions);
+
+    /**
+     * \brief Internal method called when opening events created with GD 3.1.x
+     *
+     * Variables related and some storage instructions have been changed.
+     */
+    static void UpdateInstructionsFromGD31x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions);
 };
 
 }

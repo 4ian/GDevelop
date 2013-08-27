@@ -17,6 +17,40 @@ using namespace std;
 namespace gd
 {
 
+void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions)
+{
+    for (unsigned int i = 0;i<list.size();++i)
+    {
+        gd::Instruction & instr = list[i];
+
+        const gd::InstructionMetadata & metadata = instructionsAreActions ?
+                                             MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(), instr.GetType()) :
+                                             MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(), instr.GetType());
+
+        if (instr.GetType() == "VarScene" || 
+            instr.GetType() == "VarSceneTxt" || 
+            instr.GetType() == "VarGlobal" || 
+            instr.GetType() == "VarGlobalTxt" || 
+            instr.GetType() == "ModVarScene" || 
+            instr.GetType() == "ModVarSceneTxt" || 
+            instr.GetType() == "ModVarGlobal" || 
+            instr.GetType() == "ModVarGlobalTxt" )
+        {
+            std::vector< gd::Expression > parameters = instr.GetParameters();
+            if ( parameters.size() >= 1 ) parameters.erase(parameters.begin()+0);
+            instr.SetParameters(parameters);
+        }
+
+        if (instr.GetType() == "VarSceneDef" || 
+            instr.GetType() == "VarGlobalDef" || 
+            instr.GetType() == "VarObjetDef" )
+        {
+            instr.SetParameter(1, gd::Expression("\""+instr.GetParameter(1).GetPlainString()+"\""));
+        }
+
+        //UpdateInstructionsFromGD31x(project, instr.GetSubInstructions(), instructionsAreActions);
+    }
+}
 
 void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions)
 {
@@ -104,8 +138,6 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
             }
             instr.SetParameters(parameters);
         }
-
-
 
         //Common updates for some parameters
         const std::vector< gd::Expression > & parameters = instr.GetParameters();
@@ -220,6 +252,10 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector <
         elemConditions = elemConditions->NextSiblingElement();
     }
 
+    if ( project.GetLastSaveGDMajorVersion() < 3 || 
+         (project.GetLastSaveGDMajorVersion() == 3 && project.GetLastSaveGDMinorVersion() <= 1 ) )
+        UpdateInstructionsFromGD31x(project, conditions, false);
+
     if ( project.GetLastSaveGDMajorVersion() < 3 )
         UpdateInstructionsFromGD2x(project, conditions, false);
 }
@@ -258,6 +294,10 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd
         actions.push_back(instruction);
         elemActions = elemActions->NextSiblingElement();
     }
+    
+    if ( project.GetLastSaveGDMajorVersion() < 3 || 
+         (project.GetLastSaveGDMajorVersion() == 3 && project.GetLastSaveGDMinorVersion() <= 1 ) )
+        UpdateInstructionsFromGD31x(project, actions, true);
 
     if ( project.GetLastSaveGDMajorVersion() < 3 )
         UpdateInstructionsFromGD2x(project, actions, true);

@@ -456,7 +456,7 @@ string EventsCodeGenerator::GenerateActionsListCode(vector < gd::Instruction > &
 
 std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
                                                         gd::EventsCodeGenerationContext & context,
-                                                        const std::vector < gd::Expression > & othersParameters,
+                                                        const std::string & previousParameter,
                                                         std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     std::string argOutput;
@@ -577,8 +577,8 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(vector < gd::Express
         if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
             parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
-        std::string argOutput = GenerateParameterCodes(parameters[pNb].GetPlainString(), parametersInfo[pNb], context, parameters,
-                                                       supplementaryParametersTypes);
+        std::string argOutput = GenerateParameterCodes(parameters[pNb].GetPlainString(), parametersInfo[pNb], context,
+            pNb == 0 ? "" : parameters[pNb-1].GetPlainString(), supplementaryParametersTypes);
 
         arguments.push_back(argOutput);
     }
@@ -741,44 +741,25 @@ void EventsCodeGenerator::ReportError()
     errorOccurred = true;
 }
 
-std::string EventsCodeGenerator::GenerateCurrentObjectFunctionCall(std::string objectListName,
+std::string EventsCodeGenerator::GenerateObjectFunctionCall(std::string objectListName,
                                                       const gd::ObjectMetadata & objMetadata,
-                                                      std::string functionCallName,
+                                                      const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       std::string parametersStr,
+                                                      std::string defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    return "TODO (GenerateCurrentObjectFunctionCall)";
+    return "TODO (GenerateObjectFunctionCall)";
 }
 
-std::string EventsCodeGenerator::GenerateNotPickedObjectFunctionCall(std::string objectListName,
-                                                        const gd::ObjectMetadata & objMetadata,
-                                                        std::string functionCallName,
-                                                        std::string parametersStr,
-                                                        std::string defaultOutput,
-                                                        gd::EventsCodeGenerationContext & context)
-{
-    return "TODO (GenerateNotPickedObjectFunctionCall)";
-}
-
-std::string EventsCodeGenerator::GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
-                                                                                       std::string automatismName,
+std::string EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(std::string objectListName,
+                                                      std::string automatismName,
                                                       const gd::AutomatismMetadata & autoInfo,
-                                                      std::string functionCallName,
+                                                      const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       std::string parametersStr,
+                                                      std::string defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    return "TODO (GenerateCurrentObjectAutomatismFunctionCall)";
-}
-
-std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
-                                                                                       std::string automatismName,
-                                                        const gd::AutomatismMetadata & autoInfo,
-                                                        std::string functionCallName,
-                                                        std::string parametersStr,
-                                                        std::string defaultOutput,
-                                                        gd::EventsCodeGenerationContext & context)
-{
-    return "TODO (GenerateNotPickedObjectAutomatismFunctionCall)";
+    return "TODO (GenerateObjectAutomatismFunctionCall)";
 }
 
 

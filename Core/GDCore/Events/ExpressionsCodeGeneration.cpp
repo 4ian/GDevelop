@@ -53,7 +53,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
 
@@ -73,7 +73,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
 {
     codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //TODO : A bit of hack here..
@@ -107,7 +107,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -132,10 +132,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Build string to access the object
         codeGenerator.AddIncludeFiles(objInfo.includeFiles);
-        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
-            output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
-        else
-            output = codeGenerator.GenerateNotPickedObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
+        output = codeGenerator.GenerateObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
     plainExpression += output;
@@ -150,7 +147,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -175,10 +172,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Build string to access the object
         codeGenerator.AddIncludeFiles(objInfo.includeFiles);
-        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
-            output = codeGenerator.GenerateCurrentObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
-        else
-            output = codeGenerator.GenerateNotPickedObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
+        output = codeGenerator.GenerateObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
     plainExpression += output;
@@ -193,7 +187,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -219,10 +213,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Build string to access the automatism
         codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
-        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
-            output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
-        else
-            output = codeGenerator.GenerateNotPickedObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
+        output = codeGenerator.GenerateObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
     plainExpression += output;
@@ -237,7 +228,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -263,10 +254,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Build string to access the automatism
         codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
-        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
-            output = codeGenerator.GenerateCurrentObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, context);
-        else
-            output = codeGenerator.GenerateNotPickedObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation.functionCallName, parametersStr, output, context);
+        output = codeGenerator.GenerateObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
     plainExpression += output;

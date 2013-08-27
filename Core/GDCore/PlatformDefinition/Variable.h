@@ -6,6 +6,7 @@
 #ifndef GDCORE_VARIABLE_H
 #define GDCORE_VARIABLE_H
 #include <string>
+#include <map>
 
 namespace gd
 {
@@ -24,8 +25,13 @@ public:
     /**
      * \brief Default constructor creating a variable with 0 as value.
      */
-    Variable() : value(0), isNumber(true) {};
+    Variable() : value(0), isNumber(true), isStructure(false) {};
     virtual ~Variable() {};
+
+    /** \name Number or string
+     * Methods and operators used when the variable is considered as a number or a string.
+     */
+    ///@{
 
     /**
      * \brief Return the content of the variable, considered as a string.
@@ -39,6 +45,7 @@ public:
     {
         str = newStr;
         isNumber = false;
+        isStructure = false;
     }
 
     /**
@@ -53,6 +60,7 @@ public:
     {
         value = val;
         isNumber = true;
+        isStructure = false;
     }
 
     //Operators are overloaded to allow accessing to variable using a simple int-like semantic.
@@ -76,10 +84,50 @@ public:
     bool operator==(const std::string & val) const { return GetString() == val;};
     bool operator!=(const std::string & val) const { return GetString() != val;};
 
+    ///@}
+
+    /** \name Structure
+     * Methods used when the variable is considered as a structure.
+     */
+    ///@{
+
+    /**
+     * \brief Return true if the variable is a structure and has the specified child.
+     */
+    bool HasChild(const std::string & name);
+
+    /**
+     * \brief Return the child with the specified name. 
+     * 
+     * If the variable has not the specified child, an empty variable with the specified name 
+     * is added as child.
+     */
+    Variable & GetChild(const std::string & name);
+
+    /**
+     * \brief Return the child with the specified name. 
+     * 
+     * If the variable has not the specified child, an empty variable with the specified name 
+     * is added as child.
+     */
+    const Variable & GetChild(const std::string & name) const;
+
+    /**
+     * \brief Remove the child with the specified name.
+     * 
+     * If the variable is not a structure or has not
+     * the specified child, nothing is done.
+     */
+    void RemoveChild(const std::string & name);
+
+    ///@}
+
 private:
     mutable double value;
     mutable std::string str;
-    mutable bool isNumber;
+    mutable bool isNumber; ///< True if the type of the variable is a number.
+    mutable bool isStructure; ///< False when the variable is a primitive ( i.e: Number or string ), true when it is a structure and has may have children.
+    mutable std::map<std::string, Variable> children; ///<Children, when the variable is considered as a structure.
 };
 
 }

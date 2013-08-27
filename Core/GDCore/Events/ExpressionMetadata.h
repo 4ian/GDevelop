@@ -14,6 +14,65 @@ namespace gd
 {
 
 /**
+ * \brief Defines information about how generate code for an expression
+ */
+class ExpressionCodeGenerationInformation
+{
+public:
+    ExpressionCodeGenerationInformation() : staticFunction(false) {};
+    virtual ~ExpressionCodeGenerationInformation() {};
+
+    /**
+     * \brief Set the function name which will be used when generating the code.
+     */
+    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & cppCallingName_)
+    {
+        functionCallName = cppCallingName_;
+        return *this;
+    }
+
+    /**
+     * \brief Set that the function is static
+     */
+    ExpressionCodeGenerationInformation & SetStatic()
+    {
+        staticFunction = true;
+        return *this;
+    }
+
+    /**
+     * \brief Set that the function is located in a specific include file
+     */
+    ExpressionCodeGenerationInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+    {
+        optionalIncludeFile = optionalIncludeFile_;
+        return *this;
+    }
+
+    /** \brief Class used to redefine instruction code generation
+     */
+    class CustomCodeGenerator
+    {
+    public:
+        virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
+    };
+
+    /**
+     * \brief Set that the function must be generated using a custom code generator.
+     */
+    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+    {
+        optionalCustomCodeGenerator = codeGenerator;
+        return *this;
+    }
+
+    bool staticFunction;
+    std::string functionCallName;
+    std::string optionalIncludeFile;
+    boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+};
+
+/**
  * \brief Contains user-friendly infos about expressions and members needed to setup an expression
  *
  * \ingroup Events
@@ -67,51 +126,7 @@ public:
         return *this;
     };
 
-    /**
-     * \brief Defines information about how generate C++ code for an instruction
-     */
-    class ExtraInformation
-    {
-    public:
-        virtual ~ExtraInformation() {};
-
-        /**
-         * Set the C++ function name which will be used when generating the C++ code.
-         */
-        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
-        {
-            functionCallName = cppCallingName_;
-            return *this;
-        }
-
-        /**
-         * Set that the function is located in a specific include file
-         */
-        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
-        {
-            optionalIncludeFile = optionalIncludeFile_;
-            return *this;
-        }
-
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
-        {
-        public:
-            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
-        };
-
-        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
-            return *this;
-        }
-
-        std::string functionCallName;
-        std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
-    };
-    ExtraInformation codeExtraInformation;
+    ExpressionCodeGenerationInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fullfil std::map requirements
      */
@@ -184,51 +199,7 @@ public:
         return *this;
     };
 
-    /**
-     * \brief Defines information about how generate C++ code for an instruction
-     */
-    class ExtraInformation
-    {
-    public:
-        virtual ~ExtraInformation() {};
-
-        /**
-         * Set the C++ function name which will be used when generating the C++ code.
-         */
-        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
-        {
-            functionCallName = cppCallingName_;
-            return *this;
-        }
-
-        /**
-         * Set that the function is located in a specific include file
-         */
-        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
-        {
-            optionalIncludeFile = optionalIncludeFile_;
-            return *this;
-        }
-
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
-        {
-        public:
-            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
-        };
-
-        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
-            return *this;
-        }
-
-        std::string functionCallName;
-        std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
-    };
-    ExtraInformation codeExtraInformation;
+    ExpressionCodeGenerationInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fulfill std::map requirements
      */

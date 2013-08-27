@@ -14,6 +14,7 @@ namespace gd { class ObjectMetadata; }
 namespace gd { class AutomatismMetadata; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class EventsCodeGenerationContext; }
+namespace gd { class ExpressionCodeGenerationInformation; }
 namespace gd { class InstructionMetadata;}
 namespace gd { class Platform;}
 
@@ -149,9 +150,9 @@ public:
      * The string construction must be explicit : for example, quotes must be added if the target language need quotes.
      *
      * Usage example :
-     * \code
+     \code
         code += codeGenerator.ConvertToStringExplicit(name);
-     / \endcode
+     \endcode
      *
      * \note The default implementation simply call ConvertToString and add quotes
      *
@@ -323,7 +324,7 @@ protected:
      */
     virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
                                                gd::EventsCodeGenerationContext & context,
-                                               const std::vector < gd::Expression > & othersParameters,
+                                               const std::string & previousParameter,
                                                std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
 
     /**
@@ -336,29 +337,12 @@ protected:
      * \param parametersStr The parameters of the function
      * \param context The context : May be used to get information about the current scope.
      */
-    virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
+    virtual std::string GenerateObjectFunctionCall(std::string objectListName,
                                                           const ObjectMetadata & objMetadata,
-                                                          std::string functionCallName,
+                                                          const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                           std::string parametersStr,
+                                                          std::string defaultOutput,
                                                           gd::EventsCodeGenerationContext & context);
-
-    /**
-     * \brief Call a function of an object of a list.
-     *
-     * The object to be used must be the first object of the list
-     *
-     * \param objectListName The full name of the object list being used
-     * \param objMetadata Metadata about the object being used.
-     * \param functionCallName The function to be called on this object.
-     * \param parametersStr The parameters of the function
-     * \param context The context : May be used to get information about the current scope.
-     */
-    virtual std::string GenerateNotPickedObjectFunctionCall(std::string objectListName,
-                                                            const ObjectMetadata & objMetadata,
-                                                            std::string functionCallName,
-                                                            std::string parametersStr,
-                                                            std::string defaultOutput,
-                                                            gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Call a function of an automatism of the current object.
@@ -371,32 +355,13 @@ protected:
      * \param parametersStr The parameters of the function
      * \param context The context : May be used to get information about the current scope.
      */
-    virtual std::string GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
+    virtual std::string GenerateObjectAutomatismFunctionCall(std::string objectListName,
                                                                       std::string automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
-                                                                      std::string functionCallName,
-                                                                      std::string parametersStr,
-                                                            gd::EventsCodeGenerationContext & context);
-
-    /**
-     * \brief Call a function of an automatism of an object of a list.
-     *
-     * The object to be used must be the first object of the list
-     *
-     * \param objectListName The full name of the object list being used
-     * \param automatismName The full name of the automatism to be used
-     * \param objMetadata Metadata about the automatism being used.
-     * \param functionCallName The function to be called on this object.
-     * \param parametersStr The parameters of the function
-     * \param context The context : May be used to get information about the current scope.
-     */
-    virtual std::string GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
-                                                                      std::string automatismName,
-                                                                      const gd::AutomatismMetadata & autoInfo,
-                                                                      std::string functionCallName,
+                                                                      const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                                       std::string parametersStr,
                                                                       std::string defaultOutput,
-                                                            gd::EventsCodeGenerationContext & context);
+                                                                    gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Called when a new scope must be entered.

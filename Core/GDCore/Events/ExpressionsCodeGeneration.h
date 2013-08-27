@@ -53,7 +53,7 @@ public:
     bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
     bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
 
-private :
+private:
     std::string & plainExpression;
     EventsCodeGenerator & codeGenerator;
     EventsCodeGenerationContext & context;

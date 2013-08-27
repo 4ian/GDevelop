@@ -105,7 +105,9 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
+    wxString oldWorkingDir = wxGetCwd();
     wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "\"Game Develop\" Project(*.gdg)|*.gdg|\"Game Develop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
+    wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
         Open( gd::ToString(openFileDialog.GetPath()) );
@@ -125,7 +127,9 @@ void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
     wxString examplesDir = wxGetCwd()+"/Examples/";
     #endif
 
+    wxString oldWorkingDir = wxGetCwd();
     wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"Game Develop\" Project (*.gdg)|*.gdg" );
+    wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
         Open(ToString(open.GetPath()));

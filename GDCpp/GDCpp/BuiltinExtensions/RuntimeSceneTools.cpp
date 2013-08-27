@@ -174,76 +174,30 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
     return true;
 }
 
-gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName)
+bool GD_API SceneVariableExists(RuntimeScene & scene, const std::string & variable)
 {
-    return scene.GetVariables().Get(variableName);
+    return scene.GetVariables().Has(variable);
 }
 
-gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
+bool GD_API GlobalVariableExists(RuntimeScene & scene, const std::string & variable)
 {
-
-    return scene.game->GetVariables().Get(variableName);
+    return scene.game->GetVariables().Has(variable);
 }
 
-gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int index)
-{
-    return scene.GetVariables().Get(index);
-}
+gd::Variable & GD_API ReturnVariable(gd::Variable & variable) 
+{ 
+    return variable; 
+};
 
-gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int index)
-{
-    return scene.game->GetVariables().Get(index);
-}
+double GD_API GetVariableValue(const gd::Variable & variable) 
+{ 
+    return variable.GetValue(); 
+};
 
-bool GD_API SceneVariableDefined(RuntimeScene & scene, const std::string & variableName)
-{
-    return scene.GetVariables().Has(variableName);
-}
-
-bool GD_API GlobalVariableDefined(RuntimeScene & scene, const std::string & variableName)
-{
-    return scene.game->GetVariables().Has(variableName);
-}
-
-double GD_API GetSceneVariableValue( const RuntimeScene & scene, const std::string & variableName)
-{
-    return scene.GetVariables().GetVariableValue( variableName );
-}
-
-const std::string & GD_API GetSceneVariableString( const RuntimeScene & scene, const std::string & variableName)
-{
-    return scene.GetVariables().GetVariableString( variableName );
-}
-
-double GD_API GetGlobalVariableValue( const RuntimeScene & scene, const std::string & variableName)
-{
-    return scene.game->GetVariables().GetVariableValue( variableName );
-}
-
-const std::string & GD_API GetGlobalVariableString( const RuntimeScene & scene, const std::string & variableName)
-{
-    return scene.game->GetVariables().GetVariableString( variableName );
-}
-
-double GD_API IndexGetSceneVariableValue( const RuntimeScene & scene, unsigned int index)
-{
-    return scene.GetVariables().Get(index).GetValue();
-}
-
-const std::string & GD_API IndexGetSceneVariableString( const RuntimeScene & scene, unsigned int index)
-{
-    return scene.GetVariables().Get(index).GetString();
-}
-
-double GD_API IndexGetGlobalVariableValue( const RuntimeScene & scene, unsigned int index)
-{
-    return scene.game->GetVariables().Get(index).GetValue();
-}
-
-const std::string & GD_API IndexGetGlobalVariableString( const RuntimeScene & scene, unsigned int index)
-{
-    return scene.game->GetVariables().Get(index).GetString();
-}
+const std::string& GD_API GetVariableString(const gd::Variable & variable) 
+{ 
+    return variable.GetString(); 
+};
 
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 {

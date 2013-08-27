@@ -240,7 +240,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
-            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
 
         obj.AddAction("ModVarObjetTxt",
@@ -255,7 +255,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("string", _("Text"))
-            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
 
 
@@ -380,7 +380,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
-            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
         obj.AddCondition("VarObjetTxt",
                        _("Text of variable of an object"),
@@ -394,7 +394,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("string", _("Text to test"))
-            .codeExtraInformation.SetFunctionName("GetVariables().Get").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
         obj.AddCondition("VarObjetDef",
                        _("Variable defined"),
@@ -405,8 +405,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().Has");
+            .AddParameter("string", _("Name of the variable"))
+            .codeExtraInformation.SetFunctionName("VariableExists");
 
         obj.AddCondition("AutomatismActivated",
                        _("Automatism activated"),
@@ -602,13 +602,13 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         obj.AddExpression("Variable", _("Object's variable"), _("Object's variable"), _("Variables"), "res/actions/var.png")
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().GetVariableValue");
+            .AddParameter("objectvar", _("Variable"))
+            .codeExtraInformation.SetFunctionName("GetVariableValue").SetStatic();
 
         obj.AddStrExpression("VariableString", _("Object's variable"), _("Text of variable of an object"), _("Variables"), "res/actions/var.png")
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
-            .codeExtraInformation.SetFunctionName("GetVariables().GetVariableString");
+            .AddParameter("objectvar", _("Variable"))
+            .codeExtraInformation.SetFunctionName("GetVariableString").SetStatic();
         #endif
 
     }

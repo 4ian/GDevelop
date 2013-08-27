@@ -5,6 +5,7 @@
 
 #include "JoystickTools.h"
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Variable.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -30,7 +31,7 @@ double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick,
     return sf::Joystick::getAxisPosition(joystick, axis);
 }
 
-void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable )
+void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, gd::Variable & variable )
 {
     //Obtain axis and joystick
     sf::Joystick::Axis axis;
@@ -46,7 +47,7 @@ void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joys
     else return;
 
     //Update variable value
-    scene.GetVariables().Get(variable).SetValue(sf::Joystick::getAxisPosition(joystick, axis));
+    variable.SetValue(sf::Joystick::getAxisPosition(joystick, axis));
 
     return;
 }

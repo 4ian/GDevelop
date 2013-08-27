@@ -14,9 +14,11 @@
 namespace gd { class ObjectMetadata; }
 namespace gd { class AutomatismMetadata; }
 namespace gd { class InstructionMetadata; }
+namespace gd { class ExpressionCodeGenerationInformation; }
 
 class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator
 {
+  friend class VariableCodeGenerationCallbacks;
 public:
 
     /**
@@ -49,36 +51,24 @@ public:
 protected:
     virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
                                                gd::EventsCodeGenerationContext & context,
-                                               const std::vector < gd::Expression > & othersParameters,
+                                               const std::string & previousParameter,
                                                std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
 
-    virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
+    virtual std::string GenerateObjectFunctionCall(std::string objectListName,
                                                           const gd::ObjectMetadata & objMetadata,
-                                                          std::string functionCallName,
+                                                          const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                           std::string parametersStr,
+                                                          std::string defaultOutput,
                                                           gd::EventsCodeGenerationContext & context);
-    virtual std::string GenerateNotPickedObjectFunctionCall(std::string objectListName,
-                                                            const gd::ObjectMetadata & objMetadata,
-                                                            std::string functionCallName,
-                                                            std::string parametersStr,
-                                                            std::string defaultOutput,
-                                                            gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
+    virtual std::string GenerateObjectAutomatismFunctionCall(std::string objectListName,
                                                                       std::string automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
-                                                                      std::string functionCallName,
-                                                                      std::string parametersStr,
-                                                                      gd::EventsCodeGenerationContext & context);
-
-    virtual std::string GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
-                                                                      std::string automatismName,
-                                                                      const gd::AutomatismMetadata & autoInfo,
-                                                                      std::string functionCallName,
+                                                                      const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                                       std::string parametersStr,
                                                                       std::string defaultOutput,
                                                                       gd::EventsCodeGenerationContext & context);
-
+    
     virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,

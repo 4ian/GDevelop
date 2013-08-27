@@ -75,34 +75,28 @@ public:
     const gd::Variable & Get(const std::string & name) const;
 
     /**
-     * variablesArrayReturn a reference to the variable at the @ index position in the list.
+     * \brief Return a reference to the variable at the @ index position in the list.
      * \warning No bound check is made. Please use other overload of gd::VariablesContainer::Get when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
     inline gd::Variable & Get(unsigned int index) { return *variablesArray[index]; }
 
     /**
-     * variablesArrayReturn a reference to the variable at the @ index position in the list.
+     * \brief Return a reference to the variable at the @ index position in the list.
      * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
     inline const gd::Variable & Get(unsigned int index) const { return *variablesArray[index]; }
 
     /**
-     * \brief Shortcut for Get(varName).GetString()
+     * \brief Return a "bad" variable that can be used when no other valid variable can be used.
      */
-    inline const std::string & GetVariableString(const std::string & varName) const
-    {
-        return Get(varName).GetString();
-    }
+    static gd::Variable & GetBadVariable() { return badVariable; }
 
     /**
-     * \brief Shortcut for Get(varName).GetValue()
+     * \brief Return a "bad" variables container that can be used when no other valid container can be used.
      */
-    inline double GetVariableValue(const std::string & varName) const
-    {
-        return Get(varName).GetValue();
-    }
+    static RuntimeVariablesContainer & GetBadVariablesContainer() { return badVariablesContainer; }
 
     /**
      * \brief Merge the variables from the container with the already existing variables.
@@ -128,6 +122,7 @@ private:
     std::vector < gd::Variable* > variablesArray;
     mutable std::map < std::string, gd::Variable* > variables;
     static gd::Variable badVariable;
+    static RuntimeVariablesContainer badVariablesContainer;
 };
 
 #endif // RUNTIMEVARIABLESCONTAINER_H

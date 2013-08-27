@@ -10,6 +10,7 @@
 #include "GDCpp/RuntimeVariablesContainer.h"
 
 gd::Variable RuntimeVariablesContainer::badVariable;
+RuntimeVariablesContainer RuntimeVariablesContainer::badVariablesContainer;
 
 RuntimeVariablesContainer::RuntimeVariablesContainer(const gd::VariablesContainer & container)
 {

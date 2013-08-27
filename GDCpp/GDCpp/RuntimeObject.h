@@ -364,6 +364,11 @@ public:
     void AddForceToMoveAroundObject( RuntimeObject * object, float velocity, float length, float clearing );
     void PutAroundObject( RuntimeObject * object, float length, float angleInDegrees );
 
+    static gd::Variable & ReturnVariable(gd::Variable & variable) { return variable; };
+    bool VariableExists(const std::string & variable);
+    static double GetVariableValue(const gd::Variable & variable) { return variable.GetValue(); };
+    static const std::string& GetVariableString(const gd::Variable & variable) { return variable.GetString(); };
+
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
     void Duplicate( RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists );
@@ -375,9 +380,6 @@ public:
 
     double GetSqDistanceWithObject( RuntimeObject * other );
     double GetDistanceWithObject( RuntimeObject * other );
-
-    double GetVariableValue( const std::string & variable ); /** Only used internally by GD events generated code. */
-    const std::string & GetVariableString( const std::string & variable ); /** Only used internally by GD events generated code. */
 
     void SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 

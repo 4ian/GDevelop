@@ -1,11 +1,22 @@
 #include "RuntimeContext.h"
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/RuntimeGame.h"
 #include "GDCpp/profile.h"
 #include <vector>
 
 std::vector<RuntimeObject*> RuntimeContext::GetObjectsRawPointers(const std::string & name)
 {
     return scene->objectsInstances.GetObjectsRawPointers(name);
+}
+
+RuntimeVariablesContainer & RuntimeContext::GetSceneVariables()
+{
+	return scene->GetVariables();
+}
+
+RuntimeVariablesContainer & RuntimeContext::GetGameVariables()
+{
+	return scene->game->GetVariables();
 }
 
 RuntimeContext & RuntimeContext::ClearObjectListsMap()

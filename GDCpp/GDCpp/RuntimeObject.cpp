@@ -436,16 +436,6 @@ void RuntimeObject::SetXY( const char* xOperator, float xValue, const char* yOpe
         SetY( GetY() / yValue );
 }
 
-double RuntimeObject::GetVariableValue( const std::string & variable )
-{
-    return objectVariables.GetVariableValue(variable);
-}
-
-const std::string & RuntimeObject::GetVariableString( const std::string & variable )
-{
-    return objectVariables.GetVariableString(variable);
-}
-
 std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
 {
     std::vector<Polygon2d> mask;
@@ -554,6 +544,11 @@ void RuntimeObject::DoAutomatismsPostEvents(RuntimeScene & scene)
 {
     for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPostEvents(scene);
+}
+
+bool RuntimeObject::VariableExists(const std::string & variable)
+{
+    return objectVariables.Has(variable);
 }
 
 void DestroyBaseRuntimeObject(RuntimeObject * object)

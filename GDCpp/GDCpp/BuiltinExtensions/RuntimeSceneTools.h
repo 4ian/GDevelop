@@ -79,87 +79,27 @@ void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor );
 
 /**
  * Only used internally by GD events generated code.
- * \return Variable with specified name
  */
-gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName);
+bool GD_API SceneVariableExists(RuntimeScene & scene, const gd::Variable & variable);
+/**
+ * Only used internally by GD events generated code.
+ */
+bool GD_API GlobalVariableExists(RuntimeScene & scene, const gd::Variable & variable);
 
 /**
  * Only used internally by GD events generated code.
- * \return Global variable with specified name
  */
-gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName);
+gd::Variable & GD_API ReturnVariable(gd::Variable & variable);
 
 /**
  * Only used internally by GD events generated code.
- * \return Variable with specified name
  */
-gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int variableIndex);
+double GD_API GetVariableValue(const gd::Variable & variable);
 
 /**
  * Only used internally by GD events generated code.
- * \return Global variable with specified name
  */
-gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int variableIndex);
-
-/**
- * Only used internally by GD events generated code.
- * \return True if a variable exists
- */
-bool GD_API SceneVariableDefined(RuntimeScene & scene, const std::string & variableName);
-
-/**
- * Only used internally by GD events generated code.
- * \return True if a variable exists
- */
-bool GD_API GlobalVariableDefined(RuntimeScene & scene, const std::string & variableName);
-
-/**
- * Only used internally by GD events generated code.
- * \return Value of a variable
- */
-double GD_API GetSceneVariableValue( const RuntimeScene & scene, const std::string & variableName);
-
-/**
- * Only used internally by GD events generated code.
- * \return String of a variable
- */
-const std::string & GD_API GetSceneVariableString( const RuntimeScene & scene, const std::string & variableName);
-
-/**
- * Only used internally by GD events generated code.
- * \return Value of a global variable
- */
-double GD_API GetGlobalVariableValue( const RuntimeScene & scene, const std::string & variableName);
-
-/**
- * Only used internally by GD events generated code.
- * \return String of a global variable
- */
-const std::string & GD_API GetGlobalVariableString( const RuntimeScene & scene, const std::string & variableName);
-
-/**
- * Only used internally by GD events generated code.
- * \return Value of a variable
- */
-double GD_API IndexGetSceneVariableValue( const RuntimeScene & scene, unsigned int variableIndex);
-
-/**
- * Only used internally by GD events generated code.
- * \return String of a variable
- */
-const std::string & GD_API IndexGetSceneVariableString( const RuntimeScene & scene, unsigned int variableIndex);
-
-/**
- * Only used internally by GD events generated code.
- * \return Value of a global variable
- */
-double GD_API IndexGetGlobalVariableValue( const RuntimeScene & scene, unsigned int variableIndex);
-
-/**
- * Only used internally by GD events generated code.
- * \return String of a global variable
- */
-const std::string & GD_API IndexGetGlobalVariableString( const RuntimeScene & scene, unsigned int variableIndex);
+const std::string& GD_API GetVariableString(const gd::Variable & variable);
 
 /**
  * Only used internally by GD events generated code.

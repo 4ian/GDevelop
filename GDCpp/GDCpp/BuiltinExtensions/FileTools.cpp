@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Variable.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/XmlFilesHelper.h"
 #include "FileTools.h"
@@ -264,7 +265,7 @@ void GD_API WriteStringInFile( const std::string & filename, const std::string &
     return;
 }
 
-void GD_API ReadValueFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, const std::string & sceneVariable )
+void GD_API ReadValueFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable )
 {
     boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
@@ -295,12 +296,12 @@ void GD_API ReadValueFromFile( const std::string & filename, const std::string &
     hdl.ToElement()->Attribute("value", &value);
 
     //Update variable value
-    scene.GetVariables().Get(sceneVariable).SetValue(value);
+    variable.SetValue(value);
 
     return;
 }
 
-void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, const std::string & sceneVariable )
+void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable )
 {
     boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
@@ -329,7 +330,7 @@ void GD_API ReadStringFromFile( const std::string & filename, const std::string 
     if ( hdl.ToElement()->Attribute("texte") == NULL ) return;
 
     //Update variable texte
-    scene.GetVariables().Get( sceneVariable ).SetString(hdl.ToElement()->Attribute("texte"));
+    variable.SetString(hdl.ToElement()->Attribute("texte"));
 
     return;
 }

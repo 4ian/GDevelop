@@ -20,63 +20,73 @@
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/SceneNameMangler.h"
 #include "GDCpp/ProfileEvent.h"
+#include "GDCpp/Events/VariableParserCallbacks.h"
 
 using namespace std;
 
-std::string EventsCodeGenerator::GenerateCurrentObjectFunctionCall(std::string objectListName,
+std::string EventsCodeGenerator::GenerateObjectFunctionCall(std::string objectListName,
                                                       const gd::ObjectMetadata & objMetadata,
-                                                      std::string functionCallName,
+                                                      const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       std::string parametersStr,
+                                                      std::string defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
     bool castNeeded = !objMetadata.className.empty();
-    if ( !castNeeded )
-        return "("+ManObjListName(objectListName)+"[i]->"+functionCallName+"("+parametersStr+"))";
+
+    if ( codeInfo.staticFunction ) 
+    {
+        if ( !castNeeded )
+            return "(RuntimeObject::"+codeInfo.functionCallName+"("+parametersStr+"))";
+        else
+            return "("+objMetadata.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";   
+    }
+    else if ( context.GetCurrentObject() == objectListName && !context.GetCurrentObject().empty())
+    {
+        if ( !castNeeded )
+            return "("+ManObjListName(objectListName)+"[i]->"+codeInfo.functionCallName+"("+parametersStr+"))";
+        else
+            return "(static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[i])->"+codeInfo.functionCallName+"("+parametersStr+"))";   
+    }
     else
-        return "(static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[i])->"+functionCallName+"("+parametersStr+"))";
+    {
+        if ( !castNeeded )
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ ManObjListName(objectListName)+"[0]->"+codeInfo.functionCallName+"("+parametersStr+"))";
+        else
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[0])->"+codeInfo.functionCallName+"("+parametersStr+"))";        
+    }
 }
 
-std::string EventsCodeGenerator::GenerateNotPickedObjectFunctionCall(std::string objectListName,
-                                                        const gd::ObjectMetadata & objMetadata,
-                                                        std::string functionCallName,
-                                                        std::string parametersStr,
-                                                        std::string defaultOutput,
-                                                        gd::EventsCodeGenerationContext & context)
-{
-    bool castNeeded = !objMetadata.className.empty();
-    if ( !castNeeded )
-        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ ManObjListName(objectListName)+"[0]->"+functionCallName+"("+parametersStr+"))";
-    else
-        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[0])->"+functionCallName+"("+parametersStr+"))";
-}
-
-std::string EventsCodeGenerator::GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
-                                                                                       std::string automatismName,
+std::string EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(std::string objectListName,
+                                                                             std::string automatismName,
                                                       const gd::AutomatismMetadata & autoInfo,
-                                                      std::string functionCallName,
+                                                      const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       std::string parametersStr,
+                                                      std::string defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
     bool castNeeded = !autoInfo.className.empty();
-    if ( !castNeeded )
-        return "("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+functionCallName+"("+parametersStr+"))";
-    else
-        return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
-}
 
-std::string EventsCodeGenerator::GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
-                                                                                       std::string automatismName,
-                                                        const gd::AutomatismMetadata & autoInfo,
-                                                        std::string functionCallName,
-                                                        std::string parametersStr,
-                                                        std::string defaultOutput,
-                                                        gd::EventsCodeGenerationContext & context)
-{
-    bool castNeeded = !autoInfo.className.empty();
-    if ( !castNeeded )
-        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\")->"+functionCallName+"("+parametersStr+"))";
+    if ( codeInfo.staticFunction ) 
+    {
+        if ( !castNeeded )
+            return "(gd::Automatism::"+codeInfo.functionCallName+"("+parametersStr+"))";
+        else
+            return "("+autoInfo.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";   
+    }
+    else if ( context.GetCurrentObject() == objectListName && !context.GetCurrentObject().empty())
+    {
+        if ( !castNeeded )
+            return "("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
+        else
+            return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";        
+    }
     else
-        return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+functionCallName+"("+parametersStr+"))";
+    {
+        if ( !castNeeded )
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
+        else
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";
+    }
 }
 
 std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
@@ -294,7 +304,7 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
 
 std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
                                                         gd::EventsCodeGenerationContext & context,
-                                                        const std::vector < gd::Expression > & othersParameters,
+                                                        const std::string & previousParameter,
                                                         std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     std::string argOutput;
@@ -352,8 +362,46 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
                 argOutput += ")";
         }
     }
+    else if (metadata.type == "scenevar")
+    {
+        VariableCodeGenerationCallbacks callbacks(argOutput, *this, context, VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
+
+        gd::VariableParser parser(parameter);
+        if ( !parser.Parse(callbacks) )
+        {
+            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            argOutput = "runtimeContext->GetSceneVariables().GetBadVariable()";
+        }
+    }
+    else if (metadata.type == "globalvar")
+    {
+        VariableCodeGenerationCallbacks callbacks(argOutput, *this, context, VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
+
+        gd::VariableParser parser(parameter);
+        if ( !parser.Parse(callbacks) )
+        {
+            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            argOutput = "runtimeContext->GetGameVariables().GetBadVariable()";
+        }
+    }
+    else if (metadata.type == "objectvar")
+    {
+        //Object is either the object of the previous parameter or, if it is empty,
+        //the object being picked by the instruction.
+        std::string object = previousParameter;
+        if ( object.empty() ) object = context.GetCurrentObject();
+
+        VariableCodeGenerationCallbacks callbacks(argOutput, *this, context, object);
+
+        gd::VariableParser parser(parameter);
+        if ( !parser.Parse(callbacks) )
+        {
+            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            argOutput = "runtimeContext->GetGameVariables().GetBadVariable()";
+        }
+    }
     else
-        return gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, othersParameters, supplementaryParametersTypes);
+        return gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, previousParameter, supplementaryParametersTypes);
 
     return argOutput;
 }

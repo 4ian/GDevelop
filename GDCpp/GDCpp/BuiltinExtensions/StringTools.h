@@ -20,7 +20,7 @@ namespace StringTools
 
 std::string GD_API SubStr(const std::string & str, size_t start, size_t length );
 std::string GD_API StrAt(const std::string & str, size_t pos );
-std::string GD_API NewLine() { return "\n"; };
+std::string GD_API NewLine();
 unsigned int GD_API StrLen(const std::string & str);
 int GD_API StrFind(const std::string & str, const std::string & findwhat);
 int GD_API StrRFind(const std::string & str, const std::string & findwhat);

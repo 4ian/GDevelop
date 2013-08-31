@@ -87,6 +87,11 @@ int GD_API StrRFindFrom(const std::string & str, const std::string & findwhat, u
     return -1;
 }
 
+std::string GD_API NewLine() 
+{
+    return "\n";
+};
+
 }
 }
 

@@ -230,7 +230,7 @@ CameraExtension::CameraExtension()
     AddAction("CentreCamera",
                    _("Center the camera on an object"),
                    _("Center the camera on the specified object."),
-                   _("Center camera on _PARAM1_ ( layer : _PARAM4_, camera : _PARAM5_ )"),
+                   _("Center camera on _PARAM1_ ( layer : _PARAM3_, camera : _PARAM4_ )"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")

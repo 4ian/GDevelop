@@ -410,10 +410,10 @@ int Game_Develop_EditorApp::OnExit()
 #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
 void Game_Develop_EditorApp::OnUnhandledException()
 {
-    wxSafeShowMessage( "Erreur fatale", "Game Develop a rencontré une erreur fatale : (01) Fatal error.\nLe programme va devoir se fermer." );
+    wxSafeShowMessage( "Fatal error", "A fatal error occurred (01).\nGame Develop has to be shutdown." );
 
     wxFile dataErrorFile("errordata.txt", wxFile::write);
-    dataErrorFile.Write("Game Develop - Trace de l'erreur.\n");
+    dataErrorFile.Write("Game Develop - Error log.\n");
     dataErrorFile.Write("\n");
     dataErrorFile.Write("GD Error code : (01) Fatal error\n");
 
@@ -433,10 +433,10 @@ void Game_Develop_EditorApp::OnUnhandledException()
 bool Game_Develop_EditorApp::OnExceptionInMainLoop()
 {
     #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
-    wxSafeShowMessage( "Erreur fatale", "Game Develop a rencontré une erreur fatale : (02) Segmentation fault.\nLe programme va devoir se fermer.\n\nAu prochain lancement, il vous sera proposé de charger la copie de sauvegarde de votre jeu, et de nous envoyer un rapport d'erreur." );
+    wxSafeShowMessage( "Fatal error", "A fatal error occurred: (02) Segmentation Fault.\nGame Develop has to be shutdown." );
 
     wxFile dataErrorFile("errordata.txt", wxFile::write);
-    dataErrorFile.Write("Game Develop - Trace de l'erreur.\n");
+    dataErrorFile.Write("Game Develop - Error log.\n");
     dataErrorFile.Write("\n");
     dataErrorFile.Write("GD Error code : (02) Segmentation Fault\n");
 

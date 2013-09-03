@@ -112,7 +112,7 @@ scene(scene_)
 
 	Create(parent, wxID_ANY, _("Edit the action"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	SetClientSize(wxSize(717,396));
-	SetMinSize(wxSize(640,480));
+	SetMinSize(wxSize(640,550));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/actionicon.png"))));
 	SetIcon(FrameIcon);
@@ -121,7 +121,7 @@ scene(scene_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,500), 0, _T("ID_NOTEBOOK1"));
+	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,400), 0, _T("ID_NOTEBOOK1"));
 	ActionsTree = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	ActionsTree->SetToolTip(_("Choose an action to set up."));
 	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
@@ -871,14 +871,10 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionMetadata.parameters[i].type == "yesorno" )
         {
-            if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
-            {
+            if (wxMessageBox(_("Choose yes or no to fullfil this parameter:"), _("Yes or no") ,wxYES_NO ) == wxYES)
                 ParaEdit.at(i)->ChangeValue(_("yes"));
-            }
             else
-            {
                 ParaEdit.at(i)->ChangeValue(_("no"));
-            }
 
             return;
         }
@@ -926,7 +922,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             gd::ChooseVariableDialog dialog(this, object->GetVariables());
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
             return;
         }
@@ -935,7 +931,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             gd::ChooseVariableDialog dialog(this, scene.GetVariables());
             dialog.SetAssociatedLayout(&game, &scene);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
             return;
         }
@@ -944,7 +940,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             gd::ChooseVariableDialog dialog(this, game.GetVariables());
             dialog.SetAssociatedProject(&game);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
             return;
         }

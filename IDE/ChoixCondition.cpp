@@ -119,7 +119,7 @@ conditionInverted(false)
 
     Create(parent, wxID_ANY, _("Edit the condition"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(650,236));
-    SetMinSize(wxSize(640,480));
+    SetMinSize(wxSize(640,550));
     wxIcon FrameIcon;
     FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/conditionicon.png"))));
     SetIcon(FrameIcon);
@@ -886,7 +886,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "yesorno" )
         {
-            if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
+            if (wxMessageBox(_("Choose yes or no to fullfil this parameter:"), _("Yes or no") ,wxYES_NO ) == wxYES)
                 ParaEdit.at(i)->ChangeValue(_("yes"));
             else
                 ParaEdit.at(i)->ChangeValue(_("no"));
@@ -928,7 +928,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
             gd::ChooseVariableDialog dialog(this, object->GetVariables());
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
             return;
         }
@@ -937,7 +937,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             gd::ChooseVariableDialog dialog(this, scene.GetVariables());
             dialog.SetAssociatedLayout(&game, &scene);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
             return;
         }
@@ -946,7 +946,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             gd::ChooseVariableDialog dialog(this, game.GetVariables());
             dialog.SetAssociatedProject(&game);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
             return;
         }

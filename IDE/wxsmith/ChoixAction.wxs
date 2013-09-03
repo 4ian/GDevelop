@@ -4,7 +4,7 @@
 		<title>Edit the action</title>
 		<centered>1</centered>
 		<size>717,396</size>
-		<minsize>640,480</minsize>
+		<minsize>640,550</minsize>
 		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/actionicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>

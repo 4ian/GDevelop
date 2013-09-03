@@ -166,7 +166,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
             {
                 wxString depart = _("A scene named \"");
                 wxString fin = _("\" already exists in the game. Do you want to replace it \?");
-                if (wxMessageBox(depart+secondGame.GetLayout(i).GetName()+fin, "Une scène de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetLayout(i).GetName()+fin, _("Already existing scene"),wxYES_NO ) == wxYES)
                 {
                     //Replace layout by the new one
                     unsigned int layoutPosition = game.GetLayoutPosition(secondGame.GetLayout(i).GetName());
@@ -189,7 +189,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
             {
                 wxString depart = _("A global object named \"");
                 wxString fin = _("\" already exists in the game. Do you want to replace it \?");
-                if (wxMessageBox(depart+secondGame.GetObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetObjects()[i]->GetName()+fin, _("Already existing global object"),wxYES_NO ) == wxYES)
                 {
                     //Remplacement
                     *object = boost::shared_ptr<gd::Object>(secondGame.GetObjects()[i]->Clone());
@@ -210,7 +210,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
             {
                 wxString depart = _("A global group named \"");
                 wxString fin = _("\" already exists in the game. Do you want to replace it \?");
-                if (wxMessageBox(depart+secondGame.GetObjectGroups()[i].GetName()+fin, "Un groupe global de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetObjectGroups()[i].GetName()+fin, _("Already existing global group"),wxYES_NO ) == wxYES)
                 {
                     //Remplacement
                     *group = secondGame.GetObjectGroups()[i];
@@ -229,7 +229,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
                 //Ask for confirmation if we're about to replace already existing external events
                 wxString depart = _("Externals events called \"");
                 wxString fin = _("\" already exists in the game. Do you want to replace it \?");
-                if (wxMessageBox(depart+secondGame.GetExternalEvents(i).GetName()+fin, "Evenements externes déjà existants",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetExternalEvents(i).GetName()+fin, _("Already existing external events"),wxYES_NO ) == wxYES)
                 {
                     //Replace external events by the new ones
                     unsigned int eventsPosition = game.GetExternalEventsPosition(secondGame.GetExternalEvents(i).GetName());

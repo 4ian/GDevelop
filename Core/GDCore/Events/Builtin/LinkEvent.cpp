@@ -134,7 +134,7 @@ void LinkEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEle
     }
 
     if ( eventElem->FirstChildElement( "Scene" ) && eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { SetTarget(eventElem->FirstChildElement( "Scene" )->Attribute( "value" ));}
-    else { cout <<"Les informations concernant le nom de la scène liée."; }
+    else { cout <<"Cannot found link target"; }
 }
 
 gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)

@@ -6,6 +6,7 @@
 #include "GDCore/PlatformDefinition/Variable.h"
 #include <string>
 #include <sstream>
+#include "GDCore/TinyXml/tinyxml.h"
 
 using namespace std;
 
@@ -39,7 +40,7 @@ const std::string & Variable::GetString() const
     return str;
 }
 
-bool Variable::HasChild(const std::string & name)
+bool Variable::HasChild(const std::string & name) const
 {
     return isStructure && children.find(name) != children.end();
 }
@@ -88,6 +89,50 @@ void Variable::RemoveChild(const std::string & name)
 {
     if ( !isStructure ) return;
     children.erase(name);
+}
+
+void Variable::SaveToXml(TiXmlElement * element) const
+{
+    if (!element) return;
+
+    if ( !isStructure )
+        element->SetAttribute("Value", GetString().c_str());
+    else
+    {
+        TiXmlElement * childrenElem = new TiXmlElement( "Children" );
+        element->LinkEndChild( childrenElem );
+        for (std::map<std::string, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i)
+        {
+            TiXmlElement * variable = new TiXmlElement( "Variable" );
+            childrenElem->LinkEndChild( variable );
+
+            variable->SetAttribute("Name", i->first.c_str());
+            i->second.SaveToXml(variable);
+        }
+    }
+}
+
+void Variable::LoadFromXml(const TiXmlElement * element)
+{
+    if (!element) return;
+
+    isStructure = element->FirstChildElement("Children") != NULL;
+
+    if ( isStructure )
+    {
+        const TiXmlElement * child = element->FirstChildElement("Children")->FirstChildElement();
+        while ( child )
+        {
+            std::string name = child->Attribute("Name") ? child->Attribute("Name") : "";
+            gd::Variable childVariable;
+            childVariable.LoadFromXml(child);
+            children[name] = childVariable;
+
+            child = child->NextSiblingElement();
+        }
+    }
+    else if (element->Attribute("Value"))
+        SetString(element->Attribute("Value"));
 }
 
 }

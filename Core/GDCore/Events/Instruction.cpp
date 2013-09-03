@@ -61,7 +61,7 @@ void Instruction::SetParameter(unsigned int nb, const gd::Expression & val)
 {
     if ( nb >= parameters.size() )
     {
-        cout << "Tentative d'écriture dans un paramètre invalide.\n\nCeci est peut être dû à un bug de Game Develop.\nReportez vous à l'aide pour savoir comment nous rapport une erreur.";
+        cout << "Trying to write an out of bound parameter.\n\nThis can be an error of Game Develop: Please report it to the developer.";
         return;
     }
     parameters[nb] = val;

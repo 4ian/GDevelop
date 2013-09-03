@@ -35,13 +35,11 @@
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="variablesList" member="yes">
-					<size>374,149</size>
-					<style>wxLC_REPORT|wxLC_EDIT_LABELS</style>
-					<handler function="OnvariablesListBeginLabelEdit" entry="EVT_LIST_BEGIN_LABEL_EDIT" />
-					<handler function="OnvariablesListEndLabelEdit" entry="EVT_LIST_END_LABEL_EDIT" />
-					<handler function="OnvariablesListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
-					<handler function="OnvariablesListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+				<object class="Custom" name="ID_TREELISTCTRL1" subclass="wxTreeListCtrl" variable="variablesList" member="yes">
+					<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
+					<include_file>wx/treelist.h</include_file>
+					<style></style>
+					<handler function="OnvariablesListKeyDown1" entry="EVT_KEY_DOWN" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
@@ -106,6 +104,25 @@
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="contextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
+				<label>Edit initial value</label>
+				<handler function="OnEditValueSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem2" member="yes">
+				<label>Rename</label>
+				<handler function="OnRenameSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem3" member="yes">
+				<label>Add a child variable</label>
+				<handler function="OnAddChildSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem4" member="yes">
+				<label>Remove</label>
+				<handler function="OnRemoveSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>

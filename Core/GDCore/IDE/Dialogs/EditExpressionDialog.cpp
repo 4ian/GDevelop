@@ -712,7 +712,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
         dialog.SetAssociatedLayout(&project, &layout);
         if ( dialog.ShowModal() == 0 ) return "";
 
-        return dialog.selectedVariable;
+        return dialog.GetSelectedVariable();
     }
     else if ( parameterMetadata.type == "globalvar" )
     {
@@ -720,7 +720,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
         dialog.SetAssociatedProject(&project);
         if ( dialog.ShowModal() == 0 ) return "";
 
-        return dialog.selectedVariable;
+        return dialog.GetSelectedVariable();
     }
     else if ( parameterMetadata.type == "objectvar" )
     {
@@ -735,7 +735,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
 
         gd::ChooseVariableDialog dialog(this, object->GetVariables());
         if ( dialog.ShowModal() == 1 )
-            return dialog.selectedVariable;
+            return dialog.GetSelectedVariable();
 
         return "";
     }

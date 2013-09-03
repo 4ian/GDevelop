@@ -88,13 +88,13 @@ void ForEachEvent::LoadFromXml(gd::Project & project, const TiXmlElement * event
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
         gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
     else
-        cout << "Aucune informations sur les conditions d'un évènement";
+        cout << "Conditions missing for a \"For each\" event";
 
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
         gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
     else
-        cout << "Aucune informations sur les actions d'un évènement";
+        cout << "Actions missing for a \"For each\" event";
 
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )

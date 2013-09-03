@@ -448,7 +448,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
         gd::ChooseVariableDialog dialog(this, layout.GetVariables());
         dialog.SetAssociatedLayout(&project, &layout);
         if ( dialog.ShowModal() == 1 )
-            return dialog.selectedVariable;
+            return dialog.GetSelectedVariable();
 
         return "";
     }
@@ -457,7 +457,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
         gd::ChooseVariableDialog dialog(this, project.GetVariables());
         dialog.SetAssociatedProject(&project);
         if ( dialog.ShowModal() == 1 )
-            return dialog.selectedVariable;
+            return dialog.GetSelectedVariable();
 
         return "";
     }
@@ -474,7 +474,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
 
         gd::ChooseVariableDialog dialog(this, object->GetVariables());
         if ( dialog.ShowModal() == 1 )
-            return dialog.selectedVariable;
+            return dialog.GetSelectedVariable();
 
         return "";
     }

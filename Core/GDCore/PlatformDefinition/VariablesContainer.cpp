@@ -144,10 +144,10 @@ void VariablesContainer::LoadFromXml(const TiXmlElement * rootElement)
     while ( element )
     {
         Variable variable;
-        if ( element->Attribute( "Value" ) != NULL ) variable.SetString(element->Attribute( "Value" ));
-
+        variable.LoadFromXml(element);
         std::string name = element->Attribute( "Name" ) != NULL ? element->Attribute( "Name" ) : "";
         Insert(name, variable, -1);
+        
         element = element->NextSiblingElement();
     }
 }
@@ -163,7 +163,7 @@ void VariablesContainer::SaveToXml(TiXmlElement * element) const
         element->LinkEndChild( variable );
 
         variable->SetAttribute("Name", variables[j].first.c_str());
-        variable->SetAttribute("Value", variables[j].second.GetString().c_str());
+        variables[j].second.SaveToXml(variable);
     }
 }
 #endif

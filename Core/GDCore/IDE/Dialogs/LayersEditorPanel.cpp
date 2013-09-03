@@ -292,11 +292,11 @@ void LayersEditorPanel::OnUpSelected(wxCommandEvent& event)
     	{
     	    if ( i <= layout.GetLayersCount()-1-1 )
     	    {
+                //Move the layer
     	        layout.SwapLayers(i,i+1);
-
                 Refresh();
 
-                //On reslectionne le calque
+                //Focus it again
                 layersList->SetItemState(layout.GetLayersCount()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     	    }
     	    return;
@@ -317,12 +317,11 @@ void LayersEditorPanel::OnDownSelected(wxCommandEvent& event)
     	{
     	    if ( i >= 1 )
     	    {
-    	        //On déplace le calque
+    	        //Move the layer
     	        layout.SwapLayers(i,i-1);
-
                 Refresh();
 
-                //On reslectionne le calque
+                //Focus it again
                 layersList->SetItemState(layout.GetLayersCount()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     	    }
     	    return;

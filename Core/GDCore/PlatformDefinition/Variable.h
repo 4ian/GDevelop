@@ -7,6 +7,7 @@
 #define GDCORE_VARIABLE_H
 #include <string>
 #include <map>
+class TiXmlElement;
 
 namespace gd
 {
@@ -92,9 +93,14 @@ public:
     ///@{
 
     /**
+     * \brief Return true if the variable is a structure which can have children.
+     */
+    bool IsStructure() const { return isStructure; }
+
+    /**
      * \brief Return true if the variable is a structure and has the specified child.
      */
-    bool HasChild(const std::string & name);
+    bool HasChild(const std::string & name) const;
 
     /**
      * \brief Return the child with the specified name. 
@@ -120,7 +126,28 @@ public:
      */
     void RemoveChild(const std::string & name);
 
+    /**
+     * \brief Get the map containing all the children.
+     */
+    const std::map<std::string, Variable> & GetAllChildren() const { return children; }
+
     ///@}
+
+    /** \name Serialization
+     * Methods used when to load or save a variable to XML.
+     */
+    ///@{
+    /**
+     * Called to save the layout to a TiXmlElement.
+     */
+    void SaveToXml(TiXmlElement * element) const;
+
+    /**
+     * Called to load the layout from a TiXmlElement.
+     */
+    void LoadFromXml(const TiXmlElement * element);
+    ///@}
+
 
 private:
     mutable double value;

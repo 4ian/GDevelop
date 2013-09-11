@@ -19,34 +19,51 @@ VariablesExtension::VariablesExtension()
                           "Florian Rival",
                           "Freeware");
     #if defined(GD_IDE_ONLY)
-    {
-        AddCondition("VarScene",
-                   _("Scene variables"),
-                   _("Test a variable."),
-                   _("Variable _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Variables"),
-                   "res/conditions/var24.png",
-                   "res/conditions/var.png")
-        .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
-    }
+    AddCondition("VarScene",
+               _("Scene variables"),
+               _("Test a variable."),
+               _("Variable _PARAM0_ is _PARAM1__PARAM2_"),
+               _("Variables"),
+               "res/conditions/var24.png",
+               "res/conditions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .AddParameter("relationalOperator", _("Sign of the test"))
+    .AddParameter("expression", _("Value to test"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
-    {
-        AddCondition("VarSceneTxt",
-                   _("Text of a scene variable"),
-                   _("Test the text of a variable."),
-                   _("The text of variable _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Variables"),
-                   "res/conditions/var24.png",
-                   "res/conditions/var.png")
-        .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("string", _("Text to test"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
-    }
+    AddCondition("VarSceneTxt",
+             _("Text of a scene variable"),
+             _("Test the text of a variable."),
+             _("The text of variable _PARAM0_ is _PARAM1__PARAM2_"),
+             _("Variables"),
+             "res/conditions/var24.png",
+             "res/conditions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .AddParameter("relationalOperator", _("Sign of the test"))
+    .AddParameter("string", _("Text to test"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
+    AddCondition("VariableChildExists",
+             _("Child existence"),
+             _("Return true if the specified child of the variable exists."),
+             _("Child _PARAM1_ of variable _PARAM0_ exists"),
+             _("Variables/Structures"),
+             "res/conditions/var24.png",
+             "res/conditions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .AddParameter("string", _("Text to test"))
+    .codeExtraInformation.SetFunctionName("VariableChildExists");
+
+    AddCondition("GlobalVariableChildExists",
+             _("Child existence"),
+             _("Return true if the specified child of the global variable exists."),
+             _("Child _PARAM1_ of global variable _PARAM0_ exists"),
+             _("Variables/Global/Structures"),
+             "res/conditions/var24.png",
+             "res/conditions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .AddParameter("string", _("Text to test"))
+    .codeExtraInformation.SetFunctionName("VariableChildExists");
 
     AddCondition("VarSceneDef",
                    _("Test if a scene variable is defined"),
@@ -55,134 +72,133 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the variable"))
-        .codeExtraInformation.SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    .AddCodeOnlyParameter("currentScene", "")
+    .AddParameter("string", _("Variable"))
+    .SetHidden()
+    .codeExtraInformation.SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
+    AddCondition("VarGlobal",
+               _("Value of a global variable"),
+               _("Compare the value of a global variable."),
+               _("Global variable _PARAM0_ is _PARAM1__PARAM2_"),
+               _("Variables/Global"),
+               "res/conditions/var24.png",
+               "res/conditions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .AddParameter("relationalOperator", _("Sign of the test"))
+    .AddParameter("expression", _("Value to test"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
-    {
-        AddCondition("VarGlobal",
-                   _("Global variable"),
-                   _("Test the value of a global variable."),
-                   _("The global variable _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Variables"),
-                   "res/conditions/var24.png",
-                   "res/conditions/var.png")
-        .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
-    }
-
-
-    {
-        AddCondition("VarGlobalTxt",
-                   _("Text of a global variable"),
-                   _("Test the text of a global variable."),
-                   _("The text of the global variable _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Variables"),
-                   "res/conditions/var24.png",
-                   "res/conditions/var.png")
-        .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("string", _("Text to test"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
-
-    }
+    AddCondition("VarGlobalTxt",
+               _("Text of a global variable"),
+               _("Compare the text of a global variable."),
+               _("The text of the global variable _PARAM0_ is _PARAM1__PARAM2_"),
+               _("Variables/Global"),
+               "res/conditions/var24.png",
+               "res/conditions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .AddParameter("relationalOperator", _("Sign of the test"))
+    .AddParameter("string", _("Text to test"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
     AddCondition("VarGlobalDef",
                    _("Test if a global variable is defined"),
                    _("Test if a global variable exists"),
                    _("Global variable _PARAM0_ is defined"),
-                   _("Variables"),
+                   _("Variables/Global"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the variable"))
-        .codeExtraInformation.SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    .AddCodeOnlyParameter("currentScene", "")
+    .AddParameter("string", _("Variable"))
+    .SetHidden()
+    .codeExtraInformation.SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    {
-        AddAction("ModVarScene",
-                   _("Scene variables"),
-                   _("Modify a scene variable."),
-                   _("Do _PARAM1__PARAM2_ to variable _PARAM0_"),
-                   _("Variables"),
-                   "res/actions/var24.png",
-                   "res/actions/var.png")
-        .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
+    
+    AddAction("ModVarScene",
+               _("Value of a variable"),
+               _("Modify the value of a scene variable."),
+               _("Do _PARAM1__PARAM2_ to variable _PARAM0_"),
+               _("Variables"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .AddParameter("operator", _("Modification's sign"))
+    .AddParameter("expression", _("Value"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
-    }
+    AddAction("ModVarSceneTxt",
+               _("String of a variable"),
+               _("Modify the text of a scene variable."),
+               _("Do _PARAM1__PARAM2_ to the text of variable _PARAM0_"),
+               _("Variables"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .AddParameter("operator", _("Modification's sign"))
+    .AddParameter("string", _("Text"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
-    {
-        AddAction("ModVarSceneTxt",
-                   _("Text of a scene variable"),
-                   _("Modify the text of a scene variable."),
-                   _("Do _PARAM1__PARAM2_ to the text of variable _PARAM0_"),
-                   _("Variables"),
-                   "res/actions/var24.png",
-                   "res/actions/var.png")
-        .AddParameter("scenevar", _("Name of the variable"))
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("string", _("Text"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
+    AddAction("ModVarGlobal",
+               _("Value of a global variable"),
+               _("Modify the value of a global variable"),
+               _("Do _PARAM1__PARAM2_ to global variable _PARAM0_"),
+               _("Variables/Global"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .AddParameter("operator", _("Modification's sign"))
+    .AddParameter("expression", _("Value"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
-    }
+    AddAction("ModVarGlobalTxt",
+               _("String of a global variable"),
+               _("Modify the text of a global variable."),
+               _("Do _PARAM1__PARAM2_ to the text of global variable _PARAM0_"),
+               _("Variables/Global"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .AddParameter("operator", _("Modification's sign"))
+    .AddParameter("string", _("Text"))
+    .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
-    {
-        AddAction("ModVarGlobal",
-                   _("Global variable"),
-                   _("Modify a global variable"),
-                   _("Do _PARAM1__PARAM2_ to global variable _PARAM0_"),
-                   _("Variables"),
-                   "res/actions/var24.png",
-                   "res/actions/var.png")
-        .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
+    AddAction("VariableRemoveChild",
+               _("Remove a child"),
+               _("Remove a child from a variable."),
+               _("Remove child _PARAM1_ from variable _PARAM0_"),
+               _("Variables/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .AddParameter("string", _("Child's name"))
+    .codeExtraInformation.SetFunctionName("VariableRemoveChild");
 
-    }
+    AddAction("GlobalVariableRemoveChild",
+               _("Remove a child"),
+               _("Remove a child from a global variable."),
+               _("Remove child _PARAM1_ from global variable _PARAM0_"),
+               _("Variables/Global/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .AddParameter("string", _("Child's name"))
+    .codeExtraInformation.SetFunctionName("VariableRemoveChild");
 
-    {
-        AddAction("ModVarGlobalTxt",
-                   _("Text of a global variable"),
-                   _("Modify the text of a global variable."),
-                   _("Do _PARAM1__PARAM2_ to the text of global variable _PARAM0_"),
-                   _("Variables"),
-                   "res/actions/var24.png",
-                   "res/actions/var.png")
-        .AddParameter("globalvar", _("Name of the variable"))
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("string", _("Text"))
-        .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
-    }
+    AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .codeExtraInformation.SetFunctionName("GetVariableValue");
 
-    {
-        AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")
-        .AddParameter("scenevar", _("Name of the variable"))
-        .codeExtraInformation.SetFunctionName("GetVariableValue");
-    }
+    AddStrExpression("VariableString", _("Scene variables"), _("Text of a scene variable"), _("Variables"), "res/actions/var.png")
+    .AddParameter("scenevar", _("Variable"))
+    .codeExtraInformation.SetFunctionName("GetVariableString");
 
-    {
-        AddStrExpression("VariableString", _("Scene variables"), _("Text of a scene variable"), _("Variables"), "res/actions/var.png")
-        .AddParameter("scenevar", _("Name of the variable"))
-        .codeExtraInformation.SetFunctionName("GetVariableString");
-    }
+    AddExpression("GlobalVariable", _("Global variables"), _("Global variable"), _("Variables"), "res/actions/var.png")
+    .AddParameter("globalvar", _("Name of the global variable"))
+    .codeExtraInformation.SetFunctionName("GetVariableValue");
 
-    {
-        AddExpression("GlobalVariable", _("Global variable"), _("Global variable"), _("Variables"), "res/actions/var.png")
-        .AddParameter("globalvar", _("Name of the global variable"))
-        .codeExtraInformation.SetFunctionName("GetVariableValue");
-    }
-
-    {
-        AddStrExpression("GlobalVariableString", _("Global variable"), _("Text of a global variable"), _("Variables"), "res/actions/var.png")
-        .AddParameter("globalvar", _("Name of the variable"))
-        .codeExtraInformation.SetFunctionName("GetVariableString");
-    }
+    AddStrExpression("GlobalVariableString", _("Global variables"), _("Text of a global variable"), _("Variables"), "res/actions/var.png")
+    .AddParameter("globalvar", _("Variable"))
+    .codeExtraInformation.SetFunctionName("GetVariableString");
     #endif
 }
 

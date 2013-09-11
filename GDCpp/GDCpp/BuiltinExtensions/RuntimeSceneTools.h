@@ -89,6 +89,16 @@ bool GD_API GlobalVariableExists(RuntimeScene & scene, const gd::Variable & vari
 /**
  * Only used internally by GD events generated code.
  */
+bool GD_API VariableChildExists(const gd::Variable & variable, const std::string & childName);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API VariableRemoveChild(gd::Variable & variable, const std::string & childName);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 gd::Variable & GD_API ReturnVariable(gd::Variable & variable);
 
 /**

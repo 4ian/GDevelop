@@ -308,7 +308,7 @@ void DebuggerGUI::UpdateGUI()
         it!=sceneVariables.end();++it, ++i)
     {
         generalList->SetItem(generalBaseItemCount+i, 0, it->first);
-        generalList->SetItem(generalBaseItemCount+i, 1, it->second->GetString());
+        generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
         generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -329,7 +329,7 @@ void DebuggerGUI::UpdateGUI()
         it!=gameVariables.end();++it, ++i)
     {
         generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, it->first);
-        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->GetString());
+        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
         generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -496,7 +496,7 @@ void DebuggerGUI::UpdateGUI()
         it!=objectVariables.end();++it, ++i)
     {
         objectList->SetItem(baseItemCount+i, 0, it->first);
-        objectList->SetItem(baseItemCount+i, 1, it->second->GetString());
+        objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
     }
 }
 

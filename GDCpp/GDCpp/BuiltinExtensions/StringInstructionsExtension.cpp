@@ -24,8 +24,8 @@ StringInstructionsExtension::StringInstructionsExtension()
         .codeExtraInformation.SetFunctionName("GDpriv::StringTools::NewLine").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
     AddStrExpression("SubStr",
-                   _("Get a portion of text from a text"),
-                   _("Get a portion of text from a text"),
+                   _("Get a portion of a text"),
+                   _("Get a portion of a text"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
@@ -87,7 +87,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("string", _("Text to search for"), "",false)
-        .AddParameter("expression", _("Position from which searching must begin"), "",false)
+        .AddParameter("expression", _("Position of the first character in the string to be considered in the search"), "",false)
         .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 
@@ -100,7 +100,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("string", _("Text to search for"), "",false)
-        .AddParameter("expression", _("Position from which searching must begin"), "",false)
+        .AddParameter("expression", _("Position of the last character in the string to be considered in the search"), "",false)
         .codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
 
 

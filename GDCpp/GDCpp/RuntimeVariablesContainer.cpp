@@ -41,8 +41,7 @@ void RuntimeVariablesContainer::Merge(const gd::VariablesContainer & container)
             Get(variable.first) = variable.second;
         else
         {
-            gd::Variable * newVariable = new gd::Variable;
-            newVariable->SetString(variable.second.GetString());
+            gd::Variable * newVariable = new gd::Variable(variable.second);
             variablesArray.push_back(newVariable);
             variables[variable.first] = newVariable;
         }

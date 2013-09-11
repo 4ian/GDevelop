@@ -551,6 +551,16 @@ bool RuntimeObject::VariableExists(const std::string & variable)
     return objectVariables.Has(variable);
 }
 
+bool RuntimeObject::VariableChildExists(const gd::Variable & variable, const std::string & childName)
+{
+    return variable.HasChild(childName);
+}
+
+void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const std::string & childName)
+{
+    variable.RemoveChild(childName);
+}
+
 void DestroyBaseRuntimeObject(RuntimeObject * object)
 {
     delete object;

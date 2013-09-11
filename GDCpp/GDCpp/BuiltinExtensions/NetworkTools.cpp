@@ -8,6 +8,7 @@
 #include <SFML/Network.hpp>
 #include "GDCpp/BuiltinExtensions/NetworkTools.h"
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Variable.h"
 #include "GDCpp/Tools/md5.h"
 
 using namespace std;
@@ -20,13 +21,13 @@ using namespace std;
  * be sure data were not modified.
 */
 void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
-                     const std::string & password,
-                     const std::string & data1,
-                     const std::string & data2,
-                     const std::string & data3,
-                     const std::string & data4,
-                     const std::string & data5,
-                     const std::string & data6)
+    const std::string & password,
+    const std::string & data1,
+    const std::string & data2,
+    const std::string & data3,
+    const std::string & data4,
+    const std::string & data5,
+    const std::string & data6)
 {
     string data1md5 = md5(data1+password); //On leur ajoute le mot de passe
     string data2md5 = md5(data2+password); //Et on effectue la somme de contrôle
@@ -70,6 +71,30 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
 #endif
 
     return;
+}
+
+void GD_API SendHttpRequest(const std::string & host, const std::string & uri, const std::string & body, 
+    const std::string & method, const std::string & contentType, gd::Variable & responseVar)
+{
+    // Create Http
+    sf::Http Http;
+    Http.setHost(host);
+
+    // Create request
+    sf::Http::Request request;
+    request.setMethod(method == "POST" ? sf::Http::Request::Post : sf::Http::Request::Get);
+    request.setField("Content-Type", contentType.empty() ? "application/x-www-form-urlencoded" : contentType);
+    request.setUri(uri);
+    request.setBody(body);
+
+    // Send request & Get response
+    sf::Http::Response response = Http.sendRequest(request);
+
+    if (response.getStatus() == sf::Http::Response::Ok)
+    {
+        responseVar.SetString(response.getBody());
+    }
+    //else request failed.
 }
 
 void GD_API DownloadFile( const std::string & host, const std::string & uri, const std::string & outputfilename )

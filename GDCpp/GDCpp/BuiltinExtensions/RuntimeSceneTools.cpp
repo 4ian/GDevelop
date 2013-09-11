@@ -9,6 +9,7 @@
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDCpp/RuntimeObject.h"
+#include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CppPlatform.h"
 #include "GDCpp/ObjectHelpers.h"
@@ -26,12 +27,12 @@ bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 
 void GD_API ShowLayer( RuntimeScene & scene, const std::string & layer )
 {
-    scene.GetLayer(layer).SetVisibility(true);
+    scene.GetRuntimeLayer(layer).SetVisibility(true);
 }
 
 void GD_API HideLayer( RuntimeScene & scene, const std::string & layer )
 {
-    scene.GetLayer(layer).SetVisibility(false);
+    scene.GetRuntimeLayer(layer).SetVisibility(false);
 }
 
 void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor )
@@ -188,6 +189,16 @@ gd::Variable & GD_API ReturnVariable(gd::Variable & variable)
 { 
     return variable; 
 };
+
+bool GD_API VariableChildExists(const gd::Variable & variable, const std::string & childName)
+{
+    return variable.HasChild(childName);
+}
+
+void GD_API VariableRemoveChild(gd::Variable & variable, const std::string & childName)
+{
+    variable.RemoveChild(childName);
+}
 
 double GD_API GetVariableValue(const gd::Variable & variable) 
 { 

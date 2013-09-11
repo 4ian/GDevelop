@@ -237,7 +237,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/var.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
+            .AddParameter("objectvar", _("Variable"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
             .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
@@ -252,11 +252,34 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/var.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
+            .AddParameter("objectvar", _("Variable"))
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("string", _("Text"))
             .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
 
+        obj.AddCondition("ObjectVariableChildExists",
+                 _("Child existence"),
+                 _("Return true if the specified child of the variable exists."),
+                 _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
+                 _("Variables/Structures"),
+                 "res/conditions/var24.png",
+                 "res/conditions/var.png")
+            .AddParameter("object", _("Object"))
+            .AddParameter("objectvar", _("Variable"))
+            .AddParameter("string", _("Text to test"))
+            .codeExtraInformation.SetFunctionName("VariableChildExists");
+
+        obj.AddAction("ObjectVariableRemoveChild",
+                   _("Remove a child"),
+                   _("Remove a child from a variable of an object."),
+                   _("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
+                   _("Variables/Global/Structure"),
+                   "res/actions/var24.png",
+                   "res/actions/var.png")
+            .AddParameter("object", _("Object"))
+            .AddParameter("objectvar", _("Variable"))
+            .AddParameter("string", _("Child's name"))
+            .codeExtraInformation.SetFunctionName("VariableRemoveChild");
 
 
         obj.AddAction("Cache",
@@ -377,7 +400,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
+            .AddParameter("objectvar", _("Variable"))
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
             .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
@@ -391,7 +414,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("objectvar", _("Name of the variable"))
+            .AddParameter("objectvar", _("Variable"))
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("string", _("Text to test"))
             .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string");
@@ -405,7 +428,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("string", _("Name of the variable"))
+            .AddParameter("string", _("Variable"))
+            .SetHidden()
             .codeExtraInformation.SetFunctionName("VariableExists");
 
         obj.AddCondition("AutomatismActivated",

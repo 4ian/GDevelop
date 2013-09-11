@@ -368,7 +368,9 @@ public:
     bool VariableExists(const std::string & variable);
     static double GetVariableValue(const gd::Variable & variable) { return variable.GetValue(); };
     static const std::string& GetVariableString(const gd::Variable & variable) { return variable.GetString(); };
-
+    static bool VariableChildExists(const gd::Variable & variable, const std::string & childName);
+    static void VariableRemoveChild(gd::Variable & variable, const std::string & childName);
+    
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
     void Duplicate( RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists );

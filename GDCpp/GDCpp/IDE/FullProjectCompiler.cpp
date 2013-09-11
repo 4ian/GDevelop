@@ -392,8 +392,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
         boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
-        if ( extension != boost::shared_ptr<ExtensionBase>() &&
-            ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
+        if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
+
+        if ( ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
             && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin
         {
             if ( windowsTarget)
@@ -414,39 +415,17 @@ void FullProjectCompiler::LaunchProjectCompilation()
                     diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Mac OS in compilation directory.\n" )));
             }
         }
-        if ( extension != boost::shared_ptr<ExtensionBase>() )
+
+        const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
+        for (unsigned int i = 0;i<supplementaryFiles.size();++i)
         {
-            if ( windowsTarget)
+            if ( (supplementaryFiles[i].first == "Windows" && windowsTarget) ||
+                 (supplementaryFiles[i].first == "Linux" && linuxTarget) ||
+                 (supplementaryFiles[i].first == "Mac" && macTarget) )
             {
-                const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
-                for (unsigned int i = 0;i<supplementaryFiles.size();++i)
-                {
-                    if ( supplementaryFiles[i].first == "Windows"
-                         && wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + supplementaryFiles[i].second, true ) == false )
-                        diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" for Windows in compilation directory.\n" )));
-                }
-            }
 
-            if ( linuxTarget )
-            {
-                const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
-                for (unsigned int i = 0;i<supplementaryFiles.size();++i)
-                {
-                    if ( supplementaryFiles[i].first == "Linux"
-                         && wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + supplementaryFiles[i].second, true ) == false )
-                        diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" for Linux in compilation directory.\n" )));
-                }
-            }
-
-            if ( macTarget )
-            {
-                const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
-                for (unsigned int i = 0;i<supplementaryFiles.size();++i)
-                {
-                    if ( supplementaryFiles[i].first == "Mac"
-                         && wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + supplementaryFiles[i].second, true ) == false )
-                        diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" for Mac OS in compilation directory.\n" )));
-                }
+                if ( wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + wxFileName::FileName(supplementaryFiles[i].second).GetFullName(), true ) == false )
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" in compilation directory.\n" )));
             }
         }
     }

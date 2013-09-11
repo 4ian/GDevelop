@@ -111,8 +111,6 @@ scene(scene_)
 	wxBoxSizer* BoxSizer3;
 
 	Create(parent, wxID_ANY, _("Edit the action"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
-	SetClientSize(wxSize(717,396));
-	SetMinSize(wxSize(640,550));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/actionicon.png"))));
 	SetIcon(FrameIcon);
@@ -121,20 +119,21 @@ scene(scene_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,400), 0, _T("ID_NOTEBOOK1"));
+	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
+	Notebook1->SetMinSize(wxSize(270,-1));
 	ActionsTree = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	ActionsTree->SetToolTip(_("Choose an action to set up."));
 	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	BoxSizer9 = new wxBoxSizer(wxVERTICAL);
 	BoxSizer10 = new wxBoxSizer(wxVERTICAL);
 	objectsListsNotebook = new wxNotebook(Panel1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
-	ObjetsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
+	ObjetsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL2, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
 	ObjetsList->SetToolTip(_("Choose an object in the list"));
-	GroupesList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
+	GroupesList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL3, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
 	GroupesList->SetToolTip(_("Choose an object in the list"));
-	globalObjectsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL4, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
+	globalObjectsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL4, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
 	globalObjectsList->SetToolTip(_("Choose an object in the list"));
-	globalObjectGroups = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL5, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL5"));
+	globalObjectGroups = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL5, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL5"));
 	globalObjectGroups->SetToolTip(_("Choose an object in the list"));
 	objectsListsNotebook->AddPage(ObjetsList, _("Objects"), false);
 	objectsListsNotebook->AddPage(GroupesList, _("Objects groups"), false);
@@ -212,16 +211,18 @@ scene(scene_)
 	FlexGridSizer2->Add(BoxSizer5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer6->Add(FlexGridSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(BoxSizer6);
-	SetSizer(BoxSizer6);
-	Layout();
+	BoxSizer6->Fit(this);
+	BoxSizer6->SetSizeHints(this);
 	Center();
 
+	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ChoixAction::OnActionsTreeItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnActionsTreeSelectionChanged);
 	Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
 	Connect(ID_TREECTRL3,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
 	Connect(ID_TREECTRL4,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
 	Connect(ID_TREECTRL5,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
 	Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixAction::OnobjectsSearchCtrlText);
+	Connect(ID_TREECTRL6,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ChoixAction::OnobjectActionsTreeItemActivated);
 	Connect(ID_TREECTRL6,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnobjectActionsTreeSelectionChanged);
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixAction::OnsearchCtrlText);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnmoreBtClick);
@@ -253,6 +254,7 @@ scene(scene_)
 
     RefreshAllLists();
     Center();
+    SetSize(wxDefaultCoord, 600);
 }
 
 ChoixAction::~ChoixAction()
@@ -268,6 +270,28 @@ void ChoixAction::RefreshAllLists()
     RefreshList();
 }
 
+wxTreeItemId ChoixAction::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr)
+{
+	std::vector<std::string> groups = SplitString<string>(groupStr, '/');
+
+	for(unsigned int i = 0;i<groups.size();++i)
+	{
+		if ( groups[i].empty() ) continue;
+
+	    wxTreeItemIdValue cookie;
+	    wxTreeItemId groupItem = treeCtrl->GetFirstChild(parent, cookie);
+	    while ( groupItem.IsOk() && treeCtrl->GetItemText(groupItem) != groups[i] )
+	    {
+	        groupItem = treeCtrl->GetNextSibling(groupItem);
+	    }
+	    if ( !groupItem.IsOk() )
+	        groupItem = treeCtrl->AppendItem(parent, groups[i], 0);
+
+	    parent = groupItem;
+    }
+
+    return parent;
+}
 
 /**
  * Create the list of actions
@@ -322,19 +346,7 @@ void ChoixAction::RefreshList()
                 if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
-                wxTreeItemIdValue cookie;
-                wxTreeItemId groupItem = ActionsTree->GetFirstChild(objectTypeItem, cookie);
-                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
-                {
-                    groupItem = ActionsTree->GetNextSibling(groupItem);
-                }
-                if ( !groupItem.IsOk() )
-                {
-                    if ( !it->second.GetGroup().empty() )
-                        groupItem = ActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
-                    else
-                        groupItem = objectTypeItem;
-                }
+                wxTreeItemId groupItem = GetGroupItem(ActionsTree, objectTypeItem, it->second.GetGroup());
 
                 //Add action item
                 int IDimage = 0;
@@ -369,19 +381,7 @@ void ChoixAction::RefreshList()
                 if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
-                wxTreeItemIdValue cookie;
-                wxTreeItemId groupItem = ActionsTree->GetFirstChild(automatismTypeItem, cookie);
-                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
-                {
-                    groupItem = ActionsTree->GetNextSibling(groupItem);
-                }
-                if ( !groupItem.IsOk() )
-                {
-                    if ( !it->second.GetGroup().empty() )
-                        groupItem = ActionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
-                    else
-                        groupItem = automatismTypeItem;
-                }
+                wxTreeItemId groupItem = GetGroupItem(ActionsTree, automatismTypeItem, it->second.GetGroup());
 
                 //Add action item
                 int IDimage = 0;
@@ -409,19 +409,7 @@ void ChoixAction::RefreshList()
             if ( it->second.IsHidden() ) continue;
 
             //Search and/or add group item
-            wxTreeItemIdValue cookie;
-            wxTreeItemId groupItem = ActionsTree->GetFirstChild(extensionItem, cookie);
-            while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
-            {
-                groupItem = ActionsTree->GetNextSibling(groupItem);
-            }
-            if ( !groupItem.IsOk() )
-            {
-                if ( !it->second.GetGroup().empty() )
-                    groupItem = ActionsTree->AppendItem(extensionItem, it->second.GetGroup(), 0);
-                else
-                    groupItem = extensionItem;
-            }
+            wxTreeItemId groupItem = GetGroupItem(ActionsTree, extensionItem, it->second.GetGroup());
 
             //Add action item
             int IDimage = 0;
@@ -498,19 +486,7 @@ void ChoixAction::RefreshObjectActionsList()
             if ( it->second.IsHidden() ) continue;
 
             //Search and/or add group item
-            wxTreeItemIdValue cookie;
-            wxTreeItemId groupItem = objectActionsTree->GetFirstChild(objectTypeItem, cookie);
-            while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
-            {
-                groupItem = objectActionsTree->GetNextSibling(groupItem);
-            }
-            if ( !groupItem.IsOk() )
-            {
-                if ( !it->second.GetGroup().empty() )
-                    groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
-                else
-                    groupItem = objectTypeItem;
-            }
+            wxTreeItemId groupItem = GetGroupItem(objectActionsTree, objectTypeItem, it->second.GetGroup());
 
             //Add action item, if it is not hidden
             int IDimage = 0;
@@ -552,19 +528,7 @@ void ChoixAction::RefreshObjectActionsList()
                 if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
-                wxTreeItemIdValue cookie;
-                wxTreeItemId groupItem = objectActionsTree->GetFirstChild(automatismTypeItem, cookie);
-                while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
-                {
-                    groupItem = objectActionsTree->GetNextSibling(groupItem);
-                }
-                if ( !groupItem.IsOk() )
-                {
-                    if ( !it->second.GetGroup().empty() )
-                        groupItem = objectActionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
-                    else
-                        groupItem = automatismTypeItem;
-                }
+            	wxTreeItemId groupItem = GetGroupItem(objectActionsTree, automatismTypeItem, it->second.GetGroup());
 
                 //Add action item
                 int IDimage = 0;
@@ -1093,3 +1057,12 @@ void ChoixAction::OnsearchCtrlText(wxCommandEvent& event)
     RefreshObjectActionsList();
 }
 
+void ChoixAction::OnActionsTreeItemActivated(wxTreeEvent& event)
+{
+	if ( !ParaEdit.empty() ) ParaEdit[0]->SetFocus();
+}
+
+void ChoixAction::OnobjectActionsTreeItemActivated(wxTreeEvent& event)
+{
+	if ( !ParaEdit.empty() ) ParaEdit[0]->SetFocus();
+}

@@ -3,8 +3,6 @@
 	<object class="wxDialog" name="ChoixAction">
 		<title>Edit the action</title>
 		<centered>1</centered>
-		<size>717,396</size>
-		<minsize>640,550</minsize>
 		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/actionicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
@@ -19,7 +17,7 @@
 							<growablerows>0</growablerows>
 							<object class="sizeritem">
 								<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-									<size>270,500</size>
+									<minsize>270,-1</minsize>
 									<object class="notebookpage">
 										<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ActionsTree" member="yes">
 											<image_list></image_list>
@@ -33,6 +31,7 @@
 											</items_text>
 											<tooltip>Choose an action to set up.</tooltip>
 											<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+											<handler function="OnActionsTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 											<handler function="OnActionsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 										</object>
 										<label>All actions</label>
@@ -58,7 +57,6 @@
 																			<item2></item2>
 																		</items_text>
 																		<pos>-71,-11</pos>
-																		<size>179,170</size>
 																		<tooltip>Choose an object in the list</tooltip>
 																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -77,7 +75,6 @@
 																			<item2></item2>
 																		</items_text>
 																		<pos>-71,-11</pos>
-																		<size>179,170</size>
 																		<tooltip>Choose an object in the list</tooltip>
 																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -96,7 +93,6 @@
 																			<item2></item2>
 																		</items_text>
 																		<pos>-71,-11</pos>
-																		<size>179,170</size>
 																		<tooltip>Choose an object in the list</tooltip>
 																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -115,7 +111,6 @@
 																			<item2></item2>
 																		</items_text>
 																		<pos>-71,-11</pos>
-																		<size>281,190</size>
 																		<tooltip>Choose an object in the list</tooltip>
 																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -151,6 +146,7 @@
 														</items_text>
 														<tooltip>Choose an action to set up.</tooltip>
 														<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+														<handler function="OnobjectActionsTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 														<handler function="OnobjectActionsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

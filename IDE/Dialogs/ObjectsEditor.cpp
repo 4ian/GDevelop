@@ -496,7 +496,8 @@ void ObjectsEditor::OnobjectsListKeyDown(wxTreeEvent& event)
 
 void ObjectsEditor::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
 {
-    renamedItemOldName = gd::ToString(event.GetLabel());
+	//Do not work on Linux:
+    //renamedItemOldName = gd::ToString(event.GetLabel());
 }
 
 void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
@@ -640,6 +641,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
 {
     lastSelectedItem = event.GetItem();
+    renamedItemOldName = gd::ToString(objectsList->GetItemText(lastSelectedItem));
 
     mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();

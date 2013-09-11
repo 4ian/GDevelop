@@ -14,14 +14,14 @@ namespace AutoVersion{
 	
 	//Standard Version Type
 	static const long GDCore_MAJOR = 3;
-	static const long GDCore_MINOR = 1;
-	static const long GDCore_BUILD = 61;
+	static const long GDCore_MINOR = 2;
+	static const long GDCore_BUILD = 62;
 	static const long GDCore_REVISION = 0;
 	
 	//Miscellaneous Version Types
-	#define GDCore_RC_FILEVERSION 3,1,61,0
-	#define GDCore_RC_FILEVERSION_STRING "3, 1, 61, 0\0"
-	static const char GDCore_FULLVERSION_STRING[] = "3.1.61.0";
+	#define GDCore_RC_FILEVERSION 3,2,62,0
+	#define GDCore_RC_FILEVERSION_STRING "3, 2, 62, 0\0"
+	static const char GDCore_FULLVERSION_STRING[] = "3.2.62.0";
 	
 	//These values are to keep track of your versioning state, don't modify them.
 	static const long GDCore_BUILD_HISTORY = 0;

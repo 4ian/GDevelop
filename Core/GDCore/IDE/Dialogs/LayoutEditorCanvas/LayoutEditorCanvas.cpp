@@ -110,7 +110,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     editing(true)
 {
 	//(*Initialize(LayoutEditorCanvas)
-	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxWANTS_CHARS, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS, _T("wxID_ANY"));
 	//*)
 
     //Initialization allowing to run SFML within the wxWidgets control.

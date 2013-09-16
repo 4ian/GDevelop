@@ -40,7 +40,7 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS, _T("ID_PANEL1"));
 	Panel1->SetFocus();
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
@@ -74,6 +74,9 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixClavier::OnButton1Click);
 	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&ChoixClavier::OnKeyDown);
 	//*)
+
+    Panel1->SetWindowStyleFlag(wxWANTS_CHARS);
+    Panel1->SetFocus();
 }
 
 ChoixClavier::~ChoixClavier()

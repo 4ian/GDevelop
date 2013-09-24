@@ -280,12 +280,14 @@ wxTreeItemId ChoixAction::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId paren
 
 	    wxTreeItemIdValue cookie;
 	    wxTreeItemId groupItem = treeCtrl->GetFirstChild(parent, cookie);
+	    size_t latestGroupPos = 0;
 	    while ( groupItem.IsOk() && treeCtrl->GetItemText(groupItem) != groups[i] )
 	    {
+	        if ( treeCtrl->HasChildren(groupItem) ) latestGroupPos++;
 	        groupItem = treeCtrl->GetNextSibling(groupItem);
 	    }
 	    if ( !groupItem.IsOk() )
-	        groupItem = treeCtrl->AppendItem(parent, groups[i], 0);
+	        groupItem = treeCtrl->InsertItem(parent, latestGroupPos, groups[i], 0);
 
 	    parent = groupItem;
     }
@@ -781,7 +783,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "musicfile" )
         {
             wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choose a music ( ogg files )"), gameDirectory, "", "Fichiers audio (*.ogg)|*.ogg");
+            wxFileDialog dialog(this, _("Choose a music ( ogg files )"), gameDirectory, "", _("Audio files (*.ogg)|*.ogg"));
             dialog.ShowModal();
 
             if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
@@ -795,7 +797,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "soundfile" )
         {
             wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choose a sound ( wav file )"), gameDirectory, "", "Fichiers audio (*.wav)|*.wav");
+            wxFileDialog dialog(this, _("Choose a sound"), gameDirectory, "", _("Audio files (*.wav, *.ogg)|*.wav;*.ogg"));
             dialog.ShowModal();
 
             if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:

@@ -296,12 +296,14 @@ wxTreeItemId ChoixCondition::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId pa
 
         wxTreeItemIdValue cookie;
         wxTreeItemId groupItem = treeCtrl->GetFirstChild(parent, cookie);
+        size_t latestGroupPos = 0;
         while ( groupItem.IsOk() && treeCtrl->GetItemText(groupItem) != groups[i] )
         {
+            if ( treeCtrl->HasChildren(groupItem) ) latestGroupPos++;
             groupItem = treeCtrl->GetNextSibling(groupItem);
         }
         if ( !groupItem.IsOk() )
-            groupItem = treeCtrl->AppendItem(parent, groups[i], 0);
+            groupItem = treeCtrl->InsertItem(parent, latestGroupPos, groups[i], 0);
 
         parent = groupItem;
     }

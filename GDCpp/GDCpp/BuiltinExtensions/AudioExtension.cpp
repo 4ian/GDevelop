@@ -25,7 +25,7 @@ AudioExtension::AudioExtension()
                    _("Play a sound on a channel"),
                    _("Play a sound ( small audio file ) on a specific canal,\nso as to be able to manipulate it."),
                    _("Play the sound _PARAM1_ on the channel _PARAM2_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -40,7 +40,7 @@ AudioExtension::AudioExtension()
                    _("Stop the sound of a channel"),
                    _("Stop the sound on the specified channel."),
                    _("Stop the sound of channel _PARAM1_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -51,7 +51,7 @@ AudioExtension::AudioExtension()
                    _("Pause the sound of a channel"),
                    _("Pause the sound played on the specified channel."),
                    _("Pause the sound of channel _PARAM1_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -62,7 +62,7 @@ AudioExtension::AudioExtension()
                    _("Play the sound of a channel"),
                    _("Play the sound of the channel."),
                    _("Play the sound of channel _PARAM1_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -73,7 +73,7 @@ AudioExtension::AudioExtension()
                    _("Play a music on a channel"),
                    _("Play a music an on specific channel,\nso as to be able to interact with later."),
                    _("Play the music _PARAM1_ on channel _PARAM2_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -88,7 +88,7 @@ AudioExtension::AudioExtension()
                    _("Stop the music on a channel"),
                    _("Stop the music on the specified channel"),
                    _("Stop the music of channel _PARAM1_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -99,7 +99,7 @@ AudioExtension::AudioExtension()
                    _("Pause the music of a channel"),
                    _("Pause the music on the specified channel."),
                    _("Pause the music of channel _PARAM1_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -110,7 +110,7 @@ AudioExtension::AudioExtension()
                    _("Play the music of a channel"),
                    _("Play the music of the channel."),
                    _("Play the music of channel _PARAM1_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -121,7 +121,7 @@ AudioExtension::AudioExtension()
                    _("Volume of the sound on a channel"),
                    _("This action modify the volume of the sound on the specified channel. The volume is between 0 and 100."),
                    _("Do _PARAM2__PARAM3_ to the volume of the sound on channel _PARAM1_"),
-                   _("Sound level"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -134,7 +134,7 @@ AudioExtension::AudioExtension()
                    _("Volume of the music on a channel"),
                    _("This action modify the volume of the music on the specified channel. The volume is between 0 and 100."),
                    _("Do _PARAM2__PARAM3_ to the volume of the music on channel _PARAM1_"),
-                   _("Sound level"),
+                   _("Audio/Musics on channels"),
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -147,7 +147,7 @@ AudioExtension::AudioExtension()
                    _("Game global volume"),
                    _("This action modify the global volumeof the game. The volume is between 0 and 100."),
                    _("Do _PARAM1__PARAM2_ to global sound level"),
-                   _("Sound level"),
+                   _("Audio"),
                    "res/actions/volume24.png",
                    "res/actions/volume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -159,7 +159,7 @@ AudioExtension::AudioExtension()
                    _("Pitch of the sound of a channel"),
                    _("This action modify pitch ( speed ) of the sound on a channel.\n1 is the default pitch."),
                    _("Do _PARAM2__PARAM3_ to the pitch of the sound on channel _PARAM1_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -173,7 +173,7 @@ AudioExtension::AudioExtension()
                    _("Pitch of the music on a channel"),
                    _("This action modify the pitch of the music on the specified channel. 1 is the default pitch"),
                    _("Do _PARAM2__PARAM3_ to the pitch of the music on channel _PARAM1_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -187,7 +187,7 @@ AudioExtension::AudioExtension()
                    _("Playing offset of the sound on a channel"),
                    _("This action modify the playing offset of the sound on a channel"),
                    _("Do _PARAM2__PARAM3_ to the playing offset of the sound on channel _PARAM1_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -200,7 +200,7 @@ AudioExtension::AudioExtension()
                    _("Playing offset of the music on a channel"),
                    _("This action modify the playing offset of the music on the specified channel"),
                    _("Do _PARAM2__PARAM3_ to the playing offset of the music on channel _PARAM1_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -213,7 +213,7 @@ AudioExtension::AudioExtension()
                    _("Play a sound"),
                    _("Play a sound."),
                    _("Play the sound _PARAM1_"),
-                   _("Sounds"),
+                   _("Audio"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -227,7 +227,7 @@ AudioExtension::AudioExtension()
                    _("Play a music"),
                    _("Play a music."),
                    _("Play the music _PARAM1_"),
-                   _("Musics"),
+                   _("Audio"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -241,7 +241,7 @@ AudioExtension::AudioExtension()
                    _("A music is being played"),
                    _("Test if the music on a channel is being played"),
                    _("The music on channel _PARAM1_ is being played"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -254,7 +254,7 @@ AudioExtension::AudioExtension()
                    _("A music is paused"),
                    _("Test if the music on the specified canal is paused."),
                    _("The music on channel _PARAM1_ is paused"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -267,7 +267,7 @@ AudioExtension::AudioExtension()
                    _("A music is stopped"),
                    _("Test if the music on the specified canal is stopped."),
                    _("The music on channel _PARAM1_ is stopped"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -279,7 +279,7 @@ AudioExtension::AudioExtension()
                    _("A sound is being played"),
                    _("Test if the sound on a channel is being played."),
                    _("Thee sound on channel _PARAM1_ is being played"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/conditions/sonplaying24.png",
                    "res/conditions/sonplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -292,7 +292,7 @@ AudioExtension::AudioExtension()
                    _("A sound is paused"),
                    _("Test if the sound on the specified canal is paused."),
                    _("The sound on channel _PARAM1_ is paused"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/conditions/sonpaused24.png",
                    "res/conditions/sonpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -305,7 +305,7 @@ AudioExtension::AudioExtension()
                    _("A sound is stopped"),
                    _("Test if the sound on the specified canal is stopped."),
                    _("The sound on channel _PARAM1_ is stopped"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/conditions/sonstopped24.png",
                    "res/conditions/sonstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -318,7 +318,7 @@ AudioExtension::AudioExtension()
                    _("Volume of the sound on a channel"),
                    _("Test the volume of the sound on the specified channel. The volume is between 0 and 100."),
                    _("The volume of the sound on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Sound level"),
+                   _("Audio/Sounds on channels"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -333,7 +333,7 @@ AudioExtension::AudioExtension()
                    _("Volume of the music on a channel"),
                    _("Test the volume of the music on specified channel. The volume is between 0 and 100."),
                    _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Sound level"),
+                   _("Audio/Musics on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -348,7 +348,7 @@ AudioExtension::AudioExtension()
                    _("global"),
                    _("Test the global sound level. The volume is between 0 and 100."),
                    _("The global game volume is _PARAM2_ to _PARAM1_"),
-                   _("Sound level"),
+                   _("Audio"),
                    "res/conditions/volume24.png",
                    "res/conditions/volume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -362,7 +362,7 @@ AudioExtension::AudioExtension()
                    _("Pitch of the sound of a channel"),
                    _("Test the pitch of the sound on the specified channel. 1 is the default pitch."),
                    _("The pitch of the sound on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -377,7 +377,7 @@ AudioExtension::AudioExtension()
                    _("Pitch of the music on a channel"),
                    _("Test the pitch ( speed ) of the music on specified channel. 1 is the default pitch."),
                    _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -392,7 +392,7 @@ AudioExtension::AudioExtension()
                    _("Playing offset of the sound on a channel"),
                    _("Test the playing offset of the sound on the specified channel."),
                    _("The playing offset of the sound on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Sounds"),
+                   _("Audio/Sounds on channels"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -407,7 +407,7 @@ AudioExtension::AudioExtension()
                    _("Playing offset of the music on a channel"),
                    _("Test the playing offset of the music on the specified channel."),
                    _("The playing offset of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Musics"),
+                   _("Audio/Musics on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")

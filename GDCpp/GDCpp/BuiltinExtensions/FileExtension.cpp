@@ -80,7 +80,7 @@ FileExtension::FileExtension()
 
     AddAction("LireFichierTxt",
                    _("Read a text"),
-                   _("ead the text saved in the specified element and\nstore it in a variable.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Read the text saved in the specified element and\nstore it in a variable.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
                    _("Read _PARAM1_ from file _PARAM0_ and store as text in _PARAM3_"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -115,7 +115,7 @@ FileExtension::FileExtension()
     AddCondition("FileExists",
                    _("A file exists"),
                    _("Test if the file exists."),
-                   _("The file _PARAM0_ exists"),
+                   _("File _PARAM0_ exists"),
                    _("Files"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")

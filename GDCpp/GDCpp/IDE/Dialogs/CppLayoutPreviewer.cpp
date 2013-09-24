@@ -269,8 +269,8 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
         externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
         previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
 
-        externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
-        previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
+        /*externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
+        previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);*/
     }
 }
 void CppLayoutPreviewer::ExternalWindowClosed()

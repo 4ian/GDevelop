@@ -58,7 +58,7 @@ VariablesExtension::VariablesExtension()
              _("Child existence"),
              _("Return true if the specified child of the global variable exists."),
              _("Child _PARAM1_ of global variable _PARAM0_ exists"),
-             _("Variables/Global/Structures"),
+             _("Variables/Global variables/Structures"),
              "res/conditions/var24.png",
              "res/conditions/var.png")
     .AddParameter("globalvar", _("Variable"))
@@ -81,7 +81,7 @@ VariablesExtension::VariablesExtension()
                _("Value of a global variable"),
                _("Compare the value of a global variable."),
                _("Global variable _PARAM0_ is _PARAM1__PARAM2_"),
-               _("Variables/Global"),
+               _("Variables/Global variables"),
                "res/conditions/var24.png",
                "res/conditions/var.png")
     .AddParameter("globalvar", _("Variable"))
@@ -93,7 +93,7 @@ VariablesExtension::VariablesExtension()
                _("Text of a global variable"),
                _("Compare the text of a global variable."),
                _("The text of the global variable _PARAM0_ is _PARAM1__PARAM2_"),
-               _("Variables/Global"),
+               _("Variables/Global variables"),
                "res/conditions/var24.png",
                "res/conditions/var.png")
     .AddParameter("globalvar", _("Variable"))
@@ -105,7 +105,7 @@ VariablesExtension::VariablesExtension()
                    _("Test if a global variable is defined"),
                    _("Test if a global variable exists"),
                    _("Global variable _PARAM0_ is defined"),
-                   _("Variables/Global"),
+                   _("Variables/Global variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
     .AddCodeOnlyParameter("currentScene", "")
@@ -142,7 +142,7 @@ VariablesExtension::VariablesExtension()
                _("Value of a global variable"),
                _("Modify the value of a global variable"),
                _("Do _PARAM1__PARAM2_ to global variable _PARAM0_"),
-               _("Variables/Global"),
+               _("Variables/Global variables"),
                "res/actions/var24.png",
                "res/actions/var.png")
     .AddParameter("globalvar", _("Variable"))
@@ -154,7 +154,7 @@ VariablesExtension::VariablesExtension()
                _("String of a global variable"),
                _("Modify the text of a global variable."),
                _("Do _PARAM1__PARAM2_ to the text of global variable _PARAM0_"),
-               _("Variables/Global"),
+               _("Variables/Global variables"),
                "res/actions/var24.png",
                "res/actions/var.png")
     .AddParameter("globalvar", _("Variable"))
@@ -177,7 +177,7 @@ VariablesExtension::VariablesExtension()
                _("Remove a child"),
                _("Remove a child from a global variable."),
                _("Remove child _PARAM1_ from global variable _PARAM0_"),
-               _("Variables/Global/Structure"),
+               _("Variables/Global variables/Structure"),
                "res/actions/var24.png",
                "res/actions/var.png")
     .AddParameter("globalvar", _("Variable"))

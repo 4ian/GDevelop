@@ -46,6 +46,8 @@ CommonBitmapManager::CommonBitmapManager()
     backthumbsBg.LoadFile("res/backthumbs.png", wxBITMAP_TYPE_ANY);
     varBt.LoadFile("res/var.png", wxBITMAP_TYPE_ANY);
     unknown24.LoadFile("res/unknown24.png", wxBITMAP_TYPE_ANY);
+    unknownAction24.LoadFile("res/unknownAction24.png", wxBITMAP_TYPE_ANY);
+    unknownCondition24.LoadFile("res/unknownCondition24.png", wxBITMAP_TYPE_ANY);
     semitransparentHitBox.LoadFile("res/semitransparentHitBox.png", wxBITMAP_TYPE_ANY);
     noProtection.LoadFile("res/noProtection.png", wxBITMAP_TYPE_ANY);
     folder40.LoadFile("res/folder40.png", wxBITMAP_TYPE_ANY);

@@ -44,6 +44,8 @@ public:
     wxBitmap add24;
     wxBitmap remove16;
     wxBitmap unknown24;
+    wxBitmap unknownAction24;
+    wxBitmap unknownCondition24;
     wxBitmap scene;
     wxBitmap layerBt;
     wxBitmap joyaxisBt;

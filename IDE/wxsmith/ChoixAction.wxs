@@ -181,7 +181,7 @@
 									<cols>2</cols>
 									<object class="sizeritem">
 										<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="ActionImg" member="yes">
-											<bitmap>res/unknown24.png</bitmap>
+											<bitmap>res/unknownAction24.png</bitmap>
 											<size>24,24</size>
 											<style>wxNO_BORDER</style>
 										</object>

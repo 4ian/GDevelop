@@ -166,7 +166,7 @@ conditionInverted(false)
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(2);
     FlexGridSizer3->AddGrowableRow(0);
-    ConditionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknown24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
+    ConditionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknownCondition24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer3->Add(ConditionImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
     NomConditionTxt = new wxStaticText(this, ID_STATICTEXT1, _("No condition chosen"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
@@ -615,7 +615,7 @@ void ChoixCondition::RefreshFromCondition()
     ConditionTextTxt->SetLabel( instructionMetadata.GetDescription() );
     ConditionTextTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ConditionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
-    else ConditionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknown24);
+    else ConditionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknownCondition24);
 
     //Update controls count
     while ( ParaEdit.size() < instructionMetadata.parameters.size() )

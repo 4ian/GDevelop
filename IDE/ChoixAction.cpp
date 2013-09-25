@@ -158,7 +158,7 @@ scene(scene_)
 	BoxSizer7->Add(FlexGridSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer8 = new wxBoxSizer(wxVERTICAL);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
-	ActionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknown24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	ActionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknownAction24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer3->Add(ActionImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
 	NomActionTxt = new wxStaticText(this, ID_STATICTEXT1, _("No action chosen"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
@@ -599,7 +599,7 @@ void ChoixAction::RefreshFromAction()
     ActionTextTxt->SetLabel( instructionMetadata.GetDescription() );
     ActionTextTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
-    else ActionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknown24);
+    else ActionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknownAction24);
 
     //Update controls count
     while ( ParaEdit.size() < instructionMetadata.parameters.size() )

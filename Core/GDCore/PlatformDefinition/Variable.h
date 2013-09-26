@@ -85,6 +85,10 @@ public:
     bool operator==(const std::string & val) const { return GetString() == val;};
     bool operator!=(const std::string & val) const { return GetString() != val;};
 
+    /** 
+     * \brief Return true if the variable is a number
+     */
+    bool IsNumber() const { return !isStructure && isNumber; }
     ///@}
 
     /** \name Structure

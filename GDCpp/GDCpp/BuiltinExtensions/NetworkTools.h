@@ -20,5 +20,8 @@ void GD_API SendHttpRequest(const std::string & host, const std::string & uri, c
 	const std::string & method, const std::string & contentType, gd::Variable & response);
 void GD_API DownloadFile( const std::string & host, const std::string & uri, const std::string & outputfilename );
 
+std::string GD_API VariableStructureToJSON(const gd::Variable & variable);
+void GD_API JSONToVariableStructure(const std::string & JSON, gd::Variable & variable);
+
 #endif // NETWORKTOOLS_H
 

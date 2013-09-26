@@ -58,6 +58,25 @@ NetworkExtension::NetworkExtension()
         .AddParameter("string", _("Path to file ( For example : /folder/file.txt )"), "",false)
         .AddParameter("string", _("Save as"), "",false)
         .codeExtraInformation.SetFunctionName("DownloadFile").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+
+    AddAction("JSONToVariableStructure",
+            _("Convert JSON to variable"),
+            _("Parse a JSON object and store it into a variable"),
+            _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
+            _("Network"),
+            "res/actions/net24.png",
+            "res/actions/net.png")
+        .AddParameter("string", _("JSON string"), "",false)
+        .AddParameter("scenevar", _("Variable where store the JSON object"), "",false)
+        .codeExtraInformation.SetFunctionName("JSONToVariableStructure").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+
+    AddStrExpression("ToJSON",
+                       _("Convert to JSON"),
+                       _("Convert a variable to JSON"),
+                       _("Conversion"),
+                       "res/conditions/toujours24.png")
+        .AddParameter("scenevar", _("The variable to be stringify"), "",false)
+        .codeExtraInformation.SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
     #endif
 }
 

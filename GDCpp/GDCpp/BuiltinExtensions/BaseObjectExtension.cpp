@@ -266,14 +266,14 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                  "res/conditions/var.png")
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Variable"))
-            .AddParameter("string", _("Text to test"))
+            .AddParameter("string", _("Name of the child"))
             .codeExtraInformation.SetFunctionName("VariableChildExists");
 
         obj.AddAction("ObjectVariableRemoveChild",
                    _("Remove a child"),
                    _("Remove a child from a variable of an object."),
                    _("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
-                   _("Variables/Global/Structure"),
+                   _("Variables/Structure"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
             .AddParameter("object", _("Object"))

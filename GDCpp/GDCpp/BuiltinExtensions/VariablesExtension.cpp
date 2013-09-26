@@ -51,7 +51,7 @@ VariablesExtension::VariablesExtension()
              "res/conditions/var24.png",
              "res/conditions/var.png")
     .AddParameter("scenevar", _("Variable"))
-    .AddParameter("string", _("Text to test"))
+    .AddParameter("string", _("Name of the child"))
     .codeExtraInformation.SetFunctionName("VariableChildExists");
 
     AddCondition("GlobalVariableChildExists",
@@ -62,7 +62,7 @@ VariablesExtension::VariablesExtension()
              "res/conditions/var24.png",
              "res/conditions/var.png")
     .AddParameter("globalvar", _("Variable"))
-    .AddParameter("string", _("Text to test"))
+    .AddParameter("string", _("Name of the child"))
     .codeExtraInformation.SetFunctionName("VariableChildExists");
 
     AddCondition("VarSceneDef",

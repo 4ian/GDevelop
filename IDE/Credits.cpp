@@ -315,7 +315,11 @@ void Credits::OnCompilGamesBtClick(wxCommandEvent& event)
 
 void Credits::OnDonBtClick(wxCommandEvent& event)
 {
-    OpenLink(_("http://www.en.compilgames.net/\?file=kop8.php"));
+    wxString donateLink = _("http://www.compilgames.net/donate.php");
+    if ( !donateLink.StartsWith("http://www.compilgames.net/") ) donateLink = "http://www.compilgames.net/donate.php";
+    donateLink += "?utm_source=GD&utm_medium=AboutDialogLink&utm_campaign=paywhatyouwant";
+
+    OpenLink(donateLink);
 }
 
 void Credits::OnLLVMBtClick(wxCommandEvent& event)

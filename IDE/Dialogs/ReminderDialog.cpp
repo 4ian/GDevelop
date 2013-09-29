@@ -79,8 +79,8 @@ ReminderDialog::ReminderDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	SetIcon(frameIcon);
 
     srand(static_cast<unsigned int>(time(NULL)));
-    std::string nb = gd::ToString(rand()%3 + 1);
-    imageBmp->SetBitmap(wxBitmap(wxImage("res/reminder-"+nb+".png")));
+    imageId = gd::ToString(rand()%3 + 1);
+    imageBmp->SetBitmap(wxBitmap(wxImage("res/reminder-"+imageId+".png")));
 
 }
 
@@ -116,6 +116,9 @@ void ReminderDialog::OnHyperlinkCtrl1Click(wxCommandEvent& event)
 {
     wxString link = _("http://www.compilgames.net/donate.php");
     if ( !link.StartsWith("http://www.compilgames.net/") ) link = "http://www.compilgames.net/donate.php";
+
+    link += "?utm_source=GD&utm_medium=ReminderDialog&utm_campaign=paywhatyouwant";
+    link += "&utm_content="+imageId;
 
     OpenLink(link);
     EndModal(0);

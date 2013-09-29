@@ -47,6 +47,8 @@ private:
     //*)
     void OpenLink(wxString link);
 
+    std::string imageId; ///< The ID of the image displayed.
+
     DECLARE_EVENT_TABLE()
 };
 

@@ -206,7 +206,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer6->AddGrowableRow(0);
 	StaticBitmap8 = new wxStaticBitmap(this, ID_STATICBITMAP8, wxBitmap(wxImage(_T("res/donateicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP8"));
 	FlexGridSizer6->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl5 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL16, _("If you like Game Develop, you can make a donation to the author."), _("http://www.compilgames.net/contactEN.html"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
+	HyperlinkCtrl5 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL16, _("If you like Game Develop, you can make a donation to the author."), _("http://www.compilgames.net/donate.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
 	FlexGridSizer6->Add(HyperlinkCtrl5, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -228,6 +228,12 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL11,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent7BtClick);
 	Connect(ID_HYPERLINKCTRL21,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnopenExamplesLinkClick);
 	//*)
+
+    wxString donateLink = _("http://www.compilgames.net/donate.php");
+    if ( !donateLink.StartsWith("http://www.compilgames.net/") ) donateLink = "http://www.compilgames.net/donate.php";
+    donateLink += "?utm_source=GD&utm_medium=StartPageLink&utm_campaign=paywhatyouwant";
+
+	HyperlinkCtrl5->SetURL(donateLink);
 
     Refresh();
 }

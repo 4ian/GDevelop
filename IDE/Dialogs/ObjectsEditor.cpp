@@ -496,8 +496,8 @@ void ObjectsEditor::OnobjectsListKeyDown(wxTreeEvent& event)
 
 void ObjectsEditor::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
 {
-	//Do not work on Linux:
-    //renamedItemOldName = gd::ToString(event.GetLabel());
+	if ( !event.GetLabel().empty() ) //event.GetLabel() is empty on linux.
+    	renamedItemOldName = gd::ToString(event.GetLabel());
 }
 
 void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)

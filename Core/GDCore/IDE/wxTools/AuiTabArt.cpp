@@ -207,7 +207,7 @@ AuiTabArt::AuiTabArt()
 {
     m_normal_font = *wxNORMAL_FONT;
     m_selected_font = *wxNORMAL_FONT;
-    m_selected_font.SetWeight(wxBOLD);
+    //m_selected_font.SetWeight(wxBOLD);
     m_measuring_font = m_selected_font;
 
     m_fixed_tab_width = 100;
@@ -385,9 +385,150 @@ void AuiTabArt::DrawTab(wxDC& dc,
                                  wxRect* out_button_rect,
                                  int* x_extent)
 {
+    #if 0
+    if(in_rect.height <= 2)
+        return;
+
+    int close_button_width = 0;
+    if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
+    {
+        close_button_width = m_active_close_bmp.GetWidth();
+    }
+
+    wxCoord normal_textx, normal_texty;
+    dc.SetFont(m_normal_font);
+    dc.GetTextExtent(page.caption, &normal_textx, &normal_texty);
+
+    wxColour m_tab_active_background_colour = *wxWHITE;
+    wxColour m_tab_active_background_gradient_colour = m_active_colour;
+    wxColour m_tab_border_pen = m_active_colour;
+    wxColour m_tab_label_colour = *wxBLACK;
+
+    wxCoord tab_height = m_tab_ctrl_height - 3;
+    wxCoord tab_width = normal_textx + close_button_width;
+    wxCoord tab_x = in_rect.x;
+    wxCoord tab_y = in_rect.y + in_rect.height - tab_height;
+    wxRect out_tab_rect(tab_x, tab_y, tab_width, tab_height);
+    *out_tab_rectPtr = out_tab_rect;
+
+    if(page.active /*|| page.hovered || page.highlight*/)
+    {
+        if(page.active)
+        {
+            wxRect background(out_tab_rect);
+
+            background.x += 2;
+            background.y += 2;
+            background.width -= 4;
+            background.height -= 2;
+
+            dc.GradientFillLinear(background, m_tab_active_background_gradient_colour,
+                m_tab_active_background_colour, wxSOUTH);
+
+            // TODO: active and hovered
+        }
+
+        wxPoint border_points[6];
+        border_points[0] = wxPoint(1, out_tab_rect.height - 2);
+        border_points[1] = wxPoint(1, 3);
+        border_points[2] = wxPoint(3, 1);
+        border_points[3] = wxPoint(out_tab_rect.width - 4, 1);
+        border_points[4] = wxPoint(out_tab_rect.width - 2, 3);
+        border_points[5] = wxPoint(out_tab_rect.width - 2, out_tab_rect.height - 1);
+
+        dc.SetPen(m_tab_border_pen);
+        dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, out_tab_rect.x, out_tab_rect.y);
+
+        if(page.active)
+        {
+            // Give the tab a curved outward border at the bottom
+            dc.DrawPoint(out_tab_rect.x, out_tab_rect.y + out_tab_rect.height - 2);
+            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 1, out_tab_rect.y + out_tab_rect.height - 2);
+
+            wxPen p(m_tab_active_background_gradient_colour);
+            dc.SetPen(p);
+
+            // Technically the first two points are the wrong colour, but they're near enough
+            dc.DrawPoint(out_tab_rect.x + 1, out_tab_rect.y + out_tab_rect.height - 2);
+            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 2, out_tab_rect.y + out_tab_rect.height - 2);
+            dc.DrawPoint(out_tab_rect.x + 1, out_tab_rect.y + out_tab_rect.height - 1);
+            dc.DrawPoint(out_tab_rect.x, out_tab_rect.y + out_tab_rect.height - 1);
+            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 2, out_tab_rect.y + out_tab_rect.height - 1);
+            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 1, out_tab_rect.y + out_tab_rect.height - 1);
+        }
+    }
+
+    if(true/*m_flags & wxRIBBON_BAR_SHOW_PAGE_ICONS*/)
+    {
+        wxBitmap icon = page.bitmap;
+        if(icon.IsOk())
+        {
+        int x = out_tab_rect.x + 4;
+        if(false/*(m_flags & wxRIBBON_BAR_SHOW_PAGE_LABELS) == 0*/)
+            x = out_tab_rect.x + (out_tab_rect.width - icon.GetWidth()) / 2;
+        dc.DrawBitmap(icon, x, out_tab_rect.y + 1 + (out_tab_rect.height - 1 -
+            icon.GetHeight()) / 2, true);
+        }
+    }
+    if(true/*m_flags & wxRIBBON_BAR_SHOW_PAGE_LABELS*/)
+    {
+        wxString label = page.caption;
+        if(!label.IsEmpty())
+        {
+            dc.SetFont(m_normal_font);
+            dc.SetTextForeground(m_tab_label_colour);
+            dc.SetBackgroundMode(wxTRANSPARENT);
+
+            int text_height;
+            int text_width;
+            dc.GetTextExtent(label, &text_width, &text_height);
+            int width = out_tab_rect.width - 5;
+            int x = out_tab_rect.x + 3;
+            if(true/*m_flags & wxRIBBON_BAR_SHOW_PAGE_ICONS*/)
+            {
+                x += 3 + page.bitmap.GetWidth();
+                width -= 3 + page.bitmap.GetWidth();
+            }
+            int y = out_tab_rect.y + (out_tab_rect.height - text_height) / 2;
+
+            if(width <= text_width)
+            {
+                dc.SetClippingRegion(x, out_tab_rect.y, width, out_tab_rect.height);
+                dc.DrawText(label, x, y);
+            }
+            else
+            {
+                dc.DrawText(label, x + (width - text_width) / 2 + 1, y);
+            }
+        }
+    }
+
+    // draw close button if necessary
+    if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
+    {
+        wxBitmap bmp = m_disabled_close_bmp;
+
+        if (close_button_state == wxAUI_BUTTON_STATE_HOVER ||
+            close_button_state == wxAUI_BUTTON_STATE_PRESSED)
+        {
+            bmp = m_active_close_bmp;
+        }
+
+        wxRect rect(tab_x + tab_width - close_button_width - 1,
+                    tab_y + (tab_height/2) - (bmp.GetHeight()/2),
+                    close_button_width,
+                    tab_height);
+        IndentPressedBitmap(&rect, close_button_state);
+        dc.DrawBitmap(bmp, rect.x, rect.y, true);
+
+        *out_button_rect = rect;
+    }
+
+    #else
     wxCoord normal_textx, normal_texty;
     wxCoord selected_textx, selected_texty;
     wxCoord texty;
+    wxFont m_selected_font = m_normal_font;
 
     // if the caption is empty, measure some temporary text
     wxString caption = page.caption;
@@ -506,11 +647,13 @@ void AuiTabArt::DrawTab(wxDC& dc,
         dc.DrawPoint(r.x+r.width-2, r.y+1);
 
         // set rectangle down a bit for gradient drawing
-        r.SetHeight(r.GetHeight()/2);
+        //r.SetHeight(r.GetHeight()/2);
         r.x += 2;
         r.width -= 2;
-        r.y += r.height;
-        r.y -= 2;
+        /*r.y += r.height;
+        r.y -= 2;*/
+        r.y += 2;
+        r.height -= 2;
 
         // draw gradient background
         wxColor top_color = *wxWHITE;
@@ -658,6 +801,7 @@ void AuiTabArt::DrawTab(wxDC& dc,
     *out_tab_rect = wxRect(tab_x, tab_y, tab_width, tab_height);
 
     dc.DestroyClippingRegion();
+    #endif
 }
 
 int gd::AuiTabArt::GetIndentSize()

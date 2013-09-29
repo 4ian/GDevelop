@@ -208,10 +208,8 @@ namespace
             while ( firstChild || jsonStr[pos] == ',' )
             {
                 pos++;
-                std::cout << "c" << pos << std::endl;
                 std::string childName;
                 pos = SkipString(jsonStr, pos, childName);
-                std::cout << "childName" << childName << std::endl;
                 
                 pos++;
                 pos = SkipBlankChar(jsonStr, pos);
@@ -228,9 +226,24 @@ namespace
             if ( jsonStr[pos] != '}' ) return std::string::npos;
             return pos+1;
         }
+        else if ( jsonStr[pos] == '[' ) //Array are translated into child named 0,1,2...
+        {
+            unsigned int index = 0;
+            while ( index == 0 || jsonStr[pos] == ',' )
+            {
+                pos++;
+                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(ToString(index)));
+
+                pos = SkipBlankChar(jsonStr, pos);
+                if ( pos >= jsonStr.length()) return std::string::npos;
+                index++;
+            }
+
+            if ( jsonStr[pos] != ']' ) return std::string::npos;
+            return pos+1;
+        }
         else if ( jsonStr[pos] == '"' ) //String
         {
-                std::cout << "b" << pos << std::endl;
             std::string str;
             pos = SkipString(jsonStr, pos, str);
             if ( pos >= jsonStr.length() ) return std::string::npos;
@@ -245,7 +258,6 @@ namespace
             const std::string separators = " \n,}";
             while (endPos < jsonStr.length() && separators.find_first_of(jsonStr[endPos]) == std::string::npos ) {
                 endPos++;
-                std::cout << "a"<< pos  << std::endl;
             }
 
             str = jsonStr.substr(pos, endPos-pos);

@@ -9,8 +9,8 @@
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCpp/RuntimeVariablesContainer.h"
 
-gd::Variable RuntimeVariablesContainer::badVariable;
-RuntimeVariablesContainer RuntimeVariablesContainer::badVariablesContainer;
+BadVariable RuntimeVariablesContainer::badVariable;
+BadRuntimeVariablesContainer RuntimeVariablesContainer::badVariablesContainer;
 
 RuntimeVariablesContainer::RuntimeVariablesContainer(const gd::VariablesContainer & container)
 {
@@ -68,4 +68,17 @@ const gd::Variable & RuntimeVariablesContainer::Get(const std::string & name) co
     gd::Variable * newVariable = new gd::Variable;
     variables[name] = newVariable;
     return *newVariable;
+}
+
+gd::Variable & RuntimeVariablesContainer::GetBadVariable()
+{
+    return badVariable;
+}
+
+/**
+ * \brief Return a "bad" variables container that can be used when no other valid container can be used.
+ */
+RuntimeVariablesContainer & RuntimeVariablesContainer::GetBadVariablesContainer()
+{
+    return badVariablesContainer;
 }

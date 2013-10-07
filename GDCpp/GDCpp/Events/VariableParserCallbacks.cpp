@@ -63,6 +63,8 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 	    output = "RuntimeVariablesContainer::GetBadVariablesContainer()";
 	    for (unsigned int i = 0;i<realObjects.size();++i)
 	    {
+        	context.ObjectsListNeeded(realObjects[i]);
+        	
 	        //Generate the call to GetVariables() method.
 	        if ( context.GetCurrentObject() == realObjects[i] && !context.GetCurrentObject().empty())
 	            output = codeGenerator.GetObjectListName(realObjects[i], context)+"[i]->GetVariables()";

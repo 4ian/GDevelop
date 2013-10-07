@@ -10,6 +10,8 @@
 #include <vector>
 #include "GDCore/PlatformDefinition/Variable.h"
 namespace gd { class VariablesContainer; };
+class BadRuntimeVariablesContainer;
+class BadVariable;
 
 /**
  * \brief Container for gd::Variable used at by games at runtime
@@ -67,36 +69,36 @@ public:
     /**
      * \brief Return a reference to the variable called \a name.
      */
-    gd::Variable & Get(const std::string & name);
+    virtual gd::Variable & Get(const std::string & name);
 
     /**
      * \brief Return a reference to the variable called \a name.
      */
-    const gd::Variable & Get(const std::string & name) const;
+    virtual const gd::Variable & Get(const std::string & name) const;
 
     /**
      * \brief Return a reference to the variable at the @ index position in the list.
      * \warning No bound check is made. Please use other overload of gd::VariablesContainer::Get when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
-    inline gd::Variable & Get(unsigned int index) { return *variablesArray[index]; }
+    virtual gd::Variable & Get(unsigned int index) { return *variablesArray[index]; }
 
     /**
      * \brief Return a reference to the variable at the @ index position in the list.
      * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
-    inline const gd::Variable & Get(unsigned int index) const { return *variablesArray[index]; }
+    virtual const gd::Variable & Get(unsigned int index) const { return *variablesArray[index]; }
 
     /**
      * \brief Return a "bad" variable that can be used when no other valid variable can be used.
      */
-    static gd::Variable & GetBadVariable() { return badVariable; }
+    static gd::Variable & GetBadVariable();
 
     /**
      * \brief Return a "bad" variables container that can be used when no other valid container can be used.
      */
-    static RuntimeVariablesContainer & GetBadVariablesContainer() { return badVariablesContainer; }
+    static RuntimeVariablesContainer & GetBadVariablesContainer();
 
     /**
      * \brief Merge the variables from the container with the already existing variables.
@@ -105,7 +107,7 @@ public:
      * Newly added variables are available thanks to their index. Be careful: If the container was not empty,
      * the index of the new variables are not the same as their index in the original container.
      */
-    void Merge(const gd::VariablesContainer & container);
+    virtual void Merge(const gd::VariablesContainer & container);
 
     /**
      * Get a map containing all variables.
@@ -121,8 +123,49 @@ private:
 
     std::vector < gd::Variable* > variablesArray;
     mutable std::map < std::string, gd::Variable* > variables;
-    static gd::Variable badVariable;
-    static RuntimeVariablesContainer badVariablesContainer;
+    static BadVariable badVariable;
+    static BadRuntimeVariablesContainer badVariablesContainer;
+};
+
+
+/**
+ * \brief "Bad" variable, used by events when no other valid variable can be found.
+ *
+ * This variable has no state and always return 0 or the empty string.
+ * \see RuntimeVariablesContainer
+ * \see BadRuntimeVariablesContainer
+ */
+class GD_API BadVariable : public gd::Variable
+{
+public:
+    BadVariable() : gd::Variable() {};
+    virtual ~BadVariable() {};
+
+    virtual void SetString(const std::string &) { };
+    virtual void SetValue(double) { };
+    virtual bool HasChild(const std::string & name) const { return false; }
+    virtual Variable & GetChild(const std::string & name) { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual const Variable & GetChild(const std::string & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
+};
+
+/**
+ * \brief "Bad" variable container, used by events when no other valid container can be found.
+ *
+ * This container has no state and always returns the bad variable ( see RuntimeVariablesContainer::GetBadVariable() ).
+ * \see RuntimeVariablesContainer
+ * \see BadVariable
+ */
+class GD_API BadRuntimeVariablesContainer : public RuntimeVariablesContainer
+{
+public:
+    BadRuntimeVariablesContainer() : RuntimeVariablesContainer() {};
+    virtual ~BadRuntimeVariablesContainer() {};
+
+    virtual gd::Variable & Get(const std::string & name) { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual const gd::Variable & Get(const std::string & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual gd::Variable & Get(unsigned int index) { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual const gd::Variable & Get(unsigned int index) const { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual void Merge(const gd::VariablesContainer & container) {}
 };
 
 #endif // RUNTIMEVARIABLESCONTAINER_H

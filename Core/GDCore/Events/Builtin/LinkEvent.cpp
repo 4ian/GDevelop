@@ -155,19 +155,22 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     wxRect rect(x+1, y, width, GetRenderedHeight(width, platform)-2);
     dc.DrawRectangle(rect);
 
-    dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
+    dc.DrawBitmap( wxBitmap( "res/events24.png", wxBITMAP_TYPE_ANY ), x+4, y + 1, true);
 
-    dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
+    if ( !IsDisabled() )
+        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    else
+        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _("Link to ")+GetTarget(), x+56, y + 16 );
+    dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
     wxRect lien = dc.GetTextExtent(_("Link to ")+GetTarget());
 
     dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
     if ( IncludeAllEvents() )
-        dc.DrawText( _("Include all events"), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Include all events"), x+lien.GetWidth()+32+10, y + 5 );
     else
-        dc.DrawText( _("Include events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Include events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+32+10, y + 5 );
 }
 
 /**
@@ -184,7 +187,7 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform
         dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
         wxRect lien = dc.GetTextExtent(_("Link to "));
 
-        renderedHeight = lien.GetHeight()+32;
+        renderedHeight = lien.GetHeight()+10;
         eventHeightNeedUpdate = false;
     }
 

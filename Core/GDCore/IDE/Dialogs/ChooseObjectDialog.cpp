@@ -125,6 +125,7 @@ void ChooseObjectDialog::Refresh()
     ObjectListDialogsHelper objectListsHelper(project, layout);
     objectListsHelper.SetSearchText(ToString(searchCtrl->GetValue()));
     objectListsHelper.SetAllowedObjectType(onlyObjectOfType);
+    objectListsHelper.SetGroupsAllowed(canSelectGroup);
     objectListsHelper.RefreshList(objectsList);
 }
 

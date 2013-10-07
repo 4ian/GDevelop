@@ -95,9 +95,9 @@ void ObjectListDialogsHelper::RefreshList(wxTreeCtrl * objectsList)
     objectsList->AddRoot( "Root" );
 
     AddObjectsToList(objectsList, layout, false, false);
-    AddGroupsToList(objectsList, layout.GetObjectGroups(), false, false);
+    if ( groupsAllowed ) AddGroupsToList(objectsList, layout.GetObjectGroups(), false, false);
     AddObjectsToList(objectsList, project, true, false);
-    AddGroupsToList(objectsList, project.GetObjectGroups(), true, false);
+    if ( groupsAllowed ) AddGroupsToList(objectsList, project.GetObjectGroups(), true, false);
 
     objectsList->ExpandAll();
 }
@@ -112,7 +112,8 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
         std::string name = objects.GetObject(i).GetName();
 
         //Only add objects if they match the search criteria
-        if ( ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
+        if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) && 
+            ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
         {
             /*int thumbnailID = -1;
             wxBitmap thumbnail;
@@ -148,7 +149,8 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
     wxTreeItemId lastAddedItem;
     for (unsigned int i = 0;i<groups.size();++i)
     {
-        if ( ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
+        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, project.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) && 
+            ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
             wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName()/*, 1*/ );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
@@ -169,5 +171,3 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
 }
 
 }
-
-

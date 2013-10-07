@@ -38,6 +38,7 @@ public:
 
     void SetSearchText(std::string searchText_) { searchText = searchText_; }
     void SetAllowedObjectType(std::string allowedObjectType_) { objectTypeAllowed = allowedObjectType_; }
+    void SetGroupsAllowed(bool canSelectGroup) { groupsAllowed = canSelectGroup; }
 
     /**
      * Update tree controls with objects and objects groups from the project and layout
@@ -72,6 +73,7 @@ private:
     const Layout & layout;
     std::string objectTypeAllowed;
     std::string searchText;
+    bool groupsAllowed;
 };
 
 }

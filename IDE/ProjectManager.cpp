@@ -1172,7 +1172,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasLayoutNamed(newLayoutName))
     {
-        newLayoutName = _("Copy of") + " " + newLayout.GetName() + " " + (i == 1 ? "" : ToString(i));
+        newLayoutName = _("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+ToString(i));
         ++i;
     }
 

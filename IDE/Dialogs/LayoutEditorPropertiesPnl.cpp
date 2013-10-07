@@ -21,10 +21,12 @@ using namespace gd;
 //(*IdInit(LayoutEditorPropertiesPnl)
 const long LayoutEditorPropertiesPnl::ID_PROPGRID = wxNewId();
 //*)
+const wxEventType LayoutEditorPropertiesPnl::refreshEventType = wxNewEventType();
 
 BEGIN_EVENT_TABLE(LayoutEditorPropertiesPnl,wxPanel)
 	//(*EventTable(LayoutEditorPropertiesPnl)
 	//*)
+    EVT_COMMAND(wxID_ANY, LayoutEditorPropertiesPnl::refreshEventType, LayoutEditorPropertiesPnl::OnMustRefresh)
 END_EVENT_TABLE()
 
 LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Project & project_,
@@ -67,6 +69,11 @@ LayoutEditorPropertiesPnl::~LayoutEditorPropertiesPnl()
 {
 	//(*Destroy(LayoutEditorPropertiesPnl)
 	//*)
+}
+
+void LayoutEditorPropertiesPnl::OnMustRefresh(wxCommandEvent&)
+{
+    Refresh();
 }
 
 void LayoutEditorPropertiesPnl::Refresh()
@@ -137,8 +144,11 @@ void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
     if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
     if ( object )
     {
-        if ( objectsHelper.OnPropertySelected(object, &layout, event) )
-            ;//Refresh(); No refreshing, can trigger a crash
+        if ( objectsHelper.OnPropertySelected(object, &layout, event) ) {   
+            wxCommandEvent refreshEvent(refreshEventType);
+            wxPostEvent(grid, refreshEvent);
+            //Refresh(); Can trigger a crash
+        }
     }
 }
 
@@ -164,8 +174,11 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
     }
     if ( object )
     {
-        if ( objectsHelper.OnPropertyChanged(object, &layout, event) )
-            ;//Refresh(); No refreshing, can trigger a crash
+        if ( objectsHelper.OnPropertyChanged(object, &layout, event) ){   
+            wxCommandEvent refreshEvent(refreshEventType);
+            wxPostEvent(grid, refreshEvent);
+            //Refresh(); Can trigger a crash
+        }
     }
 }
 

@@ -209,7 +209,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	centerPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(centerPanel);
 	FlexGridSizer3->SetSizeHints(centerPanel);
-	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("centerPane")).Caption(_("Pane caption")).CaptionVisible(false).Center().DockFixed());
+	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("centerPane")).DefaultPane().Caption(_("Pane caption")).CaptionVisible(false).Center().DockFixed());
 	animationsPanel = new wxPanel(this, ID_PANEL3, wxPoint(352,456), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer2 = new wxFlexGridSizer(2, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
@@ -232,7 +232,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	animationsPanel->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(animationsPanel);
 	FlexGridSizer2->SetSizeHints(animationsPanel);
-	mgr->AddPane(animationsPanel, wxAuiPaneInfo().Name(_T("animationsPane")).Caption(_("Animations")).CaptionVisible().CloseButton(false).Left());
+	mgr->AddPane(animationsPanel, wxAuiPaneInfo().Name(_T("animationsPane")).DefaultPane().Caption(_("Animations")).CaptionVisible().CloseButton(false).Left());
 	imagesPanel = new wxPanel(this, ID_PANEL2, wxPoint(356,449), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -242,7 +242,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	imagesPanel->SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(imagesPanel);
 	FlexGridSizer1->SetSizeHints(imagesPanel);
-	mgr->AddPane(imagesPanel, wxAuiPaneInfo().Name(_T("imagePane")).Caption(_("Images")).CaptionVisible().CloseButton(false).Bottom());
+	mgr->AddPane(imagesPanel, wxAuiPaneInfo().Name(_T("imagePane")).DefaultPane().Caption(_("Images")).CaptionVisible().CloseButton(false).Bottom());
 	maskPanel = new wxPanel(this, ID_PANEL8, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL8"));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
@@ -260,7 +260,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_MASKAPPLYWHOLEANIMITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->Realize();
-	AuiManager3->AddPane(maskToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
+	AuiManager3->AddPane(maskToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().DefaultPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager3->Update();
 	FlexGridSizer6->Add(Panel3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	maskTree = new wxTreeListCtrl(maskPanel,ID_TREELISTCTRL1,wxDefaultPosition,wxDefaultSize,0,_T("ID_TREELISTCTRL1"));
@@ -268,7 +268,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	maskPanel->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->Fit(maskPanel);
 	FlexGridSizer6->SetSizeHints(maskPanel);
-	mgr->AddPane(maskPanel, wxAuiPaneInfo().Name(_T("maskPane")).Caption(_("Collision masks ( Hit boxes )")).CaptionVisible().Right());
+	mgr->AddPane(maskPanel, wxAuiPaneInfo().Name(_T("maskPane")).DefaultPane().Caption(_("Collision masks ( Hit boxes )")).CaptionVisible().Right());
 	pointsPanel = new wxPanel(this, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL5"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
@@ -281,7 +281,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	pointToolbar->AddSeparator();
 	pointToolbar->AddTool(ID_POINTAPPLYWHOLEANIMITEM, _("Apply the changes to the whole animation"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, _("Apply changes to the whole animation"), wxEmptyString, NULL);
 	pointToolbar->Realize();
-	AuiManager2->AddPane(pointToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
+	AuiManager2->AddPane(pointToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().DefaultPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager2->Update();
 	FlexGridSizer5->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	pointsList = new wxListCtrl(pointsPanel, ID_LISTCTRL3, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_EDIT_LABELS, wxDefaultValidator, _T("ID_LISTCTRL3"));
@@ -289,9 +289,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	pointsPanel->SetSizer(FlexGridSizer5);
 	FlexGridSizer5->Fit(pointsPanel);
 	FlexGridSizer5->SetSizeHints(pointsPanel);
-	mgr->AddPane(pointsPanel, wxAuiPaneInfo().Name(_T("pointsPane")).Caption(_("Points")).CaptionVisible().Right());
+	mgr->AddPane(pointsPanel, wxAuiPaneInfo().Name(_T("pointsPane")).DefaultPane().Caption(_("Points")).CaptionVisible().Right());
 	previewPanel = new wxPanel(this, ID_PANEL10, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL10"));
-	mgr->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).Caption(_("Preview")).CaptionVisible().Left());
+	mgr->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).DefaultPane().Caption(_("Preview")).CaptionVisible().Left());
 	mgr->Update();
 	MenuItem2 = new wxMenu();
 	automaticRotationItem = new wxMenuItem(MenuItem2, ID_MENUITEM5, _("Automatic rotation"), wxEmptyString, wxITEM_RADIO);
@@ -352,6 +352,10 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	imagePanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelLeftUp,0,this);
 	imagePanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelMouseMove,0,this);
 	imagePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelResize,0,this);
+	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnyScrollBarScroll);
+	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnyScrollBarScroll);
+	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnxScrollBarScroll);
+	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnxScrollBarScroll);
 	Connect(ID_AUITOOLBARITEM5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddAnimationSelected);
 	Connect(ID_AUITOOLBARITEM8,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteAnimationSelected);
 	Connect(ID_TOOLLOOP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnToolLoopClick);
@@ -1788,5 +1792,16 @@ void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
-#endif
+void SpriteObjectEditor::OnyScrollBarScroll(wxScrollEvent& event)
+{
+	imagePanel->Refresh();
+	imagePanel->Update();
+}
 
+void SpriteObjectEditor::OnxScrollBarScroll(wxScrollEvent& event)
+{
+	imagePanel->Refresh();
+	imagePanel->Update();
+}
+
+#endif

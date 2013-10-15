@@ -114,6 +114,8 @@
 										<pagesize>1</pagesize>
 										<minsize>16,0</minsize>
 										<style>wxSB_VERTICAL</style>
+										<handler function="OnyScrollBarScroll" entry="EVT_COMMAND_SCROLL" />
+										<handler function="OnyScrollBarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								</object>
@@ -123,6 +125,8 @@
 										<range>10</range>
 										<pagesize>1</pagesize>
 										<style>wxSB_HORIZONTAL</style>
+										<handler function="OnxScrollBarScroll" entry="EVT_COMMAND_SCROLL" />
+										<handler function="OnxScrollBarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<option>1</option>

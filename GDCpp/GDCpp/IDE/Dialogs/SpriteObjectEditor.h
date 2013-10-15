@@ -210,6 +210,8 @@ private:
     void OnAddPolygonMaskClick(wxCommandEvent& event);
     void OnAddVerticeClick(wxCommandEvent& event);
     void OnRotatePolygonSelected(wxCommandEvent& event);
+    void OnyScrollBarScroll(wxScrollEvent& event);
+    void OnxScrollBarScroll(wxScrollEvent& event);
     //*)
     void OnmaskTreeItemRClick(wxTreeListEvent& event);
     void OnmaskTreeItemActivated(wxTreeListEvent& event);

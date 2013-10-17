@@ -1,0 +1,730 @@
+/** \file
+ *  Game Develop
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ */
+#include "LayoutEditorCanvas.h"
+#include <cmath>
+#include <wx/wx.h>
+#include <wx/config.h>
+#include <wx/filename.h>
+#include <wx/ribbon/bar.h>
+#include <wx/ribbon/page.h>
+#include <wx/ribbon/buttonbar.h>
+#include <wx/aui/aui.h>
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
+#include "GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/Dialogs/GridSetupDialog.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/Clipboard.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ImageManager.h"
+#include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/CommonTools.h"
+
+using namespace std;
+
+namespace gd
+{
+
+void LayoutEditorCanvas::OnUpdate()
+{
+    if (!editing)
+    {
+        if ( currentPreviewer ) currentPreviewer->OnUpdate();
+    }
+    else
+    {
+        //First reload some images if necessary.
+        if ( !project.imagesChanged.empty() )
+        {
+            if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+                wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
+
+            for (unsigned int i = 0;i<project.imagesChanged.size();++i)
+                project.GetImageManager()->ReloadImage(project.imagesChanged[i]);
+
+            project.GetImageManager()->LoadPermanentImages();
+            project.imagesChanged.clear();
+            layout.SetRefreshNeeded();
+
+            wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
+            std::cout << "CWDe:" << wxGetCwd();
+        }
+        if ( firstRefresh )
+        {
+            firstRefresh = false;
+            ReloadResources();
+        }
+
+        //Then display the layout
+        RenderEdittime();
+        UpdateScrollbars();
+
+    }
+}
+
+void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
+{
+    //Create the shapes
+    boost::shared_ptr<sf::Shape> selection = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    selection->setPosition(rectangle.left, rectangle.top);
+    selection->setFillColor(sf::Color( 0, 0, 200, 40 ));
+    selection->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
+    selection->setOutlineThickness(1);
+
+    //Add the shape to be drawn
+    target.push_back(selection);
+}
+
+void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle )
+{
+    //Create the shapes
+    boost::shared_ptr<sf::Shape> centerShape = boost::shared_ptr<sf::Shape>(new sf::CircleShape(3));
+    centerShape->setPosition(position);
+    centerShape->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
+    centerShape->setOutlineThickness(1);
+    centerShape->setFillColor(sf::Color( 0, 0, 200, 40 ));
+    centerShape->setOrigin(sf::Vector2f(3,3));
+
+    boost::shared_ptr<sf::Shape> angleButton = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    angleButton->setPosition(position+sf::Vector2f(25.0*cos(angle/180.0*3.14159), 25.0*sin(angle/180.0*3.14159)));
+    angleButton->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
+    angleButton->setOutlineThickness(1);
+    angleButton->setOrigin(sf::Vector2f(smallButtonSize/2.0, smallButtonSize/2.0));
+
+    boost::shared_ptr<sf::Shape> line = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(26, 1)));
+    line->setPosition(position+sf::Vector2f(3.0*cos(angle/180.0*3.14159), 3.0*sin(angle/180.0*3.14159)));
+    line->setRotation(angle);
+    line->setFillColor(sf::Color( 0, 0, 200, 128 ));
+    line->setOutlineThickness(0);
+
+    //Declare the angle button as a gui element
+    gd::LayoutEditorCanvasGuiElement guiElement;
+    guiElement.name = "angle";
+    guiElement.area = wxRect(angleButton->getPosition().x-smallButtonSize/2.0, angleButton->getPosition().y-smallButtonSize/2.0, smallButtonSize, smallButtonSize);
+    guiElements.push_back(guiElement);
+    if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
+        angleButton->setFillColor(sf::Color( 220, 220, 220, 255 ));
+    else
+        angleButton->setFillColor(sf::Color( 255, 255, 255, 255 ));
+
+    angleButtonCenter = position; //Save the position of the center to calculate the new angle when we'll be dragging the button ( See OnMoving method )
+
+    //Add the shape to be drawn
+    target.push_back(line);
+    target.push_back(centerShape);
+    target.push_back(angleButton);
+}
+
+void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
+{
+    boost::shared_ptr<sf::Shape> highlight = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    highlight->setPosition(rectangle.left, rectangle.top);
+    highlight->setFillColor(sf::Color( 230, 230, 230, 20 ));
+    highlight->setOutlineColor(sf::Color( 200, 200, 200, 70 ));
+    highlight->setOutlineThickness(1);
+
+    target.push_back(highlight);
+}
+
+void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
+{
+    //Declare the button as a gui element
+    gd::LayoutEditorCanvasGuiElement guiElement;
+    guiElement.name = buttonName;
+    guiElement.area = wxRect(position.x, position.y, smallButtonSize, smallButtonSize);
+    guiElements.push_back(guiElement);
+
+    //Draw button
+    boost::shared_ptr<sf::Shape> button = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    button->setPosition(position);
+    button->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
+    button->setOutlineThickness(1);
+    if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
+        button->setFillColor(sf::Color( 220, 220, 220, 255 ));
+    else
+        button->setFillColor(sf::Color( 255, 255, 255, 255 ));
+
+    target.push_back(button);
+}
+
+/**
+ * \brief Internal Tool class used to display instances at edittime
+ */
+class InstancesRenderer : public gd::InitialInstanceFunctor
+{
+public:
+    InstancesRenderer(LayoutEditorCanvas & editor_, gd::InitialInstance * highlightedInstance_, std::vector < boost::shared_ptr<sf::Shape> > & guiElementsShapes_) :
+        drawResizeButtons(false),
+        resizeButtonsMaxX(0),
+        resizeButtonsMinX(0),
+        resizeButtonsMaxY(0),
+        resizeButtonsMinY(0),
+        selectionAngle(0),
+        editor(editor_),
+        highlightedInstance(highlightedInstance_),
+        guiElementsShapes(guiElementsShapes_)
+    {};
+    virtual ~InstancesRenderer() {};
+
+    virtual void operator()(gd::InitialInstance & instance)
+    {
+        gd::Object * associatedObject = editor.GetObjectLinkedToInitialInstance(instance);
+        if ( !associatedObject ) return;
+
+        associatedObject->DrawInitialInstance(instance, editor, editor.project, editor.layout);
+        sf::Vector2f origin = associatedObject->GetInitialInstanceOrigin(instance, editor.project, editor.layout);
+        sf::Vector2f size = sf::Vector2f(instance.GetCustomWidth(), instance.GetCustomHeight());
+        if ( !instance.HasCustomSize() )
+            size = associatedObject->GetInitialInstanceDefaultSize(instance, editor.project, editor.layout);
+
+        //Selection rectangle
+        if ( editor.selectedInstances.find(&instance) != editor.selectedInstances.end() )
+        {
+            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x, instance.GetY()-origin.y, editor.editionView);
+            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x+size.x, instance.GetY()-origin.y+size.y, editor.editionView);
+
+            editor.DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
+
+            if ( !drawResizeButtons )
+            {
+                resizeButtonsMaxX = rectangleEnd.x;
+                resizeButtonsMaxY = rectangleEnd.y;
+                resizeButtonsMinX = rectangleOrigin.x;
+                resizeButtonsMinY = rectangleOrigin.y;
+                selectionAngle = instance.GetAngle();
+                drawResizeButtons = true;
+            }
+            else
+            {
+                resizeButtonsMaxX = std::max(resizeButtonsMaxX, rectangleEnd.x);
+                resizeButtonsMaxY = std::max(resizeButtonsMaxY, rectangleEnd.y);
+                resizeButtonsMinX = std::min(resizeButtonsMinX, rectangleOrigin.x);
+                resizeButtonsMinY = std::min(resizeButtonsMinY, rectangleOrigin.y);
+            }
+        }
+        else if ( highlightedInstance == &instance )
+        {
+            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x, instance.GetY()-origin.y, editor.editionView);
+            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()-origin.x+size.x, instance.GetY()-origin.y+size.y, editor.editionView);
+
+            editor.DrawHighlightRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
+        }
+    }
+
+    bool drawResizeButtons;
+    float resizeButtonsMaxX;
+    float resizeButtonsMinX;
+    float resizeButtonsMaxY;
+    float resizeButtonsMinY;
+    float selectionAngle;
+
+private:
+    LayoutEditorCanvas & editor;
+    gd::InitialInstance * highlightedInstance;
+    std::vector < boost::shared_ptr<sf::Shape> > & guiElementsShapes;
+};
+
+void LayoutEditorCanvas::RenderEdittime()
+{
+    clear( sf::Color( layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue() ) );
+    setView(editionView);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    pushGLStates(); //To allow using OpenGL to draw
+
+    //Prepare GUI elements and the renderer
+    std::vector < boost::shared_ptr<sf::Shape> > guiElementsShapes;
+    guiElements.clear();
+    InstancesRenderer renderer(*this, GetInitialInstanceUnderCursor(), guiElementsShapes);
+
+    for (unsigned int layerIndex =0;layerIndex<layout.GetLayersCount();++layerIndex)
+    {
+        if ( layout.GetLayer(layerIndex).GetVisibility() )
+        {
+            popGLStates();
+
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluPerspective(layout.GetOpenGLFOV(), static_cast<double>(getSize().x)/static_cast<double>(getSize().y), layout.GetOpenGLZNear(), layout.GetOpenGLZFar());
+
+            glViewport(0,0, getSize().x, getSize().y);
+
+            pushGLStates();
+
+            instances.IterateOverInstancesWithZOrdering(renderer, layout.GetLayer(layerIndex).GetName());
+        }
+    }
+
+
+    //Go back to "window" view before drawing GUI elements
+    setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
+
+    if ( options.grid ) RenderGrid();
+
+    if ( renderer.drawResizeButtons )
+    {
+        float resizeButtonsMaxX = renderer.resizeButtonsMaxX;
+        float resizeButtonsMinX = renderer.resizeButtonsMinX;
+        float resizeButtonsMaxY = renderer.resizeButtonsMaxY;
+        float resizeButtonsMinY = renderer.resizeButtonsMinY;
+
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeLeftUp");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeUp");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeRightUp");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), "resizeRight");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeRightDown");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeDown");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeLeftDown");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), "resizeLeft" );
+        DrawAngleButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), renderer.selectionAngle);
+    }
+
+    if ( isSelecting )
+    {
+        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(selectionRectangle.GetX(), selectionRectangle.GetY(),
+                                                                  editionView);
+
+        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(selectionRectangle.GetBottomRight().x,
+                                                               selectionRectangle.GetBottomRight().y,
+                                                               editionView);
+
+        DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin));
+    }
+
+    for (unsigned int i = 0;i<guiElementsShapes.size();++i)
+    	draw(*guiElementsShapes[i]);
+
+    if ( options.windowMask )
+    {
+        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionView.getCenter().x-project.GetMainWindowDefaultWidth()/2,
+                                                                  editionView.getCenter().y-project.GetMainWindowDefaultHeight()/2,
+                                                                  editionView);
+
+        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionView.getCenter().x+project.GetMainWindowDefaultWidth()/2,
+                                                                  editionView.getCenter().y+project.GetMainWindowDefaultHeight()/2,
+                                                                  editionView);
+        sf::Color maskColor((layout.GetBackgroundColorRed()+128)%255, (layout.GetBackgroundColorGreen()+128)%255, (layout.GetBackgroundColorBlue()+128)%255, 128);
+
+        {
+            sf::RectangleShape mask(sf::Vector2f(getSize().x, rectangleOrigin.y));
+            mask.setPosition(0, 0);
+            mask.setFillColor(maskColor);
+            draw(mask);
+        }
+        {
+            sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, getSize().y-rectangleOrigin.y));
+            mask.setPosition(0, rectangleOrigin.y);
+            mask.setFillColor(maskColor);
+            draw(mask);
+        }
+        {
+            sf::RectangleShape mask(sf::Vector2f(getSize().x-rectangleEnd.x, getSize().y-rectangleOrigin.y));
+            mask.setPosition(rectangleEnd.x, rectangleOrigin.y);
+            mask.setFillColor(maskColor);
+            draw(mask);
+        }
+        {
+            sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, getSize().y-rectangleEnd.y));
+            mask.setPosition(rectangleOrigin.x, rectangleEnd.y);
+            mask.setFillColor(maskColor);
+            draw(mask);
+        }
+    }
+
+    setView(editionView);
+    popGLStates();
+    display();
+}
+
+
+void LayoutEditorCanvas::RenderGrid()
+{
+    int initialXPos = floor((editionView.getCenter().x-editionView.getSize().x/2) / options.gridWidth)-options.gridWidth;
+    initialXPos *= options.gridWidth;
+    int initialYPos = floor((editionView.getCenter().y-editionView.getSize().y/2) / options.gridHeight)-options.gridHeight;
+    initialYPos *= options.gridHeight;
+
+    for ( int Xpos = initialXPos;Xpos < (editionView.getCenter().x+editionView.getSize().x/2) ; Xpos += options.gridWidth )
+    {
+        sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(Xpos, initialYPos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
+                              sf::Vertex(ConvertToWindowCoordinates(Xpos, editionView.getCenter().y+editionView.getSize().y/2, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
+        draw(line, 2, sf::Lines);
+    }
+
+    for ( int Ypos = initialYPos;Ypos < (editionView.getCenter().y+editionView.getSize().y/2) ; Ypos += options.gridHeight )
+    {
+        sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(initialXPos, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
+                              sf::Vertex(ConvertToWindowCoordinates(editionView.getCenter().x+editionView.getSize().x/2, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
+        draw(line, 2, sf::Lines);
+    }
+}
+
+sf::Vector2f LayoutEditorCanvas::ConvertToWindowCoordinates(float x, float y, const sf::View & view)
+{
+    //Transform by the view matrix
+    sf::Vector2f hCoords = view.getTransform().transformPoint(x,y);
+
+    //Go back from homogeneous coordinates to viewport ones.
+    sf::IntRect viewport = getViewport(view);
+    return sf::Vector2f(( hCoords.x + 1.f ) / 2.f * viewport.width + viewport.left,
+                        (-hCoords.y + 1.f ) / 2.f * viewport.height + viewport.top);
+}
+
+void LayoutEditorCanvas::OnDeleteObjectSelected(wxCommandEvent & event)
+{
+    std::vector<gd::InitialInstance*> instancesToDelete;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        instancesToDelete.push_back(it->first);
+
+    DeleteInstances(instancesToDelete);
+
+    ClearSelection();
+    ChangesMade();
+}
+
+void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
+{
+    gd::ChooseObjectTypeDialog chooseTypeDialog(this, project);
+    if ( chooseTypeDialog.ShowModal() == 0 )
+        return;
+
+    //Find a new unique name for the object
+    std::string name = ToString(_("NewObject"));
+    for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
+        name =  _("NewObject")+ToString(i);
+
+    //Add a new object of selected type to objects list
+    layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, layout.GetObjectsCount());
+
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->ObjectsUpdated();
+
+    //Add it on the layout ( Use oldMouseX/Y as the cursor has moved since the right click )
+    AddObject(name, oldMouseX, oldMouseY);
+
+    //Edit now the object
+    gd::Object & object = layout.GetObject(name);
+    object.EditObject(this, project, mainFrameWrapper);
+    project.GetCurrentPlatform().GetChangesNotifier().OnObjectEdited(project, &layout, layout.GetObject(name));
+
+    //Reload resources
+    if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+        wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+
+    object.LoadResources(project, layout);
+
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+}
+
+void LayoutEditorCanvas::OnLockSelected(wxCommandEvent & event)
+{
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        if ( it->first ) it->first->SetLocked();
+
+    ClearSelection();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+void LayoutEditorCanvas::OnUnLockSelected(wxCommandEvent & event)
+{
+    gd::InitialInstance * instance = GetInitialInstanceAtPosition(oldMouseX, oldMouseY, /*pickOnlyLockedInstances=*/true);
+    if ( instance )
+    {
+        instance->SetLocked(false);
+
+        ClearSelection();
+        SelectInstance(instance);
+        for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+            (*it)->InitialInstancesUpdated();
+    }
+}
+
+void LayoutEditorCanvas::OnCopySelected(wxCommandEvent & event)
+{
+    vector < boost::shared_ptr<gd::InitialInstance> > copiedPositions;
+
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if ( it->first == NULL ) continue;
+
+        copiedPositions.push_back(boost::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
+        copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
+    }
+
+    gd::Clipboard::GetInstance()->SetInstances(copiedPositions);
+}
+
+void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
+{
+    vector < boost::shared_ptr<gd::InitialInstance> > copiedPositions;
+
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if ( it->first == NULL ) continue;
+
+        copiedPositions.push_back(boost::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
+        copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
+    }
+    gd::Clipboard::GetInstance()->SetInstances(copiedPositions);
+    ChangesMade();
+
+    //Do not forget to remove the cut instances
+    std::vector<gd::InitialInstance*> instancesToDelete;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        instancesToDelete.push_back(it->first);
+
+    DeleteInstances(instancesToDelete);
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
+{
+    if ( !gd::Clipboard::GetInstance()->HasInstances() ) return;
+
+    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::GetInstance()->GetInstances();
+
+    for (unsigned int i =0;i<pastedInstances.size();++i)
+    {
+        gd::InitialInstance & instance = instances.InsertInitialInstance(*pastedInstances[i]->Clone());
+        instance.SetX(instance.GetX()+oldMouseX);
+        instance.SetY(instance.GetY()+oldMouseY);
+    }
+
+    ChangesMade();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
+{
+    if ( !gd::Clipboard::GetInstance()->HasInstances() ) return;
+    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::GetInstance()->GetInstances();
+    if ( pastedInstances.empty() || pastedInstances[0] == boost::shared_ptr<gd::InitialInstance>() ) return;
+
+    gd::InstancesAdvancedPasteDialog dialog(this);
+    dialog.SetStartX(oldMouseX);
+    dialog.SetStartY(oldMouseY);
+
+    boost::shared_ptr<gd::InitialInstance> instance = boost::shared_ptr<gd::InitialInstance>(pastedInstances[0]->Clone());
+    if ( instance != boost::shared_ptr<gd::InitialInstance>() )
+    {
+        sf::Vector2f size = GetInitialInstanceSize(*instance);
+        dialog.SetXGap(size.x);
+        dialog.SetYGap(size.y);
+    }
+
+    if ( dialog.ShowModal() != 1 ) return;
+
+    float angle = dialog.GetRotationIncrementation();
+    for (unsigned int i = 0;i<dialog.GetYCount();++i)
+    {
+        for (unsigned int j = 0;j<dialog.GetXCount();++j)
+        {
+            gd::InitialInstance & insertedInstance = instances.InsertInitialInstance(*instance);
+            insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);
+            insertedInstance.SetY(dialog.GetStartY()+dialog.GetYGap()*i);
+            insertedInstance.SetAngle(instance->GetAngle() + angle);
+
+            angle += dialog.GetRotationIncrementation();
+        }
+    }
+
+    ChangesMade();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+void LayoutEditorCanvas::EnsureVisible(const gd::InitialInstance & instance)
+{
+    editionView.setCenter(instance.GetX(), instance.GetY());
+}
+
+void LayoutEditorCanvas::OnZoomInitBtClick( wxCommandEvent & event )
+{
+    options.zoomFactor = 1;
+    UpdateViewAccordingToZoomFactor();
+}
+
+void LayoutEditorCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
+{
+    evt.PopupMenu(&zoomMenu);
+}
+
+void LayoutEditorCanvas::OnPreviewDropDownBtClick(wxRibbonButtonBarEvent& evt)
+{
+    evt.PopupMenu(&platformsMenu);
+}
+
+void LayoutEditorCanvas::OnMouseWheel( wxMouseEvent &event )
+{
+    if (!editing) return;
+
+    if ( ctrlPressed )
+    {
+        float rotation = -event.GetWheelRotation()*8;
+        float newheight = editionView.getSize().y + ( rotation / 25 );
+        float newZoomFactor = static_cast<float>(getSize().y)/newheight;
+        if ( newZoomFactor > 0 ) options.zoomFactor = newZoomFactor;
+        UpdateViewAccordingToZoomFactor();
+    }
+    else if ( altPressed )
+    {
+        editionView.move(-event.GetWheelRotation(), 0);
+        UpdateScrollbars();
+    }
+    else
+    {
+        editionView.move(0, -event.GetWheelRotation());
+        UpdateScrollbars();
+    }
+}
+
+void LayoutEditorCanvas::OnCustomZoom5Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.05;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom10Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.10;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom25Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.25;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom50Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.5;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom100Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 1.0;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom150Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 1.5;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom200Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 2.0;
+    UpdateViewAccordingToZoomFactor();
+}
+void LayoutEditorCanvas::OnCustomZoom500Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 5.0;
+    UpdateViewAccordingToZoomFactor();
+}
+
+void LayoutEditorCanvas::OnOrigineBtClick(wxCommandEvent & event )
+{
+    editionView.setCenter( (project.GetMainWindowDefaultWidth()/2),(project.GetMainWindowDefaultHeight()/2));
+}
+
+void LayoutEditorCanvas::UpdateSize()
+{
+    if (parentControl == NULL) return;
+
+    if ( editing )
+    {
+        //Scene takes all the space available in edition mode.
+
+        //This line is unnecessary and create a crash related to X on Linux.
+        //Window::SetSize(parentControl->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), parentControl->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
+        wxWindowBase::SetPosition(wxPoint(0,0));
+        wxWindowBase::SetSize(parentControl->GetSize().GetWidth() - (vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
+                              parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0));
+
+        UpdateViewAccordingToZoomFactor();
+    }
+    else
+    {
+        //Scene has the size of the project's window size in preview mode.
+        Window::setSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
+        wxWindowBase::SetClientSize(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
+
+        //TODO : if ( externalWindow ) externalWindow->SetSizeOfRenderingZone(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
+
+        //Scene is centered in preview mode
+        wxWindowBase::SetPosition(wxPoint((parentControl->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
+                              (parentControl->GetSize().GetHeight()-wxWindowBase::GetSize().GetY())/2));
+    }
+}
+
+void LayoutEditorCanvas::OnvScrollbarScroll(wxScrollEvent& event)
+{
+    if ( vScrollbar == NULL )
+        return;
+
+    int newY = event.GetPosition()-(vScrollbar->GetRange()/2)+(getSize().y/2);
+    editionView.setCenter( editionView.getCenter().x, newY);
+
+    OnUpdate();
+}
+
+void LayoutEditorCanvas::OnhScrollbarScroll(wxScrollEvent& event)
+{
+    if ( hScrollbar == NULL )
+        return;
+
+    int newX = event.GetPosition()-(hScrollbar->GetRange()/2)+(getSize().x/2);
+    editionView.setCenter( newX, editionView.getCenter().y );
+
+    OnUpdate();
+}
+
+void LayoutEditorCanvas::UpdateScrollbars()
+{
+    if ( hScrollbar == NULL || vScrollbar == NULL )
+        return;
+
+    //Compute the thumb position
+    int thumbY = editionView.getCenter().y+vScrollbar->GetRange()/2-getSize().y/2;
+    vScrollbar->SetScrollbar(thumbY, getSize().y, vScrollbar->GetRange(), getSize().y);
+
+    int thumbX = editionView.getCenter().x+hScrollbar->GetRange()/2-getSize().x/2;
+    hScrollbar->SetScrollbar(thumbX, getSize().x, hScrollbar->GetRange(), getSize().x);
+
+    //Update the size if needed
+    if ( thumbY <= 0 || static_cast<int>(thumbY+getSize().y) >= vScrollbar->GetRange())
+    {
+        int ajout = getSize().y;
+        vScrollbar->SetScrollbar(thumbY+ajout/2, getSize().y, vScrollbar->GetRange()+ajout, getSize().y);
+    }
+
+    if ( thumbX <= 0 || static_cast<int>(thumbX+getSize().x) >= hScrollbar->GetRange())
+    {
+        int ajout = getSize().x;
+        hScrollbar->SetScrollbar(thumbX+ajout/2, getSize().x, hScrollbar->GetRange()+ajout, getSize().x);
+    }
+}
+void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
+{
+    editionView.setSize(GetClientSize().GetWidth()/options.zoomFactor, GetClientSize().GetHeight()/options.zoomFactor);
+}
+
+void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilprojects.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
+}
+
+
+}

@@ -4,6 +4,7 @@
  */
 #include "ObjectsPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -63,14 +64,44 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
     for (unsigned int i = 0;i<automatisms.size();++i)
     {
         const gd::Automatism & automatism = object->GetAutomatism(automatisms[i]);
+        std::map<std::string, gd::PropgridPropertyDescriptor> properties = automatism.GetProperties(project);
 
         grid->AppendIn( "AUTO", new wxPropertyCategory(gd::ToString(automatism.GetName())) );
-        grid->Append( new wxStringProperty(_("Edition"), wxString("AUTO:"+automatisms[i]), _("Click to edit...")) );
-        grid->SetPropertyCell(wxString("AUTO:"+automatisms[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-        grid->SetPropertyReadOnly(wxString("AUTO:"+automatisms[i]));
+        if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
+        {
+            //"Click to edit" is not shown if properties are not empty, except if the magic property is set.
+            grid->Append( new wxStringProperty(_("Edition"), wxString("AUTO:"+automatisms[i]), _("Click to edit...")) );
+            grid->SetPropertyCell(wxString("AUTO:"+automatisms[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+            grid->SetPropertyReadOnly(wxString("AUTO:"+automatisms[i]));
+        }
         grid->Append( new wxStringProperty("", "AUTO_RENAME:"+automatisms[i], _("Rename...")) );
         grid->SetPropertyCell(wxString("AUTO_RENAME:"+automatisms[i]), 1, _("Rename..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+automatisms[i]));
+
+        //Add automatism custom properties
+        for (std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = properties.begin();
+            it != properties.end();++it)
+        {
+            if ( (*it).first == "PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS" ) continue; //Skip the magic property.
+
+            std::string type = (*it).second.GetType();
+            std::string value = (*it).second.GetValue();
+            std::string name = (*it).first;
+            if ( type == "Choice" )
+            {
+                const std::vector<std::string> & choices = (*it).second.GetExtraInfo();
+                wxArrayString choicesArray;
+                for (unsigned int j = 0; j < choices.size(); ++j)
+                    choicesArray.push_back(choices[j]);
+
+                wxEnumProperty * prop = new wxEnumProperty(name, "AUTO_PROP:"+automatisms[i], choicesArray);
+                prop->SetChoiceSelection(choicesArray.Index(value));
+                grid->Append(prop);
+            }
+            else
+                grid->Append(new wxStringProperty(name, "AUTO_PROP:"+automatisms[i], value));
+        }
+
     }
 
 
@@ -293,6 +324,22 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObject ? NULL : layout, *object, oldName);
 
         return true;*/
+    }
+    else if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
+    {
+        std::string autoName = gd::ToString(event.GetPropertyName().substr(10));
+        if ( !object->HasAutomatismNamed(autoName))
+        {
+            event.Veto();
+            return false;
+        }
+
+        gd::Automatism & automatism = object->GetAutomatism(autoName);
+        if ( !automatism.UpdateProperty(ToString(event.GetProperty()->GetLabel()), ToString(event.GetPropertyValue().GetString()), project) )
+        {
+            event.Veto();
+            return false;
+        }
     }
 
     return false;

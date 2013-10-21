@@ -8,6 +8,9 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/TinyXml/tinyxml.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#endif
 #include <SFML/Graphics.hpp>
 
 namespace gd
@@ -81,9 +84,9 @@ gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::stri
     return automatism;
 }
 
-std::map<std::string, std::string> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
+std::map<std::string, gd::PropgridPropertyDescriptor> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
 {
-    std::map<std::string, std::string> nothing;
+    std::map<std::string, gd::PropgridPropertyDescriptor> nothing;
     return nothing;
 }
 

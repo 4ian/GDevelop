@@ -10,6 +10,7 @@
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include <SFML/System/Vector2.hpp>
+namespace gd { class PropgridPropertyDescriptor; }
 namespace gd { class Automatism; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -116,7 +117,7 @@ public:
      * \return a std::map with properties names as key and values.
      * \see gd::InitialInstance
      */
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout);
+    virtual std::map<std::string, gd::PropgridPropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout);
 
     /**
      * \brief Called when the IDE wants to update a custom property of an initial instance of this object.

@@ -5,7 +5,11 @@
 #ifndef GDCORE_AUTOMATISM_H
 #define GDCORE_AUTOMATISM_H
 #include <string>
+#include <map>
+#if defined(GD_IDE_ONLY)
+namespace gd { class PropgridPropertyDescriptor; }
 namespace gd { class MainFrameWrapper; }
+#endif
 namespace gd { class Project; }
 namespace gd { class Layout; }
 class TiXmlElement;
@@ -51,12 +55,35 @@ public:
      */
     virtual void SetTypeName(const std::string & type_) { type = type_; };
 
-
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Called when user wants to edit the automatism.
      */
     virtual void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * optionalLayout, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
+
+    /**
+     * \brief Called when the IDE wants to know about the custom properties of the automatism.
+     *
+     * Usage example:
+     \code
+        std::map<std::string, gd::PropgridPropertyDescriptor> properties;
+        properties[ToString(_("Initial speed"))].SetValue("5");
+        
+        return properties;
+     \endcode
+     *
+     * \return a std::map with properties names as key.
+     * \see gd::PropgridPropertyDescriptor
+     */
+    virtual std::map<std::string, gd::PropgridPropertyDescriptor> GetProperties(gd::Project & project) const;
+
+    /**
+     * \brief Called when the IDE wants to update a custom property of the automatism
+     *
+     * \return false if the new value cannot be set
+     * \see gd::InitialInstance
+     */
+    virtual bool UpdateProperty(const std::string & name, const std::string & value, gd::Project & project) {return false;};
 
     /**
      * \brief Save the object to XML
@@ -69,8 +96,11 @@ public:
      */
     virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
-    //////
-    //TODO : C++ Platform specific code below : To be put in a RuntimeAutomatism class
+    /** \name C++ Platform specific
+     * Members functions related to automatisms of GD C++ Platform.
+     * Should be moved to a separate RuntimeAutomatism class in GDCpp.
+     */
+    ///@{
 
     /**
      * Set the object owning this automatism
@@ -105,6 +135,8 @@ public:
      * Reimplement this method to do extra work when the automatism is deactivated
      */
     virtual void OnDeActivate() {};
+
+    ///@}
 
 protected:
 

@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
+namespace gd { class PropgridPropertyDescriptor; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 class wxPropertyGrid;
@@ -176,7 +177,7 @@ public:
      * \brief Return a map containing the properties names (as keys) and their values.
      * \note Common properties ( name, position... ) do not need to be inserted in this map
      */
-    std::map<std::string, std::string> GetCustomProperties(gd::Project & project, gd::Layout & layout);
+    std::map<std::string, gd::PropgridPropertyDescriptor> GetCustomProperties(gd::Project & project, gd::Layout & layout);
 
     /**
      * \brief Update the property called \a name with the new \a value.

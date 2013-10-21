@@ -599,6 +599,13 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         else ++it;
     }
 }
+/*
+template<class Archive>
+void PlatformExtension::Serialize(Archive & archive)
+{
+    archive(CEREAL_NVP(name), CEREAL_NVP(nameSpace), CEREAL_NVP(fullname), 
+        CEREAL_NVP(informations), CEREAL_NVP(author), CEREAL_NVP(license));
+}*/
 #endif
 
 PlatformExtension::PlatformExtension()

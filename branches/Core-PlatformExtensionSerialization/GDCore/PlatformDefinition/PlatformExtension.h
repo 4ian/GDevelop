@@ -364,6 +364,18 @@ public:
      */
     static std::vector<std::string> GetBuiltinExtensionsNames();
 
+    /** \name Serialization
+     */
+    ///@{
+
+    /**
+     * \brief De/serialize the object
+     */
+    /*template<class Archive>
+    void Serialize(Archive & archive);*/
+
+    ///@}
+
 private:
 
     /**

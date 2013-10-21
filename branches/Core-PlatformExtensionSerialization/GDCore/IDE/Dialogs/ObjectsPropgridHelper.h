@@ -7,7 +7,6 @@
 
 #include <wx/propgrid/propgrid.h>
 #include <vector>
-#include <wx/propgrid/propgrid.h>
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Object; }
 namespace gd { class Project; }

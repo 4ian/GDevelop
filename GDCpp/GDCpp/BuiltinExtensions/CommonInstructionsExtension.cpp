@@ -456,6 +456,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 const gd::Project & game = codeGenerator.GetProject();
                 const gd::Layout & scene = codeGenerator.GetLayout();
 
+                //TODO: Use codeGenerator.ExpandObjectsName?
+                //std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(event.GetObjectToPick(), const gd::EventsCodeGenerationContext &context)
                 std::string objectToPick = event.GetObjectToPick();
 
                 vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPick));
@@ -468,6 +470,15 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     realObjects = (*sceneGroup).GetAllObjectsNames();
                 else
                     realObjects.push_back(objectToPick);
+
+                //Ensure that all returned objects actually exists.
+                for (unsigned int i = 0; i < realObjects.size();)
+                {
+                    if ( !codeGenerator.GetLayout().HasObjectNamed(realObjects[i]) && !codeGenerator.GetProject().HasObjectNamed(realObjects[i]) )
+                        realObjects.erase(realObjects.begin()+i);
+                    else
+                        ++i;
+                }
 
                 if ( realObjects.empty() ) return "";
 
@@ -613,6 +624,15 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     else
                         realObjects.push_back(objectToPassAsParameter);
 
+                    //Ensure that all returned objects actually exists.
+                    for (unsigned int i = 0; i < realObjects.size();)
+                    {
+                        if ( !codeGenerator.GetLayout().HasObjectNamed(realObjects[i]) && !codeGenerator.GetProject().HasObjectNamed(realObjects[i]) )
+                            realObjects.erase(realObjects.begin()+i);
+                        else
+                            ++i;
+                    }
+                    
                     if ( realObjects.empty() ) return "";
 
                     outputCode += "std::vector<RuntimeObject*> functionObjects;";

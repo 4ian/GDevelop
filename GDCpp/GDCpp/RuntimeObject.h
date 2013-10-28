@@ -195,6 +195,13 @@ public:
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     /**
+     * \brief Check collision between two objects using their hitboxes.
+     * \note If bounding circles of objects are not colliding, hit boxes are not tested.
+     * \param other The other object for collision to be tested against.
+     */
+    bool IsCollidingWith(RuntimeObject * other);
+
+    /**
      * \brief Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
      * \note The default implementation does nothing.
      */

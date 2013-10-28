@@ -19,6 +19,7 @@ class RuntimeScene;
 class wxBitmap;
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
+namespace gd { class PropgridPropertyDescriptor; }
 #endif
 
 /**
@@ -65,7 +66,7 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
+    virtual std::map<std::string, gd::PropgridPropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
     virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene);
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
     virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;

@@ -24,6 +24,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
 #include "GDCpp/IDE/Dialogs/SpriteObjectEditor.h"
 #endif
 
@@ -235,9 +236,9 @@ void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::Main
 }
 
 
-std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
+std::map<std::string, gd::PropgridPropertyDescriptor> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
 {
-    std::map<std::string, std::string> properties;
+    std::map<std::string, gd::PropgridPropertyDescriptor> properties;
     properties[ToString(_("Animation"))] = position.floatInfos.find("animation") != position.floatInfos.end() ?
                                            ToString(position.floatInfos.find("animation")->second) :
                                            "0";

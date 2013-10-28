@@ -135,8 +135,8 @@ AudioExtension::AudioExtension()
                    _("This action modify the volume of the music on the specified channel. The volume is between 0 and 100."),
                    _("Do _PARAM2__PARAM3_ to the volume of the music on channel _PARAM1_"),
                    _("Audio/Musics on channels"),
-                   "res/actions/sonVolume24.png",
-                   "res/actions/sonVolume.png")
+                   "res/actions/musicVolume24.png",
+                   "res/actions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)

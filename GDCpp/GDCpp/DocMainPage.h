@@ -88,7 +88,7 @@
 /**
  *  \page installAndUseCMake (All) Install and use Cmake
  *
- * Building is done using CMake: It is open-source build system that can generate build files for lots of IDE and build tools ( Makefiles... ).
+ * Building is done using CMake: It is an open-source build system that can generate build files for lots of IDE and build tools ( Makefiles... ).
  *
  * \section installAndUseCMake_download Download and install CMake
  *
@@ -139,7 +139,8 @@
  * ninja
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * Binaries are of course also created into *Binaries/Output/Release* folder.
+ * Binaries are of course also created into *Binaries/Output/Release* folder.<br>
+ * ( For linux, this is the directory where you put the files of Game Develop )
  */
 
 /**
@@ -154,11 +155,20 @@
 /**
  *  \page installLinux (Linux) Install development files
  *
+ * \section downloadGD Download and extract Game Develop for Linux
+ *
+ * If you didn't already downloaded Game Develop for Linux, do it now from [the official website](http://www.compilgames.net/) or
+ * even directly from [this link](http://www.compilgames.net/dl/gdlinux.tar.bz2).<br>
+ *
+ * Then extract all the files inside the <b>GameDevelop</b> folder inside the *Binaries/Output/Release/ * folder
+ * of the SDK. ( You should have files like libGDCore.so now present in Binaries/Output/Release )
+ *
+ * \section download Download, (build) and install libraries
+ *
  * %Game Develop is compiled with gcc under Linux.<br>
  * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %Game Develop and
  * the compiler used by the extensions, %Game Develop require the extensions and the platforms to use the same version of gcc.<br>
  *
- * \section download Download, (build) and install libraries
  * \subsection sfml SFML
  *
  * %Game Develop may uses some specific version of SFML library. You can download a precompiled package for linux here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
@@ -178,14 +188,10 @@
  * sudo make install
  * \endcode
  *
- * \subsection codeBlocks Install CMake
- * You'll need CMake to build the extensions.
+ * Note that you need to have GTK+ 2.0 development file installed. ( In your package manager, search for the <b>libgtk2.0-dev</b> package and install it. )
  *
- * \section copyFiles Copy some files
-
- * Finally, go to the %Game Develop directory, locate the files "libGDCpp.so" and "libGDCore.so" and copy them to (SDK folder)/Binaries/Output/release.<br>
- * Then, locate the file "libGDCpp.so" into the folder (%Game Develop folder)/CppPlatform/<b>Runtime</b>
- * and copy it to (SDK folder)/Binaries/Output/CppPlatform/<b>Runtime</b>
+ * \subsection codeBlocks Install CMake
+ * You'll need CMake to build the extensions: See more on the page on how to install and use CMake.
  */
 
 /**

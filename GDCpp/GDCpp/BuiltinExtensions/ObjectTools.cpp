@@ -137,33 +137,7 @@ bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*
 
 static bool HitBoxesInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float )
 {
-    //First check if bounding circle are too far.
-    float o1w = obj1->GetWidth();
-    float o1h = obj1->GetHeight();
-    float o2w = obj2->GetWidth();
-    float o2h = obj2->GetHeight();
-
-    float x = obj1->GetDrawableX()+obj1->GetCenterX()-(obj2->GetDrawableX()+obj2->GetCenterX());
-    float y = obj1->GetDrawableY()+obj1->GetCenterY()-(obj2->GetDrawableY()+obj2->GetCenterY());
-    float obj1BoundingRadius = sqrt(o1w*o1w+o1h*o1h)/2.0;
-    float obj2BoundingRadius = sqrt(o2w*o2w+o2h*o2h)/2.0;
-
-    if ( sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
-        return false;
-
-    //Do a real check if necessary.
-    vector<Polygon2d> objHitboxes = obj1->GetHitBoxes();
-    vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes();
-    for (unsigned int k = 0;k<objHitboxes.size();++k)
-    {
-        for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
-        {
-            if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
-                return true;
-        }
-    }
-
-    return false;
+    return obj1->IsCollidingWith(obj2);
 }
 
 bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )

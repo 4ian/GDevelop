@@ -98,6 +98,10 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
                 prop->SetChoiceSelection(choicesArray.Index(value));
                 grid->Append(prop);
             }
+            else if ( type == "Boolean" )
+            {
+                grid->Append(new wxBoolProperty(name, "AUTO_PROP:"+automatisms[i], value == "true"));
+            }
             else
                 grid->Append(new wxStringProperty(name, "AUTO_PROP:"+automatisms[i], value));
         }

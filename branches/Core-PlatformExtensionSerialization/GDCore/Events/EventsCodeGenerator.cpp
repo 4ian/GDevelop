@@ -705,6 +705,15 @@ std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::strin
         realObjects.push_back(context.GetCurrentObject());
     }
 
+    //Ensure that all returned objects actually exists.
+    for (unsigned int i = 0; i < realObjects.size();)
+    {
+        if ( !scene.HasObjectNamed(realObjects[i]) && !project.HasObjectNamed(realObjects[i]) )
+            realObjects.erase(realObjects.begin()+i);
+        else
+            ++i;
+    }
+
     return realObjects;
 }
 

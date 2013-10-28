@@ -210,6 +210,8 @@ void MainFrame::Open( string file )
     }
     //Ensure working directory is set to the IDE one.
     wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+    m_mgr.GetPane("PM").Show();
+    m_mgr.Update();
 }
 
 void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
@@ -221,7 +223,7 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
     else
     {
         if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
-            wxLogError( "L'enregistrement a échoué." );
+            wxLogError( _("Save failed!") );
         else
             wxLogStatus(_("Save ended."));
 
@@ -270,7 +272,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
                 //oui, donc on l'enregistre
                 games[i]->SetProjectFile(path);
 
-                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
+                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( _("Save failed!") );}
                 SetLastUsedFile( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
@@ -279,7 +281,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         }
         else
         {
-            if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
+            if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( _("Save failed!") );}
         }
     }
 

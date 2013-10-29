@@ -58,9 +58,9 @@ IMPLEMENT_APP(Game_Develop_EditorApp)
 
 void MessageLoading( string message, float avancement )
 {
-    // utiliser un flux de sortie pour créer la chaîne
+    // utiliser un flux de sortie pour crÃ©er la chaÃ®ne
     std::ostringstream oss;
-    // écrire la valeur dans le flux
+    // Ã©crire la valeur dans le flux
     oss << avancement;
     // renvoyer une string
     string pourcent =  oss.str();
@@ -206,19 +206,48 @@ bool Game_Develop_EditorApp::OnInit()
     singleInstanceChecker = new wxSingleInstanceChecker;
     if ( singleInstanceChecker->IsAnotherRunning() && !parser.Found( wxT("allowMultipleInstances") ) )
     {
-        wxLogMessage(_("Another instance of Game Develop is already running. Drag and drop a file on it to open it."));
+        //There is already another instance running: Ask it to open the requested files.
+        wxLogNull noLogPlease;
+        cout << "* Instance already existing: Redirecting the file to open to it." << endl;
 
+        STClient * client = new STClient;
+        wxString hostName = "localhost"; //Mandatory to provide the host ( for TCP/IP based implementations ).
+        wxConnectionBase * connection = client->MakeConnection(hostName, "GDIDE", "Game Develop IDE");
+
+        if ( connection )
+        {
+            for (unsigned int i = 0; i < filesToOpen.size(); ++i)
+                connection->Execute(filesToOpen[i]);
+
+            connection->Disconnect();
+            delete connection;
+        }
+        else
+        {
+            wxMessageBox(_("It seems that Game Develop is busy and can't open the requested file.\nPlease close any open dialogs and retry."), 
+                _("Sorry! :/"), wxICON_INFORMATION|wxOK);
+        }
+
+        delete client;
         delete singleInstanceChecker;
-        singleInstanceChecker = NULL;
 
+        cout << "* Bye!" << endl;
         return false; // OnExit() won't be called if we return false
+    }
+    else
+    {
+        //No other instance running: Set this instance as the main one, creating a server that will
+        //be called by other instance if necessary.
+        server = new STServer;
+        if ( !server->Create("GDIDE") )
+            cout << " * FAILED to create an IPC service.";
     }
     #endif
 
     cout << "* Single instance checked" << endl;
 
-    //Test si le programme n'aurait pas planté la dernière fois
-    //En vérifiant si un fichier existe toujours
+    //Test si le programme n'aurait pas plantÃ© la derniÃ¨re fois
+    //En vÃ©rifiant si un fichier existe toujours
     bool openRecupFiles = false;
     #if defined(RELEASE)
     if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log") && !wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
@@ -245,7 +274,7 @@ bool Game_Develop_EditorApp::OnInit()
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
     cout << "* Splash Screen created" << endl;
 
-    //Création du fichier de détection des erreurs
+    //CrÃ©ation du fichier de dÃ©tection des erreurs
     wxFile errorDetectFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log", wxFile::write);
     errorDetectFile.Write(" ");
 
@@ -327,7 +356,7 @@ bool Game_Develop_EditorApp::OnInit()
     LogFileManager::GetInstance()->InitalizeFromConfig();
     LogFileManager::GetInstance()->WriteToLogFile("Game Develop initialization ended"),
 
-    //Fin du splash screen, affichage de la fenêtre
+    //Fin du splash screen, affichage de la fenÃªtre
     splash->Destroy();
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
@@ -457,3 +486,16 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
     #endif
 }
 
+bool STConnection::OnExec(const wxString & topic, const wxString &filename)
+{
+    MainFrame * frame = wxDynamicCast(wxGetApp().mainEditor, MainFrame);
+    if (!frame) return true;
+
+    cout << "Received request for opening file \"" << filename << "\"";
+    if ( filename.empty() )
+        frame->Raise();
+    else
+        frame->Open(gd::ToString(filename));
+
+    return true;
+}

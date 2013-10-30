@@ -986,7 +986,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i : %s\n\nPlease correct it in order to validate the action."), parameterDisplayedNb, message.c_str()), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?"), parameterDisplayedNb, message.c_str()), _("The action contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 

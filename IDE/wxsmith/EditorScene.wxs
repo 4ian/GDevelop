@@ -63,7 +63,7 @@
 								<growablerows>0</growablerows>
 								<object class="sizeritem">
 									<object class="Custom" name="ID_CUSTOM2" subclass="EventsEditor" variable="eventsEditor" member="yes">
-										<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, &amp;layout.GetEvents(), mainFrameWrapper);</creating_code>
+										<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, mainFrameWrapper);</creating_code>
 										<style></style>
 										<size>456,317</size>
 									</object>

@@ -81,7 +81,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	eventsEditor = new EventsEditor(eventsPanel, project, layout, &layout.GetEvents(), mainFrameWrapper);
+	eventsEditor = new EventsEditor(eventsPanel, project, layout, mainFrameWrapper);
 	FlexGridSizer3->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);

@@ -50,7 +50,7 @@
 							<growablerows>0</growablerows>
 							<object class="sizeritem">
 								<object class="Custom" name="ID_CUSTOM2" subclass="EventsEditor" variable="eventsEditor" member="yes">
-									<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, emptyScene, &amp;events.GetEvents(), mainEditorCommand);</creating_code>
+									<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, emptyScene, events, mainEditorCommand);</creating_code>
 									<style></style>
 									<size>456,317</size>
 								</object>

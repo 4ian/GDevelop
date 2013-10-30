@@ -244,7 +244,7 @@ bool Game_Develop_EditorApp::OnInit()
     }
     #endif
 
-    cout << "* Single instance checked" << endl;
+    cout << "* Single instance handling done" << endl;
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
@@ -491,7 +491,7 @@ bool STConnection::OnExec(const wxString & topic, const wxString &filename)
     MainFrame * frame = wxDynamicCast(wxGetApp().mainEditor, MainFrame);
     if (!frame) return true;
 
-    cout << "Received request for opening file \"" << filename << "\"";
+    cout << "Received request for opening file \"" << filename << "\"" << std::endl;
     if ( filename.empty() )
         frame->Raise();
     else

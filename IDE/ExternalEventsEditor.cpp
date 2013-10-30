@@ -57,7 +57,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
-	eventsEditor = new EventsEditor(this, game, emptyScene, &events.GetEvents(), mainFrameWrapper);
+	eventsEditor = new EventsEditor(this, game, emptyScene, events, mainFrameWrapper);
 	FlexGridSizer4->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -71,7 +71,12 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalEventsEditor::OnparentSceneComboBoxDropDown);
 
 	eventsEditor->SetExternalEvents(&events);
-	if ( !events.GetAssociatedLayout().empty() ) parentSceneComboBox->SetValue(events.GetAssociatedLayout());
+	if ( !events.GetAssociatedLayout().empty() ) {
+		parentSceneComboBox->SetValue(events.GetAssociatedLayout());
+		wxCommandEvent useless;
+		OnparentSceneComboBoxSelect(useless);
+	}
+
 }
 
 ExternalEventsEditor::~ExternalEventsEditor()
@@ -108,7 +113,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 
     //Need to recreate an events editor.
     delete eventsEditor;
-    eventsEditor = new EventsEditor(this, game, *scene, &events.GetEvents(), mainFrameWrapper);
+    eventsEditor = new EventsEditor(this, game, *scene, events, mainFrameWrapper);
     eventsEditor->ConnectEvents();
 
     //Make sure the new events editor is properly displayed.

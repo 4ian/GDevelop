@@ -106,25 +106,43 @@ BEGIN_EVENT_TABLE(EventsEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-
-EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
-    game(game_),
+EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+	game(game_),
     scene(scene_),
     externalEvents(NULL),
-    events(events_),
+    events(&scene.GetEvents()),
     mainFrameWrapper(mainFrameWrapper_),
     layoutCanvas(NULL),
-    conditionColumnWidth(350),
-    isResizingColumns(false),
-    leftMargin(20),
     selection(refreshCallback),
-    foldBmp("res/fold.png", wxBITMAP_TYPE_ANY),
-    unfoldBmp("res/unfold.png", wxBITMAP_TYPE_ANY),
-    hideContextPanelsLabels(false),
-    ctrlKeyDown(false),
-    profilingActivated(false),
     refreshCallback(this)
 {
+	Init(parent);
+}
+    
+EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, gd::ExternalEvents & externalEvents_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+	game(game_),
+    scene(scene_),
+    externalEvents(&externalEvents_),
+    events(&externalEvents->GetEvents()),
+    mainFrameWrapper(mainFrameWrapper_),
+    layoutCanvas(NULL),
+    selection(refreshCallback),
+    refreshCallback(this)
+{
+	Init(parent);
+}
+
+void EventsEditor::Init(wxWindow* parent)
+{
+    conditionColumnWidth = 350;
+    isResizingColumns = false;
+    leftMargin = 20;
+    foldBmp = wxBitmap("res/fold.png", wxBITMAP_TYPE_ANY);
+    unfoldBmp = wxBitmap("res/unfold.png", wxBITMAP_TYPE_ANY);
+    hideContextPanelsLabels = false;
+    ctrlKeyDown = false;
+    profilingActivated = false;
+
 	//(*Initialize(EventsEditor)
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
@@ -1129,6 +1147,7 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
 
     if ( !noNeedForSceneRecompilation )
     {
+        std::cout << "Need for RECOMPILATIOOOON: extern:" << externalEvents;
         if ( externalEvents != NULL )
             gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
         else

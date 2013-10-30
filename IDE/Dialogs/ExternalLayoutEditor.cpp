@@ -121,6 +121,10 @@ mainFrameWrapper(mainFrameWrapper_)
 	layoutPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&ExternalLayoutEditor::OnscenePanelResize,0,this);
 	Connect(wxEVT_SIZE,(wxObjectEventFunction)&ExternalLayoutEditor::OnResize);
 	//*)
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar1Scroll);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar1Scroll);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar2Scroll);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar2Scroll);
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalLayoutEditor::OnparentSceneComboBoxDropDown);
 
 	//Prepare pane manager

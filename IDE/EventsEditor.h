@@ -56,15 +56,28 @@ class EventsEditor: public wxPanel
 public:
 
     /**
-     * \brief Default constructor
+     * \brief Construct an events editor to edit scene events
      *
      * \param parent Parent window
      * \param game Game the events belongs to
-     * \param scene Scene to be used to get objects, variables... The events are not necessarily the events of this scene
-     * \param events The events to be edited
+     * \param scene Scene to be edited.
      * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
-    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene, 
+        gd::MainFrameWrapper & mainFrameWrapper_ );
+    
+    /**
+     * \brief Construct an events editor to edit external events
+     *
+     * \param parent Parent window
+     * \param game Game the events belongs to
+     * \param scene Scene to be used as if the external events were included to. Used to get objects, variables...
+     * \param externalEvents The events external events to be edited.
+     * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
+     */
+    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene, 
+        gd::ExternalEvents & externalEvents, gd::MainFrameWrapper & mainFrameWrapper_ );
+
     virtual ~EventsEditor();
 
     /**
@@ -138,7 +151,7 @@ public:
     //*)
     SearchEvents * searchDialog;
 
-protected:
+private:
 
     //(*Identifiers(EventsEditor)
     static const long ID_TEXTCTRL1;
@@ -192,8 +205,6 @@ protected:
     static wxRibbonButtonBar * templateRibbonBar;
     static wxRibbonButtonBar * undoRibbonBar;
     std::vector < std::pair<long, std::string> > idForEventTypesMenu;
-
-private:
 
     //(*Handlers(EventsEditor)
     void OneventsPanelPaint(wxPaintEvent& event);
@@ -273,6 +284,11 @@ private:
     void DeleteSelection();
 
     void EndLiveEditing();
+    
+    /**
+     * \brief Common initialization code used by constructors.
+     */
+    void Init(wxWindow* parent);
 
     /**
      * Draw events.
@@ -291,10 +307,10 @@ private:
 
     gd::Project & game;
 
-    gd::Layout & scene; ///< Scene is required, even if it is a empty useless scene.
+    gd::Layout & scene; ///< Scene is required ( even if it is a empty useless scene ).
     gd::ExternalEvents * externalEvents; ///< Events editor can be used to edit external events
 
-    std::vector < gd::BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
+    std::vector < gd::BaseEventSPtr > * events; ///< Note that events modified are not necessarily the events of the scene, if externalEvents != NULL.
     gd::MainFrameWrapper & mainFrameWrapper;
     gd::LayoutEditorCanvas * layoutCanvas;
 

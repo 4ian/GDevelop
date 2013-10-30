@@ -36,7 +36,7 @@ public:
     ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_) {};
     virtual ~ObjectListDialogsHelper() {};
 
-    void SetSearchText(std::string searchText_) { searchText = searchText_; }
+    void SetSearchText(std::string searchText_);
     void SetAllowedObjectType(std::string allowedObjectType_) { objectTypeAllowed = allowedObjectType_; }
     void SetGroupsAllowed(bool canSelectGroup) { groupsAllowed = canSelectGroup; }
 

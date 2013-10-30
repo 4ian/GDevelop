@@ -68,7 +68,7 @@ game(game_)
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Include"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	AllEventsCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Every scene\'s events"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+	AllEventsCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("All scene\'s events"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	AllEventsCheck->SetValue(true);
 	FlexGridSizer2->Add(AllEventsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 5, 0, 0);

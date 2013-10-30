@@ -16,6 +16,12 @@
 namespace gd
 {
 
+void ObjectListDialogsHelper::SetSearchText(std::string searchText_) 
+{ 
+    searchText = searchText_; 
+    boost::to_upper(searchText);
+}
+
 void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTreeCtrl * sceneGroupsList, wxTreeCtrl * globalObjectsList, wxTreeCtrl * globalGroupsList)
 {
     bool searching = searchText.empty() ? false : true;
@@ -149,7 +155,7 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
     wxTreeItemId lastAddedItem;
     for (unsigned int i = 0;i<groups.size();++i)
     {
-        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, project.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) && 
+        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) && 
             ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
             wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName()/*, 1*/ );

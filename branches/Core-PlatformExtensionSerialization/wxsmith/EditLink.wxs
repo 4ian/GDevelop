@@ -37,7 +37,7 @@
 							<growablecols>0</growablecols>
 							<object class="sizeritem">
 								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="AllEventsCheck" member="yes">
-									<label>Every scene&apos;s events</label>
+									<label>All scene&apos;s events</label>
 									<selected>1</selected>
 									<style>wxRB_GROUP</style>
 									<handler function="OnOnlyEventsCheckSelect" entry="EVT_RADIOBUTTON" />

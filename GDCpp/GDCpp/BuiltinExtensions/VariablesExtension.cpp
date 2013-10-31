@@ -20,8 +20,8 @@ VariablesExtension::VariablesExtension()
                           "Freeware");
     #if defined(GD_IDE_ONLY)
     AddCondition("VarScene",
-               _("Scene variables"),
-               _("Test a variable."),
+               _("Value of a variable"),
+               _("Compare the value of a scene variable."),
                _("Variable _PARAM0_ is _PARAM1__PARAM2_"),
                _("Variables"),
                "res/conditions/var24.png",
@@ -32,8 +32,8 @@ VariablesExtension::VariablesExtension()
     .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddCondition("VarSceneTxt",
-             _("Text of a scene variable"),
-             _("Test the text of a variable."),
+             _("Text of a variable"),
+             _("Compare the text of a scene variable."),
              _("The text of variable _PARAM0_ is _PARAM1__PARAM2_"),
              _("Variables"),
              "res/conditions/var24.png",

@@ -392,8 +392,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .codeExtraInformation.SetFunctionName("TestAngleOfDisplacement");
 
         obj.AddCondition("VarObjet",
-                       _("Object's variable"),
-                       _("Test the value of a variable of an object."),
+                       _("Value of an object's variable"),
+                       _("Compare the value of a variable of an object."),
                        _("Variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
                        _("Variables"),
                        "res/conditions/var24.png",
@@ -406,8 +406,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number");
 
         obj.AddCondition("VarObjetTxt",
-                       _("Text of variable of an object"),
-                       _("Test the text of variable of an object."),
+                       _("Text of an object's variable"),
+                       _("Compare the text of a variable of an object."),
                        _("The text of variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
                        _("Variables"),
                        "res/conditions/var24.png",

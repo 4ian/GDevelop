@@ -369,11 +369,11 @@ void CppLayoutPreviewer::CreatePreviewRibbonTools(wxRibbonButtonBar & buttonBar)
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     gd::CommonBitmapManager * bitmapManager = gd::CommonBitmapManager::GetInstance();
 
-    buttonBar.AddButton(idRibbonPlay, !hideLabels ? _("Play") : "", bitmapManager->starticon24);
-    buttonBar.AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : "", bitmapManager->startwindow24);
-    buttonBar.AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", bitmapManager->pauseicon24);
-    buttonBar.AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", bitmapManager->bug24);
-    buttonBar.AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : "", bitmapManager->profiler24);
+    buttonBar.AddButton(idRibbonPlay, !hideLabels ? _("Play") : "", bitmapManager->starticon24, _("Start the preview"));
+    buttonBar.AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : "", bitmapManager->startwindow24, _("Start the preview in an external window"));
+    buttonBar.AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", bitmapManager->pauseicon24, _("Pause the preview"));
+    buttonBar.AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", bitmapManager->bug24, _("Show the debugger to view the state of the game"));
+    buttonBar.AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : "", bitmapManager->profiler24, _("Show the profiler to monitor performances"));
 }
 
 void CppLayoutPreviewer::ConnectPreviewRibbonToolsEvents()

@@ -402,6 +402,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_ITEM_ACTIVATED,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeItemActivated);
 	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_ITEM_CONTEXT_MENU,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeItemRClick);
 	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_SELECTION_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeSelectionChanged);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&SpriteObjectEditor::OnyScrollBarScroll);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&SpriteObjectEditor::OnxScrollBarScroll);
 
     wxImageList * iconList = new wxImageList(16,16);
     iconList->Add(gd::CommonBitmapManager::GetInstance()->pointEdit16);

@@ -413,9 +413,9 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Insert"), wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         insertRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : "", wxBitmap("res/eventadd24.png", wxBITMAP_TYPE_ANY));
-        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : "", wxBitmap("res/subeventadd24.png", wxBITMAP_TYPE_ANY));
-        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : "", wxBitmap("res/commentaireadd24.png", wxBITMAP_TYPE_ANY));
+        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : "", wxBitmap("res/eventadd24.png", wxBITMAP_TYPE_ANY), _("Add a new standard event with conditions and actions"));
+        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : "", wxBitmap("res/subeventadd24.png", wxBITMAP_TYPE_ANY), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
+        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : "", wxBitmap("res/commentaireadd24.png", wxBITMAP_TYPE_ANY), _("Add a comment"));
         insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
     }
     {
@@ -445,24 +445,24 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Search"), wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY), _("Search for a specific word in the event and/or replace it by another"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", wxBitmap("res/foldAll24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", wxBitmap("res/foldAll24.png", wxBITMAP_TYPE_ANY), _("Hide all subevents"));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY), _("Show all hidden subevents"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), _("For native games, display the time taken by each events during the last preview when profiling was active."));
+        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY), _("Choose the current platform being used to edit the events."));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), _("Display the help about the events editor"));
     }
 }
 

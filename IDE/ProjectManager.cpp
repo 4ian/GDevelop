@@ -329,20 +329,20 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Projects"), wxBitmap("res/openicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonNew, !hideLabels ? _("New") : "", wxBitmap("res/newicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonNew, !hideLabels ? _("New") : "", wxBitmap("res/newicon24.png", wxBITMAP_TYPE_ANY), _("Create a new game"));
+        ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY), _("Open a previously saved project"));
     }
     {
-        wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), wxBitmap("res/saveicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_EXT_BUTTON);
+        wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), wxBitmap("res/saveicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
-        file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
-        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY));
-        file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", wxBitmap("res/close24.png", wxBITMAP_TYPE_ANY));
+        file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY), _("Save the current project"));
+        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY), _("Save all open projects"));
+        file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", wxBitmap("res/close24.png", wxBITMAP_TYPE_ANY), _("Close the current project"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", wxBitmap("res/imageicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", wxBitmap("res/imageicon24.png", wxBITMAP_TYPE_ANY), _("Display the resources used by the game"));
         ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
@@ -351,19 +351,19 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *affichage_bar = new wxRibbonButtonBar(affichagePanel, wxID_ANY);
-        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projects") : "", wxBitmap("res/projectManager24.png", wxBITMAP_TYPE_ANY));
-        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Start page") : "", wxBitmap("res/startPage24.png", wxBITMAP_TYPE_ANY));
-        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("C++ Tools") : "", wxBitmap("res/source_cpp24.png", wxBITMAP_TYPE_ANY));
+        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projects") : "", wxBitmap("res/projectManager24.png", wxBITMAP_TYPE_ANY), _("Display the project manager"));
+        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Start page") : "", wxBitmap("res/startPage24.png", wxBITMAP_TYPE_ANY), _("Open the start page"));
+        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("C++ Tools") : "", wxBitmap("res/source_cpp24.png", wxBITMAP_TYPE_ANY), _("Display tools related to native games"));
 
         wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
-        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : "", wxBitmap("res/musicicon24.png", wxBITMAP_TYPE_ANY));
-        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : "", wxBitmap("res/strip24.png", wxBITMAP_TYPE_ANY));
+        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : "", wxBitmap("res/musicicon24.png", wxBITMAP_TYPE_ANY), _("Open a tool to convert MP3 files to OGG"));
+        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : "", wxBitmap("res/strip24.png", wxBITMAP_TYPE_ANY), _("Open a tool to convert various images format"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), _("Open the online help for Game Develop"));
     }
 
 }

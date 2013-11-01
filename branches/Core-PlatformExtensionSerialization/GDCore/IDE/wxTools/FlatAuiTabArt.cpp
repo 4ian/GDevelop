@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
-#include "AuiTabArt.h"
+#include "FlatAuiTabArt.h"
 #include <wx/aui/framemanager.h>
 #include <wx/aui/dockart.h>
 #include <wx/aui/floatpane.h>
@@ -203,7 +203,7 @@ private:
     int m_last_id;
 };
 
-AuiTabArt::AuiTabArt()
+FlatAuiTabArt::FlatAuiTabArt()
 {
     m_normal_font = *wxNORMAL_FONT;
     m_selected_font = *wxNORMAL_FONT;
@@ -235,7 +235,7 @@ AuiTabArt::AuiTabArt()
     noBgGradient = false;
 }
 
-void AuiTabArt::SetColour(const wxColour& colour)
+void FlatAuiTabArt::SetColour(const wxColour& colour)
 {
     m_base_colour = colour;
 
@@ -246,18 +246,18 @@ void AuiTabArt::SetColour(const wxColour& colour)
     m_base_colour_brush = wxBrush(m_base_colour);
 }
 
-void AuiTabArt::SetActiveColour(const wxColour& colour)
+void FlatAuiTabArt::SetActiveColour(const wxColour& colour)
 {
     m_active_colour = colour;
 }
 
-AuiTabArt::~AuiTabArt()
+FlatAuiTabArt::~FlatAuiTabArt()
 {
 }
 
-wxAuiTabArt* AuiTabArt::Clone()
+wxAuiTabArt* FlatAuiTabArt::Clone()
 {
-    gd::AuiTabArt* art = new gd::AuiTabArt;
+    gd::FlatAuiTabArt* art = new gd::FlatAuiTabArt;
     art->SetNormalFont(m_normal_font);
     art->SetSelectedFont(m_selected_font);
     art->SetMeasuringFont(m_measuring_font);
@@ -268,7 +268,7 @@ wxAuiTabArt* AuiTabArt::Clone()
     return art;
 }
 
-void AuiTabArt::DrawBorder(wxDC& dc, wxWindow* wnd, const wxRect& rect)
+void FlatAuiTabArt::DrawBorder(wxDC& dc, wxWindow* wnd, const wxRect& rect)
 {
     dc.SetPen(wxPen(wxColour(255,255,255)));
     int i, border_width = GetBorderWidth(wnd);
@@ -281,12 +281,12 @@ void AuiTabArt::DrawBorder(wxDC& dc, wxWindow* wnd, const wxRect& rect)
     }
 }
 
-void AuiTabArt::SetFlags(unsigned int flags)
+void FlatAuiTabArt::SetFlags(unsigned int flags)
 {
     m_flags = flags;
 }
 
-void AuiTabArt::SetSizingInfo(const wxSize& tab_ctrl_size,
+void FlatAuiTabArt::SetSizingInfo(const wxSize& tab_ctrl_size,
                                        size_t tab_count)
 {
     m_fixed_tab_width = 100;
@@ -317,7 +317,7 @@ void AuiTabArt::SetSizingInfo(const wxSize& tab_ctrl_size,
 }
 
 
-void AuiTabArt::DrawBackground(wxDC& dc,
+void FlatAuiTabArt::DrawBackground(wxDC& dc,
                                         wxWindow* WXUNUSED(wnd),
                                         const wxRect& rect)
 {
@@ -346,7 +346,7 @@ void AuiTabArt::DrawBackground(wxDC& dc,
    // draw base lines
 
     //Game Develop use a white background
-   dc.SetPen(*wxWHITE_PEN);
+   dc.SetPen(m_base_colour);
    int y = rect.GetHeight();
    int w = rect.GetWidth();
 
@@ -376,7 +376,7 @@ void AuiTabArt::DrawBackground(wxDC& dc,
 // out_rect - actual output rectangle
 // x_extent - the advance x; where the next tab should start
 
-void AuiTabArt::DrawTab(wxDC& dc,
+void FlatAuiTabArt::DrawTab(wxDC& dc,
                                  wxWindow* wnd,
                                  const wxAuiNotebookPage& page,
                                  const wxRect& in_rect,
@@ -385,146 +385,6 @@ void AuiTabArt::DrawTab(wxDC& dc,
                                  wxRect* out_button_rect,
                                  int* x_extent)
 {
-    #if 0
-    if(in_rect.height <= 2)
-        return;
-
-    int close_button_width = 0;
-    if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
-    {
-        close_button_width = m_active_close_bmp.GetWidth();
-    }
-
-    wxCoord normal_textx, normal_texty;
-    dc.SetFont(m_normal_font);
-    dc.GetTextExtent(page.caption, &normal_textx, &normal_texty);
-
-    wxColour m_tab_active_background_colour = *wxWHITE;
-    wxColour m_tab_active_background_gradient_colour = m_active_colour;
-    wxColour m_tab_border_pen = m_active_colour;
-    wxColour m_tab_label_colour = *wxBLACK;
-
-    wxCoord tab_height = m_tab_ctrl_height - 3;
-    wxCoord tab_width = normal_textx + close_button_width;
-    wxCoord tab_x = in_rect.x;
-    wxCoord tab_y = in_rect.y + in_rect.height - tab_height;
-    wxRect out_tab_rect(tab_x, tab_y, tab_width, tab_height);
-    *out_tab_rectPtr = out_tab_rect;
-
-    if(page.active /*|| page.hovered || page.highlight*/)
-    {
-        if(page.active)
-        {
-            wxRect background(out_tab_rect);
-
-            background.x += 2;
-            background.y += 2;
-            background.width -= 4;
-            background.height -= 2;
-
-            dc.GradientFillLinear(background, m_tab_active_background_gradient_colour,
-                m_tab_active_background_colour, wxSOUTH);
-
-            // TODO: active and hovered
-        }
-
-        wxPoint border_points[6];
-        border_points[0] = wxPoint(1, out_tab_rect.height - 2);
-        border_points[1] = wxPoint(1, 3);
-        border_points[2] = wxPoint(3, 1);
-        border_points[3] = wxPoint(out_tab_rect.width - 4, 1);
-        border_points[4] = wxPoint(out_tab_rect.width - 2, 3);
-        border_points[5] = wxPoint(out_tab_rect.width - 2, out_tab_rect.height - 1);
-
-        dc.SetPen(m_tab_border_pen);
-        dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, out_tab_rect.x, out_tab_rect.y);
-
-        if(page.active)
-        {
-            // Give the tab a curved outward border at the bottom
-            dc.DrawPoint(out_tab_rect.x, out_tab_rect.y + out_tab_rect.height - 2);
-            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 1, out_tab_rect.y + out_tab_rect.height - 2);
-
-            wxPen p(m_tab_active_background_gradient_colour);
-            dc.SetPen(p);
-
-            // Technically the first two points are the wrong colour, but they're near enough
-            dc.DrawPoint(out_tab_rect.x + 1, out_tab_rect.y + out_tab_rect.height - 2);
-            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 2, out_tab_rect.y + out_tab_rect.height - 2);
-            dc.DrawPoint(out_tab_rect.x + 1, out_tab_rect.y + out_tab_rect.height - 1);
-            dc.DrawPoint(out_tab_rect.x, out_tab_rect.y + out_tab_rect.height - 1);
-            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 2, out_tab_rect.y + out_tab_rect.height - 1);
-            dc.DrawPoint(out_tab_rect.x + out_tab_rect.width - 1, out_tab_rect.y + out_tab_rect.height - 1);
-        }
-    }
-
-    if(true/*m_flags & wxRIBBON_BAR_SHOW_PAGE_ICONS*/)
-    {
-        wxBitmap icon = page.bitmap;
-        if(icon.IsOk())
-        {
-        int x = out_tab_rect.x + 4;
-        if(false/*(m_flags & wxRIBBON_BAR_SHOW_PAGE_LABELS) == 0*/)
-            x = out_tab_rect.x + (out_tab_rect.width - icon.GetWidth()) / 2;
-        dc.DrawBitmap(icon, x, out_tab_rect.y + 1 + (out_tab_rect.height - 1 -
-            icon.GetHeight()) / 2, true);
-        }
-    }
-    if(true/*m_flags & wxRIBBON_BAR_SHOW_PAGE_LABELS*/)
-    {
-        wxString label = page.caption;
-        if(!label.IsEmpty())
-        {
-            dc.SetFont(m_normal_font);
-            dc.SetTextForeground(m_tab_label_colour);
-            dc.SetBackgroundMode(wxTRANSPARENT);
-
-            int text_height;
-            int text_width;
-            dc.GetTextExtent(label, &text_width, &text_height);
-            int width = out_tab_rect.width - 5;
-            int x = out_tab_rect.x + 3;
-            if(true/*m_flags & wxRIBBON_BAR_SHOW_PAGE_ICONS*/)
-            {
-                x += 3 + page.bitmap.GetWidth();
-                width -= 3 + page.bitmap.GetWidth();
-            }
-            int y = out_tab_rect.y + (out_tab_rect.height - text_height) / 2;
-
-            if(width <= text_width)
-            {
-                dc.SetClippingRegion(x, out_tab_rect.y, width, out_tab_rect.height);
-                dc.DrawText(label, x, y);
-            }
-            else
-            {
-                dc.DrawText(label, x + (width - text_width) / 2 + 1, y);
-            }
-        }
-    }
-
-    // draw close button if necessary
-    if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
-    {
-        wxBitmap bmp = m_disabled_close_bmp;
-
-        if (close_button_state == wxAUI_BUTTON_STATE_HOVER ||
-            close_button_state == wxAUI_BUTTON_STATE_PRESSED)
-        {
-            bmp = m_active_close_bmp;
-        }
-
-        wxRect rect(tab_x + tab_width - close_button_width - 1,
-                    tab_y + (tab_height/2) - (bmp.GetHeight()/2),
-                    close_button_width,
-                    tab_height);
-        IndentPressedBitmap(&rect, close_button_state);
-        dc.DrawBitmap(bmp, rect.x, rect.y, true);
-
-        *out_button_rect = rect;
-    }
-
-    #else
     wxCoord normal_textx, normal_texty;
     wxCoord selected_textx, selected_texty;
     wxCoord texty;
@@ -600,24 +460,20 @@ void AuiTabArt::DrawTab(wxDC& dc,
     dc.SetClippingRegion(tab_x, tab_y, clip_width+1, tab_height-3);
 
 
-    wxPoint border_points[6];
+    wxPoint border_points[4];
     if (m_flags &wxAUI_NB_BOTTOM)
     {
         border_points[0] = wxPoint(tab_x,             tab_y);
-        border_points[1] = wxPoint(tab_x,             tab_y+tab_height-6);
-        border_points[2] = wxPoint(tab_x+2,           tab_y+tab_height-4);
-        border_points[3] = wxPoint(tab_x+tab_width-2, tab_y+tab_height-4);
-        border_points[4] = wxPoint(tab_x+tab_width,   tab_y+tab_height-6);
-        border_points[5] = wxPoint(tab_x+tab_width,   tab_y);
+        border_points[1] = wxPoint(tab_x,             tab_y+tab_height-4);
+        border_points[2] = wxPoint(tab_x+tab_width,   tab_y+tab_height-4);
+        border_points[3] = wxPoint(tab_x+tab_width,   tab_y);
     }
     else //if (m_flags & wxAUI_NB_TOP) {}
     {
-        border_points[0] = wxPoint(tab_x,             tab_y+tab_height-4);
-        border_points[1] = wxPoint(tab_x,             tab_y+2);
-        border_points[2] = wxPoint(tab_x+2,           tab_y);
-        border_points[3] = wxPoint(tab_x+tab_width-2, tab_y);
-        border_points[4] = wxPoint(tab_x+tab_width,   tab_y+2);
-        border_points[5] = wxPoint(tab_x+tab_width,   tab_y+tab_height-4);
+        border_points[0] = wxPoint(tab_x,             tab_y+tab_height);
+        border_points[1] = wxPoint(tab_x,             tab_y);
+        border_points[2] = wxPoint(tab_x+tab_width,   tab_y);
+        border_points[3] = wxPoint(tab_x+tab_width,   tab_y+tab_height);
     }
     //  else if (m_flags &wxAUI_NB_LEFT) {}
     //  else if (m_flags &wxAUI_NB_RIGHT) {}
@@ -652,11 +508,11 @@ void AuiTabArt::DrawTab(wxDC& dc,
         r.width -= 2;
         /*r.y += r.height;
         r.y -= 2;*/
-        r.y += 2;
+        r.y += 1;
         r.height -= 2;
 
         // draw gradient background
-        wxColor top_color = *wxWHITE;
+        wxColor top_color = m_active_colour;
         wxColor bottom_color = m_active_colour;
         dc.GradientFillLinear(r, bottom_color, top_color, wxSOUTH);
 
@@ -694,7 +550,7 @@ void AuiTabArt::DrawTab(wxDC& dc,
         dc.GradientFillLinear(r, top_color, bottom_color, wxSOUTH);
         
         // Adapt text color
-        int average = (m_active_colour.Red()+m_active_colour.Green()+m_active_colour.Blue())/3;
+        int average = (m_base_colour.Red()+m_base_colour.Green()+m_base_colour.Blue())/3;
         if (average < 127) dc.SetTextForeground(*wxWHITE);
         else dc.SetTextForeground(*wxBLACK);
     }
@@ -811,15 +667,14 @@ void AuiTabArt::DrawTab(wxDC& dc,
     *out_tab_rect = wxRect(tab_x, tab_y, tab_width, tab_height);
 
     dc.DestroyClippingRegion();
-    #endif
 }
 
-int gd::AuiTabArt::GetIndentSize()
+int gd::FlatAuiTabArt::GetIndentSize()
 {
     return 5;
 }
 
-wxSize gd::AuiTabArt::GetTabSize(wxDC& dc,
+wxSize gd::FlatAuiTabArt::GetTabSize(wxDC& dc,
                                       wxWindow* WXUNUSED(wnd),
                                       const wxString& caption,
                                       const wxBitmap& bitmap,
@@ -865,7 +720,7 @@ wxSize gd::AuiTabArt::GetTabSize(wxDC& dc,
 }
 
 
-void AuiTabArt::DrawButton(wxDC& dc,
+void FlatAuiTabArt::DrawButton(wxDC& dc,
                                     wxWindow* WXUNUSED(wnd),
                                     const wxRect& in_rect,
                                     int bitmap_id,
@@ -930,7 +785,7 @@ void AuiTabArt::DrawButton(wxDC& dc,
     *out_rect = rect;
 }
 
-int gd::AuiTabArt::ShowDropDown(wxWindow* wnd,
+int gd::FlatAuiTabArt::ShowDropDown(wxWindow* wnd,
                                      const wxAuiNotebookPageArray& pages,
                                      int active_idx)
 {
@@ -975,7 +830,7 @@ int gd::AuiTabArt::ShowDropDown(wxWindow* wnd,
     return -1;
 }
 
-int gd::AuiTabArt::GetBestTabCtrlSize(wxWindow* wnd,
+int gd::FlatAuiTabArt::GetBestTabCtrlSize(wxWindow* wnd,
                                            const wxAuiNotebookPageArray& pages,
                                            const wxSize& required_bmp_size)
 {
@@ -1024,17 +879,17 @@ int gd::AuiTabArt::GetBestTabCtrlSize(wxWindow* wnd,
     return max_y+2;
 }
 
-void AuiTabArt::SetNormalFont(const wxFont& font)
+void FlatAuiTabArt::SetNormalFont(const wxFont& font)
 {
     m_normal_font = font;
 }
 
-void AuiTabArt::SetSelectedFont(const wxFont& font)
+void FlatAuiTabArt::SetSelectedFont(const wxFont& font)
 {
     m_selected_font = font;
 }
 
-void AuiTabArt::SetMeasuringFont(const wxFont& font)
+void FlatAuiTabArt::SetMeasuringFont(const wxFont& font)
 {
     m_measuring_font = font;
 }

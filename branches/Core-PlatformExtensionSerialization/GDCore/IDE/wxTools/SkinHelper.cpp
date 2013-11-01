@@ -4,7 +4,9 @@
  */
 #include "SkinHelper.h"
 #include "AuiTabArt.h"
+#include "FlatAuiTabArt.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/RibbonMetroArtProvider.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/art.h>
 #include <wx/aui/aui.h>
@@ -105,6 +107,8 @@ void SkinHelper::ApplyCurrentSkin(wxRibbonBar & bar)
         //Style
         if ( result == "AUI" )
             ribbonArtProvider = new gdRibbonAUIArtProvider;
+        else if ( result == "Metro" )
+            ribbonArtProvider = new RibbonMetroArtProvider;
         else
             ribbonArtProvider = new gdRibbonMSWArtProvider;
 
@@ -126,7 +130,7 @@ void SkinHelper::ApplyCurrentSkin(wxRibbonBar & bar)
     }
     else
     {
-        bar.SetArtProvider(new gdRibbonMSWArtProvider());
+        bar.SetArtProvider(new gdRibbonMSWArtProvider);
         bar.GetArtProvider()->SetColourScheme(wxColour(244, 245, 247), wxColour(231, 241, 254), wxColour(0, 0, 0));
     }
 }
@@ -204,8 +208,21 @@ void SkinHelper::ApplyCurrentSkin(wxAuiNotebook & notebook, bool subnotebook)
     wxConfigBase *pConfig = wxConfigBase::Get();
     wxString result;
 
-    gd::AuiTabArt * tabArt = new gd::AuiTabArt();
-    tabArt->DisableBackgroundGradient(subnotebook);
+    wxAuiTabArt * tabArt = NULL;
+    pConfig->Read( _T( "/Skin/TabStyle" ), &result );
+    if ( result == "Flat" )
+    {
+        gd::FlatAuiTabArt * art = new gd::FlatAuiTabArt();
+        art->DisableBackgroundGradient(subnotebook);        
+        tabArt = art;
+    }
+    else
+    {
+        gd::AuiTabArt * art = new gd::AuiTabArt();
+        art->DisableBackgroundGradient(subnotebook);        
+        tabArt = art;
+    }
+
     pConfig->Read( _T( "/Skin/Defined" ), &result );
     if ( result == "true" )
     {
@@ -235,6 +252,11 @@ public:
 
     virtual wxAuiToolBarArt* Clone() { return static_cast<wxAuiToolBarArt*>(new AuiToolBarArt); };
 
+    void SetBaseColour(wxColour baseColour)
+    {
+        m_baseColour = baseColour;
+    }
+
     virtual void DrawBackground( wxDC& dc, wxWindow* wnd, const wxRect& rect_)
     {
         //Defines the two rectangles for gradient
@@ -254,9 +276,52 @@ public:
     }
 };
 
+class FlatAuiToolBarArt : public wxAuiDefaultToolBarArt
+{
+public:
+
+    FlatAuiToolBarArt() : wxAuiDefaultToolBarArt() {};
+    virtual ~FlatAuiToolBarArt() {};
+
+    virtual wxAuiToolBarArt* Clone() { return static_cast<wxAuiToolBarArt*>(new FlatAuiToolBarArt); };
+
+    void SetBaseColour(wxColour baseColour)
+    {
+        m_baseColour = baseColour;
+    }
+
+    virtual void DrawBackground( wxDC& dc, wxWindow* wnd, const wxRect& rect_)
+    {
+        wxColour startColour = m_baseColour.ChangeLightness(165);
+        dc.GradientFillLinear(rect_, startColour, startColour, wxSOUTH);
+    }
+};
+
 void SkinHelper::ApplyCurrentSkin(wxAuiToolBar & toolbar)
 {
-    toolbar.SetArtProvider(new AuiToolBarArt);
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    wxString result = "Classic";
+
+    //DockArt skin
+    pConfig->Read( _T( "/Skin/ToolbarStyle" ), &result );
+    wxColor baseColor;
+    pConfig->Read( _T( "/Skin/ToolbarCustomColor" ), &baseColor );
+
+    bool toolbarCustomColor = false;
+    pConfig->Read( _T( "/Skin/ToolbarHasCustomColor" ), &toolbarCustomColor );
+
+    if ( result == "Flat" ) 
+    {
+        FlatAuiToolBarArt * art = new FlatAuiToolBarArt;
+        if ( toolbarCustomColor ) art->SetBaseColour(baseColor);
+        toolbar.SetArtProvider(art);   
+    }
+    else
+    {
+        AuiToolBarArt * art = new AuiToolBarArt;
+        if ( toolbarCustomColor ) art->SetBaseColour(baseColor);
+        toolbar.SetArtProvider(art);   
+    }
 }
 
 void SkinHelper::ApplyCurrentSkin(wxPropertyGrid & propertyGrid)

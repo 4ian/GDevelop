@@ -41,7 +41,6 @@ class Preferences: public wxDialog
 		wxPanel* Panel5;
 		wxCheckBox* hideLabelsCheck;
 		wxCheckBox* avertOnSaveCheck;
-		wxButton* auiStyleBt;
 		wxCheckBox* MAJCheck;
 		wxRadioBox* ribbonStyleBox;
 		wxButton* gdStyleBt;
@@ -57,12 +56,14 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText14;
 		wxCheckBox* logCheck;
 		wxCheckBox* deleteTemporariesCheck;
+		wxButton* Button1;
 		wxStaticText* StaticText6;
 		wxPanel* activeTabColorPnl;
 		wxPanel* borderColorPnl;
 		wxSpinCtrl* codeCompilerThreadEdit;
 		wxStaticText* StaticText19;
 		wxStaticText* StaticText8;
+		wxPanel* toolbarColorPanel;
 		wxStaticText* StaticText11;
 		wxStaticText* StaticText18;
 		wxTextCtrl* autosaveTimeEdit;
@@ -79,6 +80,7 @@ class Preferences: public wxDialog
 		wxPanel* inactiveTextColorPnl;
 		wxButton* browseJavaBt;
 		wxButton* newProjectFolderBrowseBt;
+		wxButton* Button2;
 		wxPanel* InactifColor2Pnl;
 		wxCheckBox* hidePageTabsCheck;
 		wxPanel* Panel6;
@@ -87,6 +89,8 @@ class Preferences: public wxDialog
 		wxStaticLine* StaticLine2;
 		wxStaticText* StaticText23;
 		wxStaticText* StaticText24;
+		wxCheckBox* customToolbarColorCheck;
+		wxRadioBox* tabBox;
 		wxPanel* ActifColorPnl;
 		wxCheckBox* hideContextPanelsLabels;
 		wxPropertyGrid* eventsEditorParametersProperties;
@@ -111,6 +115,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText17;
 		wxStaticText* StaticText4;
 		wxButton* browseCodeEditorBt;
+		wxRadioBox* toolbarBox;
 		wxButton* browseCompilationTempDir;
 		wxButton* officeStyleBt;
 		wxStaticText* StaticText16;
@@ -158,10 +163,11 @@ class Preferences: public wxDialog
 		static const long ID_CHOICE1;
 		static const long ID_PANEL16;
 		static const long ID_BUTTON6;
+		static const long ID_BUTTON16;
+		static const long ID_BUTTON8;
 		static const long ID_BUTTON7;
 		static const long ID_BUTTON10;
 		static const long ID_BUTTON13;
-		static const long ID_BUTTON8;
 		static const long ID_RADIOBOX1;
 		static const long ID_STATICTEXT1;
 		static const long ID_PANEL9;
@@ -189,6 +195,10 @@ class Preferences: public wxDialog
 		static const long ID_PANEL19;
 		static const long ID_STATICTEXT20;
 		static const long ID_PANEL20;
+		static const long ID_RADIOBOX2;
+		static const long ID_CHECKBOX1;
+		static const long ID_PANEL22;
+		static const long ID_RADIOBOX3;
 		static const long ID_PANEL8;
 		static const long ID_STATICTEXT17;
 		static const long ID_TEXTCTRL5;
@@ -250,6 +260,10 @@ class Preferences: public wxDialog
 		void OnnewProjectFolderBrowseBtClick(wxCommandEvent& event);
 		void OneventsEditorFontBtClick(wxCommandEvent& event);
 		void OnbrowseJavaBtClick(wxCommandEvent& event);
+		void OncustomToolbarColorCheckClick(wxCommandEvent& event);
+		void OntoolbarColorPanelLeftUp(wxMouseEvent& event);
+		void OnGDMetroStyleClick(wxCommandEvent& event);
+		void OnMetroWhiteStyleClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

@@ -29,8 +29,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-										<label>The preference window allow you to personnalize&#x0A;Game Develop. Each user of the computer owns&#x0A;his own options.</label>
-										<size>417,48</size>
+										<label>This window allows you to customize Game Develop. &#x0A;Each user of the computer has his own options.</label>
 										<style>wxALIGN_LEFT</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -171,7 +170,7 @@
 								<cols>3</cols>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
-										<label>Language</label>
+										<label>Language:</label>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -420,7 +419,7 @@
 												<cols>3</cols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
-														<label>Onglet &quot;Scène/Evenements&quot; :</label>
+														<label>Scene/Events tab:</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -461,7 +460,7 @@
 										<label>Predefined appearance </label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-												<cols>5</cols>
+												<cols>6</cols>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON6" variable="gdStyleBt" member="yes">
 														<label>Game Develop Standard</label>
@@ -472,8 +471,26 @@
 													<option>1</option>
 												</object>
 												<object class="sizeritem">
+													<object class="wxButton" name="ID_BUTTON16" variable="Button2" member="yes">
+														<label>Game Develop Metro</label>
+														<handler function="OnGDMetroStyleClick" entry="EVT_BUTTON" />
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxButton" name="ID_BUTTON8" variable="Button1" member="yes">
+														<label>Metro White</label>
+														<handler function="OnMetroWhiteStyleClick" entry="EVT_BUTTON" />
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON7" variable="officeStyleBt" member="yes">
-														<label>Microsoft Office</label>
+														<label>Office Blue</label>
 														<handler function="OnofficeStyleBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -498,15 +515,6 @@
 													<border>5</border>
 													<option>1</option>
 												</object>
-												<object class="sizeritem">
-													<object class="wxButton" name="ID_BUTTON8" variable="auiStyleBt" member="yes">
-														<label>wxAUI</label>
-														<handler function="OnauiStyleBtClick" entry="EVT_BUTTON" />
-													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<option>1</option>
@@ -519,13 +527,13 @@
 								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 										<cols>4</cols>
-										<growablecols>2</growablecols>
 										<object class="sizeritem">
 											<object class="wxRadioBox" name="ID_RADIOBOX1" variable="ribbonStyleBox" member="yes">
 												<label>Ribbon&apos;s style</label>
 												<content>
 													<item>Microsoft Office</item>
 													<item>wxAUI</item>
+													<item>Metro</item>
 												</content>
 												<default>-1</default>
 												<style>wxRA_HORIZONTAL</style>
@@ -622,7 +630,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer16" member="no">
-												<label>Bouton &quot;Fichier&quot;</label>
+												<label>File button</label>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer32" member="no">
 														<cols>3</cols>
@@ -834,55 +842,136 @@
 											<border>5</border>
 											<option>1</option>
 										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer38" member="no">
+										<cols>3</cols>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer14" member="no">
-												<label>Tabs colors</label>
+												<label>Tabs</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer30" member="no">
-														<cols>2</cols>
+														<cols>3</cols>
 														<object class="sizeritem">
-															<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText19" member="yes">
-																<label>Active :</label>
+															<object class="wxFlexGridSizer" variable="FlexGridSizer37" member="no">
+																<cols>2</cols>
+																<object class="sizeritem">
+																	<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText19" member="yes">
+																		<label>Active :</label>
+																	</object>
+																	<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+																<object class="sizeritem">
+																	<object class="wxPanel" name="ID_PANEL19" variable="activeTabColorPnl" member="yes">
+																		<size>39,16</size>
+																		<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
+																		<handler function="OnactiveTabColorPnlLeftUp" entry="EVT_LEFT_UP" />
+																	</object>
+																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+																<object class="sizeritem">
+																	<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText20" member="yes">
+																		<label>Inactive :</label>
+																	</object>
+																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+																<object class="sizeritem">
+																	<object class="wxPanel" name="ID_PANEL20" variable="tabColorPnl" member="yes">
+																		<size>39,16</size>
+																		<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
+																		<handler function="OntabColorPnlLeftUp" entry="EVT_LEFT_UP" />
+																	</object>
+																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
 															</object>
-															<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-															<border>5</border>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<option>1</option>
 														</object>
 														<object class="sizeritem">
-															<object class="wxPanel" name="ID_PANEL19" variable="activeTabColorPnl" member="yes">
-																<size>39,16</size>
-																<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
-																<handler function="OnactiveTabColorPnlLeftUp" entry="EVT_LEFT_UP" />
+															<object class="wxRadioBox" name="ID_RADIOBOX2" variable="tabBox" member="yes">
+																<label>Style</label>
+																<content>
+																	<item>Normal</item>
+																	<item>Flat</item>
+																</content>
+																<default>-1</default>
 															</object>
-															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-															<border>5</border>
-															<option>1</option>
-														</object>
-														<object class="sizeritem">
-															<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText20" member="yes">
-																<label>Inactive :</label>
-															</object>
-															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-															<border>5</border>
-															<option>1</option>
-														</object>
-														<object class="sizeritem">
-															<object class="wxPanel" name="ID_PANEL20" variable="tabColorPnl" member="yes">
-																<size>39,16</size>
-																<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
-																<handler function="OntabColorPnlLeftUp" entry="EVT_LEFT_UP" />
-															</object>
-															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<option>1</option>
 												</object>
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBoxSizer" variable="StaticBoxSizer20" member="no">
+												<label>Toolbars</label>
+												<object class="sizeritem">
+													<object class="wxFlexGridSizer" variable="FlexGridSizer35" member="no">
+														<cols>2</cols>
+														<object class="sizeritem">
+															<object class="wxFlexGridSizer" variable="FlexGridSizer36" member="no">
+																<cols>3</cols>
+																<object class="sizeritem">
+																	<object class="wxCheckBox" name="ID_CHECKBOX1" variable="customToolbarColorCheck" member="yes">
+																		<label>Custom color:</label>
+																		<handler function="OncustomToolbarColorCheckClick" entry="EVT_CHECKBOX" />
+																	</object>
+																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+																<object class="sizeritem">
+																	<object class="wxPanel" name="ID_PANEL22" variable="toolbarColorPanel" member="yes">
+																		<size>39,16</size>
+																		<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
+																		<handler function="OntoolbarColorPanelLeftUp" entry="EVT_LEFT_UP" />
+																	</object>
+																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxRadioBox" name="ID_RADIOBOX3" variable="toolbarBox" member="yes">
+																<label>Style</label>
+																<content>
+																	<item>Normal</item>
+																	<item>Flat</item>
+																</content>
+																<default>-1</default>
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -950,7 +1039,7 @@
 														<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
 														<include_file>wx/propgrid/propgrid.h</include_file>
 														<style></style>
-														<size>342,168</size>
+														<size>532,211</size>
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>

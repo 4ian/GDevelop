@@ -345,7 +345,7 @@ AudioExtension::AudioExtension()
 
 
     AddCondition("GlobalVolume",
-                   _("global"),
+                   _("Global volume"),
                    _("Test the global sound level. The volume is between 0 and 100."),
                    _("The global game volume is _PARAM2_ to _PARAM1_"),
                    _("Audio"),

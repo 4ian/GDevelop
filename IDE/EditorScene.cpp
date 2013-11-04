@@ -152,9 +152,14 @@ mainFrameWrapper(mainFrameWrapper_)
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
     layoutEditorCanvas->ConnectEvents();
 
+    //Load the saved perspective and make sure titles are translated
     wxString perspective;
 	wxConfigBase::Get()->Read("/SceneEditor/LastWorkspace", &perspective);
 	m_mgr.LoadPerspective(perspective);
+    m_mgr.GetPane(objectsEditor.get()).Caption(_( "Objects' editor" ));
+    m_mgr.GetPane(layersEditor.get()).Caption(_( "Layers' editor" ));
+    m_mgr.GetPane(propertiesPnl.get()).Caption(_( "Properties" ));
+    m_mgr.GetPane(initialInstancesBrowser.get()).Caption(_( "Instances list" ));
 
     m_mgr.Update();
 }

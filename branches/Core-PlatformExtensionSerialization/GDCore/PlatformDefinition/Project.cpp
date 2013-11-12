@@ -234,6 +234,19 @@ unsigned int Project::GetLayoutCount() const
     return scenes.size();
 }
 
+#if defined(GD_IDE_ONLY)
+void Project::SwapLayouts(unsigned int first, unsigned int second)
+{
+    if ( first >= scenes.size() || second >= scenes.size() )
+        return;
+
+    boost::shared_ptr<gd::Layout> firstItem = scenes[first];
+    boost::shared_ptr<gd::Layout> secondItem = scenes[second];
+    scenes[first] = secondItem;
+    scenes[second] = firstItem;
+}
+#endif
+
 gd::Layout & Project::InsertNewLayout(const std::string & name, unsigned int position)
 {
     boost::shared_ptr<gd::Layout> newScene = boost::shared_ptr<gd::Layout>(new Layout);
@@ -331,6 +344,28 @@ void Project::RemoveExternalEvents(const std::string & name)
 
     externalEvents.erase(events);
 }
+
+void Project::SwapExternalEvents(unsigned int first, unsigned int second)
+{
+    if ( first >= externalEvents.size() || second >= externalEvents.size() )
+        return;
+
+    boost::shared_ptr<gd::ExternalEvents> firstItem = externalEvents[first];
+    boost::shared_ptr<gd::ExternalEvents> secondItem = externalEvents[second];
+    externalEvents[first] = secondItem;
+    externalEvents[second] = firstItem;
+}
+
+void Project::SwapExternalLayouts(unsigned int first, unsigned int second)
+{
+    if ( first >= externalLayouts.size() || second >= externalLayouts.size() )
+        return;
+
+    boost::shared_ptr<gd::ExternalLayout> firstItem = externalLayouts[first];
+    boost::shared_ptr<gd::ExternalLayout> secondItem = externalLayouts[second];
+    externalLayouts[first] = secondItem;
+    externalLayouts[second] = firstItem;
+}
 #endif
 bool Project::HasExternalLayoutNamed(const std::string & name) const
 {
@@ -360,6 +395,7 @@ unsigned int Project::GetExternalLayoutPosition(const std::string & name) const
     }
     return std::string::npos;
 }
+
 unsigned int Project::GetExternalLayoutsCount() const
 {
     return externalLayouts.size();

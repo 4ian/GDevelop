@@ -280,47 +280,56 @@ public:
     ///@{
 
     /**
-     * Return true if layout called "name" exists.
+     * \brief Return true if layout called "name" exists.
      */
     bool HasLayoutNamed(const std::string & name) const;
 
     /**
-     * Return a reference to the layout called "name".
+     * \brief Return a reference to the layout called "name".
      */
     Layout & GetLayout(const std::string & name);
 
     /**
-     * Return a reference to the layout called "name".
+     * \brief Return a reference to the layout called "name".
      */
     const Layout & GetLayout(const std::string & name) const;
 
     /**
-     * Return a reference to the layout at position "index" in the layout list
+     * \brief Return a reference to the layout at position "index" in the layout list
      */
     Layout & GetLayout(unsigned int index);
 
     /**
-     * Return a reference to the layout at position "index" in the layout list
+     * \brief Return a reference to the layout at position "index" in the layout list
      */
     const Layout & GetLayout (unsigned int index) const;
 
     /**
-     * Return the position of the layout called "name" in the layout list
+     * \brief Return the position of the layout called "name" in the layout list
      */
     unsigned int GetLayoutPosition(const std::string & name) const;
 
+    #if defined(GD_IDE_ONLY)
     /**
-     * Return the number of layouts.
+     * \brief Swap the specified layouts.
+     *
+     * Do nothing if indexes are not correct.
+     */
+    void SwapLayouts(unsigned int first, unsigned int second);
+    #endif
+
+    /**
+     * \brief Return the number of layouts.
      */
     unsigned int GetLayoutCount() const;
 
     /**
-     * Must add a new empty layout called "name" at the specified position in the layout list.
+     * \brief Must add a new empty layout called "name" at the specified position in the layout list.
      */
     gd::Layout & InsertNewLayout(const std::string & name, unsigned int position);
 
     /**
-     * Must add a new layout constructed from the layout passed as parameter.
+     * \brief Must add a new layout constructed from the layout passed as parameter.
      * \note No pointer or reference must be kept on the layout passed as parameter.
      * \param layout The layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layout must be inserted at the end of the layout list.
@@ -408,6 +417,13 @@ public:
     unsigned int GetExternalEventsPosition(const std::string & name) const;
 
     /**
+     * \brief Swap the specified external events.
+     *
+     * Do nothing if indexes are not correct.
+     */
+    void SwapExternalEvents(unsigned int first, unsigned int second);
+
+    /**
      * Return the number of external events.
      */
     unsigned int GetExternalEventsCount() const;
@@ -466,6 +482,15 @@ public:
      * Return the position of the external layout called "name" in the external layout list
      */
     unsigned int GetExternalLayoutPosition(const std::string & name) const;
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Swap the specified external layouts.
+     *
+     * Do nothing if indexes are not correct.
+     */
+    void SwapExternalLayouts(unsigned int first, unsigned int second);
+    #endif
 
     /**
      * Return the number of external layout.

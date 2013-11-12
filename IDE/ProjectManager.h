@@ -58,6 +58,8 @@ class ProjectManager: public wxPanel
 		//(*Declarations(ProjectManager)
 		wxMenuItem* MenuItem8;
 		wxMenuItem* MenuItem7;
+		wxMenuItem* MenuItem26;
+		wxMenuItem* MenuItem25;
 		wxMenuItem* MenuItem5;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
@@ -65,6 +67,7 @@ class ProjectManager: public wxPanel
 		wxMenuItem* editNameGameMenuItem;
 		wxMenuItem* MenuItem14;
 		wxMenuItem* MenuItem11;
+		wxMenuItem* MenuItem29;
 		wxTreeCtrl* projectsTree;
 		wxMenuItem* MenuItem15;
 		wxMenuItem* MenuItem22;
@@ -75,12 +78,14 @@ class ProjectManager: public wxPanel
 		wxMenuItem* MenuItem10;
 		wxMenuItem* MenuItem12;
 		wxMenuItem* MenuItem24;
+		wxMenuItem* MenuItem27;
 		wxMenu externalEventsContextMenu;
 		wxMenu externalLayoutContextMenu;
 		wxMenuItem* MenuItem3;
 		wxMenu sourceFilesContextMenu;
 		wxMenuItem* MenuItem20;
 		wxMenu sourceFileContextMenu;
+		wxMenuItem* MenuItem28;
 		wxMenu scenesContextMenu;
 		wxMenuItem* copySceneMenuItem;
 		wxMenuItem* MenuItem6;
@@ -96,6 +101,7 @@ class ProjectManager: public wxPanel
 		wxMenuItem* MenuItem9;
 		wxMenuItem* closeGameBt;
 		wxMenuItem* MenuItem18;
+		wxMenuItem* MenuItem30;
 		wxMenu emptyExternalLayoutsContextMenu;
 		wxMenuItem* editScenePropMenuItem;
 		wxMenuItem* MenuItem19;
@@ -111,6 +117,8 @@ class ProjectManager: public wxPanel
 		static const long idMenuModNameScene;
 		static const long idMenuAddScene;
 		static const long idMenuDelScene;
+		static const long ID_MENUITEM29;
+		static const long ID_MENUITEM30;
 		static const long idMenuCopyScene;
 		static const long idMenuCutScene;
 		static const long idMenuPasteScene;
@@ -125,6 +133,8 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM13;
 		static const long ID_MENUITEM8;
 		static const long ID_MENUITEM9;
+		static const long ID_MENUITEM31;
+		static const long ID_MENUITEM32;
 		static const long ID_MENUITEM10;
 		static const long ID_MENUITEM11;
 		static const long ID_MENUITEM12;
@@ -139,6 +149,8 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM22;
 		static const long ID_MENUITEM23;
 		static const long ID_MENUITEM24;
+		static const long ID_MENUITEM33;
+		static const long ID_MENUITEM34;
 		static const long ID_MENUITEM25;
 		static const long ID_MENUITEM26;
 		static const long ID_MENUITEM27;
@@ -204,6 +216,12 @@ class ProjectManager: public wxPanel
 		void OnPasteExternalLayoutSelected(wxCommandEvent& event);
 		void OnprojectsTreeKeyDown(wxTreeEvent& event);
 		void OnOpenProjectFolderSelected(wxCommandEvent& event);
+		void OnSceneMoveUpSelected(wxCommandEvent& event);
+		void OnSceneMoveDownSelected(wxCommandEvent& event);
+		void OnExternalLayoutMoveUpSelected(wxCommandEvent& event);
+		void OnExternalLayoutMoveDownSelected(wxCommandEvent& event);
+		void OnExternalEventsMoveUpSelected(wxCommandEvent& event);
+		void OnExternalEventsMoveDownSelected(wxCommandEvent& event);
 		//*)
 
 		bool GetGameOfSelectedItem(gd::Project *& game, gdTreeItemProjectData *& data);

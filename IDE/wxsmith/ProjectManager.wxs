@@ -65,6 +65,19 @@
 				<handler function="OndeleteSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM29" variable="MenuItem25" member="yes">
+				<label>Move up</label>
+				<accel>Ctrl-Up</accel>
+				<bitmap>res/up.png</bitmap>
+				<handler function="OnSceneMoveUpSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM30" variable="MenuItem26" member="yes">
+				<label>Move down</label>
+				<accel>Ctrl-Down</accel>
+				<bitmap>res/down.png</bitmap>
+				<handler function="OnSceneMoveDownSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuCopyScene" variable="copySceneMenuItem" member="yes">
 				<label>Copy</label>
 				<accel>Ctrl-C</accel>
@@ -152,6 +165,19 @@
 				<handler function="OnDeleteExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM31" variable="MenuItem27" member="yes">
+				<label>Move up</label>
+				<accel>Ctrl-Up</accel>
+				<bitmap>res/up.png</bitmap>
+				<handler function="OnExternalEventsMoveUpSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM32" variable="MenuItem28" member="yes">
+				<label>Move down</label>
+				<accel>Ctrl-Down</accel>
+				<bitmap>res/down.png</bitmap>
+				<handler function="OnExternalEventsMoveDownSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem6" member="yes">
 				<label>Copy</label>
 				<accel>Ctrl-C</accel>
@@ -236,6 +262,19 @@
 				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM33" variable="MenuItem29" member="yes">
+				<label>Move up</label>
+				<accel>Ctrl-Up</accel>
+				<bitmap>res/up.png</bitmap>
+				<handler function="OnExternalLayoutMoveUpSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM34" variable="MenuItem30" member="yes">
+				<label>Move down</label>
+				<accel>Ctrl-Down</accel>
+				<bitmap>res/down.png</bitmap>
+				<handler function="OnExternalLayoutMoveDownSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">

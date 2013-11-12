@@ -54,6 +54,8 @@ const long ProjectManager::idMenuModVar = wxNewId();
 const long ProjectManager::idMenuModNameScene = wxNewId();
 const long ProjectManager::idMenuAddScene = wxNewId();
 const long ProjectManager::idMenuDelScene = wxNewId();
+const long ProjectManager::ID_MENUITEM29 = wxNewId();
+const long ProjectManager::ID_MENUITEM30 = wxNewId();
 const long ProjectManager::idMenuCopyScene = wxNewId();
 const long ProjectManager::idMenuCutScene = wxNewId();
 const long ProjectManager::idMenuPasteScene = wxNewId();
@@ -68,6 +70,8 @@ const long ProjectManager::ID_MENUITEM7 = wxNewId();
 const long ProjectManager::ID_MENUITEM13 = wxNewId();
 const long ProjectManager::ID_MENUITEM8 = wxNewId();
 const long ProjectManager::ID_MENUITEM9 = wxNewId();
+const long ProjectManager::ID_MENUITEM31 = wxNewId();
+const long ProjectManager::ID_MENUITEM32 = wxNewId();
 const long ProjectManager::ID_MENUITEM10 = wxNewId();
 const long ProjectManager::ID_MENUITEM11 = wxNewId();
 const long ProjectManager::ID_MENUITEM12 = wxNewId();
@@ -82,6 +86,8 @@ const long ProjectManager::ID_MENUITEM21 = wxNewId();
 const long ProjectManager::ID_MENUITEM22 = wxNewId();
 const long ProjectManager::ID_MENUITEM23 = wxNewId();
 const long ProjectManager::ID_MENUITEM24 = wxNewId();
+const long ProjectManager::ID_MENUITEM33 = wxNewId();
+const long ProjectManager::ID_MENUITEM34 = wxNewId();
 const long ProjectManager::ID_MENUITEM25 = wxNewId();
 const long ProjectManager::ID_MENUITEM26 = wxNewId();
 const long ProjectManager::ID_MENUITEM27 = wxNewId();
@@ -147,6 +153,13 @@ mainEditor(mainEditor_)
 	deleteSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	sceneContextMenu.Append(deleteSceneMenuItem);
 	sceneContextMenu.AppendSeparator();
+	MenuItem25 = new wxMenuItem((&sceneContextMenu), ID_MENUITEM29, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem25->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	sceneContextMenu.Append(MenuItem25);
+	MenuItem26 = new wxMenuItem((&sceneContextMenu), ID_MENUITEM30, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem26->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	sceneContextMenu.Append(MenuItem26);
+	sceneContextMenu.AppendSeparator();
 	copySceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCopyScene, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	copySceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	sceneContextMenu.Append(copySceneMenuItem);
@@ -192,6 +205,13 @@ mainEditor(mainEditor_)
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	externalEventsContextMenu.Append(MenuItem5);
 	externalEventsContextMenu.AppendSeparator();
+	MenuItem27 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM31, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem27->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	externalEventsContextMenu.Append(MenuItem27);
+	MenuItem28 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM32, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem28->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	externalEventsContextMenu.Append(MenuItem28);
+	externalEventsContextMenu.AppendSeparator();
 	MenuItem6 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM10, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	externalEventsContextMenu.Append(MenuItem6);
@@ -236,6 +256,13 @@ mainEditor(mainEditor_)
 	MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	externalLayoutContextMenu.Append(MenuItem20);
 	externalLayoutContextMenu.AppendSeparator();
+	MenuItem29 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM33, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem29->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	externalLayoutContextMenu.Append(MenuItem29);
+	MenuItem30 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM34, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem30->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	externalLayoutContextMenu.Append(MenuItem30);
+	externalLayoutContextMenu.AppendSeparator();
 	MenuItem21 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM25, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	externalLayoutContextMenu.Append(MenuItem21);
@@ -260,6 +287,8 @@ mainEditor(mainEditor_)
 	Connect(idMenuModNameScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditSceneNameMenuItemSelected);
 	Connect(idMenuAddScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnaddSceneMenuItemSelected);
 	Connect(idMenuDelScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OndeleteSceneMenuItemSelected);
+	Connect(ID_MENUITEM29,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnSceneMoveUpSelected);
+	Connect(ID_MENUITEM30,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnSceneMoveDownSelected);
 	Connect(idMenuCopyScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OncopySceneMenuItemSelected);
 	Connect(idMenuCutScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OncutSceneMenuItemSelected);
 	Connect(idMenuPasteScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnpasteSceneMenuItemSelected);
@@ -274,6 +303,8 @@ mainEditor(mainEditor_)
 	Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnRenameExternalEventsSelected);
 	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalEventsSelected);
 	Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnDeleteExternalEventsSelected);
+	Connect(ID_MENUITEM31,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnExternalEventsMoveUpSelected);
+	Connect(ID_MENUITEM32,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnExternalEventsMoveDownSelected);
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCopyExternalEventsSelected);
 	Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCutExternalEventsSelected);
 	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnPasteExternalEventsSelected);
@@ -288,6 +319,8 @@ mainEditor(mainEditor_)
 	Connect(ID_MENUITEM22,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnRenameExternalLayoutSelected);
 	Connect(ID_MENUITEM23,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalLayoutSelected);
 	Connect(ID_MENUITEM24,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnDeleteExternalLayoutSelected);
+	Connect(ID_MENUITEM33,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnExternalLayoutMoveUpSelected);
+	Connect(ID_MENUITEM34,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnExternalLayoutMoveDownSelected);
 	Connect(ID_MENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCopyExternalLayoutSelected);
 	Connect(ID_MENUITEM26,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCutExternalLayoutSelected);
 	Connect(ID_MENUITEM27,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnPasteExternalLayoutSelected);
@@ -1914,6 +1947,191 @@ void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }
 
+namespace {
+
+wxTreeItemId GetPreviousSibling(wxTreeCtrl * ctrl, wxTreeItemId item)
+{
+    wxTreeItemId parent = ctrl->GetItemParent(item);
+    wxTreeItemId previous;
+    void * cookie;
+    wxTreeItemId current = ctrl->GetFirstChild(parent, cookie);
+    while (current.IsOk())
+    {
+        if ( current == item ) return previous;
+
+        previous = current;
+        current = ctrl->GetNextSibling(current);
+    }
+
+    wxTreeItemId notOk;
+    return notOk;
+}
+
+}
+
+void ProjectManager::OnSceneMoveUpSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    unsigned int index = game->GetLayoutPosition(data->GetSecondString());
+    if ( index >= game->GetLayoutCount() || index == 0 )
+        return;
+
+    //Swap the scenes
+    game->SwapLayouts(index, index-1);
+    
+    //Update the tree
+    wxString nextName = data->GetSecondString();
+    wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
+    wxTreeItemId previous = GetPreviousSibling(projectsTree, selectedItem);
+    wxString previousName = projectsTree->GetItemText(previous);
+    wxTreeItemData* previousData = projectsTree->GetItemData(previous);
+
+    projectsTree->SetItemText(previous, nextName);
+    projectsTree->SetItemText(selectedItem, previousName);
+    projectsTree->SetItemData(previous, nextData);
+    projectsTree->SetItemData(selectedItem, previousData);
+    projectsTree->SelectItem(previous);
+}
+
+void ProjectManager::OnSceneMoveDownSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    unsigned int index = game->GetLayoutPosition(data->GetSecondString());
+    if ( index >= game->GetLayoutCount()-1 )
+        return;
+
+    //Swap the scenes
+    game->SwapLayouts(index, index+1);
+    
+    //Update the tree
+    wxString previousName = data->GetSecondString();
+    wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
+    wxTreeItemId next = projectsTree->GetNextSibling(selectedItem);
+    wxString nextName = projectsTree->GetItemText(next);
+    wxTreeItemData* nextData = projectsTree->GetItemData(next);
+
+    projectsTree->SetItemText(next, previousName);
+    projectsTree->SetItemText(selectedItem, nextName);
+    projectsTree->SetItemData(next, previousData);
+    projectsTree->SetItemData(selectedItem, nextData);
+    projectsTree->SelectItem(next);
+}
+
+void ProjectManager::OnExternalLayoutMoveUpSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    unsigned int index = game->GetExternalLayoutPosition(data->GetSecondString());
+    if ( index >= game->GetExternalLayoutsCount() || index == 0 )
+        return;
+
+    //Swap the scenes
+    game->SwapExternalLayouts(index, index-1);
+    
+    //Update the tree
+    wxString nextName = data->GetSecondString();
+    wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
+    wxTreeItemId previous = GetPreviousSibling(projectsTree, selectedItem);
+    wxString previousName = projectsTree->GetItemText(previous);
+    wxTreeItemData* previousData = projectsTree->GetItemData(previous);
+
+    projectsTree->SetItemText(previous, nextName);
+    projectsTree->SetItemText(selectedItem, previousName);
+    projectsTree->SetItemData(previous, nextData);
+    projectsTree->SetItemData(selectedItem, previousData);
+    projectsTree->SelectItem(previous);
+}
+
+void ProjectManager::OnExternalLayoutMoveDownSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    unsigned int index = game->GetExternalLayoutPosition(data->GetSecondString());
+    if ( index >= game->GetExternalLayoutsCount()-1 )
+        return;
+
+    //Swap the scenes
+    game->SwapExternalLayouts(index, index+1);
+    
+    //Update the tree
+    wxString previousName = data->GetSecondString();
+    wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
+    wxTreeItemId next = projectsTree->GetNextSibling(selectedItem);
+    wxString nextName = projectsTree->GetItemText(next);
+    wxTreeItemData* nextData = projectsTree->GetItemData(next);
+
+    projectsTree->SetItemText(next, previousName);
+    projectsTree->SetItemText(selectedItem, nextName);
+    projectsTree->SetItemData(next, previousData);
+    projectsTree->SetItemData(selectedItem, nextData);
+    projectsTree->SelectItem(next);
+}
+
+void ProjectManager::OnExternalEventsMoveUpSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    unsigned int index = game->GetExternalEventsPosition(data->GetSecondString());
+    if ( index >= game->GetExternalEventsCount() || index == 0 )
+        return;
+
+    //Swap the scenes
+    game->SwapExternalEvents(index, index-1);
+    
+    //Update the tree
+    wxString nextName = data->GetSecondString();
+    wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
+    wxTreeItemId previous = GetPreviousSibling(projectsTree, selectedItem);
+    wxString previousName = projectsTree->GetItemText(previous);
+    wxTreeItemData* previousData = projectsTree->GetItemData(previous);
+
+    projectsTree->SetItemText(previous, nextName);
+    projectsTree->SetItemText(selectedItem, previousName);
+    projectsTree->SetItemData(previous, nextData);
+    projectsTree->SetItemData(selectedItem, previousData);
+    projectsTree->SelectItem(previous);
+}
+
+void ProjectManager::OnExternalEventsMoveDownSelected(wxCommandEvent& event)
+{
+    gd::Project * game;
+    gdTreeItemProjectData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    unsigned int index = game->GetExternalEventsPosition(data->GetSecondString());
+    if ( index >= game->GetExternalEventsCount()-1 )
+        return;
+
+    //Swap the scenes
+    game->SwapExternalEvents(index, index+1);
+    
+    //Update the tree
+    wxString previousName = data->GetSecondString();
+    wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
+    wxTreeItemId next = projectsTree->GetNextSibling(selectedItem);
+    wxString nextName = projectsTree->GetItemText(next);
+    wxTreeItemData* nextData = projectsTree->GetItemData(next);
+
+    projectsTree->SetItemText(next, previousName);
+    projectsTree->SetItemText(selectedItem, nextName);
+    projectsTree->SetItemData(next, previousData);
+    projectsTree->SetItemData(selectedItem, nextData);
+    projectsTree->SelectItem(next);
+}
+
+
 void ProjectManager::OnprojectsTreeKeyDown(wxTreeEvent& event)
 {
     wxCommandEvent useless;
@@ -1952,6 +2170,26 @@ void ProjectManager::OnprojectsTreeKeyDown(wxTreeEvent& event)
                     OnPasteExternalEventsSelected(useless);
                 else if ( data->GetString() == "ExternalLayout")
                     OnPasteExternalLayoutSelected(useless);
+                break;
+            }
+            case WXK_UP:
+            {
+                if ( data->GetString() == "Scene")
+                    OnSceneMoveUpSelected(useless);
+                else if ( data->GetString() == "ExternalEvents")
+                    OnExternalEventsMoveUpSelected(useless);
+                else if ( data->GetString() == "ExternalLayout")
+                    OnExternalLayoutMoveUpSelected(useless);
+                break;
+            }
+            case WXK_DOWN:
+            {
+                if ( data->GetString() == "Scene")
+                    OnSceneMoveDownSelected(useless);
+                else if ( data->GetString() == "ExternalEvents")
+                    OnExternalEventsMoveDownSelected(useless);
+                else if ( data->GetString() == "ExternalLayout")
+                    OnExternalLayoutMoveDownSelected(useless);
                 break;
             }
             default:

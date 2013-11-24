@@ -260,7 +260,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_MASKAPPLYWHOLEANIMITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->Realize();
-	AuiManager3->AddPane(maskToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().DefaultPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
+	AuiManager3->AddPane(maskToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager3->Update();
 	FlexGridSizer6->Add(Panel3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	maskTree = new wxTreeListCtrl(maskPanel,ID_TREELISTCTRL1,wxDefaultPosition,wxDefaultSize,0,_T("ID_TREELISTCTRL1"));
@@ -281,7 +281,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	pointToolbar->AddSeparator();
 	pointToolbar->AddTool(ID_POINTAPPLYWHOLEANIMITEM, _("Apply the changes to the whole animation"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, _("Apply changes to the whole animation"), wxEmptyString, NULL);
 	pointToolbar->Realize();
-	AuiManager2->AddPane(pointToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().DefaultPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
+	AuiManager2->AddPane(pointToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager2->Update();
 	FlexGridSizer5->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	pointsList = new wxListCtrl(pointsPanel, ID_LISTCTRL3, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_EDIT_LABELS, wxDefaultValidator, _T("ID_LISTCTRL3"));

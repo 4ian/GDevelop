@@ -35,6 +35,8 @@ namespace
 
 double GD_API Random(int end)
 {
+    if ( end <= 0 ) return 0;
+
     int begin = 0;
     return std::rand() % (end - begin + 1) + begin;
 }

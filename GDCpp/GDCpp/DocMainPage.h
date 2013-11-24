@@ -183,7 +183,7 @@
  * First extract the archive inside the folder ExtLibs. <br>
  * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
  * \code
- * ./configure
+ * ./configure --enable-ribbon
  * make
  * sudo make install
  * \endcode

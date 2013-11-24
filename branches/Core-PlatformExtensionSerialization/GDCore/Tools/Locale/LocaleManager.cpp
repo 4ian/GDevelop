@@ -11,8 +11,10 @@ namespace gd
 
 LocaleManager * LocaleManager::_singleton = 0;
 
-bool LocaleManager::SetLanguage(int languageWxWidgetsId)
+bool LocaleManager::SetLanguage(int languageWxWidgetsId_)
 {
+    languageWxWidgetsId = languageWxWidgetsId_;
+
     if ( locale ) delete locale;
     locale = new wxLocale;
     locale->Init(languageWxWidgetsId);

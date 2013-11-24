@@ -369,7 +369,8 @@ void RibbonMetroArtProvider::SetColourScheme(
     m_tab_border_pen = LikePrimary(1.4, 0.03, -0.05);
     m_tab_separator_gradient_colour = LikePrimary(1.7, -0.15, -0.18);
     m_tab_hover_background_top_gradient_colour = m_tab_hover_background_colour;
-    m_tab_label_colour = *wxBLACK;
+    int average = (primary.Red()+primary.Green()+primary.Blue())/3;
+    m_tab_label_colour = average < 127 ? *wxWHITE : *wxBLACK;
     m_tab_hover_background_gradient_colour = m_tab_hover_background_colour;
 
     m_panel_minimised_border_gradient_pen = LikePrimary(-6.9, -0.17, -0.09);
@@ -382,7 +383,7 @@ void RibbonMetroArtProvider::SetColourScheme(
     m_panel_active_background_colour = m_panel_active_background_top_gradient_colour;
     m_panel_active_background_gradient_colour = m_panel_active_background_colour;
     m_panel_active_background_top_colour = m_panel_active_background_colour;
-    m_panel_label_colour = *wxBLACK;
+    m_panel_label_colour = LikePrimary(-6.9, -0.17, -0.09);
     m_panel_hover_label_colour = m_panel_label_colour;
     m_panel_minimised_label_colour = m_tab_label_colour;
     m_panel_hover_button_background_brush = LikeSecondary(-0.9, 0.16, -0.07);

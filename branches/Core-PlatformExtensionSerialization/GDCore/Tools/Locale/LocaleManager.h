@@ -23,7 +23,18 @@ class GD_CORE_API LocaleManager
 {
 public:
     wxLocale * locale; ///< wxWidgets locale object
+
+    /**
+     * \brief Set the language used.
+     * \param languageWxWidgetsId The wxWidgets identifier of the language.
+     */
     bool SetLanguage(int languageWxWidgetsId);
+
+    /**
+     * \brief Get the language used.
+     * \return The wxWidgets identifier of the language used.
+     */
+    int GetLanguage() { return languageWxWidgetsId; }
     
     /**
      * \brief Add a catalog name.
@@ -63,6 +74,8 @@ private:
 
     LocaleManager() : locale(NULL) {};
     virtual ~LocaleManager() {};
+
+    int languageWxWidgetsId;
 
     static LocaleManager *_singleton;
 };

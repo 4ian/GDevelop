@@ -8,27 +8,35 @@
 #include <string>
 
 /**
- * Class to check and retrieve information
+ * \brief Class to check and retrieve information
  * about Game Develop updates
  */
 class CheckMAJ
 {
-    public:
-        CheckMAJ() : newVersionAvailable(false), newMajor(0), newMinor(0), newBuild(0), newRevision(0) {};
-        virtual ~CheckMAJ() {};
+public:
 
-        void DownloadInformation();
+    /**
+     * \brief Default constructor
+     */
+    CheckMAJ() : newVersionAvailable(false), newMajor(0), newMinor(0), newBuild(0), newRevision(0) {};
+    virtual ~CheckMAJ() {};
 
-        bool newVersionAvailable;
+    /**
+     * Download the information from the official website.
+     * \param excludeFromStatistics If set to true, the request asks the website not to take into account the request into statistics.
+     */
+    void DownloadInformation(bool excludeFromStatistics = false);
 
-        int newMajor;
-        int newMinor;
-        int newBuild;
-        int newRevision;
-        std::string info;
-        std::string link;
+    bool newVersionAvailable;
 
-    private:
+    int newMajor;
+    int newMinor;
+    int newBuild;
+    int newRevision;
+    std::string info;
+    std::string link;
+
+private:
 };
 
 #endif // CHECKMAJ_H

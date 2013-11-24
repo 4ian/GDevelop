@@ -41,6 +41,7 @@ const long Preferences::ID_STATICTEXT7 = wxNewId();
 const long Preferences::ID_PANEL5 = wxNewId();
 const long Preferences::ID_STATICLINE2 = wxNewId();
 const long Preferences::ID_CHECKBOX4 = wxNewId();
+const long Preferences::ID_CHECKBOX10 = wxNewId();
 const long Preferences::ID_CHECKBOX3 = wxNewId();
 const long Preferences::ID_TEXTCTRL1 = wxNewId();
 const long Preferences::ID_STATICTEXT5 = wxNewId();
@@ -193,6 +194,7 @@ changesNeedRestart(false)
     wxStaticBoxSizer* StaticBoxSizer5;
     wxFlexGridSizer* FlexGridSizer32;
     wxFlexGridSizer* FlexGridSizer31;
+    wxFlexGridSizer* FlexGridSizer39;
     wxStaticBoxSizer* StaticBoxSizer18;
     wxFlexGridSizer* FlexGridSizer28;
     wxFlexGridSizer* FlexGridSizer26;
@@ -223,9 +225,15 @@ changesNeedRestart(false)
     FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer14->AddGrowableCol(0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Startup"));
-    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Checking for updates"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    FlexGridSizer39 = new wxFlexGridSizer(0, 1, 0, 0);
+    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Check for updates"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
-    StaticBoxSizer1->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer39->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    sendInfoCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Send anonymous statistics about Game Develop ( version, language used )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
+    sendInfoCheck->SetValue(false);
+    sendInfoCheck->SetToolTip(_("When checked, Game Develop will send some anonymous information to our server so as to get some statistics about the software"));
+    FlexGridSizer39->Add(sendInfoCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer1->Add(FlexGridSizer39, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Autosave"));
     FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -580,6 +588,7 @@ changesNeedRestart(false)
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
+    Connect(ID_CHECKBOX4,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnMAJCheckClick);
     Connect(ID_CHECKBOX8,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnlogCheckClick);
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnnewProjectFolderBrowseBtClick);
@@ -869,6 +878,11 @@ changesNeedRestart(false)
         pConfig->Read("/Log/File", &logFile);
     }
     {
+        bool sendInfo;
+        pConfig->Read("/Startup/SendInfo", &sendInfo, true);
+        if ( sendInfo ) sendInfoCheck->SetValue(true);
+    }
+    {
         bool avertOnSave;
         pConfig->Read("/Save/AvertOnSaveAs", &avertOnSave, true);
         if ( avertOnSave ) avertOnSaveCheck->SetValue(true);
@@ -1031,6 +1045,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write("/Log/Activated", logCheck->GetValue());
     pConfig->Write("/Log/File", logFile);
     LogFileManager::GetInstance()->InitalizeFromConfig();
+
+    pConfig->Write("/Startup/SendInfo", sendInfoCheck->GetValue());
 
     pConfig->Write("/Save/AvertOnSaveAs", avertOnSaveCheck->GetValue());
 
@@ -1717,6 +1733,10 @@ void Preferences::OneventsEditorFontBtClick(wxCommandEvent& event)
 void Preferences::OncustomToolbarColorCheckClick(wxCommandEvent& event)
 {
     toolbarColorPanel->Enable(customToolbarColorCheck->GetValue());
+}
+
+void Preferences::OnMAJCheckClick(wxCommandEvent& event)
+{
 }
 
 void Preferences::OntoolbarColorPanelLeftUp(wxMouseEvent& event)

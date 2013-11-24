@@ -143,7 +143,7 @@ MAJ::~MAJ()
 void MAJ::CheckForUpdate()
 {
     CheckMAJ checker;
-    checker.DownloadInformation();
+    checker.DownloadInformation(/*excludeFromStatistics=*/true);
 
     versionMAJTxt->SetLabel(gd::ToString(checker.newMajor)+"."+gd::ToString(checker.newMinor)+"."+gd::ToString(checker.newBuild)+"."+gd::ToString(checker.newRevision));
 

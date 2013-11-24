@@ -73,6 +73,7 @@ void MessageLoading( string message, float avancement )
  */
 bool Game_Develop_EditorApp::OnInit()
 {
+    //Setting up working directory:
 #ifdef LINUX
     string tmp; //Make sure current working directory is executable directory.
     if ( string(argv[0]) != "/" )
@@ -96,27 +97,19 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( exeDirectory.c_str() );
 #endif
 
+    //Parse command line:
     wxCmdLineEntryDesc cmdLineDesc[] = {
-
-    {wxCMD_LINE_PARAM,
-    NULL,
-    NULL,
-    ("Files to open"),
-    wxCMD_LINE_VAL_STRING,
-    wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL
-    },
-
-    {wxCMD_LINE_SWITCH, ("help"), NULL, ("Display help about launching Game Develop using command line") },
-    {wxCMD_LINE_SWITCH, ("version"), NULL, ("Display Game Develop version and quit"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-    {wxCMD_LINE_OPTION, ("lang"), NULL, ("Force loading a specific language ( Example : /lang=en_GB )"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
-    {wxCMD_LINE_SWITCH, ("allowMultipleInstances"), NULL, ("Allow to launch Game Develop even if it is already opened") },
-    {wxCMD_LINE_SWITCH, ("noCrashCheck"), NULL, ("Don't check if Game Develop crashed during last use.") },
-
-    {wxCMD_LINE_NONE}
+        {wxCMD_LINE_PARAM, NULL, NULL, ("Files to open"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL},
+        {wxCMD_LINE_SWITCH, "h", "help", ("Display help about launching Game Develop using command line") },
+        {wxCMD_LINE_SWITCH, "v", "version", ("Display Game Develop version and quit"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        {wxCMD_LINE_OPTION, NULL, ("lang"), ("Force loading a specific language ( Example : /lang=en_GB )"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+        {wxCMD_LINE_SWITCH, NULL, ("allowMultipleInstances"), ("Allow to launch Game Develop even if it is already opened") },
+        {wxCMD_LINE_SWITCH, NULL, ("noCrashCheck"), ("Don't check if Game Develop crashed during last use.") },
+        {wxCMD_LINE_NONE}
     };
 
     wxCmdLineParser parser (cmdLineDesc, argc, argv);
-    parser.AddUsageText("For more information about using Game Develop, please refer to the help file.");
+    parser.AddUsageText("For more information about using Game Develop, please refer to the online help.");
     if ( parser.Parse(false) > 0 )
         ;
     else if ( parser.Found( wxT("version") ) )
@@ -198,10 +191,6 @@ bool Game_Develop_EditorApp::OnInit()
     }
     cout << "* Language loaded" << endl;
 
-    wxInitAllImageHandlers();
-
-    cout << "* Image Handlers loaded" << endl;
-
     #ifdef RELEASE
     singleInstanceChecker = new wxSingleInstanceChecker;
     if ( singleInstanceChecker->IsAnotherRunning() && !parser.Found( wxT("allowMultipleInstances") ) )
@@ -245,6 +234,10 @@ bool Game_Develop_EditorApp::OnInit()
     #endif
 
     cout << "* Single instance handling done" << endl;
+
+    wxInitAllImageHandlers();
+
+    cout << "* Image Handlers loaded" << endl;
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours

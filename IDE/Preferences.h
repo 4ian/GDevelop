@@ -92,6 +92,7 @@ class Preferences: public wxDialog
 		wxCheckBox* customToolbarColorCheck;
 		wxRadioBox* tabBox;
 		wxPanel* ActifColorPnl;
+		wxCheckBox* sendInfoCheck;
 		wxCheckBox* hideContextPanelsLabels;
 		wxPropertyGrid* eventsEditorParametersProperties;
 		wxListbook* Listbook1;
@@ -132,6 +133,7 @@ class Preferences: public wxDialog
 		static const long ID_PANEL5;
 		static const long ID_STATICLINE2;
 		static const long ID_CHECKBOX4;
+		static const long ID_CHECKBOX10;
 		static const long ID_CHECKBOX3;
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT5;
@@ -264,6 +266,7 @@ class Preferences: public wxDialog
 		void OntoolbarColorPanelLeftUp(wxMouseEvent& event);
 		void OnGDMetroStyleClick(wxCommandEvent& event);
 		void OnMetroWhiteStyleClick(wxCommandEvent& event);
+		void OnMAJCheckClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

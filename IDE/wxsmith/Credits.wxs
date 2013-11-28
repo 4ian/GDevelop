@@ -123,7 +123,7 @@
 												<object class="sizeritem">
 													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL16" variable="HyperlinkCtrl5" member="yes">
 														<label>You can make a donation to the author.</label>
-														<url>http://www.en.compilgames.net/?file=kop8.php</url>
+														<url>http://www.compilgames.net/donate.php?utm_source=GD&utm_medium=CreditsLink&utm_campaign=paywhatyouwant</url>
 														<style>wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 													</object>
 													<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>
@@ -184,7 +184,7 @@
 										<growablecols>0</growablecols>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-												<label>Programmed in C++, compiled with TDM-GCC, with the help of Code:: Blocks</label>
+												<label>Programmed in C++, compiled with TDM-GCC, written with Sublime Text</label>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -224,7 +224,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxBitmapButton" name="ID_BITMAPBUTTON10" variable="BitmapButton3" member="yes">
-														<bitmap>res/powered-cb.png</bitmap>
+														<bitmap>res/powered-st.png</bitmap>
 														<default>1</default>
 														<handler function="OnCBBtClick" entry="EVT_BUTTON" />
 													</object>

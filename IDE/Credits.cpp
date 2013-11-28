@@ -113,7 +113,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer5->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("You like Game Develop\?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl5 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL16, _("You can make a donation to the author."), _("http://www.en.compilgames.net/\?file=kop8.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
+	HyperlinkCtrl5 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL16, _("You can make a donation to the author."), _("http://www.compilgames.net/donate.php\?utm_source=GD&utm_medium=CreditsLink&utm_campaign=paywhatyouwant"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
 	FlexGridSizer5->Add(HyperlinkCtrl5, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer10);
@@ -141,7 +141,7 @@ Credits::Credits(wxWindow* parent)
 	Panel4 = new wxPanel(Notebook1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
-	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmed in C++, compiled with TDM-GCC, with the help of Code:: Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmed in C++, compiled with TDM-GCC, written with Sublime Text"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer12->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer2 = new wxGridSizer(0, 4, 0, 0);
 	BitmapButton1 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON8, wxBitmap(wxImage(_T("res/powered-cpp.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON8"));
@@ -152,7 +152,7 @@ Credits::Credits(wxWindow* parent)
 	BitmapButton2 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON9, wxBitmap(wxImage(_T("res/powered-gcc.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON9"));
 	BitmapButton2->SetDefault();
 	GridSizer2->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BitmapButton3 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON10, wxBitmap(wxImage(_T("res/powered-cb.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON10"));
+	BitmapButton3 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON10, wxBitmap(wxImage(_T("res/powered-st.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON10"));
 	BitmapButton3->SetDefault();
 	GridSizer2->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(GridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

@@ -287,10 +287,14 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
         tries++;
     }
 
-    //Insert the new variable in the list and begin editing its name
+    newName = gd::ToString(wxGetTextFromUser(_("Please choose a new name for the new variable"), _("New variable name"), newName));
+    if ( newName.empty() ) return;
+
+    //Insert the new variable in the list
     temporaryContainer->InsertNew(newName, -1);
     wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), newName);
     RefreshVariable(item, newName, temporaryContainer->Get(newName));
+    variablesList->Select(item);
 
     modificationCount++; 
 }

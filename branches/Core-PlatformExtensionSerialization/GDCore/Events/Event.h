@@ -129,6 +129,8 @@ public:
      *
      * This is only done if the event MustBePreprocessed() return true.
      *
+     * \warning Be careful if you're iterating over a list of event, a call to Preprocess can remove the event from the list!
+     *
      * \see gd::EventMetadata
      * \see gd::BaseEvent::MustBePreprocessed
      */

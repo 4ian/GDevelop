@@ -99,7 +99,7 @@ public:
      *
      * \note This is only the default width used when creating the main window for the first time. To change the width at runtime, use the functions related to RuntimeScene.renderWindow
      */
-    void SetMainWindowDefaultWidth(unsigned int width) { windowWidth = width; }
+    void SetDefaultWidth(unsigned int width) { windowWidth = width; }
 
     /**
      * Get the default width of the project main window
@@ -109,7 +109,7 @@ public:
     /**
      * Change the default height of the project main window
      */
-    void SetMainWindowDefaultHeight(unsigned int height) { windowHeight = height; }
+    void SetDefaultHeight(unsigned int height) { windowHeight = height; }
 
     /**
      * Return the default height of the project main window

@@ -716,8 +716,8 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
 {
     if ( elem->FirstChildElement( "Nom" ) != NULL ) { SetName( elem->FirstChildElement( "Nom" )->Attribute( "value" ) ); }
-    if ( elem->FirstChildElement( "WindowW" ) != NULL ) { SetMainWindowDefaultWidth(ToInt(elem->FirstChildElement( "WindowW" )->Attribute( "value"))); }
-    if ( elem->FirstChildElement( "WindowH" ) != NULL ) { SetMainWindowDefaultHeight(ToInt(elem->FirstChildElement( "WindowH" )->Attribute( "value"))); }
+    if ( elem->FirstChildElement( "WindowW" ) != NULL ) { SetDefaultWidth(ToInt(elem->FirstChildElement( "WindowW" )->Attribute( "value"))); }
+    if ( elem->FirstChildElement( "WindowH" ) != NULL ) { SetDefaultHeight(ToInt(elem->FirstChildElement( "WindowH" )->Attribute( "value"))); }
     if ( elem->FirstChildElement( "FPSmax" ) != NULL ) { SetMaximumFPS(ToInt(elem->FirstChildElement( "FPSmax" )->Attribute( "value" ))); }
     if ( elem->FirstChildElement( "FPSmin" ) != NULL ) { SetMinimumFPS(ToInt(elem->FirstChildElement( "FPSmin" )->Attribute( "value" ))); }
 
@@ -1004,9 +1004,9 @@ void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
     if ( grid->GetProperty(_("Author")) != NULL)
         SetAuthor(gd::ToString(grid->GetProperty(_("Author"))->GetValueAsString()));
     if ( grid->GetProperty(_("Width")) != NULL)
-        SetMainWindowDefaultWidth(grid->GetProperty(_("Width"))->GetValue().GetInteger());
+        SetDefaultWidth(grid->GetProperty(_("Width"))->GetValue().GetInteger());
     if ( grid->GetProperty(_("Height")) != NULL)
-        SetMainWindowDefaultHeight(grid->GetProperty(_("Height"))->GetValue().GetInteger());
+        SetDefaultHeight(grid->GetProperty(_("Height"))->GetValue().GetInteger());
     if ( grid->GetProperty(_("Vertical Synchronization")) != NULL)
         SetVerticalSyncActivatedByDefault(grid->GetProperty(_("Vertical Synchronization"))->GetValue().GetBool());
     if ( grid->GetProperty(_("Limit the framerate")) != NULL && !grid->GetProperty(_("Limit the framerate"))->GetValue().GetBool())

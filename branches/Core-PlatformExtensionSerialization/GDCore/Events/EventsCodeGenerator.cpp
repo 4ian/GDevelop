@@ -740,8 +740,10 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
         listEvent[i]->Preprocess(*this, listEvent, i);
-        if ( listEvent[i]->CanHaveSubEvents() )
-            PreprocessEventList( listEvent[i]->GetSubEvents());
+        if ( i < listEvent.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
+            if ( listEvent[i]->CanHaveSubEvents() )
+                PreprocessEventList( listEvent[i]->GetSubEvents());
+        }
     }
 }
 

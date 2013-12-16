@@ -130,8 +130,8 @@ void SkinHelper::ApplyCurrentSkin(wxRibbonBar & bar)
     }
     else
     {
-        bar.SetArtProvider(new gdRibbonMSWArtProvider);
-        bar.GetArtProvider()->SetColourScheme(wxColour(244, 245, 247), wxColour(231, 241, 254), wxColour(0, 0, 0));
+        bar.SetArtProvider(new RibbonMetroArtProvider);
+        bar.GetArtProvider()->SetColourScheme(wxColour(245, 245, 245), wxColour(196, 203, 255), wxColour(0, 0, 0));
     }
 }
 
@@ -190,14 +190,14 @@ void SkinHelper::ApplyCurrentSkin(wxAuiManager & auiManager)
     }
     else
     {
-        dockArt->SetColour(6, wxColour(211,222,246));
-        dockArt->SetColour(13, wxColour(172,183,208));
-        dockArt->SetColour(9, wxColour(214,221,233));
-        dockArt->SetColour(10, wxColour(214,221,233));
-        dockArt->SetColour(7, wxColour(221,229,246));
-        dockArt->SetColour(8, wxColour(221,229,246));
-        dockArt->SetColour(11, wxColour(104,114,138));
-        dockArt->SetColour(12, wxColour(104,114,138));
+        dockArt->SetColour(7, wxColour(145,0,206)); //Active tab
+        dockArt->SetColour(8, wxColour(145,0,206));
+        dockArt->SetColour(9, wxColour(145,0,206)); //Inactive tab
+        dockArt->SetColour(10, wxColour(145,0,206));
+        dockArt->SetColour(13, wxColour(236,236,236)); //Border
+        dockArt->SetColour(6, wxColour(236,236,236)); //Background color
+        dockArt->SetColour(11, wxColour(255,255,255)); //Active text color
+        dockArt->SetColour(12, wxColour(255,255,255)); //Inactive text color
     }
     dockArt->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
 
@@ -211,15 +211,15 @@ void SkinHelper::ApplyCurrentSkin(wxAuiNotebook & notebook, bool subnotebook)
 
     wxAuiTabArt * tabArt = NULL;
     pConfig->Read( _T( "/Skin/TabStyle" ), &result );
-    if ( result == "Flat" )
+    if ( result == "Classic" )
     {
-        gd::FlatAuiTabArt * art = new gd::FlatAuiTabArt();
+        gd::AuiTabArt * art = new gd::AuiTabArt();
         art->DisableBackgroundGradient(subnotebook);        
         tabArt = art;
     }
     else
     {
-        gd::AuiTabArt * art = new gd::AuiTabArt();
+        gd::FlatAuiTabArt * art = new gd::FlatAuiTabArt();
         art->DisableBackgroundGradient(subnotebook);        
         tabArt = art;
     }
@@ -237,8 +237,8 @@ void SkinHelper::ApplyCurrentSkin(wxAuiNotebook & notebook, bool subnotebook)
     }
     else
     {
-        tabArt->SetColour(wxColour(220, 225, 232));
-        tabArt->SetActiveColour(wxColour(220, 225, 232));
+        tabArt->SetColour(wxColour(239,239,239));
+        tabArt->SetActiveColour(wxColour(255, 255, 255));
     }
 
     notebook.SetArtProvider(tabArt);
@@ -301,7 +301,7 @@ public:
 void SkinHelper::ApplyCurrentSkin(wxAuiToolBar & toolbar)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString result = "Classic";
+    wxString result = "Flat";
 
     //DockArt skin
     pConfig->Read( _T( "/Skin/ToolbarStyle" ), &result );

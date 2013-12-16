@@ -670,7 +670,7 @@ void MainFrame::RealizeRibbonCustomButtons()
 
     wxColor buttonColor;
     if ( !wxConfigBase::Get()->Read( _T( "/Skin/FileButtonColor" ), &buttonColor ) )
-        buttonColor = wxColour(200, 200, 255);
+        buttonColor = wxColour(145, 0, 206);
 
     //Create a temporary fake ribbon used to render the button with a custom color
     wxRibbonBar * fakeRibbon = new wxRibbonBar(this);

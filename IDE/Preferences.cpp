@@ -72,9 +72,9 @@ const long Preferences::ID_PANEL7 = wxNewId();
 const long Preferences::ID_STATICTEXT15 = wxNewId();
 const long Preferences::ID_CHOICE1 = wxNewId();
 const long Preferences::ID_PANEL16 = wxNewId();
-const long Preferences::ID_BUTTON6 = wxNewId();
 const long Preferences::ID_BUTTON16 = wxNewId();
 const long Preferences::ID_BUTTON8 = wxNewId();
+const long Preferences::ID_BUTTON6 = wxNewId();
 const long Preferences::ID_BUTTON7 = wxNewId();
 const long Preferences::ID_BUTTON10 = wxNewId();
 const long Preferences::ID_BUTTON13 = wxNewId();
@@ -360,12 +360,12 @@ changesNeedRestart(false)
     FlexGridSizer16->AddGrowableCol(0);
     StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Predefined appearance "));
     FlexGridSizer2 = new wxFlexGridSizer(0, 6, 0, 0);
-    gdStyleBt = new wxButton(Panel4, ID_BUTTON6, _("Game Develop Standard"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
-    FlexGridSizer2->Add(gdStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button2 = new wxButton(Panel4, ID_BUTTON16, _("Game Develop Metro"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON16"));
     FlexGridSizer2->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button1 = new wxButton(Panel4, ID_BUTTON8, _("Metro White"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     FlexGridSizer2->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    gdStyleBt = new wxButton(Panel4, ID_BUTTON6, _("Game Develop Office"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    FlexGridSizer2->Add(gdStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     officeStyleBt = new wxButton(Panel4, ID_BUTTON7, _("Office Blue"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
     FlexGridSizer2->Add(officeStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     radianceStyleBt = new wxButton(Panel4, ID_BUTTON10, _("Radiance"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
@@ -597,9 +597,9 @@ changesNeedRestart(false)
     Connect(ID_TEXTCTRL6,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&Preferences::OneventsCompilerTempDirEditText);
     Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseCompilationTempDirClick);
     Connect(ID_BUTTON15,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseJavaBtClick);
-    Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OngdStyleBtClick);
     Connect(ID_BUTTON16,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnGDMetroStyleClick);
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnMetroWhiteStyleClick);
+    Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnOfficeGDStyleBtClick);
     Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnofficeStyleBtClick);
     Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnradianceStyleBtClick);
     Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnoxygenStyleBtClick);
@@ -711,8 +711,11 @@ changesNeedRestart(false)
             if ( hidePageTabs )
                 hidePageTabsCheck->SetValue(true);
         }
-        else
-            SetSkinDefault();
+        else 
+        {
+            wxCommandEvent useless;
+            OnGDMetroStyleClick(useless);
+        }
 
         pConfig->Read( _T( "/Skin/Defined" ), &result );
 
@@ -799,7 +802,10 @@ changesNeedRestart(false)
             toolbarColorPanel->Refresh();
         }
         else
-            SetSkinDefault();
+        {
+            wxCommandEvent useless;
+            OnGDMetroStyleClick(useless);
+        }
 
     }
 
@@ -1031,7 +1037,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        wxLogMessage(_("Some modifications need to restart Game Develop so as to be visible."));
+        wxLogMessage(_("Game Develop must be relaunched to make some changes effective."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
@@ -1089,15 +1095,8 @@ void Preferences::OnAnnulerBtClick( wxCommandEvent& event )
     EndModal( 0 );
 }
 
-/**
- * Set standard Game Develop skin
- */
-void Preferences::OngdStyleBtClick(wxCommandEvent& event)
-{
-    SetSkinDefault();
-}
 
-void Preferences::SetSkinDefault()
+void Preferences::OnOfficeGDStyleBtClick(wxCommandEvent& event)
 {
     ribbonStyleBox->SetSelection(0);
 
@@ -1150,10 +1149,6 @@ void Preferences::SetSkinDefault()
  */
 void Preferences::OnofficeStyleBtClick(wxCommandEvent& event)
 {
-    SetSkinOffice();
-}
-void Preferences::SetSkinOffice()
-{
     ribbonStyleBox->SetSelection(0);
 
     ribbonColor1Pnl->SetBackgroundColour( wxColour(194, 216, 241) );
@@ -1205,11 +1200,6 @@ void Preferences::SetSkinOffice()
  */
 void Preferences::OnauiStyleBtClick(wxCommandEvent& event)
 {
-    SetSkinAUI();
-}
-
-void Preferences::SetSkinAUI()
-{
     ribbonStyleBox->SetSelection(1);
 
     ribbonColor1Pnl->SetBackgroundColour( wxColour(240, 240, 240) );
@@ -1255,12 +1245,8 @@ void Preferences::SetSkinAUI()
     toolbarBox->SetSelection(0);
     tabBox->SetSelection(0);
 }
-void Preferences::OnradianceStyleBtClick(wxCommandEvent& event)
-{
-    SetSkinRadiance();
-}
 
-void Preferences::SetSkinRadiance()
+void Preferences::OnradianceStyleBtClick(wxCommandEvent& event)
 {
     ribbonStyleBox->SetSelection(0);
 
@@ -1308,13 +1294,7 @@ void Preferences::SetSkinRadiance()
     tabBox->SetSelection(0);
 }
 
-
 void Preferences::OnoxygenStyleBtClick(wxCommandEvent& event)
-{
-    SetSkinOxygen();
-}
-
-void Preferences::SetSkinOxygen()
 {
     ribbonStyleBox->SetSelection(0);
 

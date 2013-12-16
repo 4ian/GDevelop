@@ -164,9 +164,9 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT15;
 		static const long ID_CHOICE1;
 		static const long ID_PANEL16;
-		static const long ID_BUTTON6;
 		static const long ID_BUTTON16;
 		static const long ID_BUTTON8;
+		static const long ID_BUTTON6;
 		static const long ID_BUTTON7;
 		static const long ID_BUTTON10;
 		static const long ID_BUTTON13;
@@ -267,8 +267,9 @@ class Preferences: public wxDialog
 		void OnGDMetroStyleClick(wxCommandEvent& event);
 		void OnMetroWhiteStyleClick(wxCommandEvent& event);
 		void OnMAJCheckClick(wxCommandEvent& event);
+		void OnOfficeGDStyleBtClick(wxCommandEvent& event);
 		//*)
-		void SetSkinDefault();
+		void SetSkinOfficeGD();
 		void SetSkinOffice();
 		void SetSkinAUI();
 		void SetSkinRadiance();

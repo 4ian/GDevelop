@@ -39,7 +39,7 @@
 							<growablerows>2</growablerows>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-									<label>Game Develop is a &quot;Pay what you want&quot; software:&#x0A;You can uses it freely, but its development costs a&#x0A;lot of time, as well as money.&#x0A;&#x0A;If Game Develop proves to be useful to you, you&#x0A;can support its author by paying anything you want:</label>
+									<label>Game Develop is a &quot;Pay what you want&quot; software:&#x0A;You can use it freely, but its development costs a&#x0A;lot of time, as well as money.&#x0A;&#x0A;If Game Develop proves to be useful to you, you&#x0A;can support its author by paying anything you want:</label>
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>

@@ -9,31 +9,31 @@
 
 class HtmlViewerPnl: public wxPanel
 {
-	public:
+public:
 
-		HtmlViewerPnl(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
-		virtual ~HtmlViewerPnl();
+	HtmlViewerPnl(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+	virtual ~HtmlViewerPnl();
 
-		void OpenURL(wxString url);
-		void GoBack();
-		void GoForward();
+	void OpenURL(wxString url);
+	void GoBack();
+	void GoForward();
 
-		//(*Declarations(HtmlViewerPnl)
-		wxWebView* Custom1;
-		//*)
+	//(*Declarations(HtmlViewerPnl)
+	wxWebView* Custom1;
+	//*)
 
-	protected:
+protected:
 
-		//(*Identifiers(HtmlViewerPnl)
-		static const long ID_CUSTOM1;
-		//*)
+	//(*Identifiers(HtmlViewerPnl)
+	static const long ID_CUSTOM1;
+	//*)
 
-	private:
+private:
 
-		//(*Handlers(HtmlViewerPnl)
-		//*)
+	//(*Handlers(HtmlViewerPnl)
+	//*)
 
-		DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 #endif

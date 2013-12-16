@@ -50,7 +50,7 @@ ReminderDialog::ReminderDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	FlexGridSizer4->Add(imageBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableRow(2);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Game Develop is a \"Pay what you want\" software:\nYou can uses it freely, but its development costs a\nlot of time, as well as money.\n\nIf Game Develop proves to be useful to you, you\ncan support its author by paying anything you want:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Game Develop is a \"Pay what you want\" software:\nYou can use it freely, but its development costs a\nlot of time, as well as money.\n\nIf Game Develop proves to be useful to you, you\ncan support its author by paying anything you want:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Donate"), _("http://www.compilgames.net/donate.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer3->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

@@ -236,8 +236,8 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
     #if !defined(GD_IDE_ONLY)
     if ( useTheNewSizeForCameraDefaultSize ) //Change future cameras default size if wanted.
     {
-        scene.game->SetMainWindowDefaultWidth( windowWidth );
-        scene.game->SetMainWindowDefaultHeight( windowHeight );
+        scene.game->SetDefaultWidth( windowWidth );
+        scene.game->SetDefaultHeight( windowHeight );
     }
 
     //Avoid recreating every tick a new window if the size has not changed!

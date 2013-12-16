@@ -56,7 +56,7 @@ WindowExtension::WindowExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Width"), "",false)
         .AddParameter("expression", _("Height"), "",false)
-        .AddParameter("yesorno", _("Use this size as default size for new scene cameras \?"), "",false)
+        .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."), "",false)
         .codeExtraInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     AddAction("SetWindowIcon",
                    _("Change window's icon"),

@@ -503,21 +503,23 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
         listEvent[i]->Preprocess(*this, listEvent, i);
-        if ( listEvent[i]->CanHaveSubEvents() )
-            PreprocessEventList( listEvent[i]->GetSubEvents());
+        if ( i < listEvent.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
+            if ( listEvent[i]->CanHaveSubEvents() )
+                PreprocessEventList( listEvent[i]->GetSubEvents());
 
-        if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && listEvent[i]->IsExecutable() )
-        {
-            //Define a new profile event
-            boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-            profileEvent->originalEvent = listEvent[i]->originalEvent;
-            profileEvent->SetPreviousProfileEvent(previousProfileEvent);
+            if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && listEvent[i]->IsExecutable() )
+            {
+                //Define a new profile event
+                boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
+                profileEvent->originalEvent = listEvent[i]->originalEvent;
+                profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
-            //Add it before the event to profile
-            listEvent.insert(listEvent.begin()+i, profileEvent);
+                //Add it before the event to profile
+                listEvent.insert(listEvent.begin()+i, profileEvent);
 
-            previousProfileEvent = profileEvent;
-            ++i; //Don't preprocess the newly added profile event
+                previousProfileEvent = profileEvent;
+                ++i; //Don't preprocess the newly added profile event
+            }
         }
     }
 

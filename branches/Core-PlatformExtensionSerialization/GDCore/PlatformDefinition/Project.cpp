@@ -57,7 +57,8 @@ Project::Project() :
     #if defined(GD_IDE_ONLY)
     ,currentPlatform(NULL),
     GDMajorVersion(gd::VersionWrapper::Major()),
-    GDMinorVersion(gd::VersionWrapper::Minor())
+    GDMinorVersion(gd::VersionWrapper::Minor()),
+    dirty(false)
     #endif
 {
     imageManager->SetGame(this);
@@ -925,6 +926,10 @@ void Project::SaveToXml(TiXmlElement * root) const
         externalSourceFilesElem->LinkEndChild( sourceFile );
         externalSourceFiles[i]->SaveToXml(sourceFile);
     }
+
+    #if defined(GD_IDE_ONLY)
+    dirty = false;
+    #endif
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)

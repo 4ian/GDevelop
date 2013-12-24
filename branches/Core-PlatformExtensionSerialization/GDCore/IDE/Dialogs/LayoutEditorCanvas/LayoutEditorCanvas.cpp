@@ -118,16 +118,27 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     #ifdef __WXGTK__
 
         // GTK implementation requires to go deeper to find the low-level X11 identifier of the widget
-        gtk_widget_realize(m_wxwindow);
+        gtk_widget_realize(m_wxwindow); //Required to create the internal gtk window
         gtk_widget_set_double_buffered(m_wxwindow, false);
 
         GtkWidget* privHandle = m_wxwindow;
         wxPizza * pizza = WX_PIZZA(privHandle);
         GtkWidget * widget = GTK_WIDGET(pizza);
 
-        GdkWindow* Win = widget->window;
-        XFlush(GDK_WINDOW_XDISPLAY(Win));
-        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(Win));
+        //Get the internal gtk window...
+        #if GTK_CHECK_VERSION(3, 0, 0)
+        GdkWindow* win = gtk_widget_get_window(widget);
+        #else
+        GdkWindow* win = widget->window;
+        #endif
+        XFlush(GDK_WINDOW_XDISPLAY(win));
+
+        //...and pass it to the sf::RenderWindow.
+        #if GTK_CHECK_VERSION(3, 0, 0)
+        sf::RenderWindow::create(GDK_WINDOW_XID(win));
+        #else
+        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(win));
+        #endif
 
     #else
 
@@ -1166,8 +1177,8 @@ void LayoutEditorCanvas::ChangesMade()
     history.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(latestState->Clone()));
     redoHistory.clear();
     latestState->Create(instances);
+    project.SetDirty();
 }
-
 
 /** \brief Tool class picking the smallest instance under the cursor.
  */

@@ -347,19 +347,22 @@ public:
      * Members functions related to saving and loading the project.
      */
     ///@{
-
     /**
-     * Save the project to a file.
+     * \brief Save the project to a file.
+     * 
+     * "Dirty" flag is set to false when save is done.
      */
     bool SaveToFile(const std::string & filename);
 
     /**
-     * Load the project from a file.
+     * \brief Load the project from a file.
      */
     bool LoadFromFile(const std::string & filename);
 
     /**
      * Called to save the layout to a TiXmlElement.
+     * 
+     * "Dirty" flag is set to false when save is done.
      */
     void SaveToXml(TiXmlElement * element) const;
 
@@ -369,6 +372,19 @@ public:
     void LoadFromXml(const TiXmlElement * element);
 
     #if defined(GD_IDE_ONLY)
+    
+    /**
+     * \brief Return true if the project is marked as being modified (The IDE or application
+     * using the project should ask for save the project if the project is closed).
+     */
+    bool IsDirty() { return dirty; }
+
+    /**
+     * \brief Mark the project as being modified (The IDE or application
+     * using the project should ask for save the project if the project is closed).
+     */
+    void SetDirty(bool enable = true) { dirty = enable; }
+
     /**
      * Get the major version of Game Develop used to save the project.
      */
@@ -672,6 +688,7 @@ private:
     std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.
+    mutable bool                                        dirty; ///< True to flag the project as being modified.
     #endif
 };
 

@@ -93,13 +93,13 @@ int main( int argc, char *p_argv[] )
         char * ibuffer = resLoader->LoadBinaryFile( "src" );
         char * obuffer = new char[size];
 
-        AES crypt;
-        crypt.SetParameters(192);
-
         unsigned char key[] = "-P:j$4t&OHIUVM/Z+u4DeDP.";
+        const unsigned char iv[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-        crypt.StartDecryption(key);
-        crypt.Decrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
+        aes_ks_t keySetting;
+        aes_setks_decrypt(key, 192, &keySetting);
+        aes_cbc_decrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer), 
+            (uint8_t*)iv, size/AES_BLOCK_SIZE, &keySetting);
 
         string uncryptedSrc = obuffer;
         delete [] obuffer;

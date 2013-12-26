@@ -12,6 +12,7 @@
 #include "GDCpp/PolygonCollision.h"
 #include "GDCpp/Polygon.h"
 #include <SFML/System.hpp>
+#include <iostream>
 #if defined(GD_IDE_ONLY)
 #include <wx/intl.h>
 #endif

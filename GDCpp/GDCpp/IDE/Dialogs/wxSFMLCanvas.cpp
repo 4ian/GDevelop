@@ -49,9 +49,20 @@ wxControl(Parent, Id, Position, Size, Style)
         wxPizza * pizza = WX_PIZZA(privHandle);
         GtkWidget * widget = GTK_WIDGET(pizza);
 
-        GdkWindow* Win = widget->window;
-        XFlush(GDK_WINDOW_XDISPLAY(Win));
-        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(Win));
+        //Get the internal gtk window...
+        #if GTK_CHECK_VERSION(3, 0, 0)
+        GdkWindow* win = gtk_widget_get_window(widget);
+        #else
+        GdkWindow* win = widget->window;
+        #endif
+        XFlush(GDK_WINDOW_XDISPLAY(win));
+        
+        //...and pass it to the sf::RenderWindow.
+        #if GTK_CHECK_VERSION(3, 0, 0)
+        sf::RenderWindow::create(GDK_WINDOW_XID(win));
+        #else
+        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(win));
+        #endif
 
     #else
 

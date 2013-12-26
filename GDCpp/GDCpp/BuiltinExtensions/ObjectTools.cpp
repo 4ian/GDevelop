@@ -4,6 +4,7 @@
 #include "GDCpp/PolygonCollision.h"
 #include "MathematicalTools.h"
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -21,6 +22,27 @@ double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObje
     return size;
 }
 
+/**
+ * Internal function picking from objectsLists1 and objectsLists2 only pairs of objects for which the test is true.
+ * If inverted == true, only the objects of the first table are filtered.
+ *
+ * Note that the functor is not called stricly for each pair: When considering a pair of objects, if these objects
+ * have already been marked as picked, the functor won't be called again.
+ *
+ * objectsLists1 and objectsLists2 may contains one or more identical pointers to some lists (See *This is important*
+ * comment at the end of the algorithm, when trimming the list).
+ *
+ * Cost (Worst case, functor being always false):
+ *    Cost(Creating tables with a total of NbObjList1+NbObjList2 booleans)
+ *  + Cost(functor)*NbObjList1*NbObjList2
+ *  + Cost(Testing NbObjList1+NbObjList2 booleans)
+ *  + Cost(Removing NbObjList1+NbObjList2 objects from all the lists)
+ *
+ * Cost (Best case, functor being always true):
+ *    Cost(Creating tables with a total of NbObjList1+NbObjList2 booleans)
+ *  + Cost(functor)*(NbObjList1+NbObjList2)
+ *  + Cost(Testing NbObjList1+NbObjList2 booleans)
+ */
 bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1,
                                std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2,
                                bool conditionInverted,
@@ -67,6 +89,7 @@ bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*
                 const std::vector<RuntimeObject*> & arr2 = *it2->second;
 
                 for(unsigned int l = 0;l<arr2.size();++l) {
+                    if ( pickedList1[i][k] && pickedList2[j][l]) continue; //Avoid unnecessary costly call to functor.
 
                     if ( arr1[k] != arr2[l] && functor(arr1[k], arr2[l], extraParameter) ) {
                         if ( !conditionInverted ) {
@@ -118,6 +141,10 @@ bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*
             size_t finalSize = 0;
             if ( !it->second ) continue;
             std::vector<RuntimeObject*> & arr = *it->second;
+
+            //*This is important*! We can have a list that has already been trimmed just before
+            if ( arr.size() != pickedList2[i].size() ) //If the size of the objects list != size of the boolean "picked" list...
+                continue; //... then the object list was already trimmed, skip it.
 
             for(unsigned int k = 0;k<arr.size();++k)
             {

@@ -242,6 +242,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     Connect(ID_BITMAPBUTTON6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnMoreOptions);
     Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnAideBtClick);
     Connect(idMenuResourcesLibrary,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnAddFromLibraryBtClick);
+    Connect(ID_AUITOOLBARITEM2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnAddFromLibraryBtClick);
 
     //Offer nice theme to property grid
     propertyGrid->SetWindowStyle(wxPG_HIDE_MARGIN|wxPGMAN_DEFAULT_STYLE|wxPG_DESCRIPTION);
@@ -371,7 +372,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
 }
 
-void ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDirStr)
+std::vector<std::string> ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDirStr)
 {
     if ( !project.GetProjectFile().empty() ) //If game is not saved, we keep absolute filenames and do not copy resources.
     {
@@ -393,11 +394,12 @@ void ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, co
         }
     }
 
-    AddResources(filenames);
+    return AddResources(filenames);
 }
 
-void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
+std::vector<std::string> ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
 {
+    std::vector<std::string> resourceNames;
     std::string alreadyExistingResources;
 
     //Find current folder, if any.
@@ -429,6 +431,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, name);
 
             resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
+            resourceNames.push_back(name);
         }
         else
             alreadyExistingResources += "\n"+name;
@@ -447,6 +450,8 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
     {
         wxLogMessage(wxString(_("Some images in the list have already the same name, and have not been added:")+"\n"+alreadyExistingResources));
     }
+
+    return resourceNames;
 }
 
 void ResourcesEditor::OnAddFromLibraryBtClick( wxCommandEvent& event )

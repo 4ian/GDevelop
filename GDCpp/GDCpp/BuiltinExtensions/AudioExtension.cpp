@@ -23,7 +23,7 @@ AudioExtension::AudioExtension()
     #if defined(GD_IDE_ONLY)
     AddAction("PlaySoundCanal",
                    _("Play a sound on a channel"),
-                   _("Play a sound ( small audio file ) on a specific canal,\nso as to be able to manipulate it."),
+                   _("Play a sound ( small audio file ) on a specific channel,\nso as to be able to manipulate it."),
                    _("Play the sound _PARAM1_ on the channel _PARAM2_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
@@ -252,7 +252,7 @@ AudioExtension::AudioExtension()
 
     AddCondition("MusicPaused",
                    _("A music is paused"),
-                   _("Test if the music on the specified canal is paused."),
+                   _("Test if the music on the specified channel is paused."),
                    _("The music on channel _PARAM1_ is paused"),
                    _("Audio/Musics on channels"),
                    "res/conditions/musicpaused24.png",
@@ -265,7 +265,7 @@ AudioExtension::AudioExtension()
 
     AddCondition("MusicStopped",
                    _("A music is stopped"),
-                   _("Test if the music on the specified canal is stopped."),
+                   _("Test if the music on the specified channel is stopped."),
                    _("The music on channel _PARAM1_ is stopped"),
                    _("Audio/Musics on channels"),
                    "res/conditions/musicstopped24.png",
@@ -290,7 +290,7 @@ AudioExtension::AudioExtension()
 
     AddCondition("SoundPaused",
                    _("A sound is paused"),
-                   _("Test if the sound on the specified canal is paused."),
+                   _("Test if the sound on the specified channel is paused."),
                    _("The sound on channel _PARAM1_ is paused"),
                    _("Audio/Sounds on channels"),
                    "res/conditions/sonpaused24.png",
@@ -303,7 +303,7 @@ AudioExtension::AudioExtension()
 
     AddCondition("SoundStopped",
                    _("A sound is stopped"),
-                   _("Test if the sound on the specified canal is stopped."),
+                   _("Test if the sound on the specified channel is stopped."),
                    _("The sound on channel _PARAM1_ is stopped"),
                    _("Audio/Sounds on channels"),
                    "res/conditions/sonstopped24.png",

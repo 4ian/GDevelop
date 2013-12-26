@@ -39,9 +39,13 @@ public:
     virtual ~SpriteObjectEditor();
 
     /**
-     * \brief Used by DndTextSpriteObjectEditor so as to add a dragged image
+     * \brief Can be called to add an image to the current animation.
+     *
+     * Used by DndTextSpriteObjectEditor so as to add a dragged image.
+     * \param image The name of the image resource to add.
+     * \param refresh Optional parameter: When set to false, the lists of images won't be refreshed.
      */
-    void AddImageToCurrentAnimation(wxString image);
+    void AddImageToCurrentAnimation(wxString image, bool refresh = true);
 
     //(*Declarations(SpriteObjectEditor)
     wxAuiManager* AuiManager1;

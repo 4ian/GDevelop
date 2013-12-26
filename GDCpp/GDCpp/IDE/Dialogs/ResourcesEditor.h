@@ -37,15 +37,17 @@ public:
 
     /**
      * Ask the resources editor to add the resources contained into \a filenames.
+     * \return A vector containing the name of the added resources.
      */
-    void AddResources(const std::vector<std::string> & filenames);
+    std::vector<std::string> AddResources(const std::vector<std::string> & filenames);
 
     /**
      * Ask the resources editor to add the resources contained into \a filenames.
      * If \a destinationDir is not empty, the resources files are copied into this directory
-     * ( which is relative to the project directory ) before being added to the project.
+     * (which is relative to the project directory) before being added to the project.
+     * \return A vector containing the name of the added resources.
      */
-    void CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDir);
+    std::vector<std::string> CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDir);
 
     /**
      * Must be called by DndTextResourcesEditor when an item from the editor has been dropped into this same editor.

@@ -48,8 +48,8 @@ std::string CodeCompilerCall::GetFullCall() const
     std::string baseDir = CodeCompiler::GetInstance()->GetBaseDirectory();
 
     std::vector<std::string> args;
-    args.push_back("-m32");
     #if defined(WINDOWS)
+    args.push_back("-m32");
     args.push_back("-nostdinc");
     args.push_back("-nostdinc++");
     args.push_back("-B\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin\"");

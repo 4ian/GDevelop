@@ -25,6 +25,7 @@
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/CommonTools.h"
 #include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/SpriteObject.h"
@@ -39,8 +40,6 @@
 #include <wx/msw/uxtheme.h>
 #endif
 namespace gd { class MainFrameWrapper; }
-
-using namespace gd;
 
 namespace { //Some private tools functions
 
@@ -453,6 +452,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     gd::SkinHelper::ApplyCurrentSkin(*mgr);
     gd::SkinHelper::ApplyCurrentSkin(*toolbar);
     gd::SkinHelper::ApplyCurrentSkin(*animationToolbar);
+    gd::SkinHelper::ApplyCurrentSkin(*pointToolbar);
 
 	RefreshAll();
 
@@ -521,13 +521,15 @@ void SpriteObjectEditor::RefreshAnimationTree()
     for (unsigned int i = 0;i<object.GetAnimationCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
-        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, new gd::TreeItemStringData(ToString(i), ""));
+        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, 
+        	new gd::TreeItemStringData(ToString(i), ""));
 
         if ( animation.useMultipleDirections )
         {
             for (unsigned int j = 0;j<animation.GetDirectionsNumber();++j)
             {
-                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1, new gd::TreeItemStringData(ToString(i), ToString(j)));
+                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1, 
+                	new gd::TreeItemStringData(ToString(i), ToString(j)));
 
             }
         }
@@ -579,7 +581,7 @@ wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resourc
 {
     try
     {
-        ImageResource & image = dynamic_cast<ImageResource&>(resource);
+        gd::ImageResource & image = dynamic_cast<gd::ImageResource&>(resource);
 
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
@@ -1000,7 +1002,7 @@ void SpriteObjectEditor::OnremoveImageItemSelected(wxCommandEvent& event)
         RefreshImageAndControls();
     }
 }
-void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image)
+void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh)
 {
     if ( selectedAnimation < object.GetAnimationCount() &&
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
@@ -1010,14 +1012,33 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image)
         newSprite.SetImageName(ToString(image));
 
         direction.AddSprite(newSprite);
-        RefreshImagesList();
-        RefreshImageAndControls();
+        if ( refresh ) 
+        {
+	        RefreshImagesList();
+	        RefreshImageAndControls();
+        }
     }
 }
 
 bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
-    editor.AddImageToCurrentAnimation(text);
+    std::vector<std::string > command = gd::SplitString<std::string>(ToString(text), ';');
+
+    if ( command.size() < 3 ) //"Normal" drop to insert an image.
+    	editor.AddImageToCurrentAnimation(text);
+    else if ( command[0] == "COPYANDADDRESOURCES") //This is a "special" drop coming from the resource library dialog
+    {
+    	if (!editor.resourcesEditorPnl) return true;
+
+    	//Add ressources dragged from the library dialog to the project.
+        std::vector<std::string > files;
+        for (unsigned int i = 2;i<command.size();++i) files.push_back(command[i]);
+        std::vector<std::string > names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1]);
+
+    	//And add them as usual to the animation.
+        for (unsigned int i = 0;i<names.size();++i)
+    		editor.AddImageToCurrentAnimation(names[i], /*refresh=*/i == names.size()-1);
+    }
 
     return true;
 }
@@ -1762,7 +1783,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                         uniqueID++;
                     }
 
-                    ImageResource image;
+                    gd::ImageResource image;
                     image.GetFile() = file.GetFullPath();
                     image.SetName(name);
                     image.SetUserAdded(false);

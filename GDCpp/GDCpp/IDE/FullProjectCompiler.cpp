@@ -274,7 +274,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxSafeYield();
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 2 out of 3" )));
 
-    //Création du fichier source
+    //Encrypt the source file.
     {
         ifstream ifile(tempDir+"/GDProjectSrcFile.gdg",ios_base::binary);
         ofstream ofile(tempDir+"/src",ios_base::binary);
@@ -291,21 +291,22 @@ void FullProjectCompiler::LaunchProjectCompilation()
         char * obuffer = new char[size];
         ifile.read(ibuffer,fsize);
 
-        AES crypt;
-        crypt.SetParameters(192);
 
         unsigned char key[] = "-P:j$4t&OHIUVM/Z+u4DeDP.";
+        const unsigned char iv[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-        crypt.StartEncryption(key);
-        crypt.Encrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
+        aes_ks_t keySetting;
+        aes_setks_encrypt(key, 192, &keySetting);
+        aes_cbc_encrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer), 
+            (uint8_t*)iv, size/AES_BLOCK_SIZE, &keySetting);
 
         ofile.write(obuffer,size);
 
-        delete [] ibuffer;
-        delete [] obuffer;
-
         ofile.close();
         ifile.close();
+
+        delete [] ibuffer;
+        delete [] obuffer;
 	}
     wxRemoveFile( tempDir + "/compil.gdg" );
     diagnosticManager.OnPercentUpdate(85);

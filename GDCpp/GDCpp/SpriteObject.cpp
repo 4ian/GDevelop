@@ -106,6 +106,26 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
                                                                (blendMode == 2 ? sf::BlendMultiply :
                                                                 sf::BlendNone))));
 
+    /*sf::RectangleShape rectangle(sf::Vector2f(GetWidth(), GetHeight()));
+    rectangle.setPosition(sf::Vector2f(GetDrawableX(), GetDrawableY()));
+    rectangle.setOutlineThickness(5);
+    rectangle.setOutlineColor(sf::Color(255,0,0));
+    renderTarget.draw(rectangle);*/
+
+    /*std::vector<Polygon2d> polygons = GetHitBoxes();
+    for (unsigned int i = 0;i<polygons.size();++i)
+    {
+        sf::ConvexShape shape;
+        shape.setOutlineThickness(5);
+        shape.setOutlineColor(sf::Color(255,0,0));
+        
+        shape.setPointCount(polygons[i].vertices.size());
+        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
+            shape.setPoint(j, polygons[i].vertices[j]);
+
+        renderTarget.draw(shape);
+    }*/
+
     return true;
 }
 

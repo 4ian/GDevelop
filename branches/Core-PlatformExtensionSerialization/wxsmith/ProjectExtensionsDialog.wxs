@@ -305,8 +305,8 @@
 								<style>italic</style>
 							</font>
 						</object>
-						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>10</border>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">

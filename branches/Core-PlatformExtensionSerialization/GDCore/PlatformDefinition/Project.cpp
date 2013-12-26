@@ -703,15 +703,15 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         }
     }
 
-    #if defined(GD_IDE_ONLY) //TODO
-    if (!updateText.empty())
+    #if defined(GD_IDE_ONLY) 
+    if (!updateText.empty()) //TODO
     {
         ProjectUpdateDialog updateDialog(NULL, updateText);
         updateDialog.ShowModal();
     }
-    #endif
 
-    return;
+    dirty = false;
+    #endif
 }
 
 void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
@@ -1100,6 +1100,9 @@ bool Project::LoadFromFile(const std::string & filename)
     TiXmlHandle hdl( &doc );
     LoadFromXml(hdl.FirstChildElement().Element());
 
+    #if defined(GD_IDE_ONLY)
+    dirty = false;
+    #endif
     return true;
 }
 

@@ -278,6 +278,7 @@
 						<growablerows>0</growablerows>
 						<object class="sizeritem">
 							<object class="wxListCtrl" name="ID_LISTCTRL1" variable="imagesList" member="yes">
+								<minsize>300,200</minsize>
 								<style>wxLC_ICON|wxLC_SINGLE_SEL</style>
 								<handler function="OnimagesListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
 								<handler function="OnimagesListItemRClick" entry="EVT_LIST_ITEM_RIGHT_CLICK" />

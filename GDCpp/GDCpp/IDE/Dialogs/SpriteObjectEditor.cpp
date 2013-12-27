@@ -237,6 +237,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	imagesList = new wxListCtrl(imagesPanel, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_ICON|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL1"));
+	imagesList->SetMinSize(wxSize(300,200));
 	FlexGridSizer1->Add(imagesList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	imagesPanel->SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(imagesPanel);
@@ -474,6 +475,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	mgr->GetPane(maskPanel).Show(false);
 	mgr->GetPane(pointsPanel).Show(false);
 	mgr->GetPane(previewPanel).Show(false);
+	#if !defined(WINDOWS)
+	mgr->GetPane(maskPanel).Dock(); //On linux, floating panes are somewhat freezed
+	mgr->GetPane(pointsPanel).Dock(); //so be sure to dock them by default so that
+	mgr->GetPane(previewPanel).Dock(); //they are usable.
+	#endif
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
@@ -487,6 +493,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	animationToolbar->Realize();
 	maskToolbar->Realize();
 	pointToolbar->Realize();
+	resourcesEditorPnl->toolbar->Realize();
 }
 
 void SpriteObjectEditor::OnimagesListRightClick(wxMouseEvent& event)
@@ -521,14 +528,14 @@ void SpriteObjectEditor::RefreshAnimationTree()
     for (unsigned int i = 0;i<object.GetAnimationCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
-        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, 
+        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1,
         	new gd::TreeItemStringData(ToString(i), ""));
 
         if ( animation.useMultipleDirections )
         {
             for (unsigned int j = 0;j<animation.GetDirectionsNumber();++j)
             {
-                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1, 
+                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1,
                 	new gd::TreeItemStringData(ToString(i), ToString(j)));
 
             }
@@ -1012,7 +1019,7 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh
         newSprite.SetImageName(ToString(image));
 
         direction.AddSprite(newSprite);
-        if ( refresh ) 
+        if ( refresh )
         {
 	        RefreshImagesList();
 	        RefreshImageAndControls();

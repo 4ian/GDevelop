@@ -179,6 +179,8 @@
 							<object class="sizeritem">
 								<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 									<cols>2</cols>
+									<growablecols>1</growablecols>
+									<growablerows>0</growablerows>
 									<object class="sizeritem">
 										<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="ActionImg" member="yes">
 											<bitmap>res/unknownAction24.png</bitmap>
@@ -202,7 +204,7 @@
 														<family>swiss</family>
 													</font>
 												</object>
-												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+												<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
 												<option>1</option>
 											</object>
@@ -220,7 +222,7 @@
 											<label>Choose an action in left menu</label>
 											<tooltip>See Help for more information about the condition.</tooltip>
 										</object>
-										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
 										<option>1</option>
 									</object>

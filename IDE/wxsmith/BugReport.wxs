@@ -1,50 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="BugReport">
-		<title>Bug's report</title>
+		<title>Something bad happened!</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
-			<object class="sizeritem">
-				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-					<bg>wxSYS_COLOUR_WINDOW</bg>
-					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-						<cols>3</cols>
-						<object class="sizeritem">
-							<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
-								<bitmap>res/bigbug.png</bitmap>
-								<style>wxNO_BORDER</style>
-							</object>
-							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-							<border>5</border>
-							<option>1</option>
-						</object>
-						<object class="sizeritem">
-							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-								<label>An error seems to have occured during&#x0A;last session.</label>
-								<font>
-									<size>11</size>
-									<weight>bold</weight>
-								</font>
-								<style>wxALIGN_CENTRE</style>
-							</object>
-							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-							<border>5</border>
-							<option>1</option>
-						</object>
-					</object>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
-			<object class="sizeritem">
-				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
-					<size>10,-1</size>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
 					<object class="notebookpage">
@@ -54,34 +17,27 @@
 								<growablecols>0</growablecols>
 								<growablerows>0</growablerows>
 								<object class="sizeritem">
-									<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
-										<label>Oops...</label>
+									<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+										<cols>3</cols>
 										<object class="sizeritem">
-											<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
-												<cols>3</cols>
-												<object class="sizeritem">
-													<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
-														<bitmap stock_id="wxART_INFORMATION" stock_client="wxART_OTHER" />
-														<style>wxNO_BORDER</style>
-													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-														<label>It seems that Game Develop has closed abruptly after an&#x0A;error. If this proves to be right, we apologize for the inconvenience&#x0A;incurred. This is not your fault, Game Develop should not &#x0A;abruptly quit whatever the user make.You can help us correct the problem&#x0A;by filling the error report.</label>
-													</object>
-													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
+												<bitmap stock_id="wxART_INFORMATION" stock_client="wxART_OTHER" />
+												<style>wxNO_BORDER</style>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+												<label>It seems that Game Develop has closed abruptly after an&#x0A;error. Game Develop should never freeze or crash whatever &#x0A;the user make. You can help us correct the problem by filling&#x0A;the error report.</label>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -145,7 +101,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Explaination</label>
+						<label>Oops...</label>
 					</object>
 					<object class="notebookpage">
 						<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
@@ -155,7 +111,7 @@
 								<growablerows>3</growablerows>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>To help us solve the problem, try to describe the error&#x0A;as precisely as you can. Indicate if possible:&#x0A;-How error has happened (Click on a button ...)&#x0A;-In which part of program (Scene editor, Choosing actions ...)</label>
+										<label>To help us solve the problem, try to describe the error as precisely as&#x0A;you can. Indicate if possible:&#x0A;-How did the error happened (Click on a button ...)&#x0A;-In which part of program (Scene editor, events editor...)</label>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -163,8 +119,8 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="UserReportEdit" member="yes">
-										<size>408,71</size>
-										<style>wxTE_MULTILINE</style>
+										<size>408,100</size>
+										<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE</style>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -177,7 +133,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-												<label>Une fois que vous aurez complété le rapport d&apos;erreur,&#x0A;cliquez sur le bouton  &quot;Créer le rapport&quot;. Envoyez&#x0A;ensuite le fichier à notre adresse mail.&#x0A;&#x0A;Merci !</label>
+												<label>When you&apos;ve described the error, click on the button&#x0A;to automatically send the report.&#x0A;&#x0A;Thanks!</label>
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -185,10 +141,10 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON1" variable="CreateRapportBt" member="yes">
-												<label>Create the error report</label>
+												<label>Send my report!</label>
 												<handler function="OnCreateRapportBtClick" entry="EVT_BUTTON" />
 											</object>
-											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<flag>wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -207,23 +163,30 @@
 								</object>
 							</object>
 						</object>
-						<label>Error&apos;s report</label>
+						<label>Report the error</label>
 					</object>
 					<object class="notebookpage">
 						<object class="wxPanel" name="ID_PANEL4" variable="Panel4" member="yes">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
 								<cols>1</cols>
 								<growablecols>0</growablecols>
-								<growablerows>1</growablerows>
+								<growablerows>0</growablerows>
 								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
-										<cols>3</cols>
+										<cols>1</cols>
 										<growablecols>0</growablecols>
-										<growablerows>0</growablerows>
+										<growablerows>1</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-												<label>Games which were edited can have been saved, under the name of gameDumpX.gdg ( where X is a number ).&#x0A;&#x0A;Game Develop can reopen these games.</label>
-												<size>424,68</size>
+												<label>Here is a list of the projects opened during the last session:</label>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="openedFilesEdit" member="yes">
+												<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY</style>
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -234,71 +197,10 @@
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
-									<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
-										<label>Automatic saves</label>
-										<object class="sizeritem">
-											<object class="wxFlexGridSizer" variable="FlexGridSizer13" member="no">
-												<cols>3</cols>
-												<object class="sizeritem">
-													<object class="wxStaticBitmap" name="ID_STATICBITMAP5" variable="StaticBitmap5" member="yes">
-														<bitmap stock_id="wxART_INFORMATION" stock_client="wxART_OTHER" />
-														<style>wxNO_BORDER</style>
-													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-														<label>If your game could not be saved before the crash or is corrupted&#x0A;you can try to open an auto-save made by Game Develop. If this&#x0A;option is activated, autosave are made inside the game folder.</label>
-													</object>
-													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-											</object>
-											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<option>1</option>
-										</object>
+									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+										<label>Game Develop may have made automatic backups of these projects. When you&apos;ll&#x0A;close this window, the backups will be opened. If these backup are not corrupted,&#x0A;you can save them over the original project files.</label>
 									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
-										<label>Attention!</label>
-										<object class="sizeritem">
-											<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
-												<cols>3</cols>
-												<growablecols>1</growablecols>
-												<growablerows>0</growablerows>
-												<object class="sizeritem">
-													<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
-														<bitmap stock_id="wxART_WARNING" stock_client="wxART_OTHER" />
-														<style>wxNO_BORDER</style>
-													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-														<label>If you open the games that could be saved before the crash&#x0A;make sure that the games are complete and not corrupted before&#x0A;saving them on the original files.</label>
-														<font>
-															<weight>bold</weight>
-														</font>
-													</object>
-													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<option>1</option>
-										</object>
-									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -306,18 +208,18 @@
 									<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
 										<cols>3</cols>
 										<object class="sizeritem">
-											<object class="wxButton" name="ID_BUTTON2" variable="CloseBt" member="yes">
-												<label>Close and open the game(s)</label>
-												<handler function="OnCloseBtClick" entry="EVT_BUTTON" />
+											<object class="wxButton" name="ID_BUTTON3" variable="CloseNoOpenBt" member="yes">
+												<label>Close but don&apos;t open the autosave(s)</label>
+												<handler function="OnCloseNoOpenBtClick" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
 										<object class="sizeritem">
-											<object class="wxButton" name="ID_BUTTON3" variable="CloseNoOpenBt" member="yes">
-												<label>Close but don't open the game(s)</label>
-												<handler function="OnCloseNoOpenBtClick" entry="EVT_BUTTON" />
+											<object class="wxButton" name="ID_BUTTON2" variable="CloseBt" member="yes">
+												<label>Close</label>
+												<handler function="OnCloseBtClick" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -329,7 +231,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Your game</label>
+						<label>Load autosaves</label>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -339,10 +241,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

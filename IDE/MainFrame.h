@@ -150,6 +150,15 @@ public:
      */
     inline std::vector<wxWindow*> * GetScenesLockingShortcutsList() { return &scenesLockingShortcuts; };
 
+    /**
+     * \brief Update the file logging the opened projects.
+     *
+     * Called whenever a project is opened/closed to keep a trace of the currently
+     * opened project (so as to restore them after a crash).
+     * Can also be called if an editor changes the open projects.
+     */
+    void UpdateOpenedProjectsLogFile();
+
     //(*Handlers(MainFrame)
     void OnQuit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);

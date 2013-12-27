@@ -365,6 +365,7 @@ wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, boo
         lastAddedItem = item;
     }
 
+    project.SetDirty();
     return lastAddedItem;
 }
 
@@ -393,6 +394,7 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
         lastAddedItem = item;
     }
 
+    project.SetDirty();
     return lastAddedItem;
 }
 
@@ -635,6 +637,8 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupRenamed(project, globalGroup ? NULL : layout, newName, oldName);
         }
     }
+
+    project.SetDirty();
 }
 
 void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
@@ -718,6 +722,9 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         object->EditObject(this, project, mainFrameWrapper);
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : layout, *object);
+    
+    	//TODO: Set dirty only if modified.
+    	project.SetDirty();
 
         //Reload thumbnail
         int thumbnailID = -1;

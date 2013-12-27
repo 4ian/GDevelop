@@ -71,6 +71,7 @@ void MainFrame::CreateNewProject()
 
             games.push_back(newProject);
             SetCurrentGame(games.size()-1);
+            UpdateOpenedProjectsLogFile();
             if ( startPage ) startPage->Refresh();
 
             //Ensure working directory is set to the IDE one.
@@ -149,6 +150,8 @@ void MainFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt)
 
 void MainFrame::SetLastUsedFile(wxString file)
 {
+    if ( file.EndsWith(".autosave") ) return;
+    
     m_recentlist.SetLastUsed( file );
     for ( unsigned int i = 0;i < 9;i++ )
         wxConfigBase::Get()->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
@@ -175,6 +178,9 @@ void MainFrame::Open( string file )
         //Mise à jour des éditeurs
         SetCurrentGame(games.size()-1);
         if ( startPage ) startPage->Refresh();
+
+        //Update the file logging the opened project
+        UpdateOpenedProjectsLogFile();
 
         string unknownExtensions = "";
         for (unsigned int i = 0;i<newProject->GetUsedExtensions().size();++i)
@@ -218,7 +224,7 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    if ( GetCurrentGame()->GetProjectFile().empty() )
+    if ( GetCurrentGame()->GetProjectFile().empty() || wxString(GetCurrentGame()->GetProjectFile()).EndsWith(".autosave") )
         SaveAs();
     else
     {
@@ -252,17 +258,17 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
-        if ( games[i]->GetProjectFile().empty() )
+        if ( games[i]->GetProjectFile().empty() || wxString(games[i]->GetProjectFile()).EndsWith(".autosave") )
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-            wxFileDialog FileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
-            FileDialog.ShowModal();
+            wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+            fileDialog.ShowModal();
 
-            std::string path = gd::ToString(FileDialog.GetPath());
+            std::string path = gd::ToString(fileDialog.GetPath());
 
             #if defined(LINUX) //Extension seems not be added with wxGTK?
-            if ( FileDialog.GetFilterIndex() == 0 && !path.empty() )
+            if ( fileDialog.GetFilterIndex() == 0 && !path.empty() )
                 path += ".gdg";
             #endif
 
@@ -277,6 +283,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
 
                 if ( games[i] == GetCurrentGame() )
                     SetCurrentGame(i);
+                UpdateOpenedProjectsLogFile();
             }
         }
         else
@@ -348,6 +355,7 @@ void MainFrame::SaveAs()
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
         SetCurrentGame(projectCurrentlyEdited, false);
+        UpdateOpenedProjectsLogFile();
 
         return;
     }

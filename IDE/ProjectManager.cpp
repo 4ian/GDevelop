@@ -1299,6 +1299,7 @@ void ProjectManager::OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event)
 
 /**
  * Close a game
+ * TODO: Should be probably put in MainFrame, next to Open and Save.
  */
 void ProjectManager::CloseGame(gd::Project * project)
 {
@@ -1368,7 +1369,7 @@ void ProjectManager::CloseGame(gd::Project * project)
     if ( mainEditor.GetProjectPropertiesPanel()->GetProject() == project ) mainEditor.GetProjectPropertiesPanel()->SetProject(NULL);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de fermer le jeu...") : NULL;
+    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo(_("Please wait, the internal compilation of events must be finished before continuing...")) : NULL;
     while ( CodeCompiler::GetInstance()->CompilationInProcess() )
     {
         wxYield();
@@ -1382,6 +1383,7 @@ void ProjectManager::CloseGame(gd::Project * project)
     }
 
     mainEditor.SetCurrentGame(mainEditor.games.size()-1, /*refreshProjectManager=*/false);
+    mainEditor.UpdateOpenedProjectsLogFile();
 }
 
 /**
@@ -1391,7 +1393,8 @@ void ProjectManager::OnRibbonCloseSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
 
-    if ( wxMessageBox( _( "Warning! All changes not saved will be lost.\n\nClose the project \?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
+    if (mainEditor.GetCurrentGame()->IsDirty() 
+    	&& wxMessageBox( _( "Changes have been made to the project.\n\nAre you sure you want to close it\?" ), _( "Unsaved changes" ), wxYES_NO|wxNO_DEFAULT, this ) == wxNO )
         return;
 
     CloseGame(mainEditor.GetCurrentGame().get());
@@ -1408,7 +1411,8 @@ void ProjectManager::OncloseGameBtSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    if ( wxMessageBox( _( "Warning! All changes not saved will be lost.\n\nClose the project \?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
+    if (game->IsDirty() 
+    	&& wxMessageBox( _("Changes have been made to the project.\n\nAre you sure you want to close it\?"), _( "Unsaved changes" ), wxYES_NO|wxNO_DEFAULT, this ) == wxNO )
         return;
 
     CloseGame(game);

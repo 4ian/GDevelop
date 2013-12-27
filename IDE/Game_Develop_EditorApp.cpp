@@ -192,44 +192,47 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Language loaded" << endl;
 
     #ifdef RELEASE
-    singleInstanceChecker = new wxSingleInstanceChecker;
-    if ( singleInstanceChecker->IsAnotherRunning() && !parser.Found( wxT("allowMultipleInstances") ) )
     {
-        //There is already another instance running: Ask it to open the requested files.
         wxLogNull noLogPlease;
-        cout << "* Instance already existing: Redirecting the file to open to it." << endl;
-
-        STClient * client = new STClient;
-        wxString hostName = "localhost"; //Mandatory to provide the host ( for TCP/IP based implementations ).
-        wxConnectionBase * connection = client->MakeConnection(hostName, "GDIDE", "Game Develop IDE");
-
-        if ( connection )
+        singleInstanceChecker = new wxSingleInstanceChecker;
+        if ( singleInstanceChecker->IsAnotherRunning() && !parser.Found( wxT("allowMultipleInstances") ) )
         {
-            for (unsigned int i = 0; i < filesToOpen.size(); ++i)
-                connection->Execute(filesToOpen[i]);
+            //There is already another instance running: Ask it to open the requested files.
+            cout << "* Instance already existing: Redirecting the file to open to it." << endl;
 
-            connection->Disconnect();
-            delete connection;
+            STClient * client = new STClient;
+            wxString hostName = "localhost"; //Mandatory to provide the host ( for TCP/IP based implementations ).
+            wxConnectionBase * connection = client->MakeConnection(hostName, "GDIDE", "Game Develop IDE");
+
+            if ( connection )
+            {
+                for (unsigned int i = 0; i < filesToOpen.size(); ++i)
+                    connection->Execute(filesToOpen[i]);
+
+                connection->Disconnect();
+                delete connection;
+            }
+            else
+            {
+                if ( !filesToOpen.empty() )
+                    wxMessageBox(_("It seems that Game Develop is busy and can't open the requested file.\nPlease close any open dialogs and retry."), 
+                        _("Sorry! :/"), wxICON_INFORMATION|wxOK);
+            }
+
+            delete client;
+            delete singleInstanceChecker;
+
+            cout << "* Bye!" << endl;
+            return false; // OnExit() won't be called if we return false
         }
         else
         {
-            wxMessageBox(_("It seems that Game Develop is busy and can't open the requested file.\nPlease close any open dialogs and retry."), 
-                _("Sorry! :/"), wxICON_INFORMATION|wxOK);
+            //No other instance running: Set this instance as the main one, creating a server that will
+            //be called by other instance if necessary.
+            server = new STServer;
+            if ( !server->Create("GDIDE") )
+                cout << " * FAILED to create an IPC service.";
         }
-
-        delete client;
-        delete singleInstanceChecker;
-
-        cout << "* Bye!" << endl;
-        return false; // OnExit() won't be called if we return false
-    }
-    else
-    {
-        //No other instance running: Set this instance as the main one, creating a server that will
-        //be called by other instance if necessary.
-        server = new STServer;
-        if ( !server->Create("GDIDE") )
-            cout << " * FAILED to create an IPC service.";
     }
     #endif
 
@@ -237,16 +240,36 @@ bool Game_Develop_EditorApp::OnInit()
 
     wxInitAllImageHandlers();
 
-    cout << "* Image Handlers loaded" << endl;
+    cout << "* Image handlers loaded" << endl;
 
-    //Test si le programme n'aurait pas planté la dernière fois
-    //En vérifiant si un fichier existe toujours
-    bool openRecupFiles = false;
+    //Check if the last session terminated not normally.
     #if defined(RELEASE)
-    if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log") && !wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
+    if ( !parser.Found( wxT("noCrashCheck") ) 
+        && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log") 
+        && !wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
     {
-        BugReport dialog(NULL);
-        if ( dialog.ShowModal() == 1 ) openRecupFiles = true;
+        //Get the files opened during the last crash
+        std::vector<string> openedFiles;
+        wxTextFile projectsLogFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
+        if (projectsLogFile.Open()) 
+        {
+            for (wxString str = projectsLogFile.GetFirstLine(); !projectsLogFile.Eof(); str = projectsLogFile.GetNextLine())
+                openedFiles.push_back(gd::ToString(str));
+        }
+
+        projectsLogFile.Close();
+
+        //Show an explanation window and offer the user to load the autosaves.
+        BugReport dialog(NULL, openedFiles);
+        if ( dialog.ShowModal() == 1 ) 
+        {
+            for (unsigned int i = 0; i < openedFiles.size(); ++i)
+            {
+                if ( wxFileExists(openedFiles[i]+".autosave") )
+                    filesToOpen.push_back(openedFiles[i]+".autosave");
+            }
+            
+        }
     }
     #endif
     cout << "* Crash management ended" << endl;
@@ -267,9 +290,10 @@ bool Game_Develop_EditorApp::OnInit()
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
     cout << "* Splash Screen created" << endl;
 
-    //Création du fichier de détection des erreurs
+    //Create the file logging the opened projects
     wxFile errorDetectFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log", wxFile::write);
     errorDetectFile.Write(" ");
+    errorDetectFile.Close();
 
     //Les log
     cout << "* Displaying Game Develop version information :" << endl;
@@ -319,17 +343,6 @@ bool Game_Develop_EditorApp::OnInit()
     //Open files
     for (unsigned int i = 0;i<filesToOpen.size();++i)
         mainEditor->Open(filesToOpen[i]);
-
-    //Open dumped files
-    if ( openRecupFiles )
-    {
-        unsigned int i = 0;
-        while( wxFileExists(wxFileName::GetTempDir()+"/GDGamesDump/"+"gameDump"+ToString(i)+".gdg") )
-        {
-            mainEditor->Open(ToString(wxFileName::GetTempDir()+"/GDGamesDump/"+"gameDump"+ToString(i)+".gdg"));
-            ++i;
-        }
-    }
 
     cout << "* Connecting shortcuts" << endl;
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));

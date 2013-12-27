@@ -328,7 +328,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
 
     SetDropTarget(new DnDFileEditor(*this));
 
-    //AccËs ‡ la configuration
+    //Acc√®s √† la configuration
     wxConfigBase *pConfig = wxConfigBase::Get();
 
     //Deactivate menu
@@ -595,13 +595,42 @@ void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
     editorsNotebook->AddPage(startPage, _("Start page"), true);
 }
 
+void MainFrame::UpdateOpenedProjectsLogFile()
+{
+    wxTextFile projectsLogFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
+    if ( projectsLogFile.Exists() ) projectsLogFile.Open();
+    else projectsLogFile.Create();
+
+    if ( !projectsLogFile.IsOpened() ) return;
+    projectsLogFile.Clear();
+
+    for(unsigned int i = 0;i<games.size();++i) 
+        projectsLogFile.AddLine(games[i]->GetProjectFile());
+    
+    projectsLogFile.Write();
+    projectsLogFile.Close();
+}
+
 /**
  * Want to close Game Develop
  */
 void MainFrame::OnClose( wxCloseEvent& event )
 {
-    if (wxMessageBox(_("Are you sure you want to quit Game Develop \?"), _("Quit Game Develop"), wxYES_NO ) == wxNO)
-        return;
+    for(unsigned int i = 0;i<games.size();++i) {
+        if ( games[i]->IsDirty() ) {
+            wxString fullMessage = wxString::Format(_("Project \"%s\" has been changed.\n\n"), games[i]->GetName());
+            fullMessage += wxString::Format(_("Do you want to save it in %s?"), games[i]->GetProjectFile());
+            int whatToDo = wxMessageBox(fullMessage, _("Project not saved"), wxYES_NO|wxCANCEL|wxCANCEL_DEFAULT);
+            
+            if (whatToDo == wxCANCEL) return;
+            else if ( whatToDo == wxYES ) {
+                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) 
+                    wxLogError( _("Save failed!") );
+                else
+                    wxLogStatus( _("Project properly saved.") );
+            }
+        }
+    }
 
     wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );
 
@@ -610,6 +639,7 @@ void MainFrame::OnClose( wxCloseEvent& event )
     ConsoleManager * consoleManager = ConsoleManager::GetInstance();
     consoleManager->DestroySingleton();
 
+    //Log the shutdown
     LogFileManager::GetInstance()->WriteToLogFile("Game Develop shutting down");
     Destroy();
 }
@@ -787,7 +817,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         {
             wxString filename = wxFileName(games[i]->GetProjectFile()).GetPath()+"/"+wxFileName(games[i]->GetProjectFile()).GetName()+".gdg.autosave";
 
-            if ( !games[i]->SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a ÈchouÈ." );}
+            if ( !games[i]->SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a √©chou√©." );}
         }
     }
 }

@@ -36,7 +36,7 @@ SigneModification::SigneModification(wxWindow* parent)
 		_("* ( Multiply by )"),
 		_("/ ( Divide by )")
 	};
-	SigneRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the operator"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+	SigneRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the operator"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	SigneRadio->SetFocus();
 	FlexGridSizer1->Add(SigneRadio, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);

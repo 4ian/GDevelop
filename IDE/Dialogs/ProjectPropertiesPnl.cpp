@@ -59,7 +59,7 @@ void ProjectPropertiesPnl::SetProject(gd::Project * project_)
     project = project_;
     propertyGrid->Clear();
 
-    if ( project != NULL )
+    if (project)
     {
         project->PopulatePropertyGrid(propertyGrid);
         propertyGrid->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
@@ -68,18 +68,20 @@ void ProjectPropertiesPnl::SetProject(gd::Project * project_)
 
 void ProjectPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
 {
-    if (project != NULL) project->OnSelectionInPropertyGrid(propertyGrid, event);
+    if (project) project->OnSelectionInPropertyGrid(propertyGrid, event);
 }
 
 void ProjectPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 {
-    if (project != NULL) project->OnChangeInPropertyGrid(propertyGrid, event);
+    if (project) project->OnChangeInPropertyGrid(propertyGrid, event);
 
     if ( event.GetPropertyName() == _("Name of the project") && associatedTree != NULL)
         associatedTree->SetItemText(associatedTreeItem, event.GetProperty()->GetValue());
 
     if ( event.GetPropertyName() == _("Activate the use of C++ source files") && associatedProjectManager != NULL)
         associatedProjectManager->Refresh();
+
+    if (project) project->SetDirty();
 }
 
 void ProjectPropertiesPnl::SetAssociatedTreeCtrlProjectItem(wxTreeCtrl * tree, wxTreeItemId item)

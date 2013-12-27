@@ -1153,6 +1153,7 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
         else
             gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
     }
+    game.SetDirty();
 }
 
 /**

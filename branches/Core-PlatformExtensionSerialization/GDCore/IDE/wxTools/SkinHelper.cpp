@@ -327,12 +327,16 @@ void SkinHelper::ApplyCurrentSkin(wxAuiToolBar & toolbar)
 
 void SkinHelper::ApplyCurrentSkin(wxPropertyGrid & propertyGrid)
 {
+    #if defined(WINDOWS)
     propertyGrid.SetMarginColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
     propertyGrid.SetCaptionBackgroundColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
     propertyGrid.SetEmptySpaceColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
     propertyGrid.SetCellBackgroundColour( *wxWHITE );
     propertyGrid.SetCellTextColour( *wxBLACK );
     propertyGrid.SetLineColour( wxColour(212,208,200) );
+    #else
+    propertyGrid.SetEmptySpaceColour(propertyGrid.GetMarginColour());
+    #endif
 }
 
 }

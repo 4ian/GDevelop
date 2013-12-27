@@ -43,6 +43,10 @@ void LayoutEditorCanvas::OnUpdate()
     }
     else
     {
+        #if !defined(WINDOWS)
+        wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Force the correct working directory.
+        #endif
+
         //First reload some images if necessary.
         if ( !project.imagesChanged.empty() )
         {

@@ -226,19 +226,15 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&ObjectsEditor::OnSetFocus);
 	//*)
 
-    std::cout << "a" << std::endl;
     #if defined(__WXMSW__) //Offer nice look to wxTreeCtrl
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
     if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    std::cout << "c" << std::endl;
     objectsImagesList = new wxImageList(24,24, true);
     objectsList->AssignImageList(objectsImagesList);
 
-    std::cout << "Refresh" << std::endl;
     Refresh();
-    std::cout << "RefreshEND" << std::endl;
 }
 
 ObjectsEditor::~ObjectsEditor()
@@ -766,6 +762,8 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
             return;
         }
     }
+
+    mainFrameWrapper.GetMainEditor()->SetFocus();
 }
 
 

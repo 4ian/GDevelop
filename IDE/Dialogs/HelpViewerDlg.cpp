@@ -82,6 +82,7 @@ HelpViewerDlg::HelpViewerDlg(wxWindow* parent, wxString url)
 	SetSize(1024,640);
 	htmlViewerPanel->OpenURL(url);
 	searchCtrl->SetDescriptiveText(_("Type a word to search in the online help"));
+	AuiToolBar1->Realize(); //Needed on linux to display the toolbar.
 }
 
 HelpViewerDlg::~HelpViewerDlg()

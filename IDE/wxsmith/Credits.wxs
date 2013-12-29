@@ -37,7 +37,7 @@
 															<weight>bold</weight>
 														</font>
 													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<option>1</option>
 												</object>
 												<object class="sizeritem">
@@ -56,7 +56,7 @@
 																<label>Florian &quot;4ian&quot; Rival</label>
 																<url>http://www.florianrival.com</url>
 															</object>
-															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<option>1</option>
 														</object>
 													</object>
@@ -123,7 +123,7 @@
 												<object class="sizeritem">
 													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL16" variable="HyperlinkCtrl5" member="yes">
 														<label>You can make a donation to the author.</label>
-														<url>http://www.compilgames.net/donate.php?utm_source=GD&utm_medium=CreditsLink&utm_campaign=paywhatyouwant</url>
+														<url>http://www.compilgames.net/donate.php?utm&amp;source=GDutm&amp;medium=CreditsLinkutm&amp;campaign=paywhatyouwant</url>
 														<style>wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 													</object>
 													<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>

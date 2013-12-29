@@ -495,7 +495,7 @@ void EditExpressionDialog::OnOkBtClick(wxCommandEvent& event)
 
     if ( !expressionParser.ParseMathExpression(project.GetCurrentPlatform(), project, layout, callbacks) )
     {
-        if ( wxMessageBox(_("The expression is malformed. Are you sur you want to validate this expression \?"), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_("The expression is malformed. Are you sure you want to validate this expression\?"), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 

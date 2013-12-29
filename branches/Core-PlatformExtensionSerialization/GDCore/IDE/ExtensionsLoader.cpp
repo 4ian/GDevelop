@@ -168,9 +168,11 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
 
     closedir( rep );
 
-    //Libraries are loaded using dlopen(.., ..|RTLD_LOCAL) meaning that their symbols are not available for other libraries
+    //Libraries are loaded using dlopen(.., RTLD_LAZY|RTLD_LOCAL) meaning that their symbols are not available for other libraries
     //nor for LLVM/Clang. We then reload set them as global to make their symbols available for LLVM/Clang. We couldn't mark them
     //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
+    //SetLibraryGlobal is also setting RTLD_NOW to ensure that all symbols are resolved: Otherwise, we can get weird
+    //"symbol lookup error" even if the symbols exist in the extensions!
     for (unsigned int i = 0;i<librariesLoaded.size();++i)
         SetLibraryGlobal(librariesLoaded[i].c_str());
     #else

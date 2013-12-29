@@ -54,6 +54,7 @@ std::string CodeCompilerCall::GetFullCall() const
     args.push_back("-nostdinc++");
     args.push_back("-B\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin\"");
     #else
+        args.push_back("-fPIC"); //Necessary, on 64 bits platforms to avoid "relocation R_X86_64_32 against `.rodata' can not be used when making a shared object" error.
         //Rely on the default includes directories of the compiler
     #endif
     for (unsigned int i = 0;i<extraOptions.size();++i)

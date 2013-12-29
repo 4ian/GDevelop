@@ -30,12 +30,15 @@
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 												<cols>1</cols>
+												<growablecols>0</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 														<label>Game Develop</label>
 														<font>
 															<weight>bold</weight>
 														</font>
+														<minsize>-1,-1</minsize>
+														<style>wxALIGN_CENTRE</style>
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<option>1</option>
@@ -43,6 +46,7 @@
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
 														<label>was created by</label>
+														<style>wxALIGN_CENTRE</style>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -64,8 +68,8 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>20</border>
 											<option>1</option>
 										</object>
 										<object class="sizeritem">

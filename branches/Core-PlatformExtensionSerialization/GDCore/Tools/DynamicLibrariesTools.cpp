@@ -46,7 +46,7 @@ namespace gd
         //RTLD_NOLOAD has the library is already opened.
         //RTLD_NOW to be sure that all symbols are existing (Otherwise, could get strange "symbol lookup error"!)
         //RTLD_GLOBAL to make the symbols available to all shared library (in particular, compiled events code).
-        return dlopen(path, RTLD_NOLOAD|RTLD_NOW|RTLD_GLOBAL|);
+        return dlopen(path, RTLD_NOLOAD|RTLD_NOW|RTLD_GLOBAL);
     }
 #else
     #warning System not supported for dynamic libraries loading

@@ -4,7 +4,7 @@
 namespace AutoVersion{
 	
 	//Date Version Types
-	static const char GDCore_DATE[] = "22";
+	static const char GDCore_DATE[] = "29";
 	static const char GDCore_MONTH[] = "12";
 	static const char GDCore_YEAR[] = "2013";
 	

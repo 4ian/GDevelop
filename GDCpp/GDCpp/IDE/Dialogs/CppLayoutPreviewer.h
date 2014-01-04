@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 #ifndef SCENEEDITORCANVAS_H
@@ -96,7 +96,7 @@ private:
     static sf::Text reloadingText;
 
     //Editors owned by the previewer
-    boost::shared_ptr<RenderDialog> externalPreviewWindow;
+    boost::shared_ptr<RenderDialog> externalPreviewWindow; ///< The external preview window: Can be NULL if OnPreviewPlayWindowBtClick was not called.
     boost::shared_ptr<DebuggerGUI> debugger;
     boost::shared_ptr<ProfileDlg> profiler;
 

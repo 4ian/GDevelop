@@ -96,6 +96,10 @@ void wxSFMLCanvas::OnIdle(wxIdleEvent&)
 {
     // Send a paint message when the control is idle, to ensure maximum framerate
     Refresh();
+    
+    #if !defined(WINDOWS)
+    event.RequestMore(); //On linux, we need to specify that we want continuous idle events
+    #endif
 }
 
 ////////////////////////////////////////////////////////////

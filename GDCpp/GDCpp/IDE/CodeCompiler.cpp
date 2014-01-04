@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 
@@ -289,7 +289,7 @@ void CodeCompiler::StartTheNextTask()
 
     //Launching the process
     std::cout << "Launching compiler process...\n";
-    //std::cout << currentTask.compilerCall.GetFullCall() << "\n";
+    std::cout << currentTask.compilerCall.GetFullCall() << "\n";
     currentTaskProcess = new CodeCompilerProcess(this);
     currentTaskProcess->Redirect();
     if ( wxExecute(currentTask.compilerCall.GetFullCall(), wxEXEC_ASYNC, currentTaskProcess) == 0 )

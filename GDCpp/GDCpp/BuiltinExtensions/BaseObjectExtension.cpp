@@ -367,8 +367,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         obj.AddCondition("Vitesse",
                        _("Speed of the object"),
-                       _("Test the overall speed of an object"),
-                       _("The speed of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                       _("Compare the overall speed of an object"),
+                       _("The speed of _PARAM0_ is _PARAM1_ _PARAM2_"),
                        _("Displacement"),
                        "res/conditions/vitesse24.png",
                        "res/conditions/vitesse.png")
@@ -380,7 +380,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         obj.AddCondition("AngleOfDisplacement",
                        _("Angle of moving"),
-                       _("Test the angle of displacement of an object"),
+                       _("Compare the angle of displacement of an object"),
                        _("The angle of displacement of _PARAM0_ is _PARAM1_ ( tolerance : _PARAM2_° )"),
                        _("Displacement"),
                        "res/conditions/vitesse24.png",

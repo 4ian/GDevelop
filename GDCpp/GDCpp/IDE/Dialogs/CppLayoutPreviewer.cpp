@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 #include <iostream>
@@ -51,9 +51,9 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
     isReloading(false),
     playing(false)
 {
-    //Creating additional editors used specifically by our platform.
-    externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
-    //Others editors are created in SetParentAuiManager method.
+    //The external preview window is created only when necessary to prevent it to be shown
+    //at creation on Linux.
+    //Additional editors are created in SetParentAuiManager method.
 
     //Loading some GUI elements
     reloadingIconImage.loadFromFile("res/compile128.png");
@@ -261,17 +261,15 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, true);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, false);
 
-    if ( externalPreviewWindow )
-    {
-        externalPreviewWindow->Show(true);
-        externalPreviewWindow->renderCanvas->setFramerateLimit( previewGame.GetMaximumFPS() );
+    //Create now the window if necessary (not done in the constructor because, on linux, the window was not hidden).
+    if (!externalPreviewWindow) 
+        externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
 
-        externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
-        previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
+    externalPreviewWindow->Show(true);
+    externalPreviewWindow->renderCanvas->setFramerateLimit( previewGame.GetMaximumFPS() );
 
-        /*externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
-        previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);*/
-    }
+    externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
+    previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
 }
 void CppLayoutPreviewer::ExternalWindowClosed()
 {

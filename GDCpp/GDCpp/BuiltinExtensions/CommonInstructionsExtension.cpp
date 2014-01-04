@@ -278,17 +278,17 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 const gd::Layout & scene = codeGenerator.GetLayout();
 
                 //Find if the link refers to externals events...
-                gd::ExternalEvents * linkedExternalEvents = NULL;
                 if ( project.HasExternalEventsNamed(event.GetTarget()) )
-                    linkedExternalEvents = &project.GetExternalEvents(event.GetTarget());
-
-                //...and  check if the external events can be compiled separately
-                DependenciesAnalyzer analyzer(project);
-                if (linkedExternalEvents != NULL &&
-                    analyzer.ExternalEventsCanBeCompiledForAScene(linkedExternalEvents->GetName()) == scene.GetName()) //Check if the link refers to events
-                {                                                                                                      //compiled separately.
-                    //There is nothing more to do for now: The code calling the external events will be generated in CodeGen::Generate.
-                    return;
+                {
+                    gd::ExternalEvents & linkedExternalEvents = project.GetExternalEvents(event.GetTarget());
+                    
+                    //...and check if the external events can be compiled separately
+                    DependenciesAnalyzer analyzer(project, linkedExternalEvents);
+                    if (analyzer.ExternalEventsCanBeCompiledForAScene() == scene.GetName()) //Check if the link refers to events
+                    {                                                                       //compiled separately.
+                        //There is nothing more to do for now: The code calling the external events will be generated in CodeGen::Generate.
+                        return;
+                    }
                 }
 
                 //If the link does not refers to separately compiled external events,

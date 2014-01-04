@@ -109,60 +109,67 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & game, gd::Layout * 
 
 void ChangesNotifier::OnEventsModified(gd::Project & game, gd::Layout & scene, bool indirectChange, std::string sourceOfTheIndirectChange) const
 {
+    std::cout << "Changes occured inside " << scene.GetName() << "...";
+
     scene.SetRefreshNeeded();
-    if ( !indirectChange ) //Changes occured directly in the scene: Recompile it.
+    if ( !indirectChange || !game.HasExternalEventsNamed(sourceOfTheIndirectChange) ) //Changes occured directly in the scene: Recompile it.
     {
         scene.SetCompilationNeeded();
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+        std::cout << "Recompilation triggered." << std::endl;
     }
     else
     {
-        DependenciesAnalyzer analyzer(game);
-        if ( analyzer.ExternalEventsCanBeCompiledForAScene(sourceOfTheIndirectChange) == scene.GetName() )
+        DependenciesAnalyzer analyzer(game, game.GetExternalEvents(sourceOfTheIndirectChange));
+        if ( analyzer.ExternalEventsCanBeCompiledForAScene() == scene.GetName() )
         {
             //Do nothing: Changes occured in an external event which is compiled separately
+            std::cout << "But nothing to do." << std::endl;
         }
         else
         {
             //Changes occurred in an external event which is directly included in the scene events.
             scene.SetCompilationNeeded();
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+            std::cout << "Recompilation asked for later." << std::endl;
         }
     }
 }
 
 void ChangesNotifier::OnEventsModified(gd::Project & game, gd::ExternalEvents & events, bool indirectChange, std::string sourceOfTheIndirectChange) const
 {
-    DependenciesAnalyzer analyzer(game);
-    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName());
+    DependenciesAnalyzer analyzer(game, events);
+    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
     bool externalEventsAreCompiledSeparately = !associatedScene.empty();
 
-    if ( externalEventsAreCompiledSeparately )
-    {
-        //The external events are compiled separately from the scene events:
-        //We need to recompile them if the changes occured inside them.
+    if ( !externalEventsAreCompiledSeparately ) return;
 
-        if ( !indirectChange )
+    std::cout << "Changes occured inside " << events.GetName() << " (compiled separately)..." << std::endl;
+
+    //The external events are compiled separately from the scene events:
+    //We need to recompile them if the changes occured inside them.
+
+    if ( !indirectChange || !game.HasExternalEventsNamed(sourceOfTheIndirectChange)  )
+    {
+        //Changes occurred directly inside the external events: We need to recompile them
+        events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
+        CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
+        std::cout << "Recompilation triggered." << std::endl;
+    }
+    else
+    {
+        DependenciesAnalyzer analyzer(game, game.GetExternalEvents(sourceOfTheIndirectChange));
+        if ( analyzer.ExternalEventsCanBeCompiledForAScene() == associatedScene )
         {
-            DependenciesAnalyzer analyzer(game);
-            if ( analyzer.ExternalEventsCanBeCompiledForAScene(sourceOfTheIndirectChange) == associatedScene )
-            {
-                //Do nothing: Changes occurred in an external event which is compiled separately
-            }
-            else
-            {
-                //Changes occurred in an another external event which is directly included in our external events.
-                events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
-                CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
-            }
+            //Do nothing: Changes occurred in an external event which is compiled separately
+            std::cout << "But nothing to do." << std::endl;
         }
         else
         {
-            //Changes occurred directly inside the external events: We need to recompile them
+            //Changes occurred in an another external event which is directly included in our external events.
             events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
             CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
+            std::cout << "Recompilation triggered." << std::endl;
         }
-
     }
 }
 
@@ -212,8 +219,13 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
         scene->SetRefreshNeeded();
 
         //...as well as the dependencies
-        DependenciesAnalyzer analyzer(game);
-        analyzer.Analyze(scene->GetEvents());
+        DependenciesAnalyzer analyzer(game, *scene);
+        if ( !analyzer.Analyze() )
+        {
+            std::cout << "WARNING: Circular dependency for scene " << scene->GetName() << std::endl;
+            return;
+        }
+
         std::set< std::string > externalEventsDependencies = analyzer.GetExternalEventsDependencies();
         for (std::set<std::string>::const_iterator i = externalEventsDependencies.begin();i!=externalEventsDependencies.end();++i)
         {

@@ -444,8 +444,8 @@ string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & projec
 
 std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(gd::Project & project, gd::ExternalEvents & events, bool compilationForRuntime)
 {
-    DependenciesAnalyzer analyzer(project);
-    std::string associatedSceneName = analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName());
+    DependenciesAnalyzer analyzer(project, events);
+    std::string associatedSceneName = analyzer.ExternalEventsCanBeCompiledForAScene();
     if ( associatedSceneName.empty() || !project.HasLayoutNamed(associatedSceneName) )
     {
         std::cout << "ERROR: Cannot generate code for an external event: No unique associated scene." << std::endl;

@@ -56,7 +56,7 @@ namespace GDpriv
  * \param game Game associated with the scene
  * \param scene Scene with events to compile
  */
-void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string & outputFilename)
+bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string & outputFilename)
 {
     std::cout << "Preparing linking task for project " << game.GetName() << "..." << std::endl;
     CodeCompilerTask task;
@@ -91,8 +91,12 @@ void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
         std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
         task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
 
-        DependenciesAnalyzer analyzer(game);
-        analyzer.Analyze(game.GetLayout(l).GetEvents());
+        DependenciesAnalyzer analyzer(game, game.GetLayout(l));
+        if ( !analyzer.Analyze() )
+        {
+            std::cout << "WARNING: Circular dependency for scene " << game.GetLayout(l).GetName() << std::endl;
+            return false;
+        }
 
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
@@ -105,18 +109,21 @@ void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
                 task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
             }
         }
-        for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
+    }
+    for (unsigned int l= 0;l<game.GetExternalEventsCount();++l)
+    {
+        gd::ExternalEvents & externalEvents = game.GetExternalEvents(l);
+
+        DependenciesAnalyzer analyzer(game, externalEvents);
+        if ( !analyzer.ExternalEventsCanBeCompiledForAScene().empty() )
         {
-            if (game.HasExternalEventsNamed(*i) && analyzer.ExternalEventsCanBeCompiledForAScene(*i) == game.GetLayout(l).GetName())
-            {
-                gd::ExternalEvents & externalEvents = game.GetExternalEvents(*i);
-                std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
-                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
-            }
+            std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
+            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
         }
     }
 
     CodeCompiler::GetInstance()->AddTask(task);
+    return true;
 }
 
 void FullProjectCompiler::LaunchProjectCompilation()
@@ -358,7 +365,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
         #endif
         codeOutputFile = tempDir+"/"+codeOutputFile;
 
-        CreateWholeProjectRuntimeLinkingTask(game, codeOutputFile);
+        if ( !CreateWholeProjectRuntimeLinkingTask(game, codeOutputFile) )
+        {
+            std::cout << "Linking cannot be done (Probably circular dependency?)." << std::endl;
+            return;
+        }
 
         wxStopWatch yieldClock;
         while (CodeCompiler::GetInstance()->CompilationInProcess())

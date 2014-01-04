@@ -61,8 +61,8 @@ namespace
 
     bool ExternalEventsNeedRecompilation(gd::Project & game, gd::ExternalEvents & events)
     {
-        DependenciesAnalyzer analyzer(game);
-        if ( analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName()).empty() )
+        DependenciesAnalyzer analyzer(game, events);
+        if ( analyzer.ExternalEventsCanBeCompiledForAScene().empty() )
             return false; //No need to recompile events as they cannot be compiled for any specific scene.
 
         if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&events)+"ObjectFile.o") ))
@@ -156,8 +156,8 @@ namespace
             {
                 gd::ExternalEvents & events = game.GetExternalEvents(*i);
 
-                DependenciesAnalyzer analyzer(game);
-                if ( !analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName()).empty() )
+                DependenciesAnalyzer analyzer(game, events);
+                if ( !analyzer.ExternalEventsCanBeCompiledForAScene().empty() )
                 {
                     CodeCompilerTask task;
                     task.compilerCall.compilationForRuntime = true;
@@ -199,8 +199,11 @@ namespace
         task.userFriendlyName = "Linking code for scene "+scene.GetName();
 
         //Also add scene dependencies to the files to be linked.
-        DependenciesAnalyzer analyzer(game);
-        analyzer.Analyze(scene.GetEvents());
+        DependenciesAnalyzer analyzer(game, scene);
+        if ( !analyzer.Analyze() )
+        {
+            std::cout << "WARNING: Circular dependency for scene " << scene.GetName() << std::endl;
+        }
 
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
@@ -215,7 +218,10 @@ namespace
         }
         for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
         {
-            if (game.HasExternalEventsNamed(*i) && analyzer.ExternalEventsCanBeCompiledForAScene(*i) == scene.GetName())
+            if ( !game.HasExternalEventsNamed(*i) ) continue;
+
+            DependenciesAnalyzer externalEventsAnalyzer(game, game.GetExternalEvents(*i));
+            if (externalEventsAnalyzer.ExternalEventsCanBeCompiledForAScene() == scene.GetName())
             {
                 gd::ExternalEvents & externalEvents = game.GetExternalEvents(*i);
                 std::cout << "Added GD" << ToString(&externalEvents) << "ObjectFile.o (Created from external events) to the linking." << std::endl;
@@ -255,8 +261,8 @@ bool EventsCodeCompilerPreWork::Execute()
         return false;
     }
 
-    DependenciesAnalyzer analyzer(*game);
-    if ( !analyzer.Analyze(scene->GetEvents()) )
+    DependenciesAnalyzer analyzer(*game, *scene);
+    if ( !analyzer.Analyze() )
     {
         //Circular dependency exists
         std::cout << "WARNING: Circular dependency for scene " << scene->GetName() << std::endl;
@@ -296,8 +302,8 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
         return false;
     }
 
-    DependenciesAnalyzer analyzer(*game);
-    if ( !analyzer.Analyze(scene->GetEvents()) )
+    DependenciesAnalyzer analyzer(*game, *scene);
+    if ( !analyzer.Analyze() )
     {
         //Circular dependency exists
         std::cout << "WARNING: Circular dependency for scene " << scene->GetName() << std::endl;
@@ -391,14 +397,14 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
         return false;
     }
 
-    DependenciesAnalyzer analyzer(*game);
-    if ( !analyzer.Analyze(externalEvents->GetEvents()) )
+    DependenciesAnalyzer analyzer(*game, *externalEvents);
+    if ( !analyzer.Analyze() )
     {
         //Circular dependency exists
         std::cout << "WARNING: Circular dependency for external events " << externalEvents->GetName() << std::endl;
         return false;
     }
-    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(externalEvents->GetName());
+    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
     if ( associatedScene.empty() )
     {
         std::cout << "ERROR: Cannot compile an external event: No unique associated scene." << std::endl;
@@ -432,8 +438,8 @@ bool ExternalEventsCodeCompilerPostWork::Execute()
 {
     //Find the scene using the compiled external events and ask it
     //to reload its bitcodes
-    DependenciesAnalyzer analyzer(*game);
-    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(externalEvents->GetName());
+    DependenciesAnalyzer analyzer(*game, *externalEvents);
+    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
     if ( associatedScene.empty() || !game->HasLayoutNamed(associatedScene) )
     {
         std::cout << "ERROR: Unable to find the scene associated with external events "<< externalEvents->GetName()<<"!"<<std::endl;
@@ -466,17 +472,14 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
         return false;
     }
 
-    std::cout << "B";
-    DependenciesAnalyzer analyzer(*game);
-    std::cout << "B";
-    if ( !analyzer.Analyze(externalEvents->GetEvents()) )
+    DependenciesAnalyzer analyzer(*game, *externalEvents);
+    if ( !analyzer.Analyze() )
     {
         //Circular dependency exists
         std::cout << "WARNING: Circular dependency for external events " << externalEvents->GetName() << std::endl;
         return false;
     }
-    std::cout << "B";
-    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(externalEvents->GetName());
+    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
     if ( associatedScene.empty() )
     {
         std::cout << "ERROR: Cannot compile an external event: No unique associated scene." << std::endl;
@@ -490,7 +493,6 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
         return true;
     }
 
-    std::cout << "C";
     Game gameCopy = *game;
     gd::ExternalEvents eventsCopy = *externalEvents;
 
@@ -498,7 +500,6 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     cout << "Generating C++ code...\n";
     gd::EventsCodeGenerator::DeleteUselessEvents(eventsCopy.GetEvents());
 
-    std::cout << "D";
     std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, eventsCopy, true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"RuntimeEventsSource.cpp").c_str() );

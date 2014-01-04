@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef ADVANCEDPASTEDLG_H
 #define ADVANCEDPASTEDLG_H

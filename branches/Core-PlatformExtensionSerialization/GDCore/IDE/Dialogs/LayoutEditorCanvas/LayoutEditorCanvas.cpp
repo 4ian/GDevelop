@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "LayoutEditorCanvas.h"
 #include <cmath>
@@ -296,10 +296,13 @@ LayoutEditorCanvas::~LayoutEditorCanvas()
 	//*)
 }
 
-void LayoutEditorCanvas::OnIdle(wxIdleEvent&)
+void LayoutEditorCanvas::OnIdle(wxIdleEvent & event)
 {
     // Send a paint message when the control is idle, to ensure maximum framerate
     Refresh();
+    #if !defined(WINDOWS)
+    event.RequestMore(); //On linux, we need to specify that we want continuous idle events
+    #endif
 }
 
 void LayoutEditorCanvas::OnPaint(wxPaintEvent&)

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "BugReport.h"
@@ -36,6 +36,8 @@ const long BugReport::ID_BUTTON4 = wxNewId();
 const long BugReport::ID_PANEL2 = wxNewId();
 const long BugReport::ID_STATICTEXT3 = wxNewId();
 const long BugReport::ID_TEXTCTRL1 = wxNewId();
+const long BugReport::ID_STATICTEXT1 = wxNewId();
+const long BugReport::ID_TEXTCTRL3 = wxNewId();
 const long BugReport::ID_STATICTEXT6 = wxNewId();
 const long BugReport::ID_BUTTON1 = wxNewId();
 const long BugReport::ID_BUTTON5 = wxNewId();
@@ -64,6 +66,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer9;
+    wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer7;
     wxFlexGridSizer* FlexGridSizer8;
     wxFlexGridSizer* FlexGridSizer12;
@@ -112,6 +115,12 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     FlexGridSizer4->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     UserReportEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(408,100), wxTE_AUTO_SCROLL|wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer4->Add(UserReportEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
+    StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("You can enter your email: (optional, so as to contact you if we need more information)"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    mailEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+    FlexGridSizer2->Add(mailEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer4->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer7->AddGrowableCol(1);
     FlexGridSizer7->AddGrowableRow(0);
@@ -158,6 +167,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     Center();
 
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnButton1Click);
+    Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&BugReport::OnUserReportEditText);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnCreateRapportBtClick);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnButton2Click);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnCloseNoOpenBtClick);
@@ -176,6 +186,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
         Button2->SetLabel(_("Close"));
     }
 
+    CreateRapportBt->Disable();
     bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(gd::VersionWrapper::Major())+gd::ToString(gd::VersionWrapper::Minor())+gd::ToString(gd::VersionWrapper::Build()));
 }
 
@@ -188,6 +199,9 @@ BugReport::~BugReport()
 
 void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
 {
+    if (UserReportEdit->GetValue().Trim().IsEmpty() || UserReportEdit->GetValue().length() < 7)
+        return;
+
     //On recherche le rapport d'erreur de Game Develop
     string rapport;
     if ( wxFileExists( "errordata.txt" ) )
@@ -215,6 +229,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
     report += "User desc.:\n";
     report += UserReportEdit->GetValue();
     report += "(End)\n";
+    report += "User mail: "+mailEdit->GetValue()+"\n";
     report.Replace("&", "%26");
 
     wxString encodedReportURI = wxURI("www.compilgames.net/bugs/report.php?report="+report).BuildURI();
@@ -264,3 +279,8 @@ void BugReport::OnButton2Click(wxCommandEvent& event)
         Notebook1->SetSelection(2);
 }
 
+
+void BugReport::OnUserReportEditText(wxCommandEvent& event)
+{
+    CreateRapportBt->Enable();
+}

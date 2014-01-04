@@ -34,10 +34,12 @@ public:
 	wxTextCtrl* UserReportEdit;
 	wxStaticText* StaticText8;
 	wxStaticBitmap* StaticBitmap4;
+	wxStaticText* StaticText1;
 	wxButton* CreateRapportBt;
 	wxStaticText* StaticText3;
 	wxButton* Button2;
 	wxPanel* Panel3;
+	wxTextCtrl* mailEdit;
 	wxStaticText* StaticText7;
 	wxPanel* Panel2;
 	wxStaticText* StaticText4;
@@ -57,6 +59,8 @@ protected:
 	static const long ID_PANEL2;
 	static const long ID_STATICTEXT3;
 	static const long ID_TEXTCTRL1;
+	static const long ID_STATICTEXT1;
+	static const long ID_TEXTCTRL3;
 	static const long ID_STATICTEXT6;
 	static const long ID_BUTTON1;
 	static const long ID_BUTTON5;
@@ -78,6 +82,7 @@ private:
 	void OnCloseBtClick(wxCommandEvent& event);
 	void OnButton1Click(wxCommandEvent& event);
 	void OnButton2Click(wxCommandEvent& event);
+	void OnUserReportEditText(wxCommandEvent& event);
 	//*)
 
 	const std::vector<std::string> & openedFiles; ///< The filenames to display

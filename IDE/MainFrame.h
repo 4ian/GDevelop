@@ -241,7 +241,6 @@ private:
     static const long ID_AUINOTEBOOK1;
     static const long ID_PANEL1;
     static const long ID_MENUITEM1;
-    static const long ID_MENUITEM8;
     static const long ID_MENUITEM2;
     static const long ID_MENUITEM4;
     static const long ID_MENUITEM5;
@@ -252,7 +251,6 @@ private:
     static const long ID_MENUITEM10;
     static const long toBeDeletedMenuItem;
     static const long ID_MENUITEM26;
-    static const long ID_MENUITEM11;
     static const long ID_MENUITEM12;
     static const long ID_MENUITEM13;
     static const long ID_MENUITEM16;
@@ -290,7 +288,6 @@ private:
     wxMenuItem* MenuItem8;
     wxMenu disabledFileMenu;
     wxMenuItem* MenuItem7;
-    wxMenuItem* MenuItem5;
     wxMenuItem* MenuItem2;
     wxTimer autoSaveTimer;
     wxMenuItem* MenuItem4;

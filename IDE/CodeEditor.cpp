@@ -13,6 +13,7 @@
 //*)
 #include <wx/mimetype.h>
 #include <wx/config.h>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
@@ -59,20 +60,20 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer1->Add(textEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	MenuItem1 = new wxMenuItem((&contextMenu), ID_MENUITEM1, _("Copy"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	contextMenu.Append(MenuItem1);
 	MenuItem2 = new wxMenuItem((&contextMenu), ID_MENUITEM2, _("Cut"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	contextMenu.Append(MenuItem2);
 	MenuItem3 = new wxMenuItem((&contextMenu), ID_MENUITEM3, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	contextMenu.Append(MenuItem3);
 	contextMenu.AppendSeparator();
 	MenuItem4 = new wxMenuItem((&contextMenu), ID_MENUITEM4, _("Cancel"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/undo.png"))));
+	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("undo", 16));
 	contextMenu.Append(MenuItem4);
 	MenuItem5 = new wxMenuItem((&contextMenu), ID_MENUITEM5, _("Redo"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/redo.png"))));
+	MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("redo", 16));
 	contextMenu.Append(MenuItem5);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
@@ -116,41 +117,41 @@ void CodeEditor::CreateRibbonPage(wxRibbonPage * page)
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels, false );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("File"), wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("File"), gd::SkinHelper::GetRibbonIcon("saveicon"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonSave, !hideLabels ? _("Save") : "", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonSave, !hideLabels ? _("Save") : "", gd::SkinHelper::GetRibbonIcon("save"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
+        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
+        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", gd::SkinHelper::GetRibbonIcon("undo"));
+        ribbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), gd::SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonFindReplace, !hideLabels ? _("Search / Replace") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonGotoLine, !hideLabels ? _("Go to...") : "", wxBitmap("res/gotoline24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonFindReplace, !hideLabels ? _("Search / Replace") : "", gd::SkinHelper::GetRibbonIcon("search"));
+        ribbonBar->AddButton(idRibbonGotoLine, !hideLabels ? _("Go to...") : "", gd::SkinHelper::GetRibbonIcon("gotoline"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Options"), wxBitmap("res/pref24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Options"), gd::SkinHelper::GetRibbonIcon("pref"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonOptions, !hideLabels ? _("Options") : "", wxBitmap("res/pref24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonOptions, !hideLabels ? _("Options") : "", gd::SkinHelper::GetRibbonIcon("pref"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonDocGDL, !hideLabels ? _("GDL doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDocSFML, !hideLabels ? _("SFML doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDocWxWidgets, !hideLabels ? _("wxWidgets doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDocBoost, !hideLabels ? _("Boost doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocGDL, !hideLabels ? _("GDL doc.") : "", gd::SkinHelper::GetRibbonIcon("help"));
+        ribbonBar->AddButton(idRibbonDocSFML, !hideLabels ? _("SFML doc.") : "", gd::SkinHelper::GetRibbonIcon("help"));
+        ribbonBar->AddButton(idRibbonDocWxWidgets, !hideLabels ? _("wxWidgets doc.") : "", gd::SkinHelper::GetRibbonIcon("help"));
+        ribbonBar->AddButton(idRibbonDocBoost, !hideLabels ? _("Boost doc.") : "", gd::SkinHelper::GetRibbonIcon("help"));
     }
 }
 

@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <wx/msgdlg.h>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;
@@ -56,7 +57,7 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 	FlexGridSizer3->AddGrowableCol(1);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
-	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer17->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	helpBt->SetToolTip(_("Display help about this window"));
@@ -103,99 +104,116 @@ void ChoixClavier::OnhelpBtClick(wxCommandEvent& event)
 void ChoixClavier::OnPanel1KeyDown1(wxKeyEvent& event)
 {
     int code = event.GetKeyCode();
+    std::cout << code << std::endl;
 
-    if ( code == 65 ) selectedKey = "a";
-    if ( code == 66 ) selectedKey = "b";
-    if ( code == 67 ) selectedKey = "c";
-    if ( code == 68 ) selectedKey = "d";
-    if ( code == 69 ) selectedKey = "e";
-    if ( code == 70 ) selectedKey = "f";
-    if ( code == 71 ) selectedKey = "g";
-    if ( code == 72 ) selectedKey = "h";
-    if ( code == 73 ) selectedKey = "i";
-    if ( code == 74 ) selectedKey = "j";
-    if ( code == 75 ) selectedKey = "k";
-    if ( code == 76 ) selectedKey = "l";
-    if ( code == 77 ) selectedKey = "m";
-    if ( code == 78 ) selectedKey = "n";
-    if ( code == 79 ) selectedKey = "o";
-    if ( code == 80 ) selectedKey = "p";
-    if ( code == 81 ) selectedKey = "q";
-    if ( code == 82 ) selectedKey = "r";
-    if ( code == 83 ) selectedKey = "s";
-    if ( code == 84 ) selectedKey = "t";
-    if ( code == 85 ) selectedKey = "u";
-    if ( code == 86 ) selectedKey = "v";
-    if ( code == 87 ) selectedKey = "w";
-    if ( code == 88 ) selectedKey = "x";
-    if ( code == 89 ) selectedKey = "y";
-    if ( code == 90 ) selectedKey = "z";
+    if ( code == 48 ) selectedKey = "Num0";
+    else if ( code == 49 ) selectedKey = "Num1";
+    else if ( code == 50 ) selectedKey = "Num2";
+    else if ( code == 51 ) selectedKey = "Num3";
+    else if ( code == 52 ) selectedKey = "Num4";
+    else if ( code == 53 ) selectedKey = "Num5";
+    else if ( code == 54 ) selectedKey = "Num6";
+    else if ( code == 55 ) selectedKey = "Num7";
+    else if ( code == 56 ) selectedKey = "Num8";
+    else if ( code == 57 ) selectedKey = "Num9";
 
-    if ( code == WXK_NUMPAD0 ) selectedKey = "Numpad0";
-    if ( code == WXK_NUMPAD1 ) selectedKey = "Numpad1";
-    if ( code == WXK_NUMPAD2 ) selectedKey = "Numpad2";
-    if ( code == WXK_NUMPAD3 ) selectedKey = "Numpad3";
-    if ( code == WXK_NUMPAD4 ) selectedKey = "Numpad4";
-    if ( code == WXK_NUMPAD5 ) selectedKey = "Numpad5";
-    if ( code == WXK_NUMPAD6 ) selectedKey = "Numpad6";
-    if ( code == WXK_NUMPAD7 ) selectedKey = "Numpad7";
-    if ( code == WXK_NUMPAD8 ) selectedKey = "Numpad8";
-    if ( code == WXK_NUMPAD9 ) selectedKey = "Numpad9";
+    else if ( code == 65 ) selectedKey = "a";
+    else if ( code == 66 ) selectedKey = "b";
+    else if ( code == 67 ) selectedKey = "c";
+    else if ( code == 68 ) selectedKey = "d";
+    else if ( code == 69 ) selectedKey = "e";
+    else if ( code == 70 ) selectedKey = "f";
+    else if ( code == 71 ) selectedKey = "g";
+    else if ( code == 72 ) selectedKey = "h";
+    else if ( code == 73 ) selectedKey = "i";
+    else if ( code == 74 ) selectedKey = "j";
+    else if ( code == 75 ) selectedKey = "k";
+    else if ( code == 76 ) selectedKey = "l";
+    else if ( code == 77 ) selectedKey = "m";
+    else if ( code == 78 ) selectedKey = "n";
+    else if ( code == 79 ) selectedKey = "o";
+    else if ( code == 80 ) selectedKey = "p";
+    else if ( code == 81 ) selectedKey = "q";
+    else if ( code == 82 ) selectedKey = "r";
+    else if ( code == 83 ) selectedKey = "s";
+    else if ( code == 84 ) selectedKey = "t";
+    else if ( code == 85 ) selectedKey = "u";
+    else if ( code == 86 ) selectedKey = "v";
+    else if ( code == 87 ) selectedKey = "w";
+    else if ( code == 88 ) selectedKey = "x";
+    else if ( code == 89 ) selectedKey = "y";
+    else if ( code == 90 ) selectedKey = "z";
 
-    if ( code == WXK_ESCAPE ) selectedKey = "Escape";
-    if ( code == WXK_SPACE ) selectedKey = "Space";
-    if ( code == WXK_RETURN ) selectedKey = "Return";
-    if ( code == WXK_BACK ) selectedKey = "Back";
-    if ( code == WXK_TAB ) selectedKey = "Tab";
-    if ( code == WXK_PAGEUP ) selectedKey = "PageUp";
-    if ( code == WXK_PAGEDOWN ) selectedKey = "PageDown";
-    if ( code == WXK_END ) selectedKey = "End";
-    if ( code == WXK_HOME ) selectedKey = "Home";
-    if ( code == WXK_INSERT ) selectedKey = "Insert";
-    if ( code == WXK_DELETE ) selectedKey = "Delete";
+    //TODO: Not working?
+    else if ( code == '[' ) selectedKey = "LBracket";
+    else if ( code == ']' ) selectedKey = "RBracket";
+    else if ( code == ';' ) selectedKey = "SemiColon";
 
-    if ( code == WXK_ADD ) selectedKey = "Add";
-    if ( code == WXK_SUBTRACT) selectedKey = "Subtract";
-    if ( code == WXK_MULTIPLY ) selectedKey = "Multiply";
-    if ( code == WXK_DIVIDE ) selectedKey = "Divide";
+    else if ( code == WXK_NUMPAD0 ) selectedKey = "Numpad0";
+    else if ( code == WXK_NUMPAD1 ) selectedKey = "Numpad1";
+    else if ( code == WXK_NUMPAD2 ) selectedKey = "Numpad2";
+    else if ( code == WXK_NUMPAD3 ) selectedKey = "Numpad3";
+    else if ( code == WXK_NUMPAD4 ) selectedKey = "Numpad4";
+    else if ( code == WXK_NUMPAD5 ) selectedKey = "Numpad5";
+    else if ( code == WXK_NUMPAD6 ) selectedKey = "Numpad6";
+    else if ( code == WXK_NUMPAD7 ) selectedKey = "Numpad7";
+    else if ( code == WXK_NUMPAD8 ) selectedKey = "Numpad8";
+    else if ( code == WXK_NUMPAD9 ) selectedKey = "Numpad9";
 
-    if ( code == WXK_LEFT ) selectedKey = "Left";
-    if ( code == WXK_RIGHT) selectedKey = "Right";
-    if ( code == WXK_UP ) selectedKey = "Up";
-    if ( code == WXK_DOWN ) selectedKey = "Down";
+    else if ( code == WXK_ESCAPE ) selectedKey = "Escape";
+    else if ( code == WXK_SPACE ) selectedKey = "Space";
+    else if ( code == WXK_RETURN ) selectedKey = "Return";
+    else if ( code == WXK_BACK ) selectedKey = "Back";
+    else if ( code == WXK_TAB ) selectedKey = "Tab";
+    else if ( code == WXK_PAGEUP ) selectedKey = "PageUp";
+    else if ( code == WXK_PAGEDOWN ) selectedKey = "PageDown";
+    else if ( code == WXK_END ) selectedKey = "End";
+    else if ( code == WXK_HOME ) selectedKey = "Home";
+    else if ( code == WXK_INSERT ) selectedKey = "Insert";
+    else if ( code == WXK_DELETE ) selectedKey = "Delete";
 
-    if ( code == WXK_F1 ) selectedKey = "F1";
-    if ( code == WXK_F2 ) selectedKey = "F2";
-    if ( code == WXK_F3 ) selectedKey = "F3";
-    if ( code == WXK_F4 ) selectedKey = "F4";
-    if ( code == WXK_F5 ) selectedKey = "F5";
-    if ( code == WXK_F6 ) selectedKey = "F6";
-    if ( code == WXK_F7 ) selectedKey = "F7";
-    if ( code == WXK_F8 ) selectedKey = "F8";
-    if ( code == WXK_F9 ) selectedKey = "F9";
-    if ( code == WXK_F10 ) selectedKey = "F10";
-    if ( code == WXK_F11 ) selectedKey = "F11";
-    if ( code == WXK_F12 ) selectedKey = "F12";
+    else if ( code == WXK_ADD ) selectedKey = "Add";
+    else if ( code == WXK_SUBTRACT) selectedKey = "Subtract";
+    else if ( code == WXK_MULTIPLY ) selectedKey = "Multiply";
+    else if ( code == WXK_DIVIDE ) selectedKey = "Divide";
 
-    if ( code == WXK_PAUSE ) selectedKey = "Pause";
+    else if ( code == WXK_LEFT ) selectedKey = "Left";
+    else if ( code == WXK_RIGHT) selectedKey = "Right";
+    else if ( code == WXK_UP ) selectedKey = "Up";
+    else if ( code == WXK_DOWN ) selectedKey = "Down";
 
-    if ( event.ControlDown() )
+    else if ( code == WXK_F1 ) selectedKey = "F1";
+    else if ( code == WXK_F2 ) selectedKey = "F2";
+    else if ( code == WXK_F3 ) selectedKey = "F3";
+    else if ( code == WXK_F4 ) selectedKey = "F4";
+    else if ( code == WXK_F5 ) selectedKey = "F5";
+    else if ( code == WXK_F6 ) selectedKey = "F6";
+    else if ( code == WXK_F7 ) selectedKey = "F7";
+    else if ( code == WXK_F8 ) selectedKey = "F8";
+    else if ( code == WXK_F9 ) selectedKey = "F9";
+    else if ( code == WXK_F10 ) selectedKey = "F10";
+    else if ( code == WXK_F11 ) selectedKey = "F11";
+    else if ( code == WXK_F12 ) selectedKey = "F12";
+
+    else if ( code == WXK_PAUSE ) selectedKey = "Pause";
+
+    else if ( event.ControlDown() )
     {
-        if ( wxMessageBox(_("Right Control : Yes\nLeft Control : No"), _("Choose the key"), wxYES_NO) == wxYES)
+        if ( wxMessageBox(_("Right Control : No\nLeft Control : Yes"), _("Choose the key"), wxYES_NO) == wxNO)
             selectedKey = "RControl";
         else
             selectedKey = "LControl";
     }
-    if ( event.AltDown() )
+    else if ( event.AltDown() )
     {
-        if ( wxMessageBox(_("Right Alt : Yes\nLeft alt : No"), _("Choose the key"), wxYES_NO) == wxYES)
+        if ( wxMessageBox(_("Right Alt : No\nLeft alt : Yes"), _("Choose the key"), wxYES_NO) == wxNO)
             selectedKey = "RAlt";
         else
             selectedKey = "LAlt";
     }
-    if ( event.ShiftDown() )
+    else if ( event.ShiftDown() )
     {
-        if ( wxMessageBox(_("Right Shift : Yes\nLeft Shift : No"), _("Choose the key"), wxYES_NO) == wxYES)
+        if ( wxMessageBox(_("Right Shift : No\nLeft Shift : Yes"), _("Choose the key"), wxYES_NO) == wxNO)
             selectedKey = "RShift";
         else
             selectedKey = "LShift";

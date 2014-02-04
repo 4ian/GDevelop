@@ -8,6 +8,7 @@
 //*)
 #include <string>
 #include <vector>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -133,7 +134,7 @@ events(events_)
 	FlexGridSizer8->AddGrowableCol(1);
 	FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer18->AddGrowableRow(0);
-	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer18->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	helpBt->SetToolTip(_("Display help about this window"));
@@ -202,7 +203,7 @@ events(events_)
 	FlexGridSizer16->AddGrowableCol(1);
 	FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer19->AddGrowableRow(0);
-	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer19->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel2, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));

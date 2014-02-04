@@ -345,7 +345,7 @@
 							<growablerows>0</growablerows>
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
-									<bitmap>res/helpicon.png</bitmap>
+									<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
 									<style>wxNO_BORDER</style>
 								</object>
 								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

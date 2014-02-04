@@ -8,7 +8,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -144,7 +144,7 @@ void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
     if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
     if ( object )
     {
-        if ( objectsHelper.OnPropertySelected(object, &layout, event) ) {   
+        if ( objectsHelper.OnPropertySelected(object, &layout, event) ) {
             wxCommandEvent refreshEvent(refreshEventType);
             wxPostEvent(grid, refreshEvent);
             //Refresh(); Can trigger a crash
@@ -174,7 +174,7 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
     }
     if ( object )
     {
-        if ( objectsHelper.OnPropertyChanged(object, &layout, event) ){   
+        if ( objectsHelper.OnPropertyChanged(object, &layout, event) ){
             wxCommandEvent refreshEvent(refreshEventType);
             wxPostEvent(grid, refreshEvent);
             //Refresh(); Can trigger a crash

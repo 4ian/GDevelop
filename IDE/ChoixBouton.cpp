@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/SkinHelper.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     FlexGridSizer3->AddGrowableRow(0);
     FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer17->AddGrowableRow(0);
-    StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+    StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
     FlexGridSizer17->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
     helpBt->SetToolTip(_("Display help about this window"));

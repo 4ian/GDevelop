@@ -36,7 +36,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
@@ -65,7 +65,6 @@ const long MainFrame::ID_CUSTOM1 = wxNewId();
 const long MainFrame::ID_AUINOTEBOOK1 = wxNewId();
 const long MainFrame::ID_PANEL1 = wxNewId();
 const long MainFrame::ID_MENUITEM1 = wxNewId();
-const long MainFrame::ID_MENUITEM8 = wxNewId();
 const long MainFrame::ID_MENUITEM2 = wxNewId();
 const long MainFrame::ID_MENUITEM4 = wxNewId();
 const long MainFrame::ID_MENUITEM5 = wxNewId();
@@ -76,7 +75,6 @@ const long MainFrame::ID_MENUITEM9 = wxNewId();
 const long MainFrame::ID_MENUITEM10 = wxNewId();
 const long MainFrame::toBeDeletedMenuItem = wxNewId();
 const long MainFrame::ID_MENUITEM26 = wxNewId();
-const long MainFrame::ID_MENUITEM11 = wxNewId();
 const long MainFrame::ID_MENUITEM12 = wxNewId();
 const long MainFrame::ID_MENUITEM13 = wxNewId();
 const long MainFrame::ID_MENUITEM16 = wxNewId();
@@ -138,7 +136,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     wxMenuItem* MenuItem42;
     wxMenuItem* MenuItem41;
     wxFlexGridSizer* FlexGridSizer1;
-    wxMenuItem* MenuItem45;
 
     Create(parent, wxID_ANY, _("Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
@@ -167,11 +164,8 @@ MainFrame::MainFrame( wxWindow* parent ) :
     SetSizer(FlexGridSizer1);
     MenuItem1 = new wxMenuItem((&openContextMenu), ID_MENUITEM1, _("Open an example"), wxEmptyString, wxITEM_NORMAL);
     openContextMenu.Append(MenuItem1);
-    MenuItem45 = new wxMenuItem((&openContextMenu), ID_MENUITEM8, _("Import a game"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem45->SetBitmap(wxBitmap(wxImage(_T("res/fusionicon.png"))));
-    openContextMenu.Append(MenuItem45);
     MenuItem10 = new wxMenuItem((&saveContextMenu), ID_MENUITEM2, _("Save as..."), wxEmptyString, wxITEM_NORMAL);
-    MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/saveasicon.png"))));
+    MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("saveas", 16));
     saveContextMenu.Append(MenuItem10);
     MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Decompose an animated GIF"), wxEmptyString, wxITEM_NORMAL);
     MenuItem41->SetBitmap(wxBitmap(wxImage(_T("res/importgif.png"))));
@@ -185,11 +179,11 @@ MainFrame::MainFrame( wxWindow* parent ) :
     autoSaveTimer.SetOwner(this, ID_TIMER1);
     autoSaveTimer.Start(180000, false);
     MenuItem2 = new wxMenuItem((&fileMenu), ID_MENUITEM7, _("New\tCtrl+N"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/newicon.png"))));
+    MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("new", 16));
     fileMenu.Append(MenuItem2);
     fileMenu.AppendSeparator();
     MenuItem3 = new wxMenuItem((&fileMenu), ID_MENUITEM9, _("Open\tCtrl+O"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/openicon.png"))));
+    MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("open", 16));
     fileMenu.Append(MenuItem3);
     MenuItem4 = new wxMenuItem((&fileMenu), ID_MENUITEM10, _("Open an example"), wxEmptyString, wxITEM_NORMAL);
     fileMenu.Append(MenuItem4);
@@ -197,48 +191,44 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem23 = new wxMenuItem(menuRecentFiles, toBeDeletedMenuItem, _("useless"), wxEmptyString, wxITEM_NORMAL);
     menuRecentFiles->Append(MenuItem23);
     fileMenu.Append(ID_MENUITEM26, _("Recently opened"), menuRecentFiles, wxEmptyString);
-    MenuItem5 = new wxMenuItem((&fileMenu), ID_MENUITEM11, _("Import a game"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
-    fileMenu.Append(MenuItem5);
     fileMenu.AppendSeparator();
     MenuItem6 = new wxMenuItem((&fileMenu), ID_MENUITEM12, _("Save\tCtrl+S"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/saveicon.png"))));
+    MenuItem6->SetBitmap(gd::SkinHelper::GetIcon("save", 16));
     fileMenu.Append(MenuItem6);
     MenuItem7 = new wxMenuItem((&fileMenu), ID_MENUITEM13, _("Save as..."), wxEmptyString, wxITEM_NORMAL);
-    MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/saveasicon.png"))));
+    MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("saveas", 16));
     fileMenu.Append(MenuItem7);
     MenuItem12 = new wxMenuItem((&fileMenu), ID_MENUITEM16, _("Save all\tCtrl+Shift+S"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/save_all16.png"))));
+    MenuItem12->SetBitmap(gd::SkinHelper::GetIcon("save_all", 16));
     fileMenu.Append(MenuItem12);
     fileMenu.AppendSeparator();
     fileMenu.AppendSeparator();
     MenuItem15 = new wxMenuItem((&fileMenu), ID_MENUITEM19, _("Close the current project"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem15->SetBitmap(gd::SkinHelper::GetIcon("close", 16));
     fileMenu.Append(MenuItem15);
     fileMenu.AppendSeparator();
     MenuItem13 = new wxMenuItem((&fileMenu), ID_MENUITEM17, _("Options"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/preficon.png"))));
+    MenuItem13->SetBitmap(gd::SkinHelper::GetIcon("options", 16));
     fileMenu.Append(MenuItem13);
     fileMenu.AppendSeparator();
     MenuItem22 = new wxMenuItem((&fileMenu), ID_MENUITEM27, _("Help\tF1"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem22->SetBitmap(wxBitmap(wxImage(_T("res/helpicon.png"))));
+    MenuItem22->SetBitmap(gd::SkinHelper::GetIcon("help", 16));
     fileMenu.Append(MenuItem22);
     fileMenu.AppendSeparator();
     MenuItem8 = new wxMenuItem((&fileMenu), ID_MENUITEM14, _("Quit"), _("Quit Game Develop"), wxITEM_NORMAL);
     fileMenu.Append(MenuItem8);
     menuRecentFiles->Delete(toBeDeletedMenuItem);
     MenuItem16 = new wxMenuItem((&helpMenu), ID_MENUITEM20, _("Help"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/helpicon.png"))));
+    MenuItem16->SetBitmap(gd::SkinHelper::GetIcon("help", 16));
     helpMenu.Append(MenuItem16);
     MenuItem19 = new wxMenuItem((&helpMenu), ID_MENUITEM23, _("Tutorial"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/tutoicon.png"))));
     helpMenu.Append(MenuItem19);
     helpMenu.AppendSeparator();
     MenuItem21 = new wxMenuItem((&helpMenu), ID_MENUITEM25, _("Check for updates"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/update16.png"))));
     helpMenu.Append(MenuItem21);
     helpMenu.AppendSeparator();
     MenuItem20 = new wxMenuItem((&helpMenu), ID_MENUITEM24, _("Official web site"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/siteicon.png"))));
+    MenuItem20->SetBitmap(gd::SkinHelper::GetIcon("site", 16));
     helpMenu.Append(MenuItem20);
     MenuItem17 = new wxMenuItem((&helpMenu), ID_MENUITEM21, _("About..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/icon16.png"))));
@@ -253,7 +243,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&MainFrame::OneditorsNotebookPageClose);
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&MainFrame::OnNotebook1PageChanged);
     Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnOpenExampleSelected);
-    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuFusionSelected);
     Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeGIFSelected);
     Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeRPGSelected);
@@ -262,7 +251,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuNewSelected);
     Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuOpenSelected);
     Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnOpenExampleSelected);
-    Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuFusionSelected);
     Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveSelected);
     Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
     Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAllSelected);
@@ -305,7 +293,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
         {
             long id = wxNewId();
 
-            fileMenu.Insert(11, id, exporter->GetProjectExportButtonLabel());
+            fileMenu.Insert(10, id, exporter->GetProjectExportButtonLabel());
             Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
             idToPlatformExportMenuMap[id] = gd::PlatformManager::GetInstance()->GetAllPlatforms()[i].get();
         }
@@ -377,35 +365,35 @@ MainFrame::MainFrame( wxWindow* parent ) :
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Images bank"));
         //
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Adding resources"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Adding resources"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY), _("Add an image to the resources"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : "", wxBitmap("res/addFromLibrary24.png", wxBITMAP_TYPE_ANY), _("Add an image from a library of images"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), _("Add a virtual folder to organize resources"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add an image to the resources"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : "", gd::SkinHelper::GetRibbonIcon("addFromLibrary"), _("Add an image from a library of images"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : "", gd::SkinHelper::GetRibbonIcon("virtualfolderadd"), _("Add a virtual folder to organize resources"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("List management"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("List management"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY), _("Delete the selected resource"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", wxBitmap("res/deleteunknown24.png", wxBITMAP_TYPE_ANY), _("Check if there are useless resources that can be removed"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY), _("Refresh the list, if you've done changes in another window"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected resource"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", gd::SkinHelper::GetRibbonIcon("deleteunknown"), _("Check if there are useless resources that can be removed"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : "", gd::SkinHelper::GetRibbonIcon("refresh"), _("Refresh the list, if you've done changes in another window"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
 
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), _("Show a panel with the image displayed inside"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY), _("Show the properties of the resource"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", gd::SkinHelper::GetRibbonIcon("view"), _("Show a panel with the image displayed inside"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Show the properties of the resource"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), _("Open the online help"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Open the online help"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
     }
@@ -604,9 +592,9 @@ void MainFrame::UpdateOpenedProjectsLogFile()
     if ( !projectsLogFile.IsOpened() ) return;
     projectsLogFile.Clear();
 
-    for(unsigned int i = 0;i<games.size();++i) 
+    for(unsigned int i = 0;i<games.size();++i)
         projectsLogFile.AddLine(games[i]->GetProjectFile());
-    
+
     projectsLogFile.Write();
     projectsLogFile.Close();
 }
@@ -621,10 +609,10 @@ void MainFrame::OnClose( wxCloseEvent& event )
             wxString fullMessage = wxString::Format(_("Project \"%s\" has been changed.\n\n"), games[i]->GetName());
             fullMessage += wxString::Format(_("Do you want to save it in %s?"), games[i]->GetProjectFile());
             int whatToDo = wxMessageBox(fullMessage, _("Project not saved"), wxYES_NO|wxCANCEL|wxCANCEL_DEFAULT);
-            
+
             if (whatToDo == wxCANCEL) return;
             else if ( whatToDo == wxYES ) {
-                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) 
+                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) )
                     wxLogError( _("Save failed!") );
                 else
                     wxLogStatus( _("Project properly saved.") );

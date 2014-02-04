@@ -18,7 +18,7 @@
 #include "LayoutEditorPropertiesPnl.h"
 #include "ObjectsEditor.h"
 #include "../MainFrame.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 
 using namespace gd;
@@ -99,7 +99,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	helpSizer->AddGrowableRow(0);
 	StaticText2 = new wxStaticText(helpPanel, ID_STATICTEXT2, _("Choose the scene to be used as a base for editing the external layout"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	helpSizer->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBitmap1 = new wxStaticBitmap(helpPanel, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/up.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(helpPanel, ID_STATICBITMAP1, gd::SkinHelper::GetIcon("up", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	helpSizer->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpPanel->SetSizer(helpSizer);
 	helpSizer->Fit(helpPanel);

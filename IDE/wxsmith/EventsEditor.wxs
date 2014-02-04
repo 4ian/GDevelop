@@ -42,7 +42,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="parameterEditBt" member="yes">
-									<bitmap>res/editicon.png</bitmap>
+									<bitmap code='gd::SkinHelper::GetIcon(&quot;edit&quot;, 16)' />
 									<handler function="OnparameterEditBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -95,7 +95,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="addMoreIcon" member="yes">
-									<bitmap>res/addicon.png</bitmap>
+									<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 									<tooltip>Another event type</tooltip>
 									<style>wxNO_BORDER</style>
 								</object>
@@ -123,7 +123,7 @@
 							<cols>3</cols>
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP4" variable="addInstrIcon" member="yes">
-									<bitmap>res/addicon.png</bitmap>
+									<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 									<tooltip>Add a condition</tooltip>
 									<style>wxNO_BORDER</style>
 								</object>
@@ -164,7 +164,7 @@
 			<object class="wxMenuItem" name="deleteMenuItem" variable="deleteMenu" member="yes">
 				<label>Delete</label>
 				<accel>DEL</accel>
-				<bitmap>res/deleteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 				<handler function="OndeleteMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="toggleActivationMenuItem" variable="toggleActivation" member="yes">
@@ -175,39 +175,39 @@
 			<object class="wxMenuItem" name="copyMenuItem" variable="eventCopyMenu" member="yes">
 				<label>Copy</label>
 				<accel>Ctrl-C</accel>
-				<bitmap>res/copyicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;copy&quot;, 16)' />
 				<handler function="OneventCopyMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="cutMenuItem" variable="eventCutMenu" member="yes">
 				<label>Cut</label>
 				<accel>Ctrl-X</accel>
-				<bitmap>res/cuticon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;cut&quot;, 16)' />
 				<handler function="OneventCutMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="eventPasteMenu" member="yes">
 				<label>Paste</label>
 				<accel>Ctrl-V</accel>
-				<bitmap>res/pasteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;paste&quot;, 16)' />
 				<handler function="OneventPasteMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="undoMenu" member="yes">
 				<label>Cancel</label>
 				<accel>Ctrl-Z</accel>
-				<bitmap>res/undo.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;undo&quot;, 16)' />
 				<handler function="OnundoMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM6" variable="redoMenu" member="yes">
 				<label>Redo</label>
 				<accel>Ctrl-Y</accel>
-				<bitmap>res/redo.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;redo&quot;, 16)' />
 				<handler function="OnredoMenuSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="multipleContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem1" member="yes">
 				<label>Delete</label>
-				<bitmap>res/deleteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 				<handler function="OndeleteMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />

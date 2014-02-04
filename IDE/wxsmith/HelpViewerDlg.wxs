@@ -22,7 +22,7 @@
 									<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="AuiToolBar1" member="yes">
 										<object class="AuiToolBarItem">
 											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="previousItemBt" member="yes">
-												<bitmap>res/left16.png</bitmap>
+												<bitmap code='gd::SkinHelper::GetIcon(&quot;left&quot;, 16)' />
 												<shorthelp>Previous page</shorthelp>
 												<handler function="OnpreviousItemBtClick" entry="EVT_TOOL" />
 											</object>
@@ -30,7 +30,7 @@
 										</object>
 										<object class="AuiToolBarItem">
 											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="nextItemBt" member="yes">
-												<bitmap>res/right16.png</bitmap>
+												<bitmap code='gd::SkinHelper::GetIcon(&quot;right&quot;, 16)' />
 												<shorthelp>Next page</shorthelp>
 												<handler function="OnnextItemBtClick" entry="EVT_TOOL" />
 											</object>
@@ -42,7 +42,7 @@
 										</object>
 										<object class="AuiToolBarItem">
 											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM4" variable="contentsItemBt" member="yes">
-												<bitmap>res/helpContent16.png</bitmap>
+												<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
 												<shorthelp>Go back to the table of content of the help</shorthelp>
 												<handler function="OncontentsItemBtClick" entry="EVT_TOOL" />
 											</object>
@@ -50,7 +50,7 @@
 										</object>
 										<object class="AuiToolBarItem">
 											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM3" variable="homeItemBt" member="yes">
-												<bitmap>res/home16.png</bitmap>
+												<bitmap code='gd::SkinHelper::GetIcon(&quot;home&quot;, 16)' />
 												<shorthelp>Go back to the home page of the wiki</shorthelp>
 												<handler function="OnhomeItemBtClick" entry="EVT_TOOL" />
 											</object>

@@ -101,7 +101,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
-													<bitmap>res/up.png</bitmap>
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;up&quot;, 16)' />
 													<style>wxNO_BORDER</style>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

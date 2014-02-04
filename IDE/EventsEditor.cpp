@@ -32,6 +32,7 @@
 #include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "LogFileManager.h"
 #include "GDCpp/IDE/Dialogs/ProfileDlg.h"
@@ -118,7 +119,7 @@ EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & s
 {
 	Init(parent);
 }
-    
+
 EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, gd::ExternalEvents & externalEvents_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 	game(game_),
     scene(scene_),
@@ -161,7 +162,7 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer2->AddGrowableRow(0);
 	liveEdit = new wxTextCtrl(liveEditingPanel, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(280,21), wxTE_AUTO_SCROLL|wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer2->Add(liveEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	parameterEditBt = new wxBitmapButton(liveEditingPanel, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/editicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
+	parameterEditBt = new wxBitmapButton(liveEditingPanel, ID_BITMAPBUTTON1, gd::SkinHelper::GetIcon("edit", 16), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
 	FlexGridSizer2->Add(parameterEditBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	liveEditingPanel->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(liveEditingPanel);
@@ -178,7 +179,7 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer3->Add(addSubEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addSubEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT2, _("A sub event"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(addSubEventBt, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	addMoreIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
+	addMoreIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP3, gd::SkinHelper::GetIcon("add", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	addMoreIcon->SetToolTip(_("Another event type"));
 	FlexGridSizer3->Add(addMoreIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addMoreBt = new wxStaticText(eventContextPanel, ID_STATICTEXT3, _("Other"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
@@ -187,7 +188,7 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer3->SetSizeHints(eventContextPanel);
 	listContextPanel = new wxPanel(eventsPanel, ID_PANEL4, wxPoint(136,50), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	addInstrIcon = new wxStaticBitmap(listContextPanel, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
+	addInstrIcon = new wxStaticBitmap(listContextPanel, ID_STATICBITMAP4, gd::SkinHelper::GetIcon("add", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
 	addInstrIcon->SetToolTip(_("Add a condition"));
 	FlexGridSizer4->Add(addInstrIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addInstrBt = new wxStaticText(listContextPanel, ID_STATICTEXT4, _("Add a condition"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -200,29 +201,29 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer1->Add(scrollBar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	deleteMenu = new wxMenuItem((&eventsContextMenu), deleteMenuItem, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
-	deleteMenu->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	deleteMenu->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	eventsContextMenu.Append(deleteMenu);
 	toggleActivation = new wxMenuItem((&eventsContextMenu), toggleActivationMenuItem, _("De/activate"), wxEmptyString, wxITEM_NORMAL);
 	eventsContextMenu.Append(toggleActivation);
 	eventsContextMenu.AppendSeparator();
 	eventCopyMenu = new wxMenuItem((&eventsContextMenu), copyMenuItem, _("Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
-	eventCopyMenu->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	eventCopyMenu->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	eventsContextMenu.Append(eventCopyMenu);
 	eventCutMenu = new wxMenuItem((&eventsContextMenu), cutMenuItem, _("Cut\tCtrl+X"), wxEmptyString, wxITEM_NORMAL);
-	eventCutMenu->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	eventCutMenu->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	eventsContextMenu.Append(eventCutMenu);
 	eventPasteMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM4, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
-	eventPasteMenu->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	eventPasteMenu->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	eventsContextMenu.Append(eventPasteMenu);
 	eventsContextMenu.AppendSeparator();
 	undoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM5, _("Cancel\tCtrl-Z"), wxEmptyString, wxITEM_NORMAL);
-	undoMenu->SetBitmap(wxBitmap(wxImage(_T("res/undo.png"))));
+	undoMenu->SetBitmap(gd::SkinHelper::GetIcon("undo", 16));
 	eventsContextMenu.Append(undoMenu);
 	redoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM6, _("Redo\tCtrl-Y"), wxEmptyString, wxITEM_NORMAL);
-	redoMenu->SetBitmap(wxBitmap(wxImage(_T("res/redo.png"))));
+	redoMenu->SetBitmap(gd::SkinHelper::GetIcon("redo", 16));
 	eventsContextMenu.Append(redoMenu);
 	MenuItem1 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	multipleContextMenu.Append(MenuItem1);
 	multipleContextMenu.AppendSeparator();
 	MenuItem5 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM11, _("Cancel"), wxEmptyString, wxITEM_NORMAL);
@@ -411,58 +412,58 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Insert"), wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Insert"), gd::SkinHelper::GetRibbonIcon("add"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         insertRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : "", wxBitmap("res/eventadd24.png", wxBITMAP_TYPE_ANY), _("Add a new standard event with conditions and actions"));
-        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : "", wxBitmap("res/subeventadd24.png", wxBITMAP_TYPE_ANY), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
-        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : "", wxBitmap("res/commentaireadd24.png", wxBITMAP_TYPE_ANY), _("Add a comment"));
-        insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : "", gd::SkinHelper::GetRibbonIcon("eventadd"), _("Add a new standard event with conditions and actions"));
+        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : "", gd::SkinHelper::GetRibbonIcon("subeventadd"), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
+        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : "", gd::SkinHelper::GetRibbonIcon("commentaireadd"), _("Add a comment"));
+        insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : "", gd::SkinHelper::GetRibbonIcon("add"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Delete"), wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Delete"), gd::SkinHelper::GetRibbonIcon("delete"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         deleteRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : "", gd::SkinHelper::GetRibbonIcon("deleteselected"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), wxBitmap("res/unredo24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         undoRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
-        undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
+        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", gd::SkinHelper::GetRibbonIcon("undo"));
+        undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         clipboardRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
-        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
-        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
+        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
+        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
+        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Templates"), wxBitmap("res/template24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Templates"), gd::SkinHelper::GetRibbonIcon("template"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         templateRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        templateRibbonBar->AddButton(idRibbonTemplate, !hideLabels ? _("Insert") : "", wxBitmap("res/template24.png", wxBITMAP_TYPE_ANY));
-        templateRibbonBar->AddButton(idRibbonCreateTemplate, !hideLabels ? _("Create") : "", wxBitmap("res/addtemplate24.png", wxBITMAP_TYPE_ANY));
+        templateRibbonBar->AddButton(idRibbonTemplate, !hideLabels ? _("Insert") : "", gd::SkinHelper::GetRibbonIcon("template"));
+        templateRibbonBar->AddButton(idRibbonCreateTemplate, !hideLabels ? _("Create") : "", gd::SkinHelper::GetRibbonIcon("addtemplate"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Search"), wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Search"), gd::SkinHelper::GetRibbonIcon("search"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY), _("Search for a specific word in the event and/or replace it by another"));
+        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : "", gd::SkinHelper::GetRibbonIcon("search"), _("Search for a specific word in the event and/or replace it by another"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), gd::SkinHelper::GetRibbonIcon("view"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", wxBitmap("res/foldAll24.png", wxBITMAP_TYPE_ANY), _("Hide all subevents"));
-        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY), _("Show all hidden subevents"));
+        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", gd::SkinHelper::GetRibbonIcon("foldAll"), _("Hide all subevents"));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", gd::SkinHelper::GetRibbonIcon("unFoldAll"), _("Show all hidden subevents"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), gd::SkinHelper::GetRibbonIcon("profiler"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), _("For native games, display the time taken by each events during the last preview when profiling was active."));
-        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY), _("Choose the current platform being used to edit the events."));
+        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", gd::SkinHelper::GetRibbonIcon("profiler"), _("For native games, display the time taken by each events during the last preview when profiling was active."));
+        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", gd::SkinHelper::GetRibbonIcon("extension"), _("Choose the current platform being used to edit the events."));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), _("Display the help about the events editor"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Display the help about the events editor"));
     }
 }
 

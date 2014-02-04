@@ -29,6 +29,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -120,73 +121,73 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	editMenuI = new wxMenuItem((&contextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
 	contextMenu.Append(editMenuI);
 	editPropMenuItem = new wxMenuItem((&contextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
-	editPropMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
+	editPropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
 	contextMenu.Append(editPropMenuItem);
 	editNameMenuI = new wxMenuItem((&contextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	editNameMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	editNameMenuI->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	contextMenu.Append(editNameMenuI);
 	MenuItem11 = new wxMenuItem((&contextMenu), ID_SETGLOBALITEM, _("Set as global object"), wxEmptyString, wxITEM_NORMAL);
 	contextMenu.Append(MenuItem11);
 	contextMenu.AppendSeparator();
 	addObjMenuI = new wxMenuItem((&contextMenu), idMenuAddObj, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
-	addObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	addObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	contextMenu.Append(addObjMenuI);
 	delObjMenuI = new wxMenuItem((&contextMenu), idMenuDelObj, _("Delete\tDel"), wxEmptyString, wxITEM_NORMAL);
-	delObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	delObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	contextMenu.Append(delObjMenuI);
 	contextMenu.AppendSeparator();
 	moveUpMenuI = new wxMenuItem((&contextMenu), idMoveUp, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
-	moveUpMenuI->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	moveUpMenuI->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
 	contextMenu.Append(moveUpMenuI);
 	moveDownMenuI = new wxMenuItem((&contextMenu), idMoveDown, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
-	moveDownMenuI->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	moveDownMenuI->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
 	contextMenu.Append(moveDownMenuI);
 	contextMenu.AppendSeparator();
 	copyMenuI = new wxMenuItem((&contextMenu), idMenuCopy, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
-	copyMenuI->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	copyMenuI->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	contextMenu.Append(copyMenuI);
 	cutMenuI = new wxMenuItem((&contextMenu), idMenuCut, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
-	cutMenuI->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	cutMenuI->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	contextMenu.Append(cutMenuI);
 	pasteMenuI = new wxMenuItem((&contextMenu), idMenuPaste, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
-	pasteMenuI->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	pasteMenuI->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	contextMenu.Append(pasteMenuI);
 	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete\tDEL"), _("Delete all selected items"), wxITEM_NORMAL);
-	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	multipleContextMenu.Append(MenuItem2);
 	editMenuItem = new wxMenuItem((&groupContextMenu), IdGroupEdit, _("Edit"), wxEmptyString, wxITEM_NORMAL);
-	editMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
+	editMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
 	groupContextMenu.Append(editMenuItem);
 	MenuItem4 = new wxMenuItem((&groupContextMenu), idModName, _("Rename"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	groupContextMenu.Append(MenuItem4);
 	MenuItem12 = new wxMenuItem((&groupContextMenu), ID_MENUITEM8, _("Set as global group"), wxEmptyString, wxITEM_NORMAL);
 	groupContextMenu.Append(MenuItem12);
 	groupContextMenu.AppendSeparator();
 	MenuItem1 = new wxMenuItem((&groupContextMenu), idAddGroup, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	groupContextMenu.Append(MenuItem1);
 	MenuItem3 = new wxMenuItem((&groupContextMenu), idDelGroup, _("Delete"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	groupContextMenu.Append(MenuItem3);
 	groupContextMenu.AppendSeparator();
 	MenuItem5 = new wxMenuItem((&groupContextMenu), ID_MENUITEM1, _("Copy"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	groupContextMenu.Append(MenuItem5);
 	MenuItem6 = new wxMenuItem((&groupContextMenu), ID_MENUITEM2, _("Cut"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	MenuItem6->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	groupContextMenu.Append(MenuItem6);
 	MenuItem7 = new wxMenuItem((&groupContextMenu), ID_MENUITEM3, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	groupContextMenu.Append(MenuItem7);
 	MenuItem8 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM4, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem8->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	emptyContextMenu.Append(MenuItem8);
 	MenuItem9 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM5, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
 	emptyContextMenu.Append(MenuItem9);
 	emptyContextMenu.AppendSeparator();
 	MenuItem10 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM6, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	emptyContextMenu.Append(MenuItem10);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
@@ -259,30 +260,30 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY), _("Add a new object to the list of the objects of the scene"));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY), _("Delete the selected object"));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
+        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object"));
+        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
+        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY), _("Edit the selected object"));
-        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY), _("Rename the selected object"));
+        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
+        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected object"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
+        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
+        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), _("Show the online help"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Show the online help"));
     }
 
 }
@@ -311,8 +312,8 @@ void ObjectsEditor::Refresh()
 {
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
-    objectsImagesList->Add(gd::CommonBitmapManager::GetInstance()->objects24);
-    objectsImagesList->Add(gd::CommonBitmapManager::GetInstance()->group24);
+    objectsImagesList->Add(gd::SkinHelper::GetIcon("object", 24));
+    objectsImagesList->Add(gd::SkinHelper::GetIcon("group", 24));
 
     objectsList->AddRoot( "Root", 0 );
 
@@ -718,7 +719,7 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         object->EditObject(this, project, mainFrameWrapper);
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : layout, *object);
-    
+
     	//TODO: Set dirty only if modified.
     	project.SetDirty();
 
@@ -772,7 +773,7 @@ void ObjectsEditor::OnMenuPropertiesSelected(wxCommandEvent& event)
     if ( propPnl && propPnlManager ) {
     	propPnlManager->GetPane("PROPERTIES").Show();
     	propPnlManager->Update();
-	}    	
+	}
 }
 
 void ObjectsEditor::OnMenuRenameSelected(wxCommandEvent& event)
@@ -971,7 +972,7 @@ void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-        if (itemData) 
+        if (itemData)
         {
 	        if (objectsList->GetItemText( item ) == name
 	            && itemData->GetString() == dataStr

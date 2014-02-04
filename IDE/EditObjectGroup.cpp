@@ -20,7 +20,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -87,7 +87,7 @@ modificationCount(0)
 	FlexGridSizer2->AddGrowableCol(1);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer3->AddGrowableRow(0);
-	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer3->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	helpBt->SetToolTip(_("Display help about this window"));
@@ -101,10 +101,10 @@ modificationCount(0)
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	MenuItem1 = new wxMenuItem((&ContextMenu), idAddObjet, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	ContextMenu.Append(MenuItem1);
 	MenuItem2 = new wxMenuItem((&ContextMenu), idDelObjet, _("Delete the object"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	ContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
@@ -123,7 +123,7 @@ modificationCount(0)
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idAddObjet, _( "Add an object" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add an object") );
-    toolbar->AddTool( idDelObjet, _( "Delete the selected object" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected object") );
+    toolbar->AddTool( idDelObjet, _( "Delete the selected object" ), wxBitmap( gd::SkinHelper::GetIcon("delete", 16) ), _("Delete the selected object") );
     toolbar->Realize();
     gd::SkinHelper::ApplyCurrentSkin(*toolbar);
 

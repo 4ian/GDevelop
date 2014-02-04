@@ -78,7 +78,7 @@
 									<growablerows>0</growablerows>
 									<object class="sizeritem">
 										<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
-											<bitmap>res/helpicon.png</bitmap>
+											<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
 											<style>wxNO_BORDER</style>
 										</object>
 										<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -129,12 +129,12 @@
 		<object class="wxMenu" variable="ContextMenu" member="yes">
 			<object class="wxMenuItem" name="idAddObjet" variable="MenuItem1" member="yes">
 				<label>Add an object</label>
-				<bitmap>res/addicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddObjetSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idDelObjet" variable="MenuItem2" member="yes">
 				<label>Delete the object</label>
-				<bitmap>res/deleteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 				<handler function="OnDelObjetSelected" entry="EVT_MENU" />
 			</object>
 		</object>

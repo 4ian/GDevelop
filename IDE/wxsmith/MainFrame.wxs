@@ -54,16 +54,11 @@
 				<label>Open an example</label>
 				<handler function="OnOpenExampleSelected" entry="EVT_MENU" />
 			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem45" member="no">
-				<label>Import a game</label>
-				<bitmap>res/fusionicon.png</bitmap>
-				<handler function="OnMenuFusionSelected" entry="EVT_MENU" />
-			</object>
 		</object>
 		<object class="wxMenu" variable="saveContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem10" member="yes">
 				<label>Save as...</label>
-				<bitmap>res/saveasicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;saveas&quot;, 16)' />
 				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
 			</object>
 		</object>
@@ -93,14 +88,14 @@
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem2" member="yes">
 				<label>New</label>
 				<accel>Ctrl+N</accel>
-				<bitmap>res/newicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;new&quot;, 16)' />
 				<handler function="OnMenuNewSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem3" member="yes">
 				<label>Open</label>
 				<accel>Ctrl+O</accel>
-				<bitmap>res/openicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;open&quot;, 16)' />
 				<handler function="OnMenuOpenSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem4" member="yes">
@@ -113,46 +108,42 @@
 					<label>useless</label>
 				</object>
 			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem5" member="yes">
-				<label>Import a game</label>
-				<bitmap>res/addicon.png</bitmap>
-				<handler function="OnMenuFusionSelected" entry="EVT_MENU" />
-			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem6" member="yes">
 				<label>Save</label>
 				<accel>Ctrl+S</accel>
-				<bitmap>res/saveicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;save&quot;, 16)' />
 				<handler function="OnMenuSaveSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem7" member="yes">
 				<label>Save as...</label>
-				<bitmap>res/saveasicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;saveas&quot;, 16)' />
 				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
 				<label>Save all</label>
 				<accel>Ctrl+Shift+S</accel>
-				<bitmap>res/save_all16.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;save_all&quot;, 16)' />
 				<handler function="OnMenuSaveAllSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">
 				<label>Close the current project</label>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;close&quot;, 16)' />
 				<handler function="OnCloseCurrentProjectSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM17" variable="MenuItem13" member="yes">
 				<label>Options</label>
-				<bitmap>res/preficon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;options&quot;, 16)' />
 				<handler function="OnMenuPrefSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM27" variable="MenuItem22" member="yes">
 				<label>Help</label>
 				<accel>F1</accel>
-				<bitmap>res/helpicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
 				<handler function="OnMenuAideSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
@@ -165,24 +156,22 @@
 		<object class="wxMenu" variable="helpMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM20" variable="MenuItem16" member="yes">
 				<label>Help</label>
-				<bitmap>res/helpicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
 				<handler function="OnMenuAideSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM23" variable="MenuItem19" member="yes">
 				<label>Tutorial</label>
-				<bitmap>res/tutoicon.png</bitmap>
 				<handler function="OnMenuTutoSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">
 				<label>Check for updates</label>
-				<bitmap>res/update16.png</bitmap>
 				<handler function="OnMenuItem36Selected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM24" variable="MenuItem20" member="yes">
 				<label>Official web site</label>
-				<bitmap>res/siteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;site&quot;, 16)' />
 				<handler function="OnMenuSiteSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM21" variable="MenuItem17" member="yes">

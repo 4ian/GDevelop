@@ -19,6 +19,7 @@
 #include <wx/busyinfo.h>
 #include <fstream>
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
@@ -134,143 +135,143 @@ mainEditor(mainEditor_)
 	FlexGridSizer1->Add(projectsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	editSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuEditScene, _("Edit this scene"), wxEmptyString, wxITEM_NORMAL);
-	editSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
+	editSceneMenuItem->SetBitmap(gd::SkinHelper::GetIcon("edit", 16));
 	sceneContextMenu.Append(editSceneMenuItem);
 	editScenePropMenuItem = new wxMenuItem((&sceneContextMenu), idMenuEditPropScene, _("Edit the properties"), wxEmptyString, wxITEM_NORMAL);
-	editScenePropMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
+	editScenePropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
 	sceneContextMenu.Append(editScenePropMenuItem);
 	modVarSceneMenuI = new wxMenuItem((&sceneContextMenu), idMenuModVar, _("Modify inital variables"), wxEmptyString, wxITEM_NORMAL);
-	modVarSceneMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
+	modVarSceneMenuI->SetBitmap(gd::SkinHelper::GetIcon("var", 16));
 	sceneContextMenu.Append(modVarSceneMenuI);
 	editSceneNameMenuItem = new wxMenuItem((&sceneContextMenu), idMenuModNameScene, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	editSceneNameMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	editSceneNameMenuItem->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	sceneContextMenu.Append(editSceneNameMenuItem);
 	sceneContextMenu.AppendSeparator();
 	addSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuAddScene, _("Add a scene"), wxEmptyString, wxITEM_NORMAL);
-	addSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	addSceneMenuItem->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	sceneContextMenu.Append(addSceneMenuItem);
 	deleteSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuDelScene, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
-	deleteSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	deleteSceneMenuItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	sceneContextMenu.Append(deleteSceneMenuItem);
 	sceneContextMenu.AppendSeparator();
 	MenuItem25 = new wxMenuItem((&sceneContextMenu), ID_MENUITEM29, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem25->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	MenuItem25->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
 	sceneContextMenu.Append(MenuItem25);
 	MenuItem26 = new wxMenuItem((&sceneContextMenu), ID_MENUITEM30, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem26->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	MenuItem26->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
 	sceneContextMenu.Append(MenuItem26);
 	sceneContextMenu.AppendSeparator();
 	copySceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCopyScene, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
-	copySceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	copySceneMenuItem->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	sceneContextMenu.Append(copySceneMenuItem);
 	cutSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCutScene, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
-	cutSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	cutSceneMenuItem->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	sceneContextMenu.Append(cutSceneMenuItem);
 	pasteSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuPasteScene, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
-	pasteSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	pasteSceneMenuItem->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	sceneContextMenu.Append(pasteSceneMenuItem);
 	MenuItem1 = new wxMenuItem((&scenesContextMenu), ID_MENUITEM1, _("Add a scene"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	scenesContextMenu.Append(MenuItem1);
 	editPropGameMenuItem = new wxMenuItem((&gameContextMenu), ID_MENUITEM2, _("Edit the property of the game"), wxEmptyString, wxITEM_NORMAL);
-	editPropGameMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
+	editPropGameMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
 	gameContextMenu.Append(editPropGameMenuItem);
 	editGblVarMenuItem = new wxMenuItem((&gameContextMenu), ID_MENUITEM3, _("Modify global variables"), wxEmptyString, wxITEM_NORMAL);
-	editGblVarMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
+	editGblVarMenuItem->SetBitmap(gd::SkinHelper::GetIcon("var", 16));
 	gameContextMenu.Append(editGblVarMenuItem);
 	editNameGameMenuItem = new wxMenuItem((&gameContextMenu), ID_MENUITEM4, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	editNameGameMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	editNameGameMenuItem->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	gameContextMenu.Append(editNameGameMenuItem);
 	gameContextMenu.AppendSeparator();
 	MenuItem24 = new wxMenuItem((&gameContextMenu), ID_MENUITEM28, _("Open the folder of the project"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem24->SetBitmap(wxBitmap(wxImage(_T("res/foldericon.png"))));
+	MenuItem24->SetBitmap(gd::SkinHelper::GetIcon("open", 16));
 	gameContextMenu.Append(MenuItem24);
 	gameContextMenu.AppendSeparator();
 	closeGameBt = new wxMenuItem((&gameContextMenu), ID_MENUITEM5, _("Close this project"), wxEmptyString, wxITEM_NORMAL);
 	gameContextMenu.Append(closeGameBt);
 	MenuItem2 = new wxMenuItem((&emptyExternalEventsContextMenu), ID_MENUITEM6, _("Add external events"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	emptyExternalEventsContextMenu.Append(MenuItem2);
 	MenuItem3 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM7, _("Edit"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/eventsedit16.png"))));
+	MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("edit", 16));
 	externalEventsContextMenu.Append(MenuItem3);
 	MenuItem9 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM13, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	MenuItem9->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	externalEventsContextMenu.Append(MenuItem9);
 	externalEventsContextMenu.AppendSeparator();
 	MenuItem4 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM8, _("Add external events"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	externalEventsContextMenu.Append(MenuItem4);
 	MenuItem5 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM9, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	externalEventsContextMenu.Append(MenuItem5);
 	externalEventsContextMenu.AppendSeparator();
 	MenuItem27 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM31, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem27->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	MenuItem27->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
 	externalEventsContextMenu.Append(MenuItem27);
 	MenuItem28 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM32, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem28->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	MenuItem28->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
 	externalEventsContextMenu.Append(MenuItem28);
 	externalEventsContextMenu.AppendSeparator();
 	MenuItem6 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM10, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	MenuItem6->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	externalEventsContextMenu.Append(MenuItem6);
 	MenuItem7 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM11, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	externalEventsContextMenu.Append(MenuItem7);
 	MenuItem8 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM12, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	MenuItem8->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	externalEventsContextMenu.Append(MenuItem8);
 	MenuItem14 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM18, _("Create a new C++ file"), wxEmptyString, wxITEM_NORMAL);
 	sourceFilesContextMenu.Append(MenuItem14);
 	MenuItem10 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM14, _("Add an already existing C++ file"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	sourceFilesContextMenu.Append(MenuItem10);
 	MenuItem11 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM15, _("Edit"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
+	MenuItem11->SetBitmap(gd::SkinHelper::GetIcon("edit", 16));
 	sourceFileContextMenu.Append(MenuItem11);
 	sourceFileContextMenu.AppendSeparator();
 	MenuItem12 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM16, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem12->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	sourceFileContextMenu.Append(MenuItem12);
 	sourceFileContextMenu.AppendSeparator();
 	MenuItem15 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM19, _("Create a new C++ file"), wxEmptyString, wxITEM_NORMAL);
 	sourceFileContextMenu.Append(MenuItem15);
 	MenuItem13 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM17, _("Add an already existing C++ file"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem13->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	sourceFileContextMenu.Append(MenuItem13);
 	MenuItem16 = new wxMenuItem((&emptyExternalLayoutsContextMenu), ID_MENUITEM20, _("Add an external layout"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	MenuItem16->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	emptyExternalLayoutsContextMenu.Append(MenuItem16);
 	MenuItem17 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM21, _("Edit"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/eventsedit16.png"))));
+	MenuItem17->SetBitmap(gd::SkinHelper::GetIcon("edit", 16));
 	externalLayoutContextMenu.Append(MenuItem17);
 	MenuItem18 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM22, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	MenuItem18->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	externalLayoutContextMenu.Append(MenuItem18);
 	externalLayoutContextMenu.AppendSeparator();
 	MenuItem19 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM23, _("Add an external layout"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	MenuItem19->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	externalLayoutContextMenu.Append(MenuItem19);
 	MenuItem20 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM24, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem20->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	externalLayoutContextMenu.Append(MenuItem20);
 	externalLayoutContextMenu.AppendSeparator();
 	MenuItem29 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM33, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem29->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	MenuItem29->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
 	externalLayoutContextMenu.Append(MenuItem29);
 	MenuItem30 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM34, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem30->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	MenuItem30->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
 	externalLayoutContextMenu.Append(MenuItem30);
 	externalLayoutContextMenu.AppendSeparator();
 	MenuItem21 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM25, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	MenuItem21->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
 	externalLayoutContextMenu.Append(MenuItem21);
 	MenuItem22 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM26, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem22->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	MenuItem22->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
 	externalLayoutContextMenu.Append(MenuItem22);
 	MenuItem23 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM27, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem23->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	MenuItem23->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	externalLayoutContextMenu.Append(MenuItem23);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
@@ -327,13 +328,13 @@ mainEditor(mainEditor_)
 	//*)
 
     wxImageList * imageList = new wxImageList(16,16);
-    imageList->Add(wxBitmap("res/window.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY));
+    imageList->Add(gd::SkinHelper::GetIcon("project", 16));
+    imageList->Add(gd::SkinHelper::GetIcon("scene", 16));
+    imageList->Add(gd::SkinHelper::GetIcon("image", 16));
+    imageList->Add(gd::SkinHelper::GetIcon("extensions", 16));
+    imageList->Add(gd::SkinHelper::GetIcon("events", 16));
+    imageList->Add(gd::SkinHelper::GetIcon("source_cpp", 16));
+    imageList->Add(gd::SkinHelper::GetIcon("external_layout", 16));
     projectsTree->SetImageList(imageList);
 
     #if defined(__WXMSW__) //Offers nice look to wxTreeCtrl
@@ -360,43 +361,43 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Projects"), wxBitmap("res/openicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Projects"), SkinHelper::GetRibbonIcon("open"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonNew, !hideLabels ? _("New") : "", wxBitmap("res/newicon24.png", wxBITMAP_TYPE_ANY), _("Create a new game"));
-        ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY), _("Open a previously saved project"));
+        ribbonBar->AddButton(idRibbonNew, !hideLabels ? _("New") : "", SkinHelper::GetRibbonIcon("new"), _("Create a new game"));
+        ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", SkinHelper::GetRibbonIcon("open"), _("Open a previously saved project"));
     }
     {
-        wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), wxBitmap("res/saveicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), SkinHelper::GetRibbonIcon("save"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
-        file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY), _("Save the current project"));
-        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY), _("Save all open projects"));
-        file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", wxBitmap("res/close24.png", wxBITMAP_TYPE_ANY), _("Close the current project"));
+        file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
+        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
+        file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", wxBitmap("res/imageicon24.png", wxBITMAP_TYPE_ANY), _("Display the resources used by the game"));
-        ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
+        ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", SkinHelper::GetRibbonIcon("sceneadd"));
+        ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", SkinHelper::GetRibbonIcon("eventsadd"));
+        ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", SkinHelper::GetRibbonIcon("externallayoutadd"));
+        ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", SkinHelper::GetRibbonIcon("extension"));
     }
     {
-        wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), SkinHelper::GetRibbonIcon("image"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *affichage_bar = new wxRibbonButtonBar(affichagePanel, wxID_ANY);
-        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projects") : "", wxBitmap("res/projectManager24.png", wxBITMAP_TYPE_ANY), _("Display the project manager"));
-        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Start page") : "", wxBitmap("res/startPage24.png", wxBITMAP_TYPE_ANY), _("Open the start page"));
-        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("C++ Tools") : "", wxBitmap("res/source_cpp24.png", wxBITMAP_TYPE_ANY), _("Display tools related to native games"));
+        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projects") : "", SkinHelper::GetRibbonIcon("projectManager"), _("Display the project manager"));
+        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Start page") : "", SkinHelper::GetRibbonIcon("startPage"), _("Open the start page"));
+        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("C++ Tools") : "", SkinHelper::GetRibbonIcon("source_cpp"), _("Display tools related to native games"));
 
-        wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
-        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : "", wxBitmap("res/musicicon24.png", wxBITMAP_TYPE_ANY), _("Open a tool to convert MP3 files to OGG"));
-        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : "", wxBitmap("res/strip24.png", wxBITMAP_TYPE_ANY), _("Open a tool to convert various images format"));
+        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : "", SkinHelper::GetRibbonIcon("audioconverter"), _("Open a tool to convert MP3 files to OGG"));
+        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : "", SkinHelper::GetRibbonIcon("imageconverter"), _("Open a tool to convert various images format"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), _("Open the online help for Game Develop"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"), _("Open the online help for Game Develop"));
     }
 
 }
@@ -1393,7 +1394,7 @@ void ProjectManager::OnRibbonCloseSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
 
-    if (mainEditor.GetCurrentGame()->IsDirty() 
+    if (mainEditor.GetCurrentGame()->IsDirty()
     	&& wxMessageBox( _( "Changes have been made to the project.\n\nAre you sure you want to close it\?" ), _( "Unsaved changes" ), wxYES_NO|wxNO_DEFAULT, this ) == wxNO )
         return;
 
@@ -1411,7 +1412,7 @@ void ProjectManager::OncloseGameBtSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    if (game->IsDirty() 
+    if (game->IsDirty()
     	&& wxMessageBox( _("Changes have been made to the project.\n\nAre you sure you want to close it\?"), _( "Unsaved changes" ), wxYES_NO|wxNO_DEFAULT, this ) == wxNO )
         return;
 
@@ -1985,7 +1986,7 @@ void ProjectManager::OnSceneMoveUpSelected(wxCommandEvent& event)
 
     //Swap the scenes
     game->SwapLayouts(index, index-1);
-    
+
     //Update the tree
     wxString nextName = data->GetSecondString();
     wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
@@ -2012,7 +2013,7 @@ void ProjectManager::OnSceneMoveDownSelected(wxCommandEvent& event)
 
     //Swap the scenes
     game->SwapLayouts(index, index+1);
-    
+
     //Update the tree
     wxString previousName = data->GetSecondString();
     wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
@@ -2039,7 +2040,7 @@ void ProjectManager::OnExternalLayoutMoveUpSelected(wxCommandEvent& event)
 
     //Swap the scenes
     game->SwapExternalLayouts(index, index-1);
-    
+
     //Update the tree
     wxString nextName = data->GetSecondString();
     wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
@@ -2066,7 +2067,7 @@ void ProjectManager::OnExternalLayoutMoveDownSelected(wxCommandEvent& event)
 
     //Swap the scenes
     game->SwapExternalLayouts(index, index+1);
-    
+
     //Update the tree
     wxString previousName = data->GetSecondString();
     wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
@@ -2093,7 +2094,7 @@ void ProjectManager::OnExternalEventsMoveUpSelected(wxCommandEvent& event)
 
     //Swap the scenes
     game->SwapExternalEvents(index, index-1);
-    
+
     //Update the tree
     wxString nextName = data->GetSecondString();
     wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
@@ -2120,7 +2121,7 @@ void ProjectManager::OnExternalEventsMoveDownSelected(wxCommandEvent& event)
 
     //Swap the scenes
     game->SwapExternalEvents(index, index+1);
-    
+
     //Update the tree
     wxString previousName = data->GetSecondString();
     wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);

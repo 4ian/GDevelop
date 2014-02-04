@@ -19,28 +19,28 @@
 		<object class="wxMenu" variable="contextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
 				<label>Copy</label>
-				<bitmap>res/copyicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;copy&quot;, 16)' />
 				<handler function="OnMenuCopySelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem2" member="yes">
 				<label>Cut</label>
-				<bitmap>res/cuticon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;cut&quot;, 16)' />
 				<handler function="OnMenuCutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem3" member="yes">
 				<label>Paste</label>
-				<bitmap>res/pasteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;paste&quot;, 16)' />
 				<handler function="OnMenuPasteSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem4" member="yes">
 				<label>Cancel</label>
-				<bitmap>res/undo.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;undo&quot;, 16)' />
 				<handler function="OnMenuUndoSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem5" member="yes">
 				<label>Redo</label>
-				<bitmap>res/redo.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;redo&quot;, 16)' />
 				<handler function="OnMenuRedoSelected" entry="EVT_MENU" />
 			</object>
 		</object>

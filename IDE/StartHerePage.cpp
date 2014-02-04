@@ -148,7 +148,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer12->Add(googleplusLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	BoxSizer1->Add(FlexGridSizer4, 7, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer1->Add(FlexGridSizer4, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Recent projects"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
@@ -198,7 +198,7 @@ mainEditor(mainEditor_)
 	HyperlinkCtrl9 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL21, _("Open examples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL21"));
 	FlexGridSizer2->Add(HyperlinkCtrl9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
-	BoxSizer1->Add(FlexGridSizer5, 3, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer1->Add(FlexGridSizer5, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 20);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 0, 0, 0);
@@ -249,37 +249,44 @@ void StartHerePage::Refresh()
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/0" ), &result );
-        recent1Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent1Bt->SetLabel( result );
     }
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/1" ), &result );
-        recent2Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent2Bt->SetLabel( result );
     }
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/2" ), &result );
-        recent3Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent3Bt->SetLabel( result );
     }
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/3" ), &result );
-        recent4Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent4Bt->SetLabel( result );
     }
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/4" ), &result );
-        recent5Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent5Bt->SetLabel( result );
     }
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/5" ), &result );
-        recent6Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent6Bt->SetLabel( result );
     }
     {
         wxString result;
         wxConfigBase::Get()->Read( _T( "/Recent/6" ), &result );
-        recent7Bt->SetLabel( wxFileName::FileName(result).GetFullName() );
+        if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
+        recent7Bt->SetLabel( result );
     }
 }
 

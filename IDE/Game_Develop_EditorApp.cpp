@@ -37,6 +37,7 @@
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
@@ -215,7 +216,7 @@ bool Game_Develop_EditorApp::OnInit()
             else
             {
                 if ( !filesToOpen.empty() )
-                    wxMessageBox(_("It seems that Game Develop is busy and can't open the requested file.\nPlease close any open dialogs and retry."), 
+                    wxMessageBox(_("It seems that Game Develop is busy and can't open the requested file.\nPlease close any open dialogs and retry."),
                         _("Sorry! :/"), wxICON_INFORMATION|wxOK);
             }
 
@@ -243,15 +244,18 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Image handlers loaded" << endl;
 
     //Check if the last session terminated not normally.
+    bool recoveringFromBug = false;
     #if defined(RELEASE)
-    if ( !parser.Found( wxT("noCrashCheck") ) 
-        && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log") 
+    if ( !parser.Found( wxT("noCrashCheck") )
+        && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log")
         && !wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
     {
+        recoveringFromBug = true;
+
         //Get the files opened during the last crash
         std::vector<string> openedFiles;
         wxTextFile projectsLogFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
-        if (projectsLogFile.Open()) 
+        if (projectsLogFile.Open())
         {
             for (wxString str = projectsLogFile.GetFirstLine(); !projectsLogFile.Eof(); str = projectsLogFile.GetNextLine())
                 openedFiles.push_back(gd::ToString(str));
@@ -261,14 +265,14 @@ bool Game_Develop_EditorApp::OnInit()
 
         //Show an explanation window and offer the user to load the autosaves.
         BugReport dialog(NULL, openedFiles);
-        if ( dialog.ShowModal() == 1 ) 
+        if ( dialog.ShowModal() == 1 )
         {
             for (unsigned int i = 0; i < openedFiles.size(); ++i)
             {
                 if ( wxFileExists(openedFiles[i]+".autosave") )
                     filesToOpen.push_back(openedFiles[i]+".autosave");
             }
-            
+
         }
     }
     #endif
@@ -394,6 +398,7 @@ bool Game_Develop_EditorApp::OnInit()
     }
 
     //Pay what you want reminder
+    if (!recoveringFromBug)
     {
         int result = 3;
         Config->Read( "Startup/Reminder", &result );
@@ -434,6 +439,9 @@ int Game_Develop_EditorApp::OnExit()
     if ( singleInstanceChecker ) delete singleInstanceChecker;
     singleInstanceChecker = NULL;
     #endif
+
+    cout << "* Clearing icon cache..." << endl;
+    SkinHelper::ClearIconCache();
 
     cout << "* Deleting the crash detection file..." << endl;
     wxRemoveFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");

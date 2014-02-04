@@ -10,7 +10,7 @@
 #include <wx/string.h>
 //*)
 #include "HtmlViewerPnl.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 
 //(*IdInit(HelpViewerDlg)
 const long HelpViewerDlg::ID_AUITOOLBARITEM1 = wxNewId();
@@ -50,11 +50,11 @@ HelpViewerDlg::HelpViewerDlg(wxWindow* parent, wxString url)
 	AuiToolBar1 = new wxAuiToolBar(Panel1, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	searchCtrl = new wxSearchCtrl(AuiToolBar1, ID_TEXTCTRL1, wxEmptyString, wxPoint(-49,-5), wxSize(500,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	searchCtrl->SetToolTip(_("Enter a keyword to perform an search in the online help"));
-	AuiToolBar1->AddTool(ID_AUITOOLBARITEM1, _("Previous page"), wxBitmap(wxImage(_T("res/left16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Previous page"), wxEmptyString, NULL);
-	AuiToolBar1->AddTool(ID_AUITOOLBARITEM2, _("Next page"), wxBitmap(wxImage(_T("res/right16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Next page"), wxEmptyString, NULL);
+	AuiToolBar1->AddTool(ID_AUITOOLBARITEM1, _("Previous page"), gd::SkinHelper::GetIcon("left", 16), wxNullBitmap, wxITEM_NORMAL, _("Previous page"), wxEmptyString, NULL);
+	AuiToolBar1->AddTool(ID_AUITOOLBARITEM2, _("Next page"), gd::SkinHelper::GetIcon("right", 16), wxNullBitmap, wxITEM_NORMAL, _("Next page"), wxEmptyString, NULL);
 	AuiToolBar1->AddSeparator();
-	AuiToolBar1->AddTool(ID_AUITOOLBARITEM4, _("Go back to the table of content of the help"), wxBitmap(wxImage(_T("res/helpContent16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Go back to the table of content of the help"), wxEmptyString, NULL);
-	AuiToolBar1->AddTool(ID_AUITOOLBARITEM3, _("Go back to the home page of the wiki"), wxBitmap(wxImage(_T("res/home16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Go back to the home page of the wiki"), wxEmptyString, NULL);
+	AuiToolBar1->AddTool(ID_AUITOOLBARITEM4, _("Go back to the table of content of the help"), gd::SkinHelper::GetIcon("help", 16), wxNullBitmap, wxITEM_NORMAL, _("Go back to the table of content of the help"), wxEmptyString, NULL);
+	AuiToolBar1->AddTool(ID_AUITOOLBARITEM3, _("Go back to the home page of the wiki"), gd::SkinHelper::GetIcon("home", 16), wxNullBitmap, wxITEM_NORMAL, _("Go back to the home page of the wiki"), wxEmptyString, NULL);
 	AuiToolBar1->AddSeparator();
 	AuiToolBar1->AddControl(searchCtrl, wxEmptyString);
 	AuiToolBar1->Realize();

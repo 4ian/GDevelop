@@ -48,29 +48,29 @@
 		<object class="wxMenu" variable="contextMenu" member="yes">
 			<object class="wxMenuItem" name="idMenuEdit" variable="MenuItem1" member="yes">
 				<label>Edit the layer properties</label>
-				<bitmap>res/editnom.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;rename&quot;, 16)' />
 				<handler function="OnEditSelected1" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuAdd" variable="MenuItem2" member="yes">
 				<label>Add a layer</label>
-				<bitmap>res/addicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDel" variable="MenuItem3" member="no">
 				<label>Delete the layer</label>
-				<bitmap>res/deleteicon.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 				<handler function="OnDelSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuUp" variable="MenuItem4" member="no">
 				<label>Move over</label>
-				<bitmap>res/up.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;up&quot;, 16)' />
 				<handler function="OnUpSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDown" variable="MenuItem5" member="no">
 				<label>Move below</label>
-				<bitmap>res/down.png</bitmap>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;down&quot;, 16)' />
 				<handler function="OnDownSelected" entry="EVT_MENU" />
 			</object>
 		</object>

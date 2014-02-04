@@ -2,9 +2,11 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#include <iostream>
 #include "SkinHelper.h"
-#include "AuiTabArt.h"
-#include "FlatAuiTabArt.h"
+#include "GDCore/IDE/wxTools/AuiTabArt.h"
+#include "GDCore/IDE/wxTools/FlatAuiTabArt.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/RibbonMetroArtProvider.h"
 #include <wx/ribbon/bar.h>
@@ -15,16 +17,19 @@
 #include <wx/config.h>
 #include <wx/dcbuffer.h>
 #include <wx/settings.h>
+#include <wx/log.h>
 
 namespace gd
 {
+
+std::map<std::string, wxBitmap*> SkinHelper::cachedIcons;
 
 /** \brief Internal art provider providing a nice help button instead of the default one.
  */
 class gdRibbonMSWArtProvider : public wxRibbonMSWArtProvider
 {
 public:
-    gdRibbonMSWArtProvider() : wxRibbonMSWArtProvider(), helpBitmap(gd::CommonBitmapManager::GetInstance()->help16) {};
+    gdRibbonMSWArtProvider() : wxRibbonMSWArtProvider(), helpBitmap(gd::SkinHelper::GetIcon("help", 16)) {};
     virtual ~gdRibbonMSWArtProvider() {};
     wxRibbonArtProvider* Clone() const { return new gdRibbonMSWArtProvider(*this); };
 
@@ -59,7 +64,7 @@ public:
 class gdRibbonAUIArtProvider : public wxRibbonAUIArtProvider
 {
 public:
-    gdRibbonAUIArtProvider() : wxRibbonAUIArtProvider(), helpBitmap(gd::CommonBitmapManager::GetInstance()->help16) {};
+    gdRibbonAUIArtProvider() : wxRibbonAUIArtProvider(), helpBitmap(gd::SkinHelper::GetIcon("help", 16)) {};
     virtual ~gdRibbonAUIArtProvider() {};
     wxRibbonArtProvider* Clone() const { return new gdRibbonAUIArtProvider(*this); };
 
@@ -214,13 +219,13 @@ void SkinHelper::ApplyCurrentSkin(wxAuiNotebook & notebook, bool subnotebook)
     if ( result == "Classic" )
     {
         gd::AuiTabArt * art = new gd::AuiTabArt();
-        art->DisableBackgroundGradient(subnotebook);        
+        art->DisableBackgroundGradient(subnotebook);
         tabArt = art;
     }
     else
     {
         gd::FlatAuiTabArt * art = new gd::FlatAuiTabArt();
-        art->DisableBackgroundGradient(subnotebook);        
+        art->DisableBackgroundGradient(subnotebook);
         tabArt = art;
     }
 
@@ -311,17 +316,17 @@ void SkinHelper::ApplyCurrentSkin(wxAuiToolBar & toolbar)
     bool toolbarCustomColor = false;
     pConfig->Read( _T( "/Skin/ToolbarHasCustomColor" ), &toolbarCustomColor );
 
-    if ( result == "Flat" ) 
+    if ( result == "Flat" )
     {
         FlatAuiToolBarArt * art = new FlatAuiToolBarArt;
         if ( toolbarCustomColor ) art->SetBaseColour(baseColor);
-        toolbar.SetArtProvider(art);   
+        toolbar.SetArtProvider(art);
     }
     else
     {
         AuiToolBarArt * art = new AuiToolBarArt;
         if ( toolbarCustomColor ) art->SetBaseColour(baseColor);
-        toolbar.SetArtProvider(art);   
+        toolbar.SetArtProvider(art);
     }
 }
 
@@ -337,6 +342,71 @@ void SkinHelper::ApplyCurrentSkin(wxPropertyGrid & propertyGrid)
     #else
     propertyGrid.SetEmptySpaceColour(propertyGrid.GetMarginColour());
     #endif
+}
+
+wxBitmap SkinHelper::GetRibbonIcon(wxString iconName)
+{
+    wxLogNull noLogPlease;
+    wxString skinName;
+    wxString size;
+    wxConfigBase::Get()->Read( _T( "/Skin/RibbonIcons" ), &skinName, "default" );
+    wxConfigBase::Get()->Read( _T( "/Skin/RibbonIconsSize" ), &size, "24" );
+
+    if ( !wxFileExists("res/ribbon_"+skinName+"/"+iconName+size+".png") )
+        skinName = "default";
+    if ( !wxFileExists("res/ribbon_"+skinName+"/"+iconName+size+".png") )
+        size = "24";
+
+    return wxBitmap("res/ribbon_"+skinName+"/"+iconName+size+".png", wxBITMAP_TYPE_ANY);
+}
+
+wxBitmap SkinHelper::GetIcon(wxString name, unsigned int size)
+{
+    wxLogNull noLogPlease;
+    wxString skinName;
+    std::string iconName = gd::ToString(name);
+    std::string sizeStr = ToString(size);
+    wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
+    std::string identifier = "res/icons_"+gd::ToString(skinName)+"/"+iconName+sizeStr+".png";
+
+    if ( cachedIcons.find(identifier) != cachedIcons.end() && cachedIcons.find(identifier)->second != NULL )
+        return *cachedIcons.find(identifier)->second;
+
+    //No cached icon, load it from the file
+    if ( !wxFileExists("res/icons_"+skinName+"/"+iconName+sizeStr+".png") )
+        skinName = "default";
+
+    wxBitmap * bmp = new wxBitmap("res/icons_"+skinName+"/"+iconName+sizeStr+".png", wxBITMAP_TYPE_ANY);
+    cachedIcons[identifier] = bmp;
+    return *bmp;
+}
+
+bool SkinHelper::IconExists(wxString name, unsigned int size)
+{
+    wxLogNull noLogPlease;
+    wxString skinName;
+    std::string iconName = gd::ToString(name);
+    std::string sizeStr = ToString(size);
+    wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
+    std::string identifier = "res/icons_"+gd::ToString(skinName)+"/"+iconName+sizeStr+".png";
+
+    if ( cachedIcons.find(identifier) != cachedIcons.end() && cachedIcons.find(identifier)->second != NULL )
+        return true;
+
+    //No cached icon, check if the file exists
+    return wxFileExists("res/icons_"+skinName+"/"+iconName+sizeStr+".png")
+        || wxFileExists("res/icons_default/"+iconName+sizeStr+".png");
+}
+
+void SkinHelper::ClearIconCache()
+{
+    for(std::map<std::string, wxBitmap*>::iterator it = cachedIcons.begin(); it != cachedIcons.end();++it)
+    {
+        if (it->second != NULL)
+            delete it->second;
+    }
+
+    cachedIcons.clear();
 }
 
 }

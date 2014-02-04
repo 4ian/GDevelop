@@ -19,6 +19,7 @@
 #include <wx/bitmap.h>
 #include <wx/settings.h>
 #include <wx/textdlg.h>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -137,7 +138,7 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer2->Add(FlexGridSizer7, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
-	StaticBitmap2 = new wxStaticBitmap(centerPanel, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
+	StaticBitmap2 = new wxStaticBitmap(centerPanel, ID_STATICBITMAP5, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));

@@ -17,7 +17,7 @@
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
 #include <wx/msgdlg.h>
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/EventsVariablesFinder.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
@@ -88,7 +88,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
-	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
@@ -141,14 +141,14 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     toolbar->AddTool( idAddVar, _( "Add a variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add a variable") );
     toolbar->AddTool( idEditVar, _( "Edit the initial value of the variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _("Edit the initial value of the variable") );
     toolbar->AddTool( idRenameVar, _( "Rename variable" ), wxBitmap( wxImage( "res/editnom.png" ) ), _("Rename variable") );
-    toolbar->AddTool( idDelVar, _( "Delete the selected variable" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected variable") );
+    toolbar->AddTool( idDelVar, _( "Delete the selected variable" ), wxBitmap( gd::SkinHelper::GetIcon("delete", 16) ), _("Delete the selected variable") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMoveUpVar, _( "Move up" ), wxBitmap( wxImage( "res/up.png" ) ), _("Move up") );
-    toolbar->AddTool( idMoveDownVar, _( "Move down" ), wxBitmap( wxImage( "res/down.png" ) ), _("Move down") );
+    toolbar->AddTool( idMoveUpVar, _( "Move up" ), wxBitmap( gd::SkinHelper::GetIcon("up", 16) ), _("Move up") );
+    toolbar->AddTool( idMoveDownVar, _( "Move down" ), wxBitmap( gd::SkinHelper::GetIcon("down", 16) ), _("Move down") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idFindUndeclared, _( "Search for undeclared variables" ), wxBitmap( wxImage( "res/find16.png" ) ), _("Search for undeclared variables inside the project") );
+    toolbar->AddTool( idFindUndeclared, _( "Search for undeclared variables" ), wxBitmap( gd::SkinHelper::GetIcon("find", 16) ), _("Search for undeclared variables inside the project") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, _( "Help about variables" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Help about variables") );
+    toolbar->AddTool( ID_Help, _( "Help about variables" ), wxBitmap( gd::SkinHelper::GetIcon("help", 16) ), _("Help about variables") );
     toolbar->Realize();
 
     if ( editingOnly )
@@ -195,7 +195,7 @@ void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const std::strin
     //Update the name and remove children
     variablesList->SetItemText(item, 0, name);
     bool wasExpanded = variablesList->IsExpanded(item);
-    
+
     if ( !variable.IsStructure() ) {
         while ( variablesList->GetFirstChild(item).IsOk() )
             variablesList->DeleteItem(variablesList->GetFirstChild(item));
@@ -296,7 +296,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
     RefreshVariable(item, newName, temporaryContainer->Get(newName));
     variablesList->Select(item);
 
-    modificationCount++; 
+    modificationCount++;
 }
 
 
@@ -410,7 +410,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
     wxArrayInt selection = dialog.GetSelections();
     for (unsigned int i = 0;i<selection.size();++i)
     {
-        temporaryContainer->InsertNew(ToString(variablesNotDeclared[selection[i]]),temporaryContainer->Count());   
+        temporaryContainer->InsertNew(ToString(variablesNotDeclared[selection[i]]),temporaryContainer->Count());
         modificationCount++;
     }
 
@@ -445,7 +445,7 @@ void ChooseVariableDialog::OnEditValueSelected(wxCommandEvent& event)
     std::string value = ToString(wxGetTextFromUser(_("Enter the initial value of the variable"), _("Initial value"), selectedVariable->GetString()));
     selectedVariable->SetString(value);
     RefreshVariable(variablesList->GetSelection(), selectedVariableName, *selectedVariable);
-    
+
     modificationCount++;
 }
 
@@ -468,7 +468,7 @@ void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)
         temporaryContainer->Rename(selectedVariableName, newName);
     }
     UpdateSelectedAndParentVariable();
-    
+
     modificationCount++;
 }
 
@@ -577,7 +577,7 @@ void ChooseVariableDialog::OnResize(wxSizeEvent& event)
     variablesList->SetColumnWidth(1, variablesList->GetSize().GetWidth()/2-5);
     event.Skip();
 }
-    
+
 wxTreeListItem ChooseVariableDialog::GetPreviousSibling(wxTreeListCtrl * ctrl, wxTreeListItem item)
 {
     wxTreeListItem parent = ctrl->GetItemParent(item);

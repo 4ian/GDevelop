@@ -12,6 +12,7 @@
 #include <wx/bitmap.h>
 #include <wx/imaglist.h>
 #include <wx/config.h>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
@@ -50,7 +51,7 @@ canSelectGroup(canSelectGroup_)
 
 	Create(parent, wxID_ANY, _("Choose an object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
-	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/objeticon.png"))));
+	FrameIcon.CopyFromBitmap(gd::SkinHelper::GetIcon("object", 16));
 	SetIcon(FrameIcon);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);

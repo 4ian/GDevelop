@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <wx/dcmemory.h>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -155,7 +156,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     wxRect rect(x+1, y, width, GetRenderedHeight(width, platform)-2);
     dc.DrawRectangle(rect);
 
-    dc.DrawBitmap( wxBitmap( "res/events24.png", wxBITMAP_TYPE_ANY ), x+4, y + 1, true);
+    dc.DrawBitmap( gd::SkinHelper::GetIcon("events", 24), x+4, y + 1, true);
 
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     if ( !IsDisabled() )

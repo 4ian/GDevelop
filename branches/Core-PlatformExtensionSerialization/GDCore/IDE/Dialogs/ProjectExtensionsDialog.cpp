@@ -25,6 +25,7 @@
 #include <wx/imaglist.h>
 #include <wx/log.h>
 
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -176,7 +177,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
-	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	helpBt->SetToolTip(_("Display help about this window"));

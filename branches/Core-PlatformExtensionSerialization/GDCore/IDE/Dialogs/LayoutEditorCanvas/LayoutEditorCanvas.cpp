@@ -25,6 +25,7 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 // Platform-specific includes. Be sure to include them at the end as it seems to be some incompatibilities with SFML's WindowStyle.hpp
 #ifdef __WXGTK__
@@ -208,11 +209,11 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     //Generate context menu
     {
         wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Put the object(s) on the higher layer"), wxEmptyString, wxITEM_NORMAL);
-        layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
+        layerUpItem->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
         wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Put the object(s) on the lower layer"), wxEmptyString, wxITEM_NORMAL);
-        layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
+        layerDownItem->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
         wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Delete the selection\tDEL"), wxEmptyString, wxITEM_NORMAL);
-        deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
+        deleteItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 
         contextMenu.Append(ID_PROPMENU, _("Properties"));
         contextMenu.AppendSeparator();
@@ -225,13 +226,13 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         contextMenu.AppendSeparator();
 
         wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copy"), wxEmptyString, wxITEM_NORMAL);
-        copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
+        copyItem->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
         contextMenu.Append(copyItem);
         wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Cut"), wxEmptyString, wxITEM_NORMAL);
-        cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
+        cutItem->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
         contextMenu.Append(cutItem);
         wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        pasteItem->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
         contextMenu.Append(pasteItem);
         wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
         contextMenu.Append(pasteSpecialItem);
@@ -247,7 +248,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         noObjectContextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
         noObjectContextMenu.AppendSeparator();
         wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        pasteItem->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
         noObjectContextMenu.Append(pasteItem);
         wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
         noObjectContextMenu.Append(pasteSpecialItem);
@@ -487,19 +488,19 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), wxBitmap("res/preview24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), _("Edit the layout"));
-        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", wxBitmap("res/preview24.png", wxBITMAP_TYPE_ANY), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
+        ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
+        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
     }
 
-    wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar * ribbonToolbar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"));
     }
 
     return ribbonToolbar;
@@ -523,19 +524,18 @@ void LayoutEditorCanvas::CreateEditionRibbonTools()
 {
     bool hideLabels = false;
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
-    gd::CommonBitmapManager * bitmapManager = gd::CommonBitmapManager::GetInstance();
 
     wxRibbonButtonBar * ribbonToolbar = mainFrameWrapper.GetRibbonSceneEditorButtonBar();
-    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : "", bitmapManager->objects24, _("Show the list of objects of the scene"));
-    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : "", bitmapManager->layers24, _("Show the layers editor"));
-    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : "", bitmapManager->objectsPositionsList24, _("Open a list of all instances of objects put on the scene"));
-    ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : "", bitmapManager->undo24, _("Undo the last change"));
-    ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", bitmapManager->redo24);
-    ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : "", bitmapManager->grid24, _("Show a grid"));
-    ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : "", bitmapManager->gridedit24, _("Edit the size of the grid"));
-    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : "", bitmapManager->windowMask24, _("Show a mask corresponding to the size of the game window"));
-    ribbonToolbar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : "", bitmapManager->center24, _("Go back to the origin of the scene"));
-    ribbonToolbar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : "", bitmapManager->zoom24, _("Go back to the initial zoom level"));
+    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : "", gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
+    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : "", gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
+    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : "", gd::SkinHelper::GetRibbonIcon("ObjectsPositionsList"), _("Open a list of all instances of objects put on the scene"));
+    ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"), _("Undo the last change"));
+    ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
+    ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : "", gd::SkinHelper::GetRibbonIcon("grid"));
+    ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : "", gd::SkinHelper::GetRibbonIcon("gridedit"), _("Edit the size of the grid"));
+    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : "", gd::SkinHelper::GetRibbonIcon("windowMask"), _("Show a mask corresponding to the size of the game window"));
+    ribbonToolbar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : "", gd::SkinHelper::GetRibbonIcon("center"), _("Go back to the origin of the scene"));
+    ribbonToolbar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : "", gd::SkinHelper::GetRibbonIcon("zoom"), _("Go back to the initial zoom level"));
 }
 
 void LayoutEditorCanvas::UpdateContextMenu()

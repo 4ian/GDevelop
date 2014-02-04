@@ -33,6 +33,7 @@ ActionSentenceFormatter *ActionSentenceFormatter::_singleton = NULL;
 string ActionSentenceFormatter::Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos)
 {
     std::string trad = infos.GetSentence();
+    if ( trad.empty() ) trad = "   "; //Prevent empty sentences that could trigger graphical glitches.
 
     //Format special
     /*if ( trad.substr(0, 3) == "Do " && infos.parameters.size() >  ) 

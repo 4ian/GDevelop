@@ -9,8 +9,9 @@
 #endif
 #include "GDCore/IDE/wxTools/RibbonMetroArtProvider.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/SkinHelper.h"
 
-namespace gd 
+namespace gd
 {
 
 static const char* const gallery_up_xpm[] = {
@@ -249,7 +250,7 @@ static const char * const ribbon_help_button_xpm[] = {
 };
 
 RibbonMetroArtProvider::RibbonMetroArtProvider(bool set_colour_scheme) :
-    helpBitmap(gd::CommonBitmapManager::GetInstance()->help16)
+    helpBitmap(gd::SkinHelper::GetIcon("help", 16))
 {
     m_flags = 0;
 #if defined( __WXMAC__ )

@@ -727,7 +727,7 @@ void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 
 void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilprojects.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
 }
 
 

@@ -13,6 +13,7 @@
 #include <wx/string.h>
 //*)
 #include <boost/algorithm/string.hpp>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 

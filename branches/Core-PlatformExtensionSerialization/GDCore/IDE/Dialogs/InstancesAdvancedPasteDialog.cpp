@@ -12,6 +12,7 @@
 //*)
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/SkinHelper.h"
 
 namespace gd
 {
@@ -68,7 +69,7 @@ InstancesAdvancedPasteDialog::InstancesAdvancedPasteDialog(wxWindow* parent,wxWi
 	Move(wxDefaultPosition);
 
 		wxIcon FrameIcon;
-		FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+		FrameIcon.CopyFromBitmap(gd::SkinHelper::GetIcon("paste", 16));
 		SetIcon(FrameIcon);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paste"));
@@ -135,7 +136,7 @@ InstancesAdvancedPasteDialog::InstancesAdvancedPasteDialog(wxWindow* parent,wxWi
 	FlexGridSizer6->AddGrowableCol(1);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
-	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	helpBt->SetToolTip(_("Display help about this window"));

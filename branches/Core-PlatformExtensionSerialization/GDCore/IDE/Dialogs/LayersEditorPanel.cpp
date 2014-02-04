@@ -20,7 +20,7 @@
 #include "GDCore/PlatformDefinition/Layer.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 
 namespace gd
 {
@@ -71,16 +71,16 @@ mainFrameWrapper(mainFrameWrapper_)
 	toolBarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(120,25), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	AuiManager1 = new wxAuiManager(toolBarPanel, wxAUI_MGR_DEFAULT);
 	toolbar = new wxAuiToolBar(toolBarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add a layer"), wxBitmap(wxImage(_T("res/addicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add a layer"), _("Add a new layer"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Delete the selected layer"), wxBitmap(wxImage(_T("res/deleteicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Delete the selected layer"), _("Delete the selected layer"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add a layer"), gd::SkinHelper::GetIcon("add", 16), wxNullBitmap, wxITEM_NORMAL, _("Add a layer"), _("Add a new layer"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Delete the selected layer"), gd::SkinHelper::GetIcon("delete", 16), wxNullBitmap, wxITEM_NORMAL, _("Delete the selected layer"), _("Delete the selected layer"), NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM5, _("Edit the properties of the layer"), wxBitmap(wxImage(_T("res/editpropicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Edit the properties of the layer"), _("Edit the properties of the layer"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM3, _("Move the layer over"), wxBitmap(wxImage(_T("res/up.png"))), wxNullBitmap, wxITEM_NORMAL, _("Move the layer over"), _("Move the layer over"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Move the layer below"), wxBitmap(wxImage(_T("res/down.png"))), wxNullBitmap, wxITEM_NORMAL, _("Move the layer below"), _("Move the layer below"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM5, _("Edit the properties of the layer"), gd::SkinHelper::GetIcon("properties", 16), wxNullBitmap, wxITEM_NORMAL, _("Edit the properties of the layer"), _("Edit the properties of the layer"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM3, _("Move the layer over"), gd::SkinHelper::GetIcon("up", 16), wxNullBitmap, wxITEM_NORMAL, _("Move the layer over"), _("Move the layer over"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Move the layer below"), gd::SkinHelper::GetIcon("down", 16), wxNullBitmap, wxITEM_NORMAL, _("Move the layer below"), _("Move the layer below"), NULL);
 	toolbar->AddSeparator();
 	toolbar->AddTool(ID_AUITOOLBARITEM6, _("Refresh the list"), wxBitmap(wxImage(_T("res/refreshicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Refresh the list"), _("Refresh the list"), NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM7, _("Help"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Display help about the layers editor"), _("Display help about the layers editor"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM7, _("Help"), gd::SkinHelper::GetIcon("help", 16), wxNullBitmap, wxITEM_NORMAL, _("Display help about the layers editor"), _("Display help about the layers editor"), NULL);
 	toolbar->Realize();
 	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
 	AuiManager1->Update();
@@ -89,21 +89,21 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer1->Add(layersList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Edit the layer properties"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
 	contextMenu.Append(MenuItem1);
 	contextMenu.AppendSeparator();
 	MenuItem2 = new wxMenuItem((&contextMenu), idMenuAdd, _("Add a layer"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	contextMenu.Append(MenuItem2);
 	MenuItem3 = new wxMenuItem((&contextMenu), idMenuDel, _("Delete the layer"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	contextMenu.Append(MenuItem3);
 	contextMenu.AppendSeparator();
 	MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("Move over"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
 	contextMenu.Append(MenuItem4);
 	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Move below"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+	MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
 	contextMenu.Append(MenuItem5);
 	imageList = new wxImageList(16, 16, 1);
 	FlexGridSizer1->Fit(this);

@@ -47,7 +47,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/ResourceLibraryDialog.h"
 #include "GDCore/IDE/wxTools/FileProperty.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 
 #include "GDCpp/IDE/DndResourcesEditor.h"
@@ -127,10 +127,10 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     AuiManager1 = new wxAuiManager(this, wxAUI_MGR_DEFAULT);
     toolbar = new wxAuiToolBar(this, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-    toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add an image"), wxBitmap(wxImage(_T("res/addicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add an image"), _("Add an image"), NULL);
+    toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add an image"), gd::SkinHelper::GetIcon("add", 16), wxNullBitmap, wxITEM_NORMAL, _("Add an image"), _("Add an image"), NULL);
     toolbar->AddTool(ID_AUITOOLBARITEM2, _("Add from resource library"), wxBitmap(wxImage(_T("res/package16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add from resource library"), _("Add from resource library"), NULL);
     toolbar->AddSeparator();
-    toolbar->AddTool(ID_AUITOOLBARITEM5, _("Help"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Get help about using the resource manager"), _("Get help about using the resource manager"), NULL);
+    toolbar->AddTool(ID_AUITOOLBARITEM5, _("Help"), gd::SkinHelper::GetIcon("help", 16), wxNullBitmap, wxITEM_NORMAL, _("Get help about using the resource manager"), _("Get help about using the resource manager"), NULL);
     toolbar->Realize();
     AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Floatable(false).Movable(false).Gripper(false));
     corePanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
@@ -160,40 +160,40 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     AuiManager1->AddPane(propertiesPanel, wxAuiPaneInfo().Name(_T("propertiesPane")).Caption(_("Properties")).CaptionVisible().Position(1).Right());
     AuiManager1->Update();
     MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+    MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
     ContextMenu.Append(MenuItem3);
     ContextMenu.AppendSeparator();
     MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAjouter, _("Add an image"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+    MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
     ContextMenu.Append(MenuItem1);
     deleteImageItem = new wxMenuItem((&ContextMenu), idMenuDel, _("Delete the image\tDEL"), wxEmptyString, wxITEM_NORMAL);
-    deleteImageItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+    deleteImageItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
     ContextMenu.Append(deleteImageItem);
     MenuItem14 = new wxMenuItem((&ContextMenu), ID_MENUITEM9, _("Remove from folder only"), wxEmptyString, wxITEM_NORMAL);
     ContextMenu.Append(MenuItem14);
     ContextMenu.AppendSeparator();
     MenuItem7 = new wxMenuItem((&ContextMenu), idMoveUp, _("Move up\tCtrl-J"), _("Move the image up"), wxITEM_NORMAL);
-    MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+    MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
     ContextMenu.Append(MenuItem7);
     MenuItem8 = new wxMenuItem((&ContextMenu), idMoveDown, _("Move down\tCtrl-K"), _("Move the image down"), wxITEM_NORMAL);
-    MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+    MenuItem8->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
     ContextMenu.Append(MenuItem8);
     MenuItem2 = new wxMenuItem((&emptyMenu), ID_MENUITEM1, _("Add an image"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+    MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
     emptyMenu.Append(MenuItem2);
     emptyMenu.AppendSeparator();
     MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
     MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
     emptyMenu.Append(MenuItem6);
     MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+    MenuItem9->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
     folderMenu.Append(MenuItem9);
     MenuItem13 = new wxMenuItem((&folderMenu), ID_MENUITEM5, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+    MenuItem13->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
     folderMenu.Append(MenuItem13);
     folderMenu.AppendSeparator();
     MenuItem10 = new wxMenuItem((&folderMenu), ID_MENUITEM6, _("Add an image"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+    MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
     folderMenu.Append(MenuItem10);
     folderMenu.AppendSeparator();
     MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
@@ -201,10 +201,10 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     folderMenu.Append(MenuItem5);
     folderMenu.AppendSeparator();
     MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _("Move up\tCtrl-J"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
+    MenuItem11->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
     folderMenu.Append(MenuItem11);
     MenuItem12 = new wxMenuItem((&folderMenu), ID_MENUITEM8, _("Move down\tCtrl-K"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
+    MenuItem12->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
     folderMenu.Append(MenuItem12);
 
     Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnAddImageBtClick);

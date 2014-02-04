@@ -118,7 +118,7 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
         sf::ConvexShape shape;
         shape.setOutlineThickness(5);
         shape.setOutlineColor(sf::Color(255,0,0));
-        
+
         shape.setPointCount(polygons[i].vertices.size());
         for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
             shape.setPoint(j, polygons[i].vertices[j]);

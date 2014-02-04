@@ -27,7 +27,7 @@
 #include "GDCpp/CppPlatform.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include <SFML/Graphics.hpp>
 #undef _
 #define _(s) wxGetTranslation((s))
@@ -130,7 +130,7 @@ objectChanged(true)
 	FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objectName = new wxStaticText(Panel2, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer5->Add(objectName, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	deleteBt = new wxBitmapButton(Panel2, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/deleteicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
+	deleteBt = new wxBitmapButton(Panel2, ID_BITMAPBUTTON1, gd::SkinHelper::GetIcon("delete", 16), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
 	deleteBt->SetToolTip(_("Delete this object"));
 	FlexGridSizer5->Add(deleteBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 2);
 	FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

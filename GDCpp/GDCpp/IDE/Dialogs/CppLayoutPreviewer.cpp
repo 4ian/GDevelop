@@ -13,6 +13,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
 #include "GDCpp/Project.h"
@@ -262,7 +263,7 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, false);
 
     //Create now the window if necessary (not done in the constructor because, on linux, the window was not hidden).
-    if (!externalPreviewWindow) 
+    if (!externalPreviewWindow)
         externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
 
     externalPreviewWindow->Show(true);
@@ -365,13 +366,12 @@ void CppLayoutPreviewer::CreatePreviewRibbonTools(wxRibbonButtonBar & buttonBar)
 {
     bool hideLabels = false;
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
-    gd::CommonBitmapManager * bitmapManager = gd::CommonBitmapManager::GetInstance();
 
-    buttonBar.AddButton(idRibbonPlay, !hideLabels ? _("Play") : "", bitmapManager->starticon24, _("Start the preview"));
-    buttonBar.AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : "", bitmapManager->startwindow24, _("Start the preview in an external window"));
-    buttonBar.AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", bitmapManager->pauseicon24, _("Pause the preview"));
-    buttonBar.AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", bitmapManager->bug24, _("Show the debugger to view the state of the game"));
-    buttonBar.AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : "", bitmapManager->profiler24, _("Show the profiler to monitor performances"));
+    buttonBar.AddButton(idRibbonPlay, !hideLabels ? _("Play") : "", gd::SkinHelper::GetRibbonIcon("start"), _("Start the preview"));
+    buttonBar.AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : "", gd::SkinHelper::GetRibbonIcon("startwindow"), _("Start the preview in an external window"));
+    buttonBar.AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", gd::SkinHelper::GetRibbonIcon("pause"), _("Pause the preview"));
+    buttonBar.AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", gd::SkinHelper::GetRibbonIcon("bug"), _("Show the debugger to view the state of the game"));
+    buttonBar.AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : "", gd::SkinHelper::GetRibbonIcon("profiler"), _("Show the profiler to monitor performances"));
 }
 
 void CppLayoutPreviewer::ConnectPreviewRibbonToolsEvents()

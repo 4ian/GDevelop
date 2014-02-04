@@ -102,7 +102,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         obj.AddAction("MettreAutourPos",
                        _("Put an object around a position"),
                        _("Position an object around a position, with specified angle and distance."),
-                       _("Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_° and _PARAM3_ pixels distance."),
+                       _("Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_ degrees and _PARAM3_ pixels distance."),
                        _("Position"),
                        "res/actions/positionAutour24.png",
                        "res/actions/positionAutour.png")
@@ -126,21 +126,21 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("X coordinate of moving"))
             .AddParameter("expression", _("Y coordinate of moving"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("expression", _("Damping (Default: 0)"))
             .codeExtraInformation.SetFunctionName("AddForce");
 
         obj.AddAction("AddForceAL",
                        _("Add a force ( angle )"),
                        _("Add a force to an object. The object will move according to\nall forces it owns. This action creates the force using the specified angle and length."),
-                       _("Add to _PARAM0_ a force, angle : _PARAM1_° and length : _PARAM2_ pixels"),
+                       _("Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"),
                        _("Displacement"),
                        "res/actions/force24.png",
                        "res/actions/force.png")
 
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Angle"))
-            .AddParameter("expression", _("Length ( in pixels )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("expression", _("Length (in pixels)"))
+            .AddParameter("expression", _("Damping (Default: 0)"))
             .codeExtraInformation.SetFunctionName("AddForceUsingPolarCoordinates");
 
 
@@ -155,15 +155,15 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("X position"))
             .AddParameter("expression", _("Y position"))
-            .AddParameter("expression", _("Length ( in pixels )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("expression", _("Length (in pixels)"))
+            .AddParameter("expression", _("Damping (Default: 0)"))
             .codeExtraInformation.SetFunctionName("AddForceTowardPosition");
 
 
         obj.AddAction("AddForceTournePos",
                        _("Add a force so as to move around a position"),
                        _("Add a force to an object so as it rotates toward a position.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
-                       _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_°/sec and _PARAM4_ pixels away"),
+                       _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_ deg/sec and _PARAM4_ pixels away"),
                        _("Displacement"),
                        "res/actions/forceTourne24.png",
                        "res/actions/forceTourne.png")
@@ -171,9 +171,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("X position of the center"))
             .AddParameter("expression", _("Y position of the center"))
-            .AddParameter("expression", _("Speed ( in Degrees per seconds )"))
-            .AddParameter("expression", _("Distance ( in pixels )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("expression", _("Speed (in Degrees per seconds)"))
+            .AddParameter("expression", _("Distance (in pixels)"))
+            .AddParameter("expression", _("Damping (Default: 0)"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAround");
 
 
@@ -224,7 +224,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/layer.png")
 
             .AddParameter("object", _("Object"))
-            .AddParameter("layer", _("Put on the layer ( base layer if empty )")).SetDefaultValue("\"\"")
+            .AddParameter("layer", _("Put on the layer (base layer if empty)")).SetDefaultValue("\"\"")
             .codeExtraInformation.SetFunctionName("SetLayer");
 
 
@@ -381,7 +381,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         obj.AddCondition("AngleOfDisplacement",
                        _("Angle of moving"),
                        _("Compare the angle of displacement of an object"),
-                       _("The angle of displacement of _PARAM0_ is _PARAM1_ ( tolerance : _PARAM2_° )"),
+                       _("The angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"),
                        _("Displacement"),
                        "res/conditions/vitesse24.png",
                        "res/conditions/vitesse.png")
@@ -469,14 +469,14 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("objectPtr", _("Target Object"))
             .AddParameter("expression", _("Length in pixel"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("expression", _("Damping (Default: 0)"))
             .codeExtraInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 
 
         obj.AddAction("AddForceTourne",
                        _("Add a force so as to move around an object"),
                        _("Add a force to an object so as it rotates around another.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
-                       _("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_°/sec and _PARAM3_ pixels away"),
+                       _("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_ deg/sec and _PARAM3_ pixels away"),
                        _("Displacement"),
                        "res/actions/forceTourne24.png",
                        "res/actions/forceTourne.png")
@@ -485,14 +485,14 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectPtr", _("Rotate around this object"))
             .AddParameter("expression", _("Speed ( Degrees per second )"))
             .AddParameter("expression", _("Distance ( in pixel )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("expression", _("Damping (Default: 0)"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 
 
         obj.AddAction("MettreAutour",
                        _("Put an object around another"),
                        _("Position an object around another, with the specified angle and distance."),
-                       _("Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_° and _PARAM2_ pixels distance."),
+                       _("Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_ degrees and _PARAM2_ pixels distance."),
                        _("Position"),
                        "res/actions/positionAutour24.png",
                        "res/actions/positionAutour.png")

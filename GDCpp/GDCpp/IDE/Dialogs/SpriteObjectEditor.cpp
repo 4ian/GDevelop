@@ -34,7 +34,7 @@
 #include "GDCpp/Project.h"
 #include "GDCpp/ResourcesManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #include <wx/msw/uxtheme.h>
@@ -179,9 +179,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	toolbar->AddTool(ID_MASKITEM, _("Edit the collision masks ( Hit boxes )"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the collision masks ( Hit boxes )"), wxEmptyString, NULL);
 	toolbar->AddTool(ID_POINTSITEM, _("Edit the image\'s point"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the image\'s point"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Item label"), gd::CommonBitmapManager::GetInstance()->preview16, wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Preview"), gd::SkinHelper::GetIcon("preview", 16), wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Help"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Help"), gd::SkinHelper::GetIcon("help", 16), wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
 	toolbar->Realize();
 	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager1->Update();
@@ -216,8 +216,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	Panel2 = new wxPanel(animationsPanel, ID_PANEL11, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL11"));
 	AuiManager4 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
 	animationToolbar = new wxAuiToolBar(Panel2, ID_AUITOOLBAR4, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	animationToolbar->AddTool(ID_AUITOOLBARITEM5, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, _("Add an animation"), wxEmptyString, NULL);
-	animationToolbar->AddTool(ID_AUITOOLBARITEM8, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, _("Delete an animation"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM5, _("Item label"), gd::SkinHelper::GetIcon("add", 16), wxNullBitmap, wxITEM_NORMAL, _("Add an animation"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM8, _("Item label"), gd::SkinHelper::GetIcon("remove", 16), wxNullBitmap, wxITEM_NORMAL, _("Delete an animation"), wxEmptyString, NULL);
 	animationToolbar->AddSeparator();
 	animationToolbar->AddTool(ID_TOOLLOOP, _("De/activate loop"), wxBitmap(wxImage(_T("res/repeat.png"))), wxNullBitmap, wxITEM_CHECK, _("De/activate loop"), wxEmptyString, NULL);
 	animationToolbar->AddTool(ID_AUITOOLBARITEM10, _("Item label"), wxBitmap(wxImage(_T("res/time16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Time between each images"), wxEmptyString, NULL);
@@ -254,11 +254,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM11, _("Item label"), wxBitmap(wxImage(_T("res/addvertice.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
-	maskToolbar->AddTool(ID_AUITOOLBARITEM7, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	maskToolbar->AddTool(ID_AUITOOLBARITEM7, _("Item label"), gd::SkinHelper::GetIcon("remove", 16), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM1, _("Go back to default mask"), gd::CommonBitmapManager::GetInstance()->defaultMask16, wxNullBitmap, wxITEM_NORMAL, _("Go back to default mask"), wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
-	maskToolbar->AddTool(ID_MASKAPPLYWHOLEANIMITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
+	maskToolbar->AddTool(ID_MASKAPPLYWHOLEANIMITEM, _("Item label"), gd::SkinHelper::GetIcon("copy", 16), wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->Realize();
 	AuiManager3->AddPane(maskToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager3->Update();
@@ -276,10 +276,10 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	Panel1 = new wxPanel(pointsPanel, ID_PANEL7, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL7"));
 	AuiManager2 = new wxAuiManager(Panel1, wxAUI_MGR_DEFAULT);
 	pointToolbar = new wxAuiToolBar(Panel1, ID_AUITOOLBAR2, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	pointToolbar->AddTool(ID_AUITOOLBARITEM3, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
-	pointToolbar->AddTool(ID_DELETEPOINTITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	pointToolbar->AddTool(ID_AUITOOLBARITEM3, _("Item label"), gd::SkinHelper::GetIcon("add", 16), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	pointToolbar->AddTool(ID_DELETEPOINTITEM, _("Item label"), gd::SkinHelper::GetIcon("remove", 16), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	pointToolbar->AddSeparator();
-	pointToolbar->AddTool(ID_POINTAPPLYWHOLEANIMITEM, _("Apply the changes to the whole animation"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, _("Apply changes to the whole animation"), wxEmptyString, NULL);
+	pointToolbar->AddTool(ID_POINTAPPLYWHOLEANIMITEM, _("Apply the changes to the whole animation"), gd::SkinHelper::GetIcon("copy", 16), wxNullBitmap, wxITEM_CHECK, _("Apply changes to the whole animation"), wxEmptyString, NULL);
 	pointToolbar->Realize();
 	AuiManager2->AddPane(pointToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager2->Update();
@@ -305,16 +305,16 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	animationsMenu.Append(MenuItem8);
 	animationsMenu.AppendSeparator();
 	MenuItem1 = new wxMenuItem((&animationsMenu), ID_MENUITEM1, _("Add an animation"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
+	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	animationsMenu.Append(MenuItem1);
 	animationsMenu.AppendSeparator();
 	deleteItem = new wxMenuItem((&animationsMenu), ID_MENUITEM2, _("Delete"), wxEmptyString, wxITEM_NORMAL);
-	deleteItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->remove16);
+	deleteItem->SetBitmap(gd::SkinHelper::GetIcon("remove", 16));
 	animationsMenu.Append(deleteItem);
 	MenuItem3 = new wxMenuItem((&animationsMenu), ID_MENUITEM3, _("Rename"), wxEmptyString, wxITEM_NORMAL);
 	animationsMenu.Append(MenuItem3);
 	MenuItem4 = new wxMenuItem((&imagesMenu), ID_MENUITEM7, _("Add an image from a file"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
+	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	imagesMenu.Append(MenuItem4);
 	MenuItem9 = new wxMenuItem((&imagesMenu), ID_MENUITEM11, _("Add from the image bank"), wxEmptyString, wxITEM_NORMAL);
 	imagesMenu.Append(MenuItem9);
@@ -322,10 +322,10 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	removeImageItem = new wxMenuItem((&imagesMenu), ID_MENUITEM8, _("Remove\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	imagesMenu.Append(removeImageItem);
 	moveLeftItem = new wxMenuItem((&imagesMenu), ID_MENUITEM9, _("Move left\tJ"), wxEmptyString, wxITEM_NORMAL);
-	moveLeftItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->left16);
+	moveLeftItem->SetBitmap(gd::SkinHelper::GetIcon("left", 16));
 	imagesMenu.Append(moveLeftItem);
 	moveRightItem = new wxMenuItem((&imagesMenu), ID_MENUITEM10, _("Move right\tK"), wxEmptyString, wxITEM_NORMAL);
-	moveRightItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->right16);
+	moveRightItem->SetBitmap(gd::SkinHelper::GetIcon("right", 16));
 	imagesMenu.Append(moveRightItem);
 	MenuItem5 = new wxMenuItem((&maskMenu), ID_POSITIONMASKITEM, _("Position"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem5);
@@ -337,7 +337,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	previewTimer.SetOwner(this, ID_TIMER1);
 	previewTimer.Start(50, false);
 	MenuItem10 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM12, _("Add an image from a file"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem10->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
+	MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	emptyImagesMenu.Append(MenuItem10);
 	MenuItem11 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM13, _("Add from the image bank"), wxEmptyString, wxITEM_NORMAL);
 	emptyImagesMenu.Append(MenuItem11);
@@ -483,11 +483,6 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
-
-	if ( game.GetCurrentPlatform().GetName() == "Game Develop JS platform" )
-    {
-        toolbar->EnableTool(ID_MASKITEM, false);
-    }
 
 	toolbar->Realize(); //Toolbars need to be realized again under Linux.
 	animationToolbar->Realize();

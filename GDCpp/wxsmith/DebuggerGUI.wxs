@@ -175,7 +175,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="deleteBt" member="yes">
-														<bitmap>res/deleteicon.png</bitmap>
+														<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 														<tooltip>Delete this object</tooltip>
 														<handler function="OndeleteBtClick" entry="EVT_BUTTON" />
 													</object>

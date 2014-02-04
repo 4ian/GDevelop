@@ -118,7 +118,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         AddCondition("Or",
                    _("Or"),
                    _("Return true if one of the sub conditions is true"),
-                   _("If one of these conditions is true :"),
+                   _("If one of these conditions is true:"),
                    _("Advanced"),
                    "res/conditions/or24.png",
                    "res/conditions/or.png")
@@ -149,7 +149,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         AddCondition("And",
                    _("And"),
                    _("Return true if all sub conditions are true"),
-                   _("If all of these conditions are true :"),
+                   _("If all of these conditions are true:"),
                    _("Advanced"),
                    "res/conditions/and24.png",
                    "res/conditions/and.png")
@@ -199,7 +199,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         AddCondition("Not",
                    _("No"),
                    _("Return the contrary of the result of the sub conditions"),
-                   _("Invert the logical result of these conditions :"),
+                   _("Invert the logical result of these conditions:"),
                    _("Advanced"),
                    "res/conditions/not24.png",
                    "res/conditions/not.png")
@@ -281,7 +281,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 if ( project.HasExternalEventsNamed(event.GetTarget()) )
                 {
                     gd::ExternalEvents & linkedExternalEvents = project.GetExternalEvents(event.GetTarget());
-                    
+
                     //...and check if the external events can be compiled separately
                     DependenciesAnalyzer analyzer(project, linkedExternalEvents);
                     if (analyzer.ExternalEventsCanBeCompiledForAScene() == scene.GetName()) //Check if the link refers to events
@@ -627,7 +627,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                         else
                             ++i;
                     }
-                    
+
                     if ( realObjects.empty() ) return "";
 
                     outputCode += "std::vector<RuntimeObject*> functionObjects;";

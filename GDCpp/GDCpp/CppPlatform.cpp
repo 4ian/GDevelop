@@ -6,6 +6,7 @@
 #include "GDCpp/CppPlatform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/IDE/Exporter.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/ExtensionBase.h"
@@ -40,8 +41,7 @@
 #include "GDCpp/Object.h"
 #include "GDCpp/CommonTools.h"
 
-#if defined(GD_IDE_ONLY)
-#include <wx/intl.h>
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/config.h>
 #include <wx/filename.h>
 #endif
@@ -55,7 +55,7 @@ ChangesNotifier CppPlatform::changesNotifier;
 CppPlatform::CppPlatform() :
     gd::Platform()
 {
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //Events compiler setup
     cout << "* Setting up events compiler..." << endl;
     CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
@@ -117,7 +117,7 @@ bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platform
         runtimeObjDestroyFunctionTable[objectsTypes[i]] = extension->GetDestroyRuntimeObjectFunction(objectsTypes[i]);
     }
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //And Add include directories
     for (unsigned int i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
         CodeCompiler::GetInstance()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
@@ -146,10 +146,12 @@ std::string CppPlatform::GetDescription() const
     return ToString(_("Allows to create 2D games which can be compiled and played on Windows or Linux."));
 }
 
+#if !defined(GD_NO_WX_GUI)
 boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
 }
+#endif
 
 boost::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
 {
@@ -158,8 +160,10 @@ boost::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
 
 void CppPlatform::OnIDEClosed()
 {
+#if !defined(GD_NO_WX_GUI)
     if ( CodeCompiler::GetInstance()->MustDeleteTemporaries() )
         CodeCompiler::GetInstance()->ClearOutputDirectory();
+#endif
 
     SoundManager::GetInstance()->DestroySingleton();
     FontManager::GetInstance()->DestroySingleton();
@@ -186,6 +190,7 @@ void CppPlatform::DestroySingleton()
 #include "GDCore/PlatformDefinition/Platform.cpp"
 #endif
 
+#if !defined(EMSCRIPTEN)
 /**
  * Used by Game Develop to create the platform class
  */
@@ -199,3 +204,4 @@ extern "C" gd::Platform * GD_API CreateGDPlatform() {
 extern "C" void GD_API DestroyGDPlatform() {
     CppPlatform::DestroySingleton();
 }
+#endif

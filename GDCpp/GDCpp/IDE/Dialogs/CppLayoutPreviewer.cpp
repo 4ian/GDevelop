@@ -2,14 +2,15 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <iostream>
 #include <wx/dcclient.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/filename.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/scrolbar.h>
 #include <wx/config.h>
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -60,7 +61,7 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
     reloadingIconImage.loadFromFile("res/compile128.png");
     reloadingIconSprite.setTexture(reloadingIconImage);
     reloadingText.setColor(sf::Color(0,0,0,128));
-    reloadingText.setString(string(_("Compiling...").mb_str()));
+    reloadingText.setString(_("Compiling..."));
     reloadingText.setCharacterSize(40);
     reloadingText.setFont(*FontManager::GetInstance()->GetFont(""));
 
@@ -218,7 +219,7 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     if ( !previewScene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(editor.GetLayout().GetCompiledEventsFile(),
                                                                         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(editor.GetLayout().GetName())) )
     {
-        wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")
+        gd::LogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")
                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
         editor.GoToEditingState();
 

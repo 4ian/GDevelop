@@ -4,6 +4,7 @@
  */
 
 #include <cstring>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/Automatism.h"
@@ -13,9 +14,6 @@
 #include "GDCpp/Polygon.h"
 #include <SFML/System.hpp>
 #include <iostream>
-#if defined(GD_IDE_ONLY)
-#include <wx/intl.h>
-#endif
 
 using namespace std;
 

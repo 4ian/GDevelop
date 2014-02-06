@@ -7,11 +7,9 @@
 #define PLATFORM_H
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/IDE/ChangesNotifier.h"
-#if defined(GD_IDE_ONLY)
-#include <wx/intl.h>
-#endif
 namespace gd { class Automatism; }
 namespace gd { class Object; }
 class RuntimeObject;
@@ -67,10 +65,12 @@ public:
      */
     virtual ChangesNotifier & GetChangesNotifier() const { return changesNotifier; };
 
+#if !defined(GD_NO_WX_GUI)
     /**
      * \brief Preview can be done directly inside the editor thanks to CppLayoutPreviewer
      */
     virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+#endif
 
     /**
      * \brief Expose to the IDE how to export games.
@@ -95,15 +95,17 @@ public:
      **/
     static void DestroySingleton();
 
-private:
     CppPlatform();
     virtual ~CppPlatform() {};
+private:
 
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
     std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
 #if defined(GD_IDE_ONLY)
     static ChangesNotifier changesNotifier;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap icon32;
+#endif
 #endif
 
     static CppPlatform * singleton;

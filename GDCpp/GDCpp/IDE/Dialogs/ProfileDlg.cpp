@@ -3,11 +3,11 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ProfileDlg.h"
 
 //(*InternalHeaders(ProfileDlg)
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
 #undef CreateDialog //Thanks windows.h

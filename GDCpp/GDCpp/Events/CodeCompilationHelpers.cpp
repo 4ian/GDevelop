@@ -3,7 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "CodeCompilationHelpers.h"
 
@@ -15,9 +15,10 @@
 #include <wx/filename.h>
 #include <wx/datetime.h>
 
-#include "GDCpp/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCpp/Scene.h"
-#include "GDCpp/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
@@ -277,7 +278,7 @@ bool EventsCodeCompilerPreWork::Execute()
         return true;
     }
 
-    Game gameCopy = *game;
+    gd::Project gameCopy = *game;
     Scene sceneCopy = *scene;
 
     //Generate the code
@@ -318,7 +319,7 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
         return true;
     }
 
-    Game gameCopy = *game;
+    gd::Project gameCopy = *game;
     Scene sceneCopy = *scene;
 
     //Generate the code
@@ -418,7 +419,7 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
         return true;
     }
 
-    Game gameCopy = *game;
+    gd::Project gameCopy = *game;
     gd::ExternalEvents eventsCopy = *externalEvents;
 
     //Generate the code
@@ -493,7 +494,7 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
         return true;
     }
 
-    Game gameCopy = *game;
+    gd::Project gameCopy = *game;
     gd::ExternalEvents eventsCopy = *externalEvents;
 
     //Generate the code

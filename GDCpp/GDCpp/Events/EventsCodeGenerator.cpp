@@ -33,26 +33,26 @@ std::string EventsCodeGenerator::GenerateObjectFunctionCall(std::string objectLi
 {
     bool castNeeded = !objMetadata.className.empty();
 
-    if ( codeInfo.staticFunction ) 
+    if ( codeInfo.staticFunction )
     {
         if ( !castNeeded )
             return "(RuntimeObject::"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "("+objMetadata.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";   
+            return "("+objMetadata.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
     else if ( context.GetCurrentObject() == objectListName && !context.GetCurrentObject().empty())
     {
         if ( !castNeeded )
             return "("+ManObjListName(objectListName)+"[i]->"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "(static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[i])->"+codeInfo.functionCallName+"("+parametersStr+"))";   
+            return "(static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[i])->"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
     else
     {
         if ( !castNeeded )
             return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ ManObjListName(objectListName)+"[0]->"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[0])->"+codeInfo.functionCallName+"("+parametersStr+"))";        
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+objMetadata.className+"*>("+ManObjListName(objectListName)+"[0])->"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
 }
 
@@ -66,19 +66,19 @@ std::string EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(std::strin
 {
     bool castNeeded = !autoInfo.className.empty();
 
-    if ( codeInfo.staticFunction ) 
+    if ( codeInfo.staticFunction )
     {
         if ( !castNeeded )
             return "(gd::Automatism::"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "("+autoInfo.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";   
+            return "("+autoInfo.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
     else if ( context.GetCurrentObject() == objectListName && !context.GetCurrentObject().empty())
     {
         if ( !castNeeded )
             return "("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";        
+            return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
     else
     {
@@ -498,7 +498,9 @@ EventsCodeGenerator::~EventsCodeGenerator()
 
 void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & listEvent )
 {
+    #if !defined(GD_NO_WX_GUI) //No support for profiling when wxWidgets is disabled.
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
+    #endif
 
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
@@ -507,6 +509,7 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
             if ( listEvent[i]->CanHaveSubEvents() )
                 PreprocessEventList( listEvent[i]->GetSubEvents());
 
+            #if !defined(GD_NO_WX_GUI) //No support for profiling when wxWidgets is disabled.
             if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && listEvent[i]->IsExecutable() )
             {
                 //Define a new profile event
@@ -520,9 +523,11 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
                 previousProfileEvent = profileEvent;
                 ++i; //Don't preprocess the newly added profile event
             }
+            #endif
         }
     }
 
+    #if !defined(GD_NO_WX_GUI) //No support for profiling when wxWidgets is disabled.
     if ( !listEvent.empty() && scene.GetProfiler() && scene.GetProfiler()->profilingActivated )
     {
         //Define a new profile event
@@ -532,6 +537,7 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
         //Add it at the end of the events list
         listEvent.push_back(profileEvent);
     }
+    #endif
 }
 
 #endif

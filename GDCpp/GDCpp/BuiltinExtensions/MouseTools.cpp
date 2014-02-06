@@ -35,6 +35,9 @@ void GD_API ShowCursor( RuntimeScene & scene )
 
 double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
+    if (scene.GetRuntimeLayer(layer).GetCameraCount() == 0) return 0;
+    if (camera >= scene.GetRuntimeLayer(layer).GetCameraCount()) camera = 0;
+
     //Get view, and compute mouse position
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), view).x;
@@ -42,6 +45,9 @@ double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & laye
 
 double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
+    if (scene.GetRuntimeLayer(layer).GetCameraCount() == 0) return 0;
+    if (camera >= scene.GetRuntimeLayer(layer).GetCameraCount()) camera = 0;
+
     //Get view, and compute mouse position
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), view).y;

@@ -1,4 +1,5 @@
-#if defined(GD_IDE_ONLY)
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #ifndef EXECUTABLEICONCHANGER_H
 #define EXECUTABLEICONCHANGER_H
@@ -24,4 +25,3 @@ class GD_API ExecutableIconChanger
 
 #endif // EXECUTABLEICONCHANGER_H
 #endif
-

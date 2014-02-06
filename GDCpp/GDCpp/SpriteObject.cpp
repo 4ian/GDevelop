@@ -3,10 +3,11 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/SpriteObject.h"
 #include "GDCpp/Animation.h"
 #include "GDCpp/Project.h"
@@ -28,10 +29,9 @@
 #include "GDCpp/IDE/Dialogs/SpriteObjectEditor.h"
 #endif
 
-sf::Sprite RuntimeSpriteObject::badSprite;
 Animation RuntimeSpriteObject::badAnimation;
 Animation SpriteObject::badAnimation;
-Sprite RuntimeSpriteObject::badSpriteDatas;
+Sprite * RuntimeSpriteObject::badSpriteDatas = NULL;
 
 SpriteObject::SpriteObject(std::string name_) :
     Object(name_)
@@ -63,6 +63,8 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
     colorV( 255 ),
     colorB( 255 )
 {
+    if (!badSpriteDatas) badSpriteDatas = new Sprite();
+
     const SpriteObject & spriteObject = static_cast<const SpriteObject&>(object);
     animations = spriteObject.GetAllAnimations();
 
@@ -218,6 +220,7 @@ sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instan
 
 bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     //Generate a thumbnail from the first animation
     if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
     {
@@ -233,6 +236,7 @@ bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thu
             return true;
         }
     }
+#endif
 
     return false;
 }
@@ -251,8 +255,10 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     SpriteObjectEditor dialog( parent, dynamic_cast<Game&>(project), *this, mainFrameWrapper );
     dialog.ShowModal();
+#endif
 }
 
 
@@ -503,7 +509,7 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
 {
     bool multipleDirections = false;
     if ( currentAnimation >= animations.size() )
-        ptrToCurrentSprite = &badSpriteDatas;
+        ptrToCurrentSprite = badSpriteDatas;
     else
     {
         Animation & animation = animations[currentAnimation].GetNonConst();
@@ -511,12 +517,12 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
 
         unsigned int directionIndex = multipleDirections ? currentDirection : 0;
         if ( directionIndex >= animation.GetDirectionsNumber() )
-            ptrToCurrentSprite = &badSpriteDatas;
+            ptrToCurrentSprite = badSpriteDatas;
         else
         {
             Direction & direction = animation.GetDirectionToModify(directionIndex);
             if ( currentSprite >= direction.GetSpriteCount())
-                ptrToCurrentSprite = &badSpriteDatas;
+                ptrToCurrentSprite = badSpriteDatas;
             else
                 ptrToCurrentSprite = &direction.GetSprite(currentSprite);
         }

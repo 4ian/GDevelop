@@ -13,8 +13,6 @@
 
 using namespace std;
 
-Sprite Direction::badSprite;
-
 Direction::Direction() :
 loop(false),
 timeBetweenFrame(1)
@@ -39,18 +37,12 @@ void Direction::AddSprite( const Sprite & sprite )
 
 const Sprite & Direction::GetSprite(unsigned int nb) const
 {
-    if ( nb < sprites.size() )
-        return sprites[nb];
-
-    return badSprite;
+    return sprites[nb];
 }
 
 Sprite & Direction::GetSprite(unsigned int nb)
 {
-    if ( nb < sprites.size() )
-        return sprites[nb];
-
-    return badSprite;
+    return sprites[nb];
 }
 
 void Direction::RemoveSprite(unsigned int index)
@@ -68,13 +60,10 @@ void Direction::SwapSprites(unsigned int firstSpriteIndex, unsigned int secondSp
 void OpenPoint(Point & point, const TiXmlElement * elemPoint)
 {
     if ( elemPoint->Attribute( "nom" ) != NULL ) { point.SetName(elemPoint->Attribute( "nom" ));}
-    else { cout <<( "Les informations concernant le nom d'un point d'un sprite manquent." ); }
 
     if ( elemPoint->Attribute( "X" ) != NULL ) { int value; elemPoint->QueryIntAttribute("X", &value); point.SetX(value);}
-    else { cout <<( "Les informations concernant la coordonnée X d'un point d'un sprite manquent." ); }
 
     if ( elemPoint->Attribute( "Y" ) != NULL ) { int value; elemPoint->QueryIntAttribute("Y", &value); point.SetY(value);}
-    else { cout <<( "Les informations concernant la coordonnée Y d'un point d'un sprite manquent." ); }
 
 }
 

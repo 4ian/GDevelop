@@ -2,9 +2,10 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h> //Must be placed first
 #endif
+#include "GDCore/Tools/Log.h"
 #include "GDCpp/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/BuiltinExtensions/CommonInstructionsTools.h"
@@ -185,9 +186,9 @@ bool GD_API GlobalVariableExists(RuntimeScene & scene, const std::string & varia
     return scene.game->GetVariables().Has(variable);
 }
 
-gd::Variable & GD_API ReturnVariable(gd::Variable & variable) 
-{ 
-    return variable; 
+gd::Variable & GD_API ReturnVariable(gd::Variable & variable)
+{
+    return variable;
 };
 
 bool GD_API VariableChildExists(const gd::Variable & variable, const std::string & childName)
@@ -200,14 +201,14 @@ void GD_API VariableRemoveChild(gd::Variable & variable, const std::string & chi
     variable.RemoveChild(childName);
 }
 
-double GD_API GetVariableValue(const gd::Variable & variable) 
-{ 
-    return variable.GetValue(); 
+double GD_API GetVariableValue(const gd::Variable & variable)
+{
+    return variable.GetValue();
 };
 
-const std::string& GD_API GetVariableString(const gd::Variable & variable) 
-{ 
-    return variable.GetString(); 
+const std::string& GD_API GetVariableString(const gd::Variable & variable)
+{
+    return variable.GetString();
 };
 
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
@@ -337,6 +338,7 @@ void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable )
 #if defined(GD_IDE_ONLY)
 bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
 {
+    #if !defined(GD_NO_WX_GUI)
     if (wxMessageBox(_("A \"While\" event was repeated 100000 times: You may have created an infinite loop, which is repeating itself indefinitely and which is going to freeze the software.\n"
                        "\n"
                        "If you want to stop the preview to correct the issue, click on Yes.\n"
@@ -348,6 +350,9 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
         scene.running = false;
         return true;
     }
+    #else
+    gd::LogWarning("While event repeated 100000 times!");
+    #endif
 
     return false;
 }

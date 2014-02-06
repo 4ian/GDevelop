@@ -3,7 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be include first otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <sstream>
@@ -32,6 +32,8 @@
 #include "GDCpp/Text.h"
 #include "GDCpp/ManualTimer.h"
 #include "GDCpp/CppPlatform.h"
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Log.h"
 
 #include "GDCpp/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
@@ -42,8 +44,6 @@
 #endif
 #include "GDCpp/ExtensionBase.h"
 #undef GetObject //Disable an annoying macro
-#undef _
-#define _(s) wxGetTranslation((s))
 
 RuntimeLayer RuntimeScene::badRuntimeLayer;
 

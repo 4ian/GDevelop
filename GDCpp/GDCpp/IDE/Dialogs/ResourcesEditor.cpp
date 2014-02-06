@@ -3,7 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
 #ifdef __WXMSW__
@@ -12,7 +12,7 @@
 
 //(*InternalHeaders(ResourcesEditor)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -23,7 +23,7 @@
 #include <wx/msgdlg.h>
 #include <wx/aui/aui.h>
 #include <wx/settings.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/filedlg.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
@@ -354,7 +354,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {
-        wxLogStatus( _( "Adding images" ) );
+        gd::LogStatus( _( "Adding images" ) );
 
         wxArrayString files;
         FileDialog.GetPaths( files );
@@ -367,7 +367,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
         AddResources(filenames);
 
-        wxLogStatus( _( "Resources successfully added" ) );
+        gd::LogStatus( _( "Resources successfully added" ) );
     }
 
 }
@@ -386,7 +386,7 @@ std::vector<std::string> ResourcesEditor::CopyAndAddResources(std::vector<std::s
             wxString name = wxFileName::FileName(filenames[i]).GetFullName();
             wxFileName destinationFile = wxFileName::FileName(destinationDir.GetPath()+"/"+name);
 
-            wxLogStatus( _( "Copy of" ) + " " + name );
+            gd::LogStatus( gd::ToString(_( "Copy of" ) + " " + name) );
 
             //Copy the resource
             wxCopyFile(filenames[i], destinationFile.GetFullPath(), true);
@@ -422,7 +422,7 @@ std::vector<std::string> ResourcesEditor::AddResources(const std::vector<std::st
             file.MakeRelativeTo(projectDirectory);
 
         std::string name = gd::ToString(file.GetFullName());
-        wxLogStatus( _( "Adding " ) + name );
+        gd::LogStatus( _( "Adding " ) + name );
 
         //Add to all images
         if ( project.GetResourcesManager().AddResource(name, gd::ToString(file.GetFullPath())) )
@@ -448,7 +448,7 @@ std::vector<std::string> ResourcesEditor::AddResources(const std::vector<std::st
 
     if ( !alreadyExistingResources.empty() )
     {
-        wxLogMessage(wxString(_("Some images in the list have already the same name, and have not been added:")+"\n"+alreadyExistingResources));
+        gd::LogMessage(gd::ToString(_("Some images in the list have already the same name, and have not been added:")+"\n"+alreadyExistingResources));
     }
 
     return resourceNames;
@@ -480,7 +480,7 @@ void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)
         resourcesTree->Delete(m_itemSelected);
     }
     else
-        wxLogStatus( _( "No image selected" ) );
+        gd::LogStatus( _( "No image selected" ) );
 }
 
 /**
@@ -562,7 +562,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
         }
         else
         {
-            wxLogStatus( _( "No image selected" ) );
+            gd::LogStatus( _( "No image selected" ) );
         }
     }
 }
@@ -578,7 +578,7 @@ void ResourcesEditor::OnModNameImageBtClick( wxCommandEvent& event )
     }
     else
     {
-        wxLogStatus( _( "No image selected" ) );
+        gd::LogStatus( _( "No image selected" ) );
     }
 }
 
@@ -693,7 +693,7 @@ void ResourcesEditor::UpdatePropertyGrid()
     {
         if ( !selection.empty() )
         {
-            propertyGrid->SetPropertyValue(nameProperty, _("(Multiple values)"));
+            propertyGrid->SetPropertyValue(nameProperty, wxString(_("(Multiple values)")));
             propertyGrid->SetPropertyReadOnly(nameProperty);
         }
     }
@@ -716,7 +716,7 @@ void ResourcesEditor::UpdatePropertyGrid()
                 //If one of the selected resource has no file, mark the file field as N/A.
                 if ( !resource.UseFile() )
                 {
-                    propertyGrid->SetPropertyValue(fileProperty, _("N/A"));
+                    propertyGrid->SetPropertyValue(fileProperty, wxString(_("N/A")));
                     propertyGrid->SetPropertyReadOnly(fileProperty);
                     break;
                 }
@@ -726,7 +726,7 @@ void ResourcesEditor::UpdatePropertyGrid()
                         propertyGrid->SetPropertyValue(fileProperty, wxString(resource.GetFile()));
                     else
                     {
-                        propertyGrid->SetPropertyValue(fileProperty, _("(Multiple values)"));
+                        propertyGrid->SetPropertyValue(fileProperty, wxString(_("(Multiple values)")));
                         propertyGrid->SetPropertyReadOnly(fileProperty);
                         break;
                     }
@@ -748,8 +748,8 @@ void ResourcesEditor::UpdatePropertyGrid()
                 {
                     //It is assumed that the description and the user friendly name
                     //are the same for all the properties with the same name.
-                    wxString propertyUserFriendlyName;
-                    wxString propertyDescription;
+                    std::string propertyUserFriendlyName;
+                    std::string propertyDescription;
                     project.GetResourcesManager().GetResource(data->GetSecondString()).GetPropertyInformation(project, commonProperties[j], propertyUserFriendlyName, propertyDescription);
                     propertyGrid->SetPropertyLabel(property, propertyUserFriendlyName);
                     propertyGrid->SetPropertyHelpString(property, propertyDescription);
@@ -828,7 +828,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
             {
                 if ( project.GetResourcesManager().HasResource(propertyNewValue) )
                 {
-                    wxLogWarning( _( "Unable to rename the image : another image has already this name." ) );
+                    gd::LogWarning( _( "Unable to rename the image : another image has already this name." ) );
                     event.Veto();
                     return;
                 }
@@ -841,7 +841,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
             {
                 if ( project.GetResourcesManager().HasFolder(propertyNewValue) )
                 {
-                    wxLogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
+                    gd::LogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
                     event.Veto();
                     return;
                 }
@@ -890,7 +890,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( project.GetResourcesManager().HasFolder(newName) )
             {
-                wxLogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
+                gd::LogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
                 event.Veto();
                 return;
             }
@@ -904,7 +904,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( project.GetResourcesManager().HasResource(newName) )
             {
-                wxLogWarning( _( "Unable to rename the image : another image has already this name." ) );
+                gd::LogWarning( _( "Unable to rename the image : another image has already this name." ) );
                 event.Veto();
                 return;
             }

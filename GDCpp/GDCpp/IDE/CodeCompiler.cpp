@@ -2,19 +2,20 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "CodeCompiler.h"
 #include <SFML/System.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/Scene.h"
-#include <wx/log.h>
 #include <wx/filename.h>
 #include <wx/filefn.h>
 #include <wx/txtstrm.h>
+#include "GDCpp/CommonTools.h"
+#include "GDCpp/Scene.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -294,7 +295,7 @@ void CodeCompiler::StartTheNextTask()
     currentTaskProcess->Redirect();
     if ( wxExecute(currentTask.compilerCall.GetFullCall(), wxEXEC_ASYNC, currentTaskProcess) == 0 )
     {
-        wxLogError(_("Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every file needed are present."));
+        gd::LogError(_("Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every file needed are present."));
         delete currentTaskProcess;
         currentTaskProcess = NULL;
     }

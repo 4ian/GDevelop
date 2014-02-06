@@ -3,13 +3,13 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "FullProjectCompiler.h"
 #include <fstream>
 #include <iostream>
 #include <wx/filefn.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/msgdlg.h>
 #include <wx/stopwatch.h>
 #include <wx/dir.h>
@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <wx/filename.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/Events/CodeCompilationHelpers.h"
 #include "GDCpp/DatFile.h"
@@ -32,7 +33,7 @@
 #include "GDCpp/Tools/AES.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/ExtensionBase.h"
-#include "GDCpp/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCpp/IDE/ExecutableIconChanger.h"
@@ -40,8 +41,6 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/CppPlatform.h"
-#undef _
-#define _(s) wxGetTranslation((s))
 
 using namespace std;
 using namespace gd;
@@ -128,6 +127,10 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
 
 void FullProjectCompiler::LaunchProjectCompilation()
 {
+#if defined(GD_NO_WX_GUI)
+    gd::LogError("BAD USE: FullProjectCompiler::LaunchProjectCompilation called but compilation is not supported when wxWidgets support is disabled");
+#else
+
     #if defined(WINDOWS)
         windowsTarget = true;
         linuxTarget = false;
@@ -304,7 +307,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
         aes_ks_t keySetting;
         aes_setks_encrypt(key, 192, &keySetting);
-        aes_cbc_encrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer), 
+        aes_cbc_encrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer),
             (uint8_t*)iv, size/AES_BLOCK_SIZE, &keySetting);
 
         ofile.write(obuffer,size);
@@ -573,6 +576,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnPercentUpdate(100);
 
     diagnosticManager.OnCompilationSuccessed();
+#endif
 }
 
 
@@ -581,6 +585,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
  */
 std::string FullProjectCompiler::GetTempDir()
 {
+#if !defined(GD_NO_WX_GUI)
     std::string tempDir = forcedTempDir;
     if ( tempDir.empty() ) //If the user has not forced a directory
     {
@@ -596,10 +601,12 @@ std::string FullProjectCompiler::GetTempDir()
     }
 
     return tempDir + "/GDDeploymentTemporaries";
+#endif
 }
 
 void FullProjectCompiler::ClearDirectory(std::string directory)
 {
+#if !defined(GD_NO_WX_GUI)
     if ( !wxDirExists( directory ) && !wxMkdir( directory ) )
             diagnosticManager.AddError(gd::ToString(_( "Unable to create directory:" ) + directory + "\n"));
 
@@ -611,6 +618,7 @@ void FullProjectCompiler::ClearDirectory(std::string directory)
 
         file = wxFindNextFile();
     }
+#endif
 }
 
 
@@ -641,4 +649,3 @@ void FullProjectCompilerConsoleDiagnosticManager::OnPercentUpdate(float percents
 
 }
 #endif
-

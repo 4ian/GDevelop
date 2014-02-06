@@ -3,7 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #ifndef CODECOMPILER_H
 #define CODECOMPILER_H
@@ -348,4 +348,3 @@ private:
 
 #endif // CODECOMPILER_H
 #endif
-

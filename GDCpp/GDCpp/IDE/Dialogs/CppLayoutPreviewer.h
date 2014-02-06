@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef SCENEEDITORCANVAS_H
 #define SCENEEDITORCANVAS_H
 #include <boost/shared_ptr.hpp>

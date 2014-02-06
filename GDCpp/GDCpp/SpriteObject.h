@@ -245,8 +245,7 @@ private:
     unsigned int colorB;
 
     //Null objects if need to return a bad object.
-    static sf::Sprite   badSprite;
-    static Sprite       badSpriteDatas;
+    static Sprite     * badSpriteDatas; ///< Used when no valid sprite can be displayed. Created when the first RuntimeSpriteObject is created
     static Animation    badAnimation;
 };
 

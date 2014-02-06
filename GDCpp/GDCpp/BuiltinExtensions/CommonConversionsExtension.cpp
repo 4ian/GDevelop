@@ -18,8 +18,6 @@ CommonConversionsExtension::CommonConversionsExtension()
         .AddParameter("string", _("Text to convert in a number"), "",false)
         .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToDouble").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
 
-
-
     AddStrExpression("ToString",
                        _("Number > Text"),
                        _("Convert the result of the expression in a text"),

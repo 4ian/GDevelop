@@ -4,7 +4,6 @@
  */
 
 #if defined(GD_IDE_ONLY)
-
 #ifndef BASEDEBUGGER_H
 #define BASEDEBUGGER_H
 #include <SFML/System.hpp>
@@ -35,4 +34,3 @@ class GD_API BaseDebugger
 
 #endif // BASEDEBUGGER_H
 #endif
-

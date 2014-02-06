@@ -37,7 +37,7 @@ void RuntimeVariablesContainer::Merge(const gd::VariablesContainer & container)
     {
         const std::pair<std::string, gd::Variable> & variable = container.Get(i);
 
-        if ( Has(variable.first) ) 
+        if ( Has(variable.first) )
             Get(variable.first) = variable.second;
         else
         {
@@ -53,7 +53,7 @@ gd::Variable & RuntimeVariablesContainer::Get(const std::string & name)
     std::map < std::string, gd::Variable* >::const_iterator var = variables.find(name);
 
     if ( var != variables.end() ) return *(var->second);
-    
+
     gd::Variable * newVariable = new gd::Variable;
     variables[name] = newVariable;
     return *newVariable;
@@ -64,7 +64,7 @@ const gd::Variable & RuntimeVariablesContainer::Get(const std::string & name) co
     std::map < std::string, gd::Variable* >::const_iterator var = variables.find(name);
 
     if ( var != variables.end() ) return *(var->second);
-    
+
     gd::Variable * newVariable = new gd::Variable;
     variables[name] = newVariable;
     return *newVariable;

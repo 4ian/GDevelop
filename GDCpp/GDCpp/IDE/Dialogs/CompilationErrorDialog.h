@@ -1,6 +1,11 @@
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef ERRORCOMPILATION_H
 #define ERRORCOMPILATION_H
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 //(*Headers(CompilationErrorDialog)
 #include <wx/sizer.h>

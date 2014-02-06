@@ -1,4 +1,4 @@
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "wxSFMLCanvas.hpp"
 #include <iostream>
@@ -56,7 +56,7 @@ wxControl(Parent, Id, Position, Size, Style)
         GdkWindow* win = widget->window;
         #endif
         XFlush(GDK_WINDOW_XDISPLAY(win));
-        
+
         //...and pass it to the sf::RenderWindow.
         #if GTK_CHECK_VERSION(3, 0, 0)
         sf::RenderWindow::create(GDK_WINDOW_XID(win));
@@ -96,7 +96,7 @@ void wxSFMLCanvas::OnIdle(wxIdleEvent&)
 {
     // Send a paint message when the control is idle, to ensure maximum framerate
     Refresh();
-    
+
     #if !defined(WINDOWS)
     event.RequestMore(); //On linux, we need to specify that we want continuous idle events
     #endif

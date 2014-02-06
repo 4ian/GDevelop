@@ -2,12 +2,12 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "SpriteObjectEditor.h"
 
 //(*InternalHeaders(SpriteObjectEditor)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -16,7 +16,7 @@
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
 #include <wx/richtooltip.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/config.h>
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
@@ -1141,7 +1141,7 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
         }
         else
         {
-            wxLogMessage(_("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
+            gd::LogMessage(_("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
             event.Veto();
         }
 
@@ -1809,7 +1809,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 {
-    wxLogMessage(_("Drag images from the image bank to add them to the animation."));
+    gd::LogMessage(_("Drag images from the image bank to add them to the animation."));
 }
 
 void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)

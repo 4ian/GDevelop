@@ -6,7 +6,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#if !defined(GD_NO_WX_GUI)
 #include <wx/datetime.h>
+#endif
 #include "ChangesNotifier.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -91,6 +93,7 @@ void ChangesNotifier::OnAutomatismDeleted(gd::Project & project, gd::Layout * la
 
 void ChangesNotifier::OnObjectVariablesChanged(gd::Project & game, gd::Layout * scene, gd::Object & object) const
 {
+    #if !defined(GD_NO_WX_GUI) //Compilation is not supported when wxWidgets support is disabled.
     if ( scene )
         scene->SetRefreshNeeded();
     else //Scene pointer is NULL: Update shared data of all scenes
@@ -105,10 +108,12 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & game, gd::Layout * 
             game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
         }
     }
+    #endif
 }
 
 void ChangesNotifier::OnEventsModified(gd::Project & game, gd::Layout & scene, bool indirectChange, std::string sourceOfTheIndirectChange) const
 {
+    #if !defined(GD_NO_WX_GUI) //Compilation is not supported when wxWidgets support is disabled.
     std::cout << "Changes occured inside " << scene.GetName() << "...";
 
     scene.SetRefreshNeeded();
@@ -133,10 +138,12 @@ void ChangesNotifier::OnEventsModified(gd::Project & game, gd::Layout & scene, b
             std::cout << "Recompilation asked for later." << std::endl;
         }
     }
+    #endif
 }
 
 void ChangesNotifier::OnEventsModified(gd::Project & game, gd::ExternalEvents & events, bool indirectChange, std::string sourceOfTheIndirectChange) const
 {
+    #if !defined(GD_NO_WX_GUI) //Compilation is not supported when wxWidgets support is disabled.
     DependenciesAnalyzer analyzer(game, events);
     std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
     bool externalEventsAreCompiledSeparately = !associatedScene.empty();
@@ -171,6 +178,7 @@ void ChangesNotifier::OnEventsModified(gd::Project & game, gd::ExternalEvents & 
             std::cout << "Recompilation triggered." << std::endl;
         }
     }
+    #endif
 }
 
 void ChangesNotifier::OnLayoutAdded(gd::Project & project, gd::Layout & layout) const
@@ -213,6 +221,7 @@ void ChangesNotifier::OnLayoutDeleted(gd::Project & project, const std::string d
 
 void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * scene) const
 {
+    #if !defined(GD_NO_WX_GUI) //Compilation is not supported when wxWidgets support is disabled.
     if ( scene )
     {
         //Notify the scene it has been changed...
@@ -248,6 +257,7 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
             game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
         }
     }
+    #endif
 }
 
 void ChangesNotifier::OnResourceModified(gd::Project & project, const std::string & resourceName) const

@@ -2,12 +2,12 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "DebuggerGUI.h"
 
 //(*InternalHeaders(DebuggerGUI)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -15,7 +15,7 @@
 #include <wx/image.h>
 #include <boost/weak_ptr.hpp>
 #include <wx/textdlg.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <string>
 #include <set>
 #include "GDCpp/CommonTools.h"
@@ -29,8 +29,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include <SFML/Graphics.hpp>
-#undef _
-#define _(s) wxGetTranslation((s))
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -586,7 +585,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
-            wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+            gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     //A specific property
@@ -601,7 +600,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
-            wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+            gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     else //Or a variable
@@ -663,7 +662,7 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
-        wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+        gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
     }
 }
 
@@ -700,7 +699,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
     if ( variableName == "" ) return;
     if ( scene.GetVariables().Has(variableName) )
     {
-        wxLogMessage(_("A variable with this name already exists!"));
+        gd::LogMessage(_("A variable with this name already exists!"));
         return;
     }
 
@@ -719,7 +718,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().Has(variableName) )
     {
-        wxLogMessage(_("A variable with this name already exists!"));
+        gd::LogMessage(_("A variable with this name already exists!"));
         return;
     }
 
@@ -747,7 +746,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     if ( newObject == boost::shared_ptr<RuntimeObject> () )
     {
-        wxLogWarning(_("Unable to create object."));
+        gd::LogWarning(_("Unable to create object."));
         return;
     }
 

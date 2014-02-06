@@ -137,12 +137,12 @@ public:
     /**
      * Return a reference to a camera
      */
-    inline const RuntimeCamera & GetCamera(unsigned int n) const { if ( n >= cameras.size() ) return badCamera; return cameras[n]; }
+    inline const RuntimeCamera & GetCamera(unsigned int n) const { return cameras[n]; }
 
     /**
      * Return a reference to a camera
      */
-    inline RuntimeCamera & GetCamera(unsigned int n) { if ( n >= cameras.size() ) return badCamera; return cameras[n]; }
+    inline RuntimeCamera & GetCamera(unsigned int n) { return cameras[n]; }
 
     /**
      * Delete a specific camera.
@@ -159,8 +159,6 @@ private:
     std::string name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
     std::vector < RuntimeCamera > cameras; ///< The camera displayed by the layer
-
-    static RuntimeCamera badCamera;
 };
 
 #endif // RUNTIMELAYER_H

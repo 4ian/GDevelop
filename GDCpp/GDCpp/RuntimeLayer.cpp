@@ -2,8 +2,6 @@
 #include "GDCpp/Layer.h"
 #include <SFML/Graphics.hpp>
 
-RuntimeCamera RuntimeLayer::badCamera;
-
 RuntimeLayer::RuntimeLayer(gd::Layer & layer, const sf::View & defaultView) :
     name(layer.GetName()),
     isVisible(layer.GetVisibility())

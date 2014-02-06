@@ -15,6 +15,7 @@
 #include "GDCore/Events/ObjectMetadata.h"
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 namespace gd { class Instruction; }
 namespace gd { class Layout; }
 namespace gd { class Object; }
@@ -33,20 +34,6 @@ class EventsCodeGenerator;
 typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
 typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
-#if defined(GD_IDE_ONLY)
-    #include <wx/intl.h>
-    //Ensure the wxWidgets macro "_" returns a std::string
-    #if defined(_)
-        #undef _
-    #endif
-    #define _(s) std::string(wxGetTranslation((s)).mb_str())
-#else
-    //Emulating wxWidgets internationalization macro
-    #ifndef _
-        #define _(x) x
-        #define wxT(x) x
-    #endif
-#endif
 
 /**
  * \brief Base class for C++ extensions.

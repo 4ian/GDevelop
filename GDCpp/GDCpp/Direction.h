@@ -50,14 +50,14 @@ public:
 
     /**
      * Return a reference to a sprite of the direction.
-     * \param nb The index of the sprite to be accessed. Bound checking is made.
+     * \param nb The index of the sprite to be accessed. Bound checking is not made.
      * \return A reference to the sprite.
      */
     const Sprite & GetSprite(unsigned int nb) const;
 
     /**
      * Return a reference to a sprite of the direction.
-     * \param nb The index of the sprite to be accessed. Bound checking is made.
+     * \param nb The index of the sprite to be accessed. Bound checking is not made.
      * \return A reference to the sprite.
      */
     Sprite & GetSprite(unsigned int nb);
@@ -104,8 +104,6 @@ private:
     bool loop;
     float timeBetweenFrame;
     vector < Sprite > sprites; ///< List of the sprite of the direction
-
-    static Sprite badSprite;
 };
 
 #endif // DIRECTION_H

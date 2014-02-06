@@ -15,4 +15,3 @@ void BaseDebugger::Update()
     }
 }
 #endif
-

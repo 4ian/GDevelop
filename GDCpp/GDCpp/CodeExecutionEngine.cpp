@@ -4,12 +4,12 @@
  */
 
 #include <iostream>
+#include "GDCore/Tools/Localization.h"
 #include "CodeExecutionEngine.h"
 #include "GDCpp/RuntimeContext.h"
 #include "GDCpp/DynamicLibrariesTools.h"
 #if defined(GD_IDE_ONLY)
-#include <wx/intl.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #endif
 
 CodeExecutionEngine::CodeExecutionEngine() :

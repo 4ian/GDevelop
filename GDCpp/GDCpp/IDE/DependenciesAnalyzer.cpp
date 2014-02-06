@@ -8,18 +8,18 @@
 #include "GDCpp/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
 
-DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::Layout & layout_) : 
-    project(project_), 
-    layout(&layout_), 
-    externalEvents(NULL) 
+DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::Layout & layout_) :
+    project(project_),
+    layout(&layout_),
+    externalEvents(NULL)
 {
     parentScenes.push_back(layout->GetName());
 }
 
-DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::ExternalEvents & externalEvents_) : 
-    project(project_), 
-    layout(NULL), 
-    externalEvents(&externalEvents_) 
+DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::ExternalEvents & externalEvents_) :
+    project(project_),
+    layout(NULL),
+    externalEvents(&externalEvents_)
 {
     parentExternalEvents.push_back(externalEvents->GetName());
 }
@@ -35,16 +35,13 @@ DependenciesAnalyzer::DependenciesAnalyzer(const DependenciesAnalyzer & parent) 
 
 bool DependenciesAnalyzer::Analyze()
 {
-    if (!layout && !externalEvents) 
-    {
-        std::cout << "ERROR: DependenciesAnalyzer called without any layout or external events.";
-        return false;
-    }
-
     if (layout)
         return Analyze(layout->GetEvents(), true);
     else if (externalEvents)
         return Analyze(externalEvents->GetEvents(), true);
+
+    std::cout << "ERROR: DependenciesAnalyzer called without any layout or external events.";
+    return false;
 }
 
 DependenciesAnalyzer::~DependenciesAnalyzer()
@@ -68,7 +65,7 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
                     return false; //Circular dependency!
 
                 externalEventsDependencies.insert(linked); //There is a direct dependency
-                if ( !isOnTopLevel ) notTopLevelExternalEventsDependencies.insert(linked); 
+                if ( !isOnTopLevel ) notTopLevelExternalEventsDependencies.insert(linked);
                 analyzer.AddParentExternalEvents(linked);
                 if ( !analyzer.Analyze(project.GetExternalEvents(linked).GetEvents(), isOnTopLevel) )
                     return false;
@@ -80,7 +77,7 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
                     return false; //Circular dependency!
 
                 scenesDependencies.insert(linked); //There is a direct dependency
-                if ( !isOnTopLevel ) notTopLevelScenesDependencies.insert(linked); 
+                if ( !isOnTopLevel ) notTopLevelScenesDependencies.insert(linked);
                 analyzer.AddParentScene(linked);
                 if ( !analyzer.Analyze(project.GetLayout(linked).GetEvents(), isOnTopLevel) )
                     return false;
@@ -105,7 +102,7 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
             sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
             sourceFilesDependencies.insert(cppCodeEvent->GetAssociatedGDManagedSourceFile(project));
         }
-        else if ( events[i]->CanHaveSubEvents() ) 
+        else if ( events[i]->CanHaveSubEvents() )
         {
             if ( !Analyze(events[i]->GetSubEvents(), false) )
                 return false;

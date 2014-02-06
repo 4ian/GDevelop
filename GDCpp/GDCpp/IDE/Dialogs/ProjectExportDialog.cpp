@@ -2,10 +2,10 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 //(*InternalHeaders(ProjectExportDialog)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -14,7 +14,7 @@
 #include <wx/image.h>
 #include <wx/bitmap.h>
 #include <wx/filefn.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/msgdlg.h>
 #include <wx/dir.h>
 #include <wx/help.h>

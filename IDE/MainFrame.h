@@ -32,7 +32,7 @@
 #include <map>
 #include <wx/fileconf.h>
 #include <wx/artprov.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

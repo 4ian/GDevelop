@@ -13,7 +13,7 @@
 #include <wx/event.h>
 #include <wx/config.h>
 #include <wx/dcbuffer.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <iostream>
 #include <utility>
 #include <algorithm>
@@ -1284,7 +1284,7 @@ void EventsEditor::AddEvent(gd::EventItem & previousEventItem)
         ChangesMadeOnEvents();
     }
     else
-        wxLogError(_("Unable to create standard event."));
+        gd::LogError(_("Unable to create standard event."));
 }
 
 void EventsEditor::OnaddEventBtClick(wxCommandEvent& event)
@@ -1336,7 +1336,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
         ChangesMadeOnEvents();
     }
     else
-        wxLogError(_("Unable to create a comment event."));
+        gd::LogError(_("Unable to create a comment event."));
 }
 
 /**
@@ -1356,7 +1356,7 @@ void EventsEditor::AddSubEvent(gd::EventItem & parentEventItem)
         ChangesMadeOnEvents();
     }
     else
-        wxLogError(_("Unable to create standard event."));
+        gd::LogError(_("Unable to create standard event."));
 }
 
 void EventsEditor::OnaddSubEventBtClick(wxCommandEvent& event)
@@ -1643,7 +1643,7 @@ void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
     if ( eventsSelected.empty() )
     {
-        wxLogMessage(_("Please select events to use so as to create the template, and then click again on the Create button."));
+        gd::LogMessage(_("Please select events to use so as to create the template, and then click again on the Create button."));
         return;
     }
 
@@ -1663,7 +1663,7 @@ void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
     if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL )
     {
-        wxLogMessage(_("Please select an event before adding a template."));
+        gd::LogMessage(_("Please select an event before adding a template."));
         return;
     }
 
@@ -1708,7 +1708,7 @@ void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
     {
         if ( !profilingActivated && !sceneCanvas->GetProfileDialog()->profilingActivated)
         {
-            wxLogMessage(_("Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."));
+            gd::LogMessage(_("Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."));
             return;
         }
     }

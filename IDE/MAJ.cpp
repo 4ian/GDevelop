@@ -7,7 +7,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/mimetype.h>
 #include <wx/protocol/http.h>
 #include <wx/filename.h>
@@ -174,7 +174,7 @@ void MAJ::OnLienBtClick(wxCommandEvent& event)
 {
     if ( linkCtrl->GetLabel() == _("No link"))
     {
-        wxLogMessage(_("No download link is available.\nGo on our web site so as to download the last version of Game Develop."));
+        gd::LogMessage(_("No download link is available.\nGo on our web site so as to download the last version of Game Develop."));
         return;
     }
 
@@ -244,7 +244,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     }
     else
     {
-        wxLogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
+        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
         return;
     }
 

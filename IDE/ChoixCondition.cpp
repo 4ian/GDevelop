@@ -19,7 +19,7 @@
 #include <wx/bitmap.h>
 #include <wx/filedlg.h>
 #include <wx/config.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/msgdlg.h>
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -351,7 +351,7 @@ void ChoixCondition::RefreshList()
 
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                wxString::Format(_("%s Object"), extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName().c_str()),
+                                                                wxString::Format(wxString(_("%s Object")), extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each object conditions
@@ -386,7 +386,7 @@ void ChoixCondition::RefreshList()
 	    {
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                wxString::Format(_("%s Automatism"), extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName().c_str()),
+                                                                wxString::Format(wxString(_("%s Automatism")), extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -490,7 +490,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectConditionsTree->AppendItem(extensionItem,
-                                                            wxString::Format(_("%s Object"), extensions[i]->GetObjectMetadata(objectType).GetFullName().c_str()),
+                                                            wxString::Format(wxString(_("%s Object")), extensions[i]->GetObjectMetadata(objectType).GetFullName().c_str()),
                                                             0) :
                                     extensionItem;
 
@@ -533,7 +533,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectConditionsTree->AppendItem(extensionItem,
-                                                                wxString::Format(_("%s Automatism"), extensions[i]->GetAutomatismMetadata(automatismType).GetFullName().c_str()),
+                                                                wxString::Format(wxString(_("%s Automatism")), extensions[i]->GetAutomatismMetadata(automatismType).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -930,7 +930,7 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        wxLogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
+        gd::LogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
         return;
     }
 
@@ -970,7 +970,8 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?"), parameterDisplayedNb, message.c_str()), _("The condition contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(wxString::Format(wxString(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?")),
+            parameterDisplayedNb, message.c_str()), _("The condition contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -1017,7 +1018,7 @@ void ChoixCondition::OnmoreBtClick(wxCommandEvent& event)
 
 void ChoixCondition::OnGlobalCheckSelect(wxCommandEvent& event)
 {
-    wxLogMessage(_("Warning. This option is only available for backward compatibility.\nIt must not be used anymore in new game, and it might be removed in a next version."));
+    gd::LogMessage(_("Warning. This option is only available for backward compatibility.\nIt must not be used anymore in new game, and it might be removed in a next version."));
 }
 
 void ChoixCondition::OnsearchCtrlText(wxCommandEvent& event)

@@ -11,11 +11,12 @@
 #include <wx/string.h>
 //*)
 #include <wx/filedlg.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <string>
 #include <vector>
 #include <wx/filename.h>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Tools/Localization.h"
 #include "mp3ogg.h"
 using namespace std;
 
@@ -143,7 +144,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
     filename.SetExt("ogg");
     wxRenameFile(originalFile+".ogg", filename.GetFullPath());
 
-    wxLogMessage(_("The encoding is finished. The OGG  file is located in the same directory as the MP3 file."));
+    gd::LogMessage(_("The encoding is finished. The OGG  file is located in the same directory as the MP3 file."));
 
 }
 
@@ -167,6 +168,6 @@ void mp3ogg::OnEncoderWAVBtClick(wxCommandEvent& event)
     filename.SetExt("wav");
     wxRenameFile(rep+".wav", filename.GetFullPath());
 
-    wxLogMessage(_("The encoding is finished. The WAV file is located in the same directory as the MP3 file."));
+    gd::LogMessage(_("The encoding is finished. The WAV file is located in the same directory as the MP3 file."));
 }
 

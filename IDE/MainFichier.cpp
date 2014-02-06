@@ -8,6 +8,7 @@
 #include <wx/filedlg.h>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
@@ -78,7 +79,7 @@ void MainFrame::CreateNewProject()
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
             if ( newProject->GetLayoutCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
         }
-        else wxLogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
+        else gd::LogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
     }
     else if ( dialog.UserWantToBrowseExamples() )
     {
@@ -151,7 +152,7 @@ void MainFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt)
 void MainFrame::SetLastUsedFile(wxString file)
 {
     if ( file.EndsWith(".autosave") ) return;
-    
+
     m_recentlist.SetLastUsed( file );
     for ( unsigned int i = 0;i < 9;i++ )
         wxConfigBase::Get()->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
@@ -211,7 +212,7 @@ void MainFrame::Open( string file )
             wxString errorMsg = _("One or ore extensions are used by the project but are not installed for the platform used by the project :\n")
                                 + unknownExtensions
                                 + _("\nSome objects, actions, conditions or expressions can be unavailable or not working.");
-            wxLogWarning(errorMsg);
+            gd::LogWarning(gd::ToString(errorMsg));
         }
     }
     //Ensure working directory is set to the IDE one.
@@ -229,9 +230,9 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
     else
     {
         if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
-            wxLogError( _("Save failed!") );
+            gd::LogError( _("Save failed!") );
         else
-            wxLogStatus(_("Save ended."));
+            gd::LogStatus(_("Save ended."));
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
 
@@ -278,7 +279,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
                 //oui, donc on l'enregistre
                 games[i]->SetProjectFile(path);
 
-                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( _("Save failed!") );}
+                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {gd::LogError( _("Save failed!") );}
                 SetLastUsedFile( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
@@ -288,11 +289,11 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         }
         else
         {
-            if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( _("Save failed!") );}
+            if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {gd::LogError( _("Save failed!") );}
         }
     }
 
-    wxLogStatus(_("Saves ended."));
+    gd::LogStatus(_("Saves ended."));
 }
 void MainFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
 {
@@ -350,7 +351,7 @@ void MainFrame::SaveAs()
 
         if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
         {
-            wxLogError( _("The project could not be saved properly!") );
+            gd::LogError( _("The project could not be saved properly!") );
         }
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );

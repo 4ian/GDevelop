@@ -8,7 +8,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/filedlg.h>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/CommonTools.h"
@@ -265,11 +265,11 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 
         if ( !doc.SaveFile( path.c_str() ) )
         {
-            wxLogError( _( "Unable to save file. Check that the drive has enough free space, is not write-protected and you have read/write permissions." ) );
+            gd::LogError( _( "Unable to save file. Check that the drive has enough free space, is not write-protected and you have read/write permissions." ) );
             return;
         }
 
-        wxLogMessage(_("The template was correctly created."));
+        gd::LogMessage(_("The template was correctly created."));
     }
 }
 

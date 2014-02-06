@@ -12,7 +12,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/settings.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include "GDCore/PlatformDefinition/Project.h"
@@ -200,7 +200,7 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
             {
                 group.AddObject( dialog.GetChosenObjects()[i] );
                 ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.GetChosenObjects()[i] );
-            } else { wxLogWarning(_("Object ")+dialog.GetChosenObjects()[i]+_(" is already in this group."));}
+            } else { gd::LogWarning(_("Object ")+dialog.GetChosenObjects()[i]+_(" is already in this group."));}
         }
 
         modificationCount += dialog.GetChosenObjects().size();

@@ -1,4 +1,4 @@
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 
 #include "DndTextObjectsEditor.h"
 

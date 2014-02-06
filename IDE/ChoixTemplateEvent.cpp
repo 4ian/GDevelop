@@ -7,7 +7,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/help.h>
 
 #include <stdio.h>
@@ -19,8 +19,9 @@
 #include "TemplateEvents.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Tools/Localization.h"
 
-#define MSG(x) wxLogWarning(_(x));
+#define MSG(x) gd::LogWarning(_(x));
 
 using namespace gd;
 
@@ -269,7 +270,7 @@ void ChoixTemplateEvent::Refresh()
     {
         wxString ErrorDescription = doc.ErrorDesc();
         wxString Error = _( "Error while loading :" ) + ErrorDescription;
-        wxLogWarning( Error );
+        gd::LogWarning( gd::ToString(Error) );
     }
 
     TiXmlHandle hdl( &doc );
@@ -287,7 +288,7 @@ void ChoixTemplateEvent::Refresh()
 
         if ( elem->Attribute( "name" ) != NULL ) { newTemplate.name = elem->Attribute( "name" ); }
         if ( elem->Attribute( "desc" ) != NULL ) { newTemplate.desc = elem->Attribute( "desc" ); }
-        else { wxLogWarning( "Les informations concernant la description d'un template manquent." ); }
+        else { gd::LogWarning( "Les informations concernant la description d'un template manquent." ); }
 
         unsigned int i = 1;
         while ( elem->Attribute(string("param"+ToString(i)).c_str()) != NULL )
@@ -299,7 +300,7 @@ void ChoixTemplateEvent::Refresh()
         if ( elem->FirstChildElement( "Events" ) != NULL )
             gd::EventsListSerialization::LoadEventsFromXml(project, newTemplate.events, elem->FirstChildElement( "Events" ));
         else
-            wxLogWarning( _( "The events of the template are missing." ) );
+            gd::LogWarning( _( "The events of the template are missing." ) );
 
         templatesList.push_back( newTemplate );
         elem = elem->NextSiblingElement();

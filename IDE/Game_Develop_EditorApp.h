@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <wx/app.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/ipc.h>
 #include <wx/snglinst.h>
 #include "GDCore/PlatformDefinition/Project.h"

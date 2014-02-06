@@ -18,7 +18,7 @@
 #include <wx/colordlg.h>
 #include <wx/help.h>
 #include <wx/dirdlg.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
@@ -711,7 +711,7 @@ changesNeedRestart(false)
             if ( hidePageTabs )
                 hidePageTabsCheck->SetValue(true);
         }
-        else 
+        else
         {
             wxCommandEvent useless;
             OnGDMetroStyleClick(useless);
@@ -1037,7 +1037,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        wxLogMessage(_("Game Develop must be relaunched to make some changes effective."));
+        gd::LogMessage(_("Game Develop must be relaunched to make some changes effective."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
@@ -1706,7 +1706,7 @@ void Preferences::OneventsEditorFontBtClick(wxCommandEvent& event)
         eventsEditorFontDialog->GetFontData().GetChosenFont().GetFamily() != wxFONTFAMILY_MODERN )
     {
         eventsEditorFontDialog->GetFontData().GetChosenFont() = oldFont;
-        wxLogWarning(_("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
+        gd::LogWarning(_("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
     }
 }
 

@@ -7,9 +7,9 @@ xcopy ..\..\GDCpp\*.h ..\..\Binaries\Output\Release\CppPlatform\include\GDCpp\*.
 xcopy ..\..\Core\*.h ..\..\Binaries\Output\Release\CppPlatform\include\Core\*.h /S /Y /D
 
 rem Boost (shared_ptr and dependencies) headers
-rem ..\..\ExtLibs\boost\bcp.exe --boost=..\..\ExtLibs\boost\ version config shared_ptr weak_ptr enable_shared_from_this unordered mpl ..\..\Binaries\Output\Release\CppPlatform\include\boost\
+..\..\ExtLibs\boost\bcp.exe --boost=..\..\ExtLibs\boost\ version config shared_ptr weak_ptr enable_shared_from_this unordered mpl ..\..\Binaries\Output\Release\CppPlatform\include\boost\
 
-rem SFML headers 
+rem SFML headers
 xcopy ..\..\ExtLibs\SFML\include\*.h ..\..\Binaries\Output\Release\CppPlatform\include\SFML\include\*.h /S /Y /D
 xcopy ..\..\ExtLibs\SFML\include\*.hpp ..\..\Binaries\Output\Release\CppPlatform\include\SFML\include\*.hpp /S /Y /D
 xcopy ..\..\ExtLibs\SFML\include\*.inl ..\..\Binaries\Output\Release\CppPlatform\include\SFML\include\*.inl /S /Y /D

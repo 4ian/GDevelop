@@ -17,6 +17,7 @@
 #include "EventsEditor.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -278,7 +279,7 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
                                             conditionsCheck->GetValue(),
                                             actionsCheck->GetValue());
 
-    resultsCountTxt->SetLabel(wxString::Format(_("%i results."), searchResults.size()));
+    resultsCountTxt->SetLabel(wxString::Format(wxString(_("%i results.")), searchResults.size()));
     nextBt->Enable(true);
     previousBt->Enable(true);
     currentResult = 0;

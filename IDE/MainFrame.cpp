@@ -22,7 +22,7 @@
 #include <wx/filename.h>
 #include <wx/config.h>
 #include <wx/msgdlg.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/fileconf.h>
 #include <wx/artprov.h>
 #include <wx/ribbon/bar.h>
@@ -606,16 +606,16 @@ void MainFrame::OnClose( wxCloseEvent& event )
 {
     for(unsigned int i = 0;i<games.size();++i) {
         if ( games[i]->IsDirty() ) {
-            wxString fullMessage = wxString::Format(_("Project \"%s\" has been changed.\n\n"), games[i]->GetName());
-            fullMessage += wxString::Format(_("Do you want to save it in %s?"), games[i]->GetProjectFile());
+            wxString fullMessage = wxString::Format(wxString(_("Project \"%s\" has been changed.\n\n")), games[i]->GetName());
+            fullMessage += wxString::Format(wxString(_("Do you want to save it in %s?")), games[i]->GetProjectFile());
             int whatToDo = wxMessageBox(fullMessage, _("Project not saved"), wxYES_NO|wxCANCEL|wxCANCEL_DEFAULT);
 
             if (whatToDo == wxCANCEL) return;
             else if ( whatToDo == wxYES ) {
                 if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) )
-                    wxLogError( _("Save failed!") );
+                    gd::LogError( _("Save failed!") );
                 else
-                    wxLogStatus( _("Project properly saved.") );
+                    gd::LogStatus( _("Project properly saved.") );
             }
         }
     }
@@ -805,7 +805,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         {
             wxString filename = wxFileName(games[i]->GetProjectFile()).GetPath()+"/"+wxFileName(games[i]->GetProjectFile()).GetName()+".gdg.autosave";
 
-            if ( !games[i]->SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a échoué." );}
+            if ( !games[i]->SaveToFile(string(filename.mb_str())) ) {gd::LogStatus( "L'enregistrement automatique a échoué." );}
         }
     }
 }

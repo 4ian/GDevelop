@@ -7,7 +7,7 @@
 #define DNDFILEEDITOR_H
 
 #include <wx/dnd.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 class MainFrame;
 
 /**

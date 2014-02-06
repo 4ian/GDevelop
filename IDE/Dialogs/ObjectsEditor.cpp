@@ -7,7 +7,6 @@
 #include <wx/string.h>
 //*)
 #include <wx/toolbar.h>
-#include <wx/log.h>
 #include <wx/textdlg.h>
 #include <wx/help.h>
 #include <wx/config.h>
@@ -24,6 +23,7 @@
 #include <wx/dnd.h>
 #include <boost/algorithm/string.hpp>
 
+#include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -520,7 +520,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         //Be sure there is not already another object with this name
         if ( objects->HasObjectNamed(newName) )
         {
-            wxLogWarning( _( "Unable to rename the object : another object has already this name." ) );
+            gd::LogWarning( _( "Unable to rename the object : another object has already this name." ) );
 
             event.Veto();
             return;
@@ -599,7 +599,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                             objectsGroups.end(),
                             std::bind2nd(gd::GroupHasTheSameName(), event.GetLabel())) != objectsGroups.end())
         {
-            wxLogWarning( _( "Unable to rename the groupe : another group has already this name." ) );
+            gd::LogWarning( _( "Unable to rename the groupe : another group has already this name." ) );
 
             event.Veto();
             return;
@@ -821,7 +821,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
 
     objectsList->EditLabel(itemAdded);
 
-    wxLogStatus( _( "The object was correctly added" ) );
+    gd::LogStatus( _( "The object was correctly added" ) );
 }
 
 void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
@@ -850,7 +850,7 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, layout ? layout : NULL, name);
-    wxLogStatus( _( "The group was correctly added." ) );
+    gd::LogStatus( _( "The group was correctly added." ) );
 }
 
 
@@ -862,7 +862,7 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
     std::vector < string > gObjectsDeleted;
 
     int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )\?") :
-                                                             wxString::Format(_("Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )\?"), selection.GetCount()),
+                                                             wxString::Format(wxString(_("Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )\?")), selection.GetCount()),
                               _("Confirm deletion"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 
     if ( answer == wxCANCEL ) return;
@@ -1185,7 +1185,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         std::string objectName = object->GetName();
         if ( project.HasObjectNamed(objectName) )
         {
-            wxLogMessage(_("There is already a global object with this name."));
+            gd::LogMessage(_("There is already a global object with this name."));
             return;
         }
 
@@ -1211,7 +1211,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
 
         if ( HasGroupNamed(groupName, project.GetObjectGroups()) )
         {
-            wxLogMessage(_("There is already a global object group with this name."));
+            gd::LogMessage(_("There is already a global object group with this name."));
             return;
         }
         project.GetObjectGroups().push_back(*group);

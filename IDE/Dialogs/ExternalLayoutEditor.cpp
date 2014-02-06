@@ -20,6 +20,7 @@
 #include "../MainFrame.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace gd;
 
@@ -273,7 +274,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
         scene = &emptyLayout;
     else if ( scene == NULL)
     {
-        wxLogWarning(_("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 

@@ -10,7 +10,7 @@
 //*)
 
 #include <wx/fileconf.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
 #include <wx/config.h>
@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <boost/shared_ptr.hpp>
+#include "GDCore/Tools/Localization.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "GDCore/PlatformDefinition/Project.h"
@@ -66,7 +67,7 @@ void MessageLoading( string message, float avancement )
     // renvoyer une string
     string pourcent =  oss.str();
 
-    wxLogStatus( wxString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
+    gd::LogStatus( gd::ToString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
 }
 
 /**
@@ -375,7 +376,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     cout << "* Initialization ended." << endl;
 
-    //wxLogWarning(_("This is a beta version of Game Develop 3.\n\nSome features may be missing and bugs present: Report any feedback on www.forum.compilgames.net.\nThanks!"));
+    //gd::LogWarning(_("This is a beta version of Game Develop 3.\n\nSome features may be missing and bugs present: Report any feedback on www.forum.compilgames.net.\nThanks!"));
 
     //Checking for updates
     {

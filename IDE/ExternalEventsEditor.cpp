@@ -9,8 +9,9 @@
 #include <wx/string.h>
 //*)
 #include <wx/textctrl.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/ribbon/bar.h>
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -104,7 +105,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
         scene = &emptyScene;
     else if ( scene == NULL)
     {
-        wxLogWarning(_("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 

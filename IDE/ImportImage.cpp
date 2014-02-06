@@ -5,11 +5,11 @@
 #include <wx/string.h>
 //*)
 #include <wx/filedlg.h>
-#include <wx/log.h>
 #include <wx/animate.h>
 #include <wx/animate.h>
 #include <wx/filename.h>
-
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -359,7 +359,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     wxAnimation animation;
     if ( !animation.LoadFile(FileGIFEdit->GetValue()) )
     {
-        wxLogWarning(_("Unable to open the GIF file!"));
+        gd::LogWarning(_("Unable to open the GIF file!"));
         return;
     }
 
@@ -372,7 +372,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
-    wxLogMessage(_("Decomposition of the GIF completed!"));
+    gd::LogMessage(_("Decomposition of the GIF completed!"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -419,7 +419,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
     wxImage image;
     if ( !image.LoadFile(fileRPGEdit->GetValue()) )
     {
-        wxLogWarning(_("Unable to open the file !"));
+        gd::LogWarning(_("Unable to open the file !"));
         return;
     }
 
@@ -446,7 +446,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
         }
     }
 
-    wxLogMessage(_("The decomposition of the image is completed !"));
+    gd::LogMessage(_("The decomposition of the image is completed !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -457,7 +457,7 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     wxImage image;
     if ( !image.LoadFile(fileSSEdit->GetValue()) )
     {
-        wxLogWarning(_("Unable to open the file !"));
+        gd::LogWarning(_("Unable to open the file !"));
         return;
     }
 
@@ -473,14 +473,14 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     int lineNb = ToInt(static_cast<string>(linesSSEdit->GetValue()));
     if ( lineNb <= 0 )
     {
-        wxLogWarning(_("The number of lines is invalid: The minimum is one line."));
+        gd::LogWarning(_("The number of lines is invalid: The minimum is one line."));
         return;
     }
 
     int columnNb = ToInt(static_cast<string>(columnsSSEdit->GetValue()));
     if ( columnNb <= 0 )
     {
-        wxLogWarning(_("The number of columns is invalid: The minimum is one column."));
+        gd::LogWarning(_("The number of columns is invalid: The minimum is one column."));
         return;
     }
 
@@ -491,20 +491,20 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     int height = ToInt(static_cast<string>(heightSSEdit->GetValue()));
     if ( width <= 0 || height <= 0)
     {
-        wxLogWarning(_("The size of a sprite is invalid."));
+        gd::LogWarning(_("The size of a sprite is invalid."));
         return;
     }
 
     int spaceH = ToInt(static_cast<string>(spaceHSSEdit->GetValue()));
     if ( spaceH < 0 )
     {
-        wxLogWarning(_("The horizontal spacing is invalid (must be greater than or equal to 0)."));
+        gd::LogWarning(_("The horizontal spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
     int spaceV = ToInt(static_cast<string>(spaceVSSEdit->GetValue()));
     if ( spaceV < 0 )
     {
-        wxLogWarning(_("The vertical spacing is invalid (must be greater than or equal to 0)."));
+        gd::LogWarning(_("The vertical spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
 

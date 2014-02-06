@@ -15,7 +15,7 @@
 #include <wx/toolbar.h>
 #include <wx/config.h>
 #include <wx/brush.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/dcclient.h>
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>

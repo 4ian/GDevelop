@@ -22,7 +22,8 @@
 #include <wx/txtstrm.h>
 #include <SFML/Network.hpp>
 #include <wx/uri.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -251,7 +252,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
     if (response.getStatus() != sf::Http::Response::Ok)
         std::cout << "Unable to connect to the server for sending the report!" << std::endl;
     else {
-        wxLogMessage(_("Thanks for reporting the error!"));
+        gd::LogMessage(_("Thanks for reporting the error!"));
         CreateRapportBt->Disable();
     }
 }

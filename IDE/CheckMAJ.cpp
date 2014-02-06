@@ -4,7 +4,7 @@
  */
 
 #include "CheckMAJ.h"
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/wx.h>
 #include <wx/config.h>
 #include "wx/msgdlg.h"
@@ -48,7 +48,7 @@ void CheckMAJ::DownloadInformation(bool excludeFromStatistics)
 
     wxURL *url = new wxURL(requestURL);
     url->GetProtocol().SetDefaultTimeout(5);
-    
+
     wxInputStream * input = url->GetInputStream();
 
     if (input!=NULL) {
@@ -58,18 +58,18 @@ void CheckMAJ::DownloadInformation(bool excludeFromStatistics)
             input->Read(out);
         }
         else
-            wxLogWarning( _( "Error while downloading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
+            gd::LogWarning( _( "Error while downloading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
 
         delete input;
     } else {
-        wxLogWarning( _( "Unable to connect to the server so as to check for updates.\nPlease check your internet connection, your firewall and if you can go on GD website.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
+        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nPlease check your internet connection, your firewall and if you can go on GD website.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
         return;
     }
 
     TiXmlDocument doc( wxFileName::GetTempDir()+"/GDTemporaries/"+"updateinfo.xml" );
     if ( !doc.LoadFile() )
     {
-        wxLogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
+        gd::LogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
         return;
     }
 

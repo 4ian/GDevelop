@@ -3,8 +3,9 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
- #include "Fusion.h"
 
+#include <string>
+#include <vector>
 //(*InternalHeaders(Fusion)
 #include <wx/bitmap.h>
 #include <wx/settings.h>
@@ -13,15 +14,14 @@
 #include <wx/string.h>
 //*)
 #include <wx/filedlg.h>
-#include <string>
-#include <vector>
-#include <wx/log.h>
 #include <wx/msgdlg.h>
-
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Log.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "Fusion.h"
 
 
 using namespace std;
@@ -242,6 +242,6 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
         }
     }
 
-    wxLogMessage(_("The game has been properly merged."));
+    gd::LogMessage(_("The game has been properly merged."));
 }
 

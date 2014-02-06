@@ -14,7 +14,7 @@
 //*)
 #include "wx/image.h"
 #include "wx/icon.h"
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/imaglist.h>
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
@@ -335,7 +335,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                wxString::Format(_("%s Object"), extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName().c_str()),
+                                                                wxString::Format(wxString(_("%s Object")), extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each object actions
@@ -370,7 +370,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                wxString::Format(_("%s Automatism"), extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName().c_str()),
+                                                                wxString::Format(wxString(_("%s Automatism")), extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -474,7 +474,7 @@ void ChoixAction::RefreshObjectActionsList()
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectActionsTree->AppendItem(extensionItem,
-                                                            wxString::Format(_("%s Object"), extensions[i]->GetObjectMetadata(objectType).GetFullName().c_str()),
+                                                            wxString::Format(wxString(_("%s Object")), extensions[i]->GetObjectMetadata(objectType).GetFullName().c_str()),
                                                             0) :
                                     extensionItem;
 
@@ -517,7 +517,7 @@ void ChoixAction::RefreshObjectActionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectActionsTree->AppendItem(extensionItem,
-                                                                wxString::Format(_("%s Automatism"), extensions[i]->GetAutomatismMetadata(automatismType).GetFullName().c_str()),
+                                                                wxString::Format(wxString(_("%s Automatism")), extensions[i]->GetAutomatismMetadata(automatismType).GetFullName().c_str()),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -949,7 +949,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        wxLogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
+        gd::LogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
         return;
     }
 
@@ -989,7 +989,8 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?"), parameterDisplayedNb, message.c_str()), _("The action contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(wxString::Format(wxString(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?")),
+        	parameterDisplayedNb, message.c_str()), _("The action contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 

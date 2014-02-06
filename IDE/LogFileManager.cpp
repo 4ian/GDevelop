@@ -1,6 +1,6 @@
 #include <wx/config.h>
 #include <wx/textfile.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/datetime.h>
 #include "LogFileManager.h"
 #include "GDCore/CommonTools.h"

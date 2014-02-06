@@ -1,9 +1,9 @@
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "EditComment.h"
 
 //(*InternalHeaders(EditComment)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)

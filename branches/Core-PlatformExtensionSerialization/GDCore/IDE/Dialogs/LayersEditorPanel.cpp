@@ -2,16 +2,17 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LayersEditorPanel.h"
 
 //(*InternalHeaders(LayersEditorPanel)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
@@ -277,7 +278,7 @@ void LayersEditorPanel::OnDelSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Can't find the layer to delete !"));
+    gd::LogWarning(_("Can't find the layer to delete !"));
 }
 
 void LayersEditorPanel::OnUpSelected(wxCommandEvent& event)
@@ -302,7 +303,7 @@ void LayersEditorPanel::OnUpSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Can't find the layer to move  !"));
+    gd::LogWarning(_("Can't find the layer to move  !"));
 }
 
 void LayersEditorPanel::OnDownSelected(wxCommandEvent& event)
@@ -327,7 +328,7 @@ void LayersEditorPanel::OnDownSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Can't find the layer to move  !"));
+    gd::LogWarning(_("Can't find the layer to move  !"));
 }
 
 void LayersEditorPanel::OnlayersListItemRClick(wxListEvent& event)
@@ -440,3 +441,4 @@ void LayersEditorPanel::OnlayersListItemFocused(wxListEvent& event)
 
 
 }
+#endif

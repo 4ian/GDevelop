@@ -7,7 +7,7 @@
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include <iostream>
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/SkinHelper.h"
 #include <wx/file.h>
 #include <wx/bitmap.h>
@@ -29,6 +29,7 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 #if defined(GD_IDE_ONLY)
     SetFullName(std::string(fullname_));
     SetDescription(std::string(informations_));
+#if !defined(GD_NO_WX_GUI)
     if ( gd::SkinHelper::IconExists(icon24x24, 24) )
         SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
     else if ( wxFile::Exists(icon24x24) )
@@ -39,6 +40,7 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
             << " and the specified name is not an existing filename.";
         SetBitmapIcon(wxBitmap(24,24));
     }
+#endif
 #endif
     createFunPtr = createFunPtrP;
     destroyFunPtr = destroyFunPtrP;
@@ -118,7 +120,7 @@ ObjectMetadata & ObjectMetadata::SetDescription(const std::string & description_
 
 ObjectMetadata & ObjectMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     icon = bitmap_;
 #endif
     return *this;

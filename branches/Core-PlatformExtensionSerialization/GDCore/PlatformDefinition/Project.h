@@ -249,6 +249,7 @@ public:
     ///@}
 #endif
 
+#if !defined(GD_NO_WX_GUI)
     /** \name GUI property grid management
      * Members functions related to managing the wxWidgets property grid used to display the properties of the project.
      */
@@ -273,6 +274,7 @@ public:
      */
     void OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
     ///@}
+#endif
 
     /** \name Layouts management
      * Members functions related to layout management.
@@ -349,7 +351,7 @@ public:
     ///@{
     /**
      * \brief Save the project to a file.
-     * 
+     *
      * "Dirty" flag is set to false when save is done.
      */
     bool SaveToFile(const std::string & filename);
@@ -361,7 +363,7 @@ public:
 
     /**
      * Called to save the layout to a TiXmlElement.
-     * 
+     *
      * "Dirty" flag is set to false when save is done.
      */
     void SaveToXml(TiXmlElement * element) const;
@@ -372,7 +374,7 @@ public:
     void LoadFromXml(const TiXmlElement * element);
 
     #if defined(GD_IDE_ONLY)
-    
+
     /**
      * \brief Return true if the project is marked as being modified (The IDE or application
      * using the project should ask for save the project if the project is closed).

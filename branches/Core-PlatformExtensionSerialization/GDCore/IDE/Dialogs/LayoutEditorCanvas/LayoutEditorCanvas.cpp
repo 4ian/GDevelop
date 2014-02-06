@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LayoutEditorCanvas.h"
 #include <cmath>
 #include <wx/wx.h>
@@ -26,6 +27,7 @@
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
 // Platform-specific includes. Be sure to include them at the end as it seems to be some incompatibilities with SFML's WindowStyle.hpp
 #ifdef __WXGTK__
@@ -35,7 +37,7 @@
 #endif
 
 //(*InternalHeaders(LayoutEditorCanvas)
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
 
@@ -416,7 +418,7 @@ void LayoutEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
     if ( !editing ) return;
 
     if ( !currentPreviewer ) {
-        wxLogMessage(_("This platform does not support launching previews."));
+        gd::LogMessage(_("This platform does not support launching previews."));
         return;
     }
 
@@ -1030,9 +1032,11 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
         double mouseY = GetMouseYOnLayout();
 
         if ( !editing )
-            wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Base layer, camera 0 )" ) ) );
+            gd::LogStatus( gd::ToString(wxString::Format( wxString(_( "Position %d;%d (Base layer, camera 0)." )),
+                mouseX, mouseY )) );
         else
-            wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". SHIFT for multiple selection, right click for more options." ) ) );
+            gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %d;%d. SHIFT for multiple selection, right click for more options." )),
+                mouseX, mouseY )) );
 
         //Check if there is a gui element hovered inside the layout
         for (unsigned int i = 0;i<guiElements.size();++i)
@@ -1441,3 +1445,4 @@ void LayoutEditorCanvas::GoToEditingState()
 }
 
 //The rest of the implementation is available in LayoutEditorCanvas2.cpp
+#endif

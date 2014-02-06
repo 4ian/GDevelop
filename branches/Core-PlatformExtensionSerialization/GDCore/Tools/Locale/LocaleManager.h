@@ -3,11 +3,11 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #ifndef LOCALEMANAGER_H
 #define LOCALEMANAGER_H
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 
 namespace gd
 {
@@ -35,7 +35,7 @@ public:
      * \return The wxWidgets identifier of the language used.
      */
     int GetLanguage() { return languageWxWidgetsId; }
-    
+
     /**
      * \brief Add a catalog name.
      *
@@ -46,7 +46,7 @@ public:
     void AddCatalog(std::string catalogName);
 
     /**
-     * \brief Add a path where catalog are searched. 
+     * \brief Add a path where catalog are searched.
      * \param path The path, relative to the Game Develop directory.
      */
     void AddPath(std::string path);

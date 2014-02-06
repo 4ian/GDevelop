@@ -1,8 +1,9 @@
-#if defined(GD_IDE_ONLY)
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ProjectUpdateDialog.h"
 
 //(*InternalHeaders(ProjectUpdateDialog)
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
 #include <string>

@@ -1,3 +1,4 @@
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef RIBBONMETROARTPROVIDER_H
 #define RIBBONMETROARTPROVIDER_H
 
@@ -12,7 +13,7 @@
 class wxDC;
 class wxWindow;
 
-namespace gd 
+namespace gd
 {
 
 class GD_CORE_API RibbonMetroArtProvider : public wxRibbonArtProvider
@@ -372,10 +373,11 @@ protected:
     int m_gallery_bitmap_padding_bottom_size;
     int m_toggle_button_offset;
     int m_help_button_offset;
-    
+
     wxBitmap helpBitmap;
 };
-    
+
 }
 
+#endif
 #endif

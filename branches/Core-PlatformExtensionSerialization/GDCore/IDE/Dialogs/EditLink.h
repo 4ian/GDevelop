@@ -1,3 +1,5 @@
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef EDITLINK_H
 #define EDITLINK_H
 
@@ -84,4 +86,5 @@ private:
 };
 
 }
+#endif
 #endif

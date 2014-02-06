@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef EDITORLAYERS_H
 #define EDITORLAYERS_H
 
@@ -129,4 +130,5 @@ private:
 
 }
 
+#endif
 #endif

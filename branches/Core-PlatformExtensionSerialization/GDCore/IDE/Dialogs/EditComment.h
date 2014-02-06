@@ -1,3 +1,5 @@
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_EDITCOMMENT_H
 #define GDCORE_EDITCOMMENT_H
 
@@ -74,3 +76,4 @@ class EditComment: public wxDialog
 }
 
 #endif //GDCORE_EDITCOMMENT_H
+#endif

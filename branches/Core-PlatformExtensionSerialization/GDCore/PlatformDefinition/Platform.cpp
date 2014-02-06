@@ -132,10 +132,12 @@ boost::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const std::string & event
     return boost::shared_ptr<gd::BaseEvent>();
 }
 
+#if !defined(GD_NO_WX_GUI)
 boost::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new gd::LayoutEditorPreviewer);
 }
+#endif
 
 boost::shared_ptr<gd::ProjectExporter> Platform::GetProjectExporter() const
 {

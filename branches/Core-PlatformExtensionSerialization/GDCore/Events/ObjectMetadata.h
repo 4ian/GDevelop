@@ -8,7 +8,7 @@
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 namespace gd { class Object; }
@@ -105,7 +105,9 @@ public:
 #if defined(GD_IDE_ONLY)
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDescription() const { return description; }
+#if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
+#endif
 #endif
 
     /**
@@ -137,7 +139,9 @@ private:
 #if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
+#endif
 #endif
 };
 

@@ -1,13 +1,15 @@
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GridSetupDialog.h"
 
 //(*InternalHeaders(GridSetupDialog)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/colordlg.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
@@ -125,12 +127,12 @@ void GridSetupDialog::OnokBtClick(wxCommandEvent& event)
     snap = snapCheck->GetValue();
     if ( ToInt(static_cast<string>(widthEdit->GetValue())) < 1)
     {
-        wxLogWarning(_("The width of the grid is wrong."));
+        gd::LogWarning(_("The width of the grid is wrong."));
         return;
     }
     if ( ToInt(static_cast<string>(heightEdit->GetValue())) < 1)
     {
-        wxLogWarning(_("The height of the grid is wrong."));
+        gd::LogWarning(_("The height of the grid is wrong."));
         return;
     }
 
@@ -169,3 +171,4 @@ void GridSetupDialog::OnhelpBtClick(wxCommandEvent& event)
 
 
 }
+#endif

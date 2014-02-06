@@ -1,10 +1,18 @@
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GD_IDE_ONLY)
 #ifndef EVENTMETADATA_H
 #define EVENTMETADATA_H
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
+#endif
+class wxBitmap;
 namespace gd { class BaseEvent; }
 namespace gd { class EventsCodeGenerator; }
 namespace gd { class EventsCodeGenerationContext; }
@@ -64,12 +72,16 @@ public:
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDescription() const { return description; }
     const std::string & GetGroup() const { return group; }
+#if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
+#endif
 
     std::string fullname;
     std::string description;
     std::string group;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
+#endif
 
     boost::shared_ptr<gd::BaseEvent> instance;
     boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGeneration;

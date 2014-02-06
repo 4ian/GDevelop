@@ -95,7 +95,7 @@ void Layer::LoadFromXml(const TiXmlElement * element)
 
 
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 /**
  * Display a window to edit the layer
  */

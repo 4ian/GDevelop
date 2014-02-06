@@ -10,7 +10,6 @@
 namespace gd { class Project; }
 namespace gd { class ResourceFolder; }
 class TiXmlElement;
-class wxString;
 class wxPaintDC;
 class wxPanel;
 
@@ -98,7 +97,7 @@ public:
     /**
      * \brief Must return a description of the main property provided by the resource ( Example : "Image file" )
      */
-    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, wxString & userFriendlyName, wxString & description) const { return; };
+    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const { return; };
 
     /**
      * \brief Called when a property must be changed ( i.e: its value was changed in the property grid )
@@ -112,10 +111,12 @@ public:
      */
     virtual std::vector<std::string> GetAllProperties(gd::Project & project) const { std::vector<std::string> noProperties; return noProperties; };
 
+    #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Called when the resource must be rendered in a preview panel.
      */
     virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game) {};
+    #endif
 
     /**
      * \brief Load from an xml element.
@@ -161,10 +162,12 @@ public:
     #if defined(GD_IDE_ONLY)
     virtual bool UseFile() { return true; }
 
+    #if !defined(GD_NO_WX_GUI)
     /**
      * Called when the resource must be rendered in a preview panel.
      */
     virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game);
+    #endif
 
     /**
      * Called when a property must be edited ( i.e: it was double clicked )
@@ -190,7 +193,7 @@ public:
     /**
      * Return a description of the main property provided by the resource ( Example : "Image file" )
      */
-    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, wxString & userFriendlyName, wxString & description) const;
+    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const;
 
     /**
      * Return a vector containing the name of all the properties of the resource

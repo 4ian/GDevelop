@@ -2,13 +2,14 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "ChooseAutomatismDialog.h"
 
 //(*InternalHeaders(ChooseAutomatismDialog)
 #include <wx/bitmap.h>
 #include <wx/settings.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -137,3 +138,4 @@ void ChooseAutomatismDialog::OnsearchCtrlText(wxCommandEvent& event)
 }
 
 }
+#endif

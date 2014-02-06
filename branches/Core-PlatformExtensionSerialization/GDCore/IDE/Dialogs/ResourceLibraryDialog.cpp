@@ -2,16 +2,18 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ResourceLibraryDialog.h"
 
 //(*InternalHeaders(ResourceLibraryDialog)
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
 #include <wx/treelist.h>
 #include <wx/dir.h>
 #include <wx/dcmemory.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/filename.h>
 #include <wx/dnd.h>
 #include <iostream>
@@ -249,3 +251,4 @@ void ResourceLibraryDialog::OnlistCtrlBeginDrag(wxListEvent& event)
 }
 
 }
+#endif

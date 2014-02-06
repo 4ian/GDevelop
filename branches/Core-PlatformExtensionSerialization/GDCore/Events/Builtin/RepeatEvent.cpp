@@ -100,6 +100,7 @@ void RepeatEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventE
  */
 void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int repeatTextHeight = 20;
@@ -126,10 +127,12 @@ void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Events
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+repeatTextHeight+border,
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
+#endif
 }
 
 unsigned int RepeatEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
@@ -145,12 +148,17 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width, const gd::Platfo
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
+#if !defined(GD_NO_WX_GUI)
     EditRepeatEvent dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
+#endif
 
     return ChangesMade;
 }

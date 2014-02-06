@@ -5,11 +5,12 @@
 
 #include "GDCore/CommonTools.h"
 #include <string>
-#if defined(GD_IDE_ONLY)
+#include <iostream>
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
 #endif
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 template<>
 std::string GD_CORE_API gd::ToString( const wxString & value )
 {

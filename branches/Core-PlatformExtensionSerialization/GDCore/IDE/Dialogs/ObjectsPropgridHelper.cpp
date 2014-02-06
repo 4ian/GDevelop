@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ObjectsPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
@@ -154,7 +155,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 
                 //Update the grid:
                 if ( grid->GetProperty("OBJECT_VARIABLES_CATEGORY") != NULL)
-                    grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY", 
+                    grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY",
                         _("Object variables") + " (" + gd::ToString(object->GetVariables().Count()) + ")");
             }
         }
@@ -361,3 +362,4 @@ void ObjectsPropgridHelper::UpdateAutomatismsSharedData(gd::Project & project, g
 }
 
 }
+#endif

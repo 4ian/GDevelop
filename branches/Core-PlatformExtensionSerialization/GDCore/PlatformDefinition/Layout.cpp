@@ -226,9 +226,11 @@ void Layout::SaveToXml(TiXmlElement * scene) const
     scene->SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup ? "true" : "false" );
     scene->SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused ? "true" : "false" );
 
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     TiXmlElement * settings = new TiXmlElement( "UISettings" );
     scene->LinkEndChild( settings );
     GetAssociatedLayoutEditorCanvasOptions().SaveToXml(settings);
+    #endif
 
     TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
     scene->LinkEndChild( grpsobjets );
@@ -287,9 +289,11 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
     if ( elem->Attribute( "stopSoundsOnStartup" ) != NULL ) { stopSoundsOnStartup = ToString(elem->Attribute( "stopSoundsOnStartup" )) == "true"; }
     if ( elem->Attribute( "disableInputWhenNotFocused" ) != NULL ) { disableInputWhenNotFocused = ToString(elem->Attribute( "disableInputWhenNotFocused" )) == "true"; }
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     associatedSettings.LoadFromXml(elem->FirstChildElement( "UISettings" ));
+    #endif
 
+    #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
         ObjectGroup::LoadFromXml(GetObjectGroups(), elem->FirstChildElement( "GroupesObjets" ));
     #endif

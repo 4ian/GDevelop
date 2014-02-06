@@ -8,7 +8,7 @@
 #include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
 #include <iostream>
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/SkinHelper.h"
 #include <wx/file.h>
 #include <wx/bitmap.h>
@@ -37,6 +37,7 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
     SetDefaultName(std::string(defaultName_));
     SetGroup(group_);
     className = className_;
+#if !defined(GD_NO_WX_GUI)
     if ( gd::SkinHelper::IconExists(icon24x24, 24) )
         SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
     else if ( wxFile::Exists(icon24x24) )
@@ -47,6 +48,7 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
             << " and the specified name is not an existing filename.";
         SetBitmapIcon(wxBitmap(24,24));
     }
+#endif
 #endif
 
     if ( instance ) instance->SetTypeName(name_);
@@ -139,7 +141,7 @@ AutomatismMetadata & AutomatismMetadata::SetGroup(const std::string & group_)
 }
 AutomatismMetadata & AutomatismMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     icon = bitmap_;
 #endif
     return *this;

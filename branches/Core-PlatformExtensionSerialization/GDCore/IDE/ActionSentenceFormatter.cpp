@@ -3,14 +3,14 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include <string>
 #include <vector>
 #include <utility>
 #include <sstream>
-#include <wx/log.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include <wx/config.h>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/InstructionMetadata.h"
@@ -36,7 +36,7 @@ string ActionSentenceFormatter::Translate(const gd::Instruction & action, const 
     if ( trad.empty() ) trad = "   "; //Prevent empty sentences that could trigger graphical glitches.
 
     //Format special
-    /*if ( trad.substr(0, 3) == "Do " && infos.parameters.size() >  ) 
+    /*if ( trad.substr(0, 3) == "Do " && infos.parameters.size() >  )
     {
 
     }*/

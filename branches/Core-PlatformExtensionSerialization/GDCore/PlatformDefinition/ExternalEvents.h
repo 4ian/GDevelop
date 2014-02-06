@@ -20,7 +20,7 @@ namespace gd
  *
  * \ingroup PlatformDefinition
  */
-class ExternalEvents
+class GD_CORE_API ExternalEvents
 {
 public:
     ExternalEvents();

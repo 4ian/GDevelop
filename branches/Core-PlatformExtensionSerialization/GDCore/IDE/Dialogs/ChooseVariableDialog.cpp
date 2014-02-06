@@ -2,18 +2,19 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ChooseVariableDialog.h"
 
 //(*InternalHeaders(ChooseVariableDialog)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/settings.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
 #include <wx/msgdlg.h>
@@ -431,7 +432,7 @@ void ChooseVariableDialog::OnvariablesListEndLabelEdit(wxListEvent& event)
             temporaryContainer->Rename(oldName, newName);
         else
         {
-            wxLogWarning(_("A variable with this name already exists."));
+            gd::LogWarning(_("A variable with this name already exists."));
             event.Veto();
         }
     }
@@ -594,3 +595,4 @@ wxTreeListItem ChooseVariableDialog::GetPreviousSibling(wxTreeListCtrl * ctrl, w
 
 }
 
+#endif

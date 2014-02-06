@@ -2,12 +2,12 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "EditRepeatEvent.h"
 
 //(*InternalHeaders(EditRepeatEvent)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -130,3 +130,4 @@ void EditRepeatEvent::OnhelpBtClick(wxCommandEvent& event)
 }
 
 }
+#endif

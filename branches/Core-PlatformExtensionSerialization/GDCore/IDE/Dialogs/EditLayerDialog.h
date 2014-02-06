@@ -3,9 +3,9 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_EDITLAYER_H
 #define GDCORE_EDITLAYER_H
-#if defined(GD_IDE_ONLY)
 
 //(*Headers(EditLayerDialog)
 #include <wx/sizer.h>

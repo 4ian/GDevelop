@@ -1,8 +1,14 @@
-#include "InstructionMetadata.h"
-#include "GDCore/CommonTools.h"
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
+#if !defined(GD_NO_WX_GUI)
 #include <wx/file.h>
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#endif
+#include "InstructionMetadata.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd
 {
@@ -29,6 +35,7 @@ canHaveSubInstructions(false),
 extensionNamespace(extensionNamespace_),
 hidden(false)
 {
+#if !defined(GD_NO_WX_GUI)
     if ( wxFile::Exists(icon_) )
     {
         icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY);
@@ -37,6 +44,7 @@ hidden(false)
     {
         smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
     } else { smallicon = wxBitmap(16,16);}
+#endif
 }
 
 ParameterMetadata::ParameterMetadata() :
@@ -45,11 +53,11 @@ codeOnly(false)
 {
 }
 
-InstructionMetadata & InstructionMetadata::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+InstructionMetadata & InstructionMetadata::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
 {
     ParameterMetadata info;
     info.type = type;
-    info.description = gd::ToString(description);
+    info.description = description;
     info.codeOnly = false;
     info.optional = parameterIsOptional;
     info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;

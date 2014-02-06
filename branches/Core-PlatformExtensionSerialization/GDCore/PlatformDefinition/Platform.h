@@ -166,6 +166,7 @@ public:
      */
     ///@{
 
+    #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Must provide a gd::LayoutEditorPreviewer object that will be stored and used
      * by LayoutEditorCanvas to display/run a preview of the layout of a project.
@@ -173,6 +174,7 @@ public:
      * The default implementation simply return a gd::LayoutEditorPreviewer object doing nothing.
      */
     virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+    #endif
 
     /**
      * \brief Must provide a gd::ProjectExporter object that will be used

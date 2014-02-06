@@ -1,4 +1,7 @@
-
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
 #ifndef EXPRESSIONMETADATA_H
 #define EXPRESSIONMETADATA_H
 #if defined(GD_IDE_ONLY)
@@ -6,8 +9,10 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include <boost/shared_ptr.hpp>
+#if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
-class wxString;
+#endif
+class wxBitmap;
 namespace gd { class Layout; }
 
 namespace gd
@@ -136,14 +141,18 @@ public:
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDescription() const { return description; }
     const std::string & GetGroup() const { return group; }
+#if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
+#endif
 
 private:
     std::string fullname;
     std::string description;
     std::string group;
     bool shown;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
+#endif
     std::string extensionNamespace;
 };
 
@@ -181,7 +190,7 @@ public:
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
-    gd::StrExpressionMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
+    gd::StrExpressionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \see gd::InstructionMetadata::AddCodeOnlyParameter
@@ -209,14 +218,18 @@ public:
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDescription() const { return description; }
     const std::string & GetGroup() const { return group; }
+#if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
+#endif
 
 private:
     std::string fullname;
     std::string description;
     std::string group;
     bool shown;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
+#endif
     std::string extensionNamespace;
 };
 

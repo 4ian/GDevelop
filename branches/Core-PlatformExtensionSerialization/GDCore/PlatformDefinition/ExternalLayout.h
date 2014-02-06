@@ -8,7 +8,7 @@
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include <boost/shared_ptr.hpp>
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #endif
 
@@ -49,7 +49,7 @@ public:
      */
     gd::InitialInstancesContainer & GetInitialInstances() { return instances; }
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     /**
      * \brief Get the user settings for the IDE.
      */
@@ -82,7 +82,7 @@ private:
 
     std::string name;
     gd::InitialInstancesContainer instances;
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions editionSettings;
     #endif
 };

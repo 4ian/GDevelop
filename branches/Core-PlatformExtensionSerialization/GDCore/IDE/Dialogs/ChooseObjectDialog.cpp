@@ -3,8 +3,9 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 //(*InternalHeaders(ChooseObjectDialog)
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
 #include <wx/image.h>
@@ -229,3 +230,4 @@ void ChooseObjectDialog::OnsearchCtrlText(wxCommandEvent& event)
 }
 
 }
+#endif

@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef HELPFILEACCESS_H
 #define HELPFILEACCESS_H
 #include "GDCore/Tools/Locale/LocaleManager.h"
@@ -88,3 +89,4 @@ private:
 
 }
 #endif // HELPFILEACCESS_H
+#endif

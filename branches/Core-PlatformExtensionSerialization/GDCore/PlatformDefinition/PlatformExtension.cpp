@@ -13,7 +13,7 @@
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/Event.h"
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 
@@ -603,7 +603,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
 template<class Archive>
 void PlatformExtension::Serialize(Archive & archive)
 {
-    archive(CEREAL_NVP(name), CEREAL_NVP(nameSpace), CEREAL_NVP(fullname), 
+    archive(CEREAL_NVP(name), CEREAL_NVP(nameSpace), CEREAL_NVP(fullname),
         CEREAL_NVP(informations), CEREAL_NVP(author), CEREAL_NVP(license));
 }*/
 #endif

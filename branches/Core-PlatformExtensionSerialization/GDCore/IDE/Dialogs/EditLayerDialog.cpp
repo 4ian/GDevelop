@@ -2,16 +2,17 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "EditLayerDialog.h"
 
 //(*InternalHeaders(EditLayerDialog)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
@@ -214,7 +215,7 @@ void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
     //Obligation d'avoir un nom sauf pour le calque de base
     if ( nameEdit->GetValue() == "" && nameEdit->IsEditable() )
     {
-        wxLogWarning(_("The name is incorrect"));
+        gd::LogWarning(_("The name is incorrect"));
         return;
     }
 
@@ -402,7 +403,7 @@ void EditLayerDialog::OndeleteCameraBtClick(wxCommandEvent& event)
 
     if ( tempLayer.GetCameraCount() == 1 )
     {
-        wxLogMessage(_("The layer must have at least one camera."));
+        gd::LogMessage(_("The layer must have at least one camera."));
         return;
     }
 
@@ -420,3 +421,4 @@ void EditLayerDialog::OnhelpBtClick(wxCommandEvent& event)
 }
 
 }
+#endif

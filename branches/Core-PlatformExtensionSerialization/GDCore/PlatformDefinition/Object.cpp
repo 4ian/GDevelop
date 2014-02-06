@@ -11,7 +11,9 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
 #endif
+#if !defined(GD_NO_WX_GUI)
 #include <SFML/Graphics.hpp>
+#endif
 
 namespace gd
 {
@@ -107,6 +109,7 @@ bool Object::HasAutomatismNamed(const std::string & name) const
 
 void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
+#if !defined(GD_NO_WX_GUI)
     sf::RectangleShape mask(instance.HasCustomSize() ?
                             sf::Vector2f(instance.GetCustomWidth(),instance.GetCustomHeight()) :
                             GetInitialInstanceDefaultSize(instance, project, layout));
@@ -116,6 +119,7 @@ void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarge
     mask.setOutlineThickness(1);
     mask.setOutlineColor(sf::Color( 255, 48, 69));
     renderTarget.draw(mask);
+#endif
 }
 #endif
 

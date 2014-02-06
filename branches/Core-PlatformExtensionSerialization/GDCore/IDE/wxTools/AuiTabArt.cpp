@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "AuiTabArt.h"
 #include <wx/aui/framemanager.h>
 #include <wx/aui/dockart.h>
@@ -692,7 +693,7 @@ void AuiTabArt::DrawTab(wxDC& dc,
         top_color = m_base_colour;
         bottom_color = m_base_colour;
         dc.GradientFillLinear(r, top_color, bottom_color, wxSOUTH);
-        
+
         // Adapt text color
         int average = (m_active_colour.Red()+m_active_colour.Green()+m_active_colour.Blue())/3;
         if (average < 127) dc.SetTextForeground(*wxWHITE);
@@ -1041,3 +1042,4 @@ void AuiTabArt::SetMeasuringFont(const wxFont& font)
 
 
 }
+#endif

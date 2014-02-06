@@ -1,6 +1,6 @@
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef PROJECTUPDATEDIALOG_H
 #define PROJECTUPDATEDIALOG_H
-#if defined(GD_IDE_ONLY)
 
 //(*Headers(ProjectUpdateDialog)
 #include <wx/sizer.h>

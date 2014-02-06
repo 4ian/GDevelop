@@ -12,7 +12,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/CommonTools.h"
 #include <iostream>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 

@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <iostream>
 #include "SkinHelper.h"
 #include "GDCore/IDE/wxTools/AuiTabArt.h"
@@ -17,7 +18,7 @@
 #include <wx/config.h>
 #include <wx/dcbuffer.h>
 #include <wx/settings.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 
 namespace gd
 {
@@ -410,3 +411,4 @@ void SkinHelper::ClearIconCache()
 }
 
 }
+#endif

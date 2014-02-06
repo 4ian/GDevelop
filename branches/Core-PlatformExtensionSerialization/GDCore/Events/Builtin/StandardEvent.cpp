@@ -73,14 +73,10 @@ void StandardEvent::LoadFromXml(gd::Project & project, const TiXmlElement * even
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
         gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
-    else
-        cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
         gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
-    else
-        cout << "Aucune informations sur les actions d'un évènement";
 
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
@@ -92,6 +88,7 @@ void StandardEvent::LoadFromXml(gd::Project & project, const TiXmlElement * even
  */
 void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
 
@@ -109,10 +106,12 @@ void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Even
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
 
     //Make sure that Render is rendering an event with the same height as GetRenderedHeight : Use same values for border and similar calls to compute heights
+#endif
 }
 
 unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
@@ -127,6 +126,9 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 /**

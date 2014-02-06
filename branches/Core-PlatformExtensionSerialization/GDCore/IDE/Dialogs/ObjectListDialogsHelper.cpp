@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ObjectListDialogsHelper.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -16,9 +16,9 @@
 namespace gd
 {
 
-void ObjectListDialogsHelper::SetSearchText(std::string searchText_) 
-{ 
-    searchText = searchText_; 
+void ObjectListDialogsHelper::SetSearchText(std::string searchText_)
+{
+    searchText = searchText_;
     boost::to_upper(searchText);
 }
 
@@ -118,7 +118,7 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
         std::string name = objects.GetObject(i).GetName();
 
         //Only add objects if they match the search criteria
-        if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) && 
+        if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
         {
             /*int thumbnailID = -1;
@@ -155,7 +155,7 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
     wxTreeItemId lastAddedItem;
     for (unsigned int i = 0;i<groups.size();++i)
     {
-        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) && 
+        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
             wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName()/*, 1*/ );
@@ -177,3 +177,4 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
 }
 
 }
+#endif

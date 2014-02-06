@@ -1,3 +1,5 @@
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/ribbon/art.h>
 #include <wx/ribbon/art_internal.h>
 #include <wx/ribbon/buttonbar.h>
@@ -3150,3 +3152,4 @@ RibbonMetroArtProvider::GetRibbonHelpButtonArea(const wxRect& rect)
 }
 
 }
+#endif

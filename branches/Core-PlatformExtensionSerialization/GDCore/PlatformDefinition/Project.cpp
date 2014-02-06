@@ -26,12 +26,12 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/VersionWrapper.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include "Project.h"
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/propgrid/propgrid.h>
 #include <wx/settings.h>
-#include <wx/log.h>
-#include <wx/intl.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/settings.h>
@@ -52,8 +52,10 @@ Project::Project() :
     windowHeight(600),
     maxFPS(60),
     minFPS(10),
-    verticalSync(false),
-    imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
+    verticalSync(false)
+    #if !defined(GD_NO_WX_GUI)
+    ,imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
+    #endif
     #if defined(GD_IDE_ONLY)
     ,currentPlatform(NULL),
     GDMajorVersion(gd::VersionWrapper::Major()),
@@ -61,7 +63,9 @@ Project::Project() :
     dirty(false)
     #endif
 {
+    #if !defined(GD_NO_WX_GUI)
     imageManager->SetGame(this);
+    #endif
     #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -482,7 +486,7 @@ void OpenImagesFromGD2010498(gd::Project & game, const TiXmlElement * imagesElem
 }
 //End of compatibility code
 
-
+#if !defined(GD_NO_WX_GUI)
 //Compatibility with GD2.x
 class SpriteObjectsPositionUpdater : public gd::InitialInstanceFunctor
 {
@@ -521,6 +525,8 @@ private:
 //End of compatibility code
 #endif
 
+#endif
+
 void Project::LoadFromXml(const TiXmlElement * rootElement)
 {
     if ( rootElement == NULL ) return;
@@ -529,7 +535,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
     //Checking version
     #if defined(GD_IDE_ONLY)
-    wxString updateText;
+    std::string updateText;
     GDMajorVersion = 0;
     GDMinorVersion = 0;
     int build = 0;
@@ -546,7 +552,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         GDMinorVersion = minor;
         if ( GDMajorVersion > gd::VersionWrapper::Major() )
         {
-            wxLogWarning( _( "The version of Game Develop used to create this game seems to be a new version.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+            gd::LogWarning( _( "The version of Game Develop used to create this game seems to be a new version.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
         }
         else
         {
@@ -554,14 +560,14 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
                  (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build >  gd::VersionWrapper::Build()) ||
                  (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build == gd::VersionWrapper::Build() && revision > gd::VersionWrapper::Revision()) )
             {
-                wxLogWarning( _( "The version of Game Develop used to create this game seems to be greater.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+                gd::LogWarning( _( "The version of Game Develop used to create this game seems to be greater.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
             }
         }
 
         //Compatibility code
         if ( GDMajorVersion <= 1 )
         {
-            wxLogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
+            gd::LogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
             return;
         }
         //End of Compatibility code
@@ -640,7 +646,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
                 scenes.back()->LoadFromXml(*this, elem);
 
                 //Compatibility code with GD 2.x
-                #if defined(GD_IDE_ONLY)
+                #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
                 if ( GDMajorVersion <= 2 )
                 {
                     SpriteObjectsPositionUpdater updater(*this, *scenes.back());
@@ -703,7 +709,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         }
     }
 
-    #if defined(GD_IDE_ONLY) 
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     if (!updateText.empty()) //TODO
     {
         ProjectUpdateDialog updateDialog(NULL, updateText);
@@ -941,7 +947,9 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
         if ( GetResourcesManager().GetResource(resources[i]).UseFile() )
             worker.ExposeResource(GetResourcesManager().GetResource(resources[i]).GetFile());
     }
+    #if !defined(GD_NO_WX_GUI)
     wxSafeYield();
+    #endif
 
     //Add layouts resources
     for ( unsigned int s = 0;s < GetLayoutCount();s++ )
@@ -956,14 +964,19 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     {
         LaunchResourceWorkerOnEvents(*this, GetExternalEvents(s).GetEvents(), worker);
     }
+    #if !defined(GD_NO_WX_GUI)
     wxSafeYield();
+    #endif
 
     //Add global objects resources
     for (unsigned int j = 0;j<GetObjectsCount();++j)
         GetObject(j).ExposeResources(worker);
-    wxSafeYield();
-}
 
+    #if !defined(GD_NO_WX_GUI)
+    wxSafeYield();
+    #endif
+}
+#if !defined(GD_NO_WX_GUI)
 void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
 {
     grid->Append( new wxPropertyCategory(_("Properties")) );
@@ -979,10 +992,10 @@ void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
     grid->Append( new wxIntProperty(_("Maximum FPS"), wxPG_LABEL, GetMaximumFPS()) );
     grid->Append( new wxUIntProperty(_("Minimum FPS"), wxPG_LABEL, GetMinimumFPS()) );
 
-    grid->SetPropertyCell(_("Globals variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
-    grid->SetPropertyReadOnly(_("Globals variables"));
-    grid->SetPropertyCell(_("Extensions"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
-    grid->SetPropertyReadOnly(_("Extensions"));
+    grid->SetPropertyCell(wxString(_("Globals variables")), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
+    grid->SetPropertyReadOnly(wxString(_("Globals variables")));
+    grid->SetPropertyCell(wxString(_("Extensions")), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
+    grid->SetPropertyReadOnly(wxString(_("Extensions")));
 
     if ( GetMaximumFPS() == -1 )
     {
@@ -1036,7 +1049,7 @@ void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
 void Project::OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event)
 {
     if (event.GetPropertyName() == _("Limit the framerate") )
-        grid->EnableProperty(_("Maximum FPS"), grid->GetProperty(_("Limit the framerate"))->GetValue().GetBool());
+        grid->EnableProperty(wxString(_("Maximum FPS")), grid->GetProperty(_("Limit the framerate"))->GetValue().GetBool());
 
     UpdateFromPropertyGrid(grid);
 }
@@ -1058,7 +1071,7 @@ void Project::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEve
         }
     }
 }
-
+#endif
 
 bool Project::SaveToFile(const std::string & filename)
 {
@@ -1075,7 +1088,7 @@ bool Project::SaveToFile(const std::string & filename)
     //Wrie XML to file
     if ( !doc.SaveFile( filename.c_str() ) )
     {
-        wxLogError( _( "Unable to save file ")+filename+_("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        gd::LogError( _( "Unable to save file ")+filename+_("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
         return false;
     }
 
@@ -1088,10 +1101,10 @@ bool Project::LoadFromFile(const std::string & filename)
     TiXmlDocument doc;
     if ( !doc.LoadFile(filename.c_str()) )
     {
-        wxString errorTinyXmlDesc = doc.ErrorDesc();
-        wxString error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
+        std::string errorTinyXmlDesc = doc.ErrorDesc();
+        std::string error = gd::ToString(_( "Error while loading :" )) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
 
-        wxLogError( error );
+        gd::LogError( error );
         return false;
     }
 
@@ -1156,8 +1169,10 @@ void Project::Init(const gd::Project & game)
 
     //Resources
     resourcesManager = game.resourcesManager;
+    #if !defined(GD_NO_WX_GUI)
     imageManager = boost::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
     imageManager->SetGame(this);
+    #endif
 
     GetObjects().clear();
     for (unsigned int i =0;i<game.GetObjects().size();++i)

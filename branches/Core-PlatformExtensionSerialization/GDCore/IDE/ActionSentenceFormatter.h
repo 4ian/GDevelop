@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef TRANSLATEACTION_H
 #define TRANSLATEACTION_H
 #include <string>
@@ -89,3 +90,4 @@ private:
 
 }
 #endif // TRANSLATEACTION_H
+#endif

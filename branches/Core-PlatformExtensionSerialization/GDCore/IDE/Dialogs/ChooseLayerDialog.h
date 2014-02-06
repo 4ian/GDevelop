@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef CHOIXLAYER_H
 #define CHOIXLAYER_H
 
@@ -72,4 +73,5 @@ private:
 
 
 }
+#endif
 #endif

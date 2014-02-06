@@ -3,12 +3,13 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <string>
 #include <vector>
 //(*InternalHeaders(EditExpressionDialog)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -974,10 +975,4 @@ void EditExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 }
 
 }
-
-
-
-
-
-
-
+#endif

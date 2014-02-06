@@ -16,7 +16,9 @@
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/Layer.h"
 #if defined(GD_IDE_ONLY)
+#if !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
+#endif
 namespace gd { class BaseEvent; }
 namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
 #endif
@@ -250,7 +252,7 @@ public:
      */
     void UpdateAutomatismsSharedData(gd::Project & project);
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     /**
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
@@ -438,6 +440,8 @@ private:
     static gd::Layer                            badLayer; ///< Null object, returned when GetLayer can not find an appropriate layer.
     #if defined(GD_IDE_ONLY)
     std::vector < gd::BaseEventSPtr >           events; ///< Scene events
+    #endif
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions               associatedSettings;
     #endif
 

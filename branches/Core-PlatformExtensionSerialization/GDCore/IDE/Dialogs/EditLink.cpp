@@ -1,9 +1,11 @@
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "EditLink.h"
 
 //(*InternalHeaders(EditLink)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -188,3 +190,4 @@ void EditLink::OnOnlyEventsCheckSelect(wxCommandEvent& event)
 }
 
 }
+#endif

@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #ifndef ChooseAutomatismDialog_H
 #define ChooseAutomatismDialog_H
@@ -95,4 +96,5 @@ private:
 };
 
 }
+#endif
 #endif

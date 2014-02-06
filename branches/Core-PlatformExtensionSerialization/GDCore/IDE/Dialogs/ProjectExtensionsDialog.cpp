@@ -2,13 +2,13 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ProjectExtensionsDialog.h"
 
 //(*InternalHeaders(ProjectExtensionsDialog)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -23,7 +23,7 @@
 #endif
 #include <wx/clntdata.h>
 #include <wx/imaglist.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
@@ -403,7 +403,7 @@ void ProjectExtensionsDialog::OnremovePlatformMenuItemSelected(wxCommandEvent& e
 {
     if ( !project.RemovePlatform(currentPlatform->GetName()) )
     {
-        wxLogWarning(_("Unable to remove this platform: The project must use at least one plaform."));
+        gd::LogWarning(_("Unable to remove this platform: The project must use at least one plaform."));
     }
     RefreshPlatformList();
     RefreshExtensionList();
@@ -460,3 +460,4 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
 
 
 }
+#endif

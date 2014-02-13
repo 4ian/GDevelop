@@ -134,6 +134,7 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
 #if defined(GD_IDE_ONLY)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
+    std::cout << "Reloading resources for" << name;
     for ( unsigned int j = 0; j < animations.size();j++ )
     {
         Animation & anim = animations[j].GetNonConst();
@@ -147,6 +148,7 @@ void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
             }
         }
     }
+    std::cout << "END" << std::endl;
 }
 
 const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate) const
@@ -209,7 +211,7 @@ sf::Vector2f SpriteObject::GetInitialInstanceDefaultSize(gd::InitialInstance & i
 sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
-    if ( associatedSprite == NULL ) return sf::Vector2f(0,0);
+    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return sf::Vector2f(0,0);
 
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;

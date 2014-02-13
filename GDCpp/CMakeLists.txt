@@ -14,7 +14,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     ENDIF()
 endif()
 if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
-	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths" )
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --bind -Wno-warn-absolute-paths" )
 ENDIF()
 
 #Common directories:
@@ -64,6 +64,7 @@ ENDIF(WIN32)
 set(GDCpp_extra_definitions "${GDCpp_extra_definitions} GD_IDE_ONLY=1;")
 IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
 	add_definitions( -DGD_NO_WX_GUI )
+	add_definitions( -DEMSCRIPTEN )
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	add_definitions( -DDEBUG )

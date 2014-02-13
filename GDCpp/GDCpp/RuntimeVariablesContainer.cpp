@@ -21,6 +21,8 @@ RuntimeVariablesContainer& RuntimeVariablesContainer::operator=(const gd::Variab
 {
     Clear();
     Merge(container);
+
+    return *this;
 }
 
 void RuntimeVariablesContainer::Clear()

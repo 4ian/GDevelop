@@ -156,6 +156,10 @@ double GD_API angleDifference(double angle1, double angle2)
     return mod(mod(angle1 - angle2, 360.0) + 180.0, 360.0) - 180.0;
 }
 
+double GD_API lerp(double a, double b, double x)
+{
+    return a+(b-a)*x;
+}
 
 }
 }

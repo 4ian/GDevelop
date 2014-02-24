@@ -84,12 +84,12 @@ MathematicalToolsExtension::MathematicalToolsExtension()
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::cbrt").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
 
-    AddExpression("ceil", _("Ceil ( Integer part )"), _("Ceil ( Integer part )"), _("Mathematical tools"), "res/mathfunction.png")
+    AddExpression("ceil", _("Ceil (round up)"), _("Round number up to an integer"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::ceil").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
 
-    AddExpression("floor", _("Floor ( integer part )"), _("Floor ( integer part )"), _("Mathematical tools"), "res/mathfunction.png")
+    AddExpression("floor", _("Floor (round down)"), _("Round number down to an integer"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::floor").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
@@ -187,7 +187,7 @@ MathematicalToolsExtension::MathematicalToolsExtension()
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::sinh").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
 
-    AddExpression("sqrt", _("Square root of a number"), _("Square root of a number"), _("Mathematical tools"), "res/mathfunction.png")
+    AddExpression("sqrt", _("Square root"), _("Square root of a number"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::sqrt").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
@@ -201,10 +201,15 @@ MathematicalToolsExtension::MathematicalToolsExtension()
         .AddParameter("expression", _("Expression"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::tanh").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
-
     AddExpression("trunc", _("Truncation"), _("Troncate a number"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"))
         .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::trunc").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
+
+    AddExpression("lerp", _("Lerp (Linear interpolation)"), _("Linearly interpolate a to b by x"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("a (in a+(b-a)*x)"))
+        .AddParameter("expression", _("b (in a+(b-a)*x)"))
+        .AddParameter("expression", _("x (in a+(b-a)*x)"))
+        .codeExtraInformation.SetFunctionName("GDpriv::MathematicalTools::lerp").SetIncludeFile("GDCpp/BuiltinExtensions/MathematicalTools.h");
 
     #endif
 }

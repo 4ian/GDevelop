@@ -4,6 +4,21 @@
 #include "GDCpp/profile.h"
 #include <vector>
 
+bool RuntimeContext::TriggerOnce(unsigned int conditionId)
+{
+	onceConditionsTriggered[conditionId] = true; //Remember that we triggered this condition.
+
+	//Return true only if the condition was not triggered the last frame.
+	std::map <unsigned int, bool>::iterator lastFrame = onceConditionsTriggeredLastFrame.find(conditionId);
+	return lastFrame == onceConditionsTriggeredLastFrame.end() || lastFrame->second == false;
+}
+
+void RuntimeContext::StartNewFrame()
+{
+	onceConditionsTriggeredLastFrame = onceConditionsTriggered;
+	onceConditionsTriggered.clear();
+}
+
 std::vector<RuntimeObject*> RuntimeContext::GetObjectsRawPointers(const std::string & name)
 {
     return scene->objectsInstances.GetObjectsRawPointers(name);

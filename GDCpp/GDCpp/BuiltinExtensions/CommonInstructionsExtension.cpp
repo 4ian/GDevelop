@@ -197,13 +197,34 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddCondition("Not",
-                   _("No"),
+                   _("Not"),
                    _("Return the contrary of the result of the sub conditions"),
                    _("Invert the logical result of these conditions:"),
                    _("Advanced"),
                    "res/conditions/not24.png",
                    "res/conditions/not.png")
             .SetCanHaveSubInstructions()
+            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+    }
+
+    {
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
+        {
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+            {
+                unsigned int uniqueId = (unsigned int)&instruction;
+                return "conditionTrue = runtimeContext->TriggerOnce("+ToString(uniqueId)+");\n";
+            };
+        };
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+
+        AddCondition("Once",
+                   _("Trigger once while true"),
+                   _("Force the actions of the event to be run just once when the all the other conditions first becomes true."),
+                   _("Trigger once"),
+                   _("Advanced"),
+                   "res/conditions/once24.png",
+                   "res/conditions/once.png")
             .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 

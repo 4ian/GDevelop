@@ -49,6 +49,7 @@ double GD_API tanh(double expression);
 double GD_API trunc(double expression);
 double GD_API mod(double x, double y);
 double GD_API angleDifference(double angle1, double angle2);
+double GD_API lerp(double a, double b, double x);
 
 }
 }

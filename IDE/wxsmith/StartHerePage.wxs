@@ -172,25 +172,6 @@
 												<option>1</option>
 											</object>
 											<object class="sizeritem">
-												<object class="wxStaticBitmap" name="ID_STATICBITMAP7" variable="StaticBitmap7" member="yes">
-													<bitmap>res/paint.png</bitmap>
-													<style>wxNO_BORDER</style>
-												</object>
-												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-												<border>5</border>
-												<option>1</option>
-											</object>
-											<object class="sizeritem">
-												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL15" variable="resourcesLink" member="yes">
-													<label>View free to use resources</label>
-													<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
-													<handler function="OnresourcesLinkClick" entry="EVT_HYPERLINK" />
-												</object>
-												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-												<border>5</border>
-												<option>1</option>
-											</object>
-											<object class="sizeritem">
 												<object class="wxStaticBitmap" name="ID_STATICBITMAP16" variable="StaticBitmap16" member="yes">
 													<bitmap>res/fb16.png</bitmap>
 													<style>wxNO_BORDER</style>
@@ -399,55 +380,71 @@
 										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<option>1</option>
 									</object>
-									<object class="spacer">
-										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-										<option>1</option>
-										<size>1,9</size>
-									</object>
-									<object class="sizeritem">
-										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-											<label>Examples</label>
-											<fg>#5F5F5F</fg>
-											<font>
-												<size>12</size>
-											</font>
-										</object>
-										<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-										<border>5</border>
-										<option>1</option>
-									</object>
-									<object class="sizeritem">
-										<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-											<cols>3</cols>
-											<object class="sizeritem">
-												<object class="wxStaticBitmap" name="ID_STATICBITMAP11" variable="StaticBitmap11" member="yes">
-													<bitmap>res/openicon.png</bitmap>
-													<style>wxNO_BORDER</style>
-												</object>
-												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-												<border>5</border>
-												<option>1</option>
-											</object>
-											<object class="sizeritem">
-												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL21" variable="HyperlinkCtrl9" member="yes">
-													<label>Open examples</label>
-													<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
-													<handler function="OnopenExamplesLinkClick" entry="EVT_HYPERLINK" />
-												</object>
-												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-												<border>5</border>
-												<option>1</option>
-											</object>
-										</object>
-										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-										<option>1</option>
-									</object>
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 							</object>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+							<cols>1</cols>
+							<growablecols>0</growablecols>
+							<object class="sizeritem">
+								<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+									<label>Community news</label>
+									<fg>#5F5F5F</fg>
+									<font>
+										<size>12</size>
+									</font>
+								</object>
+								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="newsTxtSizer" member="yes">
+									<cols>3</cols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT4" variable="newsTxt" member="yes">
+											<label>No news for now!</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer13" member="no">
+									<cols>3</cols>
+									<object class="sizeritem">
+										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL13" variable="newsLink1" member="yes">
+											<label>NewsLink1</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL14" variable="newsLink2" member="yes">
+											<label>NewsLink2</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
 						<option>1</option>
 					</object>
 				</object>

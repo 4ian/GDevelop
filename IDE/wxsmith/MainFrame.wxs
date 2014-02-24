@@ -24,21 +24,21 @@
 					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
-						<growablerows>1</growablerows>
-						<object class="sizeritem">
-							<object class="Custom" name="ID_CUSTOM1" subclass="wxInfoBar" variable="infoBar" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID));</creating_code>
-								<include_file>wx/infobar.h</include_file>
-								<style></style>
-							</object>
-							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-							<option>1</option>
-						</object>
+						<growablerows>0</growablerows>
 						<object class="sizeritem">
 							<object class="wxAuiNotebook" name="ID_AUINOTEBOOK1" variable="editorsNotebook" member="yes">
 								<style>wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TOP|wxNO_BORDER</style>
 								<handler function="OneditorsNotebookPageClose" entry="EVT_AUINOTEBOOK_PAGE_CLOSE" />
 								<handler function="OnNotebook1PageChanged" entry="EVT_AUINOTEBOOK_PAGE_CHANGED" />
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="Custom" name="ID_CUSTOM1" subclass="wxInfoBar" variable="infoBar" member="yes">
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID));</creating_code>
+								<include_file>wx/infobar.h</include_file>
+								<style></style>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<option>1</option>

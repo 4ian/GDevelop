@@ -169,12 +169,12 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer2->SetSizeHints(liveEditingPanel);
 	eventContextPanel = new wxPanel(eventsPanel, ID_PANEL3, wxPoint(136,24), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 7, 0, 0);
-	addEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/eventaddicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	addEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP1, gd::SkinHelper::GetIcon("add_event", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	addEventIcon->SetToolTip(_("Add an event"));
 	FlexGridSizer3->Add(addEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT1, _("Add an event"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(addEventBt, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
-	addSubEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/subeventaddicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	addSubEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("add_subevent", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	addSubEventIcon->SetToolTip(_("Add a sub event"));
 	FlexGridSizer3->Add(addSubEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addSubEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT2, _("A sub event"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
@@ -738,8 +738,13 @@ void EventsEditor::OneventsPanelLeftUp(wxMouseEvent& event)
         isResizingColumns = false;
     }
 
-    if ( selection.EndDragEvent(!ctrlKeyDown, selection.IsEventHighlightedOnBottomPart()) || selection.EndDragInstruction(!ctrlKeyDown, selection.IsInstructionHighlightedOnBottomPart()) )
+    if (selection.EndDragEvent(!ctrlKeyDown, selection.IsEventHighlightedOnBottomPart()))
         ChangesMadeOnEvents();
+    else if (std::vector<gd::Instruction> * list = selection.EndDragInstruction(!ctrlKeyDown, selection.IsInstructionHighlightedOnBottomPart()))
+    {
+        EnsureTriggerOnceIsLastCondition(*list);
+        ChangesMadeOnEvents();
+    }
 
     Refresh();
 }
@@ -1219,6 +1224,32 @@ void EventsEditor::OnliveEditText(wxCommandEvent& event)
     liveEditingChangesMade = true;
 }
 
+void EventsEditor::EnsureTriggerOnceIsLastCondition(std::vector<gd::Instruction> & conditions) {
+	if (conditions.empty()) return;
+
+	bool endWithTriggerOnce = conditions.back().GetType() == "BuiltinCommonInstructions::Once";
+	bool multipleOnce = false;
+	for (unsigned int i = 0;i<conditions.size()-1;)
+	{
+		if (conditions[i].GetType() == "BuiltinCommonInstructions::Once")
+		{
+			if (!endWithTriggerOnce)
+			{
+				conditions.push_back(conditions[i]); //"Move" the "Trigger once" condition at the end
+				endWithTriggerOnce = true;
+			}
+			else
+				multipleOnce = true;
+
+			conditions.erase(conditions.begin()+i); //In any case, remove the trigger once as it is not at the end.
+		}
+		else
+			++i;
+	}
+
+	if (multipleOnce)
+		mainFrameWrapper.GetInfoBar()->ShowMessage(_("Only one \"Trigger Once\" condition is needed in a list of conditions."));
+}
 
 void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 {
@@ -1237,6 +1268,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 
             listHighlighted.instructionList->push_back(instruction);
             listHighlighted.event->eventHeightNeedUpdate = true;
+            EnsureTriggerOnceIsLastCondition(*listHighlighted.instructionList);
             Refresh();
             ChangesMadeOnEvents();
         }
@@ -1541,6 +1573,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
             else
                 instructionList->push_back(instructions[i]);
         }
+        EnsureTriggerOnceIsLastCondition(*instructionList);
 
         if ( event != NULL ) event->eventHeightNeedUpdate = true;
         if ( !instructions.empty() ) ChangesMadeOnEvents();

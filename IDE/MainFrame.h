@@ -87,19 +87,25 @@ public:
     }
 
     /**
-     * Change the current game
+     *  \briefChange the current game
      */
     void SetCurrentGame(unsigned int i, bool refreshProjectManager = true);
 
     /**
-     * Open a game from its filename
+     *  \briefOpen a game from its filename
      */
     void Open(string FichierJeu);
 
     /**
-     * Open the new project dialog
+     *  \briefOpen the new project dialog
      */
     void CreateNewProject();
+
+    /**
+     * \brief Ask the start page to update its news using
+     * UpdateChecker.
+     */
+    void RefreshNews();
 
     /**
      * Get a pointer to the notebook containing editors
@@ -237,8 +243,8 @@ public:
 private:
 
     //(*Identifiers(MainFrame)
-    static const long ID_CUSTOM1;
     static const long ID_AUINOTEBOOK1;
+    static const long ID_CUSTOM1;
     static const long ID_PANEL1;
     static const long ID_MENUITEM1;
     static const long ID_MENUITEM2;

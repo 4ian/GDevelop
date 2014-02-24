@@ -122,8 +122,8 @@ modificationCount(0)
 	//*)
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idAddObjet, _( "Add an object" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add an object") );
-    toolbar->AddTool( idDelObjet, _( "Delete the selected object" ), wxBitmap( gd::SkinHelper::GetIcon("delete", 16) ), _("Delete the selected object") );
+    toolbar->AddTool( idAddObjet, _( "Add an object" ), gd::SkinHelper::GetIcon("add", 16), _("Add an object") );
+    toolbar->AddTool( idDelObjet, _( "Delete the selected object" ), gd::SkinHelper::GetIcon("delete", 16), _("Delete the selected object") );
     toolbar->Realize();
     gd::SkinHelper::ApplyCurrentSkin(*toolbar);
 

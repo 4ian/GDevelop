@@ -61,8 +61,8 @@
 #include "Dialogs/HelpViewerDlg.h"
 
 //(*IdInit(MainFrame)
-const long MainFrame::ID_CUSTOM1 = wxNewId();
 const long MainFrame::ID_AUINOTEBOOK1 = wxNewId();
+const long MainFrame::ID_CUSTOM1 = wxNewId();
 const long MainFrame::ID_PANEL1 = wxNewId();
 const long MainFrame::ID_MENUITEM1 = wxNewId();
 const long MainFrame::ID_MENUITEM2 = wxNewId();
@@ -152,11 +152,11 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
-    FlexGridSizer2->AddGrowableRow(1);
-    infoBar = new wxInfoBar(Panel1,ID_CUSTOM1);
-    FlexGridSizer2->Add(infoBar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer2->AddGrowableRow(0);
     editorsNotebook = new wxAuiNotebook(Panel1, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TOP|wxNO_BORDER);
     FlexGridSizer2->Add(editorsNotebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    infoBar = new wxInfoBar(Panel1,ID_CUSTOM1);
+    FlexGridSizer2->Add(infoBar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Panel1->SetSizer(FlexGridSizer2);
     FlexGridSizer2->Fit(Panel1);
     FlexGridSizer2->SetSizeHints(Panel1);
@@ -959,3 +959,7 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
     m_mgr.Update();
 }
 
+void MainFrame::RefreshNews()
+{
+    startPage->RefreshNewsUsingUpdateChecker();
+}

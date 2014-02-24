@@ -16,6 +16,7 @@
 #include "GDCore/CommonTools.h"
 #include <wx/mimetype.h> // mimetype support
 #include "MainFrame.h"
+#include "UpdateChecker.h"
 
 using namespace gd;
 
@@ -33,8 +34,6 @@ const long StartHerePage::ID_STATICBITMAP5 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL3 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP6 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL4 = wxNewId();
-const long StartHerePage::ID_STATICBITMAP7 = wxNewId();
-const long StartHerePage::ID_HYPERLINKCTRL15 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP16 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL1 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP17 = wxNewId();
@@ -54,9 +53,10 @@ const long StartHerePage::ID_STATICBITMAP14 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL10 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP15 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL11 = wxNewId();
+const long StartHerePage::ID_STATICTEXT3 = wxNewId();
 const long StartHerePage::ID_STATICTEXT4 = wxNewId();
-const long StartHerePage::ID_STATICBITMAP11 = wxNewId();
-const long StartHerePage::ID_HYPERLINKCTRL21 = wxNewId();
+const long StartHerePage::ID_HYPERLINKCTRL13 = wxNewId();
+const long StartHerePage::ID_HYPERLINKCTRL14 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP8 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL16 = wxNewId();
 //*)
@@ -79,6 +79,7 @@ mainEditor(mainEditor_)
 	wxFlexGridSizer* FlexGridSizer7;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer13;
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
@@ -133,10 +134,6 @@ mainEditor(mainEditor_)
 	FlexGridSizer7->Add(StaticBitmap6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl4 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL4, _("Go on the forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
 	FlexGridSizer7->Add(HyperlinkCtrl4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBitmap7 = new wxStaticBitmap(this, ID_STATICBITMAP7, wxBitmap(wxImage(_T("res/paint.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP7"));
-	FlexGridSizer7->Add(StaticBitmap7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	resourcesLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL15, _("View free to use resources"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL15"));
-	FlexGridSizer7->Add(resourcesLink, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap16 = new wxStaticBitmap(this, ID_STATICBITMAP16, wxBitmap(wxImage(_T("res/fb16.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP16"));
 	FlexGridSizer7->Add(StaticBitmap16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -186,20 +183,26 @@ mainEditor(mainEditor_)
 	recent7Bt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL11, _("-"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL11"));
 	FlexGridSizer8->Add(recent7Bt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer5->Add(1,9,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Examples"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	StaticText4->SetForegroundColour(wxColour(95,95,95));
-	wxFont StaticText4Font(12,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	StaticText4->SetFont(StaticText4Font);
-	FlexGridSizer5->Add(StaticText4, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap11 = new wxStaticBitmap(this, ID_STATICBITMAP11, wxBitmap(wxImage(_T("res/openicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP11"));
-	FlexGridSizer2->Add(StaticBitmap11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl9 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL21, _("Open examples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL21"));
-	FlexGridSizer2->Add(HyperlinkCtrl9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer5->Add(FlexGridSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer1->Add(FlexGridSizer5, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer2->AddGrowableCol(0);
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Community news"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3->SetForegroundColour(wxColour(95,95,95));
+	wxFont StaticText3Font(12,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText3->SetFont(StaticText3Font);
+	FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	newsTxtSizer = new wxFlexGridSizer(0, 3, 0, 0);
+	newsTxt = new wxStaticText(this, ID_STATICTEXT4, _("No news for now!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	newsTxtSizer->Add(newsTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(newsTxtSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
+	newsLink1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL13, _("NewsLink1"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL13"));
+	FlexGridSizer13->Add(newsLink1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	newsLink2 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL14, _("NewsLink2"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL14"));
+	FlexGridSizer13->Add(newsLink2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer13, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer9->Add(FlexGridSizer2, 1, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 20);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 0, 0, 0);
 	FlexGridSizer6->AddGrowableCol(1);
@@ -216,7 +219,6 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL12,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnnewProjectLinkClick);
 	Connect(ID_HYPERLINKCTRL18,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnguideBtClick);
 	Connect(ID_HYPERLINKCTRL19,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OntutoBtClick);
-	Connect(ID_HYPERLINKCTRL15,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnresourcesLinkClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnfbLinkClick);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OngoogleplusLinkClick);
 	Connect(ID_HYPERLINKCTRL5,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent1BtClick);
@@ -226,7 +228,6 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL8,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent5BtClick);
 	Connect(ID_HYPERLINKCTRL10,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent6BtClick);
 	Connect(ID_HYPERLINKCTRL11,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent7BtClick);
-	Connect(ID_HYPERLINKCTRL21,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnopenExamplesLinkClick);
 	//*)
 
     wxString donateLink = _("http://www.compilgames.net/donate.php");
@@ -236,6 +237,23 @@ mainEditor(mainEditor_)
 	HyperlinkCtrl5->SetURL(donateLink);
 
     Refresh();
+}
+
+void StartHerePage::RefreshNewsUsingUpdateChecker()
+{
+	UpdateChecker * checker = UpdateChecker::GetInstance();
+	if (!checker->news.empty())
+		newsTxt->SetLabel(checker->news);
+	else
+		newsTxt->SetLabel(_("No news for now!"));
+
+	newsTxt->Wrap(newsTxtSizer->GetSize().x);
+
+	newsLink1->SetLabel(checker->newsLinkLabel1);
+	newsLink1->SetURL(checker->newsLink1);
+	newsLink2->SetLabel(checker->newsLinkLabel2);
+	newsLink2->SetURL(checker->newsLink2);
+	Layout();
 }
 
 StartHerePage::~StartHerePage()
@@ -288,6 +306,8 @@ void StartHerePage::Refresh()
         if (result.length() > 30) result = result.Left(5)+_("...")+result.Right(23);
         recent7Bt->SetLabel( result );
     }
+
+    RefreshNewsUsingUpdateChecker();
 }
 
 void StartHerePage::Onrecent1BtClick(wxCommandEvent& event)
@@ -428,5 +448,3 @@ void StartHerePage::OngoogleplusLinkClick(wxCommandEvent& event)
         delete filetype;
     }
 }
-
-

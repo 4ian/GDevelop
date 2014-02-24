@@ -217,7 +217,7 @@ Credits::Credits(wxWindow* parent)
     string status = gd::VersionWrapper::Status();
     string version ="Game Develop "+nbversion+" "+status+"";
 	StaticText1->SetLabel(version);
-	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: ( No special order)")+"</h5>\n"
+	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: (No special order)")+"</h5>\n"
                       +"<br>"
                       +_("François Dumortier : Game Develop logo design and website conception.")+"<br>"
                       +"( <a href=http://www.fdumortier.com>http://www.fdumortier.com</a> )"+"<br>"
@@ -227,10 +227,12 @@ Credits::Credits(wxWindow* parent)
                       +"<br>"
                       +_("Constantine Shvetsov: Awesome design of icons")+"<br>"
                       +"<br>"
-                      +_("Diego Schiavon : English translation of the tutorial")+"<br>"
+                      +_("Franco Maciel: Spanish translation")+"<br>"
                       +"<br>"
                       +_("MillionthVector : Graphics of various examples.")+"<br>"
                       +"( <a href=http://pixelhoot.x10.mx/>http://pixelhoot.x10.mx</a> )"+"<br>"
+                      +"<br>"
+                      +_("Diego Schiavon : English translation of the tutorial")+"<br>"
                       +"<br>"
                       +_("Thomas Flecy: Original Sound object extension")+"<br>"
                       +"<br>"

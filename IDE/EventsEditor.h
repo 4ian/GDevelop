@@ -63,9 +63,9 @@ public:
      * \param scene Scene to be edited.
      * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
-    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene, 
+    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene,
         gd::MainFrameWrapper & mainFrameWrapper_ );
-    
+
     /**
      * \brief Construct an events editor to edit external events
      *
@@ -75,7 +75,7 @@ public:
      * \param externalEvents The events external events to be edited.
      * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
-    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene, 
+    EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene,
         gd::ExternalEvents & externalEvents, gd::MainFrameWrapper & mainFrameWrapper_ );
 
     virtual ~EventsEditor();
@@ -280,11 +280,12 @@ private:
     void AddSubEvent(gd::EventItem & parentEventItem);
     void AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem);
 
+    void EnsureTriggerOnceIsLastCondition(std::vector<gd::Instruction> & conditions);
     void RecomputeAllEventsWidth(std::vector < boost::shared_ptr<gd::BaseEvent> > & eventsToRefresh);
     void DeleteSelection();
 
     void EndLiveEditing();
-    
+
     /**
      * \brief Common initialization code used by constructors.
      */

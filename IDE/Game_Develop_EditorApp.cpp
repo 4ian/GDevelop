@@ -42,7 +42,7 @@
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
-#include "CheckMAJ.h"
+#include "UpdateChecker.h"
 #include "MAJ.h"
 #include "SplashScreen.h"
 #include "ConsoleManager.h"
@@ -384,9 +384,9 @@ bool Game_Develop_EditorApp::OnInit()
         Config->Read( "Startup/CheckUpdate", &result );
         if ( result != "false" )
         {
-            CheckMAJ verif;
-            verif.DownloadInformation();
-            if ( verif.newVersionAvailable )
+            UpdateChecker * checker = UpdateChecker::GetInstance();
+            checker->DownloadInformation();
+            if ( checker->newVersionAvailable )
             {
                 MAJ dialog(mainEditor, true);
                 if ( dialog.ShowModal() == 2 )
@@ -396,6 +396,7 @@ bool Game_Develop_EditorApp::OnInit()
                 }
             }
         }
+        mainEditor->RefreshNews();
     }
 
     //Pay what you want reminder

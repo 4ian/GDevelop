@@ -20,7 +20,7 @@
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "CheckMAJ.h"
+#include "UpdateChecker.h"
 #include "GDCore/IDE/SkinHelper.h"
 
 //(*IdInit(MAJ)
@@ -143,16 +143,16 @@ MAJ::~MAJ()
 
 void MAJ::CheckForUpdate()
 {
-    CheckMAJ checker;
-    checker.DownloadInformation(/*excludeFromStatistics=*/true);
+    UpdateChecker * checker = UpdateChecker::GetInstance();
+    checker->DownloadInformation(/*excludeFromStatistics=*/true);
 
-    versionMAJTxt->SetLabel(gd::ToString(checker.newMajor)+"."+gd::ToString(checker.newMinor)+"."+gd::ToString(checker.newBuild)+"."+gd::ToString(checker.newRevision));
+    versionMAJTxt->SetLabel(gd::ToString(checker->newMajor)+"."+gd::ToString(checker->newMinor)+"."+gd::ToString(checker->newBuild)+"."+gd::ToString(checker->newRevision));
 
     wxString info = _("No informations about the new version.");
-    if ( !checker.info.empty() ) info = checker.info;
+    if ( !checker->info.empty() ) info = checker->info;
 
     wxString link = _("No link");
-    if ( !checker.link.empty() ) link = checker.link;
+    if ( !checker->link.empty() ) link = checker->link;
 
     infoEdit->ChangeValue(info);
     linkCtrl->SetLabel(link);
@@ -160,7 +160,7 @@ void MAJ::CheckForUpdate()
     linkCtrl->Refresh(); //Need to call manually update.
 
     //Too slow
-    /*if ( checker.newVersionAvailable )
+    /*if ( checker->newVersionAvailable )
         downloadAndInstallBt->Enable(true);*/
 }
 

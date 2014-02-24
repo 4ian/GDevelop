@@ -3,23 +3,20 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef CHECKMAJ_H
-#define CHECKMAJ_H
+#ifndef UPDATECHECKER_H
+#define UPDATECHECKER_H
 #include <string>
 
 /**
- * \brief Class to check and retrieve information
+ * \brief Class to download and retrieve information
  * about Game Develop updates
  */
-class CheckMAJ
+class UpdateChecker
 {
 public:
 
-    /**
-     * \brief Default constructor
-     */
-    CheckMAJ() : newVersionAvailable(false), newMajor(0), newMinor(0), newBuild(0), newRevision(0) {};
-    virtual ~CheckMAJ() {};
+    static UpdateChecker *GetInstance();
+    static void DestroySingleton();
 
     /**
      * Download the information from the official website.
@@ -36,8 +33,21 @@ public:
     std::string info;
     std::string link;
 
+    std::string news;
+    std::string newsLinkLabel1;
+    std::string newsLinkLabel2;
+    std::string newsLink1;
+    std::string newsLink2;
+
 private:
+    /**
+     * \brief Default constructor
+     */
+    UpdateChecker() : newVersionAvailable(false), newMajor(0), newMinor(0), newBuild(0), newRevision(0) {};
+    virtual ~UpdateChecker() {};
+
+    static UpdateChecker *_singleton;
 };
 
-#endif // CHECKMAJ_H
+#endif // UPDATECHECKER_H
 

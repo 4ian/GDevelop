@@ -67,7 +67,7 @@ void MainFrame::CreateNewProject()
                 newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
 
             newProject->SetProjectFile(dialog.GetChosenFilename());
-            newProject->AddPlatform(associatedPlatform);
+            newProject->AddPlatform(*associatedPlatform);
             newProject->SaveToFile(newProject->GetProjectFile());
 
             games.push_back(newProject);

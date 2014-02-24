@@ -139,17 +139,17 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
 	variablesList->AppendColumn(_("Initial value"), 130);
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idAddVar, _( "Add a variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add a variable") );
-    toolbar->AddTool( idEditVar, _( "Edit the initial value of the variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _("Edit the initial value of the variable") );
-    toolbar->AddTool( idRenameVar, _( "Rename variable" ), wxBitmap( wxImage( "res/editnom.png" ) ), _("Rename variable") );
-    toolbar->AddTool( idDelVar, _( "Delete the selected variable" ), wxBitmap( gd::SkinHelper::GetIcon("delete", 16) ), _("Delete the selected variable") );
+    toolbar->AddTool( idAddVar, _( "Add a variable" ), gd::SkinHelper::GetIcon("add", 16), _("Add a variable") );
+    toolbar->AddTool( idEditVar, _( "Edit the initial value of the variable" ), gd::SkinHelper::GetIcon("edit", 16), _("Edit the initial value of the variable") );
+    toolbar->AddTool( idRenameVar, _( "Rename variable" ), gd::SkinHelper::GetIcon("editname", 16), _("Rename variable") );
+    toolbar->AddTool( idDelVar, _( "Delete the selected variable" ), gd::SkinHelper::GetIcon("delete", 16), _("Delete the selected variable") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMoveUpVar, _( "Move up" ), wxBitmap( gd::SkinHelper::GetIcon("up", 16) ), _("Move up") );
-    toolbar->AddTool( idMoveDownVar, _( "Move down" ), wxBitmap( gd::SkinHelper::GetIcon("down", 16) ), _("Move down") );
+    toolbar->AddTool( idMoveUpVar, _( "Move up" ), gd::SkinHelper::GetIcon("up", 16), _("Move up") );
+    toolbar->AddTool( idMoveDownVar, _( "Move down" ), gd::SkinHelper::GetIcon("down", 16), _("Move down") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idFindUndeclared, _( "Search for undeclared variables" ), wxBitmap( gd::SkinHelper::GetIcon("find", 16) ), _("Search for undeclared variables inside the project") );
+    toolbar->AddTool( idFindUndeclared, _( "Search for undeclared variables" ), gd::SkinHelper::GetIcon("find", 16), _("Search for undeclared variables inside the project") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, _( "Help about variables" ), wxBitmap( gd::SkinHelper::GetIcon("help", 16) ), _("Help about variables") );
+    toolbar->AddTool( ID_Help, _( "Help about variables" ), gd::SkinHelper::GetIcon("help", 16), _("Help about variables") );
     toolbar->Realize();
 
     if ( editingOnly )

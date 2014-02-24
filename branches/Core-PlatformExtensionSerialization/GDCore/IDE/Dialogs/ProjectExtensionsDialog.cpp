@@ -394,7 +394,7 @@ void ProjectExtensionsDialog::OnResize(wxSizeEvent& event)
 
 void ProjectExtensionsDialog::OnusePlatformMenuItemSelected(wxCommandEvent& event)
 {
-    project.AddPlatform(currentPlatform);
+    project.AddPlatform(*currentPlatform);
     RefreshPlatformList();
     RefreshExtensionList();
 }

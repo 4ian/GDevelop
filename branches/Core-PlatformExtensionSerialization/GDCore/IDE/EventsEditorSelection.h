@@ -169,7 +169,7 @@ public:
 
     void BeginDragInstruction();
     bool IsDraggingInstruction();
-    bool EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
+    std::vector<gd::Instruction> * EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
 
 private:
 

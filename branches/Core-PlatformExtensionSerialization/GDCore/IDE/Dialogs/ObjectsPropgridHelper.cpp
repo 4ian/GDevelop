@@ -212,16 +212,15 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         else if ( event.GetPropertyName().substr(0,12) == "AUTO_RENAME:" )
         {
             event.Veto();
-            std::string autoName = gd::ToString(event.GetPropertyName().substr(12));
-            if ( !object->HasAutomatismNamed(autoName)) return true;
+            std::string oldName = gd::ToString(event.GetPropertyName().substr(12));
+            if ( !object->HasAutomatismNamed(oldName)) return true;
 
-            gd::Automatism & automatism = object->GetAutomatism(autoName);
+            gd::Automatism & automatism = object->GetAutomatism(oldName);
 
-            std::string newName = ToString(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()));
+            std::string newName = ToString(wxGetTextFromUser(_("Enter a new name for the automatism"), _("Rename an automatism"), automatism.GetName()));
             if ( newName == automatism.GetName() || object->HasAutomatismNamed(newName) || newName.empty() ) return false;
 
-            std::string oldName = automatism.GetName();
-            automatism.SetName(newName);
+            object->RenameAutomatism(oldName, newName);
             UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)

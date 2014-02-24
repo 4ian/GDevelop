@@ -207,6 +207,12 @@ public:
     void RemoveAutomatism(const std::string & name);
 
     /**
+     * \brief Change the name of automatism called name to newName.
+     * \return true if name was successfully changed
+     */
+    bool RenameAutomatism(const std::string & name, const std::string & newName);
+
+    /**
      * \brief Add the automatism of the specified \a type with the specified \a name.
      *
      * The project's current platform is used to create the automatism.

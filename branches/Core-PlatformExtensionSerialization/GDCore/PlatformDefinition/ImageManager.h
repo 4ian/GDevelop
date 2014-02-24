@@ -133,7 +133,7 @@ class GD_CORE_API SFMLTextureWrapper
 {
 public :
     SFMLTextureWrapper(sf::Texture & texture);
-    SFMLTextureWrapper() {};
+    SFMLTextureWrapper();
     ~SFMLTextureWrapper();
 
     sf::Texture texture;

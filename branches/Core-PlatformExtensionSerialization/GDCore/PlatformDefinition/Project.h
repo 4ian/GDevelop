@@ -165,7 +165,7 @@ public:
     /**
      * Add a platform to the project
      */
-    void AddPlatform(Platform* platform);
+    void AddPlatform(Platform & platform);
 
     /**
      * Remove a platform from the project.

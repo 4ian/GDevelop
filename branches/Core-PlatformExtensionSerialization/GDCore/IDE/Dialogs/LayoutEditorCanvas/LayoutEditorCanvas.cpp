@@ -1032,10 +1032,10 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
         double mouseY = GetMouseYOnLayout();
 
         if ( !editing )
-            gd::LogStatus( gd::ToString(wxString::Format( wxString(_( "Position %d;%d (Base layer, camera 0)." )),
+            gd::LogStatus( gd::ToString(wxString::Format( wxString(_( "Position %f;%f (Base layer, camera 0)." )),
                 mouseX, mouseY )) );
         else
-            gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %d;%d. SHIFT for multiple selection, right click for more options." )),
+            gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
                 mouseX, mouseY )) );
 
         //Check if there is a gui element hovered inside the layout

@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <stdio.h>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
@@ -160,17 +161,17 @@ Platform & Project::GetCurrentPlatform() const
     return *currentPlatform;
 }
 
-void Project::AddPlatform(Platform* platform)
+void Project::AddPlatform(Platform & platform)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
-        if (platforms[i] == platform)
+        if (platforms[i] == &platform)
             return;
     }
 
     //Add the platform and make it the current one if the game has no other platform.
-    platforms.push_back(platform);
-    if ( currentPlatform == NULL ) currentPlatform = platform;
+    platforms.push_back(&platform);
+    if ( currentPlatform == NULL ) currentPlatform = &platform;
 }
 
 void Project::SetCurrentPlatform(const std::string & platformName)
@@ -609,6 +610,20 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     }
     #endif
 
+    //Compatibility code
+    #if defined(GD_IDE_ONLY)
+    if ( GDMajorVersion < 3 || (GDMajorVersion == 3 && GDMinorVersion < 3) )
+    {
+        if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarAutomatism") != GetUsedExtensions().end() )
+        {
+            GetUsedExtensions().erase( std::remove( GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarAutomatism" ), GetUsedExtensions().end() );
+            GetUsedExtensions().push_back("PathfindingAutomatism");
+            updateText += _("The project is using the pathfinding automatism. This automatism has been replaced by a new one:\n");
+            updateText += _("You must add the new 'Pathfinding' automatism to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles.");
+        }
+    }
+    #endif
+
     resourcesManager.LoadFromXml(rootElement->FirstChildElement( "Resources" ));
 
     //Global objects
@@ -769,7 +784,7 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
             gd::Platform * platform = gd::PlatformManager::GetInstance()->GetPlatform(name);
 
             if ( platform ) {
-                AddPlatform(platform);
+                AddPlatform(*platform);
                 if ( platform->GetName() == current ) currentPlatform = platform;
             }
             else {

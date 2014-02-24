@@ -44,9 +44,8 @@ void LayoutEditorCanvas::OnUpdate()
     }
     else
     {
-        #if !defined(WINDOWS)
-        wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Force the correct working directory.
-        #endif
+        if ( mainFrameWrapper.GetIDEWorkingDirectory() != wxGetCwd() ) //Force the correct working directory.
+            wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
         //First reload some images if necessary.
         if ( !project.imagesChanged.empty() )
@@ -62,7 +61,6 @@ void LayoutEditorCanvas::OnUpdate()
             layout.SetRefreshNeeded();
 
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
-            std::cout << "CWDe:" << wxGetCwd();
         }
         if ( firstRefresh )
         {

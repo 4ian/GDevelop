@@ -74,6 +74,19 @@ void Object::RemoveAutomatism(const std::string & name)
     automatisms.erase(name);
 }
 
+bool Object::RenameAutomatism(const std::string & name, const std::string & newName)
+{
+    if ( automatisms.find(name) == automatisms.end()
+      || automatisms.find(newName) != automatisms.end() ) return false;
+
+    Automatism * aut = automatisms.find(name)->second;
+    automatisms.erase(name);
+    automatisms[newName] = aut;
+    aut->SetName(newName);
+
+    return true;
+}
+
 gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
 {
     Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);

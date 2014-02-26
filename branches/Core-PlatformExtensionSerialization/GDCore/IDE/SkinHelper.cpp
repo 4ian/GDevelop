@@ -351,12 +351,12 @@ wxBitmap SkinHelper::GetRibbonIcon(wxString iconName)
     wxString skinName;
     wxString size;
     wxConfigBase::Get()->Read( _T( "/Skin/RibbonIcons" ), &skinName, "default" );
-    wxConfigBase::Get()->Read( _T( "/Skin/RibbonIconsSize" ), &size, "24" );
+    wxConfigBase::Get()->Read( _T( "/Skin/RibbonIconsSize" ), &size, "32" );
 
     if ( !wxFileExists("res/ribbon_"+skinName+"/"+iconName+size+".png") )
         skinName = "default";
     if ( !wxFileExists("res/ribbon_"+skinName+"/"+iconName+size+".png") )
-        size = "24";
+        size = "32";
 
     return wxBitmap("res/ribbon_"+skinName+"/"+iconName+size+".png", wxBITMAP_TYPE_ANY);
 }

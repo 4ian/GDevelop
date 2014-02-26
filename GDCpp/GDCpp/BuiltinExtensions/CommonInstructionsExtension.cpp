@@ -212,7 +212,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
-                unsigned int uniqueId = (unsigned int)&instruction;
+                size_t uniqueId = (size_t)&instruction;
                 return "conditionTrue = runtimeContext->TriggerOnce("+ToString(uniqueId)+");\n";
             };
         };

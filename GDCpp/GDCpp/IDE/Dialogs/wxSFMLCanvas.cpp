@@ -92,7 +92,7 @@ void wxSFMLCanvas::OnUpdate()
 /// Called when the control is idle - we can refresh our
 /// SFML window
 ////////////////////////////////////////////////////////////
-void wxSFMLCanvas::OnIdle(wxIdleEvent&)
+void wxSFMLCanvas::OnIdle(wxIdleEvent&event)
 {
     // Send a paint message when the control is idle, to ensure maximum framerate
     Refresh();

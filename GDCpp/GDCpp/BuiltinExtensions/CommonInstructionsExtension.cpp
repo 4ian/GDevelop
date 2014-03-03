@@ -220,7 +220,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         AddCondition("Once",
                    _("Trigger once while true"),
-                   _("Force the actions of the event to be run just once when the all the other conditions first becomes true."),
+                   _("Run actions only once, for each time the conditions have been met."),
                    _("Trigger once"),
                    _("Advanced"),
                    "res/conditions/once24.png",

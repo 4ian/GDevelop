@@ -70,7 +70,8 @@ void LayoutEditorCanvas::OnUpdate()
 
         //Then display the layout
         RenderEdittime();
-        UpdateScrollbars();
+        if (vScrollbar && hScrollbar && !hScrollbar->HasFocus() && !vScrollbar->HasFocus())
+            UpdateScrollbars();
 
     }
 }
@@ -707,6 +708,9 @@ void LayoutEditorCanvas::UpdateScrollbars()
     hScrollbar->SetScrollbar(thumbX, getSize().x, hScrollbar->GetRange(), getSize().x);
 
     //Update the size if needed
+    if ( hScrollbar->HasFocus() || vScrollbar->HasFocus() )
+        return;
+
     if ( thumbY <= 0 || static_cast<int>(thumbY+getSize().y) >= vScrollbar->GetRange())
     {
         int ajout = getSize().y;

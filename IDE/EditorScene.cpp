@@ -86,8 +86,8 @@ mainFrameWrapper(mainFrameWrapper_)
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);
 	FlexGridSizer3->SetSizeHints(eventsPanel);
-	notebook->AddPage(scenePanel, _("Scene"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
-	notebook->AddPage(eventsPanel, _("Events"), false, wxBitmap(wxImage(_T("res/events16.png"))));
+	notebook->AddPage(scenePanel, _("Scene"), false, gd::SkinHelper::GetIcon("scene", 16));
+	notebook->AddPage(eventsPanel, _("Events"), false, gd::SkinHelper::GetIcon("events", 16));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);

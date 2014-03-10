@@ -309,6 +309,10 @@ bool Game_Develop_EditorApp::OnInit()
     sf::RenderWindow window;
     sf::Window window2;
 
+    cout << "* Removing CppPlatform/Extensions/AStarAutomatism.xgdle" << endl;
+    if ( wxFileExists("CppPlatform/Extensions/AStarAutomatism.xgdle") )
+        wxRemoveFile("CppPlatform/Extensions/AStarAutomatism.xgdle");
+
     //Load platforms and extensions
     cout << "* Loading platforms and extensions:" << endl;
     bool loadExtensions = true;

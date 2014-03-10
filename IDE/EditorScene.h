@@ -87,6 +87,8 @@ private:
     void OnnotebookPageChanging(wxAuiNotebookEvent& event);
     void OnvScrollbarScroll(wxScrollEvent& event);
     void OnhScrollbarScroll(wxScrollEvent& event);
+    void OnvScrollbarScrollThumbRelease(wxScrollEvent& event);
+    void OnhScrollbarScrollThumbRelease(wxScrollEvent& event);
     //*)
 
     //(*Declarations(EditorScene)

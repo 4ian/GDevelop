@@ -718,7 +718,7 @@ void ProjectManager::EditSourceFile(gd::Project * game, std::string filename, si
     }
 
     CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, gd::SkinHelper::GetIcon("source_cpp", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }
@@ -775,7 +775,7 @@ void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
     }
 
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), project, layout, mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+layout.GetName(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+layout.GetName(), true, gd::SkinHelper::GetIcon("scene", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }
@@ -1069,7 +1069,7 @@ void ProjectManager::EditResourcesOfProject(gd::Project * project)
     }
 
     ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *project, mainEditor.GetMainFrameWrapper(), true);
-    mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Images bank"), true, wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY));
+    mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Images bank"), true, gd::SkinHelper::GetIcon("image", 16));
 }
 
 /**
@@ -1474,7 +1474,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     }
 
     ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("events", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }
@@ -1725,7 +1725,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
     }
 
     ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("scene", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }

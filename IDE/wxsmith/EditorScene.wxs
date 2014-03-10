@@ -50,7 +50,7 @@
 							</object>
 						</object>
 						<label>Scene</label>
-						<icon>res/sceneeditor.png</icon>
+						<icon code='gd::SkinHelper::GetIcon(&quot;scene&quot;, 16)' />
 					</object>
 					<object class="AuiNotebookPage">
 						<object class="wxPanel" name="ID_PANEL6" variable="eventsPanel" member="yes">
@@ -73,7 +73,7 @@
 							</object>
 						</object>
 						<label>Events</label>
-						<icon>res/events16.png</icon>
+						<icon code='gd::SkinHelper::GetIcon(&quot;events&quot;, 16)' />
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

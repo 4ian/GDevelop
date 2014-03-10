@@ -427,7 +427,7 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         undoRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", gd::SkinHelper::GetRibbonIcon("undo"));
+        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"));
         undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
     }
     {

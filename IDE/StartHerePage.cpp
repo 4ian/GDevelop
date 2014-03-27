@@ -230,9 +230,15 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL11,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent7BtClick);
 	//*)
 
+	#if defined(DEACTIVATED_DURING_INDIEGOGO_CAMPAIGN)
     wxString donateLink = _("http://www.compilgames.net/donate.php");
     if ( !donateLink.StartsWith("http://www.compilgames.net/") ) donateLink = "http://www.compilgames.net/donate.php";
     donateLink += "?utm_source=GD&utm_medium=StartPageLink&utm_campaign=paywhatyouwant";
+    #else
+    wxString donateLink = "https://www.indiegogo.com/projects/game-develop/x/6586688";
+    wxString lang = _("en");
+    donateLink += "?utm_source=software&utm_medium=StartPageLink_"+lang+"&utm_campaign=software";
+    #endif
 
 	HyperlinkCtrl5->SetURL(donateLink);
 

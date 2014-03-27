@@ -144,15 +144,15 @@ bool Game_Develop_EditorApp::OnInit()
     if ( !wxDirExists( ConfigPath ) )
         wxMkdir( ConfigPath );
 
-    wxFileConfig *Config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
-    wxConfigBase::Set( Config );
+    wxFileConfig *config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
+    wxConfigBase::Set( config );
     cout << "* Config file set." << endl;
 
     //Set language
     {
         wxString wantedLanguage;
         if ( !parser.Found( wxT("lang") ))
-            Config->Read("/Lang", &wantedLanguage);
+            config->Read("/Lang", &wantedLanguage);
         else
             parser.Found( wxT("lang"), &wantedLanguage);
 
@@ -385,7 +385,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Checking for updates
     {
         wxString result;
-        Config->Read( "Startup/CheckUpdate", &result );
+        config->Read( "Startup/CheckUpdate", &result );
         if ( result != "false" )
         {
             UpdateChecker * checker = UpdateChecker::GetInstance();
@@ -407,11 +407,22 @@ bool Game_Develop_EditorApp::OnInit()
     if (!recoveringFromBug)
     {
         int result = 3;
-        Config->Read( "Startup/Reminder", &result );
+        config->Read( "Startup/Reminder", &result );
+
+        //Force again the display when upgrading from a version older than 3.3.71
+        bool reminder3371Shown = false;
+        config->Read( "Startup/Reminder3371Shown", &reminder3371Shown );
+        if (!reminder3371Shown)
+        {
+            result = 3;
+            config->Write( "Startup/Reminder3371Shown", true);
+        }
+
+        //Decrement the counter and show the reminder only after 3 launch in a row.
         if ( result > 0 )
         {
             result--;
-            Config->Write( "Startup/Reminder", result);
+            config->Write( "Startup/Reminder", result);
         }
         if ( result == 0 )
         {

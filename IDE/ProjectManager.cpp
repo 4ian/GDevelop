@@ -876,6 +876,13 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
     if ( data->GetString() == "Root")
     {
+  		if (newName.find_first_of("/\\?%*:|\"<>")!=std::string::npos)
+  		{
+  			gd::LogMessage(_("You can not use this name, it contains invalid characters."));
+  			event.Veto();
+  			return;
+  		}
+
         game->SetName( newName );
     }
     //Renaming a scene
@@ -891,8 +898,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         if ( game->HasLayoutNamed(newName) )
         {
-            gd::LogWarning( _( "Unable to rename : A scene has already the same name." ) );
-            Refresh();
+            gd::LogWarning( _( "Unable to rename: a scene has already the same name." ) );
+            event.Veto();
             return;
         }
 
@@ -923,8 +930,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         if ( game->HasExternalEventsNamed(newName) )
         {
-            gd::LogWarning( _( "Unable to rename : Some external events have already the same name." ) );
-            Refresh();
+            gd::LogWarning( _( "Unable to rename: some external events have already the same name." ) );
+            event.Veto();
             return;
         }
 
@@ -955,8 +962,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         if ( game->HasExternalLayoutNamed(newName) )
         {
-            gd::LogWarning( _( "Unable to rename : Some external events have already the same name." ) );
-            Refresh();
+            gd::LogWarning( _( "Unable to rename: some external events have already the same name." ) );
+            event.Veto();
             return;
         }
 

@@ -86,7 +86,7 @@ ReminderDialog::ReminderDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	FlexGridSizer5->AddGrowableRow(0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer6->AddGrowableRow(2);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A crowdfunding campaign was launched for Game Develop.\nHelp us bring GD to MacOS, improve the support of Ubuntu\nand create an export option to export games to iOS and \nAndroid!\n\nContributors will get premium access to the beta versions\nwhen new features (OS X/Android/iOS support...)\nwill be released!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A crowdfunding campaign was launched for Game Develop.\nHelp us bring GD to MacOS, improve the support of Ubuntu\nand create an export option to publish games to iOS and \nAndroid!\n\nContributors will get premium access to the beta versions\nwhen new features (OS X/Android/iOS support...)\nwill be released!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl2 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Contribute to the campaign on Indiegogo"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer6->Add(HyperlinkCtrl2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -132,6 +132,8 @@ void ReminderDialog::OpenLink(wxString link)
     wxString mimetype = wxEmptyString;
     if (link.StartsWith (_T("http://"))) {
         mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("https://"))) {
+        mimetype = _T("text/html");
     }else if (link.StartsWith (_T("ftp://"))) {
         mimetype = _T("text/html");
     }else if (link.StartsWith (_T("mailto:"))) {
@@ -164,18 +166,20 @@ Game Develop is a "Pay what you want" software:\nYou can use it freely, but its 
     link += "&utm_content="+imageId;
 
     OpenLink(link);
+    wxConfigBase::Get()->Write("Startup/Reminder", -1);
     EndModal(0);
 }
 
 void ReminderDialog::OnHyperlinkCtrl2Click(wxCommandEvent& event)
 {
-    wxString link = "https://www.indiegogo.com/projects/game-develop/x/6586688";
+    wxString link = "http://www.indiegogo.com/projects/game-develop/x/6586688";
 
     wxString lang = _("en");
     link += "?utm_source=software&utm_medium=reminder"+lang+"&utm_campaign=reminder";
     link += "&utm_content="+imageId;
 
     OpenLink(link);
+    wxConfigBase::Get()->Write("Startup/Reminder", -1);
     EndModal(0);
 }
 

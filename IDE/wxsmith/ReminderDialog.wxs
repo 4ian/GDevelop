@@ -110,7 +110,7 @@
 									<growablerows>2</growablerows>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-											<label>A crowdfunding campaign was launched for Game Develop.&#x0A;Help us bring GD to MacOS, improve the support of Ubuntu&#x0A;and create an export option to export games to iOS and &#x0A;Android!&#x0A;&#x0A;Contributors will get premium access to the beta versions&#x0A;when new features (OS X/Android/iOS support...)&#x0A;will be released!</label>
+											<label>A crowdfunding campaign was launched for Game Develop.&#x0A;Help us bring GD to MacOS, improve the support of Ubuntu&#x0A;and create an export option to publish games to iOS and &#x0A;Android!&#x0A;&#x0A;Contributors will get premium access to the beta versions&#x0A;when new features (OS X/Android/iOS support...)&#x0A;will be released!</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

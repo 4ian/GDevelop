@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -12,7 +12,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/CommonTools.h"
 #include <iostream>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 

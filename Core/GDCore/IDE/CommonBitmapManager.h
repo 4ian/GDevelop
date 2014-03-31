@@ -1,8 +1,9 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef CommonBitmapManager_H
 #define CommonBitmapManager_H
 #include <wx/bitmap.h>
@@ -36,13 +37,11 @@ public:
     wxBitmap unknownBt;
     wxBitmap keyBt;
     wxBitmap mouseBt;
-    wxBitmap modeSimple;
     wxBitmap transparentBg;
     wxBitmap trueOrFalseBt;
     wxBitmap point;
     wxBitmap add16;
     wxBitmap add24;
-    wxBitmap remove16;
     wxBitmap unknown24;
     wxBitmap unknownAction24;
     wxBitmap unknownCondition24;
@@ -51,7 +50,6 @@ public:
     wxBitmap joyaxisBt;
     wxBitmap backthumbsBg;
     wxBitmap varBt;
-    wxBitmap semitransparentHitBox;
     wxBitmap noProtection;
     wxBitmap folder40;
     wxBitmap parentFolder40;
@@ -69,37 +67,10 @@ public:
     wxBitmap leftupdir16;
     wxBitmap maskEdit16;
     wxBitmap pointEdit16;
-    wxBitmap copy16;
     wxBitmap defaultMask16;
-    wxBitmap preview16;
     wxBitmap objectGroup16;
     wxBitmap gdFileIcon32;
     wxBitmap error48;
-    wxBitmap help16;
-    wxBitmap group24;
-
-    /** \name 24x24 bitmaps
-     * wxBitmap which can be used for ribbons.
-     */
-    ///@{
-    wxBitmap objects24;
-    wxBitmap layers24;
-    wxBitmap undo24;
-    wxBitmap redo24;
-    wxBitmap center24;
-    wxBitmap zoom24;
-    wxBitmap grid24;
-    wxBitmap gridedit24;
-    wxBitmap windowMask24;
-    wxBitmap objectsPositionsList24;
-    wxBitmap refreshicon24;
-    wxBitmap starticon24;
-    wxBitmap startwindow24;
-    wxBitmap pauseicon24;
-    wxBitmap bug24;
-    wxBitmap profiler24;
-    wxBitmap fullscreen24;
-    ///@}
 
     static CommonBitmapManager *GetInstance()
     {
@@ -128,3 +99,4 @@ private:
 }
 
 #endif // CommonBitmapManager_H
+#endif

@@ -255,12 +255,12 @@ public:
     /**
      * \brief Get the maximum depth of custom conditions reached during code generation.
      */
-    unsigned int GetMaxCustomConditionsDepth() const { return maxCustomConditionsDepth; }
+    size_t GetMaxCustomConditionsDepth() const { return maxCustomConditionsDepth; }
 
     /**
      * \brief Get the maximum size of a list of conditions.
      */
-    unsigned int GetMaxConditionsListsSize() const { return maxConditionsListsSize; }
+    size_t GetMaxConditionsListsSize() const { return maxConditionsListsSize; }
 
     /**
      * \brief Generate the full name for accessing to a boolean variable used for conditions.
@@ -459,8 +459,8 @@ protected:
     std::string customCodeOutsideMain; ///< Custom code inserted before events ( and not in events function )
     std::string customCodeInMain; ///< Custom code inserted before events ( in main function )
     std::set<std::string> customGlobalDeclaration; ///< Custom global C++ declarations inserted after includes
-    unsigned int maxCustomConditionsDepth; ///< The maximum depth value for all the custom conditions created.
-    unsigned int maxConditionsListsSize; ///< The maximum size of a list of conditions.
+    size_t maxCustomConditionsDepth; ///< The maximum depth value for all the custom conditions created.
+    size_t maxConditionsListsSize; ///< The maximum size of a list of conditions.
 };
 
 }

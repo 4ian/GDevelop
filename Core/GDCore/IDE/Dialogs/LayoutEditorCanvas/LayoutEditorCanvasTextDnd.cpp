@@ -1,8 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/CommonTools.h"
 #include "LayoutEditorCanvasTextDnd.h"
@@ -18,3 +18,4 @@ bool LayoutEditorCanvasTextDnd::OnDropText(wxCoord x, wxCoord y, const wxString&
 }
 
 }
+#endif

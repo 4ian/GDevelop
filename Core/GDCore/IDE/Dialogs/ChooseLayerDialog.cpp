@@ -1,10 +1,11 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 //(*InternalHeaders(ChooseLayerDialog)
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -90,3 +91,4 @@ void ChooseLayerDialog::OncancelBtClick(wxCommandEvent& event)
 }
 
 }
+#endif

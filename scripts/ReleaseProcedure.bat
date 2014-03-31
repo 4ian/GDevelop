@@ -33,8 +33,8 @@ cd ..\..
 
 echo.
 echo --Removing useless files...
-del Binaries\Output\Release\Examples\*.gdg.autosave > NUL 2> NUL
-del Binaries\Output\Release\log.txt > NUL 2> NUL
+del Binaries\Output\Release_Windows\Examples\*.gdg.autosave > NUL 2> NUL
+del Binaries\Output\Release_Windows\log.txt > NUL 2> NUL
 
 echo.
 echo --Creating installer...
@@ -45,7 +45,7 @@ IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 echo.
 echo --Creating archive...
 if exist Binaries\Releases\gd3xxxx.7z (del Binaries\Releases\gd3xxxx.7z)
-cd Binaries\Output\Release\
+cd Binaries\Output\Release_Windows\
 IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "C:\Program Files (x86)\7-Zip\7z.exe" a ..\..\Releases\gd3xxxx.7z * > ..\..\..\scripts\logs\7zArchiveLog.txt
 IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 cd ..\..\..

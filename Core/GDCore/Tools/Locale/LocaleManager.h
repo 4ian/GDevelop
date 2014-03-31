@@ -1,13 +1,13 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #ifndef LOCALEMANAGER_H
 #define LOCALEMANAGER_H
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 
 namespace gd
 {
@@ -23,8 +23,19 @@ class GD_CORE_API LocaleManager
 {
 public:
     wxLocale * locale; ///< wxWidgets locale object
+
+    /**
+     * \brief Set the language used.
+     * \param languageWxWidgetsId The wxWidgets identifier of the language.
+     */
     bool SetLanguage(int languageWxWidgetsId);
-    
+
+    /**
+     * \brief Get the language used.
+     * \return The wxWidgets identifier of the language used.
+     */
+    int GetLanguage() { return languageWxWidgetsId; }
+
     /**
      * \brief Add a catalog name.
      *
@@ -35,7 +46,7 @@ public:
     void AddCatalog(std::string catalogName);
 
     /**
-     * \brief Add a path where catalog are searched. 
+     * \brief Add a path where catalog are searched.
      * \param path The path, relative to the Game Develop directory.
      */
     void AddPath(std::string path);
@@ -63,6 +74,8 @@ private:
 
     LocaleManager() : locale(NULL) {};
     virtual ~LocaleManager() {};
+
+    int languageWxWidgetsId;
 
     static LocaleManager *_singleton;
 };

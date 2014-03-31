@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
@@ -8,7 +8,12 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/TinyXml/tinyxml.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#endif
+#if !defined(GD_NO_WX_GUI)
 #include <SFML/Graphics.hpp>
+#endif
 
 namespace gd
 {
@@ -69,6 +74,19 @@ void Object::RemoveAutomatism(const std::string & name)
     automatisms.erase(name);
 }
 
+bool Object::RenameAutomatism(const std::string & name, const std::string & newName)
+{
+    if ( automatisms.find(name) == automatisms.end()
+      || automatisms.find(newName) != automatisms.end() ) return false;
+
+    Automatism * aut = automatisms.find(name)->second;
+    automatisms.erase(name);
+    automatisms[newName] = aut;
+    aut->SetName(newName);
+
+    return true;
+}
+
 gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
 {
     Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);
@@ -81,9 +99,9 @@ gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::stri
     return automatism;
 }
 
-std::map<std::string, std::string> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
+std::map<std::string, gd::PropgridPropertyDescriptor> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
 {
-    std::map<std::string, std::string> nothing;
+    std::map<std::string, gd::PropgridPropertyDescriptor> nothing;
     return nothing;
 }
 
@@ -104,6 +122,7 @@ bool Object::HasAutomatismNamed(const std::string & name) const
 
 void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
+#if !defined(GD_NO_WX_GUI)
     sf::RectangleShape mask(instance.HasCustomSize() ?
                             sf::Vector2f(instance.GetCustomWidth(),instance.GetCustomHeight()) :
                             GetInitialInstanceDefaultSize(instance, project, layout));
@@ -113,6 +132,7 @@ void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarge
     mask.setOutlineThickness(1);
     mask.setOutlineColor(sf::Color( 255, 48, 69));
     renderTarget.draw(mask);
+#endif
 }
 #endif
 

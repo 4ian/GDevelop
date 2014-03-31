@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(WINDOWS)
@@ -42,7 +42,12 @@ namespace gd
     void* GetSymbol(Handle library, const char* name) { return dlsym(library, name);}
     void CloseLibrary(Handle library) {dlclose(library);}
     std::string DynamicLibraryLastError() {return std::string(dlerror());}
-    Handle SetLibraryGlobal(const char* path) {return dlopen(path, RTLD_NOLOAD|RTLD_GLOBAL);}
+    Handle SetLibraryGlobal(const char* path) {
+        //RTLD_NOLOAD has the library is already opened.
+        //RTLD_NOW to be sure that all symbols are existing (Otherwise, could get strange "symbol lookup error"!)
+        //RTLD_GLOBAL to make the symbols available to all shared library (in particular, compiled events code).
+        return dlopen(path, RTLD_NOLOAD|RTLD_NOW|RTLD_GLOBAL);
+    }
 #else
     #warning System not supported for dynamic libraries loading
 #endif

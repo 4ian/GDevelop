@@ -1,14 +1,14 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ObjectsOnBadLayerDialog.h"
 
 //(*InternalHeaders(ObjectsOnBadLayerDialog)
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -121,3 +121,4 @@ void ObjectsOnBadLayerDialog::OnCancelClick(wxCommandEvent& event)
 
 
 }
+#endif

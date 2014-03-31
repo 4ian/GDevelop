@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_PLATFORMEXTENSION_H
@@ -135,10 +135,30 @@ public:
     /**
      * \brief Declare a new object as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
+     * \param name The name of the object
+     * \param fullname The user friendly name of the object
+     * \param description The user friendly description of the object
+     * \param icon The 24x24 icon of the object: res/icons_[SkinName]/[iconName]24.png will be first tried,
+     * and then if it does not exists, the full entered name will be tried.
+     * \param createFunPtr The name of the function that create the object
+     * \param destroyFunPtr The name of the function that destroy the object
+     *
+     * Example of the create/destroy function:
+     \code
+    void DestroyMyObject(gd::Object * object)
+    {
+        delete object;
+    }
+
+    gd::Object * CreateMyObject(std::string name)
+    {
+        return new MyObject(name);
+    }
+     \endcode
      */
     gd::ObjectMetadata & AddObject(const std::string & name_,
                                    const std::string & fullname_,
-                                   const std::string & informations_,
+                                   const std::string & description_,
                                    const std::string & icon24x24_,
                                    CreateFunPtr createFunPtrP,
                                    DestroyFunPtr destroyFunPtrP);
@@ -146,6 +166,14 @@ public:
     /**
      * \brief Declare a new automatism as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
+     *
+     * \param name The name of the automatism
+     * \param fullname The user friendly name of the automatism
+     * \param description The user friendly description of the automatism
+     * \param icon The 24x24 icon of the automatism: res/icons_[SkinName]/[iconName]24.png will be first tried,
+     * and then if it does not exists, it is assumed that the icon name is the filename that must be used to open the icon.
+     * \param instance An instance of the automatism that will be used to create the automatism
+     * \param sharedDatasInstance Optional instance of the data shared by the automatisms having the same name.
      */
     gd::AutomatismMetadata & AddAutomatism(const std::string & name_,
                                           const std::string & fullname_,
@@ -363,6 +391,18 @@ public:
      * \brief Return the name of all the extensions which are considered provided by platforms.
      */
     static std::vector<std::string> GetBuiltinExtensionsNames();
+
+    /** \name Serialization
+     */
+    ///@{
+
+    /**
+     * \brief De/serialize the object
+     */
+    /*template<class Archive>
+    void Serialize(Archive & archive);*/
+
+    ///@}
 
 private:
 

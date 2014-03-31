@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_EXTERNALEVENTS_H
@@ -20,7 +20,7 @@ namespace gd
  *
  * \ingroup PlatformDefinition
  */
-class ExternalEvents
+class GD_CORE_API ExternalEvents
 {
 public:
     ExternalEvents();

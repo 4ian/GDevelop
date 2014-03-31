@@ -1,18 +1,20 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/Tools/Locale/LocaleManager.h"
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 
 namespace gd
 {
 
 LocaleManager * LocaleManager::_singleton = 0;
 
-bool LocaleManager::SetLanguage(int languageWxWidgetsId)
+bool LocaleManager::SetLanguage(int languageWxWidgetsId_)
 {
+    languageWxWidgetsId = languageWxWidgetsId_;
+
     if ( locale ) delete locale;
     locale = new wxLocale;
     locale->Init(languageWxWidgetsId);
@@ -41,3 +43,4 @@ void LocaleManager::AddPath(std::string path)
 }
 
 }
+#endif

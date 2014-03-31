@@ -1,12 +1,14 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
 #include <string>
+#if !defined(GD_NO_WX_GUI)
 #include <wx/file.h>
 #include <wx/bitmap.h>
+#endif
 
 namespace gd
 {
@@ -23,10 +25,12 @@ group(group_),
 shown(true),
 extensionNamespace(extensionNamespace_)
 {
+#if !defined(GD_NO_WX_GUI)
     if ( wxFile::Exists(smallicon_) )
     {
         smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
     } else { smallicon = wxBitmap(16,16);}
+#endif
 }
 
 ExpressionMetadata & ExpressionMetadata::SetHidden()
@@ -47,10 +51,12 @@ group(group_),
 shown(true),
 extensionNamespace(extensionNamespace_)
 {
+#if !defined(GD_NO_WX_GUI)
     if ( wxFile::Exists(smallicon_) )
     {
         smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
     } else { smallicon = wxBitmap(16,16);}
+#endif
 }
 
 StrExpressionMetadata & StrExpressionMetadata::SetHidden()
@@ -83,11 +89,11 @@ gd::ExpressionMetadata & ExpressionMetadata::AddCodeOnlyParameter(const std::str
     return *this;
 }
 
-gd::StrExpressionMetadata & StrExpressionMetadata::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+gd::StrExpressionMetadata & StrExpressionMetadata::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
 {
     gd::ParameterMetadata info;
     info.type = type;
-    info.description = gd::ToString(description);
+    info.description = description;
     info.codeOnly = false;
     info.optional = parameterIsOptional;
     info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;

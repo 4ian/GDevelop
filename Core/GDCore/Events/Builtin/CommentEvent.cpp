@@ -1,9 +1,11 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(GD_NO_WX_GUI)
 #include <wx/dcmemory.h>
+#endif
 #include "CommentEvent.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/TinyXml/tinyxml.h"
@@ -59,8 +61,10 @@ void CommentEvent::LoadFromXml(gd::Project & project, const TiXmlElement * event
 
 gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
+#if !defined(GD_NO_WX_GUI)
     EditComment dialog(parent_, *this);
     if ( dialog.ShowModal() == 0) return Cancelled;
+#endif
 
     return ChangesMadeButNoNeedForEventsRecompilation;
 }
@@ -70,6 +74,7 @@ gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, gd
  */
 void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform &)
 {
+#if !defined(GD_NO_WX_GUI)
     x += 1; //Small border
 
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
@@ -113,10 +118,12 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
         wxArrayInt neededArray;
         renderingHelper->GetHTMLRenderer().Render(x + sideSeparation + textWidth + sideSeparation, y+sideSeparation, neededArray);
     }
+#endif
 }
 
 unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platform &) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
@@ -145,7 +152,7 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platf
 
         renderedHeight = text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation;
     }
-
+#endif
     return renderedHeight+2;//2 : 2 small borders
 }
 

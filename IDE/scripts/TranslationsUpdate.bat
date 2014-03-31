@@ -15,4 +15,4 @@ dir ..\..\Core\GDCore\*.h /L /B /S >> %TEMP%\listfile.txt
 echo Generating .POT file...
 xgettext --from-code iso-8859-1  -o useMeToUpdateCatalogsWithPoEdit.pot --c++ --no-wrap -f %TEMP%\listfile.txt -k_
 
-echo .POT file generated: Update now .po catalogs using poEdit ( Open .po catalog with PoEdit, and choose Catalog:Update from .POT file)
+echo .POT file generated: Update now .po catalogs using poEdit (Open .po catalog with PoEdit, and choose Catalog:Update from .POT file)

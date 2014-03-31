@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/Event.h"

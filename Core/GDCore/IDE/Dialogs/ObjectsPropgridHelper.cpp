@@ -1,9 +1,11 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ObjectsPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -63,14 +65,48 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
     for (unsigned int i = 0;i<automatisms.size();++i)
     {
         const gd::Automatism & automatism = object->GetAutomatism(automatisms[i]);
+        std::map<std::string, gd::PropgridPropertyDescriptor> properties = automatism.GetProperties(project);
 
         grid->AppendIn( "AUTO", new wxPropertyCategory(gd::ToString(automatism.GetName())) );
-        grid->Append( new wxStringProperty(_("Edition"), wxString("AUTO:"+automatisms[i]), _("Click to edit...")) );
-        grid->SetPropertyCell(wxString("AUTO:"+automatisms[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-        grid->SetPropertyReadOnly(wxString("AUTO:"+automatisms[i]));
+        if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
+        {
+            //"Click to edit" is not shown if properties are not empty, except if the magic property is set.
+            grid->Append( new wxStringProperty(_("Edition"), wxString("AUTO:"+automatisms[i]), _("Click to edit...")) );
+            grid->SetPropertyCell(wxString("AUTO:"+automatisms[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+            grid->SetPropertyReadOnly(wxString("AUTO:"+automatisms[i]));
+        }
         grid->Append( new wxStringProperty("", "AUTO_RENAME:"+automatisms[i], _("Rename...")) );
         grid->SetPropertyCell(wxString("AUTO_RENAME:"+automatisms[i]), 1, _("Rename..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+automatisms[i]));
+
+        //Add automatism custom properties
+        for (std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = properties.begin();
+            it != properties.end();++it)
+        {
+            if ( (*it).first == "PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS" ) continue; //Skip the magic property.
+
+            std::string type = (*it).second.GetType();
+            std::string value = (*it).second.GetValue();
+            std::string name = (*it).first;
+            if ( type == "Choice" )
+            {
+                const std::vector<std::string> & choices = (*it).second.GetExtraInfo();
+                wxArrayString choicesArray;
+                for (unsigned int j = 0; j < choices.size(); ++j)
+                    choicesArray.push_back(choices[j]);
+
+                wxEnumProperty * prop = new wxEnumProperty(name, "AUTO_PROP:"+automatisms[i], choicesArray);
+                prop->SetChoiceSelection(choicesArray.Index(value));
+                grid->Append(prop);
+            }
+            else if ( type == "Boolean" )
+            {
+                grid->Append(new wxBoolProperty(name, "AUTO_PROP:"+automatisms[i], value == "true"));
+            }
+            else
+                grid->Append(new wxStringProperty(name, "AUTO_PROP:"+automatisms[i], value));
+        }
+
     }
 
 
@@ -119,7 +155,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 
                 //Update the grid:
                 if ( grid->GetProperty("OBJECT_VARIABLES_CATEGORY") != NULL)
-                    grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY", 
+                    grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY",
                         _("Object variables") + " (" + gd::ToString(object->GetVariables().Count()) + ")");
             }
         }
@@ -176,16 +212,15 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         else if ( event.GetPropertyName().substr(0,12) == "AUTO_RENAME:" )
         {
             event.Veto();
-            std::string autoName = gd::ToString(event.GetPropertyName().substr(12));
-            if ( !object->HasAutomatismNamed(autoName)) return true;
+            std::string oldName = gd::ToString(event.GetPropertyName().substr(12));
+            if ( !object->HasAutomatismNamed(oldName)) return true;
 
-            gd::Automatism & automatism = object->GetAutomatism(autoName);
+            gd::Automatism & automatism = object->GetAutomatism(oldName);
 
-            std::string newName = ToString(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()));
+            std::string newName = ToString(wxGetTextFromUser(_("Enter a new name for the automatism"), _("Rename an automatism"), automatism.GetName()));
             if ( newName == automatism.GetName() || object->HasAutomatismNamed(newName) || newName.empty() ) return false;
 
-            std::string oldName = automatism.GetName();
-            automatism.SetName(newName);
+            object->RenameAutomatism(oldName, newName);
             UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -294,6 +329,22 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
 
         return true;*/
     }
+    else if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
+    {
+        std::string autoName = gd::ToString(event.GetPropertyName().substr(10));
+        if ( !object->HasAutomatismNamed(autoName))
+        {
+            event.Veto();
+            return false;
+        }
+
+        gd::Automatism & automatism = object->GetAutomatism(autoName);
+        if ( !automatism.UpdateProperty(ToString(event.GetProperty()->GetLabel()), ToString(event.GetPropertyValue().GetString()), project) )
+        {
+            event.Veto();
+            return false;
+        }
+    }
 
     return false;
 }
@@ -310,3 +361,4 @@ void ObjectsPropgridHelper::UpdateAutomatismsSharedData(gd::Project & project, g
 }
 
 }
+#endif

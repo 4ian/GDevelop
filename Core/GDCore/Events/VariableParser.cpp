@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <string>
 #include <vector>
@@ -8,7 +8,7 @@
 namespace gd { class Layout; }
 namespace gd { class Project; }
 namespace gd { class Platform; }
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 
 namespace gd
 {
@@ -17,18 +17,18 @@ VariableParser::~VariableParser()
 {
 }
 
-bool VariableParser::Parse(VariableParserCallbacks & callbacks_) 
-{ 
+bool VariableParser::Parse(VariableParserCallbacks & callbacks_)
+{
 	callbacks = &callbacks_;
     rootVariableParsed = false;
-	firstErrorStr.clear(); 
-	firstErrorPos = 0; 
+	firstErrorStr.clear();
+	firstErrorPos = 0;
 	currentPosition = 0;
 	currentTokenType = TS_INVALID;
 	currentToken.clear();
-	S(); 
+	S();
 
-	return firstErrorStr == ""; 
+	return firstErrorStr == "";
 }
 
 void VariableParser::ReadToken()
@@ -39,7 +39,7 @@ void VariableParser::ReadToken()
 
 		if ( expression[currentPosition] == '[' ||
 			expression[currentPosition] == ']' ||
-			expression[currentPosition] == '.' ) 
+			expression[currentPosition] == '.' )
 		{
 			if ( currentTokenType == TS_VARNAME )
 				return; //We've parsed a variable name.
@@ -68,7 +68,7 @@ void VariableParser::ReadToken()
 		currentToken += expression[currentPosition];
 		currentPosition++;
 	}
-	
+
 	//Can be reached if we are at the end of the expression. In this case,
 	//currentTokenType will be either TS_VARNAME or TS_INVALID.
 }

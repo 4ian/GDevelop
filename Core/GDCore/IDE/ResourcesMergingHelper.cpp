@@ -1,19 +1,24 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "ResourcesMergingHelper.h"
+#if !defined(GD_NO_WX_GUI)
 #include <wx/filename.h>
+#endif
 #include <string>
 #include <iostream>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd
 {
 
 void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
 {
+#if !defined(GD_NO_WX_GUI)
     if ( resourceFilename.empty() ) return;
 
     wxFileName filename = wxFileName::FileName(resourceFilename);
@@ -43,6 +48,9 @@ void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
 
     std::string newResourceFilename = resourcesNewFilename[resourceFullFilename];
     resourceFilename = newResourceFilename;
+#else
+    gd::LogError(_("You tried to use ResourcesMergingHelper::ExposeResource which is currently unsupported when wxwidgets support is disabled."));
+#endif
 }
 
 void ResourcesMergingHelper::SetBaseDirectory(const std::string & baseDirectory_)

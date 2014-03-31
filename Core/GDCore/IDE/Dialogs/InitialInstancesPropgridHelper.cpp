@@ -1,8 +1,10 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "InitialInstancesPropgridHelper.h"
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/CommonTools.h"
@@ -30,7 +32,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     std::string widthProperty;
     std::string heightProperty;
     bool lockedProperty = false;
-    std::map<std::string, std::string> customProperties;
+    std::map<std::string, gd::PropgridPropertyDescriptor> customProperties;
 
     for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
     {
@@ -60,14 +62,17 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
             if ( ToString(selectedInitialInstances[i]->GetCustomHeight()) != heightProperty ) heightProperty = _("(Multiples values)");
 
             //Merge custom properties
-            std::map<std::string, std::string> instanceCustomProperties = selectedInitialInstances[i]->GetCustomProperties(project, layout);
-            for(std::map<std::string, std::string>::iterator it = instanceCustomProperties.begin(); it != instanceCustomProperties.end();++it)
+            std::map<std::string, gd::PropgridPropertyDescriptor> instanceCustomProperties = selectedInitialInstances[i]->GetCustomProperties(project, layout);
+            for(std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = instanceCustomProperties.begin();
+                it != instanceCustomProperties.end();++it)
             {
                 if ( customProperties.find(it->first) == customProperties.end() ) continue;
-                if ( customProperties[it->first] != it->second ) customProperties[it->first] = _("(Multiples values)");
+                if ( customProperties[it->first].GetValue() != it->second.GetValue() )
+                    customProperties[it->first].SetValue(ToString(_("(Multiples values)")));
             }
             //Also erase properties which are not in common.
-            for(std::map<std::string, std::string>::iterator it = customProperties.begin(); it != customProperties.end();)
+            for(std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = customProperties.begin();
+                it != customProperties.end();)
             {
                 if ( instanceCustomProperties.find(it->first) == instanceCustomProperties.end() )
                     customProperties.erase(it++);
@@ -87,14 +92,14 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     grid->Append( new wxBoolProperty(_("Custom size?"), "INSTANCE_CUSTOM_SIZE", customSizeProperty));
     grid->EnableProperty(grid->AppendIn( "INSTANCE_CUSTOM_SIZE", new wxStringProperty(_("Width"), "INSTANCE_SIZE_WIDTH", widthProperty)), customSizeProperty);
     grid->EnableProperty(grid->AppendIn( "INSTANCE_CUSTOM_SIZE", new wxStringProperty(_("Height"), "INSTANCE_SIZE_HEIGHT", heightProperty)), customSizeProperty);
-    for (std::map<std::string, std::string>::iterator it = customProperties.begin(); it != customProperties.end();++it)
+    for (std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = customProperties.begin(); it != customProperties.end();++it)
     {
-        grid->Append( new wxStringProperty(it->first, wxPG_LABEL, it->second));
+        grid->Append( new wxStringProperty(it->first, wxPG_LABEL, it->second.GetValue()));
     }
 
     if ( selectedInitialInstances.size() == 1)
     {
-        grid->Append( new wxStringProperty(_("Variables") + " (" + gd::ToString(selectedInitialInstances[0]->GetVariables().Count()) 
+        grid->Append( new wxStringProperty(_("Variables") + " (" + gd::ToString(selectedInitialInstances[0]->GetVariables().Count())
             + ")", "INSTANCE_VARIABLES", _("Click to edit...")) );
 
         grid->SetPropertyCell("INSTANCE_VARIABLES", 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
@@ -117,7 +122,7 @@ void InitialInstancesPropgridHelper::OnPropertySelected(const std::vector<gd::In
             gd::ChooseVariableDialog dialog(NULL, selectedInitialInstances[0]->GetVariables(), true);
             dialog.ShowModal();
 
-            grid->SetPropertyLabel("INSTANCE_VARIABLES", _("Variables") + " (" 
+            grid->SetPropertyLabel("INSTANCE_VARIABLES", _("Variables") + " ("
                 + gd::ToString(selectedInitialInstances[0]->GetVariables().Count()) + ")");
         }
     }
@@ -190,3 +195,4 @@ void InitialInstancesPropgridHelper::OnPropertyChanged(const std::vector<gd::Ini
 }
 
 }
+#endif

@@ -1,10 +1,13 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <iostream>
 #include <fstream>
+#if !defined(GD_NO_WX_GUI)
 #include <wx/dcmemory.h>
+#endif
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -139,8 +142,10 @@ void LinkEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEle
 
 gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
+#if !defined(GD_NO_WX_GUI)
     EditLink dialog(parent_, *this, project);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
+#endif
 
     return ChangesMade;
 }
@@ -150,12 +155,13 @@ gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::P
  */
 void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
     dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
     wxRect rect(x+1, y, width, GetRenderedHeight(width, platform)-2);
     dc.DrawRectangle(rect);
 
-    dc.DrawBitmap( wxBitmap( "res/events24.png", wxBITMAP_TYPE_ANY ), x+4, y + 1, true);
+    dc.DrawBitmap( gd::SkinHelper::GetIcon("events", 24), x+4, y + 1, true);
 
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     if ( !IsDisabled() )
@@ -171,6 +177,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
         dc.DrawText( _("Include all events"), x+lien.GetWidth()+32+10, y + 5 );
     else
         dc.DrawText( _("Include events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+32+10, y + 5 );
+#endif
 }
 
 /**
@@ -178,6 +185,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
  */
 unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         wxMemoryDC dc;
@@ -192,6 +200,9 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 }

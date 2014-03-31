@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_FILEPROPERTY_H
 #define GDCORE_FILEPROPERTY_H
 #include <wx/control.h>
@@ -47,3 +48,4 @@ private:
 }
 
 #endif // GDCORE_FILEPROPERTY_H
+#endif

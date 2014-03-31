@@ -5,7 +5,7 @@ echo -Copying all needed files to GDSDK...
 mkdir ..\GDSDK > nul
 mkdir ..\GDSDK\Binaries > nul
 mkdir ..\GDSDK\Binaries\Output > nul
-mkdir ..\GDSDK\Binaries\Output\Release > nul
+mkdir ..\GDSDK\Binaries\Output\Release_Windows > nul
 mkdir ..\GDSDK\ExtLibs > nul
 mkdir ..\Runtime\bin\release > nul
 xcopy ..\ExtLibs\Readme.txt ..\GDSDK\ExtLibs\ /Y > nul
@@ -28,9 +28,9 @@ xcopy ..\Core\doc\* ..\GDSDK\Core\doc\* /S /Y   > nul
 
 echo -Copying all needed files to GDSDK... ( GDCpp and GDCore binaries )
 
-xcopy ..\Binaries\Output\Release\CppPlatform\Runtime\*.* ..\GDSDK\Binaries\Output\Release\CppPlatform\Runtime\ /Y 
+xcopy ..\Binaries\Output\Release_Windows\CppPlatform\Runtime\*.* ..\GDSDK\Binaries\Output\Release_Windows\CppPlatform\Runtime\ /Y
 
-xcopy ..\Binaries\Output\Release\libGDCpp.dll.a ..\GDSDK\Binaries\Output\Release\ /Y 
-xcopy ..\Binaries\Output\Release\GDCpp.dll ..\GDSDK\Binaries\Output\Release\ /Y 
-xcopy ..\Binaries\Output\Release\libGDCore.dll.a ..\GDSDK\Binaries\Output\Release\ /Y 
-xcopy ..\Binaries\Output\Release\GDCore.dll ..\GDSDK\Binaries\Output\Release\ /Y 
+xcopy ..\Binaries\Output\Release_Windows\libGDCpp.dll.a ..\GDSDK\Binaries\Output\Release_Windows\ /Y
+xcopy ..\Binaries\Output\Release_Windows\GDCpp.dll ..\GDSDK\Binaries\Output\Release_Windows\ /Y
+xcopy ..\Binaries\Output\Release_Windows\libGDCore.dll.a ..\GDSDK\Binaries\Output\Release_Windows\ /Y
+xcopy ..\Binaries\Output\Release_Windows\GDCore.dll ..\GDSDK\Binaries\Output\Release_Windows\ /Y

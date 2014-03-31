@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_PROJECT_H
@@ -99,7 +99,7 @@ public:
      *
      * \note This is only the default width used when creating the main window for the first time. To change the width at runtime, use the functions related to RuntimeScene.renderWindow
      */
-    void SetMainWindowDefaultWidth(unsigned int width) { windowWidth = width; }
+    void SetDefaultWidth(unsigned int width) { windowWidth = width; }
 
     /**
      * Get the default width of the project main window
@@ -109,7 +109,7 @@ public:
     /**
      * Change the default height of the project main window
      */
-    void SetMainWindowDefaultHeight(unsigned int height) { windowHeight = height; }
+    void SetDefaultHeight(unsigned int height) { windowHeight = height; }
 
     /**
      * Return the default height of the project main window
@@ -165,7 +165,7 @@ public:
     /**
      * Add a platform to the project
      */
-    void AddPlatform(Platform* platform);
+    void AddPlatform(Platform & platform);
 
     /**
      * Remove a platform from the project.
@@ -249,6 +249,7 @@ public:
     ///@}
 #endif
 
+#if !defined(GD_NO_WX_GUI)
     /** \name GUI property grid management
      * Members functions related to managing the wxWidgets property grid used to display the properties of the project.
      */
@@ -273,6 +274,7 @@ public:
      */
     void OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
     ///@}
+#endif
 
     /** \name Layouts management
      * Members functions related to layout management.
@@ -280,47 +282,56 @@ public:
     ///@{
 
     /**
-     * Return true if layout called "name" exists.
+     * \brief Return true if layout called "name" exists.
      */
     bool HasLayoutNamed(const std::string & name) const;
 
     /**
-     * Return a reference to the layout called "name".
+     * \brief Return a reference to the layout called "name".
      */
     Layout & GetLayout(const std::string & name);
 
     /**
-     * Return a reference to the layout called "name".
+     * \brief Return a reference to the layout called "name".
      */
     const Layout & GetLayout(const std::string & name) const;
 
     /**
-     * Return a reference to the layout at position "index" in the layout list
+     * \brief Return a reference to the layout at position "index" in the layout list
      */
     Layout & GetLayout(unsigned int index);
 
     /**
-     * Return a reference to the layout at position "index" in the layout list
+     * \brief Return a reference to the layout at position "index" in the layout list
      */
     const Layout & GetLayout (unsigned int index) const;
 
     /**
-     * Return the position of the layout called "name" in the layout list
+     * \brief Return the position of the layout called "name" in the layout list
      */
     unsigned int GetLayoutPosition(const std::string & name) const;
 
+    #if defined(GD_IDE_ONLY)
     /**
-     * Return the number of layouts.
+     * \brief Swap the specified layouts.
+     *
+     * Do nothing if indexes are not correct.
+     */
+    void SwapLayouts(unsigned int first, unsigned int second);
+    #endif
+
+    /**
+     * \brief Return the number of layouts.
      */
     unsigned int GetLayoutCount() const;
 
     /**
-     * Must add a new empty layout called "name" at the specified position in the layout list.
+     * \brief Must add a new empty layout called "name" at the specified position in the layout list.
      */
     gd::Layout & InsertNewLayout(const std::string & name, unsigned int position);
 
     /**
-     * Must add a new layout constructed from the layout passed as parameter.
+     * \brief Must add a new layout constructed from the layout passed as parameter.
      * \note No pointer or reference must be kept on the layout passed as parameter.
      * \param layout The layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layout must be inserted at the end of the layout list.
@@ -338,19 +349,22 @@ public:
      * Members functions related to saving and loading the project.
      */
     ///@{
-
     /**
-     * Save the project to a file.
+     * \brief Save the project to a file.
+     *
+     * "Dirty" flag is set to false when save is done.
      */
     bool SaveToFile(const std::string & filename);
 
     /**
-     * Load the project from a file.
+     * \brief Load the project from a file.
      */
     bool LoadFromFile(const std::string & filename);
 
     /**
      * Called to save the layout to a TiXmlElement.
+     *
+     * "Dirty" flag is set to false when save is done.
      */
     void SaveToXml(TiXmlElement * element) const;
 
@@ -360,6 +374,19 @@ public:
     void LoadFromXml(const TiXmlElement * element);
 
     #if defined(GD_IDE_ONLY)
+
+    /**
+     * \brief Return true if the project is marked as being modified (The IDE or application
+     * using the project should ask for save the project if the project is closed).
+     */
+    bool IsDirty() { return dirty; }
+
+    /**
+     * \brief Mark the project as being modified (The IDE or application
+     * using the project should ask for save the project if the project is closed).
+     */
+    void SetDirty(bool enable = true) { dirty = enable; }
+
     /**
      * Get the major version of Game Develop used to save the project.
      */
@@ -406,6 +433,13 @@ public:
      * Return the position of the external events called "name" in the external events list
      */
     unsigned int GetExternalEventsPosition(const std::string & name) const;
+
+    /**
+     * \brief Swap the specified external events.
+     *
+     * Do nothing if indexes are not correct.
+     */
+    void SwapExternalEvents(unsigned int first, unsigned int second);
 
     /**
      * Return the number of external events.
@@ -466,6 +500,15 @@ public:
      * Return the position of the external layout called "name" in the external layout list
      */
     unsigned int GetExternalLayoutPosition(const std::string & name) const;
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Swap the specified external layouts.
+     *
+     * Do nothing if indexes are not correct.
+     */
+    void SwapExternalLayouts(unsigned int first, unsigned int second);
+    #endif
 
     /**
      * Return the number of external layout.
@@ -647,6 +690,7 @@ private:
     std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.
+    mutable bool                                        dirty; ///< True to flag the project as being modified.
     #endif
 };
 

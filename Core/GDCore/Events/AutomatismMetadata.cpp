@@ -1,13 +1,15 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "AutomatismMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
-#if defined(GD_IDE_ONLY)
+#include <iostream>
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include "GDCore/IDE/SkinHelper.h"
 #include <wx/file.h>
 #include <wx/bitmap.h>
 #endif
@@ -21,7 +23,7 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
                        const std::string & defaultName_,
                        const std::string & description_,
                        const std::string & group_,
-                       const std::string & icon24x24_,
+                       const std::string & icon24x24,
                        const std::string & className_,
                        boost::shared_ptr<gd::Automatism> instance_,
                        boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance_) :
@@ -35,10 +37,18 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
     SetDefaultName(std::string(defaultName_));
     SetGroup(group_);
     className = className_;
-    if ( wxFile::Exists(icon24x24_) )
-    {
-        SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY));
-    } else { SetBitmapIcon(wxBitmap(24,24));}
+#if !defined(GD_NO_WX_GUI)
+    if ( gd::SkinHelper::IconExists(icon24x24, 24) )
+        SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
+    else if ( wxFile::Exists(icon24x24) )
+        SetBitmapIcon(wxBitmap(icon24x24, wxBITMAP_TYPE_ANY));
+    else {
+        std::cout << "Warning: The icon file for automatism \"" << name_
+            << " was not found in the current skin icons"
+            << " and the specified name is not an existing filename.";
+        SetBitmapIcon(wxBitmap(24,24));
+    }
+#endif
 #endif
 
     if ( instance ) instance->SetTypeName(name_);
@@ -131,7 +141,7 @@ AutomatismMetadata & AutomatismMetadata::SetGroup(const std::string & group_)
 }
 AutomatismMetadata & AutomatismMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     icon = bitmap_;
 #endif
     return *this;

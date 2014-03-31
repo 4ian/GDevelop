@@ -37,7 +37,7 @@
 							<growablecols>0</growablecols>
 							<object class="sizeritem">
 								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="AllEventsCheck" member="yes">
-									<label>Every scene&apos;s events</label>
+									<label>All scene&apos;s events</label>
 									<selected>1</selected>
 									<style>wxRB_GROUP</style>
 									<handler function="OnOnlyEventsCheckSelect" entry="EVT_RADIOBUTTON" />
@@ -135,7 +135,7 @@
 							<growablerows>0</growablerows>
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
-									<bitmap>res/helpicon.png</bitmap>
+									<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
 									<style>wxNO_BORDER</style>
 								</object>
 								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

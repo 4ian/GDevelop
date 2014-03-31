@@ -1,11 +1,13 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "WhileEvent.h"
+#if !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
+#endif
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
@@ -79,20 +81,14 @@ void WhileEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEl
 
     if ( eventElem->FirstChildElement( "WhileConditions" ) != NULL )
         gd::EventsListSerialization::OpenConditions(project, whileConditions, eventElem->FirstChildElement( "WhileConditions" ));
-    else
-        cout << "Aucune informations sur les while conditions d'un évènement While";
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
         gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
-    else
-        cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
         gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
-    else
-        cout << "Aucune informations sur les actions d'un évènement";
 
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
@@ -104,6 +100,7 @@ void WhileEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEl
  */
 void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int repeatHeight = 20;
@@ -146,10 +143,12 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+whileConditionsHeight+border,
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
+#endif
 }
 
 unsigned int WhileEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
@@ -167,10 +166,14 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width, const gd::Platfor
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
+#if !defined(GD_NO_WX_GUI)
     if ( !justCreatedByTheUser )
     {
         wxMessageDialog dialog(parent_, _("Do you want to activate the display of a message if the event is repeated 100000 times? This message prevent the software from being frozen if you accidentally create an infinite loop ( by letting the conditions empty for example )."),
@@ -185,6 +188,7 @@ gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::
         else if ( answer == wxID_NO ) infiniteLoopWarning = false;
     }
     justCreatedByTheUser = false; //Show Message dialog next time.
+#endif
 
     return ChangesMade;
 }

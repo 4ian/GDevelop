@@ -1,14 +1,15 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include <stdexcept>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <wx/log.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include <wx/bitmap.h>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -74,7 +75,7 @@ std::string ConditionSentenceFormatter::LabelFromType( const std::string & type 
     else if ( type == "globalvar" )
         return static_cast<string>(_("Choose the global variable"));
 
-    wxLogWarning( "Game Develop n'a pas pu trouver le nom d'un bouton suivant le type du paramètre" );
+    gd::LogWarning( "Game Develop n'a pas pu trouver le nom d'un bouton suivant le type du paramètre" );
     return "undefined";
 }
 
@@ -117,8 +118,9 @@ wxBitmap ConditionSentenceFormatter::BitmapFromType( const std::string & type )
     else if ( type == "globalvar" )
         return CommonBitmapManager->varBt;
 
-    wxLogWarning( "Game Develop n'a pas pu trouver le bitmap d'un bouton suivant le type du paramètre" );
+    gd::LogWarning( "Game Develop n'a pas pu trouver le bitmap d'un bouton suivant le type du paramètre" );
     return CommonBitmapManager->unknownBt;
 }
 
 }
+#endif

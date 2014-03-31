@@ -1,12 +1,14 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <iostream>
 #include "ObjectMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
-#if defined(GD_IDE_ONLY)
+#include <iostream>
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include "GDCore/IDE/SkinHelper.h"
 #include <wx/file.h>
 #include <wx/bitmap.h>
 #endif
@@ -18,7 +20,7 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
                    const std::string & name_,
                    const std::string & fullname_,
                    const std::string & informations_,
-                   const std::string & icon24x24_,
+                   const std::string & icon24x24,
                    CreateFunPtr createFunPtrP,
                    DestroyFunPtr destroyFunPtrP) :
     extensionNamespace(extensionNamespace_)
@@ -27,7 +29,18 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 #if defined(GD_IDE_ONLY)
     SetFullName(std::string(fullname_));
     SetDescription(std::string(informations_));
-    SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY));
+#if !defined(GD_NO_WX_GUI)
+    if ( gd::SkinHelper::IconExists(icon24x24, 24) )
+        SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
+    else if ( wxFile::Exists(icon24x24) )
+        SetBitmapIcon(wxBitmap(icon24x24, wxBITMAP_TYPE_ANY));
+    else {
+        std::cout << "Warning: The icon file for object \"" << name_
+            << " was not found in the current skin icons"
+            << " and the specified name is not an existing filename.";
+        SetBitmapIcon(wxBitmap(24,24));
+    }
+#endif
 #endif
     createFunPtr = createFunPtrP;
     destroyFunPtr = destroyFunPtrP;
@@ -107,7 +120,7 @@ ObjectMetadata & ObjectMetadata::SetDescription(const std::string & description_
 
 ObjectMetadata & ObjectMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
 {
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     icon = bitmap_;
 #endif
     return *this;

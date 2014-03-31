@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "AuiTabArt.h"
 #include <wx/aui/framemanager.h>
 #include <wx/aui/dockart.h>
@@ -19,7 +20,7 @@ namespace gd
 {
 
 // the original wx functions live in dockart.cpp -- need to redefine them
-unsigned char gdAuiBlendColour(unsigned char fg, unsigned char bg, double alpha)
+static unsigned char gdAuiBlendColour(unsigned char fg, unsigned char bg, double alpha)
 {
     double result = bg + (alpha * (fg - bg));
     if (result < 0.0)
@@ -29,7 +30,7 @@ unsigned char gdAuiBlendColour(unsigned char fg, unsigned char bg, double alpha)
     return (unsigned char)result;
 }
 
-wxColor gdAuiStepColour(const wxColor& c, int ialpha)
+static wxColor gdAuiStepColour(const wxColor& c, int ialpha)
 {
     if (ialpha == 100)
         return c;
@@ -68,7 +69,7 @@ wxColor gdAuiStepColour(const wxColor& c, int ialpha)
     return wxColour(r, g, b);
 }
 
-wxBitmap gdAuiBitmapFromBits(const unsigned char bits[], int w, int h,
+static wxBitmap gdAuiBitmapFromBits(const unsigned char bits[], int w, int h,
                              const wxColour& color)
 {
     wxImage img = wxBitmap((const char*)bits, w, h).ConvertToImage();
@@ -78,7 +79,7 @@ wxBitmap gdAuiBitmapFromBits(const unsigned char bits[], int w, int h,
     return wxBitmap(img);
 }
 
-wxString gdAuiChopText(wxDC& dc, const wxString& text, int max_size)
+static wxString gdAuiChopText(wxDC& dc, const wxString& text, int max_size)
 {
     wxCoord x,y;
 
@@ -659,6 +660,11 @@ void AuiTabArt::DrawTab(wxDC& dc,
         wxColor top_color = *wxWHITE;
         wxColor bottom_color = m_active_colour;
         dc.GradientFillLinear(r, bottom_color, top_color, wxSOUTH);
+
+        // Adapt text color
+        int average = (m_active_colour.Red()+m_active_colour.Green()+m_active_colour.Blue())/3;
+        if (average < 127) dc.SetTextForeground(*wxWHITE);
+        else dc.SetTextForeground(*wxBLACK);
     }
     else
     {
@@ -687,6 +693,11 @@ void AuiTabArt::DrawTab(wxDC& dc,
         top_color = m_base_colour;
         bottom_color = m_base_colour;
         dc.GradientFillLinear(r, top_color, bottom_color, wxSOUTH);
+
+        // Adapt text color
+        int average = (m_active_colour.Red()+m_active_colour.Green()+m_active_colour.Blue())/3;
+        if (average < 127) dc.SetTextForeground(*wxWHITE);
+        else dc.SetTextForeground(*wxBLACK);
     }
 
     // draw tab outline
@@ -1031,3 +1042,4 @@ void AuiTabArt::SetMeasuringFont(const wxFont& font)
 
 
 }
+#endif

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "ForEachEvent.h"
@@ -107,6 +107,7 @@ void ForEachEvent::LoadFromXml(gd::Project & project, const TiXmlElement * event
  */
 void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int forEachTextHeight = 20;
@@ -133,10 +134,12 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+forEachTextHeight+border,
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
+#endif
 }
 
 unsigned int ForEachEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
@@ -152,12 +155,17 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width, const gd::Platf
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
+#if !defined(GD_NO_WX_GUI)
     EditForEachEvent dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
+#endif
 
     return ChangesMade;
 }

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef ImageManager_H
@@ -133,7 +133,7 @@ class GD_CORE_API SFMLTextureWrapper
 {
 public :
     SFMLTextureWrapper(sf::Texture & texture);
-    SFMLTextureWrapper() {};
+    SFMLTextureWrapper();
     ~SFMLTextureWrapper();
 
     sf::Texture texture;

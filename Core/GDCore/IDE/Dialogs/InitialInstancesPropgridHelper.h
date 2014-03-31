@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef INITIALINSTANCESPROPGRIDHELPER_H
 #define INITIALINSTANCESPROPGRIDHELPER_H
 #include <wx/propgrid/propgrid.h>
@@ -107,3 +108,4 @@ private:
 }
 
 #endif // INITIALINSTANCESPROPGRIDHELPER_H
+#endif

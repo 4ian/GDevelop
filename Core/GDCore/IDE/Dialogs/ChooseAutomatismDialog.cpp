@@ -1,18 +1,20 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "ChooseAutomatismDialog.h"
 
 //(*InternalHeaders(ChooseAutomatismDialog)
 #include <wx/bitmap.h>
 #include <wx/settings.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <boost/algorithm/string.hpp>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 
@@ -100,6 +102,7 @@ ChooseAutomatismDialog::~ChooseAutomatismDialog()
 
 void ChooseAutomatismDialog::RefreshList()
 {
+	std::cout << "RefreshList for " << automatismTypeAllowed << std::endl;
     std::string search = ToString(searchCtrl->GetValue());
     bool searching = search.empty() ? false : true;
 
@@ -109,6 +112,9 @@ void ChooseAutomatismDialog::RefreshList()
 	for (unsigned int i = 0;i<automatisms.size();++i)
 	{
 	    std::string automatismName = automatisms[i];
+		std::cout << "Name" << automatismName << std::endl;
+
+		std::cout << "Type:" << gd::GetTypeOfAutomatism(project, layout, automatismName) << std::endl;
 
 		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == gd::GetTypeOfAutomatism(project, layout, automatismName)) &&
              (!searching || (searching && boost::to_upper_copy(automatismName).find(boost::to_upper_copy(search)) != std::string::npos) ))
@@ -136,3 +142,4 @@ void ChooseAutomatismDialog::OnsearchCtrlText(wxCommandEvent& event)
 }
 
 }
+#endif

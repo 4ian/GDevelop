@@ -1,8 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(GD_NO_WX_GUI)
 #include "EventsRenderingHelper.h"
 #include <utility>
 #include <vector>
@@ -502,3 +502,4 @@ void EventsRenderingHelper::DestroySingleton()
 }
 
 }
+#endif

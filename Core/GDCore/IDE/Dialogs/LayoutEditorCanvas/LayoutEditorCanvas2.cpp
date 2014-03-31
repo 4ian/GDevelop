@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LayoutEditorCanvas.h"
 #include <cmath>
 #include <wx/wx.h>
@@ -43,6 +44,9 @@ void LayoutEditorCanvas::OnUpdate()
     }
     else
     {
+        if ( mainFrameWrapper.GetIDEWorkingDirectory() != wxGetCwd() ) //Force the correct working directory.
+            wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+
         //First reload some images if necessary.
         if ( !project.imagesChanged.empty() )
         {
@@ -57,7 +61,6 @@ void LayoutEditorCanvas::OnUpdate()
             layout.SetRefreshNeeded();
 
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
-            std::cout << "CWDe:" << wxGetCwd();
         }
         if ( firstRefresh )
         {
@@ -67,7 +70,8 @@ void LayoutEditorCanvas::OnUpdate()
 
         //Then display the layout
         RenderEdittime();
-        UpdateScrollbars();
+        if (vScrollbar && hScrollbar && !hScrollbar->HasFocus() && !vScrollbar->HasFocus())
+            UpdateScrollbars();
 
     }
 }
@@ -704,6 +708,9 @@ void LayoutEditorCanvas::UpdateScrollbars()
     hScrollbar->SetScrollbar(thumbX, getSize().x, hScrollbar->GetRange(), getSize().x);
 
     //Update the size if needed
+    if ( hScrollbar->HasFocus() || vScrollbar->HasFocus() )
+        return;
+
     if ( thumbY <= 0 || static_cast<int>(thumbY+getSize().y) >= vScrollbar->GetRange())
     {
         int ajout = getSize().y;
@@ -723,8 +730,9 @@ void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 
 void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilprojects.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
 }
 
 
 }
+#endif

@@ -1,16 +1,16 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include <string>
 #include <vector>
 #include <utility>
 #include <sstream>
-#include <wx/log.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include <wx/config.h>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/InstructionMetadata.h"
@@ -27,16 +27,21 @@ namespace gd
 
 ActionSentenceFormatter *ActionSentenceFormatter::_singleton = NULL;
 
-////////////////////////////////////////////////////////////
-/// Traduction complète
-///
-/// Traduction en une phrase complète d'une action et ses paramètres
-////////////////////////////////////////////////////////////
+/**
+ * Generate the sentence describing an action.
+ */
 string ActionSentenceFormatter::Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos)
 {
     std::string trad = infos.GetSentence();
+    if ( trad.empty() ) trad = "   "; //Prevent empty sentences that could trigger graphical glitches.
 
-    //Remplacement des _PARAMx_ par la valeur des paramètres
+    //Format special
+    /*if ( trad.substr(0, 3) == "Do " && infos.parameters.size() >  )
+    {
+
+    }*/
+
+    //Replace _PARAMx_ by values
     for (unsigned int i =0;i<infos.parameters.size();++i)
     {
         while ( trad.find( "_PARAM"+ToString(i)+"_" ) != std::string::npos )

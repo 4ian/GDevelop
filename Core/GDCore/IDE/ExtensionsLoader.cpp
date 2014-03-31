@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 
@@ -11,8 +11,8 @@
 #include "GDCore/Tools/Version.h"
 #include "GDCore/Tools/DynamicLibrariesTools.h"
 #include "GDCore/CommonTools.h"
-#if defined(GD_IDE_ONLY)
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
 #include "GDCore/Tools/Locale/LocaleManager.h"
@@ -70,7 +70,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
         if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
         {
             //Use a log file, in IDE only
-            #if defined(GD_IDE_ONLY)
+            #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
             {
                 wxFile errorDetectFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log", wxFile::write);
                 errorDetectFile.Write(directory+"/"+lec);
@@ -80,7 +80,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
             LoadExtension(directory+"/"+lec, platform);
 
             //Everything is ok : Delete the log file
-            #if defined(GD_IDE_ONLY)
+            #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
             wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
             #endif
 
@@ -102,7 +102,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 		do
 		{
             //Use a log file, in IDE only
-            #if defined(GD_IDE_ONLY)
+            #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
             {
                 wxFile errorDetectFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log", wxFile::write);
                 errorDetectFile.Write(f.cFileName);
@@ -112,14 +112,14 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 			LoadExtension(f.cFileName, platform);
 
             //Everything is ok : Delete the log file
-            #if defined(GD_IDE_ONLY)
+            #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
             wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
             #endif
 
 		} while(FindNextFile(h, &f));
 	}
 	#else
-		#warning Compiler not supported ( but might support one style of directory listing, update defines if necessary ) for dynamic libraries loading
+		#warning Compiler not supported (but might support one style of directory listing, update defines if necessary) for dynamic libraries loading
 	#endif
 }
 
@@ -168,9 +168,11 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
 
     closedir( rep );
 
-    //Libraries are loaded using dlopen(.., ..|RTLD_LOCAL) meaning that their symbols are not available for other libraries
+    //Libraries are loaded using dlopen(.., RTLD_LAZY|RTLD_LOCAL) meaning that their symbols are not available for other libraries
     //nor for LLVM/Clang. We then reload set them as global to make their symbols available for LLVM/Clang. We couldn't mark them
     //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
+    //SetLibraryGlobal is also setting RTLD_NOW to ensure that all symbols are resolved: Otherwise, we can get weird
+    //"symbol lookup error" even if the symbols exist in the extensions!
     for (unsigned int i = 0;i<librariesLoaded.size();++i)
         SetLibraryGlobal(librariesLoaded[i].c_str());
     #else
@@ -194,7 +196,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
 
         cout << "Unable to load extension " << fullpath << "." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
-        #if defined(GD_IDE_ONLY)
+        #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\n") + error);
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
@@ -209,7 +211,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     {
         cout << "Unable to load extension " << fullpath << " ( no valid create/destroy functions )." << endl;
 
-        #if defined(GD_IDE_ONLY)
+        #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         CloseLibrary(extensionHdl);
         wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations." ));
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
@@ -218,7 +220,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         return;
     }
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LocaleManager::GetInstance()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
     #endif
 
@@ -233,11 +235,13 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     else if ( extensionPtr->compilationInfo.runtimeOnly )
         error += "Extension compiled for runtime only.\n";
 
+    #if !defined(GD_NO_WX_GUI)
     else if ( extensionPtr->compilationInfo.wxWidgetsMajorVersion != wxMAJOR_VERSION ||
               extensionPtr->compilationInfo.wxWidgetsMinorVersion != wxMINOR_VERSION ||
               extensionPtr->compilationInfo.wxWidgetsReleaseNumber != wxRELEASE_NUMBER ||
               extensionPtr->compilationInfo.wxWidgetsSubReleaseNumber != wxSUBRELEASE_NUMBER )
         error += "Not the same wxWidgets version.\n";
+    #endif
     #endif
     #if defined(__GNUC__)
     else if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
@@ -273,7 +277,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         CloseLibrary(extensionHdl);
         #endif
 
-        #if defined(GD_IDE_ONLY) && defined(RELEASE) //Show errors in IDE only
+        #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI) && defined(RELEASE) //Show errors in IDE only
         wxString userMsg = string(_("Extension "))+ fullpath + string(_(" has errors :\n")) + error + string(_("\nThe extension was not loaded. Contact the developer to get more information." ));
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif

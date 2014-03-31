@@ -1,14 +1,14 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ProjectExtensionsDialog.h"
 
 //(*InternalHeaders(ProjectExtensionsDialog)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -23,8 +23,9 @@
 #endif
 #include <wx/clntdata.h>
 #include <wx/imaglist.h>
-#include <wx/log.h>
+#include "GDCore/Tools/Log.h"
 
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -176,7 +177,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
-	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	helpBt->SetToolTip(_("Display help about this window"));
@@ -185,7 +186,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Close and reopen scene editors so as to take in account newly added extensions."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
-	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
 	FermerBt = new wxButton(this, ID_BUTTON3, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer4->Add(FermerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -393,7 +394,7 @@ void ProjectExtensionsDialog::OnResize(wxSizeEvent& event)
 
 void ProjectExtensionsDialog::OnusePlatformMenuItemSelected(wxCommandEvent& event)
 {
-    project.AddPlatform(currentPlatform);
+    project.AddPlatform(*currentPlatform);
     RefreshPlatformList();
     RefreshExtensionList();
 }
@@ -402,7 +403,7 @@ void ProjectExtensionsDialog::OnremovePlatformMenuItemSelected(wxCommandEvent& e
 {
     if ( !project.RemovePlatform(currentPlatform->GetName()) )
     {
-        wxLogWarning(_("Unable to remove this platform: The project must use at least one plaform."));
+        gd::LogWarning(_("Unable to remove this platform: The project must use at least one plaform."));
     }
     RefreshPlatformList();
     RefreshExtensionList();
@@ -459,3 +460,4 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
 
 
 }
+#endif

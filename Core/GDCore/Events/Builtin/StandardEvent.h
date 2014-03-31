@@ -1,14 +1,10 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_STANDARDEVENT_H
 #define GDCORE_STANDARDEVENT_H
-#if defined(GD_IDE_ONLY)
-#include <wx/bitmap.h>
-#include <wx/dcbuffer.h>
-#include <wx/html/htmprint.h>
 #include "GDCore/Events/Event.h"
 namespace gd { class Instruction; }
 namespace gd { class Project; }
@@ -74,5 +70,4 @@ private:
 
 }
 
-#endif
 #endif // GDCORE_STANDARDEVENT_H

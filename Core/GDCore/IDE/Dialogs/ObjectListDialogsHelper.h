@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_OBJECTLISTDIALOGSHELPER_H
 #define GDCORE_OBJECTLISTDIALOGSHELPER_H
 
@@ -36,7 +37,7 @@ public:
     ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_) {};
     virtual ~ObjectListDialogsHelper() {};
 
-    void SetSearchText(std::string searchText_) { searchText = searchText_; }
+    void SetSearchText(std::string searchText_);
     void SetAllowedObjectType(std::string allowedObjectType_) { objectTypeAllowed = allowedObjectType_; }
     void SetGroupsAllowed(bool canSelectGroup) { groupsAllowed = canSelectGroup; }
 
@@ -79,3 +80,4 @@ private:
 }
 
 #endif // GDCORE_OBJECTLISTDIALOGSHELPER_H
+#endif

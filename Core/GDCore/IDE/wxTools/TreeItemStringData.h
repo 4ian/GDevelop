@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_TreeItemStringData_H
 #define GDCORE_TreeItemStringData_H
 
@@ -37,5 +38,4 @@ private:
 }
 
 #endif // GDCORE_TreeItemStringData_H
-
-
+#endif

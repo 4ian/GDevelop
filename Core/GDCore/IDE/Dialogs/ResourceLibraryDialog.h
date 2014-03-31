@@ -1,7 +1,9 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef RESOURCELIBRARYDIALOG_H
 #define RESOURCELIBRARYDIALOG_H
 
@@ -83,4 +85,5 @@ class GD_CORE_API ResourceLibraryDialog: public wxDialog
 
 }
 
+#endif
 #endif

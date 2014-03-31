@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef AUTOMATISMMETADATA_H
 #define AUTOMATISMMETADATA_H
@@ -8,7 +8,7 @@
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 namespace gd { class Automatism; }
@@ -106,7 +106,9 @@ public:
     const std::string & GetDefaultName() const { return defaultName; }
     const std::string & GetDescription() const  { return description; }
     const std::string & GetGroup() const  { return group; }
+#if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
+#endif
 #endif
     boost::shared_ptr<gd::Automatism> GetInstance() const { return instance; }
     boost::shared_ptr<gd::AutomatismsSharedData> GetSharedDataInstance() const { return sharedDatasInstance; }
@@ -127,7 +129,9 @@ private:
     std::string defaultName;
     std::string description;
     std::string group;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
+#endif
 #endif
 
     boost::shared_ptr<gd::Automatism> instance;

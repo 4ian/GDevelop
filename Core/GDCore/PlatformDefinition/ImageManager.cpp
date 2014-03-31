@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDCore/PlatformDefinition/ImageManager.h"
@@ -184,6 +184,14 @@ SFMLTextureWrapper::SFMLTextureWrapper(sf::Texture & texture_) :
 {
 }
 
+SFMLTextureWrapper::SFMLTextureWrapper()
+{
+}
+
+SFMLTextureWrapper::~SFMLTextureWrapper()
+{
+}
+
 OpenGLTextureWrapper::OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper> sfmlTexture_)
 {
     sfmlTexture = sfmlTexture_;
@@ -198,8 +206,4 @@ OpenGLTextureWrapper::OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper>
 OpenGLTextureWrapper::~OpenGLTextureWrapper()
 {
     glDeleteTextures(1, &texture);
-};
-
-SFMLTextureWrapper::~SFMLTextureWrapper()
-{
 };

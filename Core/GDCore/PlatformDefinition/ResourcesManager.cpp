@@ -1,22 +1,23 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <iostream>
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/ResourcesManager.h"
-#include "GDCore/CommonTools.h"
-#include "GDCore/TinyXml/tinyxml.h"
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include <wx/filedlg.h>
 #include <wx/panel.h>
-#include <wx/log.h>
 #include <wx/dcclient.h>
 #include <wx/file.h>
 #include <wx/filename.h>
 #endif
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/ResourcesManager.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd
 {
@@ -180,7 +181,7 @@ bool ImageResource::ChangeProperty(gd::Project & project, const std::string & pr
     return true;
 }
 
-void ImageResource::GetPropertyInformation(gd::Project & project, const std::string & property, wxString & userFriendlyName, wxString & description) const
+void ImageResource::GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const
 {
     if ( property == "smooth" )
     {
@@ -220,6 +221,7 @@ std::vector<std::string> ImageResource::GetAllProperties(gd::Project & project) 
     return allProperties;
 }
 
+#if !defined(GD_NO_WX_GUI)
 void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & project)
 {
     wxLogNull noLog; //We take care of errors.
@@ -255,6 +257,8 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Pr
                       (size.GetHeight() - bmp.GetHeight()) / 2,
                       true /* use mask */);
 }
+
+#endif
 
 Resource & ResourceFolder::GetResource(const std::string & name)
 {
@@ -327,10 +331,15 @@ bool MoveResourceDownInList(std::vector< boost::shared_ptr<Resource> > & resourc
 
 std::string Resource::GetAbsoluteFile(const gd::Project & project) const
 {
+#if !defined(GD_NO_WX_GUI)
     wxString projectDir = wxFileName::FileName(project.GetProjectFile()).GetPath();
     wxFileName filename = wxFileName::FileName(GetFile());
     filename.MakeAbsolute(projectDir);
     return ToString(filename.GetFullPath());
+#else
+    gd::LogWarning("BAD USE: Resource::GetAbsoluteFile called when compiled with no support for wxWidgets");
+    return GetFile();
+#endif
 }
 
 bool ResourceFolder::MoveResourceUpInList(const std::string & name)

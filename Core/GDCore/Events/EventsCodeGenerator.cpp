@@ -705,6 +705,15 @@ std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::strin
         realObjects.push_back(context.GetCurrentObject());
     }
 
+    //Ensure that all returned objects actually exists.
+    for (unsigned int i = 0; i < realObjects.size();)
+    {
+        if ( !scene.HasObjectNamed(realObjects[i]) && !project.HasObjectNamed(realObjects[i]) )
+            realObjects.erase(realObjects.begin()+i);
+        else
+            ++i;
+    }
+
     return realObjects;
 }
 
@@ -731,8 +740,10 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
         listEvent[i]->Preprocess(*this, listEvent, i);
-        if ( listEvent[i]->CanHaveSubEvents() )
-            PreprocessEventList( listEvent[i]->GetSubEvents());
+        if ( i < listEvent.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
+            if ( listEvent[i]->CanHaveSubEvents() )
+                PreprocessEventList( listEvent[i]->GetSubEvents());
+        }
     }
 }
 

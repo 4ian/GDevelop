@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <boost/algorithm/string.hpp>
 #include <boost/weak_ptr.hpp>
@@ -27,9 +27,9 @@ void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, 
         if ( &project.GetLayout(i) == &layout ) continue;
 
         std::vector< gd::Layout* > linkedScenes;
-        std::vector< gd::ExternalEvents * > linkedExternalEvents;
+        std::vector< gd::ExternalEvents * > notUsed;
 
-        GetScenesAndExternalEventsLinkedTo(project.GetLayout(i).GetEvents(), project, linkedScenes, linkedExternalEvents);
+        GetScenesAndExternalEventsLinkedTo(project.GetLayout(i).GetEvents(), project, linkedScenes, notUsed);
 
         for (unsigned int j = 0;j<linkedScenes.size();++j)
         {
@@ -44,9 +44,9 @@ void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, 
     for (unsigned int i = 0;i<project.GetExternalEventsCount();++i)
     {
         std::vector< gd::Layout* > linkedScenes;
-        std::vector< gd::ExternalEvents * > linkedExternalEvents;
+        std::vector< gd::ExternalEvents * > notUsed;
 
-        GetScenesAndExternalEventsLinkedTo(project.GetExternalEvents(i).GetEvents(), project, linkedScenes, linkedExternalEvents);
+        GetScenesAndExternalEventsLinkedTo(project.GetExternalEvents(i).GetEvents(), project, linkedScenes, notUsed);
 
         for (unsigned int j = 0;j<linkedScenes.size();++j)
         {
@@ -84,14 +84,14 @@ void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & 
     //Also notify external events
     for (unsigned int i = 0;i<project.GetExternalEventsCount();++i)
     {
-        std::vector< gd::Layout* > linkedScenes;
+        std::vector< gd::Layout* > notUsed;
         std::vector< gd::ExternalEvents * > linkedExternalEvents;
 
-        GetScenesAndExternalEventsLinkedTo(project.GetExternalEvents(i).GetEvents(), project, linkedScenes, linkedExternalEvents);
+        GetScenesAndExternalEventsLinkedTo(project.GetExternalEvents(i).GetEvents(), project, notUsed, linkedExternalEvents);
 
-        for (unsigned int j = 0;j<linkedScenes.size();++j)
+        for (unsigned int j = 0;j<linkedExternalEvents.size();++j)
         {
-            if ( linkedScenes[j]->GetName() == externalEvents.GetName() )
+            if ( linkedExternalEvents[j]->GetName() == externalEvents.GetName() )
             {
                 for ( unsigned int k = 0; k < project.GetUsedPlatforms().size();++k)
                     project.GetUsedPlatforms()[k]->GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, externalEvents.GetName());

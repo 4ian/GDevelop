@@ -1,9 +1,9 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
@@ -217,9 +217,9 @@ bool EventsEditorSelection::IsDraggingInstruction()
     return draggingInstruction;
 }
 
-bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bool dropAfterHighlightedElement)
+std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bool dropAfterHighlightedElement)
 {
-    if (!draggingInstruction) return false;
+    if (!draggingInstruction) return NULL;
     draggingInstruction = false;
 
     //Find where to drag
@@ -240,7 +240,7 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
         if ( instructionListHighlighted.event != NULL ) instructionListHighlighted.event->eventHeightNeedUpdate = true;
         else std::cout << "WARNING : Instruction list hightlighted event is not valid! " << std::endl;
     }
-    else return false;
+    else return NULL;
 
     //Be sure we do not try to drag inside an instruction selected
     if (instructionHighlighted.instruction != NULL)
@@ -255,11 +255,11 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
 
             if ( (*it).instruction == instructionHighlighted.instruction || (FindInInstructionsAndSubInstructions((*it).instruction->GetSubInstructions(), instructionHighlighted.instruction)) )
             {
-                return false;
+                return NULL;
             }
             if  (FindInInstructionsAndSubInstructions(instructionHighlighted.instruction->GetSubInstructions(), (*it).instruction) )
             {
-                return false;
+                return NULL;
             }
         }
     }
@@ -304,7 +304,13 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
 
     ClearSelection();
 
-    return true;
+    std::cout << "RETURNING THIS LIST" << std::endl;
+    for (std::vector<gd::Instruction>::iterator i = list->begin(); i != list->end(); ++i)
+    {
+        std::cout << i->GetType() << std::endl;
+
+    }
+    return list;
 }
 
 void EventsEditorSelection::InstructionHighlightedOnBottomPart(bool isOnbottomHandSide)

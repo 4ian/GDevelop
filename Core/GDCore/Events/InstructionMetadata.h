@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef INSTRUCTIONMETADATA_H
@@ -9,7 +9,10 @@
 #include <string>
 #include "GDCore/Events/Instruction.h"
 #include <boost/shared_ptr.hpp>
+#if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
+#endif
+class wxBitmap;
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class EventsCodeGenerator; }
@@ -67,8 +70,10 @@ public:
     const std::string & GetDescription() const { return description; }
     const std::string & GetSentence() const { return sentence; }
     const std::string & GetGroup() const { return group; }
+#if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
     const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }
+#endif
     bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
     /**
@@ -107,12 +112,13 @@ public:
 
     /**
      * Add a parameter to the instruction ( condition or action ) information class.
-     * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
-     * \param description Edittime only description for parameter
+     * \param type One of the type handled by Game Develop.
+     * This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
+     * \param description Description for parameter
      * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
      * \param parameterIsOptional true if the parameter must be optional, false otherwise.
      */
-    InstructionMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
+    InstructionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * Add a parameter not displayed in editor.
@@ -235,8 +241,10 @@ private:
     std::string description;
     std::string sentence;
     std::string group;
+#if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
     wxBitmap smallicon;
+#endif
     bool canHaveSubInstructions;
     std::string extensionNamespace;
     bool hidden;

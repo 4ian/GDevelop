@@ -1,16 +1,17 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "EditRepeatEvent.h"
 
 //(*InternalHeaders(EditRepeatEvent)
 #include <wx/bitmap.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -72,7 +73,7 @@ scene(scene_)
 	FlexGridSizer3->AddGrowableCol(1);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5->AddGrowableRow(0);
-	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer5->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	helpBt->SetToolTip(_("Display help about this window"));
@@ -129,3 +130,4 @@ void EditRepeatEvent::OnhelpBtClick(wxCommandEvent& event)
 }
 
 }
+#endif

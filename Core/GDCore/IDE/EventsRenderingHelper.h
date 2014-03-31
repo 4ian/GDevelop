@@ -1,8 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(GD_NO_WX_GUI)
 #ifndef EventsRenderingHelper_H
 #define EventsRenderingHelper_H
 #include <wx/dc.h>
@@ -204,3 +204,4 @@ class GD_CORE_API EventsRenderingHelper
 }
 
 #endif // EventsRenderingHelper_H
+#endif

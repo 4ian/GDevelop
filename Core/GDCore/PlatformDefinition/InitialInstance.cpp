@@ -1,12 +1,15 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#endif
 
 namespace gd
 {
@@ -27,7 +30,7 @@ InitialInstance::InitialInstance() :
 
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, std::string> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
+std::map<std::string, gd::PropgridPropertyDescriptor> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
 {
     //Find an object
     if ( layout.HasObjectNamed(GetObjectName()) )
@@ -35,7 +38,7 @@ std::map<std::string, std::string> gd::InitialInstance::GetCustomProperties(gd::
     else if ( project.HasObjectNamed(GetObjectName()) )
         return project.GetObject(GetObjectName()).GetInitialInstanceProperties(*this, project, layout);
 
-    std::map<std::string, std::string> nothing;
+    std::map<std::string, gd::PropgridPropertyDescriptor> nothing;
     return nothing;
 }
 

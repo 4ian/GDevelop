@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef EVENTSCODEGENERATIONCONTEXT_H
 #define EVENTSCODEGENERATIONCONTEXT_H
@@ -45,7 +45,7 @@ public:
      *
      * A context created from scratch will returns 0, and a context inheriting from a context with depth n will returns n+1.
      */
-    unsigned int GetContextDepth() const { return contextDepth; }
+    size_t GetContextDepth() const { return contextDepth; }
 
     /**
      * \brief Get the parent context, if any.
@@ -137,7 +137,7 @@ public:
      *
      * This can be useful to generate sub conditions booleans with a different name than the parent's conditions.
      */
-    unsigned int GetCurrentConditionDepth() const { return customConditionDepth; }
+    size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
 private:
     std::set<std::string> alreadyDeclaredObjectsLists; ///< Objects lists already needed in a parent context.

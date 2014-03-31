@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef EDITREPEATEVENT_H
 #define EDITREPEATEVENT_H
 
@@ -77,3 +78,4 @@ private:
 }
 
 #endif //EDITREPEATEVENT_H
+#endif

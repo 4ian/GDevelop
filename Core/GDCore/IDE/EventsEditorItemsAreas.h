@@ -1,8 +1,9 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef EVENTSEDITORITEMSAREAS_H
 #define EVENTSEDITORITEMSAREAS_H
 #include <wx/gdicmn.h>
@@ -247,6 +248,7 @@ public:
 
 private:
 };
-   
+
 }
 #endif // EVENTSEDITORITEMSAREAS_H
+#endif

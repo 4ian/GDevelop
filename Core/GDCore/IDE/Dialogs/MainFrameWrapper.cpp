@@ -1,7 +1,8 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "MainFrameWrapper.h"
 #include <wx/aui/aui.h>
 
@@ -28,3 +29,4 @@ void gd::MainFrameWrapper::RemoveControlToBeDisabledOnPreview(wxWindow * control
 }
 
 
+#endif

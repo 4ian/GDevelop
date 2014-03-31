@@ -1,19 +1,22 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "ProjectResourcesCopier.h"
 #include <map>
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <wx/filename.h>
+#include <wx/utils.h>
+#include <wx/progdlg.h>
+#include <wx/msgdlg.h>
+#endif
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/IDE/ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/CommonTools.h"
-#include <wx/filename.h>
-#include <wx/log.h>
-#include <wx/utils.h>
-#include <wx/progdlg.h>
-#include <wx/msgdlg.h>
+#include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -24,6 +27,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
                                                 wxProgressDialog * optionalProgressDialog, bool askAboutAbsoluteFilenames,
                                                 bool preserveDirectoryStructure)
 {
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //Check if there are some resources with absolute filenames
     gd::ResourcesAbsolutePathChecker absolutePathChecker;
     originalProject.ExposeResources(absolutePathChecker);
@@ -79,7 +83,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
                 }
                 if ( !copySucceeded )
                 {
-                    wxLogWarning( _( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile.GetFullPath()+_("\"."));
+                    gd::LogWarning( gd::ToString(_( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile.GetFullPath()+_("\".")));
                 }
             }
         }
@@ -88,6 +92,10 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     }
 
     return true;
+#else
+    gd::LogError(_("You tried to use ProjectResourcesCopier::CopyAllResourcesTo which is currently unsupported when wxwidgets support is disabled."));
+    return false;
+#endif
 }
 
 }

@@ -1,9 +1,9 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #ifndef EVENTSEDITORSELECTION_H
 #define EVENTSEDITORSELECTION_H
@@ -169,7 +169,7 @@ public:
 
     void BeginDragInstruction();
     bool IsDraggingInstruction();
-    bool EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
+    std::vector<gd::Instruction> * EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
 
 private:
 

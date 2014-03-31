@@ -1,13 +1,16 @@
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "EditLink.h"
 
 //(*InternalHeaders(EditLink)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include <wx/intl.h>
+#include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <sstream>
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
@@ -68,7 +71,7 @@ game(game_)
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Include"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	AllEventsCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Every scene\'s events"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+	AllEventsCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("All scene\'s events"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	AllEventsCheck->SetValue(true);
 	FlexGridSizer2->Add(AllEventsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 5, 0, 0);
@@ -97,7 +100,7 @@ game(game_)
 	FlexGridSizer5->AddGrowableCol(0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer7->AddGrowableRow(0);
-	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, gd::SkinHelper::GetIcon("help", 16), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer7->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
@@ -187,3 +190,4 @@ void EditLink::OnOnlyEventsCheckSelect(wxCommandEvent& event)
 }
 
 }
+#endif

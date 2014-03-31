@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -13,7 +13,7 @@
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/Event.h"
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 
@@ -599,6 +599,13 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         else ++it;
     }
 }
+/*
+template<class Archive>
+void PlatformExtension::Serialize(Archive & archive)
+{
+    archive(CEREAL_NVP(name), CEREAL_NVP(nameSpace), CEREAL_NVP(fullname),
+        CEREAL_NVP(informations), CEREAL_NVP(author), CEREAL_NVP(license));
+}*/
 #endif
 
 PlatformExtension::PlatformExtension()

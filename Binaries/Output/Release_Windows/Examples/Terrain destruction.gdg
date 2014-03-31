@@ -1,0 +1,1336 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Project>
+    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
+    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
+        <Nom value="Destruction" />
+        <Auteur value="" />
+        <Extensions>
+            <Extension name="BuiltinObject" />
+            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinVariables" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMouse" />
+            <Extension name="BuiltinKeyboard" />
+            <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinCamera" />
+            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinFile" />
+            <Extension name="BuiltinNetwork" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinAdvanced" />
+            <Extension name="Sprite" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinStringInstructions" />
+            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="BuiltinExternalLayouts" />
+            <Extension name="CommonDialogs" />
+        </Extensions>
+        <Platforms current="Game Develop C++ platform">
+            <Platform name="Game Develop C++ platform" />
+        </Platforms>
+        <WindowW value="640" />
+        <WindowH value="480" />
+        <Portable />
+        <LatestCompilationDirectory value="" />
+        <FPSmax value="60" />
+        <FPSmin value="10" />
+        <verticalSync value="false" />
+    </Info>
+    <Resources>
+        <Resources>
+            <Resource kind="image" name="Base.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Base.png" />
+            <Resource kind="image" name="Canon.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Canon.png" />
+            <Resource kind="image" name="Bullet.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Bullet.png" />
+            <Resource kind="image" name="Viseur.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Viseur.png" />
+            <Resource kind="image" name="Tour.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Tour.png" />
+            <Resource kind="image" name="Impact1.png" alwaysLoaded="true" smoothed="true" userAdded="true" file="Impact1.png" />
+            <Resource kind="image" name="dirtball.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="dirtball.png" />
+            <Resource kind="image" name="Foliage.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="Foliage.png" />
+            <Resource kind="image" name="symbol.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="symbol.png" />
+            <Resource kind="image" name="Leaf.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Leaf.png" />
+            <Resource kind="image" name="SmallLeaf.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="SmallLeaf.png" />
+            <Resource kind="image" name="SmallLeaf2.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="SmallLeaf2.png" />
+            <Resource kind="image" name="smallDirt.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="smallDirt.png" />
+            <Resource kind="image" name="smallDirt2.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="smallDirt2.png" />
+            <Resource kind="image" name="sky.jpg" alwaysLoaded="false" smoothed="true" userAdded="true" file="sky.jpg" />
+        </Resources>
+        <ResourceFolders />
+    </Resources>
+    <Objects />
+    <ObjectGroups />
+    <Variables />
+    <Scenes firstScene="">
+        <Scene nom="New scene" mangledName="New_32scene" r="164.000000" v="209.000000" b="255.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
+            <GroupesObjets>
+                <Groupe nom="Solid">
+                    <Objet nom="Dirtball" />
+                    <Objet nom="Foliage" />
+                    <Objet nom="Symbol" />
+                </Groupe>
+                <Groupe nom="Ground">
+                    <Objet nom="Foliage" />
+                    <Objet nom="Symbol" />
+                    <Objet nom="Dirtball" />
+                </Groupe>
+            </GroupesObjets>
+            <Objets>
+                <Objet nom="Base" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Base.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="15.000000" Y="6.000000" />
+                                        <PointCentre nom="centre" X="15.000000" Y="12.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Canon" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Canon.png">
+                                        <Points>
+                                            <Point nom="Canon" X="55.000000" Y="7.000000" />
+                                        </Points>
+                                        <PointOrigine nom="origine" X="27.000000" Y="5.000000" />
+                                        <PointCentre nom="centre" X="28.000000" Y="6.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Tir" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Bullet.png">
+                                        <Points>
+                                            <Point nom="Head" X="9.000000" Y="2.000000" />
+                                        </Points>
+                                        <PointOrigine nom="origine" X="4.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Souris" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Viseur.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Tour" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Tour.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="18.000000" Y="9.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="27.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Dirtball" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="dirtball.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="64.000000" Y="64.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Foliage" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Foliage.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="64.000000" Y="64.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Symbol" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="symbol.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="64.000000" Y="64.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Leaf" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="SmallLeaf.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="4.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="SmallLeaf2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="SmallLeaf.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="4.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="SmallLeaf2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Leaf.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="16.000000" Y="16.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="SmallLeaf2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="SmallLeaf.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="5.000000" Y="4.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Dirt" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="smallDirt.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="6.000000" Y="5.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Sky" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="sky.jpg">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="320.000000" Y="240.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+            </Objets>
+            <Layers>
+                <Layer Name="Background" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+                <Layer Name="" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+            </Layers>
+            <Variables />
+            <AutomatismsSharedDatas />
+            <Positions>
+                <Objet nom="Base" x="544.000000" y="238.000000" plan="-2" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Canon" x="530.000000" y="217.000000" plan="2" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Souris" x="276.000000" y="146.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Fond" x="0.000000" y="0.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="0.000000" />
+                        <Info name="direction" value="0.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Tour" x="544.000000" y="244.000000" plan="-3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="145.000000" y="192.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="215.000000" y="230.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="292.000000" y="283.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="382.000000" y="306.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="449.000000" y="323.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="106.000000" y="264.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="264.000000" y="393.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="327.000000" y="354.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="422.000000" y="377.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="501.000000" y="385.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="571.000000" y="412.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Foliage" x="149.000000" y="171.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Foliage" x="452.000000" y="302.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="335.000000" y="412.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="126.000000" y="387.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="40.000000" y="346.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="31.000000" y="413.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="-41.000000" y="406.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Foliage" x="197.000000" y="221.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Symbol" x="207.000000" y="331.000000" plan="-1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="174.000000" y="435.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Foliage" x="99.000000" y="304.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="646.000000" y="425.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="721.000000" y="473.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="815.000000" y="513.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="-110.000000" y="445.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="-181.000000" y="505.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Dirtball" x="-267.000000" y="521.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Sky" x="0.000000" y="0.000000" plan="0" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2282636.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+            </Positions>
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Make the canon fall if there is no ground under." />
+                    <Com2 value="Chute du poste de tir si possible" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="MettreY" />
+                            <Parametre value="Tour" />
+                            <Parametre value="+" />
+                            <Parametre value="100*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Collision" Contraire="false" />
+                            <Parametre value="Tour" />
+                            <Parametre value="Solid" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="MettreY" />
+                            <Parametre value="Tour" />
+                            <Parametre value="-" />
+                            <Parametre value="100*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Position of the elements" />
+                    <Com2 value="Positionnement des élements de tirs" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="MettreXY" />
+                            <Parametre value="Base" />
+                            <Parametre value="=" />
+                            <Parametre value="Tour.X()" />
+                            <Parametre value="=" />
+                            <Parametre value="Tour.Y()" />
+                        </Action>
+                        <Action>
+                            <Type value="MettreXY" />
+                            <Parametre value="Canon" />
+                            <Parametre value="=" />
+                            <Parametre value="Base.X()" />
+                            <Parametre value="=" />
+                            <Parametre value="Base.Y()" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="MettreX" />
+                            <Parametre value="Souris" />
+                            <Parametre value="=" />
+                            <Parametre value="SourisX()" />
+                        </Action>
+                        <Action>
+                            <Type value="MettreY" />
+                            <Parametre value="Souris" />
+                            <Parametre value="=" />
+                            <Parametre value="SourisY()" />
+                        </Action>
+                        <Action>
+                            <Type value="TourneVers" />
+                            <Parametre value="Canon" />
+                            <Parametre value="Souris" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Shooting" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="SourisBouton" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Left" />
+                        </Condition>
+                        <Condition>
+                            <Type value="Timer" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="0.10" />
+                            <Parametre value='&quot;Tir&quot;' />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Create" />
+                            <Parametre value="" />
+                            <Parametre value="Tir" />
+                            <Parametre value="Canon.X(Canon)" />
+                            <Parametre value="Canon.Y(Canon)" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceAL" />
+                            <Parametre value="Tir" />
+                            <Parametre value="Canon.Direc()" />
+                            <Parametre value="450" />
+                            <Parametre value="0.5" />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;Tir&quot;' />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Bullet physics" />
+                    <Com2 value="Physique des tirs" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="Tir" />
+                            <Parametre value="0" />
+                            <Parametre value="100" />
+                            <Parametre value="0" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangeDirection" />
+                            <Parametre value="Tir" />
+                            <Parametre value="=" />
+                            <Parametre value="Tir.Angle()" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangePlan" />
+                            <Parametre value="Tir" />
+                            <Parametre value="=" />
+                            <Parametre value="3" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PosY" Contraire="false" />
+                            <Parametre value="Tir" />
+                            <Parametre value="&gt;" />
+                            <Parametre value="480" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="Tir" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Managing the particles" />
+                    <Com2 value="Gestion des particules de feuilles et de terre" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Collision" Contraire="false" />
+                            <Parametre value="Leaf" />
+                            <Parametre value="Ground" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Arreter" />
+                            <Parametre value="Leaf" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Collision" Contraire="false" />
+                            <Parametre value="Dirt" />
+                            <Parametre value="Ground" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Arreter" />
+                            <Parametre value="Dirt" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="NbObjet" Contraire="false" />
+                            <Parametre value="Leaf" />
+                            <Parametre value="&gt;" />
+                            <Parametre value="10" />
+                        </Condition>
+                        <Condition>
+                            <Type value="Arret" Contraire="false" />
+                            <Parametre value="Leaf" />
+                        </Condition>
+                        <Condition>
+                            <Type value="AjoutHasard" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Leaf" />
+                            <Parametre value="" />
+                            <Parametre value="Leaf" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="Leaf" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="NbObjet" Contraire="false" />
+                            <Parametre value="Dirt" />
+                            <Parametre value="&gt;" />
+                            <Parametre value="10" />
+                        </Condition>
+                        <Condition>
+                            <Type value="Arret" Contraire="false" />
+                            <Parametre value="Dirt" />
+                        </Condition>
+                        <Condition>
+                            <Type value="AjoutHasard" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Dirt" />
+                            <Parametre value="" />
+                            <Parametre value="Dirt" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="Dirt" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="128.000000" b="64.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Collision between a bullet and the ground" />
+                    <Com2 value="Collision entre un obus et un décor" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Collision" Contraire="false" />
+                            <Parametre value="Tir" />
+                            <Parametre value="Solid" />
+                        </Condition>
+                    </Conditions>
+                    <Actions />
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Comment" />
+                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                            <Com1 value="Creating particles" />
+                            <Com2 value="Création de particules si besoin" />
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::ForEach" />
+                            <Object value="Foliage" />
+                            <Conditions />
+                            <Actions />
+                            <Events>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Repeat" />
+                                    <RepeatExpression value="Random(2)+3" />
+                                    <Conditions />
+                                    <Actions>
+                                        <Action>
+                                            <Type value="Create" />
+                                            <Parametre value="" />
+                                            <Parametre value="Leaf" />
+                                            <Parametre value="Tir.X(Head)" />
+                                            <Parametre value="Tir.Y(Head)" />
+                                            <Parametre value="" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceAL" />
+                                            <Parametre value="Leaf" />
+                                            <Parametre value="270+Random(20)-10" />
+                                            <Parametre value="120+Random(20)-10" />
+                                            <Parametre value="0.5" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceAL" />
+                                            <Parametre value="Leaf" />
+                                            <Parametre value="90" />
+                                            <Parametre value="50+Random(20)-10" />
+                                            <Parametre value="1.1" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="ChangeDirection" />
+                                            <Parametre value="Leaf" />
+                                            <Parametre value="=" />
+                                            <Parametre value="Random(7)" />
+                                        </Action>
+                                    </Actions>
+                                </Event>
+                            </Events>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::ForEach" />
+                            <Object value="Dirtball" />
+                            <Conditions />
+                            <Actions />
+                            <Events>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Repeat" />
+                                    <RepeatExpression value="Random(4)+6" />
+                                    <Conditions />
+                                    <Actions>
+                                        <Action>
+                                            <Type value="Create" />
+                                            <Parametre value="" />
+                                            <Parametre value="Dirt" />
+                                            <Parametre value="Tir.X(Head)" />
+                                            <Parametre value="Tir.Y(Head)" />
+                                            <Parametre value="" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceAL" />
+                                            <Parametre value="Dirt" />
+                                            <Parametre value="270" />
+                                            <Parametre value="100" />
+                                            <Parametre value="0.5" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceAL" />
+                                            <Parametre value="Dirt" />
+                                            <Parametre value="Tir.ForceAngle()+180+Random(20)-10" />
+                                            <Parametre value="120+Random(20)-10" />
+                                            <Parametre value="0.5" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="AddForceAL" />
+                                            <Parametre value="Dirt" />
+                                            <Parametre value="90" />
+                                            <Parametre value="80" />
+                                            <Parametre value="1.6" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="ChangeDirection" />
+                                            <Parametre value="Dirt" />
+                                            <Parametre value="=" />
+                                            <Parametre value="Random(7)" />
+                                        </Action>
+                                    </Actions>
+                                </Event>
+                            </Events>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Comment" />
+                            <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                            <Com1 value="Creating holes" />
+                            <Com2 value="Création d&apos;un trou à l&apos;impact" />
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions />
+                            <Actions>
+                                <Action>
+                                    <Type value="CopyImageOnImageOfSprite" />
+                                    <Parametre value="Solid" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;Impact1.png&quot;' />
+                                    <Parametre value="Tir.X(Head)-Solid.X()-10" />
+                                    <Parametre value="Tir.Y(Head)-Solid.Y()-10" />
+                                    <Parametre value="yes" />
+                                </Action>
+                                <Action>
+                                    <Type value="CopyImageOnImageOfSprite" />
+                                    <Parametre value="Solid" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;Impact1.png&quot;' />
+                                    <Parametre value="Tir.X(Head)-Solid.X()+Random(4)-Random(4)" />
+                                    <Parametre value="Tir.Y(Head)-Solid.Y()+Random(4)-Random(4)" />
+                                    <Parametre value="yes" />
+                                </Action>
+                                <Action>
+                                    <Type value="CopyImageOnImageOfSprite" />
+                                    <Parametre value="Solid" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;Impact1.png&quot;' />
+                                    <Parametre value="Tir.X(Head)-Solid.X()+Random(4)-Random(4)" />
+                                    <Parametre value="Tir.Y(Head)-Solid.Y()+Random(4)-Random(4)" />
+                                    <Parametre value="yes" />
+                                </Action>
+                                <Action>
+                                    <Type value="CopyImageOnImageOfSprite" />
+                                    <Parametre value="Solid" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;Impact1.png&quot;' />
+                                    <Parametre value="Tir.X(Head)-Solid.X()+Random(4)-Random(4)" />
+                                    <Parametre value="Tir.Y(Head)-Solid.Y()+Random(4)-Random(4)" />
+                                    <Parametre value="yes" />
+                                </Action>
+                                <Action>
+                                    <Type value="CreateMaskFromColorOnActualImage" />
+                                    <Parametre value="Solid" />
+                                    <Parametre value='&quot;255;0;255&quot;' />
+                                </Action>
+                                <Action>
+                                    <Type value="Delete" />
+                                    <Parametre value="Tir" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+            </Events>
+        </Scene>
+    </Scenes>
+    <ExternalEvents />
+    <ExternalLayouts />
+    <ExternalSourceFiles />
+</Project>

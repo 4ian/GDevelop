@@ -1,0 +1,1662 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Project>
+    <GDVersion Major="3" Minor="2" Build="64" Revision="0" />
+    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
+        <Nom value="Platformer" />
+        <Auteur value="" />
+        <Extensions>
+            <Extension name="BuiltinObject" />
+            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinVariables" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMouse" />
+            <Extension name="BuiltinKeyboard" />
+            <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinCamera" />
+            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinFile" />
+            <Extension name="BuiltinNetwork" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinAdvanced" />
+            <Extension name="Sprite" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinStringInstructions" />
+            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="BuiltinExternalLayouts" />
+            <Extension name="TiledSpriteObject" />
+            <Extension name="PlatformAutomatism" />
+            <Extension name="TextObject" />
+        </Extensions>
+        <Platforms current="Game Develop JS platform">
+            <Platform name="Game Develop JS platform" />
+        </Platforms>
+        <WindowW value="800" />
+        <WindowH value="600" />
+        <Portable />
+        <LatestCompilationDirectory value="" />
+        <FPSmax value="60" />
+        <FPSmin value="20" />
+        <verticalSync value="false" />
+    </Info>
+    <Resources>
+        <Resources>
+            <Resource kind="image" name="p1_stand.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_stand.png" />
+            <Resource kind="image" name="p1_jump.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_jump.png" />
+            <Resource kind="image" name="p1_walk01.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk01.png" />
+            <Resource kind="image" name="p1_walk02.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk02.png" />
+            <Resource kind="image" name="p1_walk03.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk03.png" />
+            <Resource kind="image" name="p1_walk04.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk04.png" />
+            <Resource kind="image" name="p1_walk05.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk05.png" />
+            <Resource kind="image" name="p1_walk06.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk06.png" />
+            <Resource kind="image" name="p1_walk07.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk07.png" />
+            <Resource kind="image" name="p1_walk08.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk08.png" />
+            <Resource kind="image" name="p1_walk09.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk09.png" />
+            <Resource kind="image" name="p1_walk10.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk10.png" />
+            <Resource kind="image" name="p1_walk11.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="p1_walk11.png" />
+            <Resource kind="image" name="brickWall.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="brickWall.png" />
+            <Resource kind="image" name="bridge.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="bridge.png" />
+            <Resource kind="image" name="grassHalfMid.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="grassHalfMid.png" />
+            <Resource kind="image" name="castleCenter.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="castleCenter.png" />
+            <Resource kind="image" name="bridgeLogs.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="bridgeLogs.png" />
+            <Resource kind="image" name="Left.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Left.png" />
+            <Resource kind="image" name="Right.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Right.png" />
+            <Resource kind="image" name="ladder_mid.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="ladder_mid.png" />
+            <Resource kind="image" name="grass.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Grass.png" />
+            <Resource kind="image" name="PlayerArea.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="PlayerArea.png" />
+            <Resource kind="image" name="slimeWalk1.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="slimeWalk1.png" />
+            <Resource kind="image" name="slimeWalk2.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="slimeWalk2.png" />
+            <Resource kind="image" name="slimeDead.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="slimeDead.png" />
+            <Resource kind="image" name="flyFly1.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="flyFly1.png" />
+            <Resource kind="image" name="flyFly2.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="flyFly2.png" />
+            <Resource kind="image" name="flyDead.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="flyDead.png" />
+            <Resource kind="image" name="cloud1.png" alwaysLoaded="false" smoothed="false" userAdded="false" file="cloud1.png" />
+            <Resource kind="image" name="cloud2.png" alwaysLoaded="false" smoothed="false" userAdded="false" file="cloud2.png" />
+            <Resource kind="image" name="cloud3.png" alwaysLoaded="false" smoothed="false" userAdded="false" file="cloud3.png" />
+            <Resource kind="image" name="bush.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="bush.png" />
+            <Resource kind="image" name="cactus.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="cactus.png" />
+            <Resource kind="image" name="plant.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="plant.png" />
+            <Resource kind="image" name="coinGold.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="coinGold.png" />
+        </Resources>
+        <ResourceFolders />
+    </Resources>
+    <Objects />
+    <ObjectGroups />
+    <Variables />
+    <Scenes firstScene="">
+        <Scene nom="New scene" mangledName="New_32scene" r="208.000000" v="244.000000" b="247.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="false" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="70.000000" grid="false" snap="true" gridHeight="70.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="true" associatedLayout="" />
+            <GroupesObjets>
+                <Groupe nom="Enemy">
+                    <Objet nom="SlimeWalk" />
+                    <Objet nom="Fly" />
+                </Groupe>
+            </GroupesObjets>
+            <Objets>
+                <Objet nom="Player" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="p1_stand.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="46.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="p1_jump.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="47.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="true" tempsEntre="0.050000">
+                                <Sprites>
+                                    <Sprite image="p1_walk03.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="48.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="p1_walk04.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="48.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="p1_walk05.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="48.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="p1_walk06.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="48.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="p1_walk07.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="48.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Platform" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" platformType="NormalPlatform" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="brickWall.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="grass.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Jumpthru" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" platformType="Jumpthru" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="bridgeLogs.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="12.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="TiledGrassPlatform" type="TiledSpriteObject::TiledSprite" texture="grassHalfMid.png" width="70" height="70">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" platformType="NormalPlatform" />
+                </Objet>
+                <Objet nom="TiledCastlePlatform" type="TiledSpriteObject::TiledSprite" texture="castleCenter.png" width="70" height="70">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" platformType="NormalPlatform" />
+                </Objet>
+                <Objet nom="MovingPlatform" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" platformType="Jumpthru" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="bridge.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="10.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="GoLeft" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Left.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="13.000000" Y="13.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="GoRight" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Right.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="13.000000" Y="13.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Ladder" type="TiledSpriteObject::TiledSprite" texture="ladder_mid.png" width="70" height="70">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" platformType="Ladder" />
+                </Objet>
+                <Objet nom="PlayerHitBox" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformerObjectAutomatism" Name="PlatformerObject" gravity="1300.000000" maxFallingSpeed="1000.000000" acceleration="1500.000000" deceleration="1500.000000" maxSpeed="250.000000" jumpSpeed="1000.000000" ignoreDefaultControls="false" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="PlayerArea.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="22.000000" Y="46.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="SlimeWalk" type="Sprite">
+                    <Variables>
+                        <Variable Name="GoingLeft" Value="0" />
+                    </Variables>
+                    <Automatism Type="PlatformAutomatism::PlatformerObjectAutomatism" Name="PlatformerObject" gravity="1000.000000" maxFallingSpeed="700.000000" acceleration="5000.000000" deceleration="5000.000000" maxSpeed="75.000000" jumpSpeed="600.000000" ignoreDefaultControls="true" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="true" tempsEntre="0.300000">
+                                <Sprites>
+                                    <Sprite image="slimeWalk1.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="25.000000" Y="14.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="slimeWalk2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="25.000000" Y="13.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="slimeDead.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="29.000000" Y="6.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Fly" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PlatformAutomatism::PlatformerObjectAutomatism" Name="PlatformerObject" gravity="0.000000" maxFallingSpeed="700.000000" acceleration="500.000000" deceleration="500.000000" maxSpeed="400.000000" jumpSpeed="600.000000" ignoreDefaultControls="true" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="true" tempsEntre="0.100000">
+                                <Sprites>
+                                    <Sprite image="flyFly1.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                    <Sprite image="flyFly2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="37.000000" Y="15.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="flyDead.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="29.000000" Y="16.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Cloud" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="cloud1.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="64.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="cloud2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="64.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="cloud3.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="64.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="BackgroundObjects" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="bush.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="cactus.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="plant.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="35.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Score" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
+                    <Variables />
+                    <String value="x 0" />
+                    <Font value="Bimbo_JVE.ttf" />
+                    <CharacterSize value="40" />
+                    <Color r="0" g="0" b="0" />
+                </Objet>
+                <Objet nom="Coin" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="coinGold.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="CoinIcon" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="coinGold.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+            </Objets>
+            <Layers>
+                <Layer Name="" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+                <Layer Name="GUI" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+            </Layers>
+            <Variables>
+                <Variable Name="Score" Value="0" />
+            </Variables>
+            <AutomatismsSharedDatas>
+                <AutomatismSharedDatas Type="PlatformAutomatism::PlatformAutomatism" Name="Platform" />
+                <AutomatismSharedDatas Type="PlatformAutomatism::PlatformerObjectAutomatism" Name="PlatformerObject" />
+            </AutomatismsSharedDatas>
+            <Positions>
+                <Objet nom="Player" x="37.122894" y="290.507690" plan="20" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="742.246094" y="500.569214" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Jumpthru" x="933.138550" y="300.692322" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Jumpthru" x="755.600037" y="418.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Jumpthru" x="847.907715" y="359.923096" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1045.677002" y="268.769287" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1116.600098" y="268.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="TiledGrassPlatform" x="-583.046265" y="570.000000" plan="3" layer="" angle="0.000000" personalizedSize="true" width="4222.892578" height="70.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="TiledCastlePlatform" x="-572.923218" y="83.000000" plan="1" layer="" angle="0.000000" personalizedSize="true" width="502.923248" height="487.461548" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="MovingPlatform" x="1195.446167" y="297.615387" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1890.677002" y="499.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1673.600098" y="289.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1673.600098" y="359.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1673.600098" y="499.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1673.600098" y="429.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1745.523193" y="499.384552" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1745.523193" y="429.384552" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1818.753906" y="499.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1817.753906" y="429.692291" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoLeft" x="1667.369385" y="291.246155" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoRight" x="1176.984619" y="295.169250" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="2976.061279" y="247.692352" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="2593.599609" y="499.230774" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="2665.830322" y="429.230774" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="2665.599854" y="498.769226" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="1745.523193" y="359.384552" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="PlayerHitBox" x="49.276611" y="291.738403" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="210.000000" y="501.569214" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="SlimeWalk" x="687.676819" y="527.461426" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="SlimeWalk" x="286.200012" y="528.461487" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoRight" x="1971.784180" y="539.015503" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoLeft" x="2553.783936" y="538.015503" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="2181.783691" y="59.015656" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="151.784729" y="182.015564" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="530.784485" y="312.015472" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="1480.784058" y="134.015594" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="2078.783691" y="385.015503" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="1847.783936" y="164.015594" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="1258.784180" y="357.015472" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="664.784485" y="170.015579" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="2078.570068" y="503.107727" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="1736.784058" y="298.015625" plan="1" layer="" angle="0.000000" personalizedSize="true" width="66.000000" height="60.999969" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="611.784546" y="505.015442" plan="-2" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="1249.784668" y="500.015381" plan="1" layer="" angle="0.000000" personalizedSize="false" width="94.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="536.784607" y="503.015381" plan="-2" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="925.784424" y="505.015442" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="1413.784180" y="502.015442" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="1371.784180" y="524.015503" plan="1" layer="" angle="0.000000" personalizedSize="true" width="58.000000" height="46.999969" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="1435.784180" y="525.015503" plan="1" layer="" angle="0.000000" personalizedSize="true" width="58.000000" height="46.999969" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="1756.784058" y="314.015625" plan="1" layer="" angle="0.000000" personalizedSize="true" width="58.000000" height="46.999969" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BackgroundObjects" x="-58.215153" y="500.015381" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="1.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Score" x="66.000000" y="4.000000" plan="1" layer="GUI" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="CoinIcon" x="21.000000" y="11.000000" plan="1" layer="GUI" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="1912.831055" y="443.307831" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="231.769226" y="453.276978" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="514.953857" y="510.092407" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="469.784637" y="513.092407" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="773.846191" y="359.815521" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="859.830872" y="296.261688" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="953.292419" y="241.430908" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="1391.938721" y="245.169373" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="414.953857" y="513.092407" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoRight" x="1145.784180" y="205.015564" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoLeft" x="1704.783936" y="206.015549" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoRight" x="2593.784180" y="369.015533" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoLeft" x="3152.783936" y="370.015503" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Fly" x="3103.784180" y="354.015533" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="2832.061279" y="247.692352" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Platform" x="2904.061279" y="247.692352" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="2992.000000" y="192.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="2849.000000" y="194.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Coin" x="2921.000000" y="193.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="SlimeWalk" x="2526.000000" y="530.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="SlimeWalk" x="1983.000000" y="525.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Fly" x="1655.784058" y="190.015564" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoRight" x="265.876923" y="545.184570" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="GoLeft" x="732.599792" y="544.184509" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+            </Positions>
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="DepartScene" Contraire="false" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Cache" />
+                            <Parametre value="PlayerHitBox" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="MettreXY" />
+                            <Parametre value="Player" />
+                            <Parametre value="=" />
+                            <Parametre value="PlayerHitBox.X()-12" />
+                            <Parametre value="=" />
+                            <Parametre value="PlayerHitBox.Y()" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Change the animation according to what the player do." />
+                    <Com2 value="On change l&apos;animation en fonction de ce que fait le joueur." />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="KeyPressed" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="RShift" />
+                        </Condition>
+                        <Condition>
+                            <Type value="BuiltinCommonInstructions::Or" Contraire="false" />
+                            <SubConditions>
+                                <Condition>
+                                    <Type value="Animation" Contraire="false" />
+                                    <Parametre value="Player" />
+                                    <Parametre value="=" />
+                                    <Parametre value="0" />
+                                </Condition>
+                                <Condition>
+                                    <Type value="Animation" Contraire="false" />
+                                    <Parametre value="Player" />
+                                    <Parametre value="=" />
+                                    <Parametre value="2" />
+                                </Condition>
+                            </SubConditions>
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="PlaySound" />
+                            <Parametre value="" />
+                            <Parametre value="jump.wav" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PlatformAutomatism::IsJumping" Contraire="false" />
+                            <Parametre value="PlayerHitBox" />
+                            <Parametre value="PlatformerObject" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ChangeAnimation" />
+                            <Parametre value="Player" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PlatformAutomatism::IsFalling" Contraire="false" />
+                            <Parametre value="PlayerHitBox" />
+                            <Parametre value="PlatformerObject" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ChangeAnimation" />
+                            <Parametre value="Player" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PlatformAutomatism::IsOnFloor" Contraire="false" />
+                            <Parametre value="PlayerHitBox" />
+                            <Parametre value="PlatformerObject" />
+                        </Condition>
+                    </Conditions>
+                    <Actions />
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="PlatformAutomatism::IsMoving" Contraire="true" />
+                                    <Parametre value="PlayerHitBox" />
+                                    <Parametre value="PlatformerObject" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ChangeAnimation" />
+                                    <Parametre value="Player" />
+                                    <Parametre value="=" />
+                                    <Parametre value="0" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="PlatformAutomatism::IsMoving" Contraire="false" />
+                                    <Parametre value="PlayerHitBox" />
+                                    <Parametre value="PlatformerObject" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ChangeAnimation" />
+                                    <Parametre value="Player" />
+                                    <Parametre value="=" />
+                                    <Parametre value="2" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="KeyPressed" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Left" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="FlipX" />
+                            <Parametre value="Player" />
+                            <Parametre value="yes" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="KeyPressed" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Right" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="FlipX" />
+                            <Parametre value="Player" />
+                            <Parametre value="no" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Make sure the camera follows the player." />
+                    <Com2 value="On s&apos;assure que la caméra suit le joueur." />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="CameraX" />
+                            <Parametre value="" />
+                            <Parametre value="=" />
+                            <Parametre value="Player.X()" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Management of the moving platform:" />
+                    <Com2 value="Gestion de la plateforme bougeante:" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="DepartScene" Contraire="false" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Cache" />
+                            <Parametre value="GoLeft" />
+                        </Action>
+                        <Action>
+                            <Type value="Cache" />
+                            <Parametre value="GoRight" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="GoLeft" />
+                            <Parametre value="MovingPlatform" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Arreter" />
+                            <Parametre value="MovingPlatform" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="MovingPlatform" />
+                            <Parametre value="-150" />
+                            <Parametre value="0" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="GoRight" />
+                            <Parametre value="MovingPlatform" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Arreter" />
+                            <Parametre value="MovingPlatform" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="MovingPlatform" />
+                            <Parametre value="150" />
+                            <Parametre value="0" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Enemies:" />
+                    <Com2 value="Enemis :" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Link" />
+                    <Type value="Link" />
+                    <Limites includeAll="true" start="2147483647.000000" end="2147483647.000000" />
+                    <Scene value="EnemiesManagement" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Objects:" />
+                    <Com2 value="Objets:" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Link" />
+                    <Type value="Link" />
+                    <Limites includeAll="true" start="2147483647.000000" end="2147483647.000000" />
+                    <Scene value="ObjectsManagement" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="GUI:" />
+                    <Com2 value="Elements de l&apos;interface:" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Link" />
+                    <Type value="Link" />
+                    <Limites includeAll="true" start="2147483647.000000" end="2147483647.000000" />
+                    <Scene value="GUIManagement" />
+                </Event>
+            </Events>
+        </Scene>
+    </Scenes>
+    <ExternalEvents>
+        <ExternalEvents Name="EnemiesManagement" AssociatedScene="New scene" LastChangeTimeStamp="1383154438">
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="DepartScene" Contraire="false" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ActivateAutomatism" />
+                            <Parametre value="Fly" />
+                            <Parametre value="PlatformerObject" />
+                            <Parametre value="no" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Enemy movement:" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="GoLeft" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ModVarObjet" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="GoingLeft" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="GoRight" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ModVarObjet" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="GoingLeft" />
+                            <Parametre value="=" />
+                            <Parametre value="0" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Animation" Contraire="false" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="=" />
+                            <Parametre value="0" />
+                        </Condition>
+                    </Conditions>
+                    <Actions />
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="VarObjet" Contraire="false" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="GoingLeft" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="AddForceXY" />
+                                    <Parametre value="Fly" />
+                                    <Parametre value="-300" />
+                                    <Parametre value="0" />
+                                    <Parametre value="0" />
+                                </Action>
+                                <Action>
+                                    <Type value="PlatformAutomatism::SimulateLeftKey" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="PlatformerObject" />
+                                </Action>
+                                <Action>
+                                    <Type value="FlipX" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="no" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="VarObjet" Contraire="false" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="GoingLeft" />
+                                    <Parametre value="=" />
+                                    <Parametre value="0" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="AddForceXY" />
+                                    <Parametre value="Fly" />
+                                    <Parametre value="300" />
+                                    <Parametre value="0" />
+                                    <Parametre value="0" />
+                                </Action>
+                                <Action>
+                                    <Type value="PlatformAutomatism::SimulateRightKey" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="PlatformerObject" />
+                                </Action>
+                                <Action>
+                                    <Type value="FlipX" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="yes" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Comment" />
+                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                            <Com1 value="Collision with the player:" />
+                            <Com2 value="Gestion des collisions avec le joueur:" />
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="CollisionNP" Contraire="false" />
+                                    <Parametre value="PlayerHitBox" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="" />
+                                </Condition>
+                            </Conditions>
+                            <Actions />
+                            <Events>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Standard" />
+                                    <Conditions>
+                                        <Condition>
+                                            <Type value="PlatformAutomatism::IsFalling" Contraire="false" />
+                                            <Parametre value="PlayerHitBox" />
+                                            <Parametre value="PlatformerObject" />
+                                        </Condition>
+                                    </Conditions>
+                                    <Actions>
+                                        <Action>
+                                            <Type value="ChangeAnimation" />
+                                            <Parametre value="Enemy" />
+                                            <Parametre value="=" />
+                                            <Parametre value="1" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="ActivateAutomatism" />
+                                            <Parametre value="Enemy" />
+                                            <Parametre value="PlatformerObject" />
+                                            <Parametre value="yes" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="PlatformAutomatism::Gravity" />
+                                            <Parametre value="Enemy" />
+                                            <Parametre value="PlatformerObject" />
+                                            <Parametre value="=" />
+                                            <Parametre value="1500" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="PlatformAutomatism::SetCanJump" />
+                                            <Parametre value="PlayerHitBox" />
+                                            <Parametre value="PlatformerObject" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="PlatformAutomatism::SimulateJumpKey" />
+                                            <Parametre value="PlayerHitBox" />
+                                            <Parametre value="PlatformerObject" />
+                                        </Action>
+                                        <Action>
+                                            <Type value="PlaySound" />
+                                            <Parametre value="" />
+                                            <Parametre value="jump.wav" />
+                                            <Parametre value="" />
+                                            <Parametre value="" />
+                                            <Parametre value="" />
+                                        </Action>
+                                    </Actions>
+                                    <Events>
+                                        <Event disabled="false" folded="false">
+                                            <Type value="BuiltinCommonInstructions::ForEach" />
+                                            <Object value="Enemy" />
+                                            <Conditions />
+                                            <Actions>
+                                                <Action>
+                                                    <Type value="ModVarScene" />
+                                                    <Parametre value="Score" />
+                                                    <Parametre value="+" />
+                                                    <Parametre value="50" />
+                                                </Action>
+                                            </Actions>
+                                        </Event>
+                                    </Events>
+                                </Event>
+                                <Event disabled="false" folded="false">
+                                    <Type value="BuiltinCommonInstructions::Standard" />
+                                    <Conditions>
+                                        <Condition>
+                                            <Type value="PosY" Contraire="false" />
+                                            <Parametre value="PlayerHitBox" />
+                                            <Parametre value="&gt;=" />
+                                            <Parametre value="Enemy.Y()-PlayerHitBox.Height()+Enemy.Height()/2" />
+                                        </Condition>
+                                    </Conditions>
+                                    <Actions />
+                                </Event>
+                            </Events>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Fading out:" />
+                    <Com2 value="Disparition des ennemis:" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Animation" Contraire="false" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Condition>
+                        <Condition>
+                            <Type value="PlatformAutomatism::IsOnFloor" Contraire="false" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="PlatformerObject" />
+                        </Condition>
+                        <Condition>
+                            <Type value="PlatformAutomatism::IsMoving" Contraire="true" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="PlatformerObject" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ActivateAutomatism" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="PlatformerObject" />
+                            <Parametre value="false" />
+                        </Action>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="Enemy" />
+                            <Parametre value="-" />
+                            <Parametre value="50*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="Opacity" Contraire="false" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="=" />
+                                    <Parametre value="0" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="Delete" />
+                                    <Parametre value="Enemy" />
+                                    <Parametre value="" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+            </Events>
+        </ExternalEvents>
+        <ExternalEvents Name="ObjectsManagement" AssociatedScene="New scene" LastChangeTimeStamp="1383151997">
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="CollisionNP" Contraire="false" />
+                            <Parametre value="PlayerHitBox" />
+                            <Parametre value="Coin" />
+                            <Parametre value="" />
+                        </Condition>
+                        <Condition>
+                            <Type value="Opacity" Contraire="false" />
+                            <Parametre value="Coin" />
+                            <Parametre value="=" />
+                            <Parametre value="255" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="Coin" />
+                            <Parametre value="=" />
+                            <Parametre value="254" />
+                        </Action>
+                        <Action>
+                            <Type value="PlaySound" />
+                            <Parametre value="" />
+                            <Parametre value="coin.wav" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="Score" />
+                            <Parametre value="+" />
+                            <Parametre value="100" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Opacity" Contraire="false" />
+                            <Parametre value="Coin" />
+                            <Parametre value="&lt;" />
+                            <Parametre value="255" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="Coin" />
+                            <Parametre value="-" />
+                            <Parametre value="255*TimeDelta()" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="Coin" />
+                            <Parametre value="0" />
+                            <Parametre value="-30" />
+                            <Parametre value="0" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Opacity" Contraire="false" />
+                            <Parametre value="Coin" />
+                            <Parametre value="=" />
+                            <Parametre value="0" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="Coin" />
+                            <Parametre value="0" />
+                        </Action>
+                    </Actions>
+                </Event>
+            </Events>
+        </ExternalEvents>
+        <ExternalEvents Name="GUIManagement" AssociatedScene="New scene" LastChangeTimeStamp="1383151997">
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="TextObject::String" />
+                            <Parametre value="Score" />
+                            <Parametre value="=" />
+                            <Parametre value='&quot;x &quot;+ToString(Variable(Score))' />
+                        </Action>
+                    </Actions>
+                </Event>
+            </Events>
+        </ExternalEvents>
+    </ExternalEvents>
+    <ExternalLayouts />
+    <ExternalSourceFiles />
+</Project>

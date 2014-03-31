@@ -1,0 +1,1334 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Project>
+    <GDVersion Major="3" Minor="0" Build="11298" Revision="57009" />
+    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
+        <Nom value="Project" />
+        <Auteur value="" />
+        <Extensions>
+            <Extension name="BuiltinObject" />
+            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinVariables" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMouse" />
+            <Extension name="BuiltinKeyboard" />
+            <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinCamera" />
+            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinFile" />
+            <Extension name="BuiltinNetwork" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinAdvanced" />
+            <Extension name="Sprite" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinStringInstructions" />
+            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="BuiltinExternalLayouts" />
+            <Extension name="PhysicsAutomatism" />
+            <Extension name="DestroyOutsideAutomatism" />
+            <Extension name="TextObject" />
+        </Extensions>
+        <Platforms current="Game Develop JS platform">
+            <Platform name="Game Develop JS platform" />
+            <Platform name="Game Develop C++ platform" />
+        </Platforms>
+        <WindowW value="800" />
+        <WindowH value="400" />
+        <Portable />
+        <LatestCompilationDirectory value="" />
+        <FPSmax value="60" />
+        <FPSmin value="10" />
+        <verticalSync value="false" />
+    </Info>
+    <Resources>
+        <Resources>
+            <Resource kind="image" name="Background.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Background.png" />
+            <Resource kind="image" name="Pea-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Standard.png" />
+            <Resource kind="image" name="Pea-Hurt.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Hurt.png" />
+            <Resource kind="image" name="Pointer-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pointer-Standard.png" />
+            <Resource kind="image" name="Block-Normal.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Block-Normal.png" />
+            <Resource kind="image" name="Block-Gel.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Block-Gel.png" />
+            <Resource kind="image" name="Alert-Ninja.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Alert-Ninja.png" />
+            <Resource kind="image" name="Alert-Boom.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Alert-Boom.png" />
+            <Resource kind="image" name="Solid.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Solid.png" />
+            <Resource kind="image" name="Pea-Red-Hurt.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Red-Hurt.png" />
+            <Resource kind="image" name="Pea-Red-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Red-Standard.png" />
+            <Resource kind="image" name="Bar-Normal.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Bar-Normal.png" />
+            <Resource kind="image" name="Block-LeftRamp.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Block-LeftRamp.png" />
+            <Resource kind="image" name="Arrow.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Arrow.png" />
+            <Resource kind="image" name="Plate.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Plate.png" />
+            <Resource kind="image" name="Cloud.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Cloud.png" />
+            <Resource kind="image" name="Background2.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Background2.png" />
+        </Resources>
+        <ResourceFolders />
+    </Resources>
+    <Objects />
+    <ObjectGroups />
+    <Variables />
+    <Scenes firstScene="">
+        <Scene nom="New scene" mangledName="New_32scene" r="209.000000" v="209.000000" b="209.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="0.844156" windowMask="true" associatedLayout="" />
+            <GroupesObjets>
+                <Groupe nom="Invisible">
+                    <Objet nom="Floor" />
+                    <Objet nom="Pointer" />
+                    <Objet nom="CameraLaunchPos" />
+                    <Objet nom="Camera" />
+                </Groupe>
+                <Groupe nom="Block">
+                    <Objet nom="BigBlock" />
+                    <Objet nom="Bar" />
+                    <Objet nom="Floor" />
+                </Groupe>
+            </GroupesObjets>
+            <Objets>
+                <Objet nom="Background" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Background.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="400.000000" Y="300.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="BigBlock" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="true" fixedRotation="false" isBullet="false" massDensity="1.000000" averageFriction="0.800000" linearDamping="0.100000" angularDamping="0.100000" shapeType="Box" positioning="OnCenter" autoResizing="false" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Block-Normal.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="30.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Floor" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="false" fixedRotation="false" isBullet="false" massDensity="1.000000" averageFriction="0.800000" linearDamping="0.100000" angularDamping="0.100000" shapeType="Box" positioning="OnCenter" autoResizing="false" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Solid.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="16.000000" Y="16.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Pea" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="true" fixedRotation="false" isBullet="false" massDensity="1.000000" averageFriction="0.800000" linearDamping="0.100000" angularDamping="0.100000" shapeType="Circle" positioning="OnCenter" autoResizing="false" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Pea-Standard.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="18.000000" Y="18.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Pea-Hurt.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="BadPea" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="true" fixedRotation="true" isBullet="false" massDensity="1.000000" averageFriction="0.800000" linearDamping="0.100000" angularDamping="0.100000" shapeType="Circle" positioning="OnCenter" autoResizing="false" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Pea-Red-Standard.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Pea-Red-Hurt.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Bar" type="Sprite">
+                    <Variables />
+                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="true" fixedRotation="false" isBullet="false" massDensity="1.000000" averageFriction="0.800000" linearDamping="0.100000" angularDamping="0.100000" shapeType="Box" positioning="OnCenter" autoResizing="false" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Bar-Normal.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="11.000000" Y="30.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Ramp" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Block-LeftRamp.png">
+                                        <Points>
+                                            <Point nom="Launch" X="66.000000" Y="-15.000000" />
+                                        </Points>
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="35.000000" Y="29.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="LaunchArrow" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Arrow.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="20.000000" Y="52.000000" automatic="false" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Pointer" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Solid.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="16.000000" Y="16.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Balloon" type="Sprite">
+                    <Variables />
+                    <Automatism Type="DestroyOutsideAutomatism::DestroyOutside" Name="DestroyOutside" extraBorder="0" />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Alert-Ninja.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="39.000000" Y="50.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="21.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Alert-Boom.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="39.000000" Y="50.000000" />
+                                        <PointCentre nom="centre" X="36.000000" Y="21.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Camera" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Solid.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="16.000000" Y="17.000000" />
+                                        <PointCentre nom="centre" X="16.000000" Y="16.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="CameraLaunchPos" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Solid.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="16.000000" Y="17.000000" />
+                                        <PointCentre nom="centre" X="16.000000" Y="16.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="FloorBackground" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Plate.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="750.000000" Y="40.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Cloud" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Cloud.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="125.000000" Y="30.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Background2" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="Background2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="400.000000" Y="139.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="Instructions" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
+                    <Variables />
+                    <String value="Touch/Press to launch a pea!" />
+                    <Font value="Bimbo_JVE.ttf" />
+                    <CharacterSize value="40" />
+                    <Color r="0" g="193" b="0" />
+                </Objet>
+            </Objets>
+            <Layers>
+                <Layer Name="Background" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+                <Layer Name="" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+                <Layer Name="GUI" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+            </Layers>
+            <Variables>
+                <Variable Name="Launching" Value="0" />
+                <Variable Name="Zoom" Value="0" />
+                <Variable Name="Launched" Value="0" />
+            </Variables>
+            <AutomatismsSharedDatas>
+                <AutomatismSharedDatas Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" gravityX="0.000000" gravityY="9.000000" scaleX="100.000000" scaleY="100.000000" />
+            </AutomatismsSharedDatas>
+            <Positions>
+                <Objet nom="Background" x="0.000000" y="-180.000000" plan="1" layer="Background" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="true">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Floor" x="-593.500000" y="401.499969" plan="1" layer="" angle="0.000000" personalizedSize="true" width="2169.000000" height="32.000000" locked="true">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Floor" x="-32.499969" y="-379.366180" plan="1" layer="" angle="0.000000" personalizedSize="true" width="32.000000" height="785.866211" locked="true">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Floor" x="1433.144287" y="-404.517700" plan="1" layer="" angle="0.000000" personalizedSize="true" width="32.000000" height="811.692993" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="757.427368" y="215.559814" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="755.427368" y="341.559814" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="918.427368" y="211.559830" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="918.427368" y="339.559814" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="917.427368" y="277.559814" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BadPea" x="935.427368" y="170.559830" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BadPea" x="788.427368" y="172.559860" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Pea" x="104.500000" y="282.500000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables>
+                        <Variable Name="LaunchState" Value="1" />
+                    </InitialVariables>
+                </Objet>
+                <Objet nom="Bar" x="760.427368" y="152.559845" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BadPea" x="853.427368" y="356.559845" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bar" x="805.427368" y="278.559845" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bar" x="758.427368" y="278.559845" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Ramp" x="156.500046" y="280.499969" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="156.500031" y="339.499969" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="LaunchArrow" x="235.500000" y="224.499985" plan="1" layer="" angle="0.000000" personalizedSize="true" width="199.000000" height="46.000015" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Pointer" x="-109.500000" y="294.499969" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BadPea" x="592.381226" y="300.821350" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="BigBlock" x="549.427368" y="338.821350" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Pea" x="127.638458" y="371.946106" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Pea" x="81.223076" y="375.315369" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Camera" x="721.885742" y="117.209808" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="CameraLaunchPos" x="721.690979" y="119.200882" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="FloorBackground" x="675.573853" y="381.268768" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="FloorBackground" x="-824.594055" y="381.268799" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="418.639832" y="-175.407333" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="1060.701416" y="38.613220" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Cloud" x="65.505981" y="31.860638" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Background2" x="1595.280884" y="126.000000" plan="-150" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Background2" x="-800.978333" y="126.000000" plan="-150" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Background2" x="0.000000" y="126.000000" plan="-150" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Background2" x="798.050659" y="126.000000" plan="-150" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Instructions" x="13.000046" y="33.999996" plan="1" layer="GUI" angle="-6.009011" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bar" x="552.976868" y="122.892395" plan="1" layer="" angle="0.000000" personalizedSize="true" width="22.000000" height="102.461517" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bar" x="554.161560" y="249.646255" plan="1" layer="" angle="0.000000" personalizedSize="true" width="22.000000" height="90.615372" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="Bar" x="552.976868" y="180.938538" plan="1" layer="" angle="89.767326" personalizedSize="true" width="22.000000" height="115.492310" locked="false">
+                    <floatInfos />
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+            </Positions>
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="DepartScene" Contraire="false" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="LaunchArrow" />
+                            <Parametre value="=" />
+                            <Parametre value="0" />
+                        </Action>
+                        <Action>
+                            <Type value="Cache" />
+                            <Parametre value="Invisible" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="MettreXY" />
+                            <Parametre value="Pointer" />
+                            <Parametre value="=" />
+                            <Parametre value='MouseX(&quot;&quot;,0)' />
+                            <Parametre value="=" />
+                            <Parametre value='MouseY(&quot;&quot;,0)' />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Launching" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="VarObjet" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="LaunchState" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ActivateAutomatism" />
+                            <Parametre value="Pea" />
+                            <Parametre value="Physics" />
+                            <Parametre value="no" />
+                        </Action>
+                        <Action>
+                            <Type value="MettreXY" />
+                            <Parametre value="Pea" />
+                            <Parametre value="=" />
+                            <Parametre value="Ramp.PointX(Launch)" />
+                            <Parametre value="=" />
+                            <Parametre value="Ramp.PointY(Launch)" />
+                        </Action>
+                        <Action>
+                            <Type value="TourneVersPos" />
+                            <Parametre value="Pea" />
+                            <Parametre value='MouseX(&quot;&quot;,0)' />
+                            <Parametre value='MouseY(&quot;&quot;,0)' />
+                        </Action>
+                    </Actions>
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="SourisBouton" Contraire="false" />
+                                    <Parametre value="" />
+                                    <Parametre value="Left" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ModVarScene" />
+                                    <Parametre value="" />
+                                    <Parametre value="Launching" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Action>
+                                <Action>
+                                    <Type value="TourneVersPos" />
+                                    <Parametre value="LaunchArrow" />
+                                    <Parametre value='MouseX(&quot;&quot;,0)' />
+                                    <Parametre value='MouseY(&quot;&quot;,0)' />
+                                </Action>
+                                <Action>
+                                    <Type value="Opacity" />
+                                    <Parametre value="LaunchArrow" />
+                                    <Parametre value="+" />
+                                    <Parametre value="500*TimeDelta()" />
+                                </Action>
+                                <Action>
+                                    <Type value="ChangeScaleWidth" />
+                                    <Parametre value="LaunchArrow" />
+                                    <Parametre value="=" />
+                                    <Parametre value="max(0.2,min(2,Pea.Distance(Pointer)/250))" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="VarScene" Contraire="false" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="Launching" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Condition>
+                                <Condition>
+                                    <Type value="SourisBouton" Contraire="true" />
+                                    <Parametre value="" />
+                                    <Parametre value="Left" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ModVarScene" />
+                                    <Parametre value="" />
+                                    <Parametre value="Launching" />
+                                    <Parametre value="=" />
+                                    <Parametre value="2" />
+                                </Action>
+                                <Action>
+                                    <Type value="ActivateAutomatism" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="Physics" />
+                                    <Parametre value="yes" />
+                                </Action>
+                                <Action>
+                                    <Type value="PhysicsAutomatism::ApplyImpulseTowardPosition" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="Physics" />
+                                    <Parametre value='MouseX(&quot;&quot;,0)' />
+                                    <Parametre value='MouseY(&quot;&quot;,0)' />
+                                    <Parametre value="max(0.2,min(2,Pea.Distance(Pointer)/250))" />
+                                    <Parametre value="" />
+                                </Action>
+                                <Action>
+                                    <Type value="ModVarObjet" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="LaunchState" />
+                                    <Parametre value="=" />
+                                    <Parametre value="2" />
+                                </Action>
+                                <Action>
+                                    <Type value="ResetTimer" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;Launching&quot;' />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="VarScene" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="Launching" />
+                            <Parametre value="=" />
+                            <Parametre value="2" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="LaunchArrow" />
+                            <Parametre value="-" />
+                            <Parametre value="500*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="Timer" Contraire="false" />
+                                    <Parametre value="" />
+                                    <Parametre value="2" />
+                                    <Parametre value='&quot;Launching&quot;' />
+                                </Condition>
+                                <Condition>
+                                    <Type value="VarObjet" Contraire="false" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="LaunchState" />
+                                    <Parametre value="=" />
+                                    <Parametre value="2" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ModVarObjet" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="LaunchState" />
+                                    <Parametre value="=" />
+                                    <Parametre value="3" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="Timer" Contraire="false" />
+                                    <Parametre value="" />
+                                    <Parametre value="2" />
+                                    <Parametre value='&quot;Launching&quot;' />
+                                </Condition>
+                                <Condition>
+                                    <Type value="VarObjet" Contraire="false" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="LaunchState" />
+                                    <Parametre value="=" />
+                                    <Parametre value="0" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="AjoutHasard" />
+                                    <Parametre value="" />
+                                    <Parametre value="Pea" />
+                                </Action>
+                                <Action>
+                                    <Type value="ModVarObjet" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="LaunchState" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Action>
+                                <Action>
+                                    <Type value="ModVarScene" />
+                                    <Parametre value="" />
+                                    <Parametre value="Launching" />
+                                    <Parametre value="=" />
+                                    <Parametre value="0" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Collisions" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PhysicsAutomatism::CollisionWith" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="Physics" />
+                            <Parametre value="Block" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions />
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="PhysicsAutomatism::LinearVelocity" Contraire="false" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="Physics" />
+                                    <Parametre value="&gt;" />
+                                    <Parametre value="1.5" />
+                                    <Parametre value="" />
+                                </Condition>
+                                <Condition>
+                                    <Type value="Timer" Contraire="false" />
+                                    <Parametre value="" />
+                                    <Parametre value="0.5" />
+                                    <Parametre value='&quot;BalloonCreation&quot;' />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="Create" />
+                                    <Parametre value="" />
+                                    <Parametre value="Balloon" />
+                                    <Parametre value="Pea.X()" />
+                                    <Parametre value="Pea.Y()" />
+                                    <Parametre value="" />
+                                </Action>
+                                <Action>
+                                    <Type value="ChangeAnimation" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Action>
+                                <Action>
+                                    <Type value="ChangeAnimation" />
+                                    <Parametre value="Balloon" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Action>
+                                <Action>
+                                    <Type value="ResetTimer" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;BalloonCreation&quot;' />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="BuiltinCommonInstructions::Or" Contraire="false" />
+                            <SubConditions>
+                                <Condition>
+                                    <Type value="PhysicsAutomatism::LinearVelocityY" Contraire="false" />
+                                    <Parametre value="Block" />
+                                    <Parametre value="Physics" />
+                                    <Parametre value="&gt;" />
+                                    <Parametre value="0.5" />
+                                    <Parametre value="" />
+                                </Condition>
+                                <Condition>
+                                    <Type value="PhysicsAutomatism::LinearVelocity" Contraire="false" />
+                                    <Parametre value="Block" />
+                                    <Parametre value="Physics" />
+                                    <Parametre value="&gt;" />
+                                    <Parametre value="2" />
+                                    <Parametre value="" />
+                                </Condition>
+                            </SubConditions>
+                        </Condition>
+                    </Conditions>
+                    <Actions />
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="PhysicsAutomatism::CollisionWith" Contraire="false" />
+                                    <Parametre value="BadPea" />
+                                    <Parametre value="Physics" />
+                                    <Parametre value="Block" />
+                                    <Parametre value="" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ChangeAnimation" />
+                                    <Parametre value="BadPea" />
+                                    <Parametre value="=" />
+                                    <Parametre value="1" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PhysicsAutomatism::LinearVelocity" Contraire="false" />
+                            <Parametre value="BadPea" />
+                            <Parametre value="Physics" />
+                            <Parametre value="&gt;" />
+                            <Parametre value="4" />
+                            <Parametre value="" />
+                        </Condition>
+                        <Condition>
+                            <Type value="PhysicsAutomatism::CollisionWith" Contraire="false" />
+                            <Parametre value="BadPea" />
+                            <Parametre value="Physics" />
+                            <Parametre value="Block" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ChangeAnimation" />
+                            <Parametre value="BadPea" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PhysicsAutomatism::LinearVelocity" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="Physics" />
+                            <Parametre value="&gt;" />
+                            <Parametre value="0.7" />
+                            <Parametre value="" />
+                        </Condition>
+                        <Condition>
+                            <Type value="PhysicsAutomatism::CollisionWith" Contraire="false" />
+                            <Parametre value="BadPea" />
+                            <Parametre value="Physics" />
+                            <Parametre value="Pea" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ChangeAnimation" />
+                            <Parametre value="BadPea" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Action>
+                    </Actions>
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="Animation" Contraire="false" />
+                                    <Parametre value="Pea" />
+                                    <Parametre value="!=" />
+                                    <Parametre value="1" />
+                                </Condition>
+                                <Condition>
+                                    <Type value="Timer" Contraire="false" />
+                                    <Parametre value="" />
+                                    <Parametre value="0.5" />
+                                    <Parametre value='&quot;BalloonCreation&quot;' />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="ResetTimer" />
+                                    <Parametre value="" />
+                                    <Parametre value='&quot;BalloonCreation&quot;' />
+                                </Action>
+                                <Action>
+                                    <Type value="Create" />
+                                    <Parametre value="" />
+                                    <Parametre value="Balloon" />
+                                    <Parametre value="Pea.X()" />
+                                    <Parametre value="Pea.Y()" />
+                                    <Parametre value="" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Ballons management" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="Balloon" />
+                            <Parametre value="0" />
+                            <Parametre value="-25" />
+                            <Parametre value="0" />
+                        </Action>
+                        <Action>
+                            <Type value="Opacity" />
+                            <Parametre value="Balloon" />
+                            <Parametre value="-" />
+                            <Parametre value="200*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Opacity" Contraire="false" />
+                            <Parametre value="Balloon" />
+                            <Parametre value="&lt;=" />
+                            <Parametre value="0" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="Balloon" />
+                            <Parametre value="" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Cloud management" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="NbObjet" Contraire="false" />
+                            <Parametre value="Cloud" />
+                            <Parametre value="&lt;" />
+                            <Parametre value="4" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Create" />
+                            <Parametre value="" />
+                            <Parametre value="Cloud" />
+                            <Parametre value="-400-Random(200)" />
+                            <Parametre value="-150+Random(150)" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="" />
+                            <Parametre value="Zoom" />
+                            <Parametre value="+" />
+                            <Parametre value="0.25*TimeDelta()" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangePlan" />
+                            <Parametre value="Cloud" />
+                            <Parametre value="=" />
+                            <Parametre value="-50" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="Cloud" />
+                            <Parametre value="20" />
+                            <Parametre value="0" />
+                            <Parametre value="0" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PosX" Contraire="false" />
+                            <Parametre value="Cloud" />
+                            <Parametre value="&gt;=" />
+                            <Parametre value="1600" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="Cloud" />
+                            <Parametre value="50" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value="Camera management" />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="VarScene" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="Launching" />
+                            <Parametre value="=" />
+                            <Parametre value="2" />
+                        </Condition>
+                        <Condition>
+                            <Type value="VarObjet" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="LaunchState" />
+                            <Parametre value="=" />
+                            <Parametre value="2" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="AddForceVers" />
+                            <Parametre value="Camera" />
+                            <Parametre value="Pea" />
+                            <Parametre value="40" />
+                            <Parametre value="0" />
+                        </Action>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="" />
+                            <Parametre value="Zoom" />
+                            <Parametre value="+" />
+                            <Parametre value="0.25*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="VarScene" Contraire="false" />
+                            <Parametre value="Pea" />
+                            <Parametre value="Launching" />
+                            <Parametre value="!=" />
+                            <Parametre value="2" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="" />
+                            <Parametre value="Zoom" />
+                            <Parametre value="-" />
+                            <Parametre value="0.25*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::Standard" />
+                            <Conditions>
+                                <Condition>
+                                    <Type value="Collision" Contraire="true" />
+                                    <Parametre value="CameraLaunchPos" />
+                                    <Parametre value="Camera" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
+                                </Condition>
+                            </Conditions>
+                            <Actions>
+                                <Action>
+                                    <Type value="AddForceVers" />
+                                    <Parametre value="Camera" />
+                                    <Parametre value="CameraLaunchPos" />
+                                    <Parametre value="40" />
+                                    <Parametre value="0" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="ModVarScene" />
+                            <Parametre value="" />
+                            <Parametre value="Zoom" />
+                            <Parametre value="=" />
+                            <Parametre value="max(min(Variable(Zoom), 1.7), 0.65)" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions />
+                    <Actions>
+                        <Action>
+                            <Type value="FixCamera" />
+                            <Parametre value="" />
+                            <Parametre value="Camera" />
+                            <Parametre value="0" />
+                            <Parametre value="0" />
+                            <Parametre value="1435" />
+                            <Parametre value="400" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ZoomCamera" />
+                            <Parametre value="" />
+                            <Parametre value="Variable(Zoom)" />
+                            <Parametre value="" />
+                            <Parametre value="" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Egal" Contraire="false" />
+                            <Parametre value="TimeFromStart()" />
+                            <Parametre value="&gt;" />
+                            <Parametre value="5" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="TextObject::Opacity" />
+                            <Parametre value="Instructions" />
+                            <Parametre value="-" />
+                            <Parametre value="128*TimeDelta()" />
+                        </Action>
+                    </Actions>
+                </Event>
+            </Events>
+        </Scene>
+    </Scenes>
+    <ExternalEvents />
+    <ExternalLayouts />
+    <ExternalSourceFiles />
+</Project>

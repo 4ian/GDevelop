@@ -1,0 +1,3 @@
+Game Develop C++ platform
+Shoot'em up
+Template showing how to make a shoot'em up game

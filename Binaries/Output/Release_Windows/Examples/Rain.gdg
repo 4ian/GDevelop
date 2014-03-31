@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Project>
+    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
+    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
+        <Nom value="inRain" />
+        <Auteur value="CROSS" />
+        <Extensions>
+            <Extension name="BuiltinObject" />
+            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinVariables" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMouse" />
+            <Extension name="BuiltinKeyboard" />
+            <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinCamera" />
+            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinFile" />
+            <Extension name="BuiltinNetwork" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinAdvanced" />
+            <Extension name="Sprite" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinStringInstructions" />
+            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="BuiltinExternalLayouts" />
+            <Extension name="CommonDialogs" />
+        </Extensions>
+        <Platforms current="Game Develop C++ platform">
+            <Platform name="Game Develop C++ platform" />
+        </Platforms>
+        <WindowW value="1024" />
+        <WindowH value="768" />
+        <Portable />
+        <LatestCompilationDirectory value="" />
+        <FPSmax value="60" />
+        <FPSmin value="10" />
+        <verticalSync value="true" />
+    </Info>
+    <Resources>
+        <Resources>
+            <Resource kind="image" name="nuage_blanc_1.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="nuage_blanc_1.png" />
+            <Resource kind="image" name="nuages_gris_1.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="nuages_gris_1.png" />
+            <Resource kind="image" name="nuages_gris_2.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="nuages_gris_2.png" />
+            <Resource kind="image" name="nuages_gris_3.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="nuages_gris_3.png" />
+            <Resource kind="image" name="rain.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="rain.png" />
+            <Resource kind="image" name="logo_inrain.png" alwaysLoaded="false" smoothed="false" userAdded="true" file="logo_inrain.png" />
+        </Resources>
+        <ResourceFolders />
+    </Resources>
+    <Objects />
+    <ObjectGroups />
+    <Variables />
+    <Scenes firstScene="">
+        <Scene nom="inrain" mangledName="inrain" r="0.000000" v="0.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
+            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
+            <GroupesObjets />
+            <Objets>
+                <Objet nom="nuages_1" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="nuages_gris_1.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="512.000000" Y="71.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="nuages_2" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="nuages_gris_2.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="512.000000" Y="91.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="nuages_3" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="nuages_gris_3.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="512.000000" Y="107.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="goutte" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="false">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="rain.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="1.000000" Y="128.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+                <Objet nom="logo_inrain" type="Sprite">
+                    <Variables />
+                    <Animations>
+                        <Animation typeNormal="true">
+                            <Direction boucle="false" tempsEntre="1.000000">
+                                <Sprites>
+                                    <Sprite image="logo_inrain.png">
+                                        <Points />
+                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
+                                        <PointCentre nom="centre" X="59.000000" Y="51.000000" automatic="true" />
+                                        <CustomCollisionMask custom="false" />
+                                    </Sprite>
+                                </Sprites>
+                            </Direction>
+                        </Animation>
+                    </Animations>
+                </Objet>
+            </Objets>
+            <Layers>
+                <Layer Name="" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+            </Layers>
+            <Variables />
+            <AutomatismsSharedDatas />
+            <Positions>
+                <Objet nom="nuages_1" x="0.000000" y="0.000000" plan="6" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2008948864.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="nuages_2" x="0.000000" y="0.000000" plan="4" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2008948864.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="nuages_3" x="0.000000" y="0.000000" plan="2" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2008948864.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+                <Objet nom="logo_inrain" x="906.000000" y="666.000000" plan="10" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
+                    <floatInfos>
+                        <Info name="animation" value="2008948864.000000" />
+                    </floatInfos>
+                    <stringInfos />
+                    <InitialVariables />
+                </Objet>
+            </Positions>
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Comment" />
+                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
+                    <Com1 value='Génétateur de pluie &quot;inRain&quot; développé par CROSS.' />
+                    <Com2 value="" />
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="DepartScene" Contraire="false" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_orage&quot;' />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_nuages_1&quot;' />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_nuages_2&quot;' />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_nuages_3&quot;' />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Timer" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="0.001" />
+                            <Parametre value='&quot;time_nuages_1&quot;' />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Create" />
+                            <Parametre value="" />
+                            <Parametre value="goutte" />
+                            <Parametre value="nuages_1.X()+Random(1024)" />
+                            <Parametre value="0" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangePlan" />
+                            <Parametre value="goutte" />
+                            <Parametre value="=" />
+                            <Parametre value="5" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="goutte" />
+                            <Parametre value="0" />
+                            <Parametre value="1000" />
+                            <Parametre value="1" />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_nuages_1&quot;' />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Timer" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="0.001" />
+                            <Parametre value='&quot;time_nuages_2&quot;' />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Create" />
+                            <Parametre value="" />
+                            <Parametre value="goutte" />
+                            <Parametre value="nuages_2.X()+Random(1024)" />
+                            <Parametre value="0" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangePlan" />
+                            <Parametre value="goutte" />
+                            <Parametre value="=" />
+                            <Parametre value="3" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="goutte" />
+                            <Parametre value="0" />
+                            <Parametre value="900" />
+                            <Parametre value="1" />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_nuages_2&quot;' />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="Timer" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="0.001" />
+                            <Parametre value='&quot;time_nuages_3&quot;' />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Create" />
+                            <Parametre value="" />
+                            <Parametre value="goutte" />
+                            <Parametre value="nuages_3.X()+Random(1024)" />
+                            <Parametre value="0" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ChangePlan" />
+                            <Parametre value="goutte" />
+                            <Parametre value="=" />
+                            <Parametre value="1" />
+                        </Action>
+                        <Action>
+                            <Type value="AddForceXY" />
+                            <Parametre value="goutte" />
+                            <Parametre value="0" />
+                            <Parametre value="800" />
+                            <Parametre value="1" />
+                        </Action>
+                        <Action>
+                            <Type value="ResetTimer" />
+                            <Parametre value="" />
+                            <Parametre value='&quot;time_nuages_3&quot;' />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="PosY" Contraire="false" />
+                            <Parametre value="goutte" />
+                            <Parametre value="&gt;=" />
+                            <Parametre value="1025" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Delete" />
+                            <Parametre value="goutte" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="KeyPressed" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Space" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="SetFullScreen" />
+                            <Parametre value="" />
+                            <Parametre value="oui" />
+                        </Action>
+                    </Actions>
+                </Event>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="KeyPressed" Contraire="false" />
+                            <Parametre value="" />
+                            <Parametre value="Escape" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="Quit" />
+                        </Action>
+                    </Actions>
+                </Event>
+            </Events>
+        </Scene>
+    </Scenes>
+    <ExternalEvents />
+    <ExternalLayouts />
+    <ExternalSourceFiles />
+</Project>

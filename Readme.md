@@ -29,3 +29,12 @@ About directory structure
 You can also download from GitHub repositories (http://www.github.com/4ian):
 * GDJS: Sources files of Game Develop JS Platform (For HTML5 games)
 * Extensions: Sources files of extensions. (For C++ or JS platform)
+
+How to build
+------------
+
+Refer to the SDK available on http://www.compilgames.net which has a nice pre-built HTML documentation for
+inside GDCpp folder, or download GDJS on http://www.github.com/4ian and also check the documentation.
+
+Basically, you need to launch CMake, choose this directory as the source directory, and a hidden directory
+like Binaries/.build as the directory where to build. Files will be output in Binaries/Output anyway.

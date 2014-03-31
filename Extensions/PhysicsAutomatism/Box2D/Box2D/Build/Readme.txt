@@ -1,1 +1,0 @@
-You should use CMake to target this directory for build files.

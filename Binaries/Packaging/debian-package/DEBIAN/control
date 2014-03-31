@@ -1,0 +1,13 @@
+Package: game-develop
+Version: 3.3.70
+Architecture: amd64
+Maintainer: Florian Rival <Florian.Rival@gmail.com>
+Section: editors
+Priority: optional
+Depends: build-essential, libwebkitgtk-3.0-0, zenity, libc6-dev
+Installed-Size: 190000
+Homepage: http://www.compilgames.net
+Description: Game Develop, free HTML5 and native game creator software
+ Game Develop is a free game development software
+ allowing to create HTML5 and native games
+ without programming.

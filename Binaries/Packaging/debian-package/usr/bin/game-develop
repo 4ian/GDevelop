@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /opt/game-develop
+sh StartGameDevelop.sh

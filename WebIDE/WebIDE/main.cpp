@@ -14,6 +14,21 @@ using namespace emscripten;
 using namespace gdjs;
 using namespace gd;
 
+namespace gd {
+	void InitializePlatforms()
+	{
+		//TODO: Not sexy
+		{
+		    boost::shared_ptr<gd::Platform> platform(&CppPlatform::Get());
+		    gd::PlatformManager::GetInstance()->AddPlatform(platform);
+	    }
+	    {
+		    boost::shared_ptr<gd::Platform> platform(&JsPlatform::Get());
+		    gd::PlatformManager::GetInstance()->AddPlatform(platform);
+	    }
+	}
+};
+
 class ProjectHelper {
 public:
 	static gd::Project & CreateNewGDJSProject()
@@ -47,36 +62,12 @@ EMSCRIPTEN_BINDINGS(GD) {
 	    .class_function("createNewGDJSProject", &ProjectHelper::CreateNewGDJSProject)
 	    .class_function("dumpProjectXml", &ProjectHelper::DumpProjectXml)
 	    ;
+
+    function("initializePlatforms", &InitializePlatforms);
 }
+
 
 #if 0
-
-EMSCRIPTEN_BINDINGS(Platform) {
-    class_<Platform>("Platform")
-        .constructor<>()
-	    .function("getName", &Platform::GetName)
-	    .function("getFullName", &Platform::GetFullName)
-	    .function("getSubtitle", &Platform::GetSubtitle)
-	    .function("getDescription", &Platform::GetDescription)
-	    ;
-
-    class_<JsPlatform, base<gd::Platform>>("JsPlatform")
-        .constructor<>()
-        .class_function("get", &JsPlatform::Get)
-        ;
-
-    class_<Project>("Project")
-        .constructor<>()
-        .function("setName", &Project::SetName).function("getName", &Project::GetName)
-        .function("setAuthor", &Project::SetAuthor).function("getAuthor", &Project::GetAuthor)
-        .function("addPlatform", &Project::AddPlatform)
-        .function("getCurrentPlatform", &Project::GetCurrentPlatform)
-       	//Properties, for convenience only:
-        .property("name", &Project::GetName, &Project::SetName)
-        .property("author", &Project::GetAuthor, &Project::SetAuthor)
-        ;
-}
-
 int main(int argc, char const *argv[])
 {
 	std::cout << "* WebIDE!" << std::endl;

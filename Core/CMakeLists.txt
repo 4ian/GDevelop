@@ -3,6 +3,11 @@ cmake_policy(SET CMP0015 NEW)
 
 project(GDCore)
 
+SET(CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 0)
+SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 0)
+SET(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES 0)
+SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 0)
+
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
@@ -13,6 +18,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
     ENDIF()
 endif()
+if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths --bind" )
+ENDIF()
 
 #Common directories:
 ###
@@ -38,25 +46,29 @@ IF(WIN32) #Special case for wxWidgets on Windows
 	set(wxwidgets_lib_dir ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll)
 ENDIF(WIN32)
 
-
 #Dependencies on external libraries:
 ###
 include_directories(${boost_include_dir})
 include_directories(${sfml_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
-ELSE()
+ELSEIF (NOT EMSCRIPTEN)
 	find_package(wxWidgets COMPONENTS core base ribbon webview stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
 	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
-	include_directories(${GTK2_INCLUDE_DIRS})
-	link_directories(${GTK2_LIBRARY_DIRS})
+	pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+	include_directories(${GTK3_INCLUDE_DIRS})
+	link_directories(${GTK3_LIBRARY_DIRS})
 ENDIF(WIN32)
+
 
 #Defines
 ###
 add_definitions( -DGD_IDE_ONLY )
+IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
+	add_definitions( -DGD_NO_WX_GUI )
+	add_definitions( -DEMSCRIPTEN )
+ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	add_definitions( -DDEBUG )
 	IF(WIN32)
@@ -79,10 +91,11 @@ IF(WIN32)
 	add_definitions( -DwxUSE_UNICODE=1 )
 	add_definitions( -DWXUSINGDLL )
 ELSE()
+	add_definitions( -Dlinux )
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK2_CFLAGS_OTHER})
+	add_definitions(${GTK3_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 #The target
@@ -94,6 +107,9 @@ file(
         GDCore/*
 )
 add_library(GDCore SHARED ${source_files})
+IF(EMSCRIPTEN)
+	set_target_properties(GDCore PROPERTIES SUFFIX ".bc")
+ENDIF()
 IF(WIN32)
 	set_target_properties(GDCore PROPERTIES PREFIX "")
 ELSE()
@@ -114,8 +130,8 @@ target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/lib
 	ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 	target_link_libraries(GDCore ws2_32 user32 opengl32 glu32)
-ELSE()
+ELSEIF (NOT EMSCRIPTEN)
 	target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
 	target_link_libraries(GDCore ${wxWidgets_LIBRARIES})
-	target_link_libraries(GDCore ${GTK2_LIBRARIES})
+	target_link_libraries(GDCore ${GTK3_LIBRARIES})
 ENDIF(WIN32)

@@ -23,6 +23,10 @@
 using namespace emscripten;
 using namespace gd;
 
+EMSCRIPTEN_BINDINGS(gd_std_wrappers) {
+    register_vector<std::string>("VectorString");
+}
+
 EMSCRIPTEN_BINDINGS(gd_Platform) {
     class_<ProjectExporter>("ProjectExporter")
         ;
@@ -39,10 +43,19 @@ EMSCRIPTEN_BINDINGS(gd_Platform) {
 }
 
 namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
+const std::string & PairStringVariable_GetFirst(std::pair<std::string, gd::Variable> & p) { return p.first; }
+gd::Variable * PairStringVariable_GetSecond(std::pair<std::string, gd::Variable> & p) { return &p.second; }
 Variable * Variable_GetChild(Variable & v, const std::string & name) { return &v.GetChild(name); }
 }
 
 EMSCRIPTEN_BINDINGS(gd_Variable) {
+    class_< std::pair<std::string, gd::Variable> >("PairStringVariable")
+        .constructor<>()
+        .function("getString", PairStringVariable_GetFirst, allow_raw_pointers())
+        .function("getName", PairStringVariable_GetFirst, allow_raw_pointers())
+        .function("getVariable", PairStringVariable_GetSecond, allow_raw_pointers())
+        ;
+
     class_<Variable>("Variable")
         .constructor<>()
         .function("getString", &Variable::GetString)
@@ -70,11 +83,13 @@ EMSCRIPTEN_BINDINGS(gd_VariablesContainer) {
         .constructor<>()
         .function("has", &VariablesContainer::Has)
         .function("get", &VariablesContainer_Get, allow_raw_pointers())
-        //.function("getAt", &VariablesContainer_GetAt, allow_raw_pointers())
+        .function("getAt", &VariablesContainer_GetAt, allow_raw_pointers())
         .function("insert", &VariablesContainer_Insert, allow_raw_pointers())
         .function("insertNew", &VariablesContainer_InsertNew, allow_raw_pointers())
         .function("remove", &VariablesContainer::Remove)
         .function("rename", &VariablesContainer::Rename)
+        .function("swap", &VariablesContainer::Swap)
+        .function("getPosition", &VariablesContainer::GetPosition) //TODO: Rename in getIndexOf
         .function("count", &VariablesContainer::Count)
         .function("clear", &VariablesContainer::Clear)
         ;
@@ -84,6 +99,7 @@ namespace gd { //Workaround for emscripten not supporting methods returning a re
 gd::Layout * Project_GetLayout(gd::Project & project, const std::string & name) { return &project.GetLayout(name); }
 gd::VariablesContainer * Project_GetVariables(gd::Project & project) { return &project.GetVariables(); }
 gd::Layout * Project_InsertNewLayout(gd::Project & project, const std::string & name, unsigned int pos) { return &project.InsertNewLayout(name, pos); }
+std::vector < std::string > * Project_GetUsedExtensions(gd::Project & project) { return &project.GetUsedExtensions(); }
 }
 
 EMSCRIPTEN_BINDINGS(gd_Project) {
@@ -98,6 +114,7 @@ EMSCRIPTEN_BINDINGS(gd_Project) {
 
         .function("addPlatform", &Project::AddPlatform)
         .function("getCurrentPlatform", &Project::GetCurrentPlatform)
+        .function("getUsedExtensions", &Project_GetUsedExtensions, allow_raw_pointers())
         .function("createObject", &Project::CreateObject)
         .function("createEvent", &Project::CreateEvent)
 
@@ -105,9 +122,13 @@ EMSCRIPTEN_BINDINGS(gd_Project) {
         .function("getLayout", gd::Project_GetLayout, allow_raw_pointers())
         .function("insertNewLayout", &Project_InsertNewLayout, allow_raw_pointers())
         .function("removeLayout", &Project::RemoveLayout)
-        .function("isDirty", &Project::IsDirty).function("setDirty", &Project::SetDirty)
+        .function("getFirstLayout", &Project::GetFirstLayout).function("setFirstLayout", &Project::SetFirstLayout)
 
         .function("getVariables", &Project_GetVariables, allow_raw_pointers())
+
+        .function("validateObjectName", &Project::ValidateObjectName)
+
+        .function("isDirty", &Project::IsDirty).function("setDirty", &Project::SetDirty)
         //Properties, for convenience only:
         .property("name", &Project::GetName, &Project::SetName)
         .property("author", &Project::GetAuthor, &Project::SetAuthor)

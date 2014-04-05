@@ -16,6 +16,7 @@
 /Binaries/Releases/*.tar.bz2
 /Binaries/Releases/*.tar.lzma
 /Binaries/Releases/*.zip
+/WebIDE/node_modules/
 *.depend
 *.layout
 *.xgdwe
@@ -27,6 +28,7 @@
 *.dll
 *.exe
 *.a
+*.bc
 /Binaries/**/MinGW32
 /Binaries/**/CppPlatform/Runtime
 /Binaries/**/CppPlatform/include

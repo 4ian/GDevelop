@@ -74,11 +74,11 @@ file(
 )
 
 add_library(
-        WebIDE
+        GD
         SHARED
         ${source_files}
 )
-set_target_properties(WebIDE PROPERTIES SUFFIX ".js")
+set_target_properties(GD PROPERTIES SUFFIX ".js")
 set(LIBRARY_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE})
 set(ARCHIVE_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE})
 set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE})
@@ -87,6 +87,6 @@ set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE
 ###
 
 #Nothing.
-target_link_libraries(WebIDE GDCore)
-target_link_libraries(WebIDE GDJS)
-target_link_libraries(WebIDE GDCpp)
+target_link_libraries(GD GDCore)
+target_link_libraries(GD GDJS)
+target_link_libraries(GD GDCpp)

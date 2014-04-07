@@ -37,3 +37,4 @@
 /Binaries/**/JsPlatform/*.dll
 /Binaries/**/JsPlatform/*.dll.a
 *.autosave
+/Binaries/Output/WebIDE/Release

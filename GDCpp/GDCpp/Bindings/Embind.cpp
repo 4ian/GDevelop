@@ -48,8 +48,8 @@ EMSCRIPTEN_BINDINGS(SpriteObject) {
 
     class_<SpriteObject, base<gd::Object> >("SpriteObject")
         .constructor<const std::string &>()
-		.function("addAnimation", &SpriteObject::AddAnimation)
-		//TODO
+        .function("addAnimation", &SpriteObject::AddAnimation)
+        //TODO
         ;
 
     function("asSpriteObject", &AsSpriteObject, allow_raw_pointers());

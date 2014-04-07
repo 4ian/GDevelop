@@ -18,6 +18,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/Events/Event.h"
 #include "GDCore/IDE/ProjectExporter.h"
 
 using namespace emscripten;
@@ -161,6 +162,7 @@ namespace gd { //Workaround for emscripten not supporting methods returning a re
 gd::InitialInstancesContainer * Layout_GetInitialInstances(gd::Layout & l) { return &l.GetInitialInstances(); }
 gd::VariablesContainer * Layout_GetVariables(gd::Layout & l) { return &l.GetVariables(); }
 gd::Layer * Layout_GetLayer(gd::Layout & l, const std::string & name) { return &l.GetLayer(name); }
+std::vector<boost::shared_ptr<gd::BaseEvent> > * Layout_GetEvents(gd::Layout & l) { return &l.GetEvents(); }
 gd::Object * ClassWithObjects_GetObject(gd::ClassWithObjects & c, const std::string & name) { return &c.GetObject(name); }
 gd::Object * ClassWithObjects_GetObjectAt(gd::ClassWithObjects & c, unsigned int id) { return &c.GetObject(id); }
 }
@@ -190,6 +192,7 @@ EMSCRIPTEN_BINDINGS(gd_Layout) {
 
         .function("getInitialInstances", &Layout_GetInitialInstances, allow_raw_pointers())
         .function("getVariables", &Layout_GetVariables, allow_raw_pointers())
+        .function("getEvents", &Layout_GetEvents, allow_raw_pointers())
 
         .function("insertNewLayer", &Layout::InsertNewLayer)
         .function("insertLayer", &Layout::InsertLayer)

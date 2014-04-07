@@ -34,6 +34,94 @@ describe('libGD.js', function(){
 		});
 	});
 
+	describe('gd.Layout', function(){
+		var project = gd.ProjectHelper.createNewGDJSProject();
+		var layout = new gd.Layout();
+		it('properties can be read and changed', function(){
+			layout.setName("My super layout");
+			expect(layout.getName()).to.be("My super layout");
+		});
+		it('events', function() {
+			var evts = layout.getEvents();
+			expect(evts.size()).to.be(0);
+			var evt = project.createEvent("BuiltinCommonInstructions::Standard", "");
+			evts.push_back(evt);
+			expect(evts.size()).to.be(1);
+			evt.getSubEvents().push_back(project.createEvent("BuiltinCommonInstructions::Standard", ""));
+			expect(evts.get(0).getSubEvents().size()).to.be(1);
+		});
+		//TODO
+
+		after(function() {
+			project.delete();
+		});
+	});
+
+	describe('gd.InitialInstancesContainer', function(){
+		var container = new gd.InitialInstancesContainer();
+
+		it('initial state', function(){
+			expect(container.getInstancesCount()).to.be(0);
+		});
+		it('adding instances', function() {
+			var instance = container.insertNewInitialInstance();
+			instance.setObjectName("MyObject");
+			instance.setZOrder(10);
+
+			var instance2 = new gd.InitialInstance();
+			instance2.setObjectName("MyObject2");
+			instance2 = container.insertInitialInstance(instance2);
+
+			var instance3 = container.insertNewInitialInstance();
+			instance3.setObjectName("MyObject3");
+			instance3.setZOrder(-1);
+			instance3.setLayer("OtherLayer");
+
+			expect(container.getInstancesCount()).to.be(3);
+		});
+		it('iterating', function() {
+			var i = 0;
+			var functor = {
+				invoke:function(instance){
+					expect((i === 0 && instance.getObjectName() === "MyObject") ||
+						(i === 1 && instance.getObjectName() === "MyObject2") ||
+						(i === 2 && instance.getObjectName() === "MyObject3")).to.be(true);
+					i++;
+				}
+			};
+			container.iterateOverInstances(gd.InitialInstanceFunctor.implement(functor));
+		});
+		it('iterating with z ordering', function() {
+			var i = 0;
+			var functor = {
+				invoke:function(instance){
+					expect((i === 0 && instance.getObjectName() === "MyObject2") ||
+						(i === 1 && instance.getObjectName() === "MyObject")).to.be(true);
+					i++;
+				}
+			};
+			container.iterateOverInstancesWithZOrdering(gd.InitialInstanceFunctor.implement(functor), "");
+		});
+		it('moving from layers to another', function() {
+			container.moveInstancesToLayer("OtherLayer", "YetAnotherLayer");
+
+			var functor = {
+				invoke:function(instance){
+					expect(instance.getObjectName()).to.be("MyObject3");
+				}
+			};
+			container.iterateOverInstancesWithZOrdering(gd.InitialInstanceFunctor.implement(functor), "YetAnotherLayer");
+		});
+		it('removing instances', function() {
+			container.removeInitialInstancesOfObject("MyObject");
+			expect(container.getInstancesCount()).to.be(2);
+		});
+		it('removing instances on a layer', function() {
+			container.removeAllInstancesOnLayer("YetAnotherLayer");
+			expect(container.getInstancesCount()).to.be(1);
+		});
+	});
+
 	describe('gd.VariablesContainer', function(){
 		it('container is empty after being created', function(){
 			var container = new gd.VariablesContainer();
@@ -112,6 +200,51 @@ describe('libGD.js', function(){
 			variable.removeChild("FirstChild");
 			expect(variable.hasChild("FirstChild")).to.be(false);
 		});
+	});
+
+	describe('gd.Instruction', function(){
+		//TODO
+	});
+
+	describe('gd.BaseEvent', function(){
+		//TODO
+	});
+
+	describe('gd.StandardEvent', function(){
+		//TODO
+		var evt = new gd.StandardEvent();
+
+		it('initial values', function(){
+			expect(evt.canHaveSubEvents()).to.be(true);
+			expect(evt.isExecutable()).to.be(true);
+		});
+		it('conditions and actions', function(){
+			var conditions = evt.getConditions();
+			expect(evt.getConditions().size()).to.be(0);
+			var cnd = new gd.Instruction();
+			conditions.push_back(cnd);
+			expect(evt.getConditions().size()).to.be(1);
+
+			var actions = evt.getActions();
+			expect(evt.getActions().size()).to.be(0);
+			var act = new gd.Instruction();
+			actions.push_back(act);
+			expect(evt.getActions().size()).to.be(1);
+		});
+
+	});
+	describe('gd.CommentEvent', function(){
+		var evt = new gd.CommentEvent();
+
+		it('initial values', function(){
+			expect(evt.canHaveSubEvents()).to.be(false);
+			expect(evt.isExecutable()).to.be(false);
+		});
+		it('comment', function(){
+			evt.setComment("My nice comment about my events!");
+			expect(evt.getComment()).to.be("My nice comment about my events!");
+		});
+
 	});
 });
 

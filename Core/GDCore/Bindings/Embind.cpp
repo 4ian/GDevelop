@@ -12,6 +12,7 @@
  *  - not all methods or classes are available.
  */
 #if defined(EMSCRIPTEN)
+#include "Embind.h"
 #include <emscripten/bind.h>
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -20,12 +21,43 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/IDE/ProjectExporter.h"
+#include <set>
 
 using namespace emscripten;
 using namespace gd;
 
+namespace gd
+{
+namespace internal {
+    template<typename SetType>
+    struct SetAccess {
+        static val has(
+            const SetType& s,
+            typename SetType::value_type value
+        ) {
+            return val(s.find(value) != s.end());
+        }
+    };
+}
+
+/**
+ * Utility function used to expose a std::set to Embind.
+ */
+template<typename T>
+class_<std::set<T> > register_set(const char* name) {
+    typedef std::set<T> SetType;
+
+    return class_<std::set<T> >(name)
+        .template constructor<>()
+        //.function("insert", &SetType::insert)
+        .function("size", &SetType::size)
+        .function("has", &internal::SetAccess<SetType>::has)
+        ;
+}
+}
 EMSCRIPTEN_BINDINGS(gd_std_wrappers) {
     register_vector<std::string>("VectorString");
+    register_set<std::string>("SetString");
 }
 
 EMSCRIPTEN_BINDINGS(gd_Platform) {
@@ -90,7 +122,7 @@ EMSCRIPTEN_BINDINGS(gd_VariablesContainer) {
         .function("remove", &VariablesContainer::Remove)
         .function("rename", &VariablesContainer::Rename)
         .function("swap", &VariablesContainer::Swap)
-        .function("getPosition", &VariablesContainer::GetPosition) //TODO: Rename in getIndexOf
+        .function("getPosition", &VariablesContainer::GetPosition) //TODO: Rename in getIndexOf?
         .function("count", &VariablesContainer::Count)
         .function("clear", &VariablesContainer::Clear)
         ;

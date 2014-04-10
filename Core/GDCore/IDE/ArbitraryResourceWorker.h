@@ -12,6 +12,7 @@
 #include <boost/shared_ptr.hpp>
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}
+namespace gd {class EventsList;}
 
 namespace gd
 {
@@ -47,7 +48,7 @@ public:
  * \see gd::ArbitraryResourceWorker
  * \ingroup IDE
  */
-void GD_CORE_API LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < boost::shared_ptr<gd::BaseEvent> > & events, gd::ArbitraryResourceWorker & worker);
+void GD_CORE_API LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & events, gd::ArbitraryResourceWorker & worker);
 
 }
 

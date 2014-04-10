@@ -30,7 +30,7 @@ public:
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \return C++ code
      */
-    static std::string GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & events, bool compilationForRuntime = false);
+    static std::string GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, gd::EventsList & events, bool compilationForRuntime = false);
 
     /**
      * Generate complete C++ file for compiling external events.
@@ -46,7 +46,7 @@ public:
     /**
      * \brief GD C++ Platform has a specific processing function so as to handle profiling.
      */
-    void PreprocessEventList( std::vector < gd::BaseEventSPtr > & listEvent );
+    void PreprocessEventList( gd::EventsList & listEvent );
 
 protected:
     virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
@@ -68,7 +68,7 @@ protected:
                                                                       std::string parametersStr,
                                                                       std::string defaultOutput,
                                                                       gd::EventsCodeGenerationContext & context);
-    
+
     virtual std::string GenerateObjectCondition(const std::string & objectName,
                                                             const gd::ObjectMetadata & objInfo,
                                                             const std::vector<std::string> & arguments,

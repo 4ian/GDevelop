@@ -13,6 +13,7 @@
 #include <wx/bitmap.h>
 #endif
 class wxBitmap;
+namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class EventsCodeGenerator; }
 namespace gd { class EventsCodeGenerationContext; }
@@ -51,7 +52,7 @@ public:
          * unless for special cases like gd::LinkEvent.
          */
         virtual void Preprocess(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-                                std::vector < boost::shared_ptr<gd::BaseEvent> > & eventList, unsigned int indexOfTheEventInThisList);
+                                gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
     };
 
     /**

@@ -8,6 +8,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+namespace gd { class EventsList; }
 namespace gd { class Layout; }
 namespace gd { class Platform; }
 namespace gd { class Project; }
@@ -27,12 +28,12 @@ namespace gd
 class GD_CORE_API EventsSearchResult
 {
 public:
-    EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ );
+    EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
     EventsSearchResult();
     ~EventsSearchResult() {};
 
     boost::weak_ptr<gd::BaseEvent> event;
-    std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList;
+    gd::EventsList * eventsList;
     unsigned int positionInList;
 };
 
@@ -49,19 +50,19 @@ public:
      * Replace all occurences of an object name by another name
      * ( include : objects in parameters and in math/text expressions of all events ).
      */
-    static void RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName);
+    static void RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string oldName, std::string newName);
 
     /**
      * Remove all actions or conditions using an object
      */
-    static void RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events, std::string name);
+    static void RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string name);
 
     /**
      * Search for a string in events
      *
      * \return A vector containing EventsSearchResult objects filled with events containing the string
      */
-    static std::vector < EventsSearchResult > SearchInEvents(gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events,
+    static std::vector < EventsSearchResult > SearchInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
                                       std::string search,
                                       bool matchCase,
                                       bool inConditions,
@@ -70,7 +71,7 @@ public:
     /**
      * Replace all occurrences of a string in events
      */
-    static void ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events,
+    static void ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
                                       std::string toReplace,
                                       std::string newString,
                                       bool matchCase,

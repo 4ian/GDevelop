@@ -27,6 +27,21 @@ StandardEvent::~StandardEvent()
 {
 };
 
+vector < const vector<gd::Instruction>* > StandardEvent::GetAllConditionsVectors() const
+{
+    vector < const vector<gd::Instruction>* > allConditions;
+    allConditions.push_back(&conditions);
+
+    return allConditions;
+}
+
+vector < const vector<gd::Instruction>* > StandardEvent::GetAllActionsVectors() const
+{
+    vector < const vector<gd::Instruction>* > allActions;
+    allActions.push_back(&actions);
+
+    return allActions;
+}
 vector < vector<gd::Instruction>* > StandardEvent::GetAllConditionsVectors()
 {
     vector < vector<gd::Instruction>* > allConditions;
@@ -56,7 +71,7 @@ void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
     gd::EventsListSerialization::SaveActions(actions, actionsElem);
 
     //Sous évènements
-    if ( !GetSubEvents().empty() )
+    if ( !GetSubEvents().IsEmpty() )
     {
         TiXmlElement * subeventsElem;
         subeventsElem = new TiXmlElement( "Events" );
@@ -137,7 +152,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
  */
 void StandardEvent::Init(const StandardEvent & event)
 {
-    events = CloneVectorOfEvents(event.events);
+    events = *event.events.Clone();
 
     conditions = event.conditions;
     actions = event.actions;

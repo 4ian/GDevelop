@@ -8,6 +8,7 @@
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/EventsList.h"
 #include <iostream>
 #include <map>
 #include <list>
@@ -83,7 +84,7 @@ std::vector < EventItem > EventsEditorSelection::GetAllSelectedEventsWithoutSubE
                 (*it2).event != boost::shared_ptr<gd::BaseEvent>() &&
                 (*it2).event->CanHaveSubEvents() )
             {
-                if ( FindInEventsAndSubEvents((*it2).event->GetSubEvents(), (*it).event) )
+                if ( FindInEventsAndSubEvents((*it2).event->GetSubEvents(), *(*it).event) )
                     isAlreadyIncludedAsSubEvent = true;
 
             }
@@ -172,24 +173,18 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
             continue;
         }
 
-        if ( (*it).event == eventHighlighted.event || ((*it).event->CanHaveSubEvents() && FindInEventsAndSubEvents((*it).event->GetSubEvents(), eventHighlighted.event)) )
+        if ( (*it).event == eventHighlighted.event || ((*it).event->CanHaveSubEvents() && FindInEventsAndSubEvents((*it).event->GetSubEvents(), *eventHighlighted.event)) )
         {
             return false;
         }
     }
 
-    //Insert dragged events
+    //Insert copy of dragged events
     size_t positionInList = !dropAfterHighlightedElement ? eventHighlighted.positionInList : eventHighlighted.positionInList+1;
     for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
         if ( (*it).event != boost::shared_ptr<gd::BaseEvent>() )
-        {
-            boost::shared_ptr<gd::BaseEvent> newEvent = (*it).event->Clone();
-            if ( positionInList < eventHighlighted.eventsList->size() )
-                eventHighlighted.eventsList->insert(eventHighlighted.eventsList->begin()+positionInList, newEvent);
-            else
-                eventHighlighted.eventsList->push_back(newEvent);
-        }
+            eventHighlighted.eventsList->InsertEvent(*(*it).event, positionInList);
     }
 
     //Remove them from their initial position
@@ -198,7 +193,7 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
         for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
         {
             if ( (*it).event != boost::shared_ptr<gd::BaseEvent>() && (*it).eventsList != NULL)
-                (*it).eventsList->erase(std::remove((*it).eventsList->begin(), (*it).eventsList->end(), (*it).event) , (*it).eventsList->end());
+                (*it).eventsList->RemoveEvent(*(*it).event);
         }
     }
 
@@ -352,12 +347,12 @@ EventsEditorSelection::EventsEditorSelection(gd::EventsEditorRefreshCallbacks & 
 {
 }
 
-bool EventsEditorSelection::FindInEventsAndSubEvents(std::vector<boost::shared_ptr<gd::BaseEvent> > & list, boost::shared_ptr<gd::BaseEvent> eventToSearch)
+bool EventsEditorSelection::FindInEventsAndSubEvents(const gd::EventsList & list, const gd::BaseEvent & eventToSearch)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {
-        if ( list[i] == eventToSearch) return true;
-        if ( list[i]->CanHaveSubEvents() && FindInEventsAndSubEvents(list[i]->GetSubEvents(), eventToSearch) )
+        if ( &list[i] == &eventToSearch) return true;
+        if ( list[i].CanHaveSubEvents() && FindInEventsAndSubEvents(list[i].GetSubEvents(), eventToSearch) )
             return true;
     }
 

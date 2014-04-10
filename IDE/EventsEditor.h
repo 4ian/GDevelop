@@ -23,6 +23,7 @@
 #include <boost/shared_ptr.hpp>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 namespace gd { class ExternalEvents; }
@@ -88,7 +89,7 @@ public:
     /**
      * Scroll view to reach an event.
      */
-    void ScrollToEvent(gd::BaseEventSPtr event);
+    void ScrollToEvent(gd::BaseEvent & event);
 
     /**
      * Called when events are changed. Can be called from an external class such as SearchEvents dialog.
@@ -281,7 +282,7 @@ private:
     void AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem);
 
     void EnsureTriggerOnceIsLastCondition(std::vector<gd::Instruction> & conditions);
-    void RecomputeAllEventsWidth(std::vector < boost::shared_ptr<gd::BaseEvent> > & eventsToRefresh);
+    void RecomputeAllEventsWidth(gd::EventsList & eventsToRefresh);
     void DeleteSelection();
 
     void EndLiveEditing();
@@ -293,25 +294,25 @@ private:
 
     /**
      * Draw events.
-     * \param wxDC where events are drawn
-     * \param Events to be drawn
-     * \param x position where draw events
-     * \param y position where draw events
-     * \param optional event that will be searched for. If event is found, it will be selected and scrollbar set to view this event
+     * \param dc wxDC where events are drawn
+     * \param events Events to be drawn
+     * \param x X position where draw events
+     * \param y Y position where draw events
+     * \param scrollTo optional event that will be searched for. If event is found, it will be selected and scrollbar set to view this event
      */
-    unsigned int DrawEvents(wxDC & dc, std::vector < boost::shared_ptr< gd::BaseEvent > > & events, int x, int y, boost::shared_ptr< gd::BaseEvent > scrollTo = boost::shared_ptr< gd::BaseEvent >() );
+    unsigned int DrawEvents(wxDC & dc, gd::EventsList & events, int x, int y, gd::BaseEvent * scrollTo = NULL );
 
     /**
      * Tool function.
      */
-    void FoldEventListAndSubEvents(std::vector<boost::shared_ptr<gd::BaseEvent> > & list, bool fold);
+    void FoldEventsListAndSubEvents(gd::EventsList & list, bool fold);
 
     gd::Project & game;
 
     gd::Layout & scene; ///< Scene is required ( even if it is a empty useless scene ).
     gd::ExternalEvents * externalEvents; ///< Events editor can be used to edit external events
 
-    std::vector < gd::BaseEventSPtr > * events; ///< Note that events modified are not necessarily the events of the scene, if externalEvents != NULL.
+    gd::EventsList * events; ///< Note that events modified are not necessarily the events of the scene, if externalEvents != NULL.
     gd::MainFrameWrapper & mainFrameWrapper;
     gd::LayoutEditorCanvas * layoutCanvas;
 
@@ -335,9 +336,9 @@ private:
 
     bool ctrlKeyDown;
 
-    std::vector < std::vector < gd::BaseEventSPtr > > history; ///<Changes history
-    std::vector < std::vector < gd::BaseEventSPtr > > redoHistory;
-    std::vector < gd::BaseEventSPtr > latestState; ///< Necessary to keep track of what changed
+    std::vector < gd::EventsList > history; ///<Changes history
+    std::vector < gd::EventsList > redoHistory;
+    gd::EventsList latestState; ///< Necessary to keep track of what changed
 
     bool profilingActivated;
 

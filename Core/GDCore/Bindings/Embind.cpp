@@ -197,13 +197,15 @@ gd::Layer * Layout_GetLayer(gd::Layout & l, const std::string & name) { return &
 std::vector<boost::shared_ptr<gd::BaseEvent> > * Layout_GetEvents(gd::Layout & l) { return &l.GetEvents(); }
 gd::Object * ClassWithObjects_GetObject(gd::ClassWithObjects & c, const std::string & name) { return &c.GetObject(name); }
 gd::Object * ClassWithObjects_GetObjectAt(gd::ClassWithObjects & c, unsigned int id) { return &c.GetObject(id); }
+gd::Object * ClassWithObjects_InsertNewObject(gd::ClassWithObjects & c, gd::Project & p, const std::string & o, const std::string & n, unsigned int p) { return &c.InsertNewObject(p, o, n, p); }
+gd::Object * ClassWithObjects_InsertObject(gd::ClassWithObjects & c, const gd::Object & o, unsigned int p) { return &c.InsertObject(o, p); }
 }
 
 EMSCRIPTEN_BINDINGS(gd_Layout) {
     class_<ClassWithObjects>("ClassWithObjects")
         .constructor<>()
-        .function("insertNewObject", &ClassWithObjects::InsertNewObject)
-        .function("insertObject", &ClassWithObjects::InsertObject)
+        .function("insertNewObject", &ClassWithObjects_InsertNewObject, allow_raw_pointers())
+        .function("insertObject", &ClassWithObjects_InsertObject, allow_raw_pointers())
         .function("hasObjectNamed", &ClassWithObjects::HasObjectNamed)
         .function("getObject", &ClassWithObjects_GetObject, allow_raw_pointers())
         .function("getObjectAt", &ClassWithObjects_GetObjectAt, allow_raw_pointers())

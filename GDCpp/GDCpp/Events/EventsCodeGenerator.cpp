@@ -406,7 +406,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     return argOutput;
 }
 
-string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)
+string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, gd::EventsList & events, bool compilationForRuntime)
 {
     string output;
 
@@ -497,29 +497,29 @@ EventsCodeGenerator::~EventsCodeGenerator()
 {
 }
 
-void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList( gd::EventsList & eventsList )
 {
     #if !defined(GD_NO_WX_GUI) //No support for profiling when wxWidgets is disabled.
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
     #endif
 
-    for ( unsigned int i = 0;i < listEvent.size();++i )
+    for ( unsigned int i = 0;i < eventsList.size();++i )
     {
-        listEvent[i]->Preprocess(*this, listEvent, i);
-        if ( i < listEvent.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
-            if ( listEvent[i]->CanHaveSubEvents() )
-                PreprocessEventList( listEvent[i]->GetSubEvents());
+        eventsList[i].Preprocess(*this, eventsList, i);
+        if ( i < eventsList.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
+            if ( eventsList[i].CanHaveSubEvents() )
+                PreprocessEventList( eventsList[i].GetSubEvents());
 
             #if !defined(GD_NO_WX_GUI) //No support for profiling when wxWidgets is disabled.
-            if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && listEvent[i]->IsExecutable() )
+            if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && eventsList[i].IsExecutable() )
             {
                 //Define a new profile event
                 boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-                profileEvent->originalEvent = listEvent[i]->originalEvent;
+                profileEvent->originalEvent = eventsList[i].originalEvent;
                 profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
                 //Add it before the event to profile
-                listEvent.insert(listEvent.begin()+i, profileEvent);
+                eventsList.InsertEvent(profileEvent, i);
 
                 previousProfileEvent = profileEvent;
                 ++i; //Don't preprocess the newly added profile event
@@ -529,14 +529,14 @@ void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & li
     }
 
     #if !defined(GD_NO_WX_GUI) //No support for profiling when wxWidgets is disabled.
-    if ( !listEvent.empty() && scene.GetProfiler() && scene.GetProfiler()->profilingActivated )
+    if ( !eventsList.IsEmpty() && scene.GetProfiler() && scene.GetProfiler()->profilingActivated )
     {
-        //Define a new profile event
+        //Define a new profile events
         boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
         profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
         //Add it at the end of the events list
-        listEvent.push_back(profileEvent);
+        eventsList.InsertEvent(profileEvent, eventsList.GetEventsCount());
     }
     #endif
 }

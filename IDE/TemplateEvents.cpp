@@ -11,11 +11,9 @@
  */
 void TemplateEvents::Init(const TemplateEvents & other)
 {
-    events = CloneVectorOfEvents(other.events);
-
+    events = *other.events.Clone();
     name = other.name;
     desc = other.desc;
-
     parameters = other.parameters;
 }
 

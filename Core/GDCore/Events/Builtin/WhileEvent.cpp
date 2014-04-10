@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
 #include "WhileEvent.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h>
@@ -39,6 +40,23 @@ vector < vector<gd::Instruction>* > WhileEvent::GetAllActionsVectors()
     return allActions;
 }
 
+vector < const vector<gd::Instruction>* > WhileEvent::GetAllConditionsVectors() const
+{
+    vector < const vector<gd::Instruction>* > allConditions;
+    allConditions.push_back(&whileConditions);
+    allConditions.push_back(&conditions);
+
+    return allConditions;
+}
+
+vector < const vector<gd::Instruction>* > WhileEvent::GetAllActionsVectors() const
+{
+    vector < const vector<gd::Instruction>* > allActions;
+    allActions.push_back(&actions);
+
+    return allActions;
+}
+
 void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     if ( eventElem == NULL ) return;
@@ -61,7 +79,7 @@ void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
     gd::EventsListSerialization::SaveActions(actions, actionsElem);
 
     //Sous évènements
-    if ( !GetSubEvents().empty() )
+    if ( !GetSubEvents().IsEmpty() )
     {
         TiXmlElement * subeventsElem;
         subeventsElem = new TiXmlElement( "Events" );
@@ -199,7 +217,7 @@ gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::
  */
 void WhileEvent::Init(const WhileEvent & event)
 {
-    events = CloneVectorOfEvents(event.events);
+    events = *event.events.Clone();
 
     whileConditions = event.whileConditions;
     conditions = event.conditions;
@@ -231,5 +249,5 @@ WhileEvent& WhileEvent::operator=(const WhileEvent & event)
     return *this;
 }
 
-
 }
+#endif

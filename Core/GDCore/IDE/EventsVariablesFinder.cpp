@@ -141,28 +141,28 @@ std::set < std::string > EventsVariablesFinder::FindArgumentsInInstructions(cons
     return results;
 }
 
-std::set < std::string > EventsVariablesFinder::FindArgumentsInEvents(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const vector < gd::BaseEventSPtr > & events, const std::string & parameterType)
+std::set < std::string > EventsVariablesFinder::FindArgumentsInEvents(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const gd::EventsList & events, const std::string & parameterType)
 {
     std::set < std::string > results;
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+        vector < const vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             std::set < std::string > results2 = FindArgumentsInInstructions(platform, project, layout, *conditionsVectors[j], /*conditions=*/true, parameterType);
             results.insert(results2.begin(), results2.end());
         }
 
-        vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+        vector < const vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             std::set < std::string > results2 = FindArgumentsInInstructions(platform, project, layout, *actionsVectors[j], /*conditions=*/false, parameterType);
             results.insert(results2.begin(), results2.end());
         }
 
-        if ( events[i]->CanHaveSubEvents() )
+        if ( events[i].CanHaveSubEvents() )
         {
-            std::set < std::string > results2 = FindArgumentsInEvents(platform, project, layout, events[i]->GetSubEvents(), parameterType);
+            std::set < std::string > results2 = FindArgumentsInEvents(platform, project, layout, events[i].GetSubEvents(), parameterType);
             results.insert(results2.begin(), results2.end());
         }
     }

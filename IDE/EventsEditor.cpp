@@ -342,7 +342,7 @@ void EventsEditor::Init(wxWindow* parent)
         listContextPanel->SetSize(5+16+5,listContextPanel->GetSize().y);
     }
 
-    latestState = CloneVectorOfEvents(*events);
+    latestState = *events->Clone();
 }
 
 void EventsEditor::RecreateCustomEventsMenu()
@@ -501,17 +501,15 @@ void EventsEditor::Refresh()
 /**
  * Mark all events as must be redraw
  */
-void EventsEditor::RecomputeAllEventsWidth(vector < gd::BaseEventSPtr > & eventsToRefresh)
+void EventsEditor::RecomputeAllEventsWidth(gd::EventsList & eventsToRefresh)
 {
-    vector<gd::BaseEventSPtr>::iterator e = eventsToRefresh.begin();
-    vector<gd::BaseEventSPtr>::const_iterator end = eventsToRefresh.end();
-
-    for(;e != end;++e)
+    for(size_t i = 0;i < eventsToRefresh.GetEventsCount();++i)
     {
-        (*e)->eventHeightNeedUpdate = true;
+    	gd::BaseEvent & event = eventsToRefresh.GetEvent(i);
+        event.eventHeightNeedUpdate = true;
 
-        if ( (*e)->CanHaveSubEvents() )
-            RecomputeAllEventsWidth((*e)->GetSubEvents());
+        if ( event.CanHaveSubEvents() )
+            RecomputeAllEventsWidth(event.GetSubEvents());
     }
 }
 
@@ -535,7 +533,7 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
     unsigned int totalHeight = DrawEvents(dc, *events, leftMargin + ( profilingActivated ? 23 : 0), -scrollBar->GetThumbPosition());
 
     wxString text;
-    if ( events->empty() )
+    if ( events->IsEmpty() )
         text = _("Add an event with the ribbon.\nHighlight then an event/action/condition with the cursor to get more edition options,\nor make a double click to edit an item.");
     else
         text = _("Highlight then an event/action/condition with the cursor to get more edition options,\nor make a double click to edit an item.");
@@ -555,25 +553,26 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
     #endif
 }
 
-unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr< gd::BaseEvent > > & events, int x, int y, boost::shared_ptr< gd::BaseEvent > scrollTo  )
+unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x, int y, gd::BaseEvent * scrollTo)
 {
     int originalYPosition = y;
 
     for (unsigned int i = 0;i<events.size();++i)
     {
-        if ( scrollTo == events[i] ) scrollBar->SetThumbPosition(y);
+        if ( scrollTo == &events[i] )
+        	scrollBar->SetThumbPosition(y);
 
         dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
         dc.SetTextForeground(wxColour(0,0,0));
 
         gd::EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
         unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
-        unsigned int height = events[i]->GetRenderedHeight(width, game.GetCurrentPlatform());
+        unsigned int height = events[i].GetRenderedHeight(width, game.GetCurrentPlatform());
 
         if( !(y+static_cast<int>(height) < 0 || y > eventsPanel->GetSize().y) ) //Render only if needed
         {
             //Event drawing :
-            EventItem eventAccessor(events[i], &events, i);
+            EventItem eventAccessor(events.GetEventSmartPtr(i), &events, i);
 
             bool drawDragTarget = false;
             if ( selection.EventHighlighted(eventAccessor) ) //Highlight and context panel if needed
@@ -601,22 +600,22 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
                 dc.DrawRectangle(0,y,eventsPanel->GetSize().x,height);
             }
 
-            if (profilingActivated && events[i]->IsExecutable())
+            if (profilingActivated && events[i].IsExecutable())
             {
                 dc.DrawText(ToString(i+1), x-leftMargin+2-42, y);
                 dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetNiceFont().Smaller());
 
                 //Draw profile results
                 dc.SetPen(wxPen(wxColour(0,0,0)));
-                dc.SetBrush(wxColour(255.0f,255.0f*(1.0f-events[i]->percentDuringLastSession*0.05f),255.0f*(1.0f-events[i]->percentDuringLastSession*0.05f)));
+                dc.SetBrush(wxColour(255.0f,255.0f*(1.0f-events[i].percentDuringLastSession*0.05f),255.0f*(1.0f-events[i].percentDuringLastSession*0.05f)));
                 dc.DrawRectangle(x-41-2, y, 41,26);
 
                 std::ostringstream timeStr; timeStr.setf(ios::fixed,ios::floatfield); timeStr.precision(2);
-                timeStr << static_cast<double>(events[i]->totalTimeDuringLastSession)/1000.0f;
+                timeStr << static_cast<double>(events[i].totalTimeDuringLastSession)/1000.0f;
                 dc.DrawText(timeStr.str()+"ms", x-41, y+1);
 
                 std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
-                percentStr << events[i]->percentDuringLastSession;
+                percentStr << events[i].percentDuringLastSession;
                 dc.DrawText(percentStr.str()+"%", x-41, y+13);
                 dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
             }
@@ -625,7 +624,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
 
             //Event rendering
-            events[i]->Render(dc, x, y, width, itemsAreas, selection, game.GetCurrentPlatform());
+            events[i].Render(dc, x, y, width, itemsAreas, selection, game.GetCurrentPlatform());
 
             if ( drawDragTarget )
             {
@@ -642,17 +641,17 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
         y += height;
 
         //Folding and sub events
-        if ( events[i]->CanHaveSubEvents() && !events[i]->GetSubEvents().empty())
+        if ( events[i].CanHaveSubEvents() && !events[i].GetSubEvents().IsEmpty())
         {
-            FoldingItem foldingItem(events[i].get());
+            FoldingItem foldingItem(&events[i]);
 
-            if ( !events[i]->folded )
+            if ( !events[i].folded )
             {
                 dc.DrawBitmap(foldBmp, x-5-foldBmp.GetWidth(), y-foldBmp.GetHeight()-2, true /*Use mask*/ );
                 itemsAreas.AddFoldingItem(wxRect(x-5-foldBmp.GetWidth(), y-foldBmp.GetHeight()-2, foldBmp.GetWidth(), foldBmp.GetHeight()), foldingItem);
 
                 //Draw sub events
-                y += DrawEvents(dc, events[i]->GetSubEvents(), x+24, y);
+                y += DrawEvents(dc, events[i].GetSubEvents(), x+24, y, scrollTo);
             }
             else
             {
@@ -1134,7 +1133,7 @@ void EventsEditor::DeleteSelection()
     for (unsigned int i = 0; i<eventsSelection.size();++i)
     {
         if ( eventsSelection[i].event != boost::shared_ptr<gd::BaseEvent>() && eventsSelection[i].eventsList != NULL)
-            eventsSelection[i].eventsList->erase(std::remove(eventsSelection[i].eventsList->begin(), eventsSelection[i].eventsList->end(), eventsSelection[i].event) , eventsSelection[i].eventsList->end());
+            eventsSelection[i].eventsList->RemoveEvent(*eventsSelection[i].event);
     }
 
     selection.ClearSelection();
@@ -1146,14 +1145,13 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
 {
     if ( updateHistory )
     {
-        history.push_back(CloneVectorOfEvents(latestState));
+        history.push_back(*latestState.Clone());
         redoHistory.clear();
-        latestState = CloneVectorOfEvents(*events);
+        latestState = *events->Clone();
     }
 
     if ( !noNeedForSceneRecompilation )
     {
-        std::cout << "Need for RECOMPILATIOOOON: extern:" << externalEvents;
         if ( externalEvents != NULL )
             gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
         else
@@ -1303,14 +1301,9 @@ void EventsEditor::AddEvent(gd::EventItem & previousEventItem)
 
         //Adding event
         if ( previousEventItem.eventsList != NULL )
-        {
-            if ( previousEventItem.positionInList < previousEventItem.eventsList->size() )
-                previousEventItem.eventsList->insert( previousEventItem.eventsList->begin() + previousEventItem.positionInList+1, eventToAdd );
-            else
-                previousEventItem.eventsList->push_back( eventToAdd );
-        }
+			previousEventItem.eventsList->InsertEvent(*eventToAdd, previousEventItem.positionInList+1);
         else if ( events != NULL )
-            events->push_back( eventToAdd );
+            events->InsertEvent( *eventToAdd );
 
         Refresh();
         ChangesMadeOnEvents();
@@ -1355,14 +1348,9 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
 
         //Adding event
         if ( previousEventItem.eventsList != NULL )
-        {
-            if ( previousEventItem.positionInList < previousEventItem.eventsList->size() )
-                previousEventItem.eventsList->insert( previousEventItem.eventsList->begin() + previousEventItem.positionInList+1, eventToAdd );
-            else
-                previousEventItem.eventsList->push_back( eventToAdd );
-        }
+            previousEventItem.eventsList->InsertEvent(*eventToAdd, previousEventItem.positionInList+1);
         else if ( events != NULL)
-            events->push_back( eventToAdd );
+            events->InsertEvent(eventToAdd);
 
         Refresh();
         ChangesMadeOnEvents();
@@ -1382,7 +1370,7 @@ void EventsEditor::AddSubEvent(gd::EventItem & parentEventItem)
         eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
 
         //Adding event
-        parentEventItem.event->GetSubEvents().insert( parentEventItem.event->GetSubEvents().begin(), eventToAdd );
+        parentEventItem.event->GetSubEvents().InsertEvent(*eventToAdd, 0);
 
         Refresh();
         ChangesMadeOnEvents();
@@ -1426,14 +1414,9 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & p
 
     //Adding event
     if ( previousEventItem.eventsList != NULL )
-    {
-        if ( previousEventItem.positionInList < previousEventItem.eventsList->size() )
-            previousEventItem.eventsList->insert( previousEventItem.eventsList->begin() + previousEventItem.positionInList+1, eventToAdd );
-        else
-            previousEventItem.eventsList->push_back( eventToAdd );
-    }
+        previousEventItem.eventsList->InsertEvent(*eventToAdd, previousEventItem.positionInList+1);
     else if ( events != NULL)
-        events->push_back( eventToAdd );
+        events->InsertEvent(eventToAdd);
 
     Refresh();
     ChangesMadeOnEvents();
@@ -1465,10 +1448,12 @@ void EventsEditor::OnaddMoreBtClick(wxCommandEvent& event)
     PopupMenu(&eventTypesMenu);
 }
 
-void EventsEditor::ScrollToEvent(gd::BaseEventSPtr eventToScrollTo)
+void EventsEditor::ScrollToEvent(gd::BaseEvent & eventToScrollTo)
 {
     wxClientDC dc(eventsPanel);
-    DrawEvents(dc, *events, leftMargin + ( profilingActivated ? 23 : 0), 0, eventToScrollTo);
+    std::cout << "Scrolling to " << &eventToScrollTo;
+    DrawEvents(dc, *events, leftMargin + ( profilingActivated ? 23 : 0), 0, &eventToScrollTo);
+    std::cout << "Refresh ";
     Refresh();
 }
 
@@ -1479,22 +1464,22 @@ void EventsEditor::OndeleteMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnRibbonFoldAll(wxRibbonButtonBarEvent& evt)
 {
-    FoldEventListAndSubEvents(*events, true);
+    FoldEventsListAndSubEvents(*events, true);
     Refresh();
 }
 
 void EventsEditor::OnRibbonUnFoldAll(wxRibbonButtonBarEvent& evt)
 {
-    FoldEventListAndSubEvents(*events, false);
+    FoldEventsListAndSubEvents(*events, false);
     Refresh();
 }
 
-void EventsEditor::FoldEventListAndSubEvents(std::vector<boost::shared_ptr<gd::BaseEvent> > & list, bool fold)
+void EventsEditor::FoldEventsListAndSubEvents(gd::EventsList & list, bool fold)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {
-        list[i]->folded = fold;
-        if ( list[i]->CanHaveSubEvents() )  FoldEventListAndSubEvents(list[i]->GetSubEvents(), fold);
+        list[i].folded = fold;
+        if ( list[i].CanHaveSubEvents() )  FoldEventsListAndSubEvents(list[i].GetSubEvents(), fold);
     }
 }
 
@@ -1527,11 +1512,11 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     else if ( selection.HasSelectedEvents() )
     {
         std::vector < EventItem > itemsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
-        std::vector < boost::shared_ptr<gd::BaseEvent> > eventsToCopy;
+        gd::EventsList eventsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].event != boost::shared_ptr<gd::BaseEvent>())
-                eventsToCopy.push_back(itemsSelected[i].event->Clone());
+                eventsToCopy.InsertEvent(*itemsSelected[i].event);
         }
 
         gd::Clipboard::GetInstance()->SetEvents(eventsToCopy);
@@ -1605,11 +1590,11 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     }
     else
     {
-        std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList; //The list where events should be inserted.
+        gd::EventsList * eventsList; //The list where events should be inserted.
         unsigned int position = std::string::npos; //The position where events should be inserted in the list.
 
         //Find where events should be inserted
-        if ( selection.HasSelectedEvents())
+        if (selection.HasSelectedEvents())
         {
             EventItem item = selection.GetAllSelectedEvents().back();
             eventsList = item.eventsList;
@@ -1621,17 +1606,11 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (eventsList == NULL) return;
 
         //Insert events
-        vector < boost::shared_ptr <gd::BaseEvent> > eventsToPaste = gd::Clipboard::GetInstance()->GetEvents();
+        gd::EventsList eventsToPaste = gd::Clipboard::GetInstance()->GetEvents();
         std::cout << "EventToPaste" << eventsToPaste.size();
-        for (unsigned int i = 0;i<eventsToPaste.size();++i)
-        {
-            if ( position < eventsList->size() )
-                eventsList->insert(eventsList->begin()+position, eventsToPaste[i]->Clone());
-            else
-                eventsList->push_back(eventsToPaste[i]->Clone());
-        }
+        eventsList->InsertEvents(eventsToPaste, 0, (size_t)-1, position);
 
-        if ( !eventsToPaste.empty() ) ChangesMadeOnEvents();
+        if ( !eventsToPaste.IsEmpty() ) ChangesMadeOnEvents();
         Refresh();
     }
 }
@@ -1640,11 +1619,11 @@ void EventsEditor::OnundoMenuSelected(wxCommandEvent& event)
 {
     if ( history.empty() ) return;
 
-    redoHistory.push_back(CloneVectorOfEvents(*events));
-    *events = CloneVectorOfEvents(history.back());
+    redoHistory.push_back(*events->Clone());
+    *events = *history.back().Clone();
     history.pop_back();
 
-    latestState = CloneVectorOfEvents(*events);
+    latestState = *events->Clone();
 
     Refresh();
     UpdateRibbonBars();
@@ -1655,11 +1634,11 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 {
     if ( redoHistory.empty() ) return;
 
-    history.push_back(CloneVectorOfEvents(*events));
-    *events = CloneVectorOfEvents(redoHistory.back());
+    history.push_back(*events->Clone());
+    *events = *redoHistory.back().Clone();
     redoHistory.pop_back();
 
-    latestState = CloneVectorOfEvents(*events);
+    latestState = *events->Clone();
 
     Refresh();
     UpdateRibbonBars();
@@ -1680,11 +1659,11 @@ void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )
         return;
     }
 
-    std::vector< boost::shared_ptr<gd::BaseEvent> > eventsToUse;
+    EventsList eventsToUse;
     for (unsigned int i = 0;i<eventsSelected.size();++i)
     {
         if (eventsSelected[i].event != boost::shared_ptr<gd::BaseEvent>())
-            eventsToUse.push_back(eventsSelected[i].event->Clone());
+            eventsToUse.InsertEvent(*eventsSelected[i].event);
     }
 
     CreateTemplate dialog( this, eventsToUse );
@@ -1704,13 +1683,7 @@ void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
     if ( dialog.ShowModal() != 1 ) return;
 
     //Insert new events
-    for ( unsigned int i = 0;i < dialog.finalTemplate.events.size();i++ )
-    {
-        if ( eventsSelected[0].positionInList < eventsSelected[0].eventsList->size() )
-            eventsSelected[0].eventsList->insert( eventsSelected[0].eventsList->begin()+eventsSelected[0].positionInList+1, dialog.finalTemplate.events[i] );
-        else
-            eventsSelected[0].eventsList->push_back( dialog.finalTemplate.events[i] );
-    }
+    eventsSelected[0].eventsList->InsertEvents(dialog.finalTemplate.events, 0, (size_t)-1, eventsSelected[0].positionInList);
 
     ChangesMadeOnEvents();
 }

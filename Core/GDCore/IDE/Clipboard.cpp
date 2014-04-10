@@ -68,15 +68,15 @@ gd::Object * Clipboard::GetObject()
     return objectCopied->Clone();
 }
 
-void Clipboard::SetEvents( const std::vector<gd::BaseEventSPtr> & events )
+void Clipboard::SetEvents( const gd::EventsList & events )
 {
-    eventsCopied = CloneVectorOfEvents(events);
+    eventsCopied = *events.Clone();
     hasEvents = true;
 }
 
-std::vector<gd::BaseEventSPtr> Clipboard::GetEvents()
+gd::EventsList Clipboard::GetEvents()
 {
-    return CloneVectorOfEvents(eventsCopied);
+    return *eventsCopied.Clone();
 }
 
 void Clipboard::SetLayout( const gd::Layout * layout )

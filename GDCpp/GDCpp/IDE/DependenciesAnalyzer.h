@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -38,7 +39,7 @@ public:
     virtual ~DependenciesAnalyzer();
 
     /**
-     * \brief Search the dependencies and return true if there are no circular dependencies in the events 
+     * \brief Search the dependencies and return true if there are no circular dependencies in the events
      * of the layout or external events passed in the constructor.
      *
      * \return true if there are no circular dependencies, false otherwise (in this case, no events code generation must done).
@@ -50,7 +51,7 @@ public:
      * This is possible when the link calling the external events does not have any parent event
      * and when this situation occurs only in a single scene and not in another.
      *
-     * \return The name of the scene which is able to call the compiled external events. 
+     * \return The name of the scene which is able to call the compiled external events.
      * If empty, no scene is able to call them. (So external events have to be included directly by links).
      */
     std::string ExternalEventsCanBeCompiledForAScene();
@@ -90,7 +91,7 @@ private:
      * \param isOnTopLevel If true, assumes that the events are on the top level (they have no parents).
      * \return false if a circular dependency exists, true otherwise.
      */
-    bool Analyze(std::vector< boost::shared_ptr<gd::BaseEvent> > & events, bool isOnTopLevel);
+    bool Analyze(gd::EventsList & events, bool isOnTopLevel);
 
     /**
      * \brief Internal constructor used when analyzing a linked layout/external events.

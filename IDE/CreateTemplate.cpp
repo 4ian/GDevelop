@@ -15,6 +15,7 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Events/EventsList.h"
 #include <string>
 #include <vector>
 
@@ -65,7 +66,7 @@ BEGIN_EVENT_TABLE( CreateTemplate, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-CreateTemplate::CreateTemplate( wxWindow* parent, vector < gd::BaseEventSPtr > & events_ ) :
+CreateTemplate::CreateTemplate( wxWindow* parent, gd::EventsList & events_ ) :
 events( events_ )
 {
     //(*Initialize(CreateTemplate)
@@ -276,12 +277,12 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remplace les paramètres par des _PARAMx_
 ////////////////////////////////////////////////////////////
-void CreateTemplate::ProcessEvents(vector < gd::BaseEventSPtr > & eventsToProcess, vector < std::pair<string, int> > parameters)
+void CreateTemplate::ProcessEvents(gd::EventsList & eventsToProcess, vector < std::pair<string, int> > parameters)
 {
     //On remplace dans chaque paramètre des actions et des conditions
     for ( unsigned int i = 0;i < eventsToProcess.size() ;i++ )
     {
-        vector < vector<gd::Instruction>* > allConditionsVectors = eventsToProcess[i]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > allConditionsVectors = eventsToProcess[i].GetAllConditionsVectors();
         for (unsigned int c = 0;c<allConditionsVectors.size();++c)
         {
             for ( unsigned int nb = 0;nb < allConditionsVectors[c]->size() ;nb++ )
@@ -300,7 +301,7 @@ void CreateTemplate::ProcessEvents(vector < gd::BaseEventSPtr > & eventsToProces
             }
         }
 
-        vector < vector<gd::Instruction>* > allActionsVectors = eventsToProcess[i]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > allActionsVectors = eventsToProcess[i].GetAllActionsVectors();
         for (unsigned int a = 0;a<allActionsVectors.size();++a)
         {
             for ( unsigned int nb = 0;nb < allActionsVectors[a]->size() ;nb++ )
@@ -321,8 +322,8 @@ void CreateTemplate::ProcessEvents(vector < gd::BaseEventSPtr > & eventsToProces
 
 
         //Les sous évènements aussi
-        if ( eventsToProcess[i]->CanHaveSubEvents() )
-            ProcessEvents(eventsToProcess[i]->GetSubEvents(), parameters);
+        if ( eventsToProcess[i].CanHaveSubEvents() )
+            ProcessEvents(eventsToProcess[i].GetSubEvents(), parameters);
     }
 }
 

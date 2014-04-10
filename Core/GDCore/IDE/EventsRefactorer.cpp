@@ -365,29 +365,29 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
     return somethingModified;
 }
 
-void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName)
+void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string oldName, std::string newName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInConditions(platform, project, layout, *conditionsVectors[j], oldName, newName);
             #if defined(GD_IDE_ONLY)
-            if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
+            if ( somethingModified )  events[i].eventHeightNeedUpdate = true;
             #endif
         }
 
-        vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInActions(platform, project, layout, *actionsVectors[j], oldName, newName);
             #if defined(GD_IDE_ONLY)
-            if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
+            if ( somethingModified )  events[i].eventHeightNeedUpdate = true;
             #endif
         }
 
-        if ( events[i]->CanHaveSubEvents() ) RenameObjectInEvents(platform, project, layout, events[i]->GetSubEvents(), oldName, newName);
+        if ( events[i].CanHaveSubEvents() ) RenameObjectInEvents(platform, project, layout, events[i].GetSubEvents(), oldName, newName);
     }
 }
 
@@ -501,33 +501,33 @@ bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, g
     return somethingModified;
 }
 
-void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::BaseEventSPtr > & events, std::string name)
+void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string name)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool conditionsModified = RemoveObjectInConditions(platform, project, layout, *conditionsVectors[j], name);
             #if defined(GD_IDE_ONLY)
-            if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
+            if ( conditionsModified ) events[i].eventHeightNeedUpdate = true;
             #endif
         }
 
-        vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool actionsModified = RemoveObjectInActions(platform, project, layout, *actionsVectors[j], name);
             #if defined(GD_IDE_ONLY)
-            if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
+            if ( actionsModified ) events[i].eventHeightNeedUpdate = true;
             #endif
         }
 
-        if ( events[i]->CanHaveSubEvents() ) RemoveObjectInEvents(platform, project, layout, events[i]->GetSubEvents(), name);
+        if ( events[i].CanHaveSubEvents() ) RemoveObjectInEvents(platform, project, layout, events[i].GetSubEvents(), name);
     }
 }
 
-void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events,
+void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
                                               std::string toReplace,
                                               std::string newString,
                                               bool matchCase,
@@ -538,29 +538,29 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
     {
         if ( inConditions )
         {
-            vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+            vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 bool conditionsModified = ReplaceStringInConditions(project, layout, *conditionsVectors[j], toReplace, newString, matchCase);
                 #if defined(GD_IDE_ONLY)
-                if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
+                if ( conditionsModified ) events[i].eventHeightNeedUpdate = true;
                 #endif
             }
         }
 
         if ( inActions )
         {
-            vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+            vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 bool actionsModified = ReplaceStringInActions(project, layout, *actionsVectors[j], toReplace, newString, matchCase);
                 #if defined(GD_IDE_ONLY)
-                if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
+                if ( actionsModified ) events[i].eventHeightNeedUpdate = true;
                 #endif
             }
         }
 
-        if ( events[i]->CanHaveSubEvents() ) ReplaceStringInEvents(project, layout, events[i]->GetSubEvents(), toReplace, newString, matchCase, inConditions, inActions);
+        if ( events[i].CanHaveSubEvents() ) ReplaceStringInEvents(project, layout, events[i].GetSubEvents(), toReplace, newString, matchCase, inConditions, inActions);
     }
 }
 
@@ -646,7 +646,7 @@ bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layo
     return somethingModified;
 }
 
-vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events,
+vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
                                   std::string search,
                                   bool matchCase,
                                   bool inConditions,
@@ -660,31 +660,31 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 
         if ( inConditions )
         {
-            vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+            vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInConditions(project, layout, *conditionsVectors[j], search, matchCase))
                 {
-                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events[i]), &events, i));
+                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
                 }
             }
         }
 
         if ( inActions )
         {
-            vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+            vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInActions(project, layout, *actionsVectors[j], search, matchCase))
                 {
-                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events[i]), &events, i));
+                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
                 }
             }
         }
 
-        if ( events[i]->CanHaveSubEvents() )
+        if ( events[i].CanHaveSubEvents() )
         {
-            vector < EventsSearchResult > subResults = SearchInEvents(project, layout, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);
+            vector < EventsSearchResult > subResults = SearchInEvents(project, layout, events[i].GetSubEvents(), search, matchCase, inConditions, inActions);
             std::copy(subResults.begin(), subResults.end(), std::back_inserter(results));
         }
     }
@@ -734,7 +734,7 @@ bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layou
     return false;
 }
 
-EventsSearchResult::EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ ) :
+EventsSearchResult::EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)

@@ -4,6 +4,7 @@
  */
 
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
@@ -11,7 +12,7 @@
 namespace gd
 {
 
-std::vector <BaseEventSPtr> BaseEvent::badSubEvents;
+EventsList BaseEvent::badSubEvents;
 
 BaseEvent::BaseEvent() :
 folded(false),
@@ -20,6 +21,11 @@ totalTimeDuringLastSession(0),
 percentDuringLastSession(0),
 disabled(false)
 {
+}
+
+bool BaseEvent::HasSubEvents() const
+{
+    return !GetSubEvents().IsEmpty();
 }
 
 std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
@@ -62,7 +68,7 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
     return "";
 }
 
-void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)
 {
     if ( IsDisabled() || !MustBePreprocessed() ) return;
 
@@ -100,23 +106,7 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, std::vector 
     }
 }
 
-std::vector < gd::BaseEventSPtr > GD_CORE_API CloneVectorOfEvents(const std::vector < gd::BaseEventSPtr > & events)
-{
-    std::vector < gd::BaseEventSPtr > newVector;
-
-    std::vector<BaseEventSPtr>::const_iterator e = events.begin();
-    std::vector<BaseEventSPtr>::const_iterator end = events.end();
-
-    for(;e != end;++e)
-    {
-        //Profiling can be enabled
-        newVector.push_back(CloneRememberingOriginalEvent(*e));
-    }
-
-    return newVector;
-}
-
-BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(gd::BaseEventSPtr event)
+BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(BaseEventSPtr event)
 {
     gd::BaseEventSPtr copy = event->Clone();
     //Original event is either the original event of the copied event, or the event copied.

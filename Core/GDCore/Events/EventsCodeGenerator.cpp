@@ -625,7 +625,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenera
 /**
  * Generate events list code.
  */
-string EventsCodeGenerator::GenerateEventsListCode(vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
+string EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & parentContext)
 {
     string output;
 
@@ -635,7 +635,7 @@ string EventsCodeGenerator::GenerateEventsListCode(vector < gd::BaseEventSPtr > 
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
 
-        string eventCoreCode = events[eId]->GenerateEventCode(*this, context);
+        string eventCoreCode = events[eId].GenerateEventCode(*this, context);
         string scopeBegin = GenerateScopeBegin(context);
         string scopeEnd = GenerateScopeEnd(context);
         string declarationsCode = GenerateObjectsDeclarationCode(context);
@@ -717,32 +717,29 @@ std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::strin
     return realObjects;
 }
 
-/**
- * Remove events not executed
- */
-void EventsCodeGenerator::DeleteUselessEvents(vector < gd::BaseEventSPtr > & events)
+void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList & events)
 {
     for ( unsigned int eId = events.size()-1; eId < events.size();--eId )
     {
-        if ( events[eId]->CanHaveSubEvents() ) //Process sub events, if any
-            DeleteUselessEvents(events[eId]->GetSubEvents());
+        if ( events[eId].CanHaveSubEvents() ) //Process sub events, if any
+            DeleteUselessEvents(events[eId].GetSubEvents());
 
-        if ( !events[eId]->IsExecutable() || events[eId]->IsDisabled() ) //Delete events that are not executable
-            events.erase(events.begin() + eId);
+        if ( !events[eId].IsExecutable() || events[eId].IsDisabled() ) //Delete events that are not executable
+            events.RemoveEvent(eId);
     }
 }
 
 /**
  * Call preprocessing method of each event
  */
-void EventsCodeGenerator::PreprocessEventList( vector < gd::BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList(gd::EventsList & listEvent)
 {
-    for ( unsigned int i = 0;i < listEvent.size();++i )
+    for ( unsigned int i = 0;i < listEvent.GetEventsCount();++i )
     {
-        listEvent[i]->Preprocess(*this, listEvent, i);
-        if ( i < listEvent.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
-            if ( listEvent[i]->CanHaveSubEvents() )
-                PreprocessEventList( listEvent[i]->GetSubEvents());
+        listEvent[i].Preprocess(*this, listEvent, i);
+        if ( i < listEvent.GetEventsCount() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
+            if ( listEvent[i].CanHaveSubEvents() )
+                PreprocessEventList( listEvent[i].GetSubEvents());
         }
     }
 }

@@ -21,9 +21,8 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Tools/Localization.h"
 
-#define MSG(x) gd::LogWarning(_(x));
-
 using namespace gd;
+using namespace std;
 
 //(*IdInit(ChoixTemplateEvent)
 const long ChoixTemplateEvent::ID_TREECTRL1 = wxNewId();
@@ -201,12 +200,12 @@ void ChoixTemplateEvent::OnInsererBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remplace les _PARAMx_ par les paramètres
 ////////////////////////////////////////////////////////////
-void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
+void ChoixTemplateEvent::ProcessEvents(gd::EventsList & events)
 {
     //Pour chaque évènement
     for ( unsigned int j = 0;j < events.size() ; j++ )
     {
-        vector < vector<gd::Instruction>* > allConditionsVectors = events[j]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > allConditionsVectors = events[j].GetAllConditionsVectors();
         for ( unsigned int k = 0;k < allConditionsVectors.size() ;k++ )
         {
             for (unsigned int l = 0;l<allConditionsVectors[k]->size();++l)
@@ -224,7 +223,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
             }
         }
 
-        vector < vector<gd::Instruction>* > allActionsVectors = events[j]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > allActionsVectors = events[j].GetAllActionsVectors();
         for ( unsigned int k = 0;k < allActionsVectors.size() ;k++ )
         {
             for (unsigned int l = 0;l<allActionsVectors[k]->size();++l)
@@ -242,8 +241,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
             }
         }
 
-        //Les sous évènements aussi
-        if ( events[j]->CanHaveSubEvents() ) ProcessEvents(events[j]->GetSubEvents());
+        if ( events[j].CanHaveSubEvents() ) ProcessEvents(events[j].GetSubEvents());
     }
 }
 

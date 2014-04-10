@@ -26,10 +26,10 @@ using namespace std;
 namespace gd
 {
 
-void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList)
 {
     //Finding what to link to.
-    const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
+    const EventsList * eventsToInclude = NULL;
     gd::ExternalEvents * linkedExternalEvents = NULL;
     if ( project.HasExternalEventsNamed(GetTarget()) )
     {
@@ -66,18 +66,12 @@ void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, std::vector < g
         //Insert an empty event to replace the link event ( we'll delete the link event at the end )
         //( If we just erase the link event without adding a blank event to replace it,
         //the first event inserted by the link will not be preprocessed ( and it can be annoying if it require preprocessing, such as another link event ). )
-        eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<gd::BaseEvent>(new gd::EmptyEvent));
-
-        //Insert linked events
-        for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ )
-        {
-            //Profiling can be enabled in editor, so we use CloneRememberingOriginalEvent.
-            eventList.insert( eventList.begin() + indexOfTheEventInThisList + 1 + insertion, /*Start inserted at indexOfTheEventInThisList+1 ( after the empty event ) */
-                             CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
-        }
+        gd::EmptyEvent emptyEvent;
+        eventList.InsertEvent(emptyEvent, indexOfTheEventInThisList);
+        eventList.InsertEvents(*eventsToInclude, firstEvent, lastEvent, indexOfTheEventInThisList+1);
 
         //Delete the link event ( which is now at the end of the list of events we've just inserted )
-        eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
+        eventList.RemoveEvent(indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1);
     }
     else
     {
@@ -85,7 +79,7 @@ void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, std::vector < g
         linkWasInvalid = true;
 
         //Delete the link event
-        eventList.erase( eventList.begin() + indexOfTheEventInThisList );
+        eventList.RemoveEvent(indexOfTheEventInThisList);
         return;
     }
 

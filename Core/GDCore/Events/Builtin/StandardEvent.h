@@ -3,9 +3,12 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_STANDARDEVENT_H
 #define GDCORE_STANDARDEVENT_H
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/EventsList.h"
 namespace gd { class Instruction; }
 namespace gd { class Project; }
 class RuntimeScene;
@@ -33,9 +36,8 @@ public:
     virtual bool IsExecutable() const {return true;}
 
     virtual bool CanHaveSubEvents() const {return true;}
-    virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
-    virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
-    void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
+    virtual const gd::EventsList & GetSubEvents() const {return events;};
+    virtual gd::EventsList & GetSubEvents() {return events;};
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
@@ -44,6 +46,8 @@ public:
     std::vector < gd::Instruction > & GetActions() { return actions; };
     void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllConditionsVectors() const;
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllActionsVectors() const;
     virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
     virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
 
@@ -65,9 +69,10 @@ private:
 
     std::vector < gd::Instruction > conditions;
     std::vector < gd::Instruction > actions;
-    std::vector < gd::BaseEventSPtr > events;
+    EventsList events;
 };
 
 }
 
 #endif // GDCORE_STANDARDEVENT_H
+#endif

@@ -61,7 +61,7 @@ private:
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInEvents(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const std::vector < gd::BaseEventSPtr > & events, const std::string & parameterType);
+    static std::set < std::string > FindArgumentsInEvents(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const gd::EventsList & events, const std::string & parameterType);
 
     EventsVariablesFinder() {};
     virtual ~EventsVariablesFinder() {};

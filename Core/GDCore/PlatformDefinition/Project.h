@@ -227,7 +227,7 @@ public:
      * unless \a platformName argument is not empty.<br>
      * It is assumed that each platform provides equivalent automatism shared data.
      *
-     * \param project The project for which the object must be created.
+     * \param project The project for which the automatism shared data must be created.
      * \param type The type of automatism shared data
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
@@ -237,12 +237,12 @@ public:
     /**
      * Create an event of the given type.
      *
-     * \note A project can use more than one platform. In this case, the first platform supporting the automatism shared data is used,
+     * \note A project can use more than one platform. In this case, the first platform supporting the event is used,
      * unless \a platformName argument is not empty.<br>
      * It is assumed that each platform provides equivalent events.
      *
-     * \param project The project for which the object must be created.
-     * \param type The type of automatism shared data
+     * \param project The project for which the event must be created.
+     * \param type The type of the event
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
     boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type, const std::string & platformName = "");
@@ -336,7 +336,7 @@ public:
      * \param layout The layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layout must be inserted at the end of the layout list.
      */
-    void InsertLayout(const Layout & layout, unsigned int position);
+    gd::Layout & InsertLayout(const Layout & layout, unsigned int position);
 
     /**
      * Must delete layout named "name".

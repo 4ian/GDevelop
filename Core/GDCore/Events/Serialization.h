@@ -5,10 +5,11 @@
 #ifndef GDCORE_EVENTS_SERIALIZATION_H
 #define GDCORE_EVENTS_SERIALIZATION_H
 #include "GDCore/TinyXml/tinyxml.h"
-#include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
+namespace gd { class Project; }
+namespace gd { class EventsList; }
 class TiXmlElement;
 
 namespace gd
@@ -21,19 +22,19 @@ class GD_CORE_API EventsListSerialization
 {
 public:
     /**
-     * \brief Load an event list from a TiXmlElement
+     * \brief Load an events list from a TiXmlElement
      * \param project The project the events belongs to.
      * \param list The event list in which the events must be loaded.
      * \param events The TiXmlElement containing the events
      */
-    static void LoadEventsFromXml(gd::Project & project, std::vector < boost::shared_ptr<gd::BaseEvent> > & list, const TiXmlElement * events);
+    static void LoadEventsFromXml(gd::Project & project, gd::EventsList & list, const TiXmlElement * events);
 
     /**
-     * \brief Save an event list from a TiXmlElement
+     * \brief Save an events list from a TiXmlElement
      * \param list The event list to be saved.
      * \param events The TiXmlElement in which the events must be saved.
      */
-    static void SaveEventsToXml(const std::vector < boost::shared_ptr<gd::BaseEvent> > & list, TiXmlElement * events);
+    static void SaveEventsToXml(const gd::EventsList & list, TiXmlElement * events);
 
     /**
      * \brief Load a list of conditions from a TiXmlElement

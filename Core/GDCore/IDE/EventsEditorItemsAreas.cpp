@@ -251,7 +251,7 @@ size_t hash_value(const gd::EventItem & a)
     return seed;
 }
 
-EventItem::EventItem(boost::shared_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ ) :
+EventItem::EventItem(boost::shared_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)

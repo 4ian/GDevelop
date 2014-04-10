@@ -66,7 +66,7 @@ public:
      * When implementing a platform with a link event, you should call this function when preprocessing the events
      * ( See gd::EventMetadata::codeGeneration ).
      */
-    void ReplaceLinkByLinkedEvents(gd::Project & project, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+    void ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList);
 
     virtual bool IsExecutable() const { return true; };
 

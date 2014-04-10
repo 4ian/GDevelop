@@ -13,6 +13,8 @@
 #include <wx/dialog.h>
 //*)
 #include "GDCpp/tinyxml/tinyxml.h"
+#include <string>
+#include <vector>
 #include "TemplateEvents.h"
 namespace gd { class Project; }
 
@@ -26,7 +28,7 @@ public:
     void Refresh();
     void RefreshTree();
 
-    vector < TemplateEvents > templatesList;
+    std::vector < TemplateEvents > templatesList;
     TemplateEvents finalTemplate;
 
     //(*Declarations(ChoixTemplateEvent)
@@ -59,8 +61,8 @@ public:
     wxTextCtrl* Param7Edit;
     wxButton* AideBt;
     //*)
-    vector < wxStaticText* > descriptionsTxt;
-    vector < wxTextCtrl* > parametersEdit;
+    std::vector < wxStaticText* > descriptionsTxt;
+    std::vector < wxTextCtrl* > parametersEdit;
 
 protected:
 
@@ -104,8 +106,8 @@ private:
     //*)
     wxTreeItemId item;
 
-    string ConvertParam( string parameter, const string & toReplace, const string & replaceBy );
-    void ProcessEvents(vector < gd::BaseEventSPtr > & events );
+    std::string ConvertParam( std::string parameter, const std::string & toReplace, const std::string & replaceBy );
+    void ProcessEvents(gd::EventsList & events );
 
     gd::Project & project;
 

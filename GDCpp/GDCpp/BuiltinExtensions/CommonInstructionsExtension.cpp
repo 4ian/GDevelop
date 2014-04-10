@@ -7,16 +7,16 @@
 #include <set>
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
-#endif
-#include "GDCpp/BuiltinExtensions/CommonInstructionsExtension.h"
-#include "GDCpp/BuiltinExtensions/CommonInstructionsTools.h"
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
+#endif
+#include "GDCpp/BuiltinExtensions/CommonInstructionsExtension.h"
+#include "GDCpp/BuiltinExtensions/CommonInstructionsTools.h"
+#include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
@@ -292,7 +292,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             }
 
             virtual void Preprocess(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
-                                    std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+                                    gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)
             {
                 gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
                 gd::Project & project = codeGenerator.GetProject();

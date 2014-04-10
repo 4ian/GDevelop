@@ -51,6 +51,29 @@ vector < gd::Expression* > ForEachEvent::GetAllExpressions()
 
     return allExpressions;
 }
+vector < const vector<gd::Instruction>* > ForEachEvent::GetAllConditionsVectors() const
+{
+    vector < const vector<gd::Instruction>* > allConditions;
+    allConditions.push_back(&conditions);
+
+    return allConditions;
+}
+
+vector < const vector<gd::Instruction>* > ForEachEvent::GetAllActionsVectors() const
+{
+    vector < const vector<gd::Instruction>* > allActions;
+    allActions.push_back(&actions);
+
+    return allActions;
+}
+
+vector < const gd::Expression* > ForEachEvent::GetAllExpressions() const
+{
+    vector < const gd::Expression* > allExpressions;
+    allExpressions.push_back(&objectsToPick);
+
+    return allExpressions;
+}
 
 void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
 {
@@ -69,7 +92,7 @@ void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
     gd::EventsListSerialization::SaveActions(actions, actionsElem);
 
     //Sous évènements
-    if ( !GetSubEvents().empty() )
+    if ( !GetSubEvents().IsEmpty() )
     {
         TiXmlElement * subeventsElem;
         subeventsElem = new TiXmlElement( "Events" );
@@ -176,7 +199,7 @@ gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, gd
  */
 void ForEachEvent::Init(const ForEachEvent & event)
 {
-    events = CloneVectorOfEvents(event.events);
+    events = *event.events.Clone();
 
     conditions = event.conditions;
     actions = event.actions;

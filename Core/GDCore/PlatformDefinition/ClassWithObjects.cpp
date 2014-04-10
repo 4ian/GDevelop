@@ -92,23 +92,27 @@ unsigned int ClassWithObjects::GetObjectsCount() const
     return initialObjects.size();
 }
 #if defined(GD_IDE_ONLY)
-void ClassWithObjects::InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position)
+gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position)
 {
     boost::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
     if (position<initialObjects.size())
         initialObjects.insert(initialObjects.begin()+position, newObject);
     else
         initialObjects.push_back(newObject);
+
+    return *newObject;
 }
 #endif
 
-void ClassWithObjects::InsertObject(const gd::Object & object, unsigned int position)
+gd::Object & ClassWithObjects::InsertObject(const gd::Object & object, unsigned int position)
 {
     boost::shared_ptr<gd::Object> newObject = boost::shared_ptr<gd::Object>(object.Clone());
     if (position<initialObjects.size())
         initialObjects.insert(initialObjects.begin()+position, newObject);
     else
         initialObjects.push_back(newObject);
+
+    return *newObject;
 }
 
 void ClassWithObjects::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex)

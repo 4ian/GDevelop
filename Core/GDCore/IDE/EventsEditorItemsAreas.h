@@ -11,6 +11,7 @@
 #include <boost/unordered_map.hpp>
 #include <vector>
 #include <utility>
+namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
 namespace gd { class Expression; }
@@ -27,14 +28,14 @@ namespace gd
 class GD_CORE_API EventItem
 {
 public:
-    EventItem(boost::shared_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ );
+    EventItem(boost::shared_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
     EventItem();
     ~EventItem() {};
 
     bool operator==(const gd::EventItem & other) const;
 
     boost::shared_ptr<gd::BaseEvent> event;
-    std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList;
+    gd::EventsList * eventsList;
     unsigned int positionInList;
 };
 size_t hash_value(const gd::EventItem & a);

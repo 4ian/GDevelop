@@ -265,10 +265,11 @@ gd::Layout & Project::InsertNewLayout(const std::string & name, unsigned int pos
     #if defined(GD_IDE_ONLY)
     newScene->UpdateAutomatismsSharedData(*this);
     #endif
+
     return *newScene;
 }
 
-void Project::InsertLayout(const gd::Layout & layout, unsigned int position)
+gd::Layout & Project::InsertLayout(const gd::Layout & layout, unsigned int position)
 {
     boost::shared_ptr<gd::Layout> newScene = boost::shared_ptr<gd::Layout>(new Layout(layout));
     if (position<scenes.size())
@@ -279,6 +280,8 @@ void Project::InsertLayout(const gd::Layout & layout, unsigned int position)
     #if defined(GD_IDE_ONLY)
     newScene->UpdateAutomatismsSharedData(*this);
     #endif
+
+    return *newScene;
 }
 
 void Project::RemoveLayout(const std::string & name)

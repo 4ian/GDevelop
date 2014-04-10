@@ -1,4 +1,5 @@
 #if defined(GD_IDE_ONLY)
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -48,17 +49,16 @@ DependenciesAnalyzer::~DependenciesAnalyzer()
 {
 }
 
-bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent> > & events, bool isOnTopLevel)
+bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        boost::shared_ptr<gd::LinkEvent> linkEvent = boost::dynamic_pointer_cast<gd::LinkEvent>(events[i]);
-        boost::shared_ptr<CppCodeEvent> cppCodeEvent = boost::dynamic_pointer_cast<CppCodeEvent>(events[i]);
-        if ( linkEvent != boost::shared_ptr<gd::LinkEvent>() )
-        {
+        try {
+            gd::LinkEvent & linkEvent = dynamic_cast<gd::LinkEvent &>(events[i]);
+
             DependenciesAnalyzer analyzer(*this);
 
-            std::string linked = linkEvent->GetTarget();
+            std::string linked = linkEvent.GetTarget();
             if ( project.HasExternalEventsNamed(linked) )
             {
                 if ( std::find(parentExternalEvents.begin(), parentExternalEvents.end(), linked) != parentExternalEvents.end() )
@@ -95,16 +95,19 @@ bool DependenciesAnalyzer::Analyze(std::vector< boost::shared_ptr<gd::BaseEvent>
                 notTopLevelScenesDependencies.insert(analyzer.GetScenesDependencies().begin(), analyzer.GetScenesDependencies().end());
                 notTopLevelExternalEventsDependencies.insert(analyzer.GetExternalEventsDependencies().begin(), analyzer.GetExternalEventsDependencies().end());
             }
-        }
-        else if ( cppCodeEvent != boost::shared_ptr<CppCodeEvent>() )
-        {
-            const std::vector<std::string> & dependencies = cppCodeEvent->GetDependencies();
+        } catch(...) {}
+
+        try {
+            CppCodeEvent & cppCodeEvent = dynamic_cast<CppCodeEvent &>(events[i]);
+
+            const std::vector<std::string> & dependencies = cppCodeEvent.GetDependencies();
             sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
-            sourceFilesDependencies.insert(cppCodeEvent->GetAssociatedGDManagedSourceFile(project));
-        }
-        else if ( events[i]->CanHaveSubEvents() )
+            sourceFilesDependencies.insert(cppCodeEvent.GetAssociatedGDManagedSourceFile(project));
+        } catch(...) {}
+
+        if ( events[i].CanHaveSubEvents() )
         {
-            if ( !Analyze(events[i]->GetSubEvents(), false) )
+            if ( !Analyze(events[i].GetSubEvents(), false) )
                 return false;
         }
     }

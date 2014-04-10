@@ -4,6 +4,7 @@
  */
 #include <boost/algorithm/string.hpp>
 #include <boost/weak_ptr.hpp>
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/ExpressionParser.h"
@@ -100,20 +101,20 @@ void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & 
     }
 }
 
-void EventsChangesNotifier::GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<gd::BaseEvent> > & events,
+void EventsChangesNotifier::GetScenesAndExternalEventsLinkedTo(const gd::EventsList & events,
                                                           gd::Project & project,
                                                           std::vector< gd::Layout * > & layouts,
                                                           std::vector< gd::ExternalEvents * > & externalEvents)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        boost::shared_ptr<gd::LinkEvent> linkEvent = boost::dynamic_pointer_cast<gd::LinkEvent>(events[i]);
-        if ( linkEvent != boost::shared_ptr<LinkEvent>() )
-        {
+        try {
+            const gd::LinkEvent & linkEvent = dynamic_cast<const gd::LinkEvent&>(events[i]);
+
             //We've got a link event, search now linked scene/external events
-            if ( project.HasExternalEventsNamed(linkEvent->GetTarget()) )
+            if ( project.HasExternalEventsNamed(linkEvent.GetTarget()) )
             {
-                gd::ExternalEvents & linkedExternalEvents = project.GetExternalEvents(linkEvent->GetTarget());
+                gd::ExternalEvents & linkedExternalEvents = project.GetExternalEvents(linkEvent.GetTarget());
 
                 //Protect against circular references
                 if ( find(externalEvents.begin(), externalEvents.end(), &linkedExternalEvents) == externalEvents.end() )
@@ -122,9 +123,9 @@ void EventsChangesNotifier::GetScenesAndExternalEventsLinkedTo(const std::vector
                     GetScenesAndExternalEventsLinkedTo(linkedExternalEvents.GetEvents(), project, layouts, externalEvents);
                 }
             }
-            else if ( project.HasLayoutNamed(linkEvent->GetTarget()) )
+            else if ( project.HasLayoutNamed(linkEvent.GetTarget()) )
             {
-                gd::Layout & linkedLayout = project.GetLayout(linkEvent->GetTarget());
+                gd::Layout & linkedLayout = project.GetLayout(linkEvent.GetTarget());
 
                 //Protect against circular references
                 if ( find(layouts.begin(), layouts.end(), &linkedLayout) == layouts.end() )
@@ -133,10 +134,10 @@ void EventsChangesNotifier::GetScenesAndExternalEventsLinkedTo(const std::vector
                     GetScenesAndExternalEventsLinkedTo(linkedLayout.GetEvents(), project, layouts, externalEvents);
                 }
             }
-        }
+        } catch(...) {}
 
-        if ( events[i]->CanHaveSubEvents() )
-            GetScenesAndExternalEventsLinkedTo(events[i]->GetSubEvents(), project, layouts, externalEvents);
+        if ( events[i].CanHaveSubEvents() )
+            GetScenesAndExternalEventsLinkedTo(events[i].GetSubEvents(), project, layouts, externalEvents);
     }
 }
 

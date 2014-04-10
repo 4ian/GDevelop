@@ -29,7 +29,7 @@ class SearchEvents: public wxDialog
 {
 public:
 
-    SearchEvents(EventsEditor * parent_, gd::Project & project_, gd::Layout & layout_, std::vector < gd::BaseEventSPtr > * events_);
+    SearchEvents(EventsEditor * parent_, gd::Project & project_, gd::Layout & layout_, gd::EventsList * events_);
     virtual ~SearchEvents();
 
     //(*Handlers(SearchEvents)
@@ -106,7 +106,7 @@ private:
     gd::Project & project;
     gd::Layout & layout;
 
-    std::vector < gd::BaseEventSPtr > * events;
+    gd::EventsList * events;
     std::vector < gd::EventsSearchResult > searchResults;
     size_t currentResult;
 

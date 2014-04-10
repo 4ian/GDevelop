@@ -9,18 +9,15 @@
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/Layer.h"
-#if defined(GD_IDE_ONLY)
-#if !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
-#endif
-namespace gd { class BaseEvent; }
-namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
 #endif
 namespace gd { class BaseEvent; }
 namespace gd { class Object; }
@@ -47,13 +44,7 @@ public:
     Layout& operator=(const Layout & rhs);
 
     /**
-     * Must return a pointer to a copy of the layout.
-     * A such method is needed as the IDE may want to store copies of some layouts and so need a way to do polymorphic copies.
-     *
-     * Typical implementation example:
-     * \code
-     * return new MyLayout(*this);
-     * \endcode
+     * \brief Return a pointer to a copy of the layout.
      */
     Layout * Clone() const { return new Layout(*this); };
 
@@ -133,12 +124,12 @@ public:
     /**
      * Get the events of the layout
      */
-    const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
+    const gd::EventsList & GetEvents() const { return events; }
 
     /**
      * Get the events of the layout
      */
-    std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
+    gd::EventsList & GetEvents() { return events; }
 #endif
     ///@}
 
@@ -439,7 +430,7 @@ private:
     bool                                        disableInputWhenNotFocused; /// If set to true, the input must be disabled when the window do not have the focus.
     static gd::Layer                            badLayer; ///< Null object, returned when GetLayer can not find an appropriate layer.
     #if defined(GD_IDE_ONLY)
-    std::vector < gd::BaseEventSPtr >           events; ///< Scene events
+    EventsList                                  events; ///< Scene events
     #endif
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions               associatedSettings;

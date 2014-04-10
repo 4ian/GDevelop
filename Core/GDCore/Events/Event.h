@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EVENT_H
 #define GDCORE_EVENT_H
 
@@ -12,6 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include "GDCore/Events/Instruction.h"
+namespace gd { class EventsList; }
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -73,36 +75,39 @@ public:
     /**
      * Return the sub events, if applicable.
      */
-    virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return badSubEvents;};
+    virtual const gd::EventsList & GetSubEvents() const {return badSubEvents;};
 
     /**
      * Return the sub events, if applicable.
      */
-    virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return badSubEvents;};
+    virtual gd::EventsList & GetSubEvents() {return badSubEvents;};
 
     /**
      * \brief Return true if the events has sub events.
      * \warning This is only applicable when CanHaveSubEvents() return true.
      */
-    bool HasSubEvents() const { return !GetSubEvents().empty(); }
+    bool HasSubEvents() const;
 
     /**
      * Event must be able to return all conditions std::vector they have.
      * Used to preprocess the conditions.
      */
     virtual std::vector < std::vector<Instruction>* > GetAllConditionsVectors() { std::vector < std::vector<Instruction>* > noConditions; return noConditions; };
+    virtual std::vector < const std::vector<Instruction>* > GetAllConditionsVectors() const { std::vector < const std::vector<Instruction>* > noConditions; return noConditions; };
 
     /**
      * Event must be able to return all actions std::vector they have.
      * Used to preprocess the actions.
      */
     virtual std::vector < std::vector<Instruction>* > GetAllActionsVectors() { std::vector < std::vector<Instruction>* > noActions; return noActions; };
+    virtual std::vector < const std::vector<Instruction>* > GetAllActionsVectors() const { std::vector < const std::vector<Instruction>* > noActions; return noActions; };
 
     /**
      * Event must be able to return all expressions they have.
      * Used to preprocess the expressions.
      */
     virtual std::vector < gd::Expression* > GetAllExpressions() { std::vector < gd::Expression* > noExpr; return noExpr;};
+    virtual std::vector < const gd::Expression* > GetAllExpressions() const { std::vector < const gd::Expression* > noExpr; return noExpr;};
 
     ///@}
 
@@ -134,7 +139,7 @@ public:
      * \see gd::EventMetadata
      * \see gd::BaseEvent::MustBePreprocessed
      */
-    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
 
     /**
      * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::codeGeneration associated to the event will be called
@@ -251,7 +256,7 @@ private:
     bool                    disabled; ///<True if the event is disabled and must not be executed
     std::string             type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
-    static std::vector <BaseEventSPtr> badSubEvents;
+    static gd::EventsList badSubEvents;
 };
 
 /**
@@ -261,15 +266,7 @@ private:
  * \see BaseEvent
  * \ingroup Events
  */
-BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(gd::BaseEventSPtr event);
-
-/**
- * Helper function for copying std::vector of shared_ptr of events
- *
- * \see BaseEvent
- * \ingroup Events
- */
-std::vector < gd::BaseEventSPtr > GD_CORE_API CloneVectorOfEvents(const std::vector < gd::BaseEventSPtr > & events);
+BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(BaseEventSPtr event);
 
 /**
  * \brief Empty event doing nothing.
@@ -285,3 +282,4 @@ class EmptyEvent : public BaseEvent
 }
 
 #endif // GDCORE_EVENT_H
+#endif

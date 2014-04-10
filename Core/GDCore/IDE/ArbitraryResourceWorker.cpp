@@ -11,6 +11,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 
 using namespace std;
@@ -20,10 +21,9 @@ namespace gd
 
 ArbitraryResourceWorker::~ArbitraryResourceWorker()
 {
-    //dtor
 }
 
-void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < gd::BaseEventSPtr > & events, gd::ArbitraryResourceWorker & worker)
+void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & events, gd::ArbitraryResourceWorker & worker)
 {
     //Get all extensions used
     std::vector< boost::shared_ptr<gd::PlatformExtension> > allGameExtensions;
@@ -38,7 +38,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < gd:
 
     for ( unsigned int j = 0;j < events.size() ;j++ )
     {
-        vector < vector<Instruction>* > allActionsVectors = events[j]->GetAllActionsVectors();
+        vector < vector<Instruction>* > allActionsVectors = events[j].GetAllActionsVectors();
         for (unsigned int i = 0;i<allActionsVectors.size();++i)
         {
             for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
@@ -78,7 +78,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < gd:
             }
         }
 
-        vector < vector<Instruction>* > allConditionsVector = events[j]->GetAllConditionsVectors();
+        vector < vector<Instruction>* > allConditionsVector = events[j].GetAllConditionsVectors();
         for (unsigned int i = 0;i<allConditionsVector.size();++i)
         {
             for ( unsigned int k = 0;k < allConditionsVector[i]->size() ;k++ )
@@ -114,8 +114,8 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < gd:
             }
         }
 
-        if ( events.at(j)->CanHaveSubEvents() )
-            LaunchResourceWorkerOnEvents(project, events.at(j)->GetSubEvents(), worker);
+        if ( events[j].CanHaveSubEvents() )
+            LaunchResourceWorkerOnEvents(project, events[j].GetSubEvents(), worker);
     }
 
     return;

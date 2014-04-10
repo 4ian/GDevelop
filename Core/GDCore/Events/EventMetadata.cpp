@@ -4,6 +4,7 @@
  */
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/EventMetadata.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 
 namespace gd
@@ -29,7 +30,7 @@ std::string EventMetadata::CodeGenerator::Generate(gd::BaseEvent & event, gd::Ev
 }
 
 void EventMetadata::CodeGenerator::Preprocess(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-                                              std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+                                              gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)
 {
 }
 

@@ -81,20 +81,22 @@ public:
 
 #if defined(GD_IDE_ONLY)
     /**
-     * \brief Add a new empty object of type \a objectType called \a name at the specified position in the layout list.<br>
+     * \brief Add a new empty object of type \a objectType called \a name at the specified position in the list.<br>
      *
      * \note The object is created using the project's current platform.
+     * \return A reference to the object in the list.
      */
-    void InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
+    gd::Object & InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
 #endif
 
     /**
-     * \brief Must add a new object constructed from the layout passed as parameter.
-     * \note No pointer or reference must be kept on the object passed as parameter.
+     * \brief Add a new object to the list
+     * \note The object passed by parameter is copied.
      * \param object The object that must be copied and inserted into the project
      * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
+     * \return A reference to the object in the list.
      */
-    void InsertObject(const gd::Object & object, unsigned int position);
+    gd::Object & InsertObject(const gd::Object & object, unsigned int position);
 
     /**
      * \brief Delete an object.
@@ -119,7 +121,7 @@ public:
     ///@}
 
     /** \name Saving and loading
-     * Members functions related to saving and loading the project.
+     * Members functions related to saving and loading the objects of the class.
      */
     ///@{
     /**

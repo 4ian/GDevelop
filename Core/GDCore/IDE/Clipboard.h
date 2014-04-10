@@ -9,6 +9,7 @@ namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 namespace gd { class ExternalLayout; }
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -32,8 +33,8 @@ public:
     bool HasObject() { return hasObject; };
     void ForgetObject() { hasObject = false; };
 
-    void SetEvents( const std::vector<gd::BaseEventSPtr> & event );
-    std::vector<gd::BaseEventSPtr> GetEvents();
+    void SetEvents( const gd::EventsList & event );
+    gd::EventsList GetEvents();
     bool HasEvents() { return hasEvents; };
 
     void SetLayout( const gd::Layout * layout );
@@ -71,7 +72,7 @@ private:
     gd::Object * objectCopied;
     bool hasObject;
 
-    std::vector<gd::BaseEventSPtr> eventsCopied;
+    gd::EventsList eventsCopied;
     bool hasEvents;
 
     std::vector<gd::Instruction> instructionsCopied;

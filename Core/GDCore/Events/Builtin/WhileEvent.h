@@ -5,6 +5,7 @@
 
 #ifndef GDCORE_WHILEEVENT_H
 #define GDCORE_WHILEEVENT_H
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 namespace gd { class Instruction; }
 namespace gd { class Project; }
@@ -35,9 +36,8 @@ public:
     virtual bool IsExecutable() const {return true;}
 
     virtual bool CanHaveSubEvents() const {return true;}
-    virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
-    virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
-    void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
+    virtual const gd::EventsList & GetSubEvents() const {return events;};
+    virtual gd::EventsList & GetSubEvents() {return events;};
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
@@ -55,6 +55,8 @@ public:
 
     virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
     virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllConditionsVectors() const;
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllActionsVectors() const;
 
     virtual void SaveToXml(TiXmlElement * eventElem) const;
     virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
@@ -80,7 +82,7 @@ private:
     std::vector < gd::Instruction > whileConditions;
     std::vector < gd::Instruction > conditions;
     std::vector < gd::Instruction > actions;
-    std::vector < gd::BaseEventSPtr > events;
+    EventsList events;
     bool infiniteLoopWarning; ///< If true, code will be generated to warn the developer against an infinite loop.
     bool justCreatedByTheUser; ///< Used so as not to show message box to de/activate infinite loop warning when the user create the event
 

@@ -1,0 +1,100 @@
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#include "EventsList.h"
+#include "GDCore/Events/Event.h"
+#include "Serialization.h"
+
+namespace gd
+{
+
+EventsList::EventsList()
+{
+}
+
+
+void EventsList::InsertEvents(const EventsList & otherEvents, size_t begin, size_t end, size_t position)
+{
+	if (begin >= otherEvents.size()) return;
+	if (end < begin) return;
+	if (end >= otherEvents.size()) end = otherEvents.size()-1;
+
+    for (unsigned int insertPos = 0;insertPos <= (end-begin);insertPos++)
+    {
+	    if (position != (size_t)-1 && position+insertPos < events.size())
+	        events.insert(events.begin()+position+insertPos, CloneRememberingOriginalEvent(otherEvents.events[begin+insertPos]));
+	    else
+	        events.push_back(CloneRememberingOriginalEvent(otherEvents.events[begin+insertPos]));
+	}
+}
+
+gd::BaseEvent & EventsList::InsertEvent(const gd::BaseEvent & evt, size_t position)
+{
+	boost::shared_ptr<gd::BaseEvent> event(evt.Clone());
+    if (position<events.size())
+        events.insert(events.begin()+position, event);
+    else
+        events.push_back(event);
+
+    return *event;
+}
+
+void EventsList::InsertEvent(boost::shared_ptr<gd::BaseEvent> event, size_t position)
+{
+    if (position<events.size())
+        events.insert(events.begin()+position, event);
+    else
+        events.push_back(event);
+}
+
+void EventsList::RemoveEvent(size_t index)
+{
+	events.erase(events.begin()+index);
+}
+
+void EventsList::RemoveEvent(const gd::BaseEvent & event)
+{
+	for (size_t i = 0; i < events.size(); ++i)
+	{
+		if (events[i].get() == &event)
+		{
+			events.erase(events.begin()+i);
+			return;
+		}
+	}
+}
+
+void EventsList::SaveToXml(TiXmlElement * element) const
+{
+	EventsListSerialization::SaveEventsToXml(*this, element);
+}
+
+void EventsList::LoadFromXml(gd::Project & project, const TiXmlElement * element)
+{
+	EventsListSerialization::LoadEventsFromXml(project, *this, element);
+}
+
+
+EventsList::EventsList(const EventsList & other)
+{
+    Init(other);
+}
+
+EventsList & EventsList::operator=(const EventsList & other)
+{
+    if ( this != &other )
+        Init(other);
+
+    return *this;
+}
+
+void EventsList::Init(const gd::EventsList & other)
+{
+	events.clear();
+	for(size_t i = 0;i<other.events.size();++i)
+		events.push_back(CloneRememberingOriginalEvent(other.events[i]));
+}
+
+}

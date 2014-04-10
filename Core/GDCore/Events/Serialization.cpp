@@ -5,11 +5,13 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -27,13 +29,13 @@ void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project,
                                              MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(), instr.GetType()) :
                                              MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(), instr.GetType());
 
-        if (instr.GetType() == "VarScene" || 
-            instr.GetType() == "VarSceneTxt" || 
-            instr.GetType() == "VarGlobal" || 
-            instr.GetType() == "VarGlobalTxt" || 
-            instr.GetType() == "ModVarScene" || 
-            instr.GetType() == "ModVarSceneTxt" || 
-            instr.GetType() == "ModVarGlobal" || 
+        if (instr.GetType() == "VarScene" ||
+            instr.GetType() == "VarSceneTxt" ||
+            instr.GetType() == "VarGlobal" ||
+            instr.GetType() == "VarGlobalTxt" ||
+            instr.GetType() == "ModVarScene" ||
+            instr.GetType() == "ModVarSceneTxt" ||
+            instr.GetType() == "ModVarGlobal" ||
             instr.GetType() == "ModVarGlobalTxt" )
         {
             std::vector< gd::Expression > parameters = instr.GetParameters();
@@ -41,8 +43,8 @@ void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project,
             instr.SetParameters(parameters);
         }
 
-        if (instr.GetType() == "VarSceneDef" || 
-            instr.GetType() == "VarGlobalDef" || 
+        if (instr.GetType() == "VarSceneDef" ||
+            instr.GetType() == "VarGlobalDef" ||
             instr.GetType() == "VarObjetDef" )
         {
             instr.SetParameter(1, gd::Expression("\""+instr.GetParameter(1).GetPlainString()+"\""));
@@ -164,51 +166,51 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
     }
 }
 
-void EventsListSerialization::LoadEventsFromXml(gd::Project & project, std::vector < boost::shared_ptr<gd::BaseEvent> > & list, const TiXmlElement * events)
+void EventsListSerialization::LoadEventsFromXml(gd::Project & project, EventsList & list, const TiXmlElement * events)
 {
-    const TiXmlElement * elemScene = events->FirstChildElement();
-
-    //Passage en revue des évènements
-    while ( elemScene )
+    const TiXmlElement * eventElem = events->FirstChildElement();
+    while ( eventElem )
     {
         string type;
-
-        if ( elemScene->FirstChildElement( "Type" ) != NULL && elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
+        if ( eventElem->FirstChildElement( "Type" ) && eventElem->FirstChildElement( "Type" )->Attribute( "value" ))
+            type = eventElem->FirstChildElement( "Type" )->Attribute( "value" );
 
         gd::BaseEventSPtr event = project.CreateEvent(type);
         if ( event != boost::shared_ptr<gd::BaseEvent>())
         {
-            event->LoadFromXml(project, elemScene);
+            event->LoadFromXml(project, eventElem);
         }
         else
         {
-            cout << "Unknown event of type " << type << endl;
+            gd::LogWarning("Unknown event of type " + type);
             event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
         }
 
-        if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
-        if ( elemScene->Attribute( "folded" ) != NULL ) { event->folded = ( string(elemScene->Attribute( "folded" )) == "true" ); }
+        if ( eventElem->Attribute( "disabled" ) != NULL ) { if ( string(eventElem->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
+        if ( eventElem->Attribute( "folded" ) != NULL ) { event->folded = ( string(eventElem->Attribute( "folded" )) == "true" ); }
 
-        list.push_back( event );
+        list.InsertEvent(*event, list.GetEventsCount());
 
-        elemScene = elemScene->NextSiblingElement();
+        eventElem = eventElem->NextSiblingElement();
     }
 }
 
-void EventsListSerialization::SaveEventsToXml(const std::vector < boost::shared_ptr<gd::BaseEvent> > & list, TiXmlElement * events)
+void EventsListSerialization::SaveEventsToXml(const EventsList & list, TiXmlElement * events)
 {
     for ( unsigned int j = 0;j < list.size();j++ )
     {
-        TiXmlElement * event = new TiXmlElement( "Event" );
-        event->SetAttribute( "disabled", list[j]->IsDisabled() ? "true" : "false" );
-        event->SetAttribute( "folded", list[j]->folded ? "true" : "false" );
-        events->LinkEndChild( event );
+        const gd::BaseEvent & event = list.GetEvent(j);
+        TiXmlElement * eventElem = new TiXmlElement( "Event" );
+
+        eventElem->SetAttribute( "disabled", event.IsDisabled() ? "true" : "false" );
+        eventElem->SetAttribute( "folded", event.folded ? "true" : "false" );
+        events->LinkEndChild( eventElem );
 
         TiXmlElement * type = new TiXmlElement( "Type" );
-        event->LinkEndChild( type );
-        type->SetAttribute( "value", list[j]->GetType().c_str() );
+        eventElem->LinkEndChild( type );
+        type->SetAttribute( "value", event.GetType().c_str() );
 
-        list[j]->SaveToXml(event);
+        event.SaveToXml(eventElem);
     }
 }
 
@@ -252,7 +254,7 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector <
         elemConditions = elemConditions->NextSiblingElement();
     }
 
-    if ( project.GetLastSaveGDMajorVersion() < 3 || 
+    if ( project.GetLastSaveGDMajorVersion() < 3 ||
          (project.GetLastSaveGDMajorVersion() == 3 && project.GetLastSaveGDMinorVersion() <= 1 ) )
         UpdateInstructionsFromGD31x(project, conditions, false);
 
@@ -294,8 +296,8 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd
         actions.push_back(instruction);
         elemActions = elemActions->NextSiblingElement();
     }
-    
-    if ( project.GetLastSaveGDMajorVersion() < 3 || 
+
+    if ( project.GetLastSaveGDMajorVersion() < 3 ||
          (project.GetLastSaveGDMajorVersion() == 3 && project.GetLastSaveGDMinorVersion() <= 1 ) )
         UpdateInstructionsFromGD31x(project, actions, true);
 

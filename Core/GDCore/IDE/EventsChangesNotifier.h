@@ -9,6 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 namespace gd { class Layout; }
+namespace gd { class EventsList; }
 namespace gd { class Project; }
 namespace gd { class ExternalEvents; }
 namespace gd { class Platform; }
@@ -36,7 +37,7 @@ private:
      * \see EventsChangesNotifier::NotifyChangesInEventsOfScene
      * \see EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents
      */
-    static void GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<gd::BaseEvent> > & events, gd::Project & project, std::vector< gd::Layout * > & layouts, std::vector< gd::ExternalEvents * > & externalEvents);
+    static void GetScenesAndExternalEventsLinkedTo(const gd::EventsList & events, gd::Project & project, std::vector< gd::Layout * > & layouts, std::vector< gd::ExternalEvents * > & externalEvents);
 
     EventsChangesNotifier() {};
     virtual ~EventsChangesNotifier() {};

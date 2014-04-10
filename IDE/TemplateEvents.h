@@ -6,33 +6,31 @@
 #ifndef TEMPLATEEVENTS_H
 #define TEMPLATEEVENTS_H
 
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
-
 #include <string>
 #include <vector>
-
-using namespace std;
 
 /**
  * Class representing an events template
  */
 class TemplateEvents
 {
-    public:
-        TemplateEvents() {};
-        TemplateEvents(const TemplateEvents & other);
-        virtual ~TemplateEvents() {};
+public:
+    TemplateEvents() {};
+    TemplateEvents(const TemplateEvents & other);
+    virtual ~TemplateEvents() {};
 
-        TemplateEvents& operator=(const TemplateEvents & other);
+    TemplateEvents& operator=(const TemplateEvents & other);
 
-        vector < gd::BaseEventSPtr > events;
-        vector < string > parameters;
-        string name;
-        string desc;
+    gd::EventsList events;
+    std::vector < std::string > parameters;
+    std::string name;
+    std::string desc;
 
-    private:
+private:
 
-        void Init(const TemplateEvents & other);
+    void Init(const TemplateEvents & other);
 };
 
 #endif // TEMPLATEEVENTS_H

@@ -6,6 +6,8 @@
 #include <vector>
 #include <set>
 #include <utility>
+namespace gd { class EventsList; }
+namespace gd { class Expression; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
@@ -31,7 +33,10 @@ class GD_CORE_API EventsCodeGenerator
 {
     friend class CallbacksForGeneratingExpressionCode;
 public:
-    static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
+    /**
+     * \brief Remove non executable events from the event list.
+     */
+    static void DeleteUselessEvents(gd::EventsList & events);
 
     /**
      * \brief Construct a code generator for the specified platform/project/layout.
@@ -44,7 +49,7 @@ public:
      *
      * This should be called before any code generation.
      */
-    void PreprocessEventList( std::vector < gd::BaseEventSPtr > & listEvent );
+    void PreprocessEventList(gd::EventsList & listEvent);
 
     /**
      * \brief Generate code for executing an event list
@@ -53,7 +58,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateEventsListCode(std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+    std::string GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & context);
 
     /**
      * \brief Generate code for executing a condition list

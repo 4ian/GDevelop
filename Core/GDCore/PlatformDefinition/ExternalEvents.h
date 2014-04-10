@@ -2,12 +2,13 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EXTERNALEVENTS_H
 #define GDCORE_EXTERNALEVENTS_H
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include "GDCore/Events/EventsList.h"
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }
 class TiXmlElement;
@@ -80,12 +81,12 @@ public:
     /**
      * \brief Get the events.
      */
-    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
+    virtual const gd::EventsList & GetEvents() const { return events; }
 
     /**
      * \brief Get the events.
      */
-    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
+    virtual gd::EventsList & GetEvents() { return events; }
 
     /**
      * \brief Load the object from xml
@@ -102,7 +103,7 @@ private:
     std::string name;
     std::string associatedScene;
     time_t lastChangeTimeStamp; ///< Time of the last build
-    std::vector < boost::shared_ptr<BaseEvent> > events; ///< List of events
+    gd::EventsList events; ///< List of events
 
     /**
      * Initialize from another ExternalEvents. Used by copy-ctor and assign-op.
@@ -121,3 +122,4 @@ struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<gd:
 }
 
 #endif // GDCORE_EXTERNALEVENTS_H
+#endif

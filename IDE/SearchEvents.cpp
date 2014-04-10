@@ -54,7 +54,7 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(EventsEditor * parent_, gd::Project & project_, gd::Layout & layout_, vector < gd::BaseEventSPtr > * events_) :
+SearchEvents::SearchEvents(EventsEditor * parent_, gd::Project & project_, gd::Layout & layout_, gd::EventsList * events_) :
 parent(parent_),
 project(project_),
 layout(layout_),
@@ -243,7 +243,7 @@ SearchEvents::~SearchEvents()
 
 void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
 {
-    vector < gd::BaseEventSPtr > eventsToInspect;
+    gd::EventsList eventsToInspect;
 
     //Check events validity
     if ( !onlySelectedEventCheck->GetValue() && events == NULL ) return;
@@ -253,7 +253,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
         for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
         {
             if ( selectedEventsInfo[i].event != boost::shared_ptr<gd::BaseEvent>() )
-                eventsToInspect.push_back(selectedEventsInfo[i].event);
+                eventsToInspect.InsertEvent(selectedEventsInfo[i].event);
         }
     }
 
@@ -314,7 +314,8 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
     parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
-    parent->ScrollToEvent(event);
+    std::cout << "Scrolling to event " << event.get();
+    parent->ScrollToEvent(*event);
 }
 
 void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
@@ -332,7 +333,8 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
     parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
-    parent->ScrollToEvent(event);
+    std::cout << "Scrolling to event " << event.get();
+    parent->ScrollToEvent(*event);
 }
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)

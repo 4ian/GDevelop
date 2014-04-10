@@ -1,3 +1,4 @@
+#if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Event.h"
@@ -31,7 +32,7 @@ void ExternalEvents::Init(const ExternalEvents & externalEvents)
     name = externalEvents.GetName();
     associatedScene = externalEvents.GetAssociatedLayout();
     lastChangeTimeStamp = externalEvents.GetLastChangeTimeStamp();
-    events = CloneVectorOfEvents(externalEvents.events);
+    events = *externalEvents.events.Clone();
 }
 
 void ExternalEvents::LoadFromXml(gd::Project & project, const TiXmlElement * element)
@@ -59,3 +60,4 @@ void ExternalEvents::SaveToXml(TiXmlElement * element) const
 }
 
 }
+#endif

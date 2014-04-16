@@ -1,3 +1,5 @@
+
+#if !defined(EMSCRIPTEN)
 #include "RuntimeLayer.h"
 #include "GDCpp/Layer.h"
 #include <SFML/Graphics.hpp>
@@ -72,3 +74,4 @@ void RuntimeCamera::SetViewport(float x1, float y1, float x2, float y2)
 {
     sfmlView.setViewport(sf::FloatRect(x1, y1, x2-x1,y2-y1));
 }
+#endif

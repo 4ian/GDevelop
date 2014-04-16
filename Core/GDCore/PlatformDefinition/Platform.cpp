@@ -30,17 +30,16 @@ Platform::~Platform()
 
 bool Platform::AddExtension(boost::shared_ptr<gd::PlatformExtension> extension)
 {
-    cout << "Adding extension " << extension->GetName() << " ("<< GetName() << ").";
+    std::cout << extension->GetName();
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
     	if ( extensionsLoaded[i]->GetName() == extension->GetName() ) {
-            std::cout << "already added." << std::endl;
+            std::cout << "(Already loaded!)" << std::endl;
     	    return false;
         }
     }
 
     //Load all creation/destruction functions for objects provided by the extension
-    std::cout << ".";
     vector < string > objectsTypes = extension->GetExtensionObjectsTypes();
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
@@ -48,9 +47,8 @@ bool Platform::AddExtension(boost::shared_ptr<gd::PlatformExtension> extension)
         destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
     }
 
-    std::cout << ".";
     extensionsLoaded.push_back(extension);
-    std::cout << ".done." << std::endl;
+    std::cout << ", ";
     return true;
 }
 
@@ -137,13 +135,12 @@ boost::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(gd::La
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new gd::LayoutEditorPreviewer);
 }
-#endif
 
 boost::shared_ptr<gd::ProjectExporter> Platform::GetProjectExporter() const
 {
     return boost::shared_ptr<gd::ProjectExporter>(new gd::ProjectExporter);
 }
-
+#endif
 
 #endif
 

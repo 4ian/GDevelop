@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #ifndef SOUND_H
 #define SOUND_H
 #include <SFML/Audio.hpp>
@@ -72,4 +73,4 @@ private:
 };
 
 #endif // SOUND_H
-
+#endif

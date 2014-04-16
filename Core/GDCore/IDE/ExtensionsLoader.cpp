@@ -3,7 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-
+#if !defined(EMSCRIPTEN)
 #include <boost/version.hpp>
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -35,6 +35,7 @@ namespace gd
 
 void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Platform & platform)
 {
+    std::cout << "Loading extensions for " << platform.GetName() << "... ";
     string suffix = "";
 
     #if defined(WINDOWS)
@@ -121,6 +122,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 	#else
 		#warning Compiler not supported (but might support one style of directory listing, update defines if necessary) for dynamic libraries loading
 	#endif
+    std::cout << " done. " << std::endl;
 }
 
 void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
@@ -293,3 +295,4 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
 }
 
 }
+#endif

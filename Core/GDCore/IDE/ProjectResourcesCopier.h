@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #ifndef PROJECTRESOURCESCOPIER_H
 #define PROJECTRESOURCESCOPIER_H
 #include <string>
@@ -34,10 +35,11 @@ public:
      * \return true if no error happened
      */
     static bool CopyAllResourcesTo(gd::Project & project, std::string destinationDirectory, bool updateOriginalProject,
-                                   wxProgressDialog * optionalProgressDialog = NULL, bool askAboutAbsoluteFilenames = true, 
+                                   wxProgressDialog * optionalProgressDialog = NULL, bool askAboutAbsoluteFilenames = true,
                                    bool preserveDirectoryStructure = true);
 };
 
 }
 
 #endif // PROJECTRESOURCESCOPIER_H
+#endif

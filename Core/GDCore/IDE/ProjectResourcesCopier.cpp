@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #include "ProjectResourcesCopier.h"
 #include <map>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -99,3 +100,4 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
 }
 
 }
+#endif

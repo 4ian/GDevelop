@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #ifndef AUDIOTOOLS_H
 #define AUDIOTOOLS_H
 #include <string>
@@ -41,4 +41,4 @@ double GD_API GetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int
 double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel);
 
 #endif // AUDIOTOOLS_H
-
+#endif

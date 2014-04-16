@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #ifndef SOUNDMANAGER_H
 #define SOUNDMANAGER_H
 
@@ -117,4 +117,4 @@ private:
 
 
 #endif // SOUNDMANAGER_H
-
+#endif

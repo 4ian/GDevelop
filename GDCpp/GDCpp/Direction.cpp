@@ -4,7 +4,6 @@
  */
 
 #include "GDCpp/Direction.h"
-#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 #include <iostream>

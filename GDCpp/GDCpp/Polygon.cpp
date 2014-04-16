@@ -4,7 +4,7 @@
  */
 #include <cmath>
 #include <iostream>
-#include <SFML/System.hpp>
+#include <SFML/System/Vector2.hpp>
 #include "Polygon.h"
 
 void Polygon2d::Rotate(float angle)

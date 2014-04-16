@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <iostream>
@@ -334,4 +334,4 @@ void GD_API ReadStringFromFile( const std::string & filename, const std::string 
 
     return;
 }
-
+#endif

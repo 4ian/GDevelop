@@ -75,7 +75,6 @@ std::string ConditionSentenceFormatter::LabelFromType( const std::string & type 
     else if ( type == "globalvar" )
         return static_cast<string>(_("Choose the global variable"));
 
-    gd::LogWarning( "Game Develop n'a pas pu trouver le nom d'un bouton suivant le type du paramètre" );
     return "undefined";
 }
 
@@ -118,7 +117,6 @@ wxBitmap ConditionSentenceFormatter::BitmapFromType( const std::string & type )
     else if ( type == "globalvar" )
         return CommonBitmapManager->varBt;
 
-    gd::LogWarning( "Game Develop n'a pas pu trouver le bitmap d'un bouton suivant le type du paramètre" );
     return CommonBitmapManager->unknownBt;
 }
 

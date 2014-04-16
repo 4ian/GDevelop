@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMESCENETOOLS_H
 #define RUNTIMESCENETOOLS_H
 
@@ -180,4 +181,4 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene );
 #endif
 
 #endif // RUNTIMESCENETOOLS_H
-
+#endif

@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #include "GDCpp/FontManager.h"
 #include "GDCpp/RessourcesLoader.h"
 #include <SFML/Graphics.hpp>
@@ -75,4 +76,4 @@ void FontManager::DestroySingleton()
         _singleton = NULL;
     }
 }
-
+#endif

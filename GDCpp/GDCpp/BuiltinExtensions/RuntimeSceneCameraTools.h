@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMESCENECAMERATOOLS_H
 #define RUNTIMESCENECAMERATOOLS_H
 
@@ -28,4 +29,4 @@ void GD_API SetCameraViewport( RuntimeScene & scene,  const std::string & layer,
 
 
 #endif // RUNTIMESCENECAMERATOOLS_H
-
+#endif

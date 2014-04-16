@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include "GDCpp/BuiltinExtensions/MathematicalTools.h"
 #include "GDCpp/CommonTools.h"
 #include <cmath>
@@ -163,4 +163,4 @@ double GD_API lerp(double a, double b, double x)
 
 }
 }
-
+#endif

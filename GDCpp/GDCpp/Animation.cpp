@@ -7,8 +7,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
 #include "GDCpp/Direction.h"
 
 Direction Animation::badDirection;

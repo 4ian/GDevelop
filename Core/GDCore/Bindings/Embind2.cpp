@@ -10,15 +10,26 @@
 #if defined(EMSCRIPTEN)
 #include <emscripten/bind.h>
 #include <boost/make_shared.hpp>
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/ForEachEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
+#include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsList.h"
 
 using namespace emscripten;
 using namespace gd;
+
+
+namespace gd { //Workaround for emscripten to directly use strings instead of gd::Expression.
+void Instruction_SetParameter(gd::Instruction & i, unsigned int nb, const std::string & val) { i.SetParameter(nb, val); };
+const std::string & Instruction_GetParameter(gd::Instruction & i, unsigned int nb) { return i.GetParameter(nb).GetPlainString(); };
+std::vector < Instruction > * Instruction_GetSubInstructions(gd::Instruction & i) { return &i.GetSubInstructions(); };
+}
 
 EMSCRIPTEN_BINDINGS(gd_Instruction) {
     register_vector< Instruction >("VectorInstruction");
@@ -27,39 +38,46 @@ EMSCRIPTEN_BINDINGS(gd_Instruction) {
         .constructor<>()
         .function("getType", &Instruction::GetType).function("setType", &Instruction::SetType)
         .function("isInverted", &Instruction::IsInverted).function("setInverted", &Instruction::SetInverted)
-        //TODO
+        .function("getParameter", &Instruction_GetParameter).function("setParameter", &Instruction_SetParameter)
+        .function("getParametersCount", &Instruction::GetParametersCount).function("setParametersCount", &Instruction::SetParametersCount)
+        .function("getSubInstructions", &Instruction_GetSubInstructions, allow_raw_pointers())
+        //Properties, for convenience only:
+        .property("parametersCount", &Instruction::GetParametersCount, &Instruction::SetParametersCount)
         ;
 }
 
 namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
-std::vector < boost::shared_ptr<BaseEvent> > * BaseEvent_GetSubEvents(BaseEvent & e) { return &e.GetSubEvents(); }
+gd::EventsList * BaseEvent_GetSubEvents(BaseEvent & e) { return &e.GetSubEvents(); }
 std::vector < gd::Instruction > * StandardEvent_GetConditions(StandardEvent & e) { return &e.GetConditions(); }
 std::vector < gd::Instruction > * StandardEvent_GetActions(StandardEvent & e) { return &e.GetActions(); }
 std::vector < gd::Instruction > * WhileEvent_GetConditions(WhileEvent & e) { return &e.GetConditions(); }
-std::vector < gd::Instruction > * WhileEvent_GetWhileConditions(WhileEvent & e) { return &e.GetWhileConditions(); }
 std::vector < gd::Instruction > * WhileEvent_GetActions(WhileEvent & e) { return &e.GetActions(); }
+std::vector < gd::Instruction > * WhileEvent_GetWhileConditions(WhileEvent & e) { return &e.GetWhileConditions(); }
+std::vector < gd::Instruction > * ForEachEvent_GetConditions(ForEachEvent & e) { return &e.GetConditions(); }
+std::vector < gd::Instruction > * ForEachEvent_GetActions(ForEachEvent & e) { return &e.GetActions(); }
+std::vector < gd::Instruction > * RepeatEvent_GetConditions(RepeatEvent & e) { return &e.GetConditions(); }
+std::vector < gd::Instruction > * RepeatEvent_GetActions(RepeatEvent & e) { return &e.GetActions(); }
 const std::string & CommentEvent_GetComment(CommentEvent & e) { return e.com1; }
 void CommentEvent_SetComment(CommentEvent & e, const std::string & com) { e.com1 = com; }
-void VectorEvent_push_back(std::vector< boost::shared_ptr<BaseEvent> > & v, gd::BaseEvent & event) {
-    boost::shared_ptr<BaseEvent> evt(&event);
-    v.push_back(evt);
-}
+gd::StandardEvent * AsStandardEvent(gd::BaseEvent * e) { return static_cast<gd::StandardEvent*>(e);}
+gd::CommentEvent * AsCommentEvent(gd::BaseEvent * e) { return static_cast<gd::CommentEvent*>(e);}
+gd::WhileEvent * AsWhileEvent(gd::BaseEvent * e) { return static_cast<gd::WhileEvent*>(e);}
+gd::ForEachEvent * AsForEachEvent(gd::BaseEvent * e) { return static_cast<gd::ForEachEvent*>(e);}
+gd::RepeatEvent * AsRepeatEvent(gd::BaseEvent * e) { return static_cast<gd::RepeatEvent*>(e);}
 }
 
 EMSCRIPTEN_BINDINGS(gd_BaseEvent) {
-    register_vector< boost::shared_ptr<BaseEvent> >("VectorEvent").
-        function("push_back", &VectorEvent_push_back); //TODO: Changing the default push_back implementation so that we accept "raw pointers".
-        //Ideally, all shared_ptrs should be hidden inside classes and not exposed as part of the C++ API. So vector<boost::shared_ptr<BaseEvent> >
-        //should be refactored and remplaced by an "EventContainer" or "EventList" class.
-
     class_<BaseEvent>("BaseEvent")
         .constructor<>()
         .smart_ptr< boost::shared_ptr<BaseEvent> >()
         .function("clone", &BaseEvent::Clone)
+        .function("getType", &BaseEvent::GetType)
 	    .function("isExecutable", &BaseEvent::IsExecutable)
 	    .function("canHaveSubEvents", &BaseEvent::CanHaveSubEvents)
         .function("hasSubEvents", &BaseEvent::HasSubEvents)
-	    .function("getSubEvents", &BaseEvent_GetSubEvents, allow_raw_pointers())
+        .function("getSubEvents", &BaseEvent_GetSubEvents, allow_raw_pointers())
+        .function("isDisabled", &BaseEvent::IsDisabled)
+        .function("setDisabled", &BaseEvent::SetDisabled)
         //TODO: Render??
 	    ;
 
@@ -78,11 +96,52 @@ EMSCRIPTEN_BINDINGS(gd_BaseEvent) {
     class_<WhileEvent, base<BaseEvent> >("WhileEvent")
         .constructor<>()
         .function("getConditions", &WhileEvent_GetConditions, allow_raw_pointers())
-        .function("getWhileConditions", &WhileEvent_GetWhileConditions, allow_raw_pointers())
         .function("getActions", &WhileEvent_GetActions, allow_raw_pointers())
+        .function("getWhileConditions", &WhileEvent_GetWhileConditions, allow_raw_pointers())
         ;
 
-    //TODO: RepeatEvent, ForEachEvent
+    class_<ForEachEvent, base<BaseEvent> >("ForEachEvent")
+        .constructor<>()
+        .function("getConditions", &ForEachEvent_GetConditions, allow_raw_pointers())
+        .function("getActions", &ForEachEvent_GetActions, allow_raw_pointers())
+        .function("getObjectsToPick", &ForEachEvent::GetObjectToPick)
+        .function("setObjectsToPick", &ForEachEvent::SetObjectToPick)
+        ;
+
+    class_<RepeatEvent, base<BaseEvent> >("RepeatEvent")
+        .constructor<>()
+        .function("getConditions", &RepeatEvent_GetConditions, allow_raw_pointers())
+        .function("getActions", &RepeatEvent_GetActions, allow_raw_pointers())
+        .function("getRepeatExpression", &RepeatEvent::GetRepeatExpression)
+        .function("setRepeatExpression", &RepeatEvent::SetRepeatExpression)
+        ;
+
+    function("asStandardEvent", &AsStandardEvent, allow_raw_pointers());
+    function("asCommentEvent", &AsCommentEvent, allow_raw_pointers());
+    function("asForEachEvent", &AsForEachEvent, allow_raw_pointers());
+    function("asWhileEvent", &AsWhileEvent, allow_raw_pointers());
+    function("asRepeatEvent", &AsRepeatEvent, allow_raw_pointers());
+}
+
+namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
+gd::BaseEvent * EventsList_GetEventAt(EventsList & l, size_t i) { return &l.GetEvent(i); }
+gd::BaseEvent * EventsList_InsertEvent(EventsList & l, gd::BaseEvent & e, size_t pos) { return &l.InsertEvent(e, pos); }
+gd::BaseEvent * EventsList_InsertNewEvent(EventsList & l, gd::Project & p, const std::string & t, size_t pos) { return &l.InsertNewEvent(p, t, pos); }
+}
+
+EMSCRIPTEN_BINDINGS(gd_EventsList) {
+    class_<EventsList>("EventsList")
+        .constructor<>()
+        .function("clone", &EventsList::Clone, allow_raw_pointers())
+        .function("insertEvent", &EventsList_InsertEvent, allow_raw_pointers())
+        .function("insertNewEvent", &EventsList_InsertNewEvent, allow_raw_pointers())
+        .function("insertEvents", &EventsList::InsertEvents)
+        .function("getEventAt", &EventsList_GetEventAt, allow_raw_pointers())
+        .function("removeEventAt", select_overload<void(size_t)>(&EventsList::RemoveEvent))
+        .function("getEventsCount", &EventsList::GetEventsCount)
+        .function("isEmpty", &EventsList::IsEmpty)
+        .function("clear", &EventsList::Clear)
+        ;
 }
 
 EMSCRIPTEN_BINDINGS(gd_EventsCodeGenerator) {

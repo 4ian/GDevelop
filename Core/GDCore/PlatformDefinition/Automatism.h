@@ -7,7 +7,7 @@
 #include <string>
 #include <map>
 #if defined(GD_IDE_ONLY)
-namespace gd { class PropgridPropertyDescriptor; }
+namespace gd { class PropertyDescriptor; }
 namespace gd { class MainFrameWrapper; }
 #endif
 namespace gd { class Project; }
@@ -66,16 +66,16 @@ public:
      *
      * Usage example:
      \code
-        std::map<std::string, gd::PropgridPropertyDescriptor> properties;
+        std::map<std::string, gd::PropertyDescriptor> properties;
         properties[ToString(_("Initial speed"))].SetValue("5");
-        
+
         return properties;
      \endcode
      *
      * \return a std::map with properties names as key.
-     * \see gd::PropgridPropertyDescriptor
+     * \see gd::PropertyDescriptor
      */
-    virtual std::map<std::string, gd::PropgridPropertyDescriptor> GetProperties(gd::Project & project) const;
+    virtual std::map<std::string, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
 
     /**
      * \brief Called when the IDE wants to update a custom property of the automatism

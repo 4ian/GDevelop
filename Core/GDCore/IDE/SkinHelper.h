@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_SKINHELPER_H
 #define GDCORE_SKINHELPER_H
 #include <string>
@@ -110,3 +111,4 @@ private:
 }
 
 #endif // GDCORE_SKINHELPER_H
+#endif

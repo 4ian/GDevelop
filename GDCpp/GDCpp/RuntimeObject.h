@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMEOBJECT_H
 #define RUNTIMEOBJECT_H
 
@@ -377,7 +378,7 @@ public:
     static const std::string& GetVariableString(const gd::Variable & variable) { return variable.GetString(); };
     static bool VariableChildExists(const gd::Variable & variable, const std::string & childName);
     static void VariableRemoveChild(gd::Variable & variable, const std::string & childName);
-    
+
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
     void Duplicate( RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists );
@@ -432,3 +433,4 @@ void DestroyBaseRuntimeObject(RuntimeObject * object);
 RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // RUNTIMEOBJECT_H
+#endif

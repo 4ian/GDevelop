@@ -174,7 +174,6 @@ public:
      * The default implementation simply return a gd::LayoutEditorPreviewer object doing nothing.
      */
     virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
-    #endif
 
     /**
      * \brief Must provide a gd::ProjectExporter object that will be used
@@ -183,6 +182,7 @@ public:
      * The default implementation simply return a gd::ProjectExporter object doing nothing.
      */
     virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+    #endif
     ///@}
 
     /**

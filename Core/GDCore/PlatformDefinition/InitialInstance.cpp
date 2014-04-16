@@ -8,7 +8,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
 
 namespace gd
@@ -30,7 +30,7 @@ InitialInstance::InitialInstance() :
 
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, gd::PropgridPropertyDescriptor> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
+std::map<std::string, gd::PropertyDescriptor> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
 {
     //Find an object
     if ( layout.HasObjectNamed(GetObjectName()) )
@@ -38,7 +38,7 @@ std::map<std::string, gd::PropgridPropertyDescriptor> gd::InitialInstance::GetCu
     else if ( project.HasObjectNamed(GetObjectName()) )
         return project.GetObject(GetObjectName()).GetInitialInstanceProperties(*this, project, layout);
 
-    std::map<std::string, gd::PropgridPropertyDescriptor> nothing;
+    std::map<std::string, gd::PropertyDescriptor> nothing;
     return nothing;
 }
 

@@ -5,6 +5,8 @@
 
 #include "EventsList.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "Serialization.h"
 
 namespace gd
@@ -47,6 +49,19 @@ void EventsList::InsertEvent(boost::shared_ptr<gd::BaseEvent> event, size_t posi
         events.insert(events.begin()+position, event);
     else
         events.push_back(event);
+}
+
+gd::BaseEvent & EventsList::InsertNewEvent(gd::Project & project, const std::string & eventType, size_t position)
+{
+    gd::BaseEventSPtr event = project.CreateEvent(eventType);
+    if ( event == boost::shared_ptr<gd::BaseEvent>())
+    {
+        std::cout << "Unknown event of type " << eventType;
+        event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
+    }
+
+    InsertEvent(event, position);
+    return *event;
 }
 
 void EventsList::RemoveEvent(size_t index)

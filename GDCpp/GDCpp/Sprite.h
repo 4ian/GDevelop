@@ -7,7 +7,9 @@
 #define SPRITE_H
 #include <string>
 #include <boost/shared_ptr.hpp>
+#if defined(EMSCRIPTEN)
 #include <SFML/Graphics.hpp>
+#endif
 #include "GDCpp/Point.h"
 #include "GDCpp/Polygon.h"
 class SFMLTextureWrapper;
@@ -27,31 +29,6 @@ class GD_API Sprite
 public:
     Sprite();
     virtual ~Sprite();
-
-    /**
-     * Get the SFML Sprite associated with the Sprite
-     */
-    inline const sf::Sprite & GetSFMLSprite() const { return sfmlSprite; }
-
-    /**
-     * Get the SFML Sprite associated with the Sprite
-     */
-    inline sf::Sprite & GetSFMLSprite() { return sfmlSprite; }
-
-    /**
-     * Set a new image to the Sprite
-     */
-    void LoadImage(boost::shared_ptr<SFMLTextureWrapper> image);
-
-    /**
-     * Get SFML Image used by the sprite
-     */
-    boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() { return sfmlImage; };
-
-    /**
-     * Get SFML Image used by the sprite
-     */
-    const boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() const { return sfmlImage; };
 
     /**
      * Change the name of the Sprite's image
@@ -163,17 +140,52 @@ public:
      */
     bool SetCentreAutomatic(bool enabled);
 
+    /** \name Sprite runtime management
+     * Functions used by the C++ game engine.
+     */
+    ///@{
+    #if !defined(EMSCRIPTEN)
+    /**
+     * Get the SFML Sprite associated with the Sprite
+     */
+    inline const sf::Sprite & GetSFMLSprite() const { return sfmlSprite; }
+
+    /**
+     * Get the SFML Sprite associated with the Sprite
+     */
+    inline sf::Sprite & GetSFMLSprite() { return sfmlSprite; }
+
+    /**
+     * Set a new image to the Sprite
+     */
+    void LoadImage(boost::shared_ptr<SFMLTextureWrapper> image);
+
+    /**
+     * Get SFML Image used by the sprite
+     */
+    boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() { return sfmlImage; };
+
+    /**
+     * Get SFML Image used by the sprite
+     */
+    const boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() const { return sfmlImage; };
+
     /**
      * Make the sprite, if it uses an image from ImageManager,
      * copy this image and own it inside.
      */
     void MakeSpriteOwnsItsImage();
+    #endif
+    ///@}
 
 private:
 
+    #if !defined(EMSCRIPTEN)
     sf::Sprite sfmlSprite; ///< Displayed SFML sprite
     boost::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
+    #endif
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
+
     std::string image; ///< Name of the image to be loaded in Image Manager.
 
     bool automaticCollisionMask; ///< True to use the custom collision mask. Otherwise, a basic bounding box is returned by GetCollisionMask()

@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include <fstream>
 #include <string>
 #include <SFML/Network.hpp>
@@ -74,7 +74,7 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
     return;
 }
 
-void GD_API SendHttpRequest(const std::string & host, const std::string & uri, const std::string & body, 
+void GD_API SendHttpRequest(const std::string & host, const std::string & uri, const std::string & body,
     const std::string & method, const std::string & contentType, gd::Variable & responseVar)
 {
     // Create Http
@@ -158,7 +158,7 @@ namespace
         return str.find_first_not_of(blankChar, pos);
     }
 
-    /** 
+    /**
      * Return the position of the end of the string. Blank are skipped if necessary
      * @param str The string to be used
      * @param startPos The start position
@@ -184,10 +184,10 @@ namespace
             strContent = str.substr(startPos+1, endPos-1-startPos);
             return endPos;
         }
-        
+
         endPos = str.find_first_of(" \n,:");
         if ( endPos >= str.length() ) return std::string::npos; //Invalid string
-        
+
         strContent = str.substr(startPos, endPos-1-startPos);
         return endPos-1;
     }
@@ -210,7 +210,7 @@ namespace
                 pos++;
                 std::string childName;
                 pos = SkipString(jsonStr, pos, childName);
-                
+
                 pos++;
                 pos = SkipBlankChar(jsonStr, pos);
                 if ( pos >= jsonStr.length() || jsonStr[pos] != ':' ) return std::string::npos;
@@ -272,3 +272,4 @@ void GD_API JSONToVariableStructure(const std::string & jsonStr, gd::Variable & 
     if ( jsonStr.empty() ) return;
     ::ParseJSONObject(jsonStr, 0, variable);
 }
+#endif

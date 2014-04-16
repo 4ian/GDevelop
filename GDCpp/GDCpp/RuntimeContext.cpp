@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #include "RuntimeContext.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
@@ -52,4 +53,4 @@ std::map <std::string, std::vector<RuntimeObject*> *> RuntimeContext::ReturnObje
 {
     return temporaryMap;
 }
-
+#endif

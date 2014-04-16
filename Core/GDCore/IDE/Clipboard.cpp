@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(EMSCRIPTEN)
 #include <boost/shared_ptr.hpp>
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -155,3 +156,4 @@ void Clipboard::SetInstances( std::vector < boost::shared_ptr<gd::InitialInstanc
 Clipboard * Clipboard::singleton = NULL;
 
 }
+#endif

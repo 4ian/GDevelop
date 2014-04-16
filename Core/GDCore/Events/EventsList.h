@@ -51,6 +51,15 @@ public:
     void InsertEvent(boost::shared_ptr<gd::BaseEvent> event, size_t position = (size_t)-1);
 
     /**
+     * \brief Insert a new event to the list.
+     * \note The event is created using the project current platform.
+     * \param project The project the events list belongs to.
+     * \param eventType The type of the event
+     * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
+     */
+    gd::BaseEvent & InsertNewEvent(gd::Project & project, const std::string & eventType, size_t position = (size_t)-1);
+
+    /**
      * \brief Copy events from another list
      */
     void InsertEvents(const EventsList & otherEvents, size_t begin, size_t end, size_t position = (size_t)-1);

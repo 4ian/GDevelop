@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include "JoystickTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Variable.h"
@@ -51,4 +51,4 @@ void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joys
 
     return;
 }
-
+#endif

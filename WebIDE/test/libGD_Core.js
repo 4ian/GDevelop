@@ -29,32 +29,29 @@ describe('libGD.js', function(){
 			expect(project.hasLayoutNamed("Scene")).to.be(false);
 		});
 
-		after(function() {
-			project.delete();
-		});
+		after(function() { project.delete(); });
 	});
 
 	describe('gd.Layout', function(){
 		var project = gd.ProjectHelper.createNewGDJSProject();
-		var layout = new gd.Layout();
+		var layout = project.insertNewLayout("Scene", 0);
+
 		it('properties can be read and changed', function(){
+			expect(layout.getName()).to.be("Scene");
 			layout.setName("My super layout");
 			expect(layout.getName()).to.be("My super layout");
 		});
 		it('events', function() {
 			var evts = layout.getEvents();
-			expect(evts.size()).to.be(0);
-			var evt = project.createEvent("BuiltinCommonInstructions::Standard", "");
-			evts.push_back(evt);
-			expect(evts.size()).to.be(1);
-			evt.getSubEvents().push_back(project.createEvent("BuiltinCommonInstructions::Standard", ""));
-			expect(evts.get(0).getSubEvents().size()).to.be(1);
+			expect(evts.getEventsCount()).to.be(0);
+			var evt = evts.insertNewEvent(project, "BuiltinCommonInstructions::Standard", 0);
+			expect(evts.getEventsCount()).to.be(1);
+			evt.getSubEvents().insertNewEvent(project, "BuiltinCommonInstructions::Standard", 0);
+			expect(evts.getEventAt(0).getSubEvents().getEventsCount()).to.be(1);
 		});
 		//TODO
 
-		after(function() {
-			project.delete();
-		});
+		after(function() { project.delete(); });
 	});
 
 	describe('gd.InitialInstancesContainer', function(){
@@ -120,6 +117,45 @@ describe('libGD.js', function(){
 			container.removeAllInstancesOnLayer("YetAnotherLayer");
 			expect(container.getInstancesCount()).to.be(1);
 		});
+
+		after(function() { container.delete(); })
+	});
+
+	describe('gd.InitialInstance', function(){
+		var project = gd.ProjectHelper.createNewGDJSProject();
+		var layout = project.insertNewLayout("Scene", 0);
+		layout.insertNewObject(project, "Sprite", "MySpriteObject", 0);
+		var initialInstance = layout.getInitialInstances().insertNewInitialInstance();
+
+		it('properties', function(){
+			initialInstance.setObjectName("MySpriteObject");
+			expect(initialInstance.getObjectName()).to.be("MySpriteObject");
+			initialInstance.setX(150);
+			expect(initialInstance.getX()).to.be(150);
+			initialInstance.setY(140);
+			expect(initialInstance.getY()).to.be(140);
+			initialInstance.setAngle(45);
+			expect(initialInstance.getAngle()).to.be(45);
+			initialInstance.setZOrder(12);
+			expect(initialInstance.getZOrder()).to.be(12);
+			initialInstance.setLayer("MyLayer");
+			expect(initialInstance.getLayer()).to.be("MyLayer");
+			initialInstance.setLocked(true);
+			expect(initialInstance.isLocked()).to.be(true);
+			initialInstance.setHasCustomSize(true);
+			expect(initialInstance.hasCustomSize()).to.be(true);
+			initialInstance.setCustomWidth(34);
+			expect(initialInstance.getCustomWidth()).to.be(34);
+			initialInstance.setCustomHeight(30);
+			expect(initialInstance.getCustomHeight()).to.be(30);
+		});
+		it('custom properties', function(){
+			initialInstance.updateCustomProperty("Animation", "2", project, layout);
+			expect(initialInstance.getCustomProperties(project, layout).get("Animation").getValue()).
+				to.be("2");
+		});
+
+		after(function(){ project.delete(); });
 	});
 
 	describe('gd.VariablesContainer', function(){
@@ -128,6 +164,7 @@ describe('libGD.js', function(){
 
 			expect(container.has("Variable")).to.be(false);
 			expect(container.count()).to.be(0);
+			container.delete();
 		});
 		it('can insert variables', function(){
 			var container = new gd.VariablesContainer();
@@ -139,6 +176,7 @@ describe('libGD.js', function(){
 			container.insertNew("SecondVariable", 0);
 			expect(container.has("SecondVariable")).to.be(true);
 			expect(container.count()).to.be(2);
+			container.delete();
 		});
 		it('can rename variables', function(){
 			var container = new gd.VariablesContainer();
@@ -154,6 +192,7 @@ describe('libGD.js', function(){
 			expect(container.has("NewName")).to.be(true);
 
 			expect(container.get("NewName").getString()).to.be("String of SecondVariable");
+			container.delete();
 		});
 		it('can reorganize variables', function(){
 			var container = new gd.VariablesContainer();
@@ -169,11 +208,11 @@ describe('libGD.js', function(){
 			expect(container.getAt(0).getName()).to.be("ThirdVariable");
 			expect(container.getAt(2).getName()).to.be("Variable");
 			expect(container.getAt(2).getVariable().getValue()).to.be(4);
+			container.delete();
 		});
 	});
 
 	describe('gd.Variable', function(){
-
 		var variable = new gd.Variable();
 
 		it('initial value', function(){
@@ -200,10 +239,59 @@ describe('libGD.js', function(){
 			variable.removeChild("FirstChild");
 			expect(variable.hasChild("FirstChild")).to.be(false);
 		});
+
+		after(function() {variable.delete();});
+	});
+
+	describe('gd.Object', function(){
+		var project = gd.ProjectHelper.createNewGDJSProject();
+		var layout = project.insertNewLayout("Scene", 0);
+		var object = layout.insertNewObject(project, "Sprite", "MyObject", 0);
+		it('properties and initial values', function() {
+			object.setName("TheObject");
+			expect(object.getName()).to.be("TheObject");
+			expect(object.hasAutomatismNamed("DoNotExists")).to.be(false);
+		});
+		//TODO
+
+		after(function() {project.delete();});
+	});
+	describe('gd.Automatism', function(){
+		var project = gd.ProjectHelper.createNewGDJSProject();
+		var automatism = new gd.Automatism();
+
+		it('properties and initial values', function() {
+			automatism.setName("MyAutomatism");
+			expect(automatism.getName()).to.be("MyAutomatism");
+			expect(automatism.getTypeName()).to.be("");
+		});
+		it('update a not existing property', function() {
+			expect(automatism.updateProperty("PropertyThatDoesNotExist", "MyValue", project)).to.be(false);
+		});
+		//TODO
+
+		after(function() {
+			automatism.delete();
+			project.delete();
+		});
 	});
 
 	describe('gd.Instruction', function(){
-		//TODO
+		var instr = new gd.Instruction();
+
+		it('initial values', function(){
+			expect(instr.getParametersCount()).to.be(0);
+			expect(instr.getSubInstructions().size()).to.be(0);
+		});
+		it('setting parameters', function(){
+			instr.setParametersCount(3);
+			expect(instr.getParametersCount()).to.be(3);
+			expect(instr.getParameter(1)).to.be("");
+			instr.setParameter(2, "MyValue");
+			expect(instr.getParameter(2)).to.be("MyValue");
+		});
+
+		after(function() {instr.delete();})
 	});
 
 	describe('gd.BaseEvent', function(){
@@ -232,6 +320,7 @@ describe('libGD.js', function(){
 			expect(evt.getActions().size()).to.be(1);
 		});
 
+		after(function() {evt.delete();})
 	});
 	describe('gd.CommentEvent', function(){
 		var evt = new gd.CommentEvent();
@@ -245,6 +334,7 @@ describe('libGD.js', function(){
 			expect(evt.getComment()).to.be("My nice comment about my events!");
 		});
 
+		after(function() {evt.delete();})
 	});
 });
 

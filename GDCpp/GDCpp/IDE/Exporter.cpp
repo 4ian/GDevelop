@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #if defined(GD_IDE_ONLY)
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
@@ -24,4 +25,5 @@ Exporter::~Exporter()
 {
     //dtor
 }
+#endif
 #endif

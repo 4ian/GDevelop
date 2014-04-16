@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #ifndef EVENTSVARIABLESFINDER_H
 #define EVENTSVARIABLESFINDER_H
 #include <string>
@@ -70,3 +71,4 @@ private:
 }
 
 #endif // EVENTSVARIABLESFINDER_H
+#endif

@@ -14,13 +14,15 @@
 #if defined(EMSCRIPTEN)
 #include "Embind.h"
 #include <emscripten/bind.h>
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/Events/Event.h"
-#include "GDCore/IDE/ProjectExporter.h"
+#include "GDCore/Events/EventsList.h"
 #include <set>
 
 using namespace emscripten;
@@ -55,15 +57,13 @@ class_<std::set<T> > register_set(const char* name) {
         ;
 }
 }
+
 EMSCRIPTEN_BINDINGS(gd_std_wrappers) {
     register_vector<std::string>("VectorString");
     register_set<std::string>("SetString");
 }
 
 EMSCRIPTEN_BINDINGS(gd_Platform) {
-    class_<ProjectExporter>("ProjectExporter")
-        ;
-
     class_<Platform>("Platform")
         .constructor<>()
 	    .function("getName", &Platform::GetName)
@@ -71,7 +71,6 @@ EMSCRIPTEN_BINDINGS(gd_Platform) {
 	    .function("getSubtitle", &Platform::GetSubtitle)
         .function("getDescription", &Platform::GetDescription)
 	    .function("isExtensionLoaded", &Platform::IsExtensionLoaded)
-        .function("getProjectExporter", &Platform::GetProjectExporter)
 	    ;
 }
 
@@ -173,19 +172,48 @@ EMSCRIPTEN_BINDINGS(gd_Project) {
         ;
 }
 
+EMSCRIPTEN_BINDINGS(gd_Automatism) {
+    class_<Automatism>("Automatism")
+        .constructor<>()
+        .function("clone", &Automatism::Clone, allow_raw_pointers())
+        .function("getName", &Automatism::GetName).function("setName", &Automatism::SetName)
+        .function("getTypeName", &Automatism::GetTypeName)
+        .function("getProperties", &Automatism::GetTypeName)
+        .function("updateProperty", &Automatism::UpdateProperty)
+        ;
+}
+
+
 namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
 gd::VariablesContainer * Object_GetVariables(gd::Object & o) { return &o.GetVariables(); }
+gd::Automatism * Object_GetAutomatism(gd::Object & o, const std::string & name) { return &o.GetAutomatism(name); }
 }
 
 EMSCRIPTEN_BINDINGS(gd_Object) {
     class_<Object>("Object")
         .constructor<const std::string &>()
+        .function("clone", &Object::Clone, allow_raw_pointers())
         .function("getName", &Object::GetName).function("setName", &Object::SetName)
         .function("getVariables", &Object_GetVariables, allow_raw_pointers())
-        //TODO:Automatisms
-        //TODO:Properties
+        .function("getAllAutomatismNames", &Object::GetAllAutomatismNames)
+        .function("hasAutomatismNamed", &Object::HasAutomatismNamed)
+        .function("getAutomatism", &Object_GetAutomatism, allow_raw_pointers())
+        .function("removeAutomatism", &Object::RemoveAutomatism)
+        .function("renameAutomatism", &Object::RenameAutomatism)
+        .function("addNewAutomatism", &Object::AddNewAutomatism, allow_raw_pointers())
         //Properties, for convenience only:
         .property("name", &Object::GetName, &Object::SetName)
+        ;
+}
+EMSCRIPTEN_BINDINGS(gd_ObjectGroup) {
+    class_<ObjectGroup>("ObjectGroup")
+        .constructor<>()
+        .function("getName", &ObjectGroup::GetName).function("setName", &ObjectGroup::SetName)
+        .function("addObject", &ObjectGroup::AddObject)
+        .function("removeObject", &ObjectGroup::RemoveObject)
+        .function("find", &ObjectGroup::Find)
+        //Properties, for convenience only:
+        .property("name", &ObjectGroup::GetName, &ObjectGroup::SetName)
         ;
 }
 
@@ -194,10 +222,10 @@ namespace gd { //Workaround for emscripten not supporting methods returning a re
 gd::InitialInstancesContainer * Layout_GetInitialInstances(gd::Layout & l) { return &l.GetInitialInstances(); }
 gd::VariablesContainer * Layout_GetVariables(gd::Layout & l) { return &l.GetVariables(); }
 gd::Layer * Layout_GetLayer(gd::Layout & l, const std::string & name) { return &l.GetLayer(name); }
-std::vector<boost::shared_ptr<gd::BaseEvent> > * Layout_GetEvents(gd::Layout & l) { return &l.GetEvents(); }
+gd::EventsList * Layout_GetEvents(gd::Layout & l) { return &l.GetEvents(); }
 gd::Object * ClassWithObjects_GetObject(gd::ClassWithObjects & c, const std::string & name) { return &c.GetObject(name); }
 gd::Object * ClassWithObjects_GetObjectAt(gd::ClassWithObjects & c, unsigned int id) { return &c.GetObject(id); }
-gd::Object * ClassWithObjects_InsertNewObject(gd::ClassWithObjects & c, gd::Project & p, const std::string & o, const std::string & n, unsigned int p) { return &c.InsertNewObject(p, o, n, p); }
+gd::Object * ClassWithObjects_InsertNewObject(gd::ClassWithObjects & c, gd::Project & p, const std::string & o, const std::string & n, unsigned int pos) { return &c.InsertNewObject(p, o, n, pos); }
 gd::Object * ClassWithObjects_InsertObject(gd::ClassWithObjects & c, const gd::Object & o, unsigned int p) { return &c.InsertObject(o, p); }
 }
 
@@ -247,8 +275,7 @@ EMSCRIPTEN_BINDINGS(gd_InitialInstance) {
     class_<InitialInstance>("InitialInstance")
         .constructor<>()
         .function("clone", &InitialInstance::Clone, allow_raw_pointers())
-        .function("getObjectName", &InitialInstance::GetObjectName)
-        .function("setObjectName", &InitialInstance::SetObjectName)
+        .function("getObjectName", &InitialInstance::GetObjectName).function("setObjectName", &InitialInstance::SetObjectName)
         .function("getX", &InitialInstance::GetX).function("setX", &InitialInstance::SetX)
         .function("getY", &InitialInstance::GetY).function("setY", &InitialInstance::SetY)
         .function("getAngle", &InitialInstance::GetAngle).function("setAngle", &InitialInstance::SetAngle)
@@ -258,6 +285,8 @@ EMSCRIPTEN_BINDINGS(gd_InitialInstance) {
         .function("getCustomWidth", &InitialInstance::GetCustomWidth).function("setCustomWidth", &InitialInstance::SetCustomWidth)
         .function("getCustomHeight", &InitialInstance::GetCustomHeight).function("setCustomHeight", &InitialInstance::SetCustomHeight)
         .function("isLocked", &InitialInstance::IsLocked).function("setLocked", &InitialInstance::SetLocked)
+        .function("getCustomProperties", &InitialInstance::GetCustomProperties)
+        .function("updateCustomProperty", &InitialInstance::UpdateCustomProperty)
         .function("getVariables", &InitialInstance_GetVariables, allow_raw_pointers())
         //Properties, for convenience only:
         .property("objectName", &InitialInstance::GetObjectName, &InitialInstance::SetObjectName)
@@ -305,6 +334,26 @@ EMSCRIPTEN_BINDINGS(gd_InitialInstancesContainer) {
         .function("removeInitialInstancesOfObject", &InitialInstancesContainer::RemoveInitialInstancesOfObject)
         .function("renameInstancesOfObject", &InitialInstancesContainer::RenameInstancesOfObject)
         .function("someInstancesAreOnLayer", &InitialInstancesContainer::SomeInstancesAreOnLayer)
+        ;
+}
+
+namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
+PropertyDescriptor * PropertyDescriptor_SetValue(PropertyDescriptor &p, const std::string & v) { return &p.SetValue(v); }
+PropertyDescriptor * PropertyDescriptor_SetType(PropertyDescriptor &p, const std::string & v) { return &p.SetType(v); }
+PropertyDescriptor * PropertyDescriptor_AddExtraInfo(PropertyDescriptor &p, const std::string & v) { return &p.AddExtraInfo(v); }
+}
+
+EMSCRIPTEN_BINDINGS(gd_PropertyDescriptor) {
+    register_map<std::string, gd::PropertyDescriptor>("MapStringPropertyDescriptor");
+
+    class_<PropertyDescriptor>("PropertyDescriptor")
+        .constructor<std::string>()
+        .function("setValue", &PropertyDescriptor_SetValue, allow_raw_pointers())
+        .function("getValue", &PropertyDescriptor::GetValue)
+        .function("setType", &PropertyDescriptor_SetType, allow_raw_pointers())
+        .function("getType", &PropertyDescriptor::GetType)
+        .function("addExtraInfo", &PropertyDescriptor_AddExtraInfo, allow_raw_pointers())
+        .function("getExtraInfo", &PropertyDescriptor::GetExtraInfo)
         ;
 }
 

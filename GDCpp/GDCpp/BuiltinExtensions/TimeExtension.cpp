@@ -173,7 +173,7 @@ TimeExtension::TimeExtension()
     #endif
 }
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
 {
     if ( propertyNb < scene.timers.size() )

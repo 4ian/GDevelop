@@ -19,7 +19,7 @@ class RuntimeScene;
 class wxBitmap;
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
-namespace gd { class PropgridPropertyDescriptor; }
+namespace gd { class PropertyDescriptor; }
 #endif
 
 /**
@@ -66,7 +66,7 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, gd::PropgridPropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
+    virtual std::map<std::string, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
     virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene);
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
     virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
@@ -104,6 +104,10 @@ private:
     static Animation    badAnimation;
 };
 
+GD_API void DestroySpriteObject(gd::Object * object);
+GD_API gd::Object * CreateSpriteObject(std::string name);
+
+#if !defined(EMSCRIPTEN)
 class GD_API RuntimeSpriteObject : public RuntimeObject
 {
 public :
@@ -249,11 +253,9 @@ private:
     static Animation    badAnimation;
 };
 
-
-GD_API void DestroySpriteObject(gd::Object * object);
-GD_API gd::Object * CreateSpriteObject(std::string name);
 GD_API void DestroyRuntimeSpriteObject(RuntimeObject * object);
 GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
+#endif
 
 #endif // SPRITEOBJECT_H
 

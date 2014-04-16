@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #include "GDCpp/BuiltinExtensions/MouseTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeLayer.h"
@@ -81,4 +82,4 @@ int GD_API GetMouseWheelDelta( RuntimeScene & scene )
 
     return 0;
 }
-
+#endif

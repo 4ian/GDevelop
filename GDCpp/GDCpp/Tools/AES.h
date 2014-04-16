@@ -49,6 +49,8 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if !defined(EMSCRIPTEN) //Florian: Disabled this file when compiling for JS
+
 #ifndef _ULIB_CRYPT_AES_H
 #define _ULIB_CRYPT_AES_H
 
@@ -91,3 +93,4 @@ void GD_API aes_cbc_decrypt(const uint8_t *in, uint8_t *out, uint8_t *iv,
 #endif
 
 #endif /* _ULIB_CRYPT_AES_H */
+#endif

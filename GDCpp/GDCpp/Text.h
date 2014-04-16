@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #ifndef TEXT_H
 #define TEXT_H
 #include <SFML/Graphics.hpp>
@@ -33,4 +33,4 @@ class GD_API Text
 };
 
 #endif // TEXT_H
-
+#endif

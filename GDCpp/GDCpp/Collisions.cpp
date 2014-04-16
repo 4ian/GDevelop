@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #include <iostream>
 #include <vector>
 #include <string>
@@ -65,3 +66,4 @@ bool GD_API CheckCollision( const RuntimeSpriteObject * const objet1, const Runt
     return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1, objet1->GetCurrentSprite().GetSFMLTexture()->image, objet2->GetCurrentSprite().GetSFMLTexture()->image  );
 }
 
+#endif

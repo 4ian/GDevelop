@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(EMSCRIPTEN)
 #include "ResourcesMergingHelper.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/filename.h>
@@ -59,10 +60,4 @@ void ResourcesMergingHelper::SetBaseDirectory(const std::string & baseDirectory_
 }
 
 }
-
-
-
-
-
-
-
+#endif

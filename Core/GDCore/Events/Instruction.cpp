@@ -52,6 +52,14 @@ gd::Expression & Instruction::GetParameter(unsigned int index)
     return parameters[index];
 }
 
+void Instruction::SetParametersCount(unsigned int size)
+{
+    while(size < parameters.size())
+        parameters.erase(parameters.begin()+parameters.size()-1);
+    while(size > parameters.size())
+        parameters.push_back(gd::Expression(""));
+}
+
 Instruction::~Instruction()
 {
     //dtor
@@ -61,7 +69,7 @@ void Instruction::SetParameter(unsigned int nb, const gd::Expression & val)
 {
     if ( nb >= parameters.size() )
     {
-        cout << "Trying to write an out of bound parameter.\n\nThis can be an error of Game Develop: Please report it to the developer.";
+        cout << "Trying to write an out of bound parameter.\n\n" << std::endl;
         return;
     }
     parameters[nb] = val;

@@ -5,7 +5,7 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 #include <vector>
-#include <SFML/System.hpp>
+#include <SFML/System/Vector2.hpp>
 
 /**
  * \brief Represents a polygon. Usually used for collisions masks.

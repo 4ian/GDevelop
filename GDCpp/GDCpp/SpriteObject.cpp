@@ -25,13 +25,11 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCpp/IDE/Dialogs/SpriteObjectEditor.h"
 #endif
 
-Animation RuntimeSpriteObject::badAnimation;
 Animation SpriteObject::badAnimation;
-Sprite * RuntimeSpriteObject::badSpriteDatas = NULL;
 
 SpriteObject::SpriteObject(std::string name_) :
     Object(name_)
@@ -42,96 +40,62 @@ SpriteObject::~SpriteObject()
 {
 };
 
-RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
-    currentAnimation( 0 ),
-    currentDirection( 0 ),
-    currentAngle( 0 ),
-    currentSprite( 0 ),
-    animationStopped(false),
-    timeElapsedOnCurrentSprite(0),
-    ptrToCurrentSprite( NULL ),
-    needUpdateCurrentSprite(true),
-    cacheAnimationSizeNeedUpdate(true),
-    opacity( 255 ),
-    blendMode(0),
-    isFlippedX(false),
-    isFlippedY(false),
-    scaleX( 1 ),
-    scaleY( 1 ),
-    colorR( 255 ),
-    colorV( 255 ),
-    colorB( 255 )
+void SpriteObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
 {
-    if (!badSpriteDatas) badSpriteDatas = new Sprite();
+    if ( elemScene->FirstChildElement( "Animations" ) == NULL ) return;
 
-    const SpriteObject & spriteObject = static_cast<const SpriteObject&>(object);
-    animations = spriteObject.GetAllAnimations();
+    const TiXmlElement * animationElem = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
 
-    //Load resources
-    for ( unsigned int j = 0; j < animations.size();j++ )
+    while ( animationElem )
     {
-        Animation & anim = animations[j].GetNonConst();
-        for ( unsigned int k = 0;k < anim.GetDirectionsNumber();k++ )
-        {
-            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpriteCount();l++ )
-            {
-                Sprite & sprite = anim.GetDirectionToModify(k).GetSprite(l);
+        Animation newAnimation;
+        newAnimation.useMultipleDirections = (animationElem->Attribute( "typeNormal" )  != NULL && ToString(animationElem->Attribute( "typeNormal" )) == "true");
 
-                sprite.LoadImage(scene.GetImageManager()->GetSFMLTexture(sprite.GetImageName()));
-            }
+        const TiXmlElement *elemObjetDirecScene = animationElem->FirstChildElement();
+        while ( elemObjetDirecScene )
+        {
+            Direction direction;
+            direction.LoadFromXml(elemObjetDirecScene);
+
+            newAnimation.SetDirectionsNumber(newAnimation.GetDirectionsNumber()+1);
+            newAnimation.SetDirection(direction, newAnimation.GetDirectionsNumber()-1);
+            elemObjetDirecScene = elemObjetDirecScene->NextSiblingElement();
+        }
+
+        AddAnimation( newAnimation );
+
+        animationElem = animationElem->NextSiblingElement();
+    }
+}
+
+#if defined(GD_IDE_ONLY)
+void SpriteObject::DoSaveToXml(TiXmlElement * elem)
+{
+    //Animations
+    TiXmlElement * animations = new TiXmlElement( "Animations" );
+    elem->LinkEndChild( animations );
+    TiXmlElement * animation;
+
+    for ( unsigned int k = 0;k < GetAnimationCount();k++ )
+    {
+        animation = new TiXmlElement( "Animation" );
+        animations->LinkEndChild( animation );
+
+        animation->SetAttribute( "typeNormal", GetAnimation( k ).useMultipleDirections ? "true" : "false" );
+
+        TiXmlElement * direction;
+        for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )
+        {
+            direction = new TiXmlElement( "Direction" );
+            animation->LinkEndChild( direction );
+
+            GetAnimation(k).GetDirection(l).SaveToXml(direction);
+
         }
     }
 }
 
-/**
- * Update animation and direction from the inital position
- */
-bool RuntimeSpriteObject::ExtraInitializationFromInitialInstance(const gd::InitialInstance & position)
-{
-    if ( position.floatInfos.find("animation") != position.floatInfos.end() )
-        SetCurrentAnimation(position.floatInfos.find("animation")->second);
-
-    return true;
-}
-
-/**
- * Render object at runtime
- */
-bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
-{
-    //Don't draw anything if hidden
-    if ( hidden ) return true;
-
-    renderTarget.draw( GetCurrentSFMLSprite(), sf::RenderStates(blendMode == 0 ? sf::BlendAlpha :
-                                                               (blendMode == 1 ? sf::BlendAdd :
-                                                               (blendMode == 2 ? sf::BlendMultiply :
-                                                                sf::BlendNone))));
-
-    /*sf::RectangleShape rectangle(sf::Vector2f(GetWidth(), GetHeight()));
-    rectangle.setPosition(sf::Vector2f(GetDrawableX(), GetDrawableY()));
-    rectangle.setOutlineThickness(5);
-    rectangle.setOutlineColor(sf::Color(255,0,0));
-    renderTarget.draw(rectangle);*/
-
-    /*std::vector<Polygon2d> polygons = GetHitBoxes();
-    for (unsigned int i = 0;i<polygons.size();++i)
-    {
-        sf::ConvexShape shape;
-        shape.setOutlineThickness(5);
-        shape.setOutlineColor(sf::Color(255,0,0));
-
-        shape.setPointCount(polygons[i].vertices.size());
-        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
-            shape.setPoint(j, polygons[i].vertices[j]);
-
-        renderTarget.draw(shape);
-    }*/
-
-    return true;
-}
-
-#if defined(GD_IDE_ONLY)
+#if !defined(EMSCRIPTEN)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
     std::cout << "Reloading resources for" << name;
@@ -254,6 +218,7 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
         }
     }
 }
+#endif
 
 void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper )
 {
@@ -264,9 +229,9 @@ void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::Main
 }
 
 
-std::map<std::string, gd::PropgridPropertyDescriptor> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
+std::map<std::string, gd::PropertyDescriptor> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
 {
-    std::map<std::string, gd::PropgridPropertyDescriptor> properties;
+    std::map<std::string, gd::PropertyDescriptor> properties;
     properties[ToString(_("Animation"))] = position.floatInfos.find("animation") != position.floatInfos.end() ?
                                            ToString(position.floatInfos.find("animation")->second) :
                                            "0";
@@ -280,44 +245,100 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position,
 
     return true;
 }
+#endif
 
-void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+#if !defined(EMSCRIPTEN)
+Animation RuntimeSpriteObject::badAnimation;
+Sprite * RuntimeSpriteObject::badSpriteDatas = NULL;
+
+RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object) :
+    RuntimeObject(scene, object),
+    currentAnimation( 0 ),
+    currentDirection( 0 ),
+    currentAngle( 0 ),
+    currentSprite( 0 ),
+    animationStopped(false),
+    timeElapsedOnCurrentSprite(0),
+    ptrToCurrentSprite( NULL ),
+    needUpdateCurrentSprite(true),
+    cacheAnimationSizeNeedUpdate(true),
+    opacity( 255 ),
+    blendMode(0),
+    isFlippedX(false),
+    isFlippedY(false),
+    scaleX( 1 ),
+    scaleY( 1 ),
+    colorR( 255 ),
+    colorV( 255 ),
+    colorB( 255 )
 {
-    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetCurrentAnimation());}
-    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetCurrentDirection());}
-    else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
-    else if ( propertyNb == 3 ) {name = _("Opacity");       value = ToString(GetOpacity());}
-    else if ( propertyNb == 4 ) {name = _("Blend mode");   if ( blendMode == 0) value = "0 (Alpha)";
-                                                                    else if ( blendMode == 1) value = "1 (Add)";
-                                                                    else if ( blendMode == 2) value = "2 (Multiply)";
-                                                                    else if ( blendMode == 3) value = "3 (None)";}
-    else if ( propertyNb == 5 ) {name = _("X Scale");       value = ToString(GetScaleX());}
-    else if ( propertyNb == 6 ) {name = _("Y Scale");       value = ToString(GetScaleY());}
+    if (!badSpriteDatas) badSpriteDatas = new Sprite();
+
+    const SpriteObject & spriteObject = static_cast<const SpriteObject&>(object);
+    animations = spriteObject.GetAllAnimations();
+
+    //Load resources
+    for ( unsigned int j = 0; j < animations.size();j++ )
+    {
+        Animation & anim = animations[j].GetNonConst();
+        for ( unsigned int k = 0;k < anim.GetDirectionsNumber();k++ )
+        {
+            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpriteCount();l++ )
+            {
+                Sprite & sprite = anim.GetDirectionToModify(k).GetSprite(l);
+
+                sprite.LoadImage(scene.GetImageManager()->GetSFMLTexture(sprite.GetImageName()));
+            }
+        }
+    }
 }
 
-bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
+/**
+ * Update animation and direction from the inital position
+ */
+bool RuntimeSpriteObject::ExtraInitializationFromInitialInstance(const gd::InitialInstance & position)
 {
-    if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
-    else if ( propertyNb == 1 )
-    {
-        if ( currentAnimation >= GetAnimationCount() ) return false;
-
-        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue));
-    }
-    else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
-    else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
-    else if ( propertyNb == 5 ) {SetScaleX(ToFloat(newValue));}
-    else if ( propertyNb == 6 ) {SetScaleY(ToFloat(newValue));}
+    if ( position.floatInfos.find("animation") != position.floatInfos.end() )
+        SetCurrentAnimation(position.floatInfos.find("animation")->second);
 
     return true;
 }
 
-unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
+/**
+ * Render object at runtime
+ */
+bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
 {
-    return 7;
+    //Don't draw anything if hidden
+    if ( hidden ) return true;
+
+    renderTarget.draw( GetCurrentSFMLSprite(), sf::RenderStates(blendMode == 0 ? sf::BlendAlpha :
+                                                               (blendMode == 1 ? sf::BlendAdd :
+                                                               (blendMode == 2 ? sf::BlendMultiply :
+                                                                sf::BlendNone))));
+
+    /*sf::RectangleShape rectangle(sf::Vector2f(GetWidth(), GetHeight()));
+    rectangle.setPosition(sf::Vector2f(GetDrawableX(), GetDrawableY()));
+    rectangle.setOutlineThickness(5);
+    rectangle.setOutlineColor(sf::Color(255,0,0));
+    renderTarget.draw(rectangle);*/
+
+    /*std::vector<Polygon2d> polygons = GetHitBoxes();
+    for (unsigned int i = 0;i<polygons.size();++i)
+    {
+        sf::ConvexShape shape;
+        shape.setOutlineThickness(5);
+        shape.setOutlineColor(sf::Color(255,0,0));
+
+        shape.setPointCount(polygons[i].vertices.size());
+        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
+            shape.setPoint(j, polygons[i].vertices[j]);
+
+        renderTarget.draw(shape);
+    }*/
+
+    return true;
 }
-#endif
 
 /**
  * Get the real X position of the sprite
@@ -858,61 +879,53 @@ void RuntimeSpriteObject::TurnTowardObject( RuntimeObject * object )
     return;
 }
 
-
-void SpriteObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
+#if defined(GD_IDE_ONLY)
+void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if ( elemScene->FirstChildElement( "Animations" ) == NULL ) return;
-
-    const TiXmlElement * elemObjetScene = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
-
-    //Pour chaque animation
-    while ( elemObjetScene )
-    {
-        Animation newAnimation;
-        newAnimation.useMultipleDirections = (elemObjetScene->Attribute( "typeNormal" )  != NULL && ToString(elemObjetScene->Attribute( "typeNormal" )) == "true");
-
-        const TiXmlElement *elemObjetDirecScene = elemObjetScene->FirstChildElement();
-        while ( elemObjetDirecScene )
-        {
-            Direction direction;
-            direction.LoadFromXml(elemObjetDirecScene);
-
-            newAnimation.SetDirectionsNumber(newAnimation.GetDirectionsNumber()+1);
-            newAnimation.SetDirection(direction, newAnimation.GetDirectionsNumber()-1);
-            elemObjetDirecScene = elemObjetDirecScene->NextSiblingElement();
-        }
-
-        AddAnimation( newAnimation );
-
-        elemObjetScene = elemObjetScene->NextSiblingElement();
-    }
+    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetCurrentAnimation());}
+    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetCurrentDirection());}
+    else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
+    else if ( propertyNb == 3 ) {name = _("Opacity");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 4 ) {name = _("Blend mode");   if ( blendMode == 0) value = "0 (Alpha)";
+                                                                    else if ( blendMode == 1) value = "1 (Add)";
+                                                                    else if ( blendMode == 2) value = "2 (Multiply)";
+                                                                    else if ( blendMode == 3) value = "3 (None)";}
+    else if ( propertyNb == 5 ) {name = _("X Scale");       value = ToString(GetScaleX());}
+    else if ( propertyNb == 6 ) {name = _("Y Scale");       value = ToString(GetScaleY());}
 }
 
-#if defined(GD_IDE_ONLY)
-void SpriteObject::DoSaveToXml(TiXmlElement * elem)
+bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    //Animations
-    TiXmlElement * animations = new TiXmlElement( "Animations" );
-    elem->LinkEndChild( animations );
-    TiXmlElement * animation;
-
-    for ( unsigned int k = 0;k < GetAnimationCount();k++ )
+    if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
+    else if ( propertyNb == 1 )
     {
-        animation = new TiXmlElement( "Animation" );
-        animations->LinkEndChild( animation );
+        if ( currentAnimation >= GetAnimationCount() ) return false;
 
-        animation->SetAttribute( "typeNormal", GetAnimation( k ).useMultipleDirections ? "true" : "false" );
-
-        TiXmlElement * direction;
-        for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )
-        {
-            direction = new TiXmlElement( "Direction" );
-            animation->LinkEndChild( direction );
-
-            GetAnimation(k).GetDirection(l).SaveToXml(direction);
-
-        }
+        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue));
     }
+    else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
+    else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
+    else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
+    else if ( propertyNb == 5 ) {SetScaleX(ToFloat(newValue));}
+    else if ( propertyNb == 6 ) {SetScaleY(ToFloat(newValue));}
+
+    return true;
+}
+
+unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
+{
+    return 7;
+}
+#endif
+
+void DestroyRuntimeSpriteObject(RuntimeObject * object)
+{
+    delete object;
+}
+
+RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)
+{
+    return new RuntimeSpriteObject(scene, object);
 }
 #endif
 
@@ -958,15 +971,4 @@ void DestroySpriteObject(gd::Object * object)
 gd::Object * CreateSpriteObject(std::string name)
 {
     return new SpriteObject(name);
-}
-
-
-void DestroyRuntimeSpriteObject(RuntimeObject * object)
-{
-    delete object;
-}
-
-RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeSpriteObject(scene, object);
 }

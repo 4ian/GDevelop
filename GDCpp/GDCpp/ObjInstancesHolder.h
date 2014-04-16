@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef OBJINSTANCESHOLDER_H
 #define OBJINSTANCESHOLDER_H
 
@@ -112,4 +113,4 @@ private:
 };
 
 #endif // OBJINSTANCESHOLDER_H
-
+#endif

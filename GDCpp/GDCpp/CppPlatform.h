@@ -70,12 +70,12 @@ public:
      * \brief Preview can be done directly inside the editor thanks to CppLayoutPreviewer
      */
     virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
-#endif
 
     /**
      * \brief Expose to the IDE how to export games.
      */
     virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+#endif
 
     /**
      * \brief When destroyed, our platform need to do ensure the destruction of some singletons.

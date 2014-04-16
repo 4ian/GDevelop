@@ -1,7 +1,9 @@
 #include "GDCpp/Sprite.h"
-#include <SFML/Graphics.hpp>
 #include "GDCpp/ImageManager.h"
 #include <iostream>
+#if defined(EMSCRIPTEN)
+#include <SFML/Graphics.hpp>
+#endif
 
 using namespace std;
 
@@ -79,36 +81,22 @@ Point & Sprite::GetPoint(const std::string & name)
     return badPoint;
 }
 
-void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
-{
-    sfmlImage = image_;
-    sfmlSprite.setTexture(sfmlImage->texture, true);
-    hasItsOwnImage = false;
-
-    if ( automaticCentre )
-        centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
-}
 
 bool Sprite::SetCentreAutomatic(bool enabled)
 {
     automaticCentre = enabled;
 
+#if !defined(EMSCRIPTEN)
     if ( automaticCentre )
         centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
+#else
+    std::cout << "WARNING: Unable to set the center point as we have no info about the sprite size!" << std::endl;
+#endif
 
     return true;
 }
 
-void Sprite::MakeSpriteOwnsItsImage()
-{
-    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<SFMLTextureWrapper>() )
-    {
-        sfmlImage = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
-        sfmlSprite.setTexture(sfmlImage->texture);
-        hasItsOwnImage = true;
-    }
-}
-
+#if !defined(EMSCRIPTEN)
 std::vector<Polygon2d> Sprite::GetCollisionMask() const
 {
     if ( automaticCollisionMask )
@@ -128,3 +116,23 @@ std::vector<Polygon2d> Sprite::GetCollisionMask() const
     return customCollisionMask;
 }
 
+void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
+{
+    sfmlImage = image_;
+    sfmlSprite.setTexture(sfmlImage->texture, true);
+    hasItsOwnImage = false;
+
+    if ( automaticCentre )
+        centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
+}
+
+void Sprite::MakeSpriteOwnsItsImage()
+{
+    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<SFMLTextureWrapper>() )
+    {
+        sfmlImage = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
+        sfmlSprite.setTexture(sfmlImage->texture);
+        hasItsOwnImage = true;
+    }
+}
+#endif

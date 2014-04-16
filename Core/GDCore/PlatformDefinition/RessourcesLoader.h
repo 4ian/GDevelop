@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(EMSCRIPTEN)
 #ifndef RESSOURCESLOADER_H
 #define RESSOURCESLOADER_H
 class Music;
@@ -84,3 +85,4 @@ private:
 
 }
 #endif // RESSOURCESLOADER_H
+#endif

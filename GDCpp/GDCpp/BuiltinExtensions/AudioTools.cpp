@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include "AudioTools.h"
 #include <string>
 #include "GDCpp/RuntimeScene.h"
@@ -293,4 +293,4 @@ double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int
 
     return static_cast<double>(SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetPlayingOffset())/1000.0;
 }
-
+#endif

@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #ifndef FONTMANAGER_H
 #define FONTMANAGER_H
 #include <SFML/Graphics.hpp>
@@ -66,4 +66,4 @@ private:
 };
 
 #endif // FONTMANAGER_H
-
+#endif

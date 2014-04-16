@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef EXTERNALLAYOUTSTOOLS_H
 #define EXTERNALLAYOUTSTOOLS_H
 #include <string>
@@ -9,4 +10,4 @@ namespace ExternalLayoutsTools
 };
 
 #endif // EXTERNALLAYOUTSTOOLS_H
-
+#endif

@@ -5,7 +5,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ObjectsPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -65,7 +65,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
     for (unsigned int i = 0;i<automatisms.size();++i)
     {
         const gd::Automatism & automatism = object->GetAutomatism(automatisms[i]);
-        std::map<std::string, gd::PropgridPropertyDescriptor> properties = automatism.GetProperties(project);
+        std::map<std::string, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
 
         grid->AppendIn( "AUTO", new wxPropertyCategory(gd::ToString(automatism.GetName())) );
         if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
@@ -80,7 +80,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+automatisms[i]));
 
         //Add automatism custom properties
-        for (std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = properties.begin();
+        for (std::map<std::string, gd::PropertyDescriptor>::iterator it = properties.begin();
             it != properties.end();++it)
         {
             if ( (*it).first == "PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS" ) continue; //Skip the magic property.

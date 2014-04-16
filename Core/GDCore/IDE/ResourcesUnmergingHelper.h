@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
+#if !defined(EMSCRIPTEN)
 #ifndef ResourcesUnmergingHelper_H
 #define ResourcesUnmergingHelper_H
 
@@ -39,5 +40,4 @@ private:
 }
 
 #endif // ResourcesUnmergingHelper_H
-
-
+#endif

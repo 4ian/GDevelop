@@ -2,7 +2,8 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if !defined(EMSCRIPTEN)
+#if defined(GD_IDE_ONLY)
 #include <wx/msgdlg.h> //Must be placed first
 #endif
 #include "GDCore/Tools/Log.h"
@@ -357,4 +358,4 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
     return false;
 }
 #endif
-
+#endif

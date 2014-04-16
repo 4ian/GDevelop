@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #include "GDCore/PlatformDefinition/RessourcesLoader.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -96,3 +97,4 @@ long int RessourcesLoader::GetBinaryFileSize( const string & filename)
 }
 
 }
+#endif

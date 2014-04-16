@@ -105,7 +105,7 @@ WindowExtension::WindowExtension()
     #endif
 }
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 void WindowExtension::ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker)
 {
     if ( action.GetType() == "EcrireTexte" && !action.GetParameter( 6 ).GetPlainString().empty() )

@@ -3,6 +3,8 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <string>
+#include <vector>
 #include "GDCpp/CppPlatform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -76,6 +78,7 @@ CppPlatform::CppPlatform() :
         CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
 #endif
 
+    std::cout << "* Loading builtin extensions... ";
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
@@ -95,6 +98,7 @@ CppPlatform::CppPlatform() :
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
+    std::cout << "done." << std::endl;
 }
 
 bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension)
@@ -110,7 +114,7 @@ bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platform
     if (!gd::Platform::AddExtension(extension)) return false;
 
     //Then Load all runtime objects provided by the extension
-    vector < string > objectsTypes = extension->GetExtensionObjectsTypes();
+    std::vector < std::string > objectsTypes = extension->GetExtensionObjectsTypes();
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
         runtimeObjCreationFunctionTable[objectsTypes[i]] = extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
@@ -151,12 +155,12 @@ boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd:
 {
     return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
 }
-#endif
 
 boost::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
 {
     return boost::shared_ptr<gd::ProjectExporter>(new Exporter);
 }
+#endif
 
 void CppPlatform::OnIDEClosed()
 {
@@ -165,8 +169,10 @@ void CppPlatform::OnIDEClosed()
         CodeCompiler::GetInstance()->ClearOutputDirectory();
 #endif
 
+#if !defined(EMSCRIPTEN)
     SoundManager::GetInstance()->DestroySingleton();
     FontManager::GetInstance()->DestroySingleton();
+#endif
 }
 #endif
 

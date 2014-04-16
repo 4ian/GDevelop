@@ -44,8 +44,7 @@ public:
     std::vector < gd::Instruction > & GetActions() { return actions; };
     void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
-    std::string GetRepeatExpression() const { return repeatNumberExpression.GetPlainString(); };
-    std::string GetRepeatExpression() { return repeatNumberExpression.GetPlainString(); };
+    const std::string & GetRepeatExpression() const { return repeatNumberExpression.GetPlainString(); };
     void SetRepeatExpression(std::string repeatNumberExpression_) { repeatNumberExpression = gd::Expression(repeatNumberExpression_); };
 
     virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();

@@ -7,7 +7,6 @@
 #define DIRECTION_H
 #include <string>
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include "GDCpp/Sprite.h"
 class TiXmlElement;
 

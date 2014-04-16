@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include "GDCpp/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDCpp/profile.h"
 #include <SFML/Graphics.hpp>
@@ -95,4 +95,4 @@ double GD_API ToDeg( double angle )
 }
 
 }
-
+#endif

@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef EXPORTER_H
 #define EXPORTER_H
 #if defined(GD_IDE_ONLY)
@@ -26,3 +27,4 @@ public:
 
 #endif
 #endif // EXPORTER_H
+#endif

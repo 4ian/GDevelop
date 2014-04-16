@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef MOUSETOOLS_H
 #define MOUSETOOLS_H
 
@@ -16,4 +17,4 @@ bool GD_API MouseButtonPressed( RuntimeScene & scene, const std::string & key );
 int GD_API GetMouseWheelDelta(RuntimeScene & scene );
 
 #endif // MOUSETOOLS_H
-
+#endif

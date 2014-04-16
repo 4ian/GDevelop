@@ -29,6 +29,7 @@ These notices must be retained in any copies of any part of this
 documentation and/or software.
 
 */
+#if !defined(EMSCRIPTEN) //Florian: Disabled this file when compiling for JS
 
 /* interface header */
 #include "md5.h"
@@ -379,3 +380,4 @@ std::string md5(const std::string str)
 #undef S43
 #undef S44
 
+#endif

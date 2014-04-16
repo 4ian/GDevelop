@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #ifndef STRINGEXPRESSIONS_H
 #define STRINGEXPRESSIONS_H
 
@@ -31,4 +31,4 @@ int GD_API StrRFindFrom(const std::string & str, const std::string & findwhat, u
 
 }
 #endif // STRINGEXPRESSIONS_H
-
+#endif

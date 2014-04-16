@@ -182,7 +182,7 @@ void EventsListSerialization::LoadEventsFromXml(gd::Project & project, EventsLis
         }
         else
         {
-            gd::LogWarning("Unknown event of type " + type);
+            std::cout << "Unknown event of type " << type;
             event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
         }
 

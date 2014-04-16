@@ -1,3 +1,4 @@
+#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMECONTEXT_H
 #define RUNTIMECONTEXT_H
 
@@ -66,4 +67,4 @@ private:
 };
 
 #endif // RUNTIMECONTEXT_H
-
+#endif

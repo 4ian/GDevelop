@@ -3,7 +3,9 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(EMSCRIPTEN)
 #include "XmlFilesHelper.h"
 
 std::map<std::string, boost::shared_ptr<XmlFile> > XmlFilesManager::openedFiles;
 
+#endif

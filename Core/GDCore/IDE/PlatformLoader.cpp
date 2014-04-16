@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(EMSCRIPTEN)
 #include <string>
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/PlatformLoader.h"
@@ -71,13 +72,13 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
 
 boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string fullpath)
 {
-    std::cout << "Loading platform " << fullpath << "...";
+    std::cout << "Loading platform " << fullpath << "..." << std::endl;
     Handle platformHdl = OpenLibrary(fullpath.c_str());
     if (platformHdl == NULL)
     {
         std::string error = DynamicLibraryLastError();
 
-        cout << "fail." << endl;
+        cout << "Loading of "<< fullpath <<" failed." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\n") + error);
@@ -91,7 +92,7 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
 
         if ( createFunPtr == NULL || destroyFunPtr == NULL )
         {
-            cout << "fail ( no valid create/destroy functions )." << endl;
+            cout << "Loading of "<< fullpath <<" failed (no valid create/destroy functions)." << endl;
 
             CloseLibrary(platformHdl);
 
@@ -102,16 +103,15 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
         }
         else
         {
-            std::cout << ".";
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
             gd::LocaleManager::GetInstance()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
             #endif
 
-            std::cout << ".";
             boost::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);
-            std::cout << ".done." << std::endl;
+            std::cout << "Loading of " << fullpath << " done." << std::endl;
 
             gd::PlatformManager::GetInstance()->AddPlatform(platform);
+            std::cout << "Registration in platform manager of " << fullpath << " done." << std::endl;
             return platform;
         }
     }
@@ -121,3 +121,4 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
 
 
 }
+#endif

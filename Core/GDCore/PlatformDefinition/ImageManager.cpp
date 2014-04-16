@@ -3,6 +3,7 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if !defined(EMSCRIPTEN)
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/RessourcesLoader.h"
@@ -207,3 +208,4 @@ OpenGLTextureWrapper::~OpenGLTextureWrapper()
 {
     glDeleteTextures(1, &texture);
 };
+#endif

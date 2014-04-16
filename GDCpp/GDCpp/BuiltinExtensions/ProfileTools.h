@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #if defined(GD_IDE_ONLY)
 
 #ifndef PROFILETOOLS_H
@@ -19,4 +19,4 @@ void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id);
 #endif // PROFILETOOLS_H
 
 #endif
-
+#endif

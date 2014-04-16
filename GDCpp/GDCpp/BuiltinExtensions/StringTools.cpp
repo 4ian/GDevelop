@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include <string>
 #include "GDCpp/RuntimeScene.h"
 
@@ -87,11 +87,11 @@ int GD_API StrRFindFrom(const std::string & str, const std::string & findwhat, u
     return -1;
 }
 
-std::string GD_API NewLine() 
+std::string GD_API NewLine()
 {
     return "\n";
 };
 
 }
 }
-
+#endif

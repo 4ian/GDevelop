@@ -4,7 +4,7 @@
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "InitialInstancesPropgridHelper.h"
-#include "GDCore/IDE/Dialogs/PropgridPropertyDescriptor.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/CommonTools.h"
@@ -32,7 +32,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     std::string widthProperty;
     std::string heightProperty;
     bool lockedProperty = false;
-    std::map<std::string, gd::PropgridPropertyDescriptor> customProperties;
+    std::map<std::string, gd::PropertyDescriptor> customProperties;
 
     for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
     {
@@ -62,8 +62,8 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
             if ( ToString(selectedInitialInstances[i]->GetCustomHeight()) != heightProperty ) heightProperty = _("(Multiples values)");
 
             //Merge custom properties
-            std::map<std::string, gd::PropgridPropertyDescriptor> instanceCustomProperties = selectedInitialInstances[i]->GetCustomProperties(project, layout);
-            for(std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = instanceCustomProperties.begin();
+            std::map<std::string, gd::PropertyDescriptor> instanceCustomProperties = selectedInitialInstances[i]->GetCustomProperties(project, layout);
+            for(std::map<std::string, gd::PropertyDescriptor>::iterator it = instanceCustomProperties.begin();
                 it != instanceCustomProperties.end();++it)
             {
                 if ( customProperties.find(it->first) == customProperties.end() ) continue;
@@ -71,7 +71,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
                     customProperties[it->first].SetValue(ToString(_("(Multiples values)")));
             }
             //Also erase properties which are not in common.
-            for(std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = customProperties.begin();
+            for(std::map<std::string, gd::PropertyDescriptor>::iterator it = customProperties.begin();
                 it != customProperties.end();)
             {
                 if ( instanceCustomProperties.find(it->first) == instanceCustomProperties.end() )
@@ -92,7 +92,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     grid->Append( new wxBoolProperty(_("Custom size?"), "INSTANCE_CUSTOM_SIZE", customSizeProperty));
     grid->EnableProperty(grid->AppendIn( "INSTANCE_CUSTOM_SIZE", new wxStringProperty(_("Width"), "INSTANCE_SIZE_WIDTH", widthProperty)), customSizeProperty);
     grid->EnableProperty(grid->AppendIn( "INSTANCE_CUSTOM_SIZE", new wxStringProperty(_("Height"), "INSTANCE_SIZE_HEIGHT", heightProperty)), customSizeProperty);
-    for (std::map<std::string, gd::PropgridPropertyDescriptor>::iterator it = customProperties.begin(); it != customProperties.end();++it)
+    for (std::map<std::string, gd::PropertyDescriptor>::iterator it = customProperties.begin(); it != customProperties.end();++it)
     {
         grid->Append( new wxStringProperty(it->first, wxPG_LABEL, it->second.GetValue()));
     }

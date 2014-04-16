@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/Music.h"
 #include "GDCpp/Sound.h"
@@ -87,4 +87,4 @@ void SoundManager::SetGlobalVolume(float volume)
         if ( musics[i] != boost::shared_ptr<Music>() ) musics[i]->UpdateVolume();
     }
 }
-
+#endif

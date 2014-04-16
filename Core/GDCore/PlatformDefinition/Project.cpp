@@ -956,6 +956,7 @@ void Project::SaveToXml(TiXmlElement * root) const
     #endif
 }
 
+#if !defined(GD_NO_WX_GUI)
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     //Add project resources
@@ -994,7 +995,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     wxSafeYield();
     #endif
 }
-#if !defined(GD_NO_WX_GUI)
+
 void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
 {
     grid->Append( new wxPropertyCategory(_("Properties")) );

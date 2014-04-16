@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMEGAME_H
 #define RUNTIMEGAME_H
 
@@ -50,4 +50,4 @@ private:
 };
 
 #endif // RUNTIMEGAME_H
-
+#endif

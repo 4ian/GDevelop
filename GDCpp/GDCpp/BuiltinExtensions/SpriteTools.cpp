@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if !defined(EMSCRIPTEN)
 #include "SpriteTools.h"
 #include <string>
 #include <vector>
@@ -26,4 +26,4 @@ bool GD_API SpriteCollision( std::map <std::string, std::vector<RuntimeObject*> 
 {
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, SpriteCollisionInnerTest, 0);
 }
-
+#endif

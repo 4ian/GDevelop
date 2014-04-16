@@ -13,7 +13,8 @@ module.exports = function(grunt) {
         uglify: {
           build: {
             files: [
-                {src: [ 'WebIDE/**.js' ], dest:buildDirectory+'GDWebIDE.js'}
+                {src: [ 'WebIDE/**.js' ], dest:buildDirectory+'GDWebIDE.js'},
+                {src: [ buildDirectory+'libGD.js' ], dest:buildDirectory+'libGD.min.js'}
             ]
           }
         },

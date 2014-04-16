@@ -1,5 +1,5 @@
-#ifndef PROPGRIDPROPERTYDESCRIPTOR
-#define PROPGRIDPROPERTYDESCRIPTOR
+#ifndef GDCORE_PROPERTYDESCRIPTOR
+#define GDCORE_PROPERTYDESCRIPTOR
 
 #include <string>
 #include <vector>
@@ -13,14 +13,14 @@ namespace gd
  * \see gd::ObjectsPropgridHelper
  * \see gd::Object
  */
-class GD_CORE_API PropgridPropertyDescriptor
+class GD_CORE_API PropertyDescriptor
 {
 public:
 	/**
 	 * \brief Create a property being a simple string with the specified value.
 	 * \param propertyValue The value of the property.
 	 */
-	PropgridPropertyDescriptor(std::string propertyValue) :
+	PropertyDescriptor(std::string propertyValue) :
 		currentValue(propertyValue),
 		type("string")
 	{
@@ -29,33 +29,33 @@ public:
 	/**
 	 * \brief Empty constructor creating an empty property to be displayed.
 	 */
-	PropgridPropertyDescriptor() {};
+	PropertyDescriptor() {};
 
 	/**
 	 * \brief Destructor
 	 */
-	virtual ~PropgridPropertyDescriptor();
+	virtual ~PropertyDescriptor();
 
 	/**
 	 * \brief Change the value displayed in the property grid
 	 */
-	PropgridPropertyDescriptor & SetValue(std::string value) { currentValue = value; return *this; }
+	PropertyDescriptor & SetValue(std::string value) { currentValue = value; return *this; }
 
 	/**
 	 * \brief Change the type of the value displayed in the property grid.
 	 * \note The type is arbitrary and is interpreted by the class updating the property grid: Refer to it
-	 * or to the documentation of the class which is returning the PropgridPropertyDescriptor to learn
+	 * or to the documentation of the class which is returning the PropertyDescriptor to learn
 	 * more about valid values for the type.
 	 */
-	PropgridPropertyDescriptor & SetType(std::string type_) { type = type_; return *this; }
+	PropertyDescriptor & SetType(std::string type_) { type = type_; return *this; }
 
 	/**
 	 * \brief Add an information about the property.
 	 * \note The information are arbitrary and are interpreted by the class updating the property grid: Refer to it
-	 * or to the documentation of the class which is returning the PropgridPropertyDescriptor to learn
+	 * or to the documentation of the class which is returning the PropertyDescriptor to learn
 	 * more about valid values for the extra information.
 	 */
-	PropgridPropertyDescriptor & AddExtraInfo(const std::string & info) { extraInformation.push_back(info); return *this; }
+	PropertyDescriptor & AddExtraInfo(const std::string & info) { extraInformation.push_back(info); return *this; }
 
 	const std::string & GetValue() const { return currentValue; }
 	const std::string & GetType() const { return type; }

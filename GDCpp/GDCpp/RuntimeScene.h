@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMESCENE_H
 #define RUNTIMESCENE_H
 
@@ -266,4 +265,3 @@ protected:
 };
 
 #endif // RUNTIMESCENE_H
-#endif

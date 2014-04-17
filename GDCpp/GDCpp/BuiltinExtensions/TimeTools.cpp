@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #include "TimeTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/ManualTimer.h"
@@ -183,4 +182,3 @@ double GD_API GetTime( const RuntimeScene & scene, const std::string & parameter
 
     return 0;
 }
-#endif

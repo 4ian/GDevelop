@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #include <string>
 #include "GDCpp/BuiltinExtensions/KeyboardTools.h"
 #include <SFML/Graphics.hpp>
@@ -141,4 +140,3 @@ bool GD_API AnyKeyIsPressed( RuntimeScene & scene )
 
     return false;
 }
-#endif

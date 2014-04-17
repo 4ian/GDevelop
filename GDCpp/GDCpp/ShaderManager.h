@@ -2,8 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
-#if !defined(EMSCRIPTEN)
 #ifndef SHADERMANAGER_H
 #define SHADERMANAGER_H
 #include <map>
@@ -34,4 +32,3 @@ private:
 };
 
 #endif // SHADERMANAGER_H
-#endif

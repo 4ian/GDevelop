@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #include "ExternalLayoutsTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/ExternalLayout.h"
@@ -17,4 +16,3 @@ void GD_API CreateObjectsFromExternalLayout(RuntimeScene & scene, const std::str
 }
 
 }
-#endif

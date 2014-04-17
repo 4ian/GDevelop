@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #ifndef PLATFORMLOADER_H
 #define PLATFORMLOADER_H
 #include <string>
@@ -55,4 +54,3 @@ private:
 }
 
 #endif // PLATFORMLOADER_H
-#endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef CODEEXECUTIONENGINE_H
 #define CODEEXECUTIONENGINE_H
 #include "GDCpp/DynamicLibrariesTools.h"
@@ -92,4 +91,3 @@ private:
 
 
 #endif // CODEEXECUTIONENGINE_H
-#endif

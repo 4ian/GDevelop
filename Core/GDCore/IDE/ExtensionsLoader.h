@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #ifndef EXTENSIONSLOADER_H
 #define EXTENSIONSLOADER_H
 #include <string>
@@ -58,4 +57,3 @@ private:
 }
 
 #endif // EXTENSIONSLOADER_H
-#endif

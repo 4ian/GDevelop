@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #include "GDCpp/Text.h"
 #include "GDCpp/FontManager.h"
 #include <iostream>
@@ -29,4 +28,3 @@ void Text::Draw(sf::RenderWindow& App)
     text.setFont(*fontManager->GetFont(fontName));
     App.draw( text );
 }
-#endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
@@ -101,4 +100,3 @@ private:
 }
 
 #endif // CLIPBOARD_H
-#endif

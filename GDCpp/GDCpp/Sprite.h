@@ -7,9 +7,7 @@
 #define SPRITE_H
 #include <string>
 #include <boost/shared_ptr.hpp>
-#if defined(EMSCRIPTEN)
-#include <SFML/Graphics.hpp>
-#endif
+#include <SFML/Graphics/Sprite.hpp>
 #include "GDCpp/Point.h"
 #include "GDCpp/Polygon.h"
 class SFMLTextureWrapper;
@@ -144,7 +142,6 @@ public:
      * Functions used by the C++ game engine.
      */
     ///@{
-    #if !defined(EMSCRIPTEN)
     /**
      * Get the SFML Sprite associated with the Sprite
      */
@@ -175,17 +172,13 @@ public:
      * copy this image and own it inside.
      */
     void MakeSpriteOwnsItsImage();
-    #endif
     ///@}
 
 private:
 
-    #if !defined(EMSCRIPTEN)
     sf::Sprite sfmlSprite; ///< Displayed SFML sprite
     boost::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
-    #endif
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
-
     std::string image; ///< Name of the image to be loaded in Image Manager.
 
     bool automaticCollisionMask; ///< True to use the custom collision mask. Otherwise, a basic bounding box is returned by GetCollisionMask()

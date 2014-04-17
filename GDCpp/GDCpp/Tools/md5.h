@@ -29,7 +29,6 @@ These notices must be retained in any copies of any part of this
 documentation and/or software.
 
 */
-#if !defined(EMSCRIPTEN) //Florian: Disabled this file when compiling for JS
 
 #ifndef BZF_MD5_H
 #define BZF_MD5_H
@@ -90,7 +89,5 @@ private:
 };
 
 std::string md5(const std::string str);
-
-#endif
 
 #endif

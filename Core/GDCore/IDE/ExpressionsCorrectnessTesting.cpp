@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/Events/Expression.h"
@@ -55,4 +54,3 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const gd::Pla
 }
 
 }
-#endif

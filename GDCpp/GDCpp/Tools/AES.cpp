@@ -49,8 +49,6 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined(EMSCRIPTEN) //Florian: Disabled this file when compiling for JS
-
 #include <string.h>
 #include "AES.h"
 
@@ -1328,4 +1326,3 @@ void GD_API aes_cbc_decrypt(const uint8_t *in, uint8_t *out, uint8_t *iv,
 
 	memcpy(iv, vec, AES_BLOCK_SIZE);
 }
-#endif

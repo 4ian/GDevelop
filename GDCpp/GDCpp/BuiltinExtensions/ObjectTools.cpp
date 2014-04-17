@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #include "ObjectTools.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon.h"
@@ -217,4 +216,3 @@ bool GD_API MovesToward( std::map <std::string, std::vector<RuntimeObject*> *> o
 {
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, MovesTowardInnerTest, tolerance);
 }
-#endif

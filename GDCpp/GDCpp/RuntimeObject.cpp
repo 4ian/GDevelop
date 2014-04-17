@@ -2,8 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
-#if !defined(EMSCRIPTEN)
 #include <cstring>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/RuntimeObject.h"
@@ -602,4 +600,3 @@ RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object &
 {
     return new RuntimeObject(scene, object);
 }
-#endif

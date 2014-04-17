@@ -2,8 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
-#if !defined(EMSCRIPTEN)
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/profile.h"
@@ -59,4 +57,3 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
 
     AddObject(theObject);
 }
-#endif

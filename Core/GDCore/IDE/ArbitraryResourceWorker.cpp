@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #if defined(GD_IDE_ONLY)
 
 #include "ArbitraryResourceWorker.h"
@@ -123,5 +122,4 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
 }
 
 }
-#endif
 #endif

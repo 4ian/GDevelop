@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #include "RuntimeSceneCameraTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeObject.h"
@@ -166,4 +165,3 @@ void GD_API SetCameraViewport( RuntimeScene & scene,  const std::string & layer,
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraNb);
     camera.SetViewport(viewportLeft, viewportTop, viewportRight, viewportBottom);
 }
-#endif

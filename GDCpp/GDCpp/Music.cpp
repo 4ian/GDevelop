@@ -1,11 +1,9 @@
-#if !defined(EMSCRIPTEN)
 #include "GDCpp/Music.h"
 #include <string>
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
 #include "GDCpp/SoundManager.h"
-
 
 using namespace std;
 
@@ -84,4 +82,3 @@ void Music::UpdateVolume()
 {
     music.setVolume(volume * SoundManager::GetInstance()->GetGlobalVolume()/100.f);
 }
-#endif

@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMESCENECAMERATOOLS_H
 #define RUNTIMESCENECAMERATOOLS_H
 
@@ -27,6 +26,4 @@ void GD_API ActDeleteCamera(RuntimeScene & scene, const std::string & layer, uns
 void GD_API AddCamera( RuntimeScene & scene, const std::string & layer, float width, float height, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom );
 void GD_API SetCameraViewport( RuntimeScene & scene,  const std::string & layer, unsigned int cameraNb, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom );
 
-
 #endif // RUNTIMESCENECAMERATOOLS_H
-#endif

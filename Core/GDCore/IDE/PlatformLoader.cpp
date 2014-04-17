@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #include <string>
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/PlatformLoader.h"
@@ -121,4 +120,3 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
 
 
 }
-#endif

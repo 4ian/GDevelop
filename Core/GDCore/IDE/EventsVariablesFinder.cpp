@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
+
 #include "EventsVariablesFinder.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
@@ -173,4 +173,3 @@ std::set < std::string > EventsVariablesFinder::FindArgumentsInEvents(const gd::
 
 
 }
-#endif

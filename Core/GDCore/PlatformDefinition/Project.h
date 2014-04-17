@@ -578,7 +578,6 @@ public:
      */
     ResourcesManager & GetResourcesManager() { return resourcesManager; }
 
-    #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
      * IDE ( or at runtime for the GD C++ Platform ).
@@ -603,7 +602,6 @@ public:
      * \see ArbitraryResourceWorker
      */
     void ExposeResources(gd::ArbitraryResourceWorker & worker);
-    #endif
     ///@}
 
     /** \name Variable management

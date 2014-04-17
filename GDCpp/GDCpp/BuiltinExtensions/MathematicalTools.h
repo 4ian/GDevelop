@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef MATHEMATICALTOOLS_H
 #define MATHEMATICALTOOLS_H
 
@@ -55,4 +54,3 @@ double GD_API lerp(double a, double b, double x);
 }
 
 #endif // MATHEMATICALTOOLS_H
-#endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "ProfileTools.h"
@@ -21,5 +20,4 @@ void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id)
     scene.GetProfiler()->profileEventsInformation[id].Stop();
 }
 
-#endif
 #endif

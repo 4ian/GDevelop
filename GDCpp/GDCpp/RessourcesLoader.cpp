@@ -1,5 +1,3 @@
-
-#if !defined(EMSCRIPTEN)
 #if !defined(GD_IDE_ONLY)
 
 #include "GDCpp/RessourcesLoader.h"
@@ -176,5 +174,4 @@ bool RessourcesLoader::HasFile(const std::string & filename)
 }
 
 }
-#endif
 #endif

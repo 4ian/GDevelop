@@ -107,7 +107,6 @@ private:
 GD_API void DestroySpriteObject(gd::Object * object);
 GD_API gd::Object * CreateSpriteObject(std::string name);
 
-#if !defined(EMSCRIPTEN)
 class GD_API RuntimeSpriteObject : public RuntimeObject
 {
 public :
@@ -255,7 +254,5 @@ private:
 
 GD_API void DestroyRuntimeSpriteObject(RuntimeObject * object);
 GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
-#endif
 
 #endif // SPRITEOBJECT_H
-

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMEOBJECT_H
 #define RUNTIMEOBJECT_H
 
@@ -433,4 +432,3 @@ void DestroyBaseRuntimeObject(RuntimeObject * object);
 RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // RUNTIMEOBJECT_H
-#endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef GDCORE_PROJECTEXPORTER_H
 #define GDCORE_PROJECTEXPORTER_H
 #include <string>
@@ -40,4 +39,3 @@ public:
 }
 
 #endif // GDCORE_PROJECTEXPORTER_H
-#endif

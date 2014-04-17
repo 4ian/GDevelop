@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #ifndef GDCORE_EXPRESSIONSCORRECTNESSTESTING_H
 #define GDCORE_EXPRESSIONSCORRECTNESSTESTING_H
 
@@ -64,4 +63,3 @@ private :
 }
 
 #endif // GDCORE_EXPRESSIONSCORRECTNESSTESTING_H
-#endif

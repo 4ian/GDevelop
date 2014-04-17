@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #ifndef RUNTIMELAYER_H
 #define RUNTIMELAYER_H
 #include <SFML/Graphics.hpp>
@@ -163,4 +162,3 @@ private:
 };
 
 #endif // RUNTIMELAYER_H
-#endif

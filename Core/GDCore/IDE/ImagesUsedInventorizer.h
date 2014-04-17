@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #if defined(GD_IDE_ONLY)
 
 #ifndef IMAGESUSEDINVENTORIZER_H
@@ -39,5 +38,4 @@ class ImagesUsedInventorizer : public gd::ArbitraryResourceWorker
 };
 
 #endif // IMAGESUSEDINVENTORIZER_H
-#endif
 #endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef NETWORKTOOLS_H
 #define NETWORKTOOLS_H
 #include <string>
@@ -24,4 +23,3 @@ std::string GD_API VariableStructureToJSON(const gd::Variable & variable);
 void GD_API JSONToVariableStructure(const std::string & JSON, gd::Variable & variable);
 
 #endif // NETWORKTOOLS_H
-#endif

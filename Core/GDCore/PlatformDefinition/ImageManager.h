@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #ifndef ImageManager_H
 #define ImageManager_H
 
@@ -162,4 +161,3 @@ private :
 
 
 #endif // ImageManager_H
-#endif

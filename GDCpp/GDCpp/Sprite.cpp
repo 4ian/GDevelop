@@ -1,9 +1,7 @@
 #include "GDCpp/Sprite.h"
 #include "GDCpp/ImageManager.h"
 #include <iostream>
-#if defined(EMSCRIPTEN)
-#include <SFML/Graphics.hpp>
-#endif
+#include <SFML/Graphics/Sprite.hpp>
 
 using namespace std;
 
@@ -86,17 +84,12 @@ bool Sprite::SetCentreAutomatic(bool enabled)
 {
     automaticCentre = enabled;
 
-#if !defined(EMSCRIPTEN)
     if ( automaticCentre )
         centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
-#else
-    std::cout << "WARNING: Unable to set the center point as we have no info about the sprite size!" << std::endl;
-#endif
 
     return true;
 }
 
-#if !defined(EMSCRIPTEN)
 std::vector<Polygon2d> Sprite::GetCollisionMask() const
 {
     if ( automaticCollisionMask )
@@ -135,4 +128,3 @@ void Sprite::MakeSpriteOwnsItsImage()
         hasItsOwnImage = true;
     }
 }
-#endif

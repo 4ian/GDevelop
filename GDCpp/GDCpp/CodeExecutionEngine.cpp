@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 #include "CodeExecutionEngine.h"
@@ -76,4 +75,3 @@ void CodeExecutionEngine::Init(const CodeExecutionEngine & other)
     if ( loaded ) Unload();
     if ( other.Ready() ) LoadFromDynamicLibrary(other.dynamicLibraryFilename, other.functionName);
 }
-#endif

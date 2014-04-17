@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #ifndef ARBITRARYRESOURCEWORKER_H
 #define ARBITRARYRESOURCEWORKER_H
 
@@ -54,4 +53,3 @@ void GD_CORE_API LaunchResourceWorkerOnEvents(const gd::Project & project, gd::E
 }
 
 #endif // ARBITRARYRESOURCEWORKER_H
-#endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #include <fstream>
 #include <string>
 #include <SFML/Network.hpp>
@@ -272,4 +271,3 @@ void GD_API JSONToVariableStructure(const std::string & jsonStr, gd::Variable & 
     if ( jsonStr.empty() ) return;
     ::ParseJSONObject(jsonStr, 0, variable);
 }
-#endif

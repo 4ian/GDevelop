@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef COMMONINSTRUCTIONS_H
 #define COMMONINSTRUCTIONS_H
 #include <string>
@@ -57,6 +56,4 @@ double GD_API ToDeg( double angle );
 }
 
 }
-
 #endif // COMMONINSTRUCTIONS_H
-#endif

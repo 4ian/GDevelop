@@ -95,7 +95,6 @@ void SpriteObject::DoSaveToXml(TiXmlElement * elem)
     }
 }
 
-#if !defined(EMSCRIPTEN)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
     std::cout << "Reloading resources for" << name;
@@ -218,7 +217,6 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
         }
     }
 }
-#endif
 
 void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper )
 {
@@ -247,7 +245,6 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position,
 }
 #endif
 
-#if !defined(EMSCRIPTEN)
 Animation RuntimeSpriteObject::badAnimation;
 Sprite * RuntimeSpriteObject::badSpriteDatas = NULL;
 
@@ -927,7 +924,6 @@ RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object
 {
     return new RuntimeSpriteObject(scene, object);
 }
-#endif
 
 AnimationProxy::AnimationProxy() :
     animation(new Animation)

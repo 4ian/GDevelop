@@ -23,9 +23,7 @@ SpriteExtension::SpriteExtension()
                    &CreateSpriteObject,
                    &DestroySpriteObject);
 
-        #if !defined(EMSCRIPTEN)
         AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
-        #endif
 
         #if defined(GD_IDE_ONLY)
         obj.SetIncludeFile("GDCpp/SpriteObject.h");

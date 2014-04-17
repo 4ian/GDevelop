@@ -3,7 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(EMSCRIPTEN)
 #include <boost/version.hpp>
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -295,4 +294,3 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
 }
 
 }
-#endif

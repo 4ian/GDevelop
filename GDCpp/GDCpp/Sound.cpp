@@ -2,8 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-
-#if !defined(EMSCRIPTEN)
 #include "GDCpp/Sound.h"
 #include <SFML/Audio.hpp>
 #include <string>
@@ -54,4 +52,3 @@ void Sound::UpdateVolume()
 
     sound.setVolume(volume*soundManager->GetGlobalVolume()/100.f);
 }
-#endif

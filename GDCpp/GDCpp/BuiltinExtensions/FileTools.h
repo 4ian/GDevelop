@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef FILETOOLS_H
 #define FILETOOLS_H
 
@@ -24,4 +23,3 @@ void GD_API ReadValueFromFile( const std::string & filename, const std::string &
 void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable );
 
 #endif // FILETOOLS_H
-#endif

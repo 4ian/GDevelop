@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #ifndef OBJECTTOOLS_H
 #define OBJECTTOOLS_H
 
@@ -50,4 +49,3 @@ float GD_API DistanceBetweenObjects(std::map <std::string, std::vector<RuntimeOb
 bool GD_API MovesToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted );
 
 #endif // OBJECTTOOLS_H
-#endif

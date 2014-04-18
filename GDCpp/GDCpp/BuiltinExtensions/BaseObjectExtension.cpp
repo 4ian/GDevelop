@@ -26,9 +26,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                    &CreateBaseObject,
                    &DestroyBaseObject);
 
-        #if !defined(EMSCRIPTEN)
         AddRuntimeObject(obj, "", &CreateBaseRuntimeObject, &DestroyBaseRuntimeObject);
-        #endif
 
         #if defined(GD_IDE_ONLY)
         obj.AddCondition("PosX",

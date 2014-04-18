@@ -79,25 +79,45 @@ CppPlatform::CppPlatform() :
 #endif
 
     std::cout << "* Loading builtin extensions... ";
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new MouseExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new MathematicalToolsExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
+    std::cout.flush();
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
+    std::cout.flush();
     std::cout << "done." << std::endl;
 }
 
@@ -169,10 +189,8 @@ void CppPlatform::OnIDEClosed()
         CodeCompiler::GetInstance()->ClearOutputDirectory();
 #endif
 
-#if !defined(EMSCRIPTEN)
     SoundManager::GetInstance()->DestroySingleton();
     FontManager::GetInstance()->DestroySingleton();
-#endif
 }
 #endif
 

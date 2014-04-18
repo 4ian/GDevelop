@@ -10,7 +10,9 @@
 #if defined(EMSCRIPTEN)
 #include <emscripten/bind.h>
 #include <boost/make_shared.hpp>
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -19,11 +21,14 @@
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Events/ObjectMetadata.h"
+#include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventsList.h"
 
 using namespace emscripten;
 using namespace gd;
-
 
 namespace gd { //Workaround for emscripten to directly use strings instead of gd::Expression.
 void Instruction_SetParameter(gd::Instruction & i, unsigned int nb, const std::string & val) { i.SetParameter(nb, val); };
@@ -142,6 +147,57 @@ EMSCRIPTEN_BINDINGS(gd_EventsList) {
         .function("isEmpty", &EventsList::IsEmpty)
         .function("clear", &EventsList::Clear)
         ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_InstructionMetadata) {
+    class_<InstructionMetadata>("InstructionMetadata")
+        .function("getFullName", &InstructionMetadata::GetFullName)
+        .function("getDescription", &InstructionMetadata::GetDescription)
+        .function("getSentence", &InstructionMetadata::GetSentence)
+        .function("getGroup", &InstructionMetadata::GetGroup)
+        .function("canHaveSubInstructions", &InstructionMetadata::CanHaveSubInstructions)
+        .function("setCanHaveSubInstructions", &InstructionMetadata::SetCanHaveSubInstructions)
+        //TODO
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_ParameterMetadata) {
+    class_<ParameterMetadata>("ParameterMetadata")
+        //TODO
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_MetadataProvider) {
+    class_<MetadataProvider>("MetadataProvider")
+        .class_function("getAutomatismMetadata", MetadataProvider::GetAutomatismMetadata)
+        .class_function("getObjectMetadata", MetadataProvider::GetObjectMetadata)
+        .class_function("getActionMetadata", MetadataProvider::GetActionMetadata)
+        .class_function("getConditionMetadata", MetadataProvider::GetConditionMetadata)
+        .class_function("getExpressionMetadata", MetadataProvider::GetExpressionMetadata)
+        .class_function("getObjectExpressionMetadata", MetadataProvider::GetObjectExpressionMetadata)
+        .class_function("getAutomatismExpressionMetadata", MetadataProvider::GetAutomatismExpressionMetadata)
+        .class_function("getStrExpressionMetadata", MetadataProvider::GetStrExpressionMetadata)
+        .class_function("getObjectStrExpressionMetadata", MetadataProvider::GetObjectStrExpressionMetadata)
+        .class_function("getAutomatismStrExpressionMetadata", MetadataProvider::GetAutomatismStrExpressionMetadata)
+        .class_function("hasCondition", MetadataProvider::HasCondition)
+        .class_function("hasAction", MetadataProvider::HasAction)
+        .class_function("hasObjectAction", MetadataProvider::HasObjectAction)
+        .class_function("hasObjectCondition", MetadataProvider::HasObjectCondition)
+        .class_function("hasAutomatismAction", MetadataProvider::HasAutomatismAction)
+        .class_function("hasAutomatismCondition", MetadataProvider::HasAutomatismCondition)
+        .class_function("hasExpression", MetadataProvider::HasExpression)
+        .class_function("hasObjectExpression", MetadataProvider::HasObjectExpression)
+        .class_function("hasAutomatismExpression", MetadataProvider::HasAutomatismExpression)
+        .class_function("hasStrExpression", MetadataProvider::HasStrExpression)
+        .class_function("hasObjectStrExpression", MetadataProvider::HasObjectStrExpression)
+        .class_function("hasAutomatismStrExpression", MetadataProvider::HasAutomatismStrExpression)
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_EventsCodeGenerator) {
+    class_<EventsCodeGenerator>("EventsCodeGenerator")
+        ;
+
 }
 
 EMSCRIPTEN_BINDINGS(gd_EventsCodeGenerator) {

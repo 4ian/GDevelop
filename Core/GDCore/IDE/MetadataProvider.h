@@ -155,16 +155,16 @@ public:
      */
     static bool HasAutomatismStrExpression(const gd::Platform & platform, std::string automatismType, std::string name);
 
+    virtual ~MetadataProvider();
 private:
+    MetadataProvider();
 
     static AutomatismMetadata badAutomatismInfo;
     static ObjectMetadata badObjectInfo;
     static gd::InstructionMetadata badInstructionMetadata;
     static gd::ExpressionMetadata badExpressionMetadata;
     static gd::StrExpressionMetadata badStrExpressionMetadata;
-
-    MetadataProvider();
-    virtual ~MetadataProvider();
+    int useless; //Useless member to avoid emscripten "must have a positive integer typeid pointer" runtime error.
 };
 
 }

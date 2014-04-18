@@ -465,4 +465,7 @@ bool MetadataProvider::HasAutomatismStrExpression(const gd::Platform & platform,
     return false;
 }
 
+MetadataProvider::~MetadataProvider() {}
+MetadataProvider::MetadataProvider() {}
+
 }

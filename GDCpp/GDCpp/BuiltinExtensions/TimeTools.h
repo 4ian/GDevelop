@@ -1,4 +1,3 @@
-#if !defined(EMSCRIPTEN)
 #ifndef TIMETOOLS_H
 #define TIMETOOLS_H
 
@@ -20,4 +19,3 @@ double GD_API GetTimeScale(RuntimeScene & scene);
 double GD_API GetTime( const RuntimeScene & scene, const std::string & parameter );
 
 #endif // TIMETOOLS_H
-#endif

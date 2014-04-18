@@ -33,7 +33,7 @@
 #include <SFML/Graphics.hpp>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/Tools/VersionWrapper.h"
@@ -364,7 +364,7 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Help provider set" << endl;
 
     cout << "* Loading events editor configuration" << endl;
-    gd::ActionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
+    gd::InstructionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
 
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;

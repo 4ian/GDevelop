@@ -22,7 +22,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "LogFileManager.h"
 #include <wx/listctrl.h>
@@ -650,7 +650,7 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel7, _("C++ Compilation"), false, 5);
 
     //Events editor parameters property grid
-    gd::ActionSentenceFormatter * eventsEditorConfig = gd::ActionSentenceFormatter::GetInstance();
+    gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::GetInstance();
     for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         eventsEditorParametersProperties->Append( new wxColourProperty(it->first, wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].color) );
@@ -1056,7 +1056,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Save/AvertOnSaveAs", avertOnSaveCheck->GetValue());
 
-    gd::ActionSentenceFormatter * eventsEditorConfig = gd::ActionSentenceFormatter::GetInstance();
+    gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::GetInstance();
     for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         if ( eventsEditorParametersProperties->GetProperty(it->first) != NULL)
@@ -1077,7 +1077,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
         }
     }
 
-    gd::ActionSentenceFormatter::GetInstance()->SaveTypesFormattingToConfig();
+    gd::InstructionSentenceFormatter::GetInstance()->SaveTypesFormattingToConfig();
 	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(gd::ToString(conditionsColumnWidthEdit->GetValue())));
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());

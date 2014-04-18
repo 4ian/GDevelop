@@ -194,8 +194,9 @@ EMSCRIPTEN_BINDINGS(gd_MetadataProvider) {
         ;
 }
 
-EMSCRIPTEN_BINDINGS(gd_EventsCodeGenerator) {
-    class_<EventsCodeGenerator>("EventsCodeGenerator")
+EMSCRIPTEN_BINDINGS(gd_InstructionSentenceFormatter) {
+    class_<InstructionSentenceFormatter>("InstructionSentenceFormatter")
+
         ;
 
 }

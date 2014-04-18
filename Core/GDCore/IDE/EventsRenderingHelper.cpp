@@ -13,8 +13,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/MetadataProvider.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
-#include "GDCore/IDE/ConditionSentenceFormatter.h"
+#include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -187,7 +186,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = ConditionSentenceFormatter::Translate(conditions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -197,7 +196,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = ConditionSentenceFormatter::Translate(conditions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -286,7 +285,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = ActionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -296,7 +295,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = ActionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -350,7 +349,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
         int freeWidth = width - leftIconsWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(ConditionSentenceFormatter::Translate(conditions[j], instructionMetadata), freeWidth);
+        int height = GetTextHeightInArea(InstructionSentenceFormatter::GetInstance()->Translate(conditions[j], instructionMetadata), freeWidth);
         y += height;
 
         //Sub conditions
@@ -382,7 +381,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         int freeWidth = width - iconWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(ActionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata), freeWidth);
+        int height = GetTextHeightInArea(InstructionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata), freeWidth);
         y+=height;
 
         //Draw sub actions
@@ -396,8 +395,8 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & instructionMetadata, bool isCondition,
                                            wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection)
 {
-    std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? ConditionSentenceFormatter::GetAsFormattedText(instruction, instructionMetadata) :
-                                                                                        ActionSentenceFormatter::GetInstance()->GetAsFormattedText(instruction, instructionMetadata);
+    std::vector< std::pair<std::string, TextFormatting > > formattedStr =
+        InstructionSentenceFormatter::GetInstance()->GetAsFormattedText(instruction, instructionMetadata);
 
     wxPoint lastPos = point;
     //size_t alreadyWrittenCharCount = 0;

@@ -29,7 +29,7 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/ConditionSentenceFormatter.h"
+#include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
@@ -684,8 +684,8 @@ void ChoixCondition::RefreshFromCondition()
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
             ParaEdit.at( i )->Show();
 
-            ParaBmpBt.at(i)->SetBitmapLabel( gd::ConditionSentenceFormatter::BitmapFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( gd::ConditionSentenceFormatter::LabelFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( gd::InstructionSentenceFormatter::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
             ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
 
             //De/activate widgets if parameter is optional

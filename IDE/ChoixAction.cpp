@@ -28,7 +28,7 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/MetadataProvider.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
@@ -670,8 +670,8 @@ void ChoixAction::RefreshFromAction()
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
             ParaEdit.at(i)->Show();
 
-            ParaBmpBt.at(i)->SetBitmapLabel( gd::ActionSentenceFormatter::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( gd::ActionSentenceFormatter::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( gd::InstructionSentenceFormatter::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
             ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
 
             //De/activate widgets if parameter is optional

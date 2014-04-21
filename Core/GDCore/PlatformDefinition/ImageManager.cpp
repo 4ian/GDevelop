@@ -41,7 +41,7 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::st
     {
         ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(name));
 
-        boost::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(*RessourcesLoader::GetInstance()->LoadSFMLTexture( image.GetFile() )));
+        boost::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(*RessourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
         texture->texture.setSmooth(image.smooth);
 
         alreadyLoadedImages[name] = texture;
@@ -98,7 +98,7 @@ void ImageManager::ReloadImage(const std::string & name) const
 
         cout << "ImageManager: Reload " << name << endl;
 
-        oldTexture->texture = *RessourcesLoader::GetInstance()->LoadSFMLTexture( image.GetFile() );
+        oldTexture->texture = *RessourcesLoader::Get()->LoadSFMLTexture( image.GetFile() );
         oldTexture->texture.setSmooth(image.smooth);
         oldTexture->image = oldTexture->texture.copyToImage();
 

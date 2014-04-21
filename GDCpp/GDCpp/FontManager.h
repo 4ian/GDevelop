@@ -35,7 +35,7 @@ public:
     /**
      * \brief Return a pointer to the global singleton class
      */
-    static FontManager *GetInstance()
+    static FontManager *Get()
     {
         if ( NULL == _singleton )
         {

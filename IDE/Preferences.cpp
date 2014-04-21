@@ -650,10 +650,10 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel7, _("C++ Compilation"), false, 5);
 
     //Events editor parameters property grid
-    gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::GetInstance();
+    gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::Get();
     for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
-        eventsEditorParametersProperties->Append( new wxColourProperty(it->first, wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].color) );
+        eventsEditorParametersProperties->Append( new wxColourProperty(it->first, wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].GetWxColor()) );
         eventsEditorParametersProperties->Append( new wxBoolProperty(it->first+_(": Bold"), wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].bold) );
         eventsEditorParametersProperties->Append( new wxBoolProperty(it->first+_(": Italic"), wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].italic) );
     }
@@ -846,7 +846,7 @@ changesNeedRestart(false)
             const wxLanguageInfo * language = wxLocale::FindLanguageInfo(languagesAvailables[i]);
             langChoice->Append(language->Description);
 
-            if (gd::LocaleManager::GetInstance()->locale->GetLanguage() == language->Language)
+            if (gd::LocaleManager::Get()->locale->GetLanguage() == language->Language)
                 langChoice->SetSelection(i);
         }
     }
@@ -905,8 +905,8 @@ changesNeedRestart(false)
     }
     else
     {
-        eventsEditorFontDialog->GetFontData().SetInitialFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
-        eventsEditorFontDialog->GetFontData().SetChosenFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+        eventsEditorFontDialog->GetFontData().SetInitialFont(gd::EventsRenderingHelper::Get()->GetFont());
+        eventsEditorFontDialog->GetFontData().SetChosenFont(gd::EventsRenderingHelper::Get()->GetFont());
     }
 
     int eventsCompilerMaxThread = 0;
@@ -1029,11 +1029,11 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( _T( "/Dossier/EventsCompilerTempDir" ), eventsCompilerTempDirEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/EventsCompilerDeleteTemp" ), deleteTemporariesCheck->GetValue());
     pConfig->Write( _T( "/Dossier/NewProjectDefaultFolder" ), newProjectFolderEdit->GetValue());
-    CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporariesCheck->GetValue());
+    CodeCompiler::Get()->SetMustDeleteTemporaries(deleteTemporariesCheck->GetValue());
 
     const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
     pConfig->Write( _T( "/Lang" ), language->CanonicalName );
-    gd::LocaleManager::GetInstance()->SetLanguage(language->Language);
+    gd::LocaleManager::Get()->SetLanguage(language->Language);
 
     if ( changesNeedRestart )
     {
@@ -1050,18 +1050,20 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Log/Activated", logCheck->GetValue());
     pConfig->Write("/Log/File", logFile);
-    LogFileManager::GetInstance()->InitalizeFromConfig();
+    LogFileManager::Get()->InitalizeFromConfig();
 
     pConfig->Write("/Startup/SendInfo", sendInfoCheck->GetValue());
 
     pConfig->Write("/Save/AvertOnSaveAs", avertOnSaveCheck->GetValue());
 
-    gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::GetInstance();
+    gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::Get();
     for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         if ( eventsEditorParametersProperties->GetProperty(it->first) != NULL)
         {
-            wxFromString("rgb"+eventsEditorParametersProperties->GetProperty(it->first)->GetValueAsString(), &eventsEditorConfig->typesFormatting[it->first].color);
+            wxColor color;
+            wxFromString("rgb"+eventsEditorParametersProperties->GetProperty(it->first)->GetValueAsString(), &color);
+            eventsEditorConfig->typesFormatting[it->first].SetColor(color);
         }
 
         if ( eventsEditorParametersProperties->GetProperty(it->first+_(": Bold")) != NULL)
@@ -1077,13 +1079,13 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
         }
     }
 
-    gd::InstructionSentenceFormatter::GetInstance()->SaveTypesFormattingToConfig();
+    gd::InstructionSentenceFormatter::Get()->SaveTypesFormattingToConfig();
 	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(gd::ToString(conditionsColumnWidthEdit->GetValue())));
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());
 
     pConfig->Write("/CodeCompiler/MaxThread", codeCompilerThreadEdit->GetValue() );
-    CodeCompiler::GetInstance()->AllowMultithread(codeCompilerThreadEdit->GetValue() > 1, codeCompilerThreadEdit->GetValue());
+    CodeCompiler::Get()->AllowMultithread(codeCompilerThreadEdit->GetValue() > 1, codeCompilerThreadEdit->GetValue());
 
     pConfig->Write("/Paths/Java", javaDirEdit->GetValue() );
 
@@ -1493,7 +1495,7 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation")); //TODO
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation")); //TODO
 }
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )

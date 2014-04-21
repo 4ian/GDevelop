@@ -167,7 +167,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 #ifndef RELEASE
 void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, int x, int & y)
 {
-    FontManager * fontManager = FontManager::GetInstance();
+    FontManager * fontManager = FontManager::Get();
 
     y += 15;
     while ( !iter->Is_Done() )
@@ -208,7 +208,7 @@ int RuntimeScene::RenderAndStep()
     {
         ManageObjectsBeforeEvents();
     }
-    SoundManager::GetInstance()->ManageGarbage();
+    SoundManager::Get()->ManageGarbage();
 
     #if defined(GD_IDE_ONLY)
     if( GetProfiler() )
@@ -631,7 +631,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     }
 
     std::cout << ".";
-    if ( StopSoundsOnStartup() ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
+    if ( StopSoundsOnStartup() ) {SoundManager::Get()->ClearAllSoundsAndMusics(); }
     if ( renderWindow ) renderWindow->setTitle(GetWindowDefaultTitle());
 
     std::cout << " Done." << std::endl;

@@ -28,8 +28,8 @@ UpdateChecker * UpdateChecker::_singleton = NULL;
 void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
 {
     wxString requestURL = "http://www.compilgames.net/update/?p=GD";
-    requestURL += "&l="+gd::LocaleManager::GetInstance()->locale->GetLanguageCanonicalName(
-        gd::LocaleManager::GetInstance()->GetLanguage());
+    requestURL += "&l="+gd::LocaleManager::Get()->locale->GetLanguageCanonicalName(
+        gd::LocaleManager::Get()->GetLanguage());
     if ( excludeFromStatistics ) requestURL += "&e=true";
 
     bool sendInfo;
@@ -126,7 +126,7 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
 }
 
 
-UpdateChecker *UpdateChecker::GetInstance()
+UpdateChecker *UpdateChecker::Get()
 {
     if ( NULL == _singleton )
     {

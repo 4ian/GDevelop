@@ -32,7 +32,7 @@ namespace gd
 class GD_CORE_API EventsRenderingHelper
 {
     public:
-        static EventsRenderingHelper * GetInstance();
+        static EventsRenderingHelper * Get();
         static void DestroySingleton();
 
         /**

@@ -247,7 +247,7 @@ mainEditor(mainEditor_)
 
 void StartHerePage::RefreshNewsUsingUpdateChecker()
 {
-	UpdateChecker * checker = UpdateChecker::GetInstance();
+	UpdateChecker * checker = UpdateChecker::Get();
 	if (!checker->news.empty())
 		newsTxt->SetLabel(checker->news);
 	else
@@ -367,12 +367,12 @@ void StartHerePage::Onrecent7BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
 }
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials"));
 }
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)

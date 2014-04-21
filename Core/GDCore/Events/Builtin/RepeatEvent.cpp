@@ -125,7 +125,7 @@ void RepeatEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventE
 void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     int border = renderingHelper->instructionsListBorder;
     const int repeatTextHeight = 20;
 
@@ -159,7 +159,7 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width, const gd::Platfo
 #if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
-        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
         int border = renderingHelper->instructionsListBorder;
         const int repeatTextHeight = 20;
 

@@ -20,6 +20,7 @@
 #include <wx/msgdlg.h>
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/EventsVariablesFinder.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/Variable.h"
@@ -63,6 +64,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     editingOnly(editingOnly_),
     associatedProject(NULL),
     associatedLayout(NULL),
+    associatedObject(NULL),
     modificationCount(0)
 {
 	//(*Initialize(ChooseVariableDialog)
@@ -150,6 +152,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     toolbar->AddTool( idFindUndeclared, _( "Search for undeclared variables" ), gd::SkinHelper::GetIcon("find", 16), _("Search for undeclared variables inside the project") );
     toolbar->AddSeparator();
     toolbar->AddTool( ID_Help, _( "Help about variables" ), gd::SkinHelper::GetIcon("help", 16), _("Help about variables") );
+    toolbar->EnableTool(idFindUndeclared, false);
     toolbar->Realize();
 
     if ( editingOnly )
@@ -291,6 +294,12 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
     newName = gd::ToString(wxGetTextFromUser(_("Please choose a new name for the new variable"), _("New variable name"), newName));
     if ( newName.empty() ) return;
 
+    if ( temporaryContainer->Has(newName) )
+    {
+        gd::LogMessage(_("A variable with this name already exists!"));
+        return;
+    }
+
     //Insert the new variable in the list
     temporaryContainer->InsertNew(newName, -1);
     wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), newName);
@@ -368,7 +377,7 @@ void ChooseVariableDialog::OnRightClick(wxTreeListEvent& event)
  */
 void ChooseVariableDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"));
 }
 
 /**
@@ -392,7 +401,8 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 {
     std::set<std::string> allVariables;
     if ( associatedProject != NULL && associatedLayout == NULL ) allVariables = EventsVariablesFinder::FindAllGlobalVariables(associatedProject->GetCurrentPlatform(), *associatedProject);
-    else if ( associatedProject != NULL && associatedLayout != NULL ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(associatedProject->GetCurrentPlatform(), *associatedProject, *associatedLayout);
+    else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(associatedProject->GetCurrentPlatform(), *associatedProject, *associatedLayout);
+    else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) allVariables = EventsVariablesFinder::FindAllObjectVariables(associatedProject->GetCurrentPlatform(), *associatedProject, *associatedLayout, *associatedObject);
     else return;
 
     //Construct a wxArrayString with not declared variables
@@ -456,16 +466,30 @@ void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)
     if ( !selectedVariable ) return;
 
     std::string newName = ToString(wxGetTextFromUser(_("Enter the new name of the variable"), _("New name"), selectedVariableName));
-    if ( newName.empty() ) return;
+    if ( newName.empty() || newName == selectedVariableName ) return;
 
-    RefreshVariable(variablesList->GetSelection(), newName, *selectedVariable);
+
     if ( parentVariable )
     {
+        if ( parentVariable->HasChild(newName) )
+        {
+            gd::LogMessage(_("A child variable with this name already exists!"));
+            return;
+        }
+
+        RefreshVariable(variablesList->GetSelection(), newName, *selectedVariable);
         parentVariable->GetChild(newName) = *selectedVariable;
         parentVariable->RemoveChild(selectedVariableName);
     }
     else
     {
+        if ( temporaryContainer->Has(newName) )
+        {
+            gd::LogMessage(_("A variable with this name already exists!"));
+            return;
+        }
+
+        RefreshVariable(variablesList->GetSelection(), newName, *selectedVariable);
         temporaryContainer->Rename(selectedVariableName, newName);
     }
     UpdateSelectedAndParentVariable();
@@ -564,12 +588,24 @@ void ChooseVariableDialog::SetAssociatedProject(const gd::Project * project)
 {
     associatedProject = project;
     associatedLayout = NULL;
+    associatedObject = NULL;
+    toolbar->EnableTool(idFindUndeclared, true);
 }
 
 void ChooseVariableDialog::SetAssociatedLayout(const gd::Project * project, const gd::Layout * layout)
 {
     associatedProject = project;
     associatedLayout = layout;
+    associatedObject = NULL;
+    toolbar->EnableTool(idFindUndeclared, true);
+}
+
+void ChooseVariableDialog::SetAssociatedObject(const gd::Project * project, const gd::Layout * layout, const gd::Object * object)
+{
+    associatedProject = project;
+    associatedLayout = layout;
+    associatedObject = object;
+    toolbar->EnableTool(idFindUndeclared, true);
 }
 
 void ChooseVariableDialog::OnResize(wxSizeEvent& event)

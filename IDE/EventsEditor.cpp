@@ -304,7 +304,7 @@ void EventsEditor::Init(wxWindow* parent)
 
 	wxFont eventsEditorFont;
 	if ( config->Read("EventsEditor/Font", &eventsEditorFont) )
-        gd::EventsRenderingHelper::GetInstance()->SetFont(eventsEditorFont);
+        gd::EventsRenderingHelper::Get()->SetFont(eventsEditorFont);
 
     //Create platform list
     for (unsigned int i = 0;i<game.GetUsedPlatforms().size();++i)
@@ -326,7 +326,7 @@ void EventsEditor::Init(wxWindow* parent)
 
     RecomputeAllEventsWidth(*events); //Recompute all widths
     liveEditingPanel->Show(false);
-    liveEdit->SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+    liveEdit->SetFont(gd::EventsRenderingHelper::Get()->GetFont());
     liveEditingPanel->Show(false);
     eventContextPanel->Show(false);
     listContextPanel->Show(false);
@@ -538,7 +538,7 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
     else
         text = _("Highlight then an event/action/condition with the cursor to get more edition options,\nor make a double click to edit an item.");
     dc.SetTextForeground(wxColor(0,0,0));
-    dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetNiceFont());
+    dc.SetFont(gd::EventsRenderingHelper::Get()->GetNiceFont());
     dc.DrawLabel(text,
                 wxRect( (eventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,-scrollBar->GetThumbPosition()+totalHeight+25,
                         (eventsPanel->GetSize().x+dc.GetMultiLineTextExtent(text).GetWidth())/2-(eventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,0)
@@ -562,10 +562,10 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
         if ( scrollTo == &events[i] )
         	scrollBar->SetThumbPosition(y);
 
-        dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+        dc.SetFont(gd::EventsRenderingHelper::Get()->GetFont());
         dc.SetTextForeground(wxColour(0,0,0));
 
-        gd::EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
+        gd::EventsRenderingHelper::Get()->SetConditionsColumnWidth(conditionColumnWidth-x);
         unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
         unsigned int height = events[i].GetRenderedHeight(width, game.GetCurrentPlatform());
 
@@ -577,8 +577,8 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
             bool drawDragTarget = false;
             if ( selection.EventHighlighted(eventAccessor) ) //Highlight and context panel if needed
             {
-                dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
-                dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+                dc.SetPen(gd::EventsRenderingHelper::Get()->GetHighlightedRectangleOutlinePen());
+                dc.SetBrush(gd::EventsRenderingHelper::Get()->GetHighlightedRectangleFillBrush());
                 dc.DrawRectangle(0,y,eventsPanel->GetSize().x,height);
 
                 //Update context panel ( unless we're dragging something )
@@ -595,15 +595,15 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
             }
             if ( selection.EventSelected(eventAccessor) ) //Selection rectangle if needed
             {
-                dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
-                dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+                dc.SetPen(gd::EventsRenderingHelper::Get()->GetSelectedRectangleOutlinePen());
+                dc.SetBrush(gd::EventsRenderingHelper::Get()->GetSelectedRectangleFillBrush());
                 dc.DrawRectangle(0,y,eventsPanel->GetSize().x,height);
             }
 
             if (profilingActivated && events[i].IsExecutable())
             {
                 dc.DrawText(ToString(i+1), x-leftMargin+2-42, y);
-                dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetNiceFont().Smaller());
+                dc.SetFont(gd::EventsRenderingHelper::Get()->GetNiceFont().Smaller());
 
                 //Draw profile results
                 dc.SetPen(wxPen(wxColour(0,0,0)));
@@ -617,7 +617,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
                 std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
                 percentStr << events[i].percentDuringLastSession;
                 dc.DrawText(percentStr.str()+"%", x-41, y+13);
-                dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+                dc.SetFont(gd::EventsRenderingHelper::Get()->GetFont());
             }
             else
                 dc.DrawText(ToString(i+1), x-leftMargin+2, y+3);
@@ -676,13 +676,13 @@ void EventsEditor::OnlistContextPanelPaint(wxPaintEvent& event)
 
     if ( selection.GetHighlightedInstructionList().isConditionList )
     {
-        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetConditionsRectangleOutlinePen());
-        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetConditionsRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::Get()->GetConditionsRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::Get()->GetConditionsRectangleFillBrush());
     }
     else
     {
-        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetActionsRectangleOutlinePen());
-        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetActionsRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::Get()->GetActionsRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::Get()->GetActionsRectangleFillBrush());
     }
     dc.DrawRectangle(0,-1,listContextPanel->GetSize().x,listContextPanel->GetSize().y+1);
     addInstrBt->SetBackgroundColour(dc.GetBrush().GetColour());
@@ -695,13 +695,13 @@ void EventsEditor::OneventContextPanelPaint(wxPaintEvent& event)
 
     if ( selection.EventSelected(selection.GetHighlightedEvent()) )
     {
-        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
-        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::Get()->GetSelectedRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::Get()->GetSelectedRectangleFillBrush());
     }
     else
     {
-        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
-        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::Get()->GetHighlightedRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::Get()->GetHighlightedRectangleFillBrush());
     }
     dc.DrawRectangle(0,-1,eventContextPanel->GetSize().x,eventContextPanel->GetSize().y+1);
     addEventBt->SetBackgroundColour(dc.GetBrush().GetColour());
@@ -801,15 +801,15 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         selection.AddInstruction(item);
 
         //Log file
-        if ( LogFileManager::GetInstance()->IsLogActivated() )
+        if ( LogFileManager::Get()->IsLogActivated() )
         {
             if ( itemsAreas.IsOnEvent(x, y) )
             {
                 EventItem eventItem = itemsAreas.GetEventAt(x, y);
                 if ( item.isCondition )
-                    LogFileManager::GetInstance()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                    LogFileManager::Get()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
                 else
-                    LogFileManager::GetInstance()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                    LogFileManager::Get()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
             }
         }
     }
@@ -833,7 +833,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         selection.AddEvent(item);
 
         //Log file
-        LogFileManager::GetInstance()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(item.positionInList)+" )");
+        LogFileManager::Get()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(item.positionInList)+" )");
     }
 }
 
@@ -1495,7 +1495,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
-        gd::Clipboard::GetInstance()->SetConditions(instructionsToCopy);
+        gd::Clipboard::Get()->SetConditions(instructionsToCopy);
     }
     else if ( selection.HasSelectedActions())
     {
@@ -1507,7 +1507,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
-        gd::Clipboard::GetInstance()->SetActions(instructionsToCopy);
+        gd::Clipboard::Get()->SetActions(instructionsToCopy);
     }
     else if ( selection.HasSelectedEvents() )
     {
@@ -1519,7 +1519,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 eventsToCopy.InsertEvent(*itemsSelected[i].event);
         }
 
-        gd::Clipboard::GetInstance()->SetEvents(eventsToCopy);
+        gd::Clipboard::Get()->SetEvents(eventsToCopy);
         std::cout << "itemsSelected" << itemsSelected.size();
     }
 }
@@ -1541,7 +1541,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 {
     if ( selection.HasSelectedConditions() || (selection.GetHighlightedInstructionList().instructionList != NULL && selection.GetHighlightedInstructionList().isConditionList) )
     {
-        if ( !gd::Clipboard::GetInstance()->HasCondition() ) return;
+        if ( !gd::Clipboard::Get()->HasCondition() ) return;
 
         //Get information about list where conditions must be pasted
         std::vector<gd::Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
@@ -1550,7 +1550,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (instructionList == NULL) return;
 
         //Paste all conditions
-        const vector < gd::Instruction > & instructions = gd::Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::Get()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1566,7 +1566,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     }
     else if ( selection.HasSelectedActions()|| (selection.GetHighlightedInstructionList().instructionList != NULL && !selection.GetHighlightedInstructionList().isConditionList) )
     {
-        if ( !gd::Clipboard::GetInstance()->HasAction() ) return;
+        if ( !gd::Clipboard::Get()->HasAction() ) return;
 
         //Get information about list where actions must be pasted
         std::vector<gd::Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
@@ -1575,7 +1575,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (instructionList == NULL) return;
 
         //Paste all actions
-        const vector < gd::Instruction > & instructions = gd::Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::Get()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1606,7 +1606,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (eventsList == NULL) return;
 
         //Insert events
-        gd::EventsList eventsToPaste = gd::Clipboard::GetInstance()->GetEvents();
+        gd::EventsList eventsToPaste = gd::Clipboard::Get()->GetEvents();
         std::cout << "EventToPaste" << eventsToPaste.size();
         eventsList->InsertEvents(eventsToPaste, 0, (size_t)-1, position);
 
@@ -1647,7 +1647,7 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
 }
 
 void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )

@@ -119,7 +119,7 @@ void WhileEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEl
 void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     int border = renderingHelper->instructionsListBorder;
     const int repeatHeight = 20;
 
@@ -137,8 +137,8 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
     //Draw icon if infinite loop warning is deactivated.
     if (!infiniteLoopWarning)
     {
-        if ( gd::CommonBitmapManager::GetInstance()->noProtection.IsOk() )
-            dc.DrawBitmap(gd::CommonBitmapManager::GetInstance()->noProtection, wxPoint(x+5,y+5+18), /*useMask=*/true);
+        if ( gd::CommonBitmapManager::Get()->noProtection.IsOk() )
+            dc.DrawBitmap(gd::CommonBitmapManager::Get()->noProtection, wxPoint(x+5,y+5+18), /*useMask=*/true);
     }
 
     //Draw "while conditions"
@@ -169,7 +169,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width, const gd::Platfor
 #if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
-        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
         int border = renderingHelper->instructionsListBorder;
         const int repeatHeight = 20;
 

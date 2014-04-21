@@ -386,9 +386,9 @@ string ChoixTemplateEvent::ConvertParam( string parameter, const string & toRepl
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)
 {
-    /*if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(151);
+    /*if ( gd::LocaleManager::Get()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::Get()->DisplaySection(151);
     else*/
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/template")); //TODO
+        gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/template")); //TODO
 }
 

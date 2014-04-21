@@ -141,5 +141,5 @@ void ChoiceJoyAxis::OnannulerBtClick(wxCommandEvent& event)
 
 void ChoiceJoyAxis::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"));
 }

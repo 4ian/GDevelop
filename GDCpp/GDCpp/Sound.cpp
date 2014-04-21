@@ -16,7 +16,7 @@ Sound::Sound(string pFile) :
 file(pFile),
 volume(100)
 {
-    buffer = gd::RessourcesLoader::GetInstance()->LoadSoundBuffer(file);
+    buffer = gd::RessourcesLoader::Get()->LoadSoundBuffer(file);
     sound.setBuffer(buffer);
 }
 
@@ -33,7 +33,7 @@ Sound::~Sound()
 Sound::Sound(const Sound & copy) :
     file(copy.file)
 {
-    buffer = gd::RessourcesLoader::GetInstance()->LoadSoundBuffer(file);
+    buffer = gd::RessourcesLoader::Get()->LoadSoundBuffer(file);
     sound.setBuffer(buffer);
 }
 
@@ -48,7 +48,7 @@ void Sound::SetVolume(float volume_)
 
 void Sound::UpdateVolume()
 {
-    SoundManager * soundManager = SoundManager::GetInstance();
+    SoundManager * soundManager = SoundManager::Get();
 
     sound.setVolume(volume*soundManager->GetGlobalVolume()/100.f);
 }

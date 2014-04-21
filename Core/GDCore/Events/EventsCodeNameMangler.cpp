@@ -45,10 +45,10 @@ std::string EventsCodeNameMangler::GetExternalEventsFunctionMangledName(const st
 
 std::string ManObjListName(const std::string & objectName)
 {
-    return EventsCodeNameMangler::GetInstance()->GetMangledObjectsListName(objectName);
+    return EventsCodeNameMangler::Get()->GetMangledObjectsListName(objectName);
 }
 
-EventsCodeNameMangler * EventsCodeNameMangler::GetInstance()
+EventsCodeNameMangler * EventsCodeNameMangler::Get()
 {
     if ( NULL == _singleton )
         _singleton = new EventsCodeNameMangler;

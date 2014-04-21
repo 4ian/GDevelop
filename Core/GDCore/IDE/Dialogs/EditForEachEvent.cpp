@@ -127,7 +127,7 @@ void EditForEachEvent::OnobjectBtClick(wxCommandEvent& event)
 
 void EditForEachEvent::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/foreach_events"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/foreach_events"));
 }
 
 }

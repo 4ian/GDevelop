@@ -176,8 +176,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	toolbarPanel = new wxPanel(centerPanel, ID_PANEL6, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
 	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_MASKITEM, _("Edit the collision masks ( Hit boxes )"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the collision masks ( Hit boxes )"), wxEmptyString, NULL);
-	toolbar->AddTool(ID_POINTSITEM, _("Edit the image\'s point"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the image\'s point"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_MASKITEM, _("Edit the collision masks ( Hit boxes )"), gd::CommonBitmapManager::Get()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the collision masks ( Hit boxes )"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_POINTSITEM, _("Edit the image\'s point"), gd::CommonBitmapManager::Get()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the image\'s point"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
 	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Preview"), gd::SkinHelper::GetIcon("preview", 16), wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
@@ -256,7 +256,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM7, _("Item label"), gd::SkinHelper::GetIcon("remove", 16), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
-	maskToolbar->AddTool(ID_AUITOOLBARITEM1, _("Go back to default mask"), gd::CommonBitmapManager::GetInstance()->defaultMask16, wxNullBitmap, wxITEM_NORMAL, _("Go back to default mask"), wxEmptyString, NULL);
+	maskToolbar->AddTool(ID_AUITOOLBARITEM1, _("Go back to default mask"), gd::CommonBitmapManager::Get()->defaultMask16, wxNullBitmap, wxITEM_NORMAL, _("Go back to default mask"), wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_MASKAPPLYWHOLEANIMITEM, _("Item label"), gd::SkinHelper::GetIcon("copy", 16), wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->Realize();
@@ -406,7 +406,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&SpriteObjectEditor::OnxScrollBarScroll);
 
     wxImageList * iconList = new wxImageList(16,16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->pointEdit16);
+    iconList->Add(gd::CommonBitmapManager::Get()->pointEdit16);
     pointsList->AssignImageList(iconList, wxIMAGE_LIST_SMALL);
     pointsList->InsertColumn(0, _("Name"));
     pointsList->InsertColumn(1, _("X"), wxLIST_FORMAT_LEFT, 35);
@@ -508,15 +508,15 @@ void SpriteObjectEditor::RefreshAnimationTree()
 {
     wxImageList * iconList = new wxImageList(16,16);
     animationsTree->AssignImageList(iconList);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->animation16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->rightdir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->rightdowndir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->downdir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->leftdowndir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->leftdir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->leftupdir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->updir16);
-    iconList->Add(gd::CommonBitmapManager::GetInstance()->rightupdir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->animation16);
+    iconList->Add(gd::CommonBitmapManager::Get()->rightdir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->rightdowndir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->downdir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->leftdowndir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->leftdir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->leftupdir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->updir16);
+    iconList->Add(gd::CommonBitmapManager::Get()->rightupdir16);
 
     animationsTree->DeleteAllItems();
     wxTreeItemId root = animationsTree->AddRoot(_("All animations"));
@@ -564,7 +564,7 @@ void SpriteObjectEditor::RefreshImagesList()
             if ( spriteBitmap.IsOk() )
                 thumbnailList->Add(spriteBitmap);
             else
-                thumbnailList->Add(gd::CommonBitmapManager::GetInstance()->error48);
+                thumbnailList->Add(gd::CommonBitmapManager::Get()->error48);
             imagesList->InsertItem(imagesList->GetItemCount(), ToString(i), i);
         }
     }
@@ -596,7 +596,7 @@ wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resourc
         //Resource is probably not an image.
     }
 
-    return gd::CommonBitmapManager::GetInstance()->error48;
+    return gd::CommonBitmapManager::Get()->error48;
 }
 
 SpriteObjectEditor::~SpriteObjectEditor()
@@ -639,7 +639,7 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
     wxSize size = imagePanel->GetSize();
 
     //Checkerboard background
-    dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(0,0, imagePanel->GetSize().GetWidth(), imagePanel->GetSize().GetHeight());
 
     if ( selectedAnimation < object.GetAnimationCount() &&
@@ -683,9 +683,9 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
                 pointY = sprite.GetPoint(ToString(pointsList->GetItemText(pointIndex))).GetY();
             }
 
-            dc.DrawBitmap(gd::CommonBitmapManager::GetInstance()->point,
-                          spritePosX+pointX-gd::CommonBitmapManager::GetInstance()->point.GetWidth()/2,
-                          spritePosY+pointY-gd::CommonBitmapManager::GetInstance()->point.GetHeight()/2,
+            dc.DrawBitmap(gd::CommonBitmapManager::Get()->point,
+                          spritePosX+pointX-gd::CommonBitmapManager::Get()->point.GetWidth()/2,
+                          spritePosY+pointY-gd::CommonBitmapManager::Get()->point.GetHeight()/2,
                           /*useMask=*/true);
         }
 
@@ -732,7 +732,7 @@ void SpriteObjectEditor::OnpreviewPanelPaint(wxPaintEvent& event)
     wxSize size = previewPanel->GetSize();
 
     //Checkerboard background
-    dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(0,0, previewPanel->GetSize().GetWidth(), previewPanel->GetSize().GetHeight());
 
     if ( selectedAnimation < object.GetAnimationCount() &&
@@ -1814,7 +1814,7 @@ void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
 void SpriteObjectEditor::OnyScrollBarScroll(wxScrollEvent& event)

@@ -188,7 +188,7 @@ bool Game_Develop_EditorApp::OnInit()
                 languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
         }
 
-        gd::LocaleManager::GetInstance()->SetLanguage(languageId);
+        gd::LocaleManager::Get()->SetLanguage(languageId);
 
     }
     cout << "* Language loaded" << endl;
@@ -284,7 +284,7 @@ bool Game_Develop_EditorApp::OnInit()
        which is dangerous ( GUI must be only updated from main thread )
     #if defined(RELEASE) && defined(WINDOWS)
     ConsoleManager * consoleManager;
-    consoleManager = ConsoleManager::GetInstance();
+    consoleManager = ConsoleManager::Get();
     cout << "ConsoleManager created" << endl;
     #endif
     */
@@ -358,25 +358,25 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Set help provider
     {
-        gd::HelpFileAccess::GetInstance()->SetHelpProvider(::HelpProvider::GetInstance());
-        ::HelpProvider::GetInstance()->SetParentWindow(mainEditor);
+        gd::HelpFileAccess::Get()->SetHelpProvider(::HelpProvider::Get());
+        ::HelpProvider::Get()->SetParentWindow(mainEditor);
     }
     cout << "* Help provider set" << endl;
 
     cout << "* Loading events editor configuration" << endl;
-    gd::InstructionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
+    gd::InstructionSentenceFormatter::Get()->LoadTypesFormattingFromConfig();
 
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;
-    LogFileManager::GetInstance()->InitalizeFromConfig();
-    LogFileManager::GetInstance()->WriteToLogFile("Game Develop initialization ended"),
+    LogFileManager::Get()->InitalizeFromConfig();
+    LogFileManager::Get()->WriteToLogFile("Game Develop initialization ended"),
 
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
 
-    gd::PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
+    gd::PlatformManager::Get()->NotifyPlatformIDEInitialized();
 
     cout << "* Initialization ended." << endl;
 
@@ -388,7 +388,7 @@ bool Game_Develop_EditorApp::OnInit()
         config->Read( "Startup/CheckUpdate", &result );
         if ( result != "false" )
         {
-            UpdateChecker * checker = UpdateChecker::GetInstance();
+            UpdateChecker * checker = UpdateChecker::Get();
             checker->DownloadInformation();
             if ( checker->newVersionAvailable )
             {
@@ -443,9 +443,9 @@ int Game_Develop_EditorApp::OnExit()
     cout << "* Closing the configuration and destroying singletons";
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
     cout << ".";
-    gd::Clipboard::GetInstance()->DestroySingleton();
+    gd::Clipboard::Get()->DestroySingleton();
     cout << ".";
-    gd::HelpFileAccess::GetInstance()->DestroySingleton();
+    gd::HelpFileAccess::Get()->DestroySingleton();
     cout << "." << endl;
 
     cout << "* Closing the platforms..." << endl;

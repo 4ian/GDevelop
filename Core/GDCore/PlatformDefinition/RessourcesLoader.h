@@ -55,7 +55,7 @@ public:
      */
     long int GetBinaryFileSize( const std::string & filename);
 
-    static RessourcesLoader *GetInstance()
+    static RessourcesLoader *Get()
     {
         if ( NULL == _singleton )
         {

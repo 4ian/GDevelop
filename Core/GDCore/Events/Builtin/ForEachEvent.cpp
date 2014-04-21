@@ -131,7 +131,7 @@ void ForEachEvent::LoadFromXml(gd::Project & project, const TiXmlElement * event
 void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     int border = renderingHelper->instructionsListBorder;
     const int forEachTextHeight = 20;
 
@@ -165,7 +165,7 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width, const gd::Platf
 #if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
-        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
         int border = renderingHelper->instructionsListBorder;
         const int forEachTextHeight = 20;
 

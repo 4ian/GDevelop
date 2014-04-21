@@ -344,10 +344,10 @@ string CreateTemplate::ConvertParam( string Parametre, string ToReplace, string 
 
 void CreateTemplate::OnAideBtClick( wxCommandEvent& event )
 {
-    /*if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(151);
+    /*if ( gd::LocaleManager::Get()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::Get()->DisplaySection(151);
     else*/
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/create_template")); //TODO
+        gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/create_template")); //TODO
 }
 
 void CreateTemplate::OnButton1Click(wxCommandEvent& event)

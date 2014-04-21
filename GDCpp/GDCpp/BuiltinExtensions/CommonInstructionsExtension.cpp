@@ -283,8 +283,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //We must generate code to call these external events.
                 std::string outputCode;
 
-                std::string functionCall = EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(runtimeContext);";
-                std::string functionDeclaration = "void "+EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(RuntimeContext * context);";
+                std::string functionCall = EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(runtimeContext);";
+                std::string functionDeclaration = "void "+EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(RuntimeContext * context);";
                 outputCode += functionCall+"\n";
                 codeGenerator.AddGlobalDeclaration(functionDeclaration);
 

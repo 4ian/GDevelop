@@ -478,7 +478,7 @@ std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(gd::Project 
     output +=
     codeGenerator.GetCustomCodeOutsideMain()+
     "\n"
-    "void "+EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(events.GetName())+"(RuntimeContext * runtimeContext)\n"
+    "void "+EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(events.GetName())+"(RuntimeContext * runtimeContext)\n"
     "{\n"
 	+codeGenerator.GetCustomCodeInMain()
     +wholeEventsCode+

@@ -3,14 +3,14 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY)
 #ifndef TRANSLATEACTION_H
 #define TRANSLATEACTION_H
 #include <string>
 #include <vector>
 #include <map>
 #include <utility>
-#include <wx/bitmap.h>
+class wxBitmap;
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/IDE/TextFormatting.h"
 namespace gd { class InstructionMetadata;}
@@ -45,6 +45,7 @@ public:
      */
     std::string LabelFromType(const std::string & type);
 
+    #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Return the bitmap of a button from parameter type
      */
@@ -59,10 +60,11 @@ public:
      * Save the configuration to wxConfigBase
      */
     void SaveTypesFormattingToConfig();
+    #endif
 
     std::map<std::string, gd::TextFormatting> typesFormatting;
 
-    static InstructionSentenceFormatter *GetInstance()
+    static InstructionSentenceFormatter *Get()
     {
         if ( NULL == _singleton )
         {
@@ -81,9 +83,9 @@ public:
         }
     }
 
+    virtual ~InstructionSentenceFormatter() {};
 private:
     InstructionSentenceFormatter() {};
-    virtual ~InstructionSentenceFormatter() {};
     static InstructionSentenceFormatter *_singleton;
 };
 

@@ -300,7 +300,7 @@ DestroyFunPtr PlatformExtension::GetDestroyObjectFunction(std::string objectType
 Automatism* PlatformExtension::CreateAutomatism(std::string type) const
 {
     if ( automatismsInfo.find(type) != automatismsInfo.end())
-        return automatismsInfo.find(type)->second.GetInstance()->Clone();
+        return automatismsInfo.find(type)->second.Get()->Clone();
 
     return NULL;
 }
@@ -381,7 +381,7 @@ bool PlatformExtension::IsBuiltin() const
 #if defined(GD_IDE_ONLY)
 void PlatformExtension::CloneExtension(const std::string & platformName, const std::string & extensionName, bool stripFunctionsNameAndCodeGeneration)
 {
-    gd::Platform* platform = gd::PlatformManager::GetInstance()->GetPlatform(platformName);
+    gd::Platform* platform = gd::PlatformManager::Get()->GetPlatform(platformName);
     if ( !platform ) {
         std::cout << "Unable to clone extension \""<< extensionName << "\" from " << platformName << ": This platform doesn't exist.";
         return;

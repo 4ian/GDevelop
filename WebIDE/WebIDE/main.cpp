@@ -21,12 +21,12 @@ namespace gd {
 		std::cout << "Initializing GDC++ platform" << std::endl;
 		{
 		    boost::shared_ptr<gd::Platform> platform(&CppPlatform::Get());
-		    gd::PlatformManager::GetInstance()->AddPlatform(platform);
+		    gd::PlatformManager::Get()->AddPlatform(platform);
 	    }
 		std::cout << "Initializing GDJS platform" << std::endl;
 	    {
 		    boost::shared_ptr<gd::Platform> platform(&JsPlatform::Get());
-		    gd::PlatformManager::GetInstance()->AddPlatform(platform);
+		    gd::PlatformManager::Get()->AddPlatform(platform);
 	    }
 		std::cout << "Platforms initialization ended." << std::endl;
 	}
@@ -42,7 +42,7 @@ public:
 		return *project;
 	}
 
-	static void DumpProjectXml(gd::Project & project)
+	static std::string DumpProjectXml(gd::Project & project)
 	{
 	    TiXmlDocument doc;
 	    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
@@ -55,7 +55,7 @@ public:
 
 		TiXmlPrinter printer;
 		doc.Accept( &printer );
-		fprintf( stdout, "%s", printer.CStr() );
+		return printer.CStr();
 	}
 
 };
@@ -77,11 +77,11 @@ int main(int argc, char const *argv[])
 	std::cout << "* Chargement de la platform C++..." << std::endl;
 	{
 	    boost::shared_ptr<gd::Platform> platform(&CppPlatform::Get()); //TODO: Vilain hack
-	    gd::PlatformManager::GetInstance()->AddPlatform(platform);
+	    gd::PlatformManager::Get()->AddPlatform(platform);
     }
     {
 	    boost::shared_ptr<gd::Platform> platform(&JsPlatform::Get()); //TODO: Vilain hack
-	    gd::PlatformManager::GetInstance()->AddPlatform(platform);
+	    gd::PlatformManager::Get()->AddPlatform(platform);
     }
 /*
 	std::cout << "* Essais..." << std::endl;

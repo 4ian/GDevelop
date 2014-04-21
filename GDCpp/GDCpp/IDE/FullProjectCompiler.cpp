@@ -72,14 +72,14 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
         boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
         if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
-        if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") ||
-             wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".dll.a"))
+        if ( wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") ||
+             wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".dll.a"))
             task.compilerCall.extraLibFiles.push_back(extension->GetName());
 
         for (unsigned int j =0;j<extension->GetSupplementaryLibFiles().size();++j)
         {
-            if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") ||
-                 wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".dll.a") )
+            if ( wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") ||
+                 wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".dll.a") )
                 task.compilerCall.extraLibFiles.push_back(extension->GetSupplementaryLibFiles()[j]);
         }
     }
@@ -88,7 +88,7 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
     for (unsigned int l= 0;l<game.GetLayoutCount();++l)
     {
         std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
-        task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
+        task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
 
         DependenciesAnalyzer analyzer(game, game.GetLayout(l));
         if ( !analyzer.Analyze() )
@@ -105,7 +105,7 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
             if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
             {
                 std::cout << "Added GD" << gd::ToString((*sourceFile).get()) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
-                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
+                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
             }
         }
     }
@@ -117,11 +117,11 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
         if ( !analyzer.ExternalEventsCanBeCompiledForAScene().empty() )
         {
             std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
-            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
+            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
         }
     }
 
-    CodeCompiler::GetInstance()->AddTask(task);
+    CodeCompiler::Get()->AddTask(task);
     return true;
 }
 
@@ -170,12 +170,12 @@ void FullProjectCompiler::LaunchProjectCompilation()
     ClearDirectory(gd::ToString(tempDir)); //Préparation du répertoire
 
     //Wait current compilations to end
-    if ( CodeCompiler::GetInstance()->CompilationInProcess() )
+    if ( CodeCompiler::Get()->CompilationInProcess() )
     {
         diagnosticManager.OnMessage(gd::ToString(_("Compilation waiting for other task to finish...")));
 
         wxStopWatch yieldClock;
-        while (CodeCompiler::GetInstance()->CompilationInProcess())
+        while (CodeCompiler::Get()->CompilationInProcess())
         {
             if ( yieldClock.Time() > 150 )
             {
@@ -228,16 +228,16 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilerCall.compilationForRuntime = true;
         task.compilerCall.optimize = optimize;
         task.compilerCall.eventsGeneratedCode = true;
-        task.compilerCall.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
-        task.compilerCall.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeObjectFile.o");
+        task.compilerCall.inputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
+        task.compilerCall.outputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
         task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
         task.scene = &game.GetLayout(i);
 
-        CodeCompiler::GetInstance()->AddTask(task);
+        CodeCompiler::Get()->AddTask(task);
 
         wxStopWatch yieldClock;
-        while (CodeCompiler::GetInstance()->CompilationInProcess())
+        while (CodeCompiler::Get()->CompilationInProcess())
         {
             if ( yieldClock.Time() > 150 )
             {
@@ -249,7 +249,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( !wxFileExists(task.compilerCall.outputFile) )
         {
             diagnosticManager.AddError(gd::ToString(_("Compilation of scene ")+game.GetLayout(i).GetName()+_(" failed: Please go on our website to report this error, joining this file:\n")
-                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt"
+                                                    +CodeCompiler::Get()->GetOutputDirectory()+"LatestCompilationOutput.txt"
                                                     +_("\n\nIf you think the error is related to an extension, please contact its developer.")));
             diagnosticManager.OnCompilationFailed();
             return;
@@ -375,7 +375,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         }
 
         wxStopWatch yieldClock;
-        while (CodeCompiler::GetInstance()->CompilationInProcess())
+        while (CodeCompiler::Get()->CompilationInProcess())
         {
             if ( yieldClock.Time() > 150 )
             {
@@ -387,7 +387,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( !wxFileExists(codeOutputFile) )
         {
             diagnosticManager.AddError(gd::ToString(_("Linking of project failed: Please go on our website to report this error, joining this file:\n")
-                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt"
+                                                    +CodeCompiler::Get()->GetOutputDirectory()+"LatestCompilationOutput.txt"
                                                     +_("\n\nIf you think the error is related to an extension, please contact its developer.")));
             diagnosticManager.OnCompilationFailed();
             return;

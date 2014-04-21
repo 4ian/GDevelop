@@ -65,7 +65,7 @@ BuildMessagesPnl::~BuildMessagesPnl()
 void BuildMessagesPnl::OnMustRefresh(wxCommandEvent&)
 {
     CompilerMessagesParser parser;
-    parser.ParseOutput(CodeCompiler::GetInstance()->GetLastTaskMessages());
+    parser.ParseOutput(CodeCompiler::Get()->GetLastTaskMessages());
 
     RefreshWith(NULL, parser.parsedMessages);
 }

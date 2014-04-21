@@ -186,7 +186,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(conditions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -196,7 +196,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(conditions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -216,11 +216,11 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
 
         //Draw needed icons
         const wxBitmap * bmp = &instructionMetadata.GetSmallBitmapIcon();
-        if ( !bmp->IsOk() ) bmp = &gd::CommonBitmapManager::GetInstance()->unknownBt;
+        if ( !bmp->IsOk() ) bmp = &gd::CommonBitmapManager::Get()->unknownBt;
 
         if ( conditions[j].IsInverted() )
         {
-            dc.DrawBitmap( gd::CommonBitmapManager::GetInstance()->invertedCondition, x + 1, y, true );
+            dc.DrawBitmap( gd::CommonBitmapManager::Get()->invertedCondition, x + 1, y, true );
             if ( bmp->IsOk() ) dc.DrawBitmap( *bmp, x + iconWidth + 1, y, true );
         }
         else if ( bmp->IsOk() ) dc.DrawBitmap( *bmp, x + 1, y, true );
@@ -285,7 +285,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -295,7 +295,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
+            std::string text = InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -315,7 +315,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
 
         //Draw needed icons
         const wxBitmap * bmp = &instructionMetadata.GetSmallBitmapIcon();
-        if ( !bmp->IsOk() ) bmp = &gd::CommonBitmapManager::GetInstance()->unknownBt;
+        if ( !bmp->IsOk() ) bmp = &gd::CommonBitmapManager::Get()->unknownBt;
         if ( bmp->IsOk() ) dc.DrawBitmap( *bmp, x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
@@ -349,7 +349,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
         int freeWidth = width - leftIconsWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(InstructionSentenceFormatter::GetInstance()->Translate(conditions[j], instructionMetadata), freeWidth);
+        int height = GetTextHeightInArea(InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata), freeWidth);
         y += height;
 
         //Sub conditions
@@ -381,7 +381,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         int freeWidth = width - iconWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(InstructionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata), freeWidth);
+        int height = GetTextHeightInArea(InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata), freeWidth);
         y+=height;
 
         //Draw sub actions
@@ -396,14 +396,14 @@ int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const 
                                            wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection)
 {
     std::vector< std::pair<std::string, TextFormatting > > formattedStr =
-        InstructionSentenceFormatter::GetInstance()->GetAsFormattedText(instruction, instructionMetadata);
+        InstructionSentenceFormatter::Get()->GetAsFormattedText(instruction, instructionMetadata);
 
     wxPoint lastPos = point;
     //size_t alreadyWrittenCharCount = 0;
     for (unsigned int i = 0;i<formattedStr.size();++i)
     {
         //Update font and properties
-        dc.SetTextForeground(!event->IsDisabled() ? formattedStr[i].second.color : wxColour(160,160,160));
+        dc.SetTextForeground(!event->IsDisabled() ? formattedStr[i].second.GetWxColor() : wxColour(160,160,160));
         font.SetWeight(formattedStr[i].second.bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
         font.SetStyle(formattedStr[i].second.italic ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL);
         std::string text = formattedStr[i].first;
@@ -483,7 +483,7 @@ std::string EventsRenderingHelper::GetHTMLText(std::string str)
     return str;
 }
 
-EventsRenderingHelper * EventsRenderingHelper::GetInstance()
+EventsRenderingHelper * EventsRenderingHelper::Get()
 {
     if ( NULL == singleton )
         singleton = new EventsRenderingHelper;

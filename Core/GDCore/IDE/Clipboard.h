@@ -25,7 +25,7 @@ namespace gd
 class GD_CORE_API Clipboard
 {
 public:
-    static Clipboard * GetInstance();
+    static Clipboard * Get();
     static void DestroySingleton();
 
     void SetObject( const gd::Object * object );
@@ -62,7 +62,7 @@ public:
     void ForgetObjectGroup() { hasObjectGroup = false; };
 
     void SetInstances( std::vector < boost::shared_ptr<InitialInstance> > instances );
-    std::vector < boost::shared_ptr<InitialInstance> > GetInstances() { return instancesCopied; };
+    std::vector < boost::shared_ptr<InitialInstance> > Gets() { return instancesCopied; };
     bool HasInstances() { return hasInstances; };
 
 private:

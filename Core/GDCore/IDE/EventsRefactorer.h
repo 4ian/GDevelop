@@ -78,6 +78,7 @@ public:
                                       bool inConditions,
                                       bool inActions);
 
+    virtual ~EventsRefactorer() {};
 private:
     /**
      * Replace all occurences of an object name by another name in an action
@@ -127,7 +128,6 @@ private:
     static bool SearchStringInConditions(gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & conditions, std::string search, bool matchCase);
 
     EventsRefactorer() {};
-    virtual ~EventsRefactorer() {};
 };
 
 }

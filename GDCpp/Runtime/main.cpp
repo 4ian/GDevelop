@@ -72,7 +72,7 @@ int main( int argc, char *p_argv[] )
     gd::ExtensionsLoader::LoadAllExtensions(".", CppPlatform::Get());
     gd::ExtensionsLoader::ExtensionsLoadingDone(".");
     //Load resource file
-    gd::RessourcesLoader * resLoader = gd::RessourcesLoader::GetInstance();
+    gd::RessourcesLoader * resLoader = gd::RessourcesLoader::Get();
     if ( !resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executablePath+"/gam.egd" ) )
     {
@@ -98,7 +98,7 @@ int main( int argc, char *p_argv[] )
 
         aes_ks_t keySetting;
         aes_setks_decrypt(key, 192, &keySetting);
-        aes_cbc_decrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer), 
+        aes_cbc_decrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer),
             (uint8_t*)iv, size/AES_BLOCK_SIZE, &keySetting);
 
         string uncryptedSrc = obuffer;
@@ -193,8 +193,8 @@ int main( int argc, char *p_argv[] )
         }
     }
 
-    SoundManager::GetInstance()->DestroySingleton();
-    FontManager::GetInstance()->DestroySingleton();
+    SoundManager::Get()->DestroySingleton();
+    FontManager::Get()->DestroySingleton();
 
     gd::CloseLibrary(codeLibrary);
 

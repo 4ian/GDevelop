@@ -736,6 +736,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
             return ToString(wxGetTextFromUser(parameterMetadata.description, _("Variable"), "", this));
 
         gd::ChooseVariableDialog dialog(this, object->GetVariables());
+        dialog.SetAssociatedObject(&project, &layout, object);
         if ( dialog.ShowModal() == 1 )
             return dialog.GetSelectedVariable();
 
@@ -971,7 +972,7 @@ void EditExpressionDialog::OnButton17Click(wxCommandEvent& event)
 
 void EditExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"));
 }
 
 }

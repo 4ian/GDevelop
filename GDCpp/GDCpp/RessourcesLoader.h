@@ -74,7 +74,7 @@ public:
      */
     bool SetResourceFile( const string & filename );
 
-    static RessourcesLoader *GetInstance()
+    static RessourcesLoader *Get()
     {
         if ( NULL == _singleton )
         {

@@ -467,7 +467,7 @@ void LayoutEditorCanvas::OnCopySelected(wxCommandEvent & event)
         copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
 
-    gd::Clipboard::GetInstance()->SetInstances(copiedPositions);
+    gd::Clipboard::Get()->SetInstances(copiedPositions);
 }
 
 void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
@@ -482,7 +482,7 @@ void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
         copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
         copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
-    gd::Clipboard::GetInstance()->SetInstances(copiedPositions);
+    gd::Clipboard::Get()->SetInstances(copiedPositions);
     ChangesMade();
 
     //Do not forget to remove the cut instances
@@ -497,9 +497,9 @@ void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 {
-    if ( !gd::Clipboard::GetInstance()->HasInstances() ) return;
+    if ( !gd::Clipboard::Get()->HasInstances() ) return;
 
-    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::GetInstance()->GetInstances();
+    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
 
     for (unsigned int i =0;i<pastedInstances.size();++i)
     {
@@ -515,8 +515,8 @@ void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
 {
-    if ( !gd::Clipboard::GetInstance()->HasInstances() ) return;
-    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::GetInstance()->GetInstances();
+    if ( !gd::Clipboard::Get()->HasInstances() ) return;
+    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
     if ( pastedInstances.empty() || pastedInstances[0] == boost::shared_ptr<gd::InitialInstance>() ) return;
 
     gd::InstancesAdvancedPasteDialog dialog(this);
@@ -730,7 +730,7 @@ void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 
 void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
 }
 
 

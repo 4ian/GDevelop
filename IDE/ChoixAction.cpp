@@ -602,7 +602,7 @@ void ChoixAction::RefreshFromAction()
     ActionTextTxt->SetLabel( instructionMetadata.GetDescription() );
     ActionTextTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
-    else ActionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknownAction24);
+    else ActionImg->SetBitmap(gd::CommonBitmapManager::Get()->unknownAction24);
 
     //Update controls count
     while ( ParaEdit.size() < instructionMetadata.parameters.size() )
@@ -616,7 +616,7 @@ void ChoixAction::RefreshFromAction()
         ParaSpacer1.push_back( new wxPanel(this) );
         ParaSpacer2.push_back( new wxPanel(this) );
         ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
-        ParaBmpBt.push_back( new wxBitmapButton( this, id, gd::CommonBitmapManager::GetInstance()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
+        ParaBmpBt.push_back( new wxBitmapButton( this, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
 
         //Connecting events
         Connect( id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChoixAction::OnABtClick ) );
@@ -670,8 +670,8 @@ void ChoixAction::RefreshFromAction()
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
             ParaEdit.at(i)->Show();
 
-            ParaBmpBt.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( gd::InstructionSentenceFormatter::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( gd::InstructionSentenceFormatter::Get()->LabelFromType(instructionMetadata.parameters[i].type) );
             ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
 
             //De/activate widgets if parameter is optional
@@ -877,19 +877,17 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             if ( ParaEdit.empty() ) return;
 
             std::string objectWanted = ToString(ParaEdit[0]->GetValue());
-            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+	        gd::Object * object = NULL;
 
-            ObjSPtr object = boost::shared_ptr<gd::Object> ();
-
-            if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-                object = *sceneObject;
-            else if ( globalObject != game.GetObjects().end() ) //Then the global object list
-                object = *globalObject;
-            else
-                return;
+	        if ( scene.HasObjectNamed(objectWanted) )
+	            object = &scene.GetObject(objectWanted);
+	        else if ( game.HasObjectNamed(objectWanted) )
+	            object = &game.GetObject(objectWanted);
+	        else
+	            return;
 
             gd::ChooseVariableDialog dialog(this, object->GetVariables());
+            dialog.SetAssociatedObject(&game, &scene, object);
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
 
@@ -1017,7 +1015,7 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action"));
 }
 
 void ChoixAction::OnextSortCheckClick(wxCommandEvent& event)

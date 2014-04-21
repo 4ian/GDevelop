@@ -277,7 +277,7 @@ public:
      */
     void AllowMultithread(bool allow = true, unsigned int maxThread = 3);
 
-    static CodeCompiler * GetInstance();
+    static CodeCompiler * Get();
     static void DestroySingleton();
 
     static sf::Mutex openSaveDialogMutex; ///< wxWidgets Open/Save dialog seems to cause crash when writing bitcode at the same time.

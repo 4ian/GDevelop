@@ -41,19 +41,19 @@ CodeCompilerTask ConstructEmptyTask()
 std::string CodeCompilerCall::GetFullCall() const
 {
     #if defined(WINDOWS)
-    std::string compilerExecutable = "\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin/g++.exe\"";
+    std::string compilerExecutable = "\""+CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/MinGW32/bin/g++.exe\"";
     #else
     std::string compilerExecutable = "g++";
     #endif
 
-    std::string baseDir = CodeCompiler::GetInstance()->GetBaseDirectory();
+    std::string baseDir = CodeCompiler::Get()->GetBaseDirectory();
 
     std::vector<std::string> args;
     #if defined(WINDOWS)
     args.push_back("-m32");
     args.push_back("-nostdinc");
     args.push_back("-nostdinc++");
-    args.push_back("-B\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin\"");
+    args.push_back("-B\""+CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/MinGW32/bin\"");
     #else
         args.push_back("-fPIC"); //Necessary, on 64 bits platforms to avoid "relocation R_X86_64_32 against `.rodata' can not be used when making a shared object" error.
         //Rely on the default includes directories of the compiler
@@ -98,7 +98,7 @@ std::string CodeCompilerCall::GetFullCall() const
             args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");
 
         //CodeCompiler extra headers directories
-        const std::set<std::string> & codeCompilerHeaders = CodeCompiler::GetInstance()->GetAllHeadersDirectories();
+        const std::set<std::string> & codeCompilerHeaders = CodeCompiler::Get()->GetAllHeadersDirectories();
         for (std::set<std::string>::const_iterator header = codeCompilerHeaders.begin();header != codeCompilerHeaders.end();++header)
             args.push_back("-I\""+*header+"\"");
 
@@ -329,7 +329,7 @@ void CodeCompilerProcess::OnTerminate( int pid, int status )
     if ( parent != NULL) wxPostEvent(parent, processEndedEvent);
     #else
     wxCommandEvent useless;
-    CodeCompiler::GetInstance()->ProcessEndedWork(useless);
+    CodeCompiler::Get()->ProcessEndedWork(useless);
     #endif
 }
 
@@ -667,7 +667,7 @@ CodeCompiler::~CodeCompiler()
 {
 }
 
-CodeCompiler * CodeCompiler::GetInstance()
+CodeCompiler * CodeCompiler::Get()
 {
     if ( NULL == _singleton )
         _singleton = new CodeCompiler;

@@ -229,7 +229,7 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Pr
     wxSize size = previewPanel.GetSize();
 
     //Checkerboard background
-    dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
     wxString fullFilename = GetAbsoluteFile(project);

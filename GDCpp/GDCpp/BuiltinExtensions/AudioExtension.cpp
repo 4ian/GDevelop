@@ -471,16 +471,16 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
     if ( propertyNb == 0 )
     {
         name = _("Global volume:");
-        value = ToString(SoundManager::GetInstance()->GetGlobalVolume());
+        value = ToString(SoundManager::Get()->GetGlobalVolume());
     }
-    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3 )
+    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
     {
         unsigned int soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
-        if (soundNb >= SoundManager::GetInstance()->sounds.size()) return;
+        if (soundNb >= SoundManager::Get()->sounds.size()) return;
 
         if ( propertyNb % 3 == 1)
         {
-            sf::Sound::Status soundStatus = SoundManager::GetInstance()->sounds[soundNb]->GetStatus();
+            sf::Sound::Status soundStatus = SoundManager::Get()->sounds[soundNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
                 name = _("Sound played:");
@@ -489,29 +489,29 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
             else if ( soundStatus == sf::Sound::Paused)
                 name = _("Paused sound:");
 
-            value = SoundManager::GetInstance()->sounds[soundNb]->file;
+            value = SoundManager::Get()->sounds[soundNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
             name = _(" -Volume/Pitch:");
-            value = ToString(SoundManager::GetInstance()->sounds[soundNb]->GetVolume())
-                    +"/"+ToString(SoundManager::GetInstance()->sounds[soundNb]->GetPitch());
+            value = ToString(SoundManager::Get()->sounds[soundNb]->GetVolume())
+                    +"/"+ToString(SoundManager::Get()->sounds[soundNb]->GetPitch());
         }
         else
         {
             name = _(" -Progress (seconds) :");
-            value = ToString(SoundManager::GetInstance()->sounds[soundNb]->GetPlayingOffset());
+            value = ToString(SoundManager::Get()->sounds[soundNb]->GetPlayingOffset());
         }
 
     }
-    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3+SoundManager::GetInstance()->musics.size()*3 )
+    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3+SoundManager::Get()->musics.size()*3 )
     {
-        unsigned int musicNb = ((propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)-(propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)%3)/3;
-        if (musicNb >= SoundManager::GetInstance()->musics.size()) return;
+        unsigned int musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
+        if (musicNb >= SoundManager::Get()->musics.size()) return;
 
         if ( propertyNb % 3 == 1)
         {
-            sf::Sound::Status soundStatus = SoundManager::GetInstance()->musics[musicNb]->GetStatus();
+            sf::Sound::Status soundStatus = SoundManager::Get()->musics[musicNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
                 name = _("Played music:");
@@ -520,18 +520,18 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
             else if ( soundStatus == sf::Sound::Paused)
                 name = _("Paused music:");
 
-            value = SoundManager::GetInstance()->musics[musicNb]->file;
+            value = SoundManager::Get()->musics[musicNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
             name = _(" -Volume/Pitch:");
-            value = ToString(SoundManager::GetInstance()->musics[musicNb]->GetVolume())
-                    +"/"+ToString(SoundManager::GetInstance()->musics[musicNb]->GetPitch());
+            value = ToString(SoundManager::Get()->musics[musicNb]->GetVolume())
+                    +"/"+ToString(SoundManager::Get()->musics[musicNb]->GetPitch());
         }
         else
         {
             name = _(" -Progress (seconds) :");
-            value = ToString(SoundManager::GetInstance()->musics[musicNb]->GetPlayingOffset());
+            value = ToString(SoundManager::Get()->musics[musicNb]->GetPlayingOffset());
         }
     }
 }
@@ -540,13 +540,13 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
 {
     if ( propertyNb == 0 )
     {
-        SoundManager::GetInstance()->SetGlobalVolume(ToFloat(newValue));
+        SoundManager::Get()->SetGlobalVolume(ToFloat(newValue));
         return true;
     }
-    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3 )
+    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
     {
         unsigned int soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
-        if (soundNb >= SoundManager::GetInstance()->sounds.size()) return false;
+        if (soundNb >= SoundManager::Get()->sounds.size()) return false;
 
         if ( propertyNb % 3 == 1)
         {
@@ -557,21 +557,21 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
             std::vector<string> values = SplitString<string>(newValue, '/');
             if ( values.size() < 2 ) return false;
 
-            SoundManager::GetInstance()->sounds[soundNb]->SetVolume(ToFloat(values[0]));
-            SoundManager::GetInstance()->sounds[soundNb]->SetPitch(ToFloat(values[1]));
+            SoundManager::Get()->sounds[soundNb]->SetVolume(ToFloat(values[0]));
+            SoundManager::Get()->sounds[soundNb]->SetPitch(ToFloat(values[1]));
             return true;
         }
         else
         {
-            SoundManager::GetInstance()->sounds[soundNb]->SetPlayingOffset(ToFloat(newValue));
+            SoundManager::Get()->sounds[soundNb]->SetPlayingOffset(ToFloat(newValue));
             return true;
         }
 
     }
-    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3+SoundManager::GetInstance()->musics.size()*3 )
+    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3+SoundManager::Get()->musics.size()*3 )
     {
-        unsigned int musicNb = ((propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)-(propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)%3)/3;
-        if (musicNb >= SoundManager::GetInstance()->musics.size()) return false;
+        unsigned int musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
+        if (musicNb >= SoundManager::Get()->musics.size()) return false;
 
         if ( propertyNb % 3 == 1)
         {
@@ -582,13 +582,13 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
             std::vector<string> values = SplitString<string>(newValue, '/');
             if ( values.size() < 2 ) return false;
 
-            SoundManager::GetInstance()->musics[musicNb]->SetVolume(ToFloat(values[0]));
-            SoundManager::GetInstance()->musics[musicNb]->SetPitch(ToFloat(values[1]));
+            SoundManager::Get()->musics[musicNb]->SetVolume(ToFloat(values[0]));
+            SoundManager::Get()->musics[musicNb]->SetPitch(ToFloat(values[1]));
             return true;
         }
         else
         {
-            SoundManager::GetInstance()->musics[musicNb]->SetPlayingOffset(ToFloat(newValue));
+            SoundManager::Get()->musics[musicNb]->SetPlayingOffset(ToFloat(newValue));
             return true;
         }
     }
@@ -599,7 +599,7 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
 
 unsigned int AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
-    return 1+SoundManager::GetInstance()->musics.size()*3+SoundManager::GetInstance()->sounds.size()*3;
+    return 1+SoundManager::Get()->musics.size()*3+SoundManager::Get()->sounds.size()*3;
 }
 
 #endif

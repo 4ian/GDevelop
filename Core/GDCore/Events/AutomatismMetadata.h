@@ -110,7 +110,7 @@ public:
     const wxBitmap & GetBitmapIcon() const { return icon; }
 #endif
 #endif
-    boost::shared_ptr<gd::Automatism> GetInstance() const { return instance; }
+    boost::shared_ptr<gd::Automatism> Get() const { return instance; }
     boost::shared_ptr<gd::AutomatismsSharedData> GetSharedDataInstance() const { return sharedDatasInstance; }
 
 #if defined(GD_IDE_ONLY)

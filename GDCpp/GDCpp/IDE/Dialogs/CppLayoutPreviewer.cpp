@@ -63,11 +63,11 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
     reloadingText.setColor(sf::Color(0,0,0,128));
     reloadingText.setString(_("Compiling..."));
     reloadingText.setCharacterSize(40);
-    reloadingText.setFont(*FontManager::GetInstance()->GetFont(""));
+    reloadingText.setFont(*FontManager::Get()->GetFont(""));
 
     //Launch now events compilation if needed :
     //Useful when opening a scene for the first time for example.
-    if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(editor.GetLayout()) )
+    if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::Get()->HasTaskRelatedTo(editor.GetLayout()) )
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());
 }
 
@@ -109,7 +109,7 @@ void CppLayoutPreviewer::StopPreview()
 {
     std::cout << "Stopping GD C++ preview..." << std::endl;
 
-    CodeCompiler::GetInstance()->EnableTaskRelatedTo(editor.GetLayout());
+    CodeCompiler::Get()->EnableTaskRelatedTo(editor.GetLayout());
     previewScene.running = false;
     playing = false;
 
@@ -128,14 +128,14 @@ void CppLayoutPreviewer::StopPreview()
     if ( profiler ) previewScene.SetProfiler(profiler.get());
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
     if ( debugger ) debugger->Pause();
-    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
+    SoundManager::Get()->ClearAllSoundsAndMusics();
 }
 
 void CppLayoutPreviewer::OnUpdate()
 {
     if ( isReloading )
     {
-        if ( CodeCompiler::GetInstance()->CompilationInProcess()  ) //We're still waiting for compilation to finish
+        if ( CodeCompiler::Get()->CompilationInProcess()  ) //We're still waiting for compilation to finish
         {
             RenderCompilationScreen(); //Display a message when compiling
             return;
@@ -174,7 +174,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
     cout << "Scene Editor canvas reloading... ( Step 1/2 )" << endl;
     isReloading = true;
 
-    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
+    SoundManager::Get()->ClearAllSoundsAndMusics();
     if ( editor.GetProject().GetImageManager() ) editor.GetProject().GetImageManager()->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
 
     //Reset game
@@ -193,7 +193,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
-    if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(editor.GetLayout()) )
+    if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::Get()->HasTaskRelatedTo(editor.GetLayout()) )
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());
         mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken into account when you switch to Edition mode"));
@@ -205,7 +205,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
 void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
 {
     cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
-    CodeCompiler::GetInstance()->DisableTaskRelatedTo(editor.GetLayout());
+    CodeCompiler::Get()->DisableTaskRelatedTo(editor.GetLayout());
 
     //Switch the working directory as we are making calls to the runtime scene
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
@@ -220,7 +220,7 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
                                                                         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(editor.GetLayout().GetName())) )
     {
         gd::LogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")
-                   +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
+                   +CodeCompiler::Get()->GetOutputDirectory()+"LatestCompilationOutput.txt");
         editor.GoToEditingState();
 
         return;

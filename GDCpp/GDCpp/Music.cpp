@@ -80,5 +80,5 @@ void Music::SetVolume(float volume_)
 
 void Music::UpdateVolume()
 {
-    music.setVolume(volume * SoundManager::GetInstance()->GetGlobalVolume()/100.f);
+    music.setVolume(volume * SoundManager::Get()->GetGlobalVolume()/100.f);
 }

@@ -240,7 +240,7 @@ void ProjectExtensionsDialog::RefreshPlatformList()
     imageList->Add(wxBitmap("res/icon32.png", wxBITMAP_TYPE_ANY));
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
     const std::vector< Platform * > & usedPlatforms = project.GetUsedPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -383,7 +383,7 @@ void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
 
 void ProjectExtensionsDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"));
 }
 
 void ProjectExtensionsDialog::OnResize(wxSizeEvent& event)
@@ -416,7 +416,7 @@ void ProjectExtensionsDialog::OnplatformListItemSelect(wxListEvent& event)
     {
         std::string chosenPlatform = associatedData->GetString();
 
-        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
         for (unsigned int i = 0;i<platforms.size();++i)
         {
             if ( platforms[i]->GetName() == chosenPlatform )
@@ -435,7 +435,7 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
     {
         std::string chosenPlatform = associatedData->GetString();
 
-        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
         for (unsigned int i = 0;i<platforms.size();++i)
         {
             if ( platforms[i]->GetName() == chosenPlatform )

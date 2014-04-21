@@ -126,7 +126,7 @@ void EditRepeatEvent::OncancelBtClick(wxCommandEvent& event)
 
 void EditRepeatEvent::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/repeat_events"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/repeat_events"));
 }
 
 }

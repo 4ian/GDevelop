@@ -155,7 +155,7 @@ void NewProjectDialog::RefreshPlatformList()
     imageList->Add(wxBitmap("res/icon32.png", wxBITMAP_TYPE_ANY));
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
+    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         platformList->InsertItem(0, platforms[i]->GetFullName(), 0);
@@ -228,7 +228,7 @@ void NewProjectDialog::RefreshTemplateList()
                 {
                     //Find the icon of the template
                     wxString iconFile = currentDir+"/"+filename+"/GDTemplateIcon.png";
-                    wxBitmap icon = wxFileExists(iconFile) ? wxBitmap(iconFile, wxBITMAP_TYPE_ANY) : gd::CommonBitmapManager::GetInstance()->gdFileIcon32;
+                    wxBitmap icon = wxFileExists(iconFile) ? wxBitmap(iconFile, wxBITMAP_TYPE_ANY) : gd::CommonBitmapManager::Get()->gdFileIcon32;
                     templateImageList->Add(icon);
 
                     templateList->InsertItem(0, name, templateImageList->GetImageCount()-1);
@@ -311,7 +311,7 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
     {
         chosenTemplatePlatform = associatedData->GetString();
     }
-    gd::Platform * platform = gd::PlatformManager::GetInstance()->GetPlatform(chosenTemplatePlatform);
+    gd::Platform * platform = gd::PlatformManager::Get()->GetPlatform(chosenTemplatePlatform);
     if ( platform ) descTxt->SetLabel(platform->GetDescription());
     RefreshTemplateList();
 }

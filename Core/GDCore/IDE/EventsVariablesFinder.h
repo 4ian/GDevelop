@@ -10,6 +10,7 @@
 #include "GDCore/Events/Event.h"
 namespace gd { class Instruction; }
 namespace gd { class Platform; }
+namespace gd { class Object; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 
@@ -17,7 +18,7 @@ namespace gd
 {
 
 /**
- * \brief Perform search over a project or a layout searching for variables
+ * \brief Perform a search over a project or a layout, searching for layout, global or object variables.
  *
  * \ingroup IDE
  */
@@ -29,7 +30,8 @@ public:
      * \param project The project to be scanned
      * \return A std::set containing the names of all global variables used
      */
-    static std::set < std::string > FindAllGlobalVariables(const gd::Platform & platform, const gd::Project & project);
+    static std::set < std::string > FindAllGlobalVariables(const gd::Platform & platform,
+        const gd::Project & project);
 
     /**
      * Construct a list containing the name of all layout variables used in the layout.
@@ -37,7 +39,18 @@ public:
      * \param layout The layout to be scanned
      * \return A std::set containing the names of all layout variables used
      */
-    static std::set < std::string > FindAllLayoutVariables(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout);
+    static std::set < std::string > FindAllLayoutVariables(const gd::Platform & platform,
+        const gd::Project & project, const gd::Layout & layout);
+
+    /**
+     * Construct a list containing the name of all object variables used in the layout.
+     * \param project The project
+     * \param layout The layout to use.
+     * \param object The object to be scanned
+     * \return A std::set containing the names of all object variables used
+     */
+    static std::set < std::string > FindAllObjectVariables(const gd::Platform & platform,
+        const gd::Project & project, const gd::Layout & layout, const gd::Object & object);
 
 private:
 
@@ -46,11 +59,16 @@ private:
      * \param project The project used
      * \param project The layout used
      * \param instructions The instructions to be analyzed
+     * \param instructionsAreConditions True if the instructions are conditions.
      * \param parameterType The parameters type to be analyzed
+     * \param objectName If not empty, parameters will be taken into account only if the last object parameter is filled with this value.
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInInstructions(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const std::vector < gd::Instruction > & instructions, bool instructionsAreConditions, const std::string & parameterType);
+    static std::set < std::string > FindArgumentsInInstructions(const gd::Platform & platform,
+        const gd::Project & project, const gd::Layout & layout,
+        const std::vector < gd::Instruction > & instructions, bool instructionsAreConditions,
+        const std::string & parameterType, const std::string & objectName = "");
 
     /**
      * Construct a list of the value of the arguments for parameters of type @ parameterType
@@ -58,10 +76,13 @@ private:
      * \param project The layout used
      * \param events The events to be analyzed
      * \param parameterType The parameters type to be analyzed
+     * \param objectName If not empty, parameters will be taken into account only if the last object parameter is filled with this value.
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInEvents(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const gd::EventsList & events, const std::string & parameterType);
+    static std::set < std::string > FindArgumentsInEvents(const gd::Platform & platform,
+        const gd::Project & project, const gd::Layout & layout, const gd::EventsList & events,
+        const std::string & parameterType, const std::string & objectName = "");
 
     EventsVariablesFinder() {};
     virtual ~EventsVariablesFinder() {};

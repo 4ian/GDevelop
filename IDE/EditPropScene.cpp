@@ -229,7 +229,7 @@ void EditPropScene::OnPanel1LeftUp(wxMouseEvent& event)
 
 void EditPropScene::OnAideBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"));
 }
 
 

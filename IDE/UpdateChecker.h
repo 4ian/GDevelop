@@ -15,7 +15,7 @@ class UpdateChecker
 {
 public:
 
-    static UpdateChecker *GetInstance();
+    static UpdateChecker *Get();
     static void DestroySingleton();
 
     /**

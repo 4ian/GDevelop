@@ -161,7 +161,7 @@ void LayersEditorPanel::OnMoreOptions(wxCommandEvent& event)
 
 void LayersEditorPanel::OnHelpClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
 }
 
 void LayersEditorPanel::Refresh()

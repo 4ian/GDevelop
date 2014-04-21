@@ -26,7 +26,7 @@ public:
      */
     std::string GetExternalEventsFunctionMangledName(const std::string & externalEventsName);
 
-    static EventsCodeNameMangler *GetInstance();
+    static EventsCodeNameMangler *Get();
     static void DestroySingleton();
 
 private:
@@ -36,7 +36,7 @@ private:
 };
 
 /**
- * Shortcut to EventsCodeNameMangler::GetInstance()->GetMangledObjectsListName(objectName).
+ * Shortcut to EventsCodeNameMangler::Get()->GetMangledObjectsListName(objectName).
  * \see EventsCodeNameMangler
  * \return Mangled object name
  */

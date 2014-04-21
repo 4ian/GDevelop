@@ -61,13 +61,13 @@ BuildProgressPnl::~BuildProgressPnl()
 
 void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
 {
-    std::vector < CodeCompilerTask > currentTasks = CodeCompiler::GetInstance()->GetCurrentTasks();
+    std::vector < CodeCompilerTask > currentTasks = CodeCompiler::Get()->GetCurrentTasks();
 
-    if (CodeCompiler::GetInstance()->CompilationInProcess())
+    if (CodeCompiler::Get()->CompilationInProcess())
     {
         if (!currentTasks.empty())
         {
-            if (!CodeCompiler::GetInstance()->LastTaskFailed())
+            if (!CodeCompiler::Get()->LastTaskFailed())
             {
                 statusTxt->SetLabel(_("Task in progress:")+currentTasks[0].userFriendlyName);
                 AppendText(_("Task in progress:")+currentTasks[0].userFriendlyName+("...")+"\n");
@@ -81,7 +81,7 @@ void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
     }
     else
     {
-        if (CodeCompiler::GetInstance()->LastTaskFailed())
+        if (CodeCompiler::Get()->LastTaskFailed())
         {
             statusTxt->SetLabel(_("Some tasks failed."));
             AppendText(_("Some tasks failed.")+"\n");

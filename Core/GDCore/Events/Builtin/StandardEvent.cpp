@@ -104,7 +104,7 @@ void StandardEvent::LoadFromXml(gd::Project & project, const TiXmlElement * even
 void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     int border = renderingHelper->instructionsListBorder;
 
     //Draw event rectangle
@@ -129,7 +129,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
 #if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
-        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
         int border = renderingHelper->instructionsListBorder;
 
         //Get maximum height needed

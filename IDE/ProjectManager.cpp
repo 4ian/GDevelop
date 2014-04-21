@@ -763,7 +763,7 @@ void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
     }
 
     //Save the event to log file
-    LogFileManager::GetInstance()->WriteToLogFile("Opened layout "+layout.GetName());
+    LogFileManager::Get()->WriteToLogFile("Opened layout "+layout.GetName());
 
     //Open a new editor if necessary
     string prefix = "";
@@ -1117,8 +1117,8 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
-    while ( CodeCompiler::GetInstance()->CompilationInProcess() )
+    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
+    while ( CodeCompiler::Get()->CompilationInProcess() )
     {
         wxYield();
     }
@@ -1144,7 +1144,7 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::GetInstance()->SetLayout(&game->GetLayout(data->GetSecondString()));
+    gd::Clipboard::Get()->SetLayout(&game->GetLayout(data->GetSecondString()));
 }
 
 /**
@@ -1165,7 +1165,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 
     gd::Layout & layout = game->GetLayout(layoutName);
 
-    gd::Clipboard::GetInstance()->SetLayout(&layout);
+    gd::Clipboard::Get()->SetLayout(&layout);
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1185,8 +1185,8 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo(_("Please wait while the internal compilation of events is finishing...")) : NULL;
-    while (CodeCompiler::GetInstance()->CompilationInProcess())
+    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo(_("Please wait while the internal compilation of events is finishing...")) : NULL;
+    while (CodeCompiler::Get()->CompilationInProcess())
     {
         wxYield();
     }
@@ -1203,7 +1203,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::Get();
     if (!clipboard->HasLayout()) return;
 
     gd::Layout & newLayout = *clipboard->GetLayout();
@@ -1377,8 +1377,8 @@ void ProjectManager::CloseGame(gd::Project * project)
     if ( mainEditor.GetProjectPropertiesPanel()->GetProject() == project ) mainEditor.GetProjectPropertiesPanel()->SetProject(NULL);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo(_("Please wait, the internal compilation of events must be finished before continuing...")) : NULL;
-    while ( CodeCompiler::GetInstance()->CompilationInProcess() )
+    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo(_("Please wait, the internal compilation of events must be finished before continuing...")) : NULL;
+    while ( CodeCompiler::Get()->CompilationInProcess() )
     {
         wxYield();
     }
@@ -1585,7 +1585,7 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
@@ -1601,7 +1601,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1631,7 +1631,7 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    gd::ExternalEvents & newEvents = *Clipboard::GetInstance()->GetExternalEvents();
+    gd::ExternalEvents & newEvents = *Clipboard::Get()->GetExternalEvents();
 
     //Finding a new, unique name for the events
     string newName = newEvents.GetName();
@@ -1790,7 +1790,7 @@ void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
@@ -1806,7 +1806,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1836,7 +1836,7 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    gd::ExternalLayout & newExternalLayout = *Clipboard::GetInstance()->GetExternalLayout();
+    gd::ExternalLayout & newExternalLayout = *Clipboard::Get()->GetExternalLayout();
 
     //Finding a new, unique name for the events
     string newName = newExternalLayout.GetName();
@@ -1956,7 +1956,7 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
  */
 void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }
 
 namespace {

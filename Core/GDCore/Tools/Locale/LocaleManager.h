@@ -51,7 +51,7 @@ public:
      */
     void AddPath(std::string path);
 
-    static LocaleManager *GetInstance()
+    static LocaleManager *Get()
     {
         if ( !_singleton )
         {

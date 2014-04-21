@@ -39,7 +39,7 @@ Clipboard::~Clipboard()
     if ( layoutCopied != NULL ) delete layoutCopied;
 }
 
-Clipboard * Clipboard::GetInstance()
+Clipboard * Clipboard::Get()
 {
     if ( NULL == singleton )
         singleton = new Clipboard;

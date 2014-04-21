@@ -48,7 +48,7 @@ void MainFrame::CreateNewProject()
     NewProjectDialog dialog(this);
     if ( dialog.ShowModal() == 1 )
     {
-        gd::Platform* associatedPlatform = gd::PlatformManager::GetInstance()->GetPlatform(dialog.GetChosenTemplatePlatform());
+        gd::Platform* associatedPlatform = gd::PlatformManager::Get()->GetPlatform(dialog.GetChosenTemplatePlatform());
         if ( associatedPlatform != NULL )
         {
             boost::shared_ptr<gd::Project> newProject(new gd::Project);

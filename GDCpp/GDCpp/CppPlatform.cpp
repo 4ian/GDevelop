@@ -60,22 +60,22 @@ CppPlatform::CppPlatform() :
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //Events compiler setup
     cout << "* Setting up events compiler..." << endl;
-    CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
+    CodeCompiler::Get()->SetBaseDirectory(ToString(wxGetCwd()));
     wxString eventsCompilerTempDir;
     if ( wxConfigBase::Get()->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
-        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(eventsCompilerTempDir));
+        CodeCompiler::Get()->SetOutputDirectory(ToString(eventsCompilerTempDir));
     else
-        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+        CodeCompiler::Get()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
     int eventsCompilerMaxThread = 0;
     if ( wxConfigBase::Get()->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) && eventsCompilerMaxThread >= 0 )
-        CodeCompiler::GetInstance()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
+        CodeCompiler::Get()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
     else
-        CodeCompiler::GetInstance()->AllowMultithread(false);
+        CodeCompiler::Get()->AllowMultithread(false);
 
     cout << "* Loading events code compiler configuration" << endl;
     bool deleteTemporaries;
     if ( wxConfigBase::Get()->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
-        CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
+        CodeCompiler::Get()->SetMustDeleteTemporaries(deleteTemporaries);
 #endif
 
     std::cout << "* Loading builtin extensions... ";
@@ -144,7 +144,7 @@ bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platform
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //And Add include directories
     for (unsigned int i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
-        CodeCompiler::GetInstance()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
+        CodeCompiler::Get()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
     #endif
     return true;
 }
@@ -185,12 +185,12 @@ boost::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
 void CppPlatform::OnIDEClosed()
 {
 #if !defined(GD_NO_WX_GUI)
-    if ( CodeCompiler::GetInstance()->MustDeleteTemporaries() )
-        CodeCompiler::GetInstance()->ClearOutputDirectory();
+    if ( CodeCompiler::Get()->MustDeleteTemporaries() )
+        CodeCompiler::Get()->ClearOutputDirectory();
 #endif
 
-    SoundManager::GetInstance()->DestroySingleton();
-    FontManager::GetInstance()->DestroySingleton();
+    SoundManager::Get()->DestroySingleton();
+    FontManager::Get()->DestroySingleton();
 }
 #endif
 

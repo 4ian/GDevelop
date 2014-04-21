@@ -222,7 +222,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     }
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    gd::LocaleManager::GetInstance()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
+    gd::LocaleManager::Get()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
     #endif
 
     gd::PlatformExtension * extensionPtr = create_extension();

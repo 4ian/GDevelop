@@ -19,7 +19,7 @@ class ConsoleManager
 public:
     void ShowConsole();
 
-    static ConsoleManager *GetInstance()
+    static ConsoleManager *Get()
     {
         if ( !_singleton )
         {

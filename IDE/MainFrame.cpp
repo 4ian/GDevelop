@@ -285,9 +285,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_TOGGLED, ( wxObjectEventFunction )&MainFrame::OnRibbonToggleBtClick );
 
     //Update the file menu with exporting items
-    for (unsigned int i = 0;i<gd::PlatformManager::GetInstance()->GetAllPlatforms().size();++i)
+    for (unsigned int i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
     {
-        boost::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::GetInstance()->GetAllPlatforms()[i]->GetProjectExporter();
+        boost::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporter();
         if ( exporter != boost::shared_ptr<gd::ProjectExporter>()
              && !exporter->GetProjectExportButtonLabel().empty() )
         {
@@ -295,7 +295,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
 
             fileMenu.Insert(10, id, exporter->GetProjectExportButtonLabel());
             Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
-            idToPlatformExportMenuMap[id] = gd::PlatformManager::GetInstance()->GetAllPlatforms()[i].get();
+            idToPlatformExportMenuMap[id] = gd::PlatformManager::Get()->GetAllPlatforms()[i].get();
         }
     }
 
@@ -503,7 +503,7 @@ MainFrame::~MainFrame()
     m_mgr.UnInit();
 
     cout << "Destroying the help provider";
-    HelpProvider::GetInstance()->DestroySingleton();
+    HelpProvider::Get()->DestroySingleton();
     cout << "." << endl;
 }
 
@@ -624,11 +624,11 @@ void MainFrame::OnClose( wxCloseEvent& event )
 
     //Close the editor close the program.
     //We have to destroy the other frames.
-    ConsoleManager * consoleManager = ConsoleManager::GetInstance();
+    ConsoleManager * consoleManager = ConsoleManager::Get();
     consoleManager->DestroySingleton();
 
     //Log the shutdown
-    LogFileManager::GetInstance()->WriteToLogFile("Game Develop shutting down");
+    LogFileManager::Get()->WriteToLogFile("Game Develop shutting down");
     Destroy();
 }
 
@@ -653,22 +653,22 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
         sceneEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::GetInstance()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
+        LogFileManager::Get()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
     }
     else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
         imagesEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::GetInstance()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
+        LogFileManager::Get()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
     }
     else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
         codeEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::GetInstance()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
+        LogFileManager::Get()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
     }
     else if ( ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
         externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::GetInstance()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
+        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
     }
 }
 
@@ -773,7 +773,7 @@ void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
         }
 
         //Save the event to log file
-        LogFileManager::GetInstance()->WriteToLogFile("Closed layout "+editor->GetLayout().GetName());
+        LogFileManager::Get()->WriteToLogFile("Closed layout "+editor->GetLayout().GetName());
     }
 }
 

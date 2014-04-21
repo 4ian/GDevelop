@@ -53,7 +53,7 @@ public:
      * Get global game sound volume.
      * Example :
      * \code
-     * float currentVolume = SoundManager::GetInstance()->GetGlobalVolume();
+     * float currentVolume = SoundManager::Get()->GetGlobalVolume();
      * \endcode
      */
     inline float GetGlobalVolume() const { return globalVolume; }
@@ -62,7 +62,7 @@ public:
      * Change global game sound volume.
      * Example :
      * \code
-     * SoundManager::GetInstance()->SetGlobalVolume(50);
+     * SoundManager::Get()->SetGlobalVolume(50);
      * \endcode
      */
     void SetGlobalVolume(float volume);
@@ -83,7 +83,7 @@ public:
      */
     void ManageGarbage();
 
-    static SoundManager *GetInstance()
+    static SoundManager *Get()
     {
         if ( NULL == _singleton )
         {

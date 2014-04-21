@@ -784,7 +784,7 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
              platformElem = platformElem->NextSiblingElement())
         {
             std::string name = platformElem->Attribute("name") ? platformElem->Attribute("name") : "";
-            gd::Platform * platform = gd::PlatformManager::GetInstance()->GetPlatform(name);
+            gd::Platform * platform = gd::PlatformManager::Get()->GetPlatform(name);
 
             if ( platform ) {
                 AddPlatform(*platform);
@@ -798,7 +798,7 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
     else
     {
         //Compatibility with GD2.x
-        platforms.push_back(gd::PlatformManager::GetInstance()->GetPlatform("Game Develop C++ platform"));
+        platforms.push_back(gd::PlatformManager::Get()->GetPlatform("Game Develop C++ platform"));
         currentPlatform = platforms.back();
     }
 

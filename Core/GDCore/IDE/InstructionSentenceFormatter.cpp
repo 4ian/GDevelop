@@ -3,22 +3,23 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
+#if defined(GD_IDE_ONLY)
 #include <string>
 #include <vector>
 #include <utility>
+#include <iostream>
+#include <map>
 #include <sstream>
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
-#include <wx/config.h>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
+#if !defined(GD_NO_WX_GUI)
+#include <wx/config.h>
 #include <wx/bitmap.h>
-#include <iostream>
-#include <map>
+#endif
 
 using namespace std;
 
@@ -124,61 +125,6 @@ TextFormatting InstructionSentenceFormatter::GetFormattingFromType(const std::st
     return typesFormatting[type];
 }
 
-void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
-{
-    wxConfigBase * config = wxConfigBase::Get();
-
-    typesFormatting.clear();
-
-    {
-    typesFormatting["expression"].color = config->ReadObject("EventsEditor/expressionColor", wxColour(99,0,0));
-    typesFormatting["expression"].bold = config->ReadBool("EventsEditor/expressionBold", true);
-    typesFormatting["expression"].italic = config->ReadBool("EventsEditor/expressionItalic", false);
-    }
-    {
-    typesFormatting["object"].color = config->ReadObject("EventsEditor/objectColor", wxColour(19,81,0));
-    typesFormatting["object"].bold = config->ReadBool("EventsEditor/objectBold", true);
-    typesFormatting["object"].italic = config->ReadBool("EventsEditor/objectItalic", false);
-    }
-    {
-    typesFormatting["automatism"].color = config->ReadObject("EventsEditor/automatismColor", wxColour(19,81,0));
-    typesFormatting["automatism"].bold = config->ReadBool("EventsEditor/automatismBold", true);
-    typesFormatting["automatism"].italic = config->ReadBool("EventsEditor/automatismItalic", false);
-    }
-    {
-    typesFormatting["operator"].color = config->ReadObject("EventsEditor/operatorColor", wxColour(64,81,79));
-    typesFormatting["operator"].bold = config->ReadBool("EventsEditor/operatorBold", true);
-    typesFormatting["operator"].italic = config->ReadBool("EventsEditor/operatorItalic", false);
-    }
-    {
-    typesFormatting["objectvar"].color = config->ReadObject("EventsEditor/objectvarColor", wxColour(44,69,99));
-    typesFormatting["objectvar"].bold = config->ReadBool("EventsEditor/objectvarBold", true);
-    typesFormatting["objectvar"].italic = config->ReadBool("EventsEditor/objectvarItalic", false);
-    }
-    {
-    typesFormatting["scenevar"].color = config->ReadObject("EventsEditor/scenevarColor", wxColour(44,69,99));
-    typesFormatting["scenevar"].bold = config->ReadBool("EventsEditor/scenevarBold", true);
-    typesFormatting["scenevar"].italic = config->ReadBool("EventsEditor/scenevarItalic", false);
-    }
-    {
-    typesFormatting["globalvar"].color = config->ReadObject("EventsEditor/globalvarColor", wxColour(44,69,99));
-    typesFormatting["globalvar"].bold = config->ReadBool("EventsEditor/globalvarBold", true);
-    typesFormatting["globalvar"].italic = config->ReadBool("EventsEditor/globalvarItalic", false);
-    }
-}
-
-void InstructionSentenceFormatter::SaveTypesFormattingToConfig()
-{
-    wxConfigBase * config = wxConfigBase::Get();
-
-    for (std::map<std::string, TextFormatting>::iterator it = typesFormatting.begin();it!=typesFormatting.end();++it)
-    {
-        config->Write("EventsEditor/"+it->first+"Color", typesFormatting[it->first].color);
-        config->Write("EventsEditor/"+it->first+"Bold", typesFormatting[it->first].bold);
-        config->Write("EventsEditor/"+it->first+"Italic", typesFormatting[it->first].italic);
-    }
-}
-
 std::string InstructionSentenceFormatter::LabelFromType(const std::string & type)
 {
     if ( type.empty() ) return "";
@@ -207,9 +153,64 @@ std::string InstructionSentenceFormatter::LabelFromType(const std::string & type
     return _("Unknown");
 }
 
+#if !defined(GD_NO_WX_GUI)
+void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
+{
+    wxConfigBase * config = wxConfigBase::Get();
+
+    typesFormatting.clear();
+
+    {
+    typesFormatting["expression"].SetColor(config->ReadObject("EventsEditor/expressionColor", wxColour(99,0,0)));
+    typesFormatting["expression"].bold = config->ReadBool("EventsEditor/expressionBold", true);
+    typesFormatting["expression"].italic = config->ReadBool("EventsEditor/expressionItalic", false);
+    }
+    {
+    typesFormatting["object"].SetColor(config->ReadObject("EventsEditor/objectColor", wxColour(19,81,0)));
+    typesFormatting["object"].bold = config->ReadBool("EventsEditor/objectBold", true);
+    typesFormatting["object"].italic = config->ReadBool("EventsEditor/objectItalic", false);
+    }
+    {
+    typesFormatting["automatism"].SetColor(config->ReadObject("EventsEditor/automatismColor", wxColour(19,81,0)));
+    typesFormatting["automatism"].bold = config->ReadBool("EventsEditor/automatismBold", true);
+    typesFormatting["automatism"].italic = config->ReadBool("EventsEditor/automatismItalic", false);
+    }
+    {
+    typesFormatting["operator"].SetColor(config->ReadObject("EventsEditor/operatorColor", wxColour(64,81,79)));
+    typesFormatting["operator"].bold = config->ReadBool("EventsEditor/operatorBold", true);
+    typesFormatting["operator"].italic = config->ReadBool("EventsEditor/operatorItalic", false);
+    }
+    {
+    typesFormatting["objectvar"].SetColor(config->ReadObject("EventsEditor/objectvarColor", wxColour(44,69,99)));
+    typesFormatting["objectvar"].bold = config->ReadBool("EventsEditor/objectvarBold", true);
+    typesFormatting["objectvar"].italic = config->ReadBool("EventsEditor/objectvarItalic", false);
+    }
+    {
+    typesFormatting["scenevar"].SetColor(config->ReadObject("EventsEditor/scenevarColor", wxColour(44,69,99)));
+    typesFormatting["scenevar"].bold = config->ReadBool("EventsEditor/scenevarBold", true);
+    typesFormatting["scenevar"].italic = config->ReadBool("EventsEditor/scenevarItalic", false);
+    }
+    {
+    typesFormatting["globalvar"].SetColor(config->ReadObject("EventsEditor/globalvarColor", wxColour(44,69,99)));
+    typesFormatting["globalvar"].bold = config->ReadBool("EventsEditor/globalvarBold", true);
+    typesFormatting["globalvar"].italic = config->ReadBool("EventsEditor/globalvarItalic", false);
+    }
+}
+
+void InstructionSentenceFormatter::SaveTypesFormattingToConfig()
+{
+    wxConfigBase * config = wxConfigBase::Get();
+
+    for (std::map<std::string, TextFormatting>::iterator it = typesFormatting.begin();it!=typesFormatting.end();++it)
+    {
+        config->Write("EventsEditor/"+it->first+"Color", typesFormatting[it->first].GetWxColor());
+        config->Write("EventsEditor/"+it->first+"Bold", typesFormatting[it->first].bold);
+        config->Write("EventsEditor/"+it->first+"Italic", typesFormatting[it->first].italic);
+    }
+}
 wxBitmap InstructionSentenceFormatter::BitmapFromType(const std::string & type)
 {
-    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::Get();
 
     if ( type == "" ) return CommonBitmapManager->unknownBt;
     else if ( type == "expression" ) return CommonBitmapManager->expressionBt;
@@ -236,7 +237,7 @@ wxBitmap InstructionSentenceFormatter::BitmapFromType(const std::string & type)
 
     return CommonBitmapManager->unknownBt;
 }
-
+#endif
 
 }
 

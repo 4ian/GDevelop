@@ -143,7 +143,7 @@ MAJ::~MAJ()
 
 void MAJ::CheckForUpdate()
 {
-    UpdateChecker * checker = UpdateChecker::GetInstance();
+    UpdateChecker * checker = UpdateChecker::Get();
     checker->DownloadInformation(/*excludeFromStatistics=*/true);
 
     versionMAJTxt->SetLabel(gd::ToString(checker->newMajor)+"."+gd::ToString(checker->newMinor)+"."+gd::ToString(checker->newBuild)+"."+gd::ToString(checker->newRevision));
@@ -248,12 +248,12 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
         return;
     }
 
-    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+gd::LocaleManager::GetInstance()->locale->GetLocale(), wxEXEC_ASYNC);
+    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+gd::LocaleManager::Get()->locale->GetLocale(), wxEXEC_ASYNC);
     EndModal(2);
 }
 
 
 void MAJ::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
 }

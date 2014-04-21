@@ -268,7 +268,7 @@ void ChooseAutomatismTypeDialog::OnResize(wxSizeEvent& event)
 
 void ChooseAutomatismTypeDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object")); //TODO: Automatism help page
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object")); //TODO: Automatism help page
 }
 
 void ChooseAutomatismTypeDialog::OnplatformChoiceSelect(wxCommandEvent& event)

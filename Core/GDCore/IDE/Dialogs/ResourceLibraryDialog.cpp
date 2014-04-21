@@ -152,7 +152,7 @@ void ResourceLibraryDialog::ConstructList()
     listCtrl->ClearAll();
 
     wxImageList * imageList = new wxImageList(40,40);
-    imageList->Add(gd::CommonBitmapManager::GetInstance()->parentFolder40);
+    imageList->Add(gd::CommonBitmapManager::Get()->parentFolder40);
 
     //If we are in the root path, do not display Parent folder item
     wxFileName currentDirPath(currentDir);
@@ -173,7 +173,7 @@ void ResourceLibraryDialog::ConstructList()
             //Only add a directory if there is a GDLibrary.txt file inside it.
             if ( wxFileExists(currentDir+"/"+filename+"/GDLibrary.txt") )
             {
-                wxBitmap folderBmp = gd::CommonBitmapManager::GetInstance()->folder40;
+                wxBitmap folderBmp = gd::CommonBitmapManager::Get()->folder40;
                 if ( wxFileExists(currentDir+"/"+filename+"/GDLibraryIcon.png") )
                     PasteBitmap(folderBmp, wxBitmap(currentDir+"/"+filename+"/GDLibraryIcon.png", wxBITMAP_TYPE_ANY), 20,20 );
 

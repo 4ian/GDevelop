@@ -30,7 +30,7 @@ public:
      */
     bool IsLogActivated() { return logActivated; }
 
-    static LogFileManager *GetInstance()
+    static LogFileManager *Get()
     {
         if ( NULL == _singleton )
         {

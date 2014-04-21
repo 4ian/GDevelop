@@ -33,7 +33,7 @@ public:
  *
  * Usage example:
  * \code
- * gd::HelpFileAccess::GetInstance()->DisplayURL(_("www.mywebsite.com/wiki/help_about_my_topic");
+ * gd::HelpFileAccess::Get()->DisplayURL(_("www.mywebsite.com/wiki/help_about_my_topic");
  * \endcode
  *
  * \ingroup Tools
@@ -62,7 +62,7 @@ public:
         helpProvider->OpenURL(url);
     }
 
-    static HelpFileAccess *GetInstance()
+    static HelpFileAccess *Get()
     {
         if (NULL == _singleton)
             _singleton =  new HelpFileAccess;

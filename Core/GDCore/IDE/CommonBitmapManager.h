@@ -72,7 +72,7 @@ public:
     wxBitmap gdFileIcon32;
     wxBitmap error48;
 
-    static CommonBitmapManager *GetInstance()
+    static CommonBitmapManager *Get()
     {
         if ( NULL == _singleton )
             _singleton =  new CommonBitmapManager;

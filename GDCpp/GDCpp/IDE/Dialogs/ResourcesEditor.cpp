@@ -1051,7 +1051,7 @@ void ResourcesEditor::OnShowPropertyGridBtClick( wxCommandEvent& event )
 
 void ResourcesEditor::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"));
 }
 
 void ResourcesEditor::OnresourcesTreeItemActivated(wxTreeEvent& event)

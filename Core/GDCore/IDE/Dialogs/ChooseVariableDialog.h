@@ -20,6 +20,7 @@
 #include <wx/dialog.h>
 //*)
 namespace gd { class VariablesContainer; }
+namespace gd { class Object; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class Variable; }
@@ -63,6 +64,14 @@ public:
      * \param project Associated layout. If different from NULL, layout variables from this layout will be scanned when searching for undeclared variables
      */
     void SetAssociatedLayout(const gd::Project * project, const gd::Layout * layout);
+
+    /**
+     * \brief Specify an optional associated object
+     * \param project Associated project.
+     * \param project Associated layout.
+     * \param project Associated object. If different from NULL, object variables from this layout will be scanned when searching for undeclared variables
+     */
+    void SetAssociatedObject(const gd::Project * project, const gd::Layout * layout, const gd::Object * object);
 
     /**
      * \brief Return the full name of the selected variable.
@@ -148,6 +157,7 @@ private:
     bool editingOnly; ///< If set to true, the dialog will act as a dialog to edit the variables and not to choose one ( Double click won't close the dialog for example ).
     const gd::Project * associatedProject;
     const gd::Layout * associatedLayout;
+    const gd::Object * associatedObject;
 
     std::string selectedVariableName; ///< Contains the name of the last selected variable.
     std::string selectedVariableFullName; ///< Contains the full name of the last selected variable. ( full string to access to the variable )

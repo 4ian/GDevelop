@@ -11,7 +11,7 @@
 using namespace std;
 
 Text::Text() :
-text("", *FontManager::GetInstance()->GetFont(""))
+text("", *FontManager::Get()->GetFont(""))
 {
     //ctor
 }
@@ -23,7 +23,7 @@ Text::~Text()
 
 void Text::Draw(sf::RenderWindow& App)
 {
-    FontManager * fontManager = FontManager::GetInstance();
+    FontManager * fontManager = FontManager::Get();
 
     text.setFont(*fontManager->GetFont(fontName));
     App.draw( text );

@@ -96,7 +96,7 @@ public:
      */
     void SetParentWindow(wxWindow * window) { parentWindow = window; }
 
-    static HelpProvider *GetInstance()
+    static HelpProvider *Get()
     {
         if (NULL == _singleton)
             _singleton =  new HelpProvider;

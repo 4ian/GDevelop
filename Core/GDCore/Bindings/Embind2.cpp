@@ -11,8 +11,11 @@
 #include <emscripten/bind.h>
 #include <boost/make_shared.hpp>
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -196,14 +199,25 @@ EMSCRIPTEN_BINDINGS(gd_MetadataProvider) {
 
 EMSCRIPTEN_BINDINGS(gd_InstructionSentenceFormatter) {
     class_<InstructionSentenceFormatter>("InstructionSentenceFormatter")
-
+        .class_function("get", &InstructionSentenceFormatter::Get, allow_raw_pointers())
+        .function("translate", &InstructionSentenceFormatter::Translate)
+        .function("getAsFormattedText", &InstructionSentenceFormatter::GetAsFormattedText)
+        .function("getFormattingFromType", &InstructionSentenceFormatter::GetFormattingFromType)
+        .function("labelFromType", &InstructionSentenceFormatter::LabelFromType)
         ;
+}
 
+EMSCRIPTEN_BINDINGS(gd_EventsRefactorer) {
+    class_<EventsRefactorer>("EventsRefactorer")
+        .class_function("renameObjectInEvents", &EventsRefactorer::RenameObjectInEvents)
+        .class_function("removeObjectInEvents", &EventsRefactorer::RemoveObjectInEvents)
+        .class_function("replaceStringInEvents", &EventsRefactorer::ReplaceStringInEvents)
+        //TODO: SearchInEvents method.
+        ;
 }
 
 EMSCRIPTEN_BINDINGS(gd_EventsCodeGenerator) {
     class_<EventsCodeGenerator>("EventsCodeGenerator")
         ;
-
 }
 #endif

@@ -47,7 +47,7 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform);
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        gd::LocaleManager::GetInstance()->AddPath("./CppPlatform/Extensions/locale");
+        gd::LocaleManager::Get()->AddPath("./CppPlatform/Extensions/locale");
         #endif
     }
 
@@ -62,7 +62,7 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        gd::LocaleManager::GetInstance()->AddPath("./JsPlatform/Extensions/locale");
+        gd::LocaleManager::Get()->AddPath("./JsPlatform/Extensions/locale");
         #endif
     }
 
@@ -103,13 +103,13 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
         else
         {
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-            gd::LocaleManager::GetInstance()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
+            gd::LocaleManager::Get()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
             #endif
 
             boost::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);
             std::cout << "Loading of " << fullpath << " done." << std::endl;
 
-            gd::PlatformManager::GetInstance()->AddPlatform(platform);
+            gd::PlatformManager::Get()->AddPlatform(platform);
             std::cout << "Registration in platform manager of " << fullpath << " done." << std::endl;
             return platform;
         }

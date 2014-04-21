@@ -290,7 +290,7 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
 
 void ObjectsEditor::OnHelpSelected( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"));
 }
 
 void ObjectsEditor::ConnectEvents()
@@ -1043,8 +1043,8 @@ void ObjectsEditor::OnCopySelected(wxCommandEvent& event)
         if ( !objects.HasObjectNamed(name) )
             return;
 
-        gd::Clipboard::GetInstance()->SetObject(&objects.GetObject(name));
-        gd::Clipboard::GetInstance()->ForgetObjectGroup();
+        gd::Clipboard::Get()->SetObject(&objects.GetObject(name));
+        gd::Clipboard::Get()->ForgetObjectGroup();
     }
     else if ( data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup" )
     {
@@ -1055,8 +1055,8 @@ void ObjectsEditor::OnCopySelected(wxCommandEvent& event)
         if ( !HasGroupNamed(name, objectsGroups) )
             return;
 
-        gd::Clipboard::GetInstance()->SetObjectGroup(GetGroup(name, objectsGroups));
-        gd::Clipboard::GetInstance()->ForgetObject();
+        gd::Clipboard::Get()->SetObjectGroup(GetGroup(name, objectsGroups));
+        gd::Clipboard::Get()->ForgetObject();
     }
 }
 
@@ -1075,8 +1075,8 @@ void ObjectsEditor::OnCutSelected(wxCommandEvent& event)
         if ( !objects.HasObjectNamed(name) )
             return;
 
-        gd::Clipboard::GetInstance()->SetObject(&objects.GetObject(name));
-        gd::Clipboard::GetInstance()->ForgetObjectGroup();
+        gd::Clipboard::Get()->SetObject(&objects.GetObject(name));
+        gd::Clipboard::Get()->ForgetObjectGroup();
 
         objects.RemoveObject(name);
 
@@ -1094,8 +1094,8 @@ void ObjectsEditor::OnCutSelected(wxCommandEvent& event)
         if ( !HasGroupNamed(name, objectsGroups) )
             return;
 
-        gd::Clipboard::GetInstance()->SetObjectGroup(GetGroup(name, objectsGroups));
-        gd::Clipboard::GetInstance()->ForgetObject();
+        gd::Clipboard::Get()->SetObjectGroup(GetGroup(name, objectsGroups));
+        gd::Clipboard::Get()->ForgetObject();
 
         RemoveGroup(name, objectsGroups);
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -1109,7 +1109,7 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
 {
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
     if (!data) return;
-    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::Get();
 
     if ( clipboard->HasObject() )
     {
@@ -1270,9 +1270,9 @@ void ObjectsEditor::UpdateAssociatedPropertiesPanel()
 
         //Log the selection
         if ( layout && !globalObject )
-            LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+object->GetName()+"\" selected ( Layout \""+layout->GetName()+"\" )"));
+            LogFileManager::Get()->WriteToLogFile(ToString("Object \""+object->GetName()+"\" selected ( Layout \""+layout->GetName()+"\" )"));
         else
-            LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+object->GetName()+"\" selected"));
+            LogFileManager::Get()->WriteToLogFile(ToString("Object \""+object->GetName()+"\" selected"));
 
         //Notify other editors of the selection of the object
         if ( propPnl ) propPnl->SelectedObject(object);

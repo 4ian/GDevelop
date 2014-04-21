@@ -148,6 +148,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         else if ( event.GetPropertyName() == _("Variables") )
         {
             gd::ChooseVariableDialog dialog(grid, object->GetVariables(), true);
+            dialog.SetAssociatedObject(&project, layout, object);
             if ( dialog.ShowModal() == 1 )
             {
                 for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)

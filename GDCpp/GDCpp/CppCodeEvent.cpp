@@ -37,7 +37,7 @@ using namespace std;
 void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & parentGame) const
 {
 #if !defined(GD_NO_WX_GUI)
-    std::string outputFile(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(this)+"SourceFile.cpp");
+    std::string outputFile(CodeCompiler::Get()->GetOutputDirectory()+"GD"+ToString(this)+"SourceFile.cpp");
 
     vector< boost::shared_ptr<gd::SourceFile> >::const_iterator sourceFileIter =
         find_if(parentGame.externalSourceFiles.begin(), parentGame.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), associatedGDManagedSourceFile));
@@ -114,7 +114,7 @@ std::string CppCodeEvent::GenerateAssociatedFileCode() const
 void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     const int titleTextHeight = 20;
 
     //Draw header rectangle
@@ -143,7 +143,7 @@ unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width, const gd::Platf
 #if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
-        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
         renderedHeight = 20;
 
         if ( codeDisplayedInEditor )

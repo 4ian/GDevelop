@@ -47,7 +47,7 @@ public:
      */
     void NotifyPlatformIDEInitialized() const;
 
-    static PlatformManager *GetInstance()
+    static PlatformManager *Get()
     {
         if ( NULL == _singleton )
         {

@@ -78,7 +78,7 @@ add_library(
         SHARED
         ${source_files}
 )
-set_target_properties(GD PROPERTIES SUFFIX ".js")
+set_target_properties(GD PROPERTIES SUFFIX ".html")
 set(LIBRARY_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE})
 set(ARCHIVE_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE})
 set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE})

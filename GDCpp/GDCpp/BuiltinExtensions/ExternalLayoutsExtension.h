@@ -8,7 +8,7 @@
 #include "GDCpp/ExtensionBase.h"
 
 /**
- * \brief Internal builtin extension providing features related to external layouts.
+ * \brief Standard extension providing features related to external layouts.
  */
 class ExternalLayoutsExtension : public ExtensionBase
 {

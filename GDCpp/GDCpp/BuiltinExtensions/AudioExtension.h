@@ -10,7 +10,7 @@ namespace gd { class Instruction; }
 namespace gd {class ArbitraryResourceWorker;}
 
 /**
- * \brief Internal builtin extension providing audio features.
+ * \brief Standard extension providing audio features.
  *
  * \ingroup BuiltinExtensions
  */

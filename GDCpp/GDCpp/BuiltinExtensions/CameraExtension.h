@@ -9,7 +9,7 @@
 #include "GDCpp/ExtensionBase.h"
 
 /**
- * \brief Internal builtin extension providing features concerning cameras.
+ * \brief Standard extension providing features concerning cameras.
  *
  * \ingroup BuiltinExtensions
  */

@@ -49,7 +49,7 @@ private:
  * Sprite object is an object composed of animations, containing directions with images.
  *
  * \see Animation
- * \see Direction
+ * \see Direction²
  * \see Sprite
  * \ingroup SpriteObjectExtension
  */

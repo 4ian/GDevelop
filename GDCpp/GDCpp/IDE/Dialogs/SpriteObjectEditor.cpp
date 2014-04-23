@@ -1267,6 +1267,8 @@ void SpriteObjectEditor::OnDeletePointClick(wxCommandEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     for (unsigned int i = 0;i<sprites.size();++i)
         sprites[i]->DelPoint(pointName);
+
+    pointsList->DeleteItem(pointIndex);
 }
 
 void SpriteObjectEditor::OnAddPointClick(wxCommandEvent& event)

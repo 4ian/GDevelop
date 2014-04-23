@@ -4,7 +4,7 @@
 #include "GDCpp/ExtensionBase.h"
 
 /**
- * \brief Internal builtin-extension providing conversion ( ToString/ToNumber ) features.
+ * \brief Standard extension providing conversion ( ToString/ToNumber ) features.
  *
  * \ingroup BuiltinExtensions
  */

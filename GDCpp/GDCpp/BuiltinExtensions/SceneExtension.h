@@ -4,7 +4,7 @@
 #include "GDCpp/ExtensionBase.h"
 
 /**
- * \brief Internal builtin-extension providing features related to Scene.
+ * \brief Standard extension providing features related to Scene.
  *
  * \ingroup BuiltinExtensions
  */

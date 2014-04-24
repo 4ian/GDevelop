@@ -14,7 +14,7 @@ namespace gd
  * \brief Tool class containing static methods to setup an extension
  * so that it provides standards events, objects or instructions of an
  * extension.
- *²
+ *
  * TOOD: Usage example.
  *
  * \ingroup BuiltinExtensions

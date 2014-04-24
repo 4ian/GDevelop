@@ -13,7 +13,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Object.h"
-#include "GDCpp/SpriteObject.h"
+#include "GDCpp/RuntimeSpriteObject.h"
 #include "GDCpp/Animation.h"
 #include "GDCpp/CppPlatform.h"
 

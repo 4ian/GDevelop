@@ -26,7 +26,7 @@
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Object.h"
-#include "GDCpp/SpriteObject.h"
+#include "GDCpp/RuntimeSpriteObject.h"
 #include "GDCpp/Events/CodeCompilationHelpers.h"
 #include "GDCpp/IDE/Dialogs/DebuggerGUI.h"
 #include "GDCpp/IDE/Dialogs/ProfileDlg.h"

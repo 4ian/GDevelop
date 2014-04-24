@@ -2,8 +2,8 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#ifndef STDALGO_H_INCLUDED
-#define STDALGO_H_INCLUDED
+#ifndef GDCPP_COMMONTOOLS_H_INCLUDED
+#define GDCPP_COMMONTOOLS_H_INCLUDED
 #include <string>
 #include <sstream>
 #include <vector>
@@ -134,5 +134,5 @@ inline double GDRound( double d )
 }
 #endif
 
-#endif // STDALGO_H_INCLUDED
+#endif // GDCPP_COMMONTOOLS_H_INCLUDED
 

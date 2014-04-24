@@ -5,7 +5,7 @@
 #include "SpriteTools.h"
 #include <string>
 #include <vector>
-#include "GDCpp/SpriteObject.h"
+#include "GDCpp/RuntimeSpriteObject.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Collisions.h"
 #include "GDCpp/profile.h"

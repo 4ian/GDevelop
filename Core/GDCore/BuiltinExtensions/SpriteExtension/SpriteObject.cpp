@@ -57,8 +57,8 @@ void SpriteObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * ele
             Direction direction;
             direction.LoadFromXml(elemObjetDirecScene);
 
-            newAnimation.SetDirectionsNumber(newAnimation.GetDirectionsNumber()+1);
-            newAnimation.SetDirection(direction, newAnimation.GetDirectionsNumber()-1);
+            newAnimation.SetDirectionsCount(newAnimation.GetDirectionsCount()+1);
+            newAnimation.SetDirection(direction, newAnimation.GetDirectionsCount()-1);
             elemObjetDirecScene = elemObjetDirecScene->NextSiblingElement();
         }
 
@@ -76,7 +76,7 @@ void SpriteObject::DoSaveToXml(TiXmlElement * elem)
     elem->LinkEndChild( animations );
     TiXmlElement * animation;
 
-    for ( unsigned int k = 0;k < GetAnimationCount();k++ )
+    for ( unsigned int k = 0;k < GetAnimationsCount();k++ )
     {
         animation = new TiXmlElement( "Animation" );
         animations->LinkEndChild( animation );
@@ -84,7 +84,7 @@ void SpriteObject::DoSaveToXml(TiXmlElement * elem)
         animation->SetAttribute( "typeNormal", GetAnimation( k ).useMultipleDirections ? "true" : "false" );
 
         TiXmlElement * direction;
-        for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )
+        for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsCount();l++ )
         {
             direction = new TiXmlElement( "Direction" );
             animation->LinkEndChild( direction );
@@ -101,9 +101,9 @@ void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
     for ( unsigned int j = 0; j < animations.size();j++ )
     {
         Animation & anim = animations[j];
-        for ( unsigned int k = 0;k < anim.GetDirectionsNumber();k++ )
+        for ( unsigned int k = 0;k < anim.GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpriteCount();l++ )
+            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
             {
                 Sprite & sprite = anim.GetDirection(k).GetSprite(l);
 
@@ -120,7 +120,7 @@ const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & inst
 
     //Search the first sprite of the current animation/direction.
     unsigned int animationId = instance.floatInfos.find("animation") != instance.floatInfos.end() ? instance.floatInfos.find("animation")->second : 0;
-    if ( animationId >= GetAnimationCount() ) animationId = 0;
+    if ( animationId >= GetAnimationsCount() ) animationId = 0;
 
     const Animation & animation = GetAnimation(animationId);
     if ( animation.HasNoDirections() ) return NULL;
@@ -134,7 +134,7 @@ const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & inst
         directionId = static_cast<int>(gd::Round(normalizedAngle/45.f))%8;
     }
 
-    if ( directionId >= animation.GetDirectionsNumber() ) directionId = 0;
+    if ( directionId >= animation.GetDirectionsCount() ) directionId = 0;
 
     const Direction & direction = animation.GetDirection(directionId);
 
@@ -208,11 +208,11 @@ bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thu
 
 void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    for ( unsigned int j = 0; j < GetAnimationCount();j++ )
+    for ( unsigned int j = 0; j < GetAnimationsCount();j++ )
     {
-        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
+        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpriteCount();l++ )
+            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesCount();l++ )
                 worker.ExposeImage(GetAnimation( j ).GetDirection(k).GetSprite(l).GetImageName());
         }
     }
@@ -268,7 +268,7 @@ void SpriteObject::AddAnimation(const Animation & animation)
 
 bool SpriteObject::RemoveAnimation(unsigned int nb)
 {
-    if ( nb >= GetAnimationCount() )
+    if ( nb >= GetAnimationsCount() )
         return false;
 
     animations.erase( animations.begin() + nb );

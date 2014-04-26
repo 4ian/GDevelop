@@ -42,12 +42,12 @@ public:
     /**
      * \brief Change direction count
      */
-    void SetDirectionsNumber(unsigned int nb);
+    void SetDirectionsCount(unsigned int nb);
 
     /**
      * \brief Get direction count
      */
-    unsigned int GetDirectionsNumber() const;
+    unsigned int GetDirectionsCount() const;
 
     /**
      * \brief Return true if there isn't any direction in the animation

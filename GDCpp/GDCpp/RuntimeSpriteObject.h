@@ -92,7 +92,7 @@ public :
     void StopAnimation() { animationStopped = true; };
     void PlayAnimation() { animationStopped = false; };
     bool IsAnimationStopped() const { return animationStopped; }
-    unsigned int GetAnimationCount() const { return animations.size(); };
+    unsigned int GetAnimationsCount() const { return animations.size(); };
 
     inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
     bool SetCurrentAnimation(unsigned int nb);

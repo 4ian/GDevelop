@@ -69,7 +69,7 @@ public:
      * Return the number of sprite used in the direction
      * \return The number of sprite used in the direction
      */
-    unsigned int GetSpriteCount() const;
+    unsigned int GetSpritesCount() const;
 
     /**
      * Remove the sprite at the specified position.

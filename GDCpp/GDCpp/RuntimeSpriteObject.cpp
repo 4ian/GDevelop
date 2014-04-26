@@ -68,9 +68,9 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
     for ( unsigned int j = 0; j < animations.size();j++ )
     {
         gd::Animation & anim = animations[j].GetNonConst();
-        for ( unsigned int k = 0;k < anim.GetDirectionsNumber();k++ )
+        for ( unsigned int k = 0;k < anim.GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpriteCount();l++ )
+            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
             {
                 gd::Sprite & sprite = anim.GetDirection(k).GetSprite(l);
 
@@ -330,12 +330,12 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
         multipleDirections = animation.useMultipleDirections;
 
         unsigned int directionIndex = multipleDirections ? currentDirection : 0;
-        if ( directionIndex >= animation.GetDirectionsNumber() )
+        if ( directionIndex >= animation.GetDirectionsCount() )
             ptrToCurrentSprite = badSpriteDatas;
         else
         {
             gd::Direction & direction = animation.GetDirection(directionIndex);
-            if ( currentSprite >= direction.GetSpriteCount())
+            if ( currentSprite >= direction.GetSpritesCount())
                 ptrToCurrentSprite = badSpriteDatas;
             else
                 ptrToCurrentSprite = &direction.GetSprite(currentSprite);
@@ -360,7 +360,7 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
  */
 void RuntimeSpriteObject::UpdateTime(float elapsedTime)
 {
-    if ( animationStopped || currentAnimation >= GetAnimationCount() ) return;
+    if ( animationStopped || currentAnimation >= GetAnimationsCount() ) return;
 
     timeElapsedOnCurrentSprite += elapsedTime;
 
@@ -380,10 +380,10 @@ void RuntimeSpriteObject::UpdateTime(float elapsedTime)
 
         timeElapsedOnCurrentSprite = 0;
     }
-    if ( currentSprite >= direction.GetSpriteCount() )
+    if ( currentSprite >= direction.GetSpritesCount() )
     {
         if ( direction.IsLooping() )  currentSprite = 0;
-        else  currentSprite = direction.GetSpriteCount() - 1;
+        else  currentSprite = direction.GetSpritesCount() - 1;
     }
 
     needUpdateCurrentSprite = true;
@@ -441,9 +441,9 @@ std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
  */
 bool RuntimeSpriteObject::SetSprite( unsigned int nb )
 {
-    if ( currentAnimation >= GetAnimationCount() ||
-        currentDirection >= animations[currentAnimation].Get().GetDirectionsNumber() ||
-        nb >= animations[currentAnimation].Get().GetDirection( currentDirection ).GetSpriteCount() ) return false;
+    if ( currentAnimation >= GetAnimationsCount() ||
+        currentDirection >= animations[currentAnimation].Get().GetDirectionsCount() ||
+        nb >= animations[currentAnimation].Get().GetDirection( currentDirection ).GetSpritesCount() ) return false;
 
     currentSprite = nb;
     timeElapsedOnCurrentSprite = 0;
@@ -457,7 +457,7 @@ bool RuntimeSpriteObject::SetSprite( unsigned int nb )
  */
 bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
 {
-    if ( nb >= GetAnimationCount() ) return false;
+    if ( nb >= GetAnimationsCount() ) return false;
 
     if ( nb == currentAnimation ) return true;
 
@@ -475,7 +475,7 @@ bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
  */
 bool RuntimeSpriteObject::SetDirection( float nb )
 {
-    if ( currentAnimation >= GetAnimationCount() ) return false;
+    if ( currentAnimation >= GetAnimationsCount() ) return false;
 
     if ( !animations[currentAnimation].Get().useMultipleDirections )
     {
@@ -486,7 +486,7 @@ bool RuntimeSpriteObject::SetDirection( float nb )
     }
     else
     {
-        if ( nb >= animations[currentAnimation].Get().GetDirectionsNumber() ||
+        if ( nb >= animations[currentAnimation].Get().GetDirectionsCount() ||
             animations[currentAnimation].Get().GetDirection( nb ).HasNoSprites() ) return false;
 
         if ( nb == currentDirection ) return true;
@@ -506,7 +506,7 @@ bool RuntimeSpriteObject::SetDirection( float nb )
  */
 bool RuntimeSpriteObject::SetAngle(float newAngle)
 {
-    if ( currentAnimation >= GetAnimationCount() ) return false;
+    if ( currentAnimation >= GetAnimationsCount() ) return false;
 
     if ( !animations[currentAnimation].Get().useMultipleDirections )
     {
@@ -538,7 +538,7 @@ float RuntimeSpriteObject::GetAngle() const
 
 float RuntimeSpriteObject::GetCurrentDirectionOrAngle() const
 {
-    if ( currentAnimation >= GetAnimationCount() ) return 0;
+    if ( currentAnimation >= GetAnimationsCount() ) return 0;
 
     if ( animations[currentAnimation].Get().useMultipleDirections )
         return GetCurrentDirection();
@@ -548,10 +548,10 @@ float RuntimeSpriteObject::GetCurrentDirectionOrAngle() const
 
 bool RuntimeSpriteObject::AnimationEnded() const
 {
-    if (currentAnimation >= GetAnimationCount()) return true;
+    if (currentAnimation >= GetAnimationsCount()) return true;
 
     const gd::Direction & direction = animations[currentAnimation].Get().GetDirection( currentDirection );
-    return ( !direction.IsLooping() && currentSprite == direction.GetSpriteCount()-1 );
+    return ( !direction.IsLooping() && currentSprite == direction.GetSpritesCount()-1 );
 }
 
 /**
@@ -656,7 +656,7 @@ bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, std::string ne
     if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
     else if ( propertyNb == 1 )
     {
-        if ( currentAnimation >= GetAnimationCount() ) return false;
+        if ( currentAnimation >= GetAnimationsCount() ) return false;
 
         return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue));
     }

@@ -22,7 +22,7 @@ Animation::~Animation()
 {
 }
 
-unsigned int Animation::GetDirectionsNumber() const
+unsigned int Animation::GetDirectionsCount() const
 {
     return directions.size();
 };
@@ -32,14 +32,14 @@ bool Animation::HasNoDirections() const
     return directions.empty();
 };
 
-void Animation::SetDirectionsNumber(unsigned int nb)
+void Animation::SetDirectionsCount(unsigned int nb)
 {
-    while ( directions.size() < nb )
-    {
+    while ( directions.size() < nb ) {
         Direction direction;
         directions.push_back(direction);
     }
-    //TODO : erase
+    while ( directions.size() > nb )
+        directions.erase(directions.begin()+directions.size()-1);
 }
 
 const Direction & Animation::GetDirection(unsigned int nb) const

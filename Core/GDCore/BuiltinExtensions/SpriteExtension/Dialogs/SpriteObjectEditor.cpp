@@ -447,7 +447,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     if ( object.HasNoAnimations() )
     {
         Animation newAnimation;
-        newAnimation.SetDirectionsNumber(1);
+        newAnimation.SetDirectionsCount(1);
         object.AddAnimation(newAnimation);
     }
 
@@ -523,7 +523,7 @@ void SpriteObjectEditor::RefreshAnimationTree()
 
     animationsTree->DeleteAllItems();
     wxTreeItemId root = animationsTree->AddRoot(_("All animations"));
-    for (unsigned int i = 0;i<object.GetAnimationCount();++i)
+    for (unsigned int i = 0;i<object.GetAnimationsCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
         wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1,
@@ -531,7 +531,7 @@ void SpriteObjectEditor::RefreshAnimationTree()
 
         if ( animation.useMultipleDirections )
         {
-            for (unsigned int j = 0;j<animation.GetDirectionsNumber();++j)
+            for (unsigned int j = 0;j<animation.GetDirectionsCount();++j)
             {
                 animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1,
                 	new gd::TreeItemStringData(ToString(i), ToString(j)));
@@ -550,11 +550,11 @@ void SpriteObjectEditor::RefreshImagesList()
     wxImageList * thumbnailList = new wxImageList(48,48);
     imagesList->AssignImageList(thumbnailList, wxIMAGE_LIST_NORMAL);
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         const Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        for (unsigned int i = 0;i<direction.GetSpriteCount();++i)
+        for (unsigned int i = 0;i<direction.GetSpritesCount();++i)
         {
             const Sprite & sprite = direction.GetSprite(i);
             wxBitmap spriteBitmap;
@@ -645,9 +645,9 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
     dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(0,0, imagePanel->GetSize().GetWidth(), imagePanel->GetSize().GetHeight());
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
-         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
+         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpritesCount() )
     {
         //Draw the sprite
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(selectedImage);
@@ -738,9 +738,9 @@ void SpriteObjectEditor::OnpreviewPanelPaint(wxPaintEvent& event)
     dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(0,0, previewPanel->GetSize().GetWidth(), previewPanel->GetSize().GetHeight());
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
-         previewCurrentSprite < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
+         previewCurrentSprite < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpritesCount() )
     {
         //Draw the sprite
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(previewCurrentSprite);
@@ -760,9 +760,9 @@ void SpriteObjectEditor::RefreshPoints()
     long selectedPointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     pointsList->DeleteAllItems();
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
-         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
+         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpritesCount() )
     {
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(selectedImage);
         wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
@@ -801,9 +801,9 @@ void SpriteObjectEditor::RefreshCollisionMasks()
 {
     maskTree->DeleteAllItems();
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
-         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
+         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpritesCount() )
     {
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(selectedImage);
 
@@ -887,8 +887,8 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 void SpriteObjectEditor::RefreshAnimationToolbar()
 {
     //Refresh also the toolbar
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         animationToolbar->ToggleTool(ID_TOOLLOOP, object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).IsLooping());
         animationToolbar->Refresh();
@@ -899,9 +899,9 @@ void SpriteObjectEditor::RefreshAnimationToolbar()
 void SpriteObjectEditor::OnAddAnimationSelected(wxCommandEvent& event)
 {
     Animation newAnimation;
-    newAnimation.SetDirectionsNumber(1);
+    newAnimation.SetDirectionsCount(1);
     object.AddAnimation(newAnimation);
-    selectedAnimation = object.GetAnimationCount()-1;
+    selectedAnimation = object.GetAnimationsCount()-1;
     selectedDirection = 0;
     selectedImage = 0;
 
@@ -910,7 +910,7 @@ void SpriteObjectEditor::OnAddAnimationSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnDeleteAnimationSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount())
+    if ( selectedAnimation < object.GetAnimationsCount())
         object.RemoveAnimation(selectedAnimation);
 
     if ( selectedAnimation > 0 ) selectedAnimation--;
@@ -922,15 +922,15 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
     OnanimationsTreeSelectionChanged(event);
 
     //Setup context menu
-    if ( selectedAnimation < object.GetAnimationCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() )
     {
         automaticRotationItem->Check(!object.GetAnimation(selectedAnimation).useMultipleDirections);
         multipleDirectionsItem->Check(object.GetAnimation(selectedAnimation).useMultipleDirections);
     }
-    animationsMenu.Enable(deleteItem->GetId(), object.GetAnimationCount() > 1);
+    animationsMenu.Enable(deleteItem->GetId(), object.GetAnimationsCount() > 1);
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
 
@@ -958,7 +958,7 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
 
 void SpriteObjectEditor::OnautomaticRotationItemSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() )
     {
         object.GetAnimation(selectedAnimation).useMultipleDirections = false;
         RefreshAnimationTree();
@@ -967,10 +967,10 @@ void SpriteObjectEditor::OnautomaticRotationItemSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnmultipleDirectionsItemSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() )
     {
         object.GetAnimation(selectedAnimation).useMultipleDirections = true;
-        object.GetAnimation(selectedAnimation).SetDirectionsNumber(8);
+        object.GetAnimation(selectedAnimation).SetDirectionsCount(8);
         RefreshAnimationTree();
     }
 }
@@ -979,14 +979,14 @@ void SpriteObjectEditor::OnimagesListItemRClick(wxListEvent& event)
 {
     OnimagesListItemSelect(event);
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         const Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        imagesMenu.Enable(removeImageItem->GetId(), direction.GetSpriteCount() > 1);
+        imagesMenu.Enable(removeImageItem->GetId(), direction.GetSpritesCount() > 1);
 
         imagesMenu.Enable(moveLeftItem->GetId(), selectedImage > 0);
-        imagesMenu.Enable(moveRightItem->GetId(), selectedImage < direction.GetSpriteCount()-1);
+        imagesMenu.Enable(moveRightItem->GetId(), selectedImage < direction.GetSpritesCount()-1);
 
         PopupMenu(&imagesMenu);
     }
@@ -994,11 +994,11 @@ void SpriteObjectEditor::OnimagesListItemRClick(wxListEvent& event)
 
 void SpriteObjectEditor::OnremoveImageItemSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        if ( selectedImage < direction.GetSpriteCount() )
+        if ( selectedImage < direction.GetSpritesCount() )
             direction.RemoveSprite(selectedImage);
 
         if ( selectedImage > 0 ) selectedImage--;
@@ -1009,8 +1009,8 @@ void SpriteObjectEditor::OnremoveImageItemSelected(wxCommandEvent& event)
 }
 void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         Sprite newSprite;
@@ -1050,8 +1050,8 @@ bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString&
 
 void SpriteObjectEditor::OnMoveLeftSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         if ( selectedImage > 0 )
@@ -1065,11 +1065,11 @@ void SpriteObjectEditor::OnMoveLeftSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnMoveRightSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        if ( selectedImage < direction.GetSpriteCount()-1 )
+        if ( selectedImage < direction.GetSpritesCount()-1 )
         {
             direction.SwapSprites(selectedImage, selectedImage+1);
             RefreshImagesList();
@@ -1120,9 +1120,9 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
     {
         //Check that all polygons of the collision mask are convex
         bool aPolygonIsNotConvex = false;
-        if ( selectedAnimation < object.GetAnimationCount() &&
-             selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
-             selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+        if ( selectedAnimation < object.GetAnimationsCount() &&
+             selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
+             selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpritesCount() )
         {
             const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(selectedImage);
 
@@ -1234,9 +1234,9 @@ std::vector < Sprite * > SpriteObjectEditor::GetSpritesToModify()
 {
     std::vector < Sprite * > result;
 
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
-         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
+         selectedImage < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpritesCount() )
     {
         result.push_back(&object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(selectedImage));
     }
@@ -1245,11 +1245,11 @@ std::vector < Sprite * > SpriteObjectEditor::GetSpritesToModify()
     if ( (editingPoint && pointToolbar->GetToolToggled(ID_POINTAPPLYWHOLEANIMITEM)) ||
          (editingMask && maskToolbar->GetToolToggled(ID_MASKAPPLYWHOLEANIMITEM)) )
     {
-        if ( selectedAnimation < object.GetAnimationCount() &&
-             selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+        if ( selectedAnimation < object.GetAnimationsCount() &&
+             selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
         {
             Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-            for (unsigned int i = 0;i<direction.GetSpriteCount();++i)
+            for (unsigned int i = 0;i<direction.GetSpritesCount();++i)
             {
                 if ( i != selectedImage ) //Sprite at index "selectedImage" is already in the vector
                     result.push_back(&direction.GetSprite(i));
@@ -1653,8 +1653,8 @@ void SpriteObjectEditor::OnmaskTreeItemRClick(wxTreeListEvent& event)
 
 void SpriteObjectEditor::OnMenuLoopSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         direction.SetLoop(animationsMenu.IsChecked(ID_MENULOOP));
@@ -1664,8 +1664,8 @@ void SpriteObjectEditor::OnMenuLoopSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnToolLoopClick(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         direction.SetLoop(animationToolbar->GetToolToggled(ID_TOOLLOOP));
@@ -1674,8 +1674,8 @@ void SpriteObjectEditor::OnToolLoopClick(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         std::string newTime = ToString(wxGetTextFromUser(_("Enter time between each image ( in seconds )"),
@@ -1689,20 +1689,20 @@ void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
 void SpriteObjectEditor::OnpreviewTimerTrigger(wxTimerEvent& event)
 {
     previewElapsedTime += previewTimer.GetInterval();
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         const Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         if ( previewElapsedTime > direction.GetTimeBetweenFrames()*1000.0f )
         {
             previewElapsedTime = 0;
             previewCurrentSprite++;
-            if ( previewCurrentSprite >= direction.GetSpriteCount() )
+            if ( previewCurrentSprite >= direction.GetSpritesCount() )
             {
                 if (direction.IsLooping())
                     previewCurrentSprite = 0;
                 else
-                    previewCurrentSprite = direction.GetSpriteCount()-1;
+                    previewCurrentSprite = direction.GetSpritesCount()-1;
             }
 
             previewPanel->Refresh();
@@ -1755,8 +1755,8 @@ void SpriteObjectEditor::OnimagesListKeyDown(wxListEvent& event)
 
 void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
 {
-    if ( selectedAnimation < object.GetAnimationCount() &&
-         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    if ( selectedAnimation < object.GetAnimationsCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_MULTIPLE );

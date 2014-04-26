@@ -66,7 +66,7 @@ bool Direction::HasNoSprites() const
     return sprites.empty();
 }
 
-unsigned int Direction::GetSpriteCount() const
+unsigned int Direction::GetSpritesCount() const
 {
     return sprites.size();
 }

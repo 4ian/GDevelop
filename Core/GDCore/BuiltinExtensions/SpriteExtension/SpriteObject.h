@@ -78,7 +78,7 @@ public :
     /**
      * \brief Return the number of animations this object has.
      */
-    unsigned int GetAnimationCount() const { return animations.size(); };
+    unsigned int GetAnimationsCount() const { return animations.size(); };
 
     /**
      * \brief Add an animation at the end of the existing ones.

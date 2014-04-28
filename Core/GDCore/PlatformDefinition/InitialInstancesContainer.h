@@ -10,7 +10,7 @@
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 namespace gd { class InitialInstanceFunctor; }
 namespace gd { class Project; }
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd
 {
@@ -140,15 +140,15 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Save the instances to a TiXmlElement.
+     * \brief Serialize instances container.
      */
-    void SaveToXml(TiXmlElement * element) const;
+    virtual void SerializeTo(SerializerElement & element) const;
     #endif
 
     /**
-     * \brief Load the instances from a TiXmlElement.
+     * \brief Unserialize the instances container.
      */
-    void LoadFromXml(const TiXmlElement * element);
+    virtual void UnserializeFrom(const SerializerElement & element);
     ///@}
 
 private:

@@ -8,6 +8,7 @@
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include <boost/shared_ptr.hpp>
+namespace gd { class SerializerElement; }
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #endif
@@ -64,18 +65,17 @@ public:
     /** \name Serialization
      */
     ///@{
-
-    /**
-     * \brief Load the object from XML
-     */
-    void LoadFromXml(const TiXmlElement * element);
-
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Save the object to XML
+     * \brief Serialize external layout.
      */
-    void SaveToXml(TiXmlElement * element) const;
+    void SerializeTo(SerializerElement & element) const;
     #endif
+
+    /**
+     * \brief Unserialize the external layout.
+     */
+    void UnserializeFrom(const SerializerElement & element);
     ///@}
 
 private:

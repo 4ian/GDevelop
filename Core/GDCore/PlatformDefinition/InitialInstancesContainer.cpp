@@ -7,8 +7,11 @@
 #include <map>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/CommonTools.h"
+
+using namespace std;
 
 namespace gd
 {
@@ -24,59 +27,50 @@ unsigned int InitialInstancesContainer::GetInstancesCount() const
     return initialInstances.size();
 }
 
-void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
+void InitialInstancesContainer::UnserializeFrom(const SerializerElement & element)
 {
-    if ( rootElem == NULL ) return;
-    const TiXmlElement * elem = rootElem->FirstChildElement();
-
-    while ( elem )
+    element.ConsiderAsArrayOf("instance", "Objet");
+    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
     {
+        const SerializerElement & instanceElement = element.GetChild(i);
         gd::InitialInstance newPosition;
 
-        if ( elem->Attribute( "nom" ) != NULL ) newPosition.SetObjectName(elem->Attribute("nom"));
-        if ( elem->Attribute( "x" ) != NULL ) newPosition.SetX(ToFloat(elem->Attribute("x")));
-        if ( elem->Attribute( "y" ) != NULL ) newPosition.SetY(ToFloat(elem->Attribute("y")));
-        if ( elem->Attribute( "angle" ) != NULL ) newPosition.SetAngle(ToFloat(elem->Attribute("angle")));
-        newPosition.SetHasCustomSize( elem->Attribute( "personalizedSize" ) != NULL && std::string(elem->Attribute( "personalizedSize" )) == "true" );
-        if ( elem->Attribute( "width" ) != NULL ) newPosition.SetCustomWidth(ToFloat(elem->Attribute("width")));
-        if ( elem->Attribute( "height" ) != NULL ) newPosition.SetCustomHeight(ToFloat(elem->Attribute("height")));
-        if ( elem->Attribute( "plan" ) != NULL ) newPosition.SetZOrder(ToInt(elem->Attribute("plan")));
-        if ( elem->Attribute( "layer" ) != NULL ) newPosition.SetLayer(elem->Attribute("layer"));
+        newPosition.SetObjectName(instanceElement.GetStringAttribute("name", "", "nom"));
+        newPosition.SetX(instanceElement.GetDoubleAttribute("x"));
+        newPosition.SetY(instanceElement.GetDoubleAttribute("y"));
+        newPosition.SetAngle(instanceElement.GetDoubleAttribute("angle"));
+        newPosition.SetHasCustomSize(instanceElement.GetBoolAttribute("customSize", false, "personalizedSize"));
+        newPosition.SetCustomWidth(instanceElement.GetDoubleAttribute("width"));
+        newPosition.SetCustomHeight(instanceElement.GetDoubleAttribute("height"));
+        newPosition.SetZOrder(instanceElement.GetIntAttribute("plan"));
+        newPosition.SetLayer(instanceElement.GetStringAttribute("layer"));
         #if defined(GD_IDE_ONLY)
-        newPosition.SetLocked( elem->Attribute( "locked" ) != NULL && std::string(elem->Attribute( "locked" )) == "true" );
+        newPosition.SetLocked(instanceElement.GetBoolAttribute( "locked", false ));
         #endif
 
-        const TiXmlElement * floatInfos = elem->FirstChildElement( "floatInfos" );
-        if ( floatInfos ) floatInfos = floatInfos->FirstChildElement("Info");
-        while ( floatInfos )
+        const SerializerElement & floatPropElement = instanceElement.GetChild("numberProperties" , 0 ,"floatInfos");
+        floatPropElement.ConsiderAsArrayOf("property", "Info");
+        for (unsigned int j = 0; j < floatPropElement.GetChildrenCount(); ++j)
         {
-            if ( floatInfos->Attribute("name") != NULL && floatInfos->Attribute("value") != NULL )
-            {
-                float value = 0;
-                floatInfos->QueryFloatAttribute("value", &value);
-                newPosition.floatInfos[floatInfos->Attribute("name")] = value;
-            }
-
-            floatInfos = floatInfos->NextSiblingElement();
+            std::string name = floatPropElement.GetChild(j).GetStringAttribute("name");
+            float value = floatPropElement.GetChild(j).GetDoubleAttribute("value");
+            newPosition.floatInfos[name] = value;
         }
 
-        const TiXmlElement * stringInfos = elem->FirstChildElement( "stringInfos" );
-        if ( stringInfos ) stringInfos = stringInfos->FirstChildElement("Info");
-        while ( stringInfos )
+        const SerializerElement & stringPropElement = instanceElement.GetChild("stringProperties" , 0 ,"stringInfos");
+        stringPropElement.ConsiderAsArrayOf("property", "Info");
+        for (unsigned int j = 0; j < stringPropElement.GetChildrenCount(); ++j)
         {
-            if ( stringInfos->Attribute("name") != NULL && stringInfos->Attribute("value") != NULL )
-                newPosition.stringInfos[stringInfos->Attribute("name")] = stringInfos->Attribute("value");
-
-            stringInfos = stringInfos->NextSiblingElement();
+            std::string name = stringPropElement.GetChild(j).GetStringAttribute("name");
+            std::string value = stringPropElement.GetChild(j).GetStringAttribute("value");
+            newPosition.stringInfos[name] = value;
         }
 
-        newPosition.GetVariables().LoadFromXml(elem->FirstChildElement( "InitialVariables" ));
+        newPosition.GetVariables().UnserializeFrom(instanceElement.GetChild("initialVariables", 0, "InitialVariables"));
 
         initialInstances.push_back( newPosition );
-        elem = elem->NextSiblingElement();
     }
 }
-
 
 void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
 {
@@ -206,50 +200,42 @@ void InitialInstancesContainer::Create(const InitialInstancesContainer & source)
     catch(...) { std::cout << "WARNING: Tried to create a GD C++ Platform InitialInstancesContainer object from an object which is not of the same type."; }
 }
 
-void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
+void InitialInstancesContainer::SerializeTo(SerializerElement & element) const
 {
-    if ( element == NULL ) return;
-
+    element.ConsiderAsArrayOf("instance");
     for (std::list<gd::InitialInstance>::const_iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
-        TiXmlElement * objet = new TiXmlElement( "Objet" );
-        element->LinkEndChild( objet );
-        objet->SetAttribute( "nom", (*it).GetObjectName().c_str() );
-        objet->SetDoubleAttribute( "x", (*it).GetX() );
-        objet->SetDoubleAttribute( "y", (*it).GetY() );
-        objet->SetAttribute( "plan", (*it).GetZOrder() );
-        objet->SetAttribute( "layer", (*it).GetLayer().c_str() );
-        objet->SetDoubleAttribute( "angle", (*it).GetAngle() );
-        objet->SetAttribute( "personalizedSize", (*it).HasCustomSize() ? "true" : "false" );
-        objet->SetDoubleAttribute( "width", (*it).GetCustomWidth() );
-        objet->SetDoubleAttribute( "height", (*it).GetCustomHeight() );
-        objet->SetAttribute( "locked", (*it).IsLocked() ? "true" : "false" );
+        SerializerElement & instanceElement = element.AddChild("instance");
+        instanceElement.SetAttribute( "name", (*it).GetObjectName() );
+        instanceElement.SetAttribute( "x", (*it).GetX() );
+        instanceElement.SetAttribute( "y", (*it).GetY() );
+        instanceElement.SetAttribute( "zOrder", (*it).GetZOrder() );
+        instanceElement.SetAttribute( "layer", (*it).GetLayer() );
+        instanceElement.SetAttribute( "angle", (*it).GetAngle() );
+        instanceElement.SetAttribute( "customSize", (*it).HasCustomSize() );
+        instanceElement.SetAttribute( "width", (*it).GetCustomWidth() );
+        instanceElement.SetAttribute( "height", (*it).GetCustomHeight() );
+        instanceElement.SetAttribute( "locked", (*it).IsLocked() );
 
-        TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
-        objet->LinkEndChild( floatInfos );
-
+        SerializerElement & floatPropElement = instanceElement.AddChild("numberProperties");
+        floatPropElement.ConsiderAsArrayOf("property");
         for(std::map<std::string, float>::const_iterator floatInfo = (*it).floatInfos.begin(); floatInfo != (*it).floatInfos.end(); ++floatInfo)
         {
-            TiXmlElement * info = new TiXmlElement( "Info" );
-            floatInfos->LinkEndChild( info );
-            info->SetAttribute( "name", floatInfo->first.c_str());
-            info->SetDoubleAttribute( "value", floatInfo->second);
+            floatPropElement.AddChild("property")
+                .SetAttribute("name", floatInfo->first)
+                .SetAttribute("value", floatInfo->second);
         }
 
-        TiXmlElement * stringInfos = new TiXmlElement( "stringInfos" );
-        objet->LinkEndChild( stringInfos );
-
+        SerializerElement & stringPropElement = instanceElement.AddChild("stringProperties");
+        floatPropElement.ConsiderAsArrayOf("property");
         for(std::map<std::string, std::string>::const_iterator stringInfo = (*it).stringInfos.begin(); stringInfo != (*it).stringInfos.end(); ++stringInfo)
         {
-            TiXmlElement * info = new TiXmlElement( "Info" );
-            stringInfos->LinkEndChild( info );
-            info->SetAttribute( "name", stringInfo->first.c_str());
-            info->SetAttribute( "value", stringInfo->second.c_str());
+            stringPropElement.AddChild("property")
+                .SetAttribute("name", stringInfo->first)
+                .SetAttribute("value", stringInfo->second);
         }
 
-        TiXmlElement * initialVariables = new TiXmlElement( "InitialVariables" );
-        objet->LinkEndChild( initialVariables );
-        (*it).GetVariables().SaveToXml(initialVariables);
+        (*it).GetVariables().SerializeTo(instanceElement.AddChild("initialVariables"));
     }
 }
 #endif

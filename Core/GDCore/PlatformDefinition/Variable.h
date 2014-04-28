@@ -7,6 +7,7 @@
 #define GDCORE_VARIABLE_H
 #include <string>
 #include <map>
+namespace gd { class SerializerElement; }
 class TiXmlElement;
 
 namespace gd
@@ -85,7 +86,7 @@ public:
     bool operator==(const std::string & val) const { return GetString() == val;};
     bool operator!=(const std::string & val) const { return GetString() != val;};
 
-    /** 
+    /**
      * \brief Return true if the variable is a number
      */
     bool IsNumber() const { return !isStructure && isNumber; }
@@ -107,24 +108,24 @@ public:
     virtual bool HasChild(const std::string & name) const;
 
     /**
-     * \brief Return the child with the specified name. 
-     * 
-     * If the variable has not the specified child, an empty variable with the specified name 
+     * \brief Return the child with the specified name.
+     *
+     * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
      */
     virtual Variable & GetChild(const std::string & name);
 
     /**
-     * \brief Return the child with the specified name. 
-     * 
-     * If the variable has not the specified child, an empty variable with the specified name 
+     * \brief Return the child with the specified name.
+     *
+     * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
      */
     virtual const Variable & GetChild(const std::string & name) const;
 
     /**
      * \brief Remove the child with the specified name.
-     * 
+     *
      * If the variable is not a structure or has not
      * the specified child, nothing is done.
      */
@@ -142,14 +143,24 @@ public:
      */
     ///@{
     /**
-     * Called to save the layout to a TiXmlElement.
+     * Called to save the variable to a TiXmlElement.
      */
     void SaveToXml(TiXmlElement * element) const;
 
     /**
-     * Called to load the layout from a TiXmlElement.
+     * Called to load the variable from a TiXmlElement.
      */
     void LoadFromXml(const TiXmlElement * element);
+
+    /**
+     * \brief Serialize variable.
+     */
+    void SerializeTo(SerializerElement & element) const;
+
+    /**
+     * \brief Unserialize the variable.
+     */
+    void UnserializeFrom(const SerializerElement & element);
     ///@}
 
 

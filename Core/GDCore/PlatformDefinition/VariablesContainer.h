@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "GDCore/PlatformDefinition/Variable.h"
+namespace gd { class SerializerElement; }
 class TiXmlElement;
 
 namespace gd
@@ -51,14 +52,14 @@ public:
 
     /**
      * \brief Return a pair containing the name and the variable at position \index in the container.
-     * 
+     *
      * \note If index is invalid, an empty variable is returned.
      */
     std::pair<std::string, gd::Variable> & Get(unsigned int index);
 
     /**
      * \brief Return a pair containing the name and the variable at position \index in the container.
-     * 
+     *
      * \note If index is invalid, an empty variable is returned.
      */
     const std::pair<std::string, gd::Variable> & Get(unsigned int index) const;
@@ -130,6 +131,18 @@ public:
      */
     virtual void LoadFromXml(const TiXmlElement * element);
     ///@}
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Serialize variable container.
+     */
+    void SerializeTo(SerializerElement & element) const;
+    #endif
+
+    /**
+     * \brief Unserialize the variable container.
+     */
+    void UnserializeFrom(const SerializerElement & element);
 
 private:
 

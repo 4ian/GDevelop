@@ -612,20 +612,6 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     }
     #endif
 
-    elem = rootElement->FirstChildElement( "ExternalLayouts" );
-    if ( elem )
-    {
-        const TiXmlElement * externalLayoutElem = elem->FirstChildElement( "ExternalLayout" );
-        while (externalLayoutElem)
-        {
-            boost::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
-            newExternalLayout->LoadFromXml(externalLayoutElem);
-            externalLayouts.push_back(newExternalLayout);
-
-            externalLayoutElem = externalLayoutElem->NextSiblingElement();
-        }
-    }
-
     #if defined(GD_IDE_ONLY)
     dirty = false;
     #endif
@@ -768,6 +754,17 @@ void Project::UnserializeFrom(const SerializerElement & element)
     }
     #endif
 
+    const SerializerElement & externalLayoutsElement = element.GetChild("externalLayouts", 0, "ExternalLayouts");
+    externalLayoutsElement.ConsiderAsArrayOf("externalLayout", "ExternalLayout");
+    for(unsigned int i = 0;i<externalLayoutsElement.GetChildrenCount();++i)
+    {
+        const SerializerElement & externalLayoutElement = externalLayoutsElement.GetChild(i);
+
+        boost::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
+        newExternalLayout->UnserializeFrom(externalLayoutElement);
+        externalLayouts.push_back(newExternalLayout);
+    }
+
     /*
 
     //Global objects
@@ -853,20 +850,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
         }
     }
     #endif
-
-    elem = rootElement->FirstChildElement( "ExternalLayouts" );
-    if ( elem )
-    {
-        const TiXmlElement * externalLayoutElem = elem->FirstChildElement( "ExternalLayout" );
-        while (externalLayoutElem)
-        {
-            boost::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
-            newExternalLayout->LoadFromXml(externalLayoutElem);
-            externalLayouts.push_back(newExternalLayout);
-
-            externalLayoutElem = externalLayoutElem->NextSiblingElement();
-        }
-    }*/
+*/
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     if (!updateText.empty()) //TODO
@@ -916,16 +900,6 @@ void Project::SaveToXml(TiXmlElement * root) const
         TiXmlElement * scene = new TiXmlElement( "Scene" );
         scenes->LinkEndChild( scene );
         GetLayout(i).SaveToXml(scene);
-    }
-
-    //External layouts
-    TiXmlElement * externalLayoutsElem = new TiXmlElement( "ExternalLayouts" );
-    root->LinkEndChild( externalLayoutsElem );
-    for (unsigned int i = 0;i<externalLayouts.size();++i)
-    {
-        TiXmlElement * externalLayout = new TiXmlElement( "ExternalLayout" );
-        externalLayoutsElem->LinkEndChild( externalLayout );
-        externalLayouts[i]->SaveToXml(externalLayout);
     }
 
     //External source files
@@ -983,6 +957,11 @@ void Project::SerializeTo(SerializerElement & element) const
     for (unsigned int i =0;i<GetExternalEventsCount();++i)
         GetExternalEvents(i).SerializeTo(externalEventsElement.AddChild("externalEvents"));
 
+    SerializerElement & externalLayoutsElement = element.AddChild("externalLayouts");
+    externalLayoutsElement.ConsiderAsArrayOf("externalLayout");
+    for (unsigned int i =0;i<externalLayouts.size();++i)
+        externalLayouts[i]->SerializeTo(externalLayoutsElement.AddChild("externalLayout"));
+
     /*
     //Global objects
     TiXmlElement * objects = new TiXmlElement( "Objects" );
@@ -1020,15 +999,6 @@ void Project::SerializeTo(SerializerElement & element) const
         GetExternalEvents(j).SaveToXml(externalEventsElem);
     }
 
-    //External layouts
-    TiXmlElement * externalLayoutsElem = new TiXmlElement( "ExternalLayouts" );
-    root->LinkEndChild( externalLayoutsElem );
-    for (unsigned int i = 0;i<externalLayouts.size();++i)
-    {
-        TiXmlElement * externalLayout = new TiXmlElement( "ExternalLayout" );
-        externalLayoutsElem->LinkEndChild( externalLayout );
-        externalLayouts[i]->SaveToXml(externalLayout);
-    }
 
     //External source files
     TiXmlElement * externalSourceFilesElem = new TiXmlElement( "ExternalSourceFiles" );

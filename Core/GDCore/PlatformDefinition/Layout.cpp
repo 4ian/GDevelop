@@ -252,7 +252,9 @@ void Layout::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * variables = new TiXmlElement( "Variables" );
     scene->LinkEndChild( variables );
-    GetVariables().SaveToXml(variables);
+    gd::SerializerElement serializedVariables;
+    GetVariables().SerializeTo(serializedVariables);
+    gd::Serializer::SerializeToXML(serializedVariables, variables);
 
     TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
     scene->LinkEndChild( autosSharedDatas );
@@ -269,7 +271,9 @@ void Layout::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * positions = new TiXmlElement( "Positions" );
     scene->LinkEndChild( positions );
-    GetInitialInstances().SaveToXml(positions);
+    gd::SerializerElement serializedInstances;
+    GetInitialInstances().SerializeTo(serializedInstances);
+    gd::Serializer::SerializeToXML(serializedInstances, positions);
 
     TiXmlElement * eventsElem = new TiXmlElement( "Events" );
     scene->LinkEndChild( eventsElem );
@@ -304,8 +308,11 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
     if ( elem->FirstChildElement( "Objets" ) != NULL )
         LoadObjectsFromXml(project, elem->FirstChildElement( "Objets" ));
 
-    if ( elem->FirstChildElement( "Positions" ) != NULL )
-        initialInstances.LoadFromXml(elem->FirstChildElement( "Positions" ));
+    if ( elem->FirstChildElement( "Positions" ) != NULL ) {
+        gd::SerializerElement serializedInstances;
+        gd::Serializer::UnserializeFromXML(serializedInstances, elem->FirstChildElement( "Positions" ));
+        initialInstances.UnserializeFrom(serializedInstances);
+    }
 
     if ( elem->FirstChildElement( "Layers" ) != NULL )
     {

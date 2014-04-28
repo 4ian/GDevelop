@@ -6,6 +6,7 @@
 #include "GDCore/PlatformDefinition/Variable.h"
 #include <string>
 #include <sstream>
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
 
 using namespace std;
@@ -46,8 +47,8 @@ bool Variable::HasChild(const std::string & name) const
 }
 
 /**
- * \brief Return the child with the specified name. 
- * 
+ * \brief Return the child with the specified name.
+ *
  * If the variable is not a structure or has not
  * the specified child, an empty variable is returned.
  */
@@ -63,8 +64,8 @@ Variable & Variable::GetChild(const std::string & name)
 }
 
 /**
- * \brief Return the child with the specified name. 
- * 
+ * \brief Return the child with the specified name.
+ *
  * If the variable is not a structure or has not
  * the specified child, an empty variable is returned.
  */
@@ -81,7 +82,7 @@ const Variable & Variable::GetChild(const std::string & name) const
 
 /**
  * \brief Remove the child with the specified name.
- * 
+ *
  * If the variable is not a structure or has not
  * the specified child, nothing is done.
  */
@@ -89,6 +90,45 @@ void Variable::RemoveChild(const std::string & name)
 {
     if ( !isStructure ) return;
     children.erase(name);
+}
+
+void Variable::SerializeTo(SerializerElement & element) const
+{
+    if (!isStructure)
+        element.SetAttribute("value", GetString());
+    else
+    {
+        SerializerElement & childrenElement = element.AddChild("children");
+        childrenElement.ConsiderAsArrayOf("variable");
+        for (std::map<std::string, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i)
+        {
+            SerializerElement & variableElement = childrenElement.AddChild("variable");
+            variableElement.SetAttribute("name", i->first);
+            i->second.SerializeTo(variableElement);
+        }
+    }
+}
+
+void Variable::UnserializeFrom(const SerializerElement & element)
+{
+    isStructure = element.HasChild("children", "Children");
+
+    if (isStructure)
+    {
+        const SerializerElement & childrenElement = element.GetChild("children", 0, "Children");
+        childrenElement.ConsiderAsArrayOf("variable", "Variable");
+        for (int i = 0; i < childrenElement.GetChildrenCount(); ++i)
+        {
+            const SerializerElement & childElement = childElement.GetChild(i);
+            std::string name = childElement.GetStringAttribute("name", "", "Name");
+
+            gd::Variable childVariable;
+            childVariable.UnserializeFrom(childElement);
+            children[name] = childVariable;
+        }
+    }
+    else
+        SetString(element.GetStringAttribute("value", "", "Value"));
 }
 
 void Variable::SaveToXml(TiXmlElement * element) const

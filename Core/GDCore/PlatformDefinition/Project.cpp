@@ -29,6 +29,7 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "Project.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/propgrid/propgrid.h>

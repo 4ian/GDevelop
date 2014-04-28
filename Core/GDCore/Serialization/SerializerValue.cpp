@@ -16,7 +16,56 @@ SerializerValue::SerializerValue() :
 {
 }
 
-bool SerializerValue::GetBoolean() const
+SerializerValue::SerializerValue(bool val) :
+	isUnknown(true),
+	isBoolean(false),
+	isString(false),
+	isInt(false),
+	isDouble(false),
+	booleanValue(false),
+	intValue(0),
+	doubleValue(0)
+{
+	SetBool(val);
+}
+SerializerValue::SerializerValue(std::string val) :
+	isUnknown(true),
+	isBoolean(false),
+	isString(false),
+	isInt(false),
+	isDouble(false),
+	booleanValue(false),
+	intValue(0),
+	doubleValue(0)
+{
+	SetString(val);
+}
+SerializerValue::SerializerValue(int val) :
+	isUnknown(true),
+	isBoolean(false),
+	isString(false),
+	isInt(false),
+	isDouble(false),
+	booleanValue(false),
+	intValue(0),
+	doubleValue(0)
+{
+	SetInt(val);
+}
+SerializerValue::SerializerValue(double val) :
+	isUnknown(true),
+	isBoolean(false),
+	isString(false),
+	isInt(false),
+	isDouble(false),
+	booleanValue(false),
+	intValue(0),
+	doubleValue(0)
+{
+	SetDouble(val);
+}
+
+bool SerializerValue::GetBool() const
 {
 	if (isString || isUnknown)
 		return stringValue != "false";
@@ -76,7 +125,7 @@ void SerializerValue::Set(const std::string & val)
 	stringValue = val;
 };
 
-void SerializerValue::SetBoolean(bool val)
+void SerializerValue::SetBool(bool val)
 {
 	isUnknown = false;
 	isBoolean = true;

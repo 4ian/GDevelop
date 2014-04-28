@@ -8,7 +8,7 @@
 #include <wx/dcmemory.h>
 #endif
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -90,48 +90,24 @@ LinkEvent::~LinkEvent()
 {
 }
 
-void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
+void LinkEvent::SerializeTo(SerializerElement & element) const
 {
-    TiXmlElement * type = new TiXmlElement( "Type" );
-    eventElem->LinkEndChild( type );
-    type->SetAttribute( "value", "Link" );
+    element.AddChild("include")
+        .SetAttribute("includeAll", IncludeAllEvents())
+        .SetAttribute("start", (int)GetIncludeStart())
+        .SetAttribute("end", (int)GetIncludeEnd());
 
-    TiXmlElement * limitsElem;
-    limitsElem = new TiXmlElement( "Limites" );
-    eventElem->LinkEndChild( limitsElem );
-
-    limitsElem->SetAttribute( "includeAll", IncludeAllEvents() ? "true" : "false" );
-    limitsElem->SetDoubleAttribute( "start", GetIncludeStart() );
-    limitsElem->SetDoubleAttribute( "end", GetIncludeEnd() );
-
-    TiXmlElement * com1;
-    com1 = new TiXmlElement( "Scene" );
-    eventElem->LinkEndChild( com1 );
-    com1->SetAttribute( "value", GetTarget().c_str() );
+    element.AddChild("target").SetValue(GetTarget());
 }
 
-void LinkEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
+void LinkEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    if ( eventElem->FirstChildElement( "Limites" ) )
-    {
-        if ( eventElem->FirstChildElement( "Limites" )->Attribute( "includeAll" ) )
-        {
-            SetIncludeAllEvents( !(ToString(eventElem->FirstChildElement( "Limites" )->Attribute( "includeAll" )) == "false") );
-        }
+    SerializerElement & includeElement = element.GetChild("include", 0, "Limites");
+    SetIncludeAllEvents(includeElement.GetBoolAttribute("includeAll", true));
+    SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
+        includeElement.GetIntAttribute("end"));
 
-        if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL && eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL )
-        {
-            SetIncludeStartAndEnd(ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "start" )),
-                                  ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "end" )));
-
-            //Backward compatibility
-            if ( ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "start" )) == -1 && ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "end" )) == -1  )
-                SetIncludeAllEvents( true );
-        }
-    }
-
-    if ( eventElem->FirstChildElement( "Scene" ) && eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { SetTarget(eventElem->FirstChildElement( "Scene" )->Attribute( "value" ));}
-    else { cout <<"Cannot found link target"; }
+    SetTarget(element.GetChild("target", 0, "Scene").GetValue().GetString());
 }
 
 gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)

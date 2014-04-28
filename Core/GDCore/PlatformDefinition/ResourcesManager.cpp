@@ -15,7 +15,8 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -527,129 +528,98 @@ void ResourcesManager::RemoveResource(const std::string & name)
 
 
 #if defined(GD_IDE_ONLY)
-/**
- * Load an xml element.
- */
-void ResourceFolder::LoadFromXml(const TiXmlElement * elem, gd::ResourcesManager & parentManager)
+void ResourceFolder::UnserializeFrom(const SerializerElement & element, gd::ResourcesManager & parentManager)
 {
-    if (!elem) return;
+    name = element.GetStringAttribute("name");
 
-    name = elem->Attribute("name") ? elem->Attribute("name") : "";
-
-    const TiXmlElement * resourcesElem = elem->FirstChildElement("Resources");
-    const TiXmlElement * resourceElem = resourcesElem ? resourcesElem->FirstChildElement("Resource") : NULL;
-    while ( resourceElem )
-    {
-        std::string resName = resourceElem->Attribute("name") ? resourceElem->Attribute("name") : "";
-        AddResource(resName, parentManager);
-
-        resourceElem = resourceElem->NextSiblingElement();
-    }
+    SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
+    resourcesElement.ConsiderAsArrayOf("resource", "Resource");
+    for(unsigned int i = 0;i<resourcesElement.GetChildrenCount();++i)
+        AddResource(resourcesElement.GetChild(i).GetStringAttribute("name"), parentManager);
 }
 
-/**
- * Save to an xml element.
- */
-void ResourceFolder::SaveToXml(TiXmlElement * elem) const
+void ResourceFolder::SerializeTo(SerializerElement & element) const
 {
-    if (!elem) return;
+    element.SetAttribute("name", name);
 
-    elem->SetAttribute("name", name.c_str());
-
-    TiXmlElement * resourcesElem = new TiXmlElement( "Resources" );
-    elem->LinkEndChild(resourcesElem);
+    SerializerElement & resourcesElement = element.AddChild("resources");
+    resourcesElement.ConsiderAsArrayOf("resource");
     for (unsigned int i = 0;i<resources.size();++i)
     {
-        if ( resources[i] == boost::shared_ptr<Resource>() ) break;
-
-        TiXmlElement * resourceElem = new TiXmlElement( "Resource" );
-        resourcesElem->LinkEndChild(resourceElem);
-
-        resourceElem->SetAttribute("name", resources[i]->GetName().c_str());
+        if ( resources[i] == boost::shared_ptr<Resource>() ) continue;
+        resourcesElement.AddChild("resource").SetAttribute("name", resources[i]->GetName());
     }
 }
 #endif
 
-void ResourcesManager::LoadFromXml(const TiXmlElement * elem)
+void ResourcesManager::UnserializeFrom(const SerializerElement & element)
 {
-    if (!elem) return;
-
-    const TiXmlElement * resourcesElem = elem->FirstChildElement("Resources");
-    const TiXmlElement * resourceElem = resourcesElem ? resourcesElem->FirstChildElement("Resource") : NULL;
-    while ( resourceElem )
+    const SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
+    resourcesElement.ConsiderAsArrayOf("resource", "Resource");
+    for(unsigned int i = 0;i<resourcesElement.GetChildrenCount();++i)
     {
-        std::string kind = resourceElem->Attribute("kind") ? resourceElem->Attribute("kind") : "";
-        std::string name = resourceElem->Attribute("name") ? resourceElem->Attribute("name") : "";
+        const SerializerElement & resourceElement = resourcesElement.GetChild(i);
+        std::string kind = resourceElement.GetStringAttribute("kind");
+        std::string name = resourceElement.GetStringAttribute("name");
 
         boost::shared_ptr<Resource> resource = CreateResource(kind);
         resource->SetName(name);
-        resource->LoadFromXml(resourceElem);
+        resource->UnserializeFrom(resourceElement);
 
         resources.push_back(resource);
-        resourceElem = resourceElem->NextSiblingElement();
     }
 
     #if defined(GD_IDE_ONLY)
-    const TiXmlElement * resourceFoldersElem = elem->FirstChildElement("ResourceFolders");
-    const TiXmlElement * resourceFolderElem  = resourceFoldersElem ? resourceFoldersElem->FirstChildElement() : NULL;
-    while ( resourceFolderElem )
+    const SerializerElement & resourcesFoldersElement = element.GetChild("resourceFolders", 0, "ResourceFolders");
+    resourcesFoldersElement.ConsiderAsArrayOf("folder", "Folder");
+    for(unsigned int i = 0;i<resourcesFoldersElement.GetChildrenCount();++i)
     {
         ResourceFolder folder;
-        folder.LoadFromXml(resourceFolderElem, *this);
+        folder.UnserializeFrom(resourcesFoldersElement.GetChild(i), *this);
 
         folders.push_back(folder);
-        resourceFolderElem = resourceFolderElem->NextSiblingElement();
     }
     #endif
 }
 
 #if defined(GD_IDE_ONLY)
-void ResourcesManager::SaveToXml(TiXmlElement * elem) const
+void ResourcesManager::SerializeTo(SerializerElement & element) const
 {
-    if (!elem) return;
-
-    TiXmlElement * resourcesElem = new TiXmlElement( "Resources" );
-    elem->LinkEndChild(resourcesElem);
+    SerializerElement & resourcesElement = element.AddChild("resources");
+    resourcesElement.ConsiderAsArrayOf("resource");
     for (unsigned int i = 0;i<resources.size();++i)
     {
         if ( resources[i] == boost::shared_ptr<Resource>() ) break;
 
-        TiXmlElement * resourceElem = new TiXmlElement( "Resource" );
-        resourcesElem->LinkEndChild(resourceElem);
+        SerializerElement & resourceElement = resourcesElement.AddChild("resource");
+        resourceElement.SetAttribute("kind", resources[i]->GetKind());
+        resourceElement.SetAttribute("name", resources[i]->GetName());
 
-        resourceElem->SetAttribute("kind", resources[i]->GetKind().c_str());
-        resourceElem->SetAttribute("name", resources[i]->GetName().c_str());
-
-        resources[i]->SaveToXml(resourceElem);
+        resources[i]->SerializeTo(resourceElement);
     }
 
-    TiXmlElement * resourceFoldersElem = new TiXmlElement( "ResourceFolders" );
-    elem->LinkEndChild(resourceFoldersElem);
+    SerializerElement & resourcesFoldersElement = element.AddChild("resourceFolders");
+    resourcesFoldersElement.ConsiderAsArrayOf("folder");
     for (unsigned int i = 0;i<folders.size();++i)
-    {
-        TiXmlElement * folderElem = new TiXmlElement( "Folder" );
-        resourceFoldersElem->LinkEndChild(folderElem);
-
-        folders[i].SaveToXml(folderElem);
-    }
+        folders[i].SerializeTo(resourcesFoldersElement.AddChild("folder"));
 }
 #endif
 
-void ImageResource::LoadFromXml(const TiXmlElement * elem)
+void ImageResource::UnserializeFrom(const SerializerElement & element)
 {
-    alwaysLoaded = elem->Attribute("alwaysLoaded") ? (std::string(elem->Attribute("alwaysLoaded")) == "true" ) : false;
-    smooth = elem->Attribute("smoothed") ? (std::string(elem->Attribute("smoothed")) != "false" ) : true;
-    SetUserAdded( elem->Attribute("userAdded") ? (std::string(elem->Attribute("userAdded")) != "false" ) : true );
-    GetFile() = elem->Attribute("file") ? elem->Attribute("file") : "";
+    alwaysLoaded = element.GetBoolAttribute("alwaysLoaded");
+    smooth = element.GetBoolAttribute("smoothed");
+    SetUserAdded( element.GetBoolAttribute("userAdded") );
+    file = element.GetStringAttribute("file");
 }
 
 #if defined(GD_IDE_ONLY)
-void ImageResource::SaveToXml(TiXmlElement * elem) const
+void ImageResource::SerializeTo(SerializerElement & element) const
 {
-    elem->SetAttribute("alwaysLoaded", alwaysLoaded ? "true" : "false");
-    elem->SetAttribute("smoothed", smooth ? "true" : "false");
-    elem->SetAttribute("userAdded", IsUserAdded() ? "true" : "false");
-    elem->SetAttribute("file", GetFile().c_str());
+    element.SetAttribute("alwaysLoaded", alwaysLoaded);
+    element.SetAttribute("smoothed", smooth);
+    element.SetAttribute("userAdded", IsUserAdded());
+    element.SetAttribute("file", GetFile());
 }
 
 

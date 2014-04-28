@@ -9,6 +9,7 @@
 #include <boost/shared_ptr.hpp>
 namespace gd { class Project; }
 namespace gd { class BaseEvent; }
+namespace gd { class SerializerElement; }
 class TiXmlElement;
 
 namespace gd
@@ -136,13 +137,13 @@ public:
      * \brief Save the objects to xml
      * \see EventsListSerialization
      */
-    void SaveToXml(TiXmlElement * element) const;
+    void SerializeTo(SerializerElement & element) const;
 
     /**
      * \brief Load the objects from xml
      * \see EventsListSerialization
      */
-    void LoadFromXml(gd::Project & project, const TiXmlElement * element);
+    void UnserializeFrom(gd::Project & project, const SerializerElement & element);
     ///@}
 
 private:

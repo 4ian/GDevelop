@@ -28,8 +28,8 @@ public:
     virtual ~CommentEvent() {};
     virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new CommentEvent(*this));}
 
-    void SaveToXml(TiXmlElement * eventElem) const;
-    void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
+    virtual void SerializeTo(SerializerElement & element) const;
+    virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
 
     int r; ///< Background color Red component
     int v; ///< Background color Green component

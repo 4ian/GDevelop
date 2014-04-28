@@ -255,10 +255,11 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
     TiXmlElement * elemEvents = new TiXmlElement( "Events" );
     root->LinkEndChild( elemEvents );
 
-    gd::EventsListSerialization::SaveEventsToXml(events, elemEvents);
+    gd::SerializerElement serializedEvents;
+    gd::EventsListSerialization::SerializeEventsTo(events, serializedEvents);
+    gd::Serializer::SerializeToXML(serializedEvents, elemEvents);
 
     wxFileDialog dialog( this, _( "Choose where save the template" ), "Templates", "", "Template (*.mgd)|*.mgd", wxFD_SAVE );
-    ;
 
     if ( dialog.ShowModal() != wxID_CANCEL )
     {

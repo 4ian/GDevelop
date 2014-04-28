@@ -8,6 +8,8 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/IDE/MetadataProvider.h"
@@ -166,92 +168,84 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
     }
 }
 
-void EventsListSerialization::LoadEventsFromXml(gd::Project & project, EventsList & list, const TiXmlElement * events)
+void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, EventsList & list, const SerializerElement & events)
 {
-    const TiXmlElement * eventElem = events->FirstChildElement();
-    while ( eventElem )
+    events.ConsiderAsArrayOf("event", "Event");
+    for(unsigned int i = 0; i<events.GetChildrenCount(); ++i)
     {
-        string type;
-        if ( eventElem->FirstChildElement( "Type" ) && eventElem->FirstChildElement( "Type" )->Attribute( "value" ))
-            type = eventElem->FirstChildElement( "Type" )->Attribute( "value" );
-
+        SerializerElement & eventElem = events.GetChild(i);
+        std::string type = eventElem.GetChild("type", 0, "Type").GetValue().GetString();
         gd::BaseEventSPtr event = project.CreateEvent(type);
         if ( event != boost::shared_ptr<gd::BaseEvent>())
-        {
-            event->LoadFromXml(project, eventElem);
-        }
+            event->UnserializeFrom(project, eventElem);
         else
         {
-            std::cout << "Unknown event of type " << type;
+            std::cout << "WARNING: Unknown event of type " << type << std::endl;
             event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
         }
 
-        if ( eventElem->Attribute( "disabled" ) != NULL ) { if ( string(eventElem->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
-        if ( eventElem->Attribute( "folded" ) != NULL ) { event->folded = ( string(eventElem->Attribute( "folded" )) == "true" ); }
+        event->SetDisabled(eventElem.GetBoolAttribute("disabled"));
+        event->folded = eventElem.GetBoolAttribute("folded");
 
         list.InsertEvent(*event, list.GetEventsCount());
-
-        eventElem = eventElem->NextSiblingElement();
     }
 }
 
-void EventsListSerialization::SaveEventsToXml(const EventsList & list, TiXmlElement * events)
+void EventsListSerialization::SerializeEventsTo(const EventsList & list, SerializerElement & events)
 {
+    events.ConsiderAsArrayOf("event");
     for ( unsigned int j = 0;j < list.size();j++ )
     {
         const gd::BaseEvent & event = list.GetEvent(j);
-        TiXmlElement * eventElem = new TiXmlElement( "Event" );
+        SerializerElement & eventElem = events.AddChild("event");
 
-        eventElem->SetAttribute( "disabled", event.IsDisabled() ? "true" : "false" );
-        eventElem->SetAttribute( "folded", event.folded ? "true" : "false" );
-        events->LinkEndChild( eventElem );
+        eventElem.SetAttribute( "disabled", event.IsDisabled());
+        eventElem.SetAttribute( "folded", event.folded);
+        eventElem.AddChild("type").SetValue(event.GetType());
 
-        TiXmlElement * type = new TiXmlElement( "Type" );
-        eventElem->LinkEndChild( type );
-        type->SetAttribute( "value", event.GetType().c_str() );
-
-        event.SaveToXml(eventElem);
+        event.SerializeTo(eventElem);
     }
 }
 
 using namespace std;
 
-
-void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector < gd::Instruction > & conditions, const TiXmlElement * elem)
+void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector < gd::Instruction > & conditions, const SerializerElement & elem)
 {
-    if (elem == NULL) return;
-    const TiXmlElement * elemConditions = elem->FirstChildElement();
-
-    //Passage en revue des conditions
-    while ( elemConditions )
+    elem.ConsiderAsArrayOf("condition", "Condition");
+    for(unsigned int i = 0; i<elem.GetChildrenCount(); ++i)
     {
         gd::Instruction instruction;
+        const SerializerElement & conditionElem = elem.GetChild(i);
 
-        //Read type and infos
-        const TiXmlElement *elemPara = elemConditions->FirstChildElement( "Type" );
-        if ( elemPara != NULL )
-        {
-            instruction.SetType( elemPara->Attribute( "value" ) != NULL ? elemPara->Attribute( "value" ) : "");
-            instruction.SetInverted( (elemPara->Attribute( "Contraire" ) != NULL) && (string(elemPara->Attribute( "Contraire" )) == "true") );
-        }
+        instruction.SetType( conditionElem.GetChild("type", 0, "Type").GetStringAttribute("value") );
+        instruction.SetInverted( conditionElem.GetChild("type", 0, "Type").GetBoolAttribute("inverted", false, "Contraire") );
 
         //Read parameters
         vector < gd::Expression > parameters;
-        elemPara = elemConditions->FirstChildElement("Parametre");
-        while ( elemPara )
-        {
-            if ( elemPara->Attribute( "value" ) != NULL ) parameters.push_back( gd::Expression(elemPara->Attribute( "value" )) );
-            elemPara = elemPara->NextSiblingElement("Parametre");
+
+        //Compatibility with GD <= 3.3
+        if (conditionElem.HasChild("Parametre")) {
+
+            for (unsigned int j = 0;j<conditionElem.GetChildrenCount("Parametre");++j)
+                parameters.push_back(gd::Expression(conditionElem.GetChild("Parametre", j).GetValue().GetString()));
+
         }
+        //end of compatibility code
+        else
+        {
+            const SerializerElement & parametersElem = conditionElem.GetChild("parameters");
+            parametersElem.ConsiderAsArrayOf("parameter");
+            for (unsigned int j = 0;j<parametersElem.GetChildrenCount();++j)
+                parameters.push_back(gd::Expression(parametersElem.GetChild(j).GetValue().GetString()));
+        }
+
         instruction.SetParameters( parameters );
 
         //Read sub conditions
-        if ( elemConditions->FirstChildElement( "SubConditions" ) != NULL )
-            OpenConditions(project, instruction.GetSubInstructions(), elemConditions->FirstChildElement( "SubConditions" ));
+        if ( conditionElem.HasChild("subConditions", "SubConditions") )
+            OpenConditions(project, instruction.GetSubInstructions(), conditionElem.GetChild("subConditions", 0, "SubConditions" ));
 
         conditions.push_back( instruction );
-
-        elemConditions = elemConditions->NextSiblingElement();
     }
 
     if ( project.GetLastSaveGDMajorVersion() < 3 ||
@@ -262,39 +256,42 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector <
         UpdateInstructionsFromGD2x(project, conditions, false);
 }
 
-void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd::Instruction > & actions, const TiXmlElement * elem)
+void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd::Instruction > & actions, const SerializerElement & elem)
 {
-    if (elem == NULL) return;
-    const TiXmlElement * elemActions = elem->FirstChildElement();
-
-    //Passage en revue des actions
-    while ( elemActions )
+    elem.ConsiderAsArrayOf("action", "Action");
+    for(unsigned int i = 0; i<elem.GetChildrenCount(); ++i)
     {
         gd::Instruction instruction;
+        const SerializerElement & actionElem = elem.GetChild(i);
 
-        //Read type and info
-        const TiXmlElement *elemPara = elemActions->FirstChildElement( "Type" );
-        if ( elemPara != NULL )
-        {
-            if (elemPara->Attribute( "value" ) != NULL) instruction.SetType( elemPara->Attribute( "value" ));
-        }
+        instruction.SetType( actionElem.GetChild("type", 0, "Type").GetStringAttribute("value") );
 
         //Read parameters
         vector < gd::Expression > parameters;
-        elemPara = elemActions->FirstChildElement("Parametre");
-        while ( elemPara )
-        {
-            if (elemPara->Attribute( "value" ) != NULL) parameters.push_back( gd::Expression(elemPara->Attribute( "value" )) );
-            elemPara = elemPara->NextSiblingElement("Parametre");
+
+        //Compatibility with GD <= 3.3
+        if (actionElem.HasChild("Parametre")) {
+
+            for (unsigned int j = 0;j<actionElem.GetChildrenCount("Parametre");++j)
+                parameters.push_back(gd::Expression(actionElem.GetChild("Parametre", j).GetValue().GetString()));
+
         }
-        instruction.SetParameters(parameters);
+        //end of compatibility code
+        else
+        {
+            const SerializerElement & parametersElem = actionElem.GetChild("parameters");
+            parametersElem.ConsiderAsArrayOf("parameter");
+            for (unsigned int j = 0;j<parametersElem.GetChildrenCount();++j)
+                parameters.push_back(gd::Expression(parametersElem.GetChild(j).GetValue().GetString()));
+        }
+
+        instruction.SetParameters( parameters );
 
         //Read sub actions
-        if ( elemActions->FirstChildElement( "SubActions" ) != NULL )
-            OpenActions(project, instruction.GetSubInstructions(), elemActions->FirstChildElement( "SubActions" ));
+        if ( actionElem.HasChild("subActions", "SubActions") )
+            OpenActions(project, instruction.GetSubInstructions(), actionElem.GetChild("subActions", 0, "SubActions" ));
 
-        actions.push_back(instruction);
-        elemActions = elemActions->NextSiblingElement();
+        actions.push_back( instruction );
     }
 
     if ( project.GetLastSaveGDMajorVersion() < 3 ||
@@ -305,73 +302,47 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd
         UpdateInstructionsFromGD2x(project, actions, true);
 }
 
-void gd::EventsListSerialization::SaveActions(const vector < gd::Instruction > & list, TiXmlElement * actions)
+void gd::EventsListSerialization::SaveActions(const vector < gd::Instruction > & list, SerializerElement & actions)
 {
+    actions.ConsiderAsArrayOf("action");
     for ( unsigned int k = 0;k < list.size();k++ )
     {
-        //Pour chaque condition
-        TiXmlElement * action;
+        SerializerElement & action = actions.AddChild("action");
+        action.AddChild("type")
+            .SetAttribute("value", list[k].GetType())
+            .SetAttribute("inverted", list[k].IsInverted());
 
-        action = new TiXmlElement( "Action" );
-        actions->LinkEndChild( action );
-
-        //Le type
-        TiXmlElement * typeAction;
-        typeAction = new TiXmlElement( "Type" );
-        action->LinkEndChild( typeAction );
-
-        typeAction->SetAttribute( "value", list[k].GetType().c_str() );
-
-
-        //Les autres paramètres
+        //Parameters
+        SerializerElement & parameters = action.AddChild("parameters");
+        parameters.ConsiderAsArrayOf("parameter");
         for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
-        {
-            TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
-            action->LinkEndChild( Parametre );
-            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
-        }
+            parameters.AddChild("parameter").SetValue(list[k].GetParameter(l).GetPlainString());
 
         //Sub instructions
-        if ( !list[k].GetSubInstructions().empty() )
-        {
-            TiXmlElement * subActions = new TiXmlElement( "SubActions" );
-            action->LinkEndChild(subActions);
-            SaveActions(list[k].GetSubInstructions() , subActions);
-        }
+        SerializerElement & subActions = action.AddChild("subActions");
+        SaveActions(list[k].GetSubInstructions(), subActions);
     }
 }
 
-void gd::EventsListSerialization::SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * conditions)
+void gd::EventsListSerialization::SaveConditions(const vector < gd::Instruction > & list, SerializerElement & conditions)
 {
+    conditions.ConsiderAsArrayOf("condition");
     for ( unsigned int k = 0;k < list.size();k++ )
     {
-        //Pour chaque condition
-        TiXmlElement * condition = new TiXmlElement( "Condition" );
-        conditions->LinkEndChild( condition );
+        SerializerElement & condition = conditions.AddChild("condition");
+        condition.AddChild("type")
+            .SetAttribute("value", list[k].GetType())
+            .SetAttribute("inverted", list[k].IsInverted());
 
-        //Le type
-        TiXmlElement * typeCondition = new TiXmlElement( "Type" );
-        condition->LinkEndChild( typeCondition );
-
-        typeCondition->SetAttribute( "value", list[k].GetType().c_str() );
-        if ( list[k].IsInverted() ) { typeCondition->SetAttribute( "Contraire", "true" ); }
-        else { typeCondition->SetAttribute( "Contraire", "false" ); }
-
-        //Les autres paramètres
+        //Parameters
+        SerializerElement & parameters = condition.AddChild("parameters");
+        parameters.ConsiderAsArrayOf("parameter");
         for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
-        {
-            TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
-            condition->LinkEndChild( Parametre );
-            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
-        }
+            parameters.AddChild("parameter").SetValue(list[k].GetParameter(l).GetPlainString());
 
         //Sub instructions
-        if ( !list[k].GetSubInstructions().empty() )
-        {
-            TiXmlElement * subConditions = new TiXmlElement( "SubConditions" );
-            condition->LinkEndChild(subConditions);
-            SaveConditions(list[k].GetSubInstructions(), subConditions);
-        }
+        SerializerElement & subConditions = condition.AddChild("subConditions");
+        SaveConditions(list[k].GetSubInstructions(), subConditions);
     }
 }
 

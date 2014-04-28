@@ -81,14 +81,14 @@ void EventsList::RemoveEvent(const gd::BaseEvent & event)
 	}
 }
 
-void EventsList::SaveToXml(TiXmlElement * element) const
+void EventsList::SerializeTo(SerializerElement & element) const
 {
-	EventsListSerialization::SaveEventsToXml(*this, element);
+	EventsListSerialization::SerializeEventsTo(*this, element);
 }
 
-void EventsList::LoadFromXml(gd::Project & project, const TiXmlElement * element)
+void EventsList::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-	EventsListSerialization::LoadEventsFromXml(project, *this, element);
+	EventsListSerialization::UnserializeEventsFrom(project, *this, element);
 }
 
 

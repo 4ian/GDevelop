@@ -15,16 +15,20 @@ namespace gd {
  * \see gd::Serializer
  * \see gd::SerializerElement
  */
-class SerializerValue
+class GD_CORE_API SerializerValue
 {
 public:
 	SerializerValue();
+	SerializerValue(bool val);
+	SerializerValue(std::string val);
+	SerializerValue(int val);
+	SerializerValue(double val);
 	virtual ~SerializerValue() {};
 
 	/**
 	 * Set the value, its type being a boolean.
 	 */
-	void SetBoolean(bool val);
+	void SetBool(bool val);
 
 	/**
 	 * Set the value, its type being a std::string.
@@ -49,7 +53,7 @@ public:
 	/**
 	 * Get the value, its type being a boolean.
 	 */
-	bool GetBoolean() const;
+	bool GetBool() const;
 
 	/**
 	 * Get the value, its type being a string.

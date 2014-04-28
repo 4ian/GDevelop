@@ -59,8 +59,8 @@ public:
     virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
     virtual std::vector < gd::Expression* > GetAllExpressions();
 
-    virtual void SaveToXml(TiXmlElement * eventElem) const;
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
+    virtual void SerializeTo(SerializerElement & element) const;
+    virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
 
     /**
      * Called by event editor to draw the event.

@@ -16,7 +16,7 @@ namespace gd
  * \brief The class used to save/load projects and GDCore classes
  * from/to XML or JSON.
  */
-class Serializer
+class GD_CORE_API Serializer
 {
 public:
     /** \name XML serialization.

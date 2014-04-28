@@ -18,7 +18,7 @@ namespace gd {
  *
  * \see gd::Serializer
  */
-class SerializerElement
+class GD_CORE_API SerializerElement
 {
 public:
 	SerializerElement();
@@ -32,11 +32,18 @@ public:
 	 * \brief Set the value of the element.
 	 */
     void SetValue(const SerializerValue & value) { valueUndefined = false; elementValue = value; }
+    void SetValue(bool val) { valueUndefined = false; elementValue = SerializerValue(val); }
+    void SetValue(std::string val) { valueUndefined = false; elementValue = SerializerValue(val); }
+    void SetValue(int val) { valueUndefined = false; elementValue = SerializerValue(val); }
+    void SetValue(unsigned int val) { valueUndefined = false; elementValue = SerializerValue((int)val); }
+    void SetValue(double val) { valueUndefined = false; elementValue = SerializerValue(val); }
 
 	/**
 	 * \brief Get the value of the element.
+	 *
+	 * If not value was set, an attribute named "value" is searched. If found, its value is returned.
 	 */
-    const SerializerValue & GetValue() const { return elementValue; }
+    const SerializerValue & GetValue() const;
 
     /**
      * \brief Return true if no value was set for the element.
@@ -53,28 +60,28 @@ public:
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	void SetAttribute(const std::string & name, bool value);
+	SerializerElement & SetAttribute(const std::string & name, bool value);
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	void SetAttribute(const std::string & name, const std::string & value);
+	SerializerElement & SetAttribute(const std::string & name, const std::string & value);
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	void SetAttribute(const std::string & name, int value);
+	SerializerElement & SetAttribute(const std::string & name, int value);
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	void SetAttribute(const std::string & name, double value);
+	SerializerElement & SetAttribute(const std::string & name, double value);
 
 	/**
 	 * Get the value of an attribute being a boolean.
@@ -123,30 +130,71 @@ public:
      * Methods related to the children elements
      */
     ///@{
+    /**
+     * \brief Consider that the element is an array for elements with the given name.
+     *
+     * In this case, no child with a different name should be added. When serialized to format accepting arrays,
+     * the element will be serialized to an array.
+     *
+     * \param name The name of the children.
+     */
+    void ConsiderAsArrayOf(const std::string & name, const std::string & deprecatedName = "") const { arrayOf = name; deprecatedArrayOf = deprecatedName; };
+
+    /**
+     * \brief Return the name of the children the element is considered an array of.
+     *
+     * Return an empty string if the element is not considered as an array.
+     */
+    const std::string & ConsideredAsArrayOf() const { return arrayOf; };
 
     /**
      * \brief Add a child at the end of the children list with the given name and return a reference to it.
      * \param name The name of the new child.
      */
-	SerializerElement & AddChild(const std::string & name);
+	SerializerElement & AddChild(std::string name);
 
     /**
-     * \brief Add a child at the end of the children list with the given name and return a reference to it.
+     * \brief Get a child of the element using its name.
      * \param name The name of the new child.
+     * \param name The index of the child
      */
-	SerializerElement & GetChild(const std::string & name);
+	SerializerElement & GetChild(std::string name, unsigned int index = 0, std::string deprecatedName = "") const;
+
+    /**
+     * \brief Get a child of the element using its index (when the element is considered as an array).
+     * \param name The index of the child
+     */
+	SerializerElement & GetChild(unsigned int index) const;
+
+    /**
+     * \brief Get the number of children having a specific name.
+     *
+     * If no children name is specified, return the number of children being part of the array.
+     * (ConsiderAsArrayOf must have been called before).
+     *
+     * \param name The name of the children.
+     *
+     * \see SerializerElement::ConsiderAsArrayOf
+     */
+	unsigned int GetChildrenCount(std::string name = "", std::string deprecatedName = "") const;
 
     /**
      * \brief Return true if the specified child exists.
      * \param name The name of the child to find.
      */
-	bool HasChild(const std::string & name);
+	bool HasChild(const std::string & name, std::string deprecatedName = "") const;
 
     /**
      * \brief Return all the children of the element.
      */
 	const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
     ///@}
+
+	/**
+	 * Hide any deprecated warning concerning how child and attributes are named.
+	 * Useful when unserializing from an old file.
+	 */
+    void HideWarnings() { hideWarning = true; };
 
 private:
 
@@ -155,6 +203,9 @@ private:
 
 	std::map< std::string, SerializerValue > attributes;
 	std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > children;
+	mutable std::string arrayOf;
+	mutable std::string deprecatedArrayOf;
+	bool hideWarning;
 	static SerializerElement nullElement;
 };
 

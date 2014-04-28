@@ -8,6 +8,7 @@
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
@@ -74,49 +75,20 @@ vector < const gd::Expression* > RepeatEvent::GetAllExpressions() const
     return allExpressions;
 }
 
-void RepeatEvent::SaveToXml(TiXmlElement * eventElem) const
+void RepeatEvent::SerializeTo(SerializerElement & element) const
 {
-    TiXmlElement * repeatElem = new TiXmlElement( "RepeatExpression" );
-    eventElem->LinkEndChild( repeatElem );
-    repeatElem->SetAttribute("value", repeatNumberExpression.GetPlainString().c_str());
-
-    //Les conditions
-    TiXmlElement * conditionsElem = new TiXmlElement( "Conditions" );
-    eventElem->LinkEndChild( conditionsElem );
-    gd::EventsListSerialization::SaveConditions(conditions, conditionsElem);
-
-    //Les actions
-    TiXmlElement * actionsElem = new TiXmlElement( "Actions" );
-    eventElem->LinkEndChild( actionsElem );
-    gd::EventsListSerialization::SaveActions(actions, actionsElem);
-
-    //Sous évènements
-    if ( !GetSubEvents().IsEmpty() )
-    {
-        TiXmlElement * subeventsElem;
-        subeventsElem = new TiXmlElement( "Events" );
-        eventElem->LinkEndChild( subeventsElem );
-
-        gd::EventsListSerialization::SaveEventsToXml(events, subeventsElem);
-    }
+    element.AddChild("repeatExpression").SetValue(repeatNumberExpression.GetPlainString());
+    gd::EventsListSerialization::SaveConditions(conditions, element.AddChild("conditions"));
+    gd::EventsListSerialization::SaveActions(actions, element.AddChild("actions"));
+    gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 }
 
-void RepeatEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
+void RepeatEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    if ( eventElem->FirstChildElement( "RepeatExpression" ) != NULL )
-        repeatNumberExpression = gd::Expression(eventElem->FirstChildElement("RepeatExpression")->Attribute("value"));
-
-    //Conditions
-    if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
-        gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
-
-    //Actions
-    if ( eventElem->FirstChildElement( "Actions" ) != NULL )
-        gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
-
-    //Subevents
-    if ( eventElem->FirstChildElement( "Events" ) != NULL )
-        gd::EventsListSerialization::LoadEventsFromXml(project, events, eventElem->FirstChildElement( "Events" ));
+    repeatNumberExpression = gd::Expression(element.GetChild("repeatExpression", 0, "RepeatExpression").GetValue().GetString());
+    gd::EventsListSerialization::OpenConditions(project, conditions, element.GetChild("conditions", 0, "Conditions"));
+    gd::EventsListSerialization::OpenActions(project, actions, element.GetChild("actions", 0, "Actions"));
+    gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events", 0, "Events"));
 }
 
 /**

@@ -29,7 +29,7 @@ void Serializer::SerializeToXML(SerializerElement & element, TiXmlElement * xmlE
 			const SerializerValue & attr = it->second;
 
 			if (attr.IsBoolean())
-				xmlElement->SetAttribute(it->first.c_str(), attr.GetBoolean() ? "true" : "false");
+				xmlElement->SetAttribute(it->first.c_str(), attr.GetBool() ? "true" : "false");
 			else if (attr.IsString())
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
 			else if (attr.IsInt())
@@ -63,20 +63,15 @@ void Serializer::UnserializeFromXML(SerializerElement & element, const TiXmlElem
 {
 	if(!xmlElement) return;
 
+	element.HideWarnings();
+
 	const TiXmlAttribute * attr = xmlElement->FirstAttribute();
 	while(attr)
 	{
 		if ( attr->Name() != NULL )
 		{
 			std::string name = attr->Name();
-
-			int intValue;
-			double doubleValue;
-			if ( attr->QueryIntValue(&intValue) == TIXML_SUCCESS )
-				element.SetAttribute(name, intValue);
-			else if ( attr->QueryDoubleValue(&doubleValue) == TIXML_SUCCESS )
-				element.SetAttribute(name, doubleValue);
-			else if (attr->Value())
+			if (attr->Value())
 				element.SetAttribute(name, std::string(attr->Value()));
 		}
 
@@ -111,7 +106,7 @@ namespace
 	std::string ValueToJSON(const SerializerValue & val)
 	{
 		if (val.IsBoolean())
-			return val.GetBoolean() ? "true" : "false";
+			return val.GetBool() ? "true" : "false";
 		else if (val.IsString())
 			return "\""+val.GetString() + "\"";
 		else if (val.IsInt())
@@ -127,33 +122,69 @@ std::string Serializer::SerializeToJSON(const SerializerElement & element)
 {
 	if (element.IsValueUndefined())
 	{
-	    std::string str = "{";
-	    bool firstChild = true;
-
-		const std::map<std::string, SerializerValue> & attributes = element.GetAllAttributes();
-		for (std::map<std::string, SerializerValue>::const_iterator it = attributes.begin();
-			it != attributes.end();++it)
-	    {
-	        if ( !firstChild ) str += ",";
-	        str += "\""+it->first+"\": "+ValueToJSON(it->second);
-
-	        firstChild = false;
-	    }
-
-		const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
-		for (size_t i = 0; i < children.size(); ++i)
+		if ( !element.ConsideredAsArrayOf().empty() )
 		{
-			if (children[i].second == boost::shared_ptr<SerializerElement>())
-				continue;
+			//Store the element as an array in JSON:
+		    std::string str = "[";
+		    bool firstChild = true;
 
-	        if ( !firstChild ) str += ",";
-	        str += "\""+children[i].first+"\": "+SerializeToJSON(*children[i].second);
+		    if ( element.GetAllAttributes().size() > 0 )
+		    {
+				std::cout << "WARNING: A SerializerElement is considered as an array of " << element.ConsideredAsArrayOf()
+					<< " but has attributes. These attributes won't be saved!" << std::endl;
+		    }
 
-	        firstChild = false;
+			const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+			for (size_t i = 0; i < children.size(); ++i)
+			{
+				if (children[i].second == boost::shared_ptr<SerializerElement>())
+					continue;
+				if (children[i].first != element.ConsideredAsArrayOf())
+				{
+					std::cout << "WARNING: A SerializerElement is considered as an array of " << element.ConsideredAsArrayOf()
+						<< " but has a children called " << children[i].first << ". This children won't be saved!" << std::endl;
+					continue;
+				}
+
+		        if ( !firstChild ) str += ",";
+		        str += SerializeToJSON(*children[i].second);
+
+		        firstChild = false;
+			}
+
+		    str += "]";
+		    return str;
 		}
+		else
+		{
+		    std::string str = "{";
+		    bool firstChild = true;
 
-	    str += "}";
-	    return str;
+			const std::map<std::string, SerializerValue> & attributes = element.GetAllAttributes();
+			for (std::map<std::string, SerializerValue>::const_iterator it = attributes.begin();
+				it != attributes.end();++it)
+		    {
+		        if ( !firstChild ) str += ",";
+		        str += "\""+it->first+"\": "+ValueToJSON(it->second);
+
+		        firstChild = false;
+		    }
+
+			const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+			for (size_t i = 0; i < children.size(); ++i)
+			{
+				if (children[i].second == boost::shared_ptr<SerializerElement>())
+					continue;
+
+		        if ( !firstChild ) str += ",";
+		        str += "\""+children[i].first+"\": "+SerializeToJSON(*children[i].second);
+
+		        firstChild = false;
+			}
+
+		    str += "}";
+		    return str;
+		}
 	}
 	else
 	{

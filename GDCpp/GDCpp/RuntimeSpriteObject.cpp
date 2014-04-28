@@ -136,7 +136,7 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
  */
 float RuntimeSpriteObject::GetDrawableX() const
 {
-    return X - GetCurrentSprite().GetOrigine().GetX()*abs(scaleX);
+    return X - GetCurrentSprite().GetOrigine().GetX()*fabs(scaleX);
 }
 
 /**
@@ -144,7 +144,7 @@ float RuntimeSpriteObject::GetDrawableX() const
  */
 float RuntimeSpriteObject::GetDrawableY() const
 {
-    return Y - GetCurrentSprite().GetOrigine().GetY()*abs(scaleY);
+    return Y - GetCurrentSprite().GetOrigine().GetY()*fabs(scaleY);
 }
 
 /**
@@ -196,7 +196,7 @@ void RuntimeSpriteObject::SetOriginalSize()
 float RuntimeSpriteObject::GetCenterX() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSprite().GetCentre().GetX()*abs(scaleX);
+    return GetCurrentSprite().GetCentre().GetX()*fabs(scaleX);
 }
 
 /**
@@ -205,7 +205,7 @@ float RuntimeSpriteObject::GetCenterX() const
 float RuntimeSpriteObject::GetCenterY() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSprite().GetCentre().GetY()*abs(scaleY);
+    return GetCurrentSprite().GetCentre().GetY()*fabs(scaleY);
 }
 
 float RuntimeSpriteObject::GetPointX(const std::string & name) const
@@ -344,10 +344,10 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
 
     ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCentre().GetX(), ptrToCurrentSprite->GetCentre().GetY() ); ;
     ptrToCurrentSprite->GetSFMLSprite().setRotation( multipleDirections ? 0 : currentAngle );
-    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCentre().GetX() - ptrToCurrentSprite->GetOrigine().GetX())*abs(scaleX),
-                                                     Y + (ptrToCurrentSprite->GetCentre().GetY() - ptrToCurrentSprite->GetOrigine().GetY())*abs(scaleY) );
-    if ( isFlippedX ) ptrToCurrentSprite->GetSFMLSprite().move((ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width/2-ptrToCurrentSprite->GetCentre().GetX())*abs(scaleX)*2,0 );
-    if ( isFlippedY ) ptrToCurrentSprite->GetSFMLSprite().move(0, (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height/2-ptrToCurrentSprite->GetCentre().GetY())*abs(scaleY)*2);
+    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCentre().GetX() - ptrToCurrentSprite->GetOrigine().GetX())*fabs(scaleX),
+                                                     Y + (ptrToCurrentSprite->GetCentre().GetY() - ptrToCurrentSprite->GetOrigine().GetY())*fabs(scaleY) );
+    if ( isFlippedX ) ptrToCurrentSprite->GetSFMLSprite().move((ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width/2-ptrToCurrentSprite->GetCentre().GetX())*fabs(scaleX)*2,0 );
+    if ( isFlippedY ) ptrToCurrentSprite->GetSFMLSprite().move(0, (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height/2-ptrToCurrentSprite->GetCentre().GetY())*fabs(scaleY)*2);
     ptrToCurrentSprite->GetSFMLSprite().setScale( scaleX, scaleY );
     ptrToCurrentSprite->GetSFMLSprite().setColor( sf::Color( colorR, colorV, colorB, opacity ) );
 

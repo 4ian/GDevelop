@@ -22,6 +22,8 @@
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
@@ -536,62 +538,185 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 {
     if ( rootElement == NULL ) return;
 
-    const TiXmlElement * elem = rootElement->FirstChildElement();
+    gd::SerializerElement rootSElement;
+    gd::Serializer::UnserializeFromXML(rootSElement, rootElement);
+    UnserializeFrom(rootSElement);
 
+    //Global objects
+    const TiXmlElement * elem = rootElement->FirstChildElement( "Objects" );
+    if ( elem )
+        LoadObjectsFromXml(*this, elem);
+
+    #if defined(GD_IDE_ONLY)
+    //Global object groups
+    elem = rootElement->FirstChildElement( "ObjectGroups" );
+    if ( elem )
+        gd::ObjectGroup::LoadFromXml(GetObjectGroups(), elem);
+    #endif
+
+    //Global variables
+    elem = rootElement->FirstChildElement( "Variables" );
+    if ( elem ) GetVariables().LoadFromXml(elem);
+
+    //Scenes
+    if ( rootElement->FirstChildElement( "Scenes" ) ) {
+        firstLayout = rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") ?
+            rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") : "";
+
+        elem = rootElement->FirstChildElement( "Scenes" ) ? rootElement->FirstChildElement( "Scenes" )->FirstChildElement() : NULL;
+        while ( elem )
+        {
+            std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
+
+            //Add a new layout
+            boost::shared_ptr<gd::Layout> layout = boost::shared_ptr<gd::Layout>(new gd::Layout);
+            if ( layout )
+            {
+                scenes.push_back(layout);
+                scenes.back()->SetName(layoutName);
+                scenes.back()->LoadFromXml(*this, elem);
+
+                //Compatibility code with GD 2.x
+                #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+                if ( GDMajorVersion <= 2 )
+                {
+                    SpriteObjectsPositionUpdater updater(*this, *scenes.back());
+                    gd::InitialInstancesContainer & instances = scenes.back()->GetInitialInstances();
+                    instances.IterateOverInstances(updater);
+
+                }
+                #endif
+                //End of compatibility code
+            }
+            else
+                std::cout << "ERROR : Unable to create a layout when loading a project!" << std::endl;
+
+            elem = elem->NextSiblingElement();
+        }
+    }
+
+    #if defined(GD_IDE_ONLY)
+
+    elem = rootElement->FirstChildElement( "ExternalSourceFiles" );
+    if ( elem )
+    {
+        const TiXmlElement * sourceFileElem = elem->FirstChildElement( "SourceFile" );
+        while (sourceFileElem)
+        {
+            boost::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
+            newSourceFile->LoadFromXml(sourceFileElem);
+            externalSourceFiles.push_back(newSourceFile);
+
+            sourceFileElem = sourceFileElem->NextSiblingElement();
+        }
+    }
+    #endif
+
+    elem = rootElement->FirstChildElement( "ExternalLayouts" );
+    if ( elem )
+    {
+        const TiXmlElement * externalLayoutElem = elem->FirstChildElement( "ExternalLayout" );
+        while (externalLayoutElem)
+        {
+            boost::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
+            newExternalLayout->LoadFromXml(externalLayoutElem);
+            externalLayouts.push_back(newExternalLayout);
+
+            externalLayoutElem = externalLayoutElem->NextSiblingElement();
+        }
+    }
+
+    #if defined(GD_IDE_ONLY)
+    dirty = false;
+    #endif
+}
+
+void Project::UnserializeFrom(const SerializerElement & element)
+{
     //Checking version
     #if defined(GD_IDE_ONLY)
     std::string updateText;
-    GDMajorVersion = 0;
-    GDMinorVersion = 0;
-    int build = 0;
-    int revision = 0;
-    if ( elem != NULL )
+
+    const SerializerElement & gdVersionElement = element.GetChild("gdVersion", 0, "GDVersion");
+    GDMajorVersion = gdVersionElement.GetIntAttribute("major", GDMajorVersion, "Major");
+    GDMinorVersion = gdVersionElement.GetIntAttribute("minor", GDMinorVersion, "Minor");
+    int build = gdVersionElement.GetIntAttribute("build", 0, "Build");
+    int revision = gdVersionElement.GetIntAttribute("revision", 0, "Revision");
+
+    if ( GDMajorVersion > gd::VersionWrapper::Major() )
+        gd::LogWarning( _( "The version of Game Develop used to create this game seems to be a new version.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+    else
     {
-        int major = 0;
-        int minor = 0;
-        elem->QueryIntAttribute( "Major", &major );
-        elem->QueryIntAttribute( "Minor", &minor );
-        elem->QueryIntAttribute( "Build", &build );
-        elem->QueryIntAttribute( "Revision", &revision );
-        GDMajorVersion = major;
-        GDMinorVersion = minor;
-        if ( GDMajorVersion > gd::VersionWrapper::Major() )
+        if ( (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion >  gd::VersionWrapper::Minor()) ||
+             (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build >  gd::VersionWrapper::Build()) ||
+             (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build == gd::VersionWrapper::Build() && revision > gd::VersionWrapper::Revision()) )
         {
-            gd::LogWarning( _( "The version of Game Develop used to create this game seems to be a new version.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+            gd::LogWarning( _( "The version of Game Develop used to create this game seems to be greater.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
         }
-        else
-        {
-            if ( (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion >  gd::VersionWrapper::Minor()) ||
-                 (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build >  gd::VersionWrapper::Build()) ||
-                 (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build == gd::VersionWrapper::Build() && revision > gd::VersionWrapper::Revision()) )
-            {
-                gd::LogWarning( _( "The version of Game Develop used to create this game seems to be greater.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
-            }
-        }
-
-        //Compatibility code
-        if ( GDMajorVersion <= 1 )
-        {
-            gd::LogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
-            return;
-        }
-        //End of Compatibility code
     }
-    #endif
-
-    elem = rootElement->FirstChildElement( "Info" );
-    if ( elem ) LoadProjectInformationFromXml(elem);
 
     //Compatibility code
-    #if defined(GD_IDE_ONLY)
-    if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion == 0 && build <= 10498) )
+    if ( GDMajorVersion <= 1 )
     {
-        OpenImagesFromGD2010498(*this,
-                                rootElement->FirstChildElement( "Images" )->FirstChildElement(),
-                                rootElement->FirstChildElement( "DossierImages" )->FirstChildElement());
+        gd::LogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
+        //return; //TODO
     }
-    #endif
     //End of Compatibility code
+    #endif
+
+    const SerializerElement & propElement = element.GetChild("properties", 0, "Info");
+    SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
+    SetDefaultWidth(propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt());
+    SetDefaultHeight(propElement.GetChild("windowHeight", 0, "WindowH").GetValue().GetInt());
+    SetMaximumFPS(propElement.GetChild("maxFPS", 0, "FPSmax").GetValue().GetInt());
+    SetMinimumFPS(propElement.GetChild("minFPS", 0, "FPSmin").GetValue().GetInt());
+    SetVerticalSyncActivatedByDefault(propElement.GetChild("verticalSync").GetValue().GetInt());
+    #if defined(GD_IDE_ONLY)
+    SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
+    SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
+    winExecutableFilename = propElement.GetStringAttribute("winExecutableFilename");
+    winExecutableIconFile = propElement.GetStringAttribute("winExecutableIconFile");
+    linuxExecutableFilename = propElement.GetStringAttribute("linuxExecutableFilename");
+    macExecutableFilename = propElement.GetStringAttribute("macExecutableFilename");
+    useExternalSourceFiles = propElement.GetBoolAttribute("useExternalSourceFiles");
+    #endif
+
+    const SerializerElement & extensionsElement = propElement.GetChild("extensions", 0, "Extensions");
+    extensionsElement.ConsiderAsArrayOf("extension", "Extension");
+    for(unsigned int i = 0;i<extensionsElement.GetChildrenCount();++i)
+    {
+        std::string extensionName = extensionsElement.GetChild(i).GetStringAttribute("name");
+        if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
+            GetUsedExtensions().push_back(extensionName);
+    }
+
+    #if defined(GD_IDE_ONLY)
+    const SerializerElement & platformsElement = propElement.GetChild("platforms", 0, "Platforms");
+    platformsElement.ConsiderAsArrayOf("platform", "Platform");
+    for(unsigned int i = 0;i<platformsElement.GetChildrenCount();++i)
+    {
+        std::string current = propElement.GetChild("currentPlatform").GetValue().GetString();
+
+        std::string name = platformsElement.GetChild(i).GetStringAttribute("name");
+        gd::Platform * platform = gd::PlatformManager::Get()->GetPlatform(name);
+
+        if ( platform ) {
+            AddPlatform(*platform);
+            if ( platform->GetName() == current || current.empty() ) currentPlatform = platform;
+        }
+        else {
+            std::cout << "Platform \"" << name << "\" is unknown." << std::endl;
+        }
+    }
+
+    if ( platformsElement.GetChildrenCount() == 0 )
+    {
+        //Compatibility with GD2.x
+        platforms.push_back(gd::PlatformManager::Get()->GetPlatform("Game Develop C++ platform"));
+        currentPlatform = platforms.back();
+    }
+
+    #endif
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
@@ -628,7 +753,22 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     }
     #endif
 
-    resourcesManager.LoadFromXml(rootElement->FirstChildElement( "Resources" ));
+    resourcesManager.UnserializeFrom(element.GetChild( "resources", 0, "Resources" ));
+
+    #if defined(GD_IDE_ONLY)
+    const SerializerElement & externalEventsElement = element.GetChild("externalEvents", 0, "ExternalEvents");
+    externalEventsElement.ConsiderAsArrayOf("externalEvents", "ExternalEvents");
+    for(unsigned int i = 0;i<externalEventsElement.GetChildrenCount();++i)
+    {
+        const SerializerElement & externalEventElement = externalEventsElement.GetChild(i);
+        gd::ExternalEvents & externalEvents = InsertNewExternalEvents(externalEventElement.GetStringAttribute("name", "", "Name"),
+            GetExternalEventsCount());
+
+        externalEvents.UnserializeFrom(*this, externalEventElement);
+    }
+    #endif
+
+    /*
 
     //Global objects
     elem = rootElement->FirstChildElement( "Objects" );
@@ -726,7 +866,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
             externalLayoutElem = externalLayoutElem->NextSiblingElement();
         }
-    }
+    }*/
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     if (!updateText.empty()) //TODO
@@ -739,163 +879,111 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     #endif
 }
 
-void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
-{
-    if ( elem->FirstChildElement( "Nom" ) != NULL ) { SetName( elem->FirstChildElement( "Nom" )->Attribute( "value" ) ); }
-    if ( elem->FirstChildElement( "WindowW" ) != NULL ) { SetDefaultWidth(ToInt(elem->FirstChildElement( "WindowW" )->Attribute( "value"))); }
-    if ( elem->FirstChildElement( "WindowH" ) != NULL ) { SetDefaultHeight(ToInt(elem->FirstChildElement( "WindowH" )->Attribute( "value"))); }
-    if ( elem->FirstChildElement( "FPSmax" ) != NULL ) { SetMaximumFPS(ToInt(elem->FirstChildElement( "FPSmax" )->Attribute( "value" ))); }
-    if ( elem->FirstChildElement( "FPSmin" ) != NULL ) { SetMinimumFPS(ToInt(elem->FirstChildElement( "FPSmin" )->Attribute( "value" ))); }
-
-    SetVerticalSyncActivatedByDefault( false );
-    if ( elem->FirstChildElement( "verticalSync" ) != NULL )
-    {
-        string result = elem->FirstChildElement( "verticalSync" )->Attribute("value");
-        if ( result == "true")
-            SetVerticalSyncActivatedByDefault(true);
-    }
-
-    if ( elem->FirstChildElement( "Extensions" ) != NULL )
-    {
-        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
-        while (extensionsElem)
-        {
-            if ( extensionsElem->Attribute("name") )
-            {
-                std::string extensionName = extensionsElem->Attribute("name");
-                if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
-                    GetUsedExtensions().push_back(extensionName);
-            }
-
-            extensionsElem = extensionsElem->NextSiblingElement();
-        }
-    }
-
-    #if defined(GD_IDE_ONLY)
-    if ( elem->FirstChildElement( "Auteur" ) != NULL ) { SetAuthor( elem->FirstChildElement( "Auteur" )->Attribute( "value" ) ); }
-    if ( elem->FirstChildElement( "LatestCompilationDirectory" ) != NULL && elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) != NULL )
-        SetLastCompilationDirectory( elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) );
-
-    if ( elem->FirstChildElement( "Platforms" ) )
-    {
-        std::string current = elem->FirstChildElement( "Platforms" )->Attribute("current") ? elem->FirstChildElement( "Platforms" )->Attribute("current") : "";
-
-        for (const TiXmlElement * platformElem = elem->FirstChildElement( "Platforms" )->FirstChildElement( "Platform" );
-             platformElem;
-             platformElem = platformElem->NextSiblingElement())
-        {
-            std::string name = platformElem->Attribute("name") ? platformElem->Attribute("name") : "";
-            gd::Platform * platform = gd::PlatformManager::Get()->GetPlatform(name);
-
-            if ( platform ) {
-                AddPlatform(*platform);
-                if ( platform->GetName() == current ) currentPlatform = platform;
-            }
-            else {
-                std::cout << "Platform \"" << name << "\" is unknown." << std::endl;
-            }
-        }
-    }
-    else
-    {
-        //Compatibility with GD2.x
-        platforms.push_back(gd::PlatformManager::Get()->GetPlatform("Game Develop C++ platform"));
-        currentPlatform = platforms.back();
-    }
-
-    if ( elem->Attribute("winExecutableFilename") ) winExecutableFilename = elem->Attribute("winExecutableFilename");
-    if ( elem->Attribute("winExecutableIconFile") ) winExecutableIconFile = elem->Attribute("winExecutableIconFile");
-    if ( elem->Attribute("linuxExecutableFilename") ) linuxExecutableFilename = elem->Attribute("linuxExecutableFilename");
-    if ( elem->Attribute("macExecutableFilename") ) macExecutableFilename = elem->Attribute("macExecutableFilename");
-    if ( elem->Attribute( "useExternalSourceFiles" )  != NULL )
-        useExternalSourceFiles = ToString(elem->Attribute( "useExternalSourceFiles" )) == "true";
-    #endif
-
-    return;
-}
 
 #if defined(GD_IDE_ONLY)
 void Project::SaveToXml(TiXmlElement * root) const
 {
-    TiXmlElement * version = new TiXmlElement( "GDVersion" );
-    root->LinkEndChild( version );
-    version->SetAttribute( "Major", ToString( gd::VersionWrapper::Major() ).c_str() );
-    version->SetAttribute( "Minor", ToString( gd::VersionWrapper::Minor() ).c_str() );
-    version->SetAttribute( "Build", ToString( gd::VersionWrapper::Build() ).c_str() );
-    version->SetAttribute( "Revision", ToString( gd::VersionWrapper::Revision() ).c_str() );
-    GDMajorVersion = gd::VersionWrapper::Major();
-    GDMinorVersion = gd::VersionWrapper::Minor();
+    gd::SerializerElement rootElement;
+    SerializeTo(rootElement);
+    gd::Serializer::SerializeToXML(rootElement, root);
 
-    TiXmlElement * infos = new TiXmlElement( "Info" );
-    root->LinkEndChild( infos );
+    //TODO: Temp
+    std::cout << "-- JSON output --" << std::endl;
+    std::cout << gd::Serializer::SerializeToJSON(rootElement) << std::endl;
+    std::cout << "-- End of JSON. --" << std::endl;
 
-    //Info du jeu
-    TiXmlElement * info;
+    //Global objects
+    TiXmlElement * objects = new TiXmlElement( "Objects" );
+    root->LinkEndChild( objects );
+    SaveObjectsToXml(objects);
+
+    //Global object groups
+    TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
+    root->LinkEndChild( globalObjectGroups );
+    gd::ObjectGroup::SaveToXml(GetObjectGroups(), globalObjectGroups);
+
+    //Global variables
+    TiXmlElement * variables = new TiXmlElement( "Variables" );
+    root->LinkEndChild( variables );
+    GetVariables().SaveToXml(variables);
+
+    //Scenes
+    TiXmlElement * scenes = new TiXmlElement( "Scenes" );
+    root->LinkEndChild( scenes );
+    scenes->SetAttribute("firstScene", firstLayout.c_str());
+    for ( unsigned int i = 0;i < GetLayoutCount();i++ )
     {
-        info = new TiXmlElement( "Nom" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", GetName().c_str() );
-        info = new TiXmlElement( "Auteur" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", GetAuthor().c_str() );
-
-        TiXmlElement * extensions = new TiXmlElement( "Extensions" );
-        infos->LinkEndChild( extensions );
-        for (unsigned int i =0;i<GetUsedExtensions().size();++i)
-        {
-            TiXmlElement * extension = new TiXmlElement( "Extension" );
-            extensions->LinkEndChild( extension );
-            extension->SetAttribute("name", GetUsedExtensions().at(i).c_str());
-        }
-
-        TiXmlElement * platformsElem = new TiXmlElement( "Platforms" );
-        if ( currentPlatform ) platformsElem->SetAttribute("current", currentPlatform->GetName().c_str());
-        infos->LinkEndChild( platformsElem );
-        for (unsigned int i =0;i<platforms.size();++i)
-        {
-            TiXmlElement * platform = new TiXmlElement( "Platform" );
-            platformsElem->LinkEndChild( platform );
-            platform->SetAttribute("name", platforms[i]->GetName().c_str() );
-        }
-
-        info = new TiXmlElement( "WindowW" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", GetMainWindowDefaultWidth() );
-        info = new TiXmlElement( "WindowH" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", GetMainWindowDefaultHeight() );
-        info = new TiXmlElement( "Portable" );
-        infos->LinkEndChild( info );
-        info = new TiXmlElement( "LatestCompilationDirectory" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", GetLastCompilationDirectory().c_str() );
-    }
-    {
-        TiXmlElement * elem = infos;
-        elem->SetAttribute("winExecutableFilename", winExecutableFilename.c_str());
-        elem->SetAttribute("winExecutableIconFile", winExecutableIconFile.c_str());
-        elem->SetAttribute("linuxExecutableFilename", linuxExecutableFilename.c_str());
-        elem->SetAttribute("macExecutableFilename", macExecutableFilename.c_str());
-        elem->SetAttribute("useExternalSourceFiles", useExternalSourceFiles ? "true" : "false");
+        TiXmlElement * scene = new TiXmlElement( "Scene" );
+        scenes->LinkEndChild( scene );
+        GetLayout(i).SaveToXml(scene);
     }
 
+    //External layouts
+    TiXmlElement * externalLayoutsElem = new TiXmlElement( "ExternalLayouts" );
+    root->LinkEndChild( externalLayoutsElem );
+    for (unsigned int i = 0;i<externalLayouts.size();++i)
+    {
+        TiXmlElement * externalLayout = new TiXmlElement( "ExternalLayout" );
+        externalLayoutsElem->LinkEndChild( externalLayout );
+        externalLayouts[i]->SaveToXml(externalLayout);
+    }
 
-    info = new TiXmlElement( "FPSmax" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", GetMaximumFPS() );
-    info = new TiXmlElement( "FPSmin" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", GetMinimumFPS() );
+    //External source files
+    TiXmlElement * externalSourceFilesElem = new TiXmlElement( "ExternalSourceFiles" );
+    root->LinkEndChild( externalSourceFilesElem );
+    for (unsigned int i = 0;i<externalSourceFiles.size();++i)
+    {
+        TiXmlElement * sourceFile = new TiXmlElement( "SourceFile" );
+        externalSourceFilesElem->LinkEndChild( sourceFile );
+        externalSourceFiles[i]->SaveToXml(sourceFile);
+    }
 
-    info = new TiXmlElement( "verticalSync" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", IsVerticalSynchronizationEnabledByDefault() ? "true" : "false" );
+    #if defined(GD_IDE_ONLY)
+    dirty = false;
+    #endif
+}
 
-    //Ressources
-    TiXmlElement * resources = new TiXmlElement( "Resources" );
-    root->LinkEndChild( resources );
-    resourcesManager.SaveToXml(resources);
+void Project::SerializeTo(SerializerElement & element) const
+{
+    SerializerElement & versionElement = element.AddChild("gdVersion");
+    versionElement.SetAttribute("major", ToString( gd::VersionWrapper::Major() ) );
+    versionElement.SetAttribute("minor", ToString( gd::VersionWrapper::Minor() ) );
+    versionElement.SetAttribute("build", ToString( gd::VersionWrapper::Build() ) );
+    versionElement.SetAttribute("revision", ToString( gd::VersionWrapper::Revision() ) );
 
+    SerializerElement & propElement = element.AddChild("properties");
+    propElement.AddChild("name").SetValue(GetName());
+    propElement.AddChild("author").SetValue(GetAuthor());
+    propElement.AddChild("windowWidth").SetValue(GetMainWindowDefaultWidth());
+    propElement.AddChild("windowHeight").SetValue(GetMainWindowDefaultHeight());
+    propElement.AddChild("latestCompilationDirectory").SetValue(GetLastCompilationDirectory());
+    propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
+    propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
+    propElement.AddChild("verticalSync").SetValue(IsVerticalSynchronizationEnabledByDefault());
+    propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
+    propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
+    propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
+    propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
+    propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
+
+    SerializerElement & extensionsElement = propElement.AddChild("extensions");
+    extensionsElement.ConsiderAsArrayOf("extension");
+    for (unsigned int i =0;i<GetUsedExtensions().size();++i)
+        extensionsElement.AddChild("extension").SetAttribute("name", GetUsedExtensions()[i]);
+
+    SerializerElement & platformsElement = propElement.AddChild("platforms");
+    platformsElement.ConsiderAsArrayOf("platform");
+    for (unsigned int i =0;i<platforms.size();++i)
+        platformsElement.AddChild("platform").SetAttribute("name", platforms[i]->GetName());
+
+    resourcesManager.SerializeTo(element.AddChild("resources"));
+
+    SerializerElement & externalEventsElement = element.AddChild("externalEvents");
+    externalEventsElement.ConsiderAsArrayOf("externalEvents");
+    for (unsigned int i =0;i<GetExternalEventsCount();++i)
+        GetExternalEvents(i).SerializeTo(externalEventsElement.AddChild("externalEvents"));
+
+    /*
     //Global objects
     TiXmlElement * objects = new TiXmlElement( "Objects" );
     root->LinkEndChild( objects );
@@ -955,6 +1043,7 @@ void Project::SaveToXml(TiXmlElement * root) const
     #if defined(GD_IDE_ONLY)
     dirty = false;
     #endif
+    */
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)

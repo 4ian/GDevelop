@@ -8,7 +8,7 @@
 #endif
 #include "CommentEvent.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/IDE/Dialogs/EditComment.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
@@ -19,44 +19,32 @@ using namespace std;
 namespace gd
 {
 
-void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
+void CommentEvent::SerializeTo(SerializerElement & element) const
 {
-    TiXmlElement * color;
-    color = new TiXmlElement( "Couleur" );
-    eventElem->LinkEndChild( color );
+    element.AddChild("color")
+        .SetAttribute("r", r)
+        .SetAttribute("g", v)
+        .SetAttribute("b", b)
+        .SetAttribute("textR", textR)
+        .SetAttribute("textG", textG)
+        .SetAttribute("textB", textB);
 
-    color->SetDoubleAttribute( "r", r );
-    color->SetDoubleAttribute( "v", v );
-    color->SetDoubleAttribute( "b", b );
-    color->SetDoubleAttribute( "textR", textR );
-    color->SetDoubleAttribute( "textG", textG );
-    color->SetDoubleAttribute( "textB", textB );
-
-    TiXmlElement * com1Elem = new TiXmlElement( "Com1" );
-    eventElem->LinkEndChild( com1Elem );
-    com1Elem->SetAttribute( "value", com1.c_str() );
-
-    TiXmlElement * com2Elem = new TiXmlElement( "Com2" );
-    eventElem->LinkEndChild( com2Elem );
-    com2Elem->SetAttribute( "value", com2.c_str() );
+    element.AddChild("comment").SetValue(com1);
+    element.AddChild("comment2").SetValue(com2);
 }
 
-void CommentEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
+void CommentEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "r" ) != NULL ) { int value;eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "r", &value ); r = value;}
-    else { cout << "Les informations concernant la couleur d'un commentaire manquent."; }
-    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "v" ) != NULL ) { int value;eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "v", &value ); v = value;}
-    else { cout <<"Les informations concernant la couleur d'un commentaire manquent." ; }
-    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "b" ) != NULL ) { int value;eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "b", &value ); b = value;}
-    else { cout <<"Les informations concernant la couleur d'un commentaire manquent." ; }
-    if ( eventElem->FirstChildElement( "Com1" )->Attribute( "value" ) != NULL ) { com1 = eventElem->FirstChildElement( "Com1" )->Attribute( "value" );}
-    else { cout <<"Les informations concernant le texte 1 d'un commentaire manquent." ; }
-    if ( eventElem->FirstChildElement( "Com2" )->Attribute( "value" ) != NULL ) { com2 = eventElem->FirstChildElement( "Com2" )->Attribute( "value" );}
-    else { cout <<"Les informations concernant le texte 2 d'un commentaire manquent." ; }
+    const SerializerElement & colorElement = element.GetChild("color", 0, "Couleur");
+    r = colorElement.GetIntAttribute("r");
+    v = colorElement.GetIntAttribute("g", 0, "v");
+    b = colorElement.GetIntAttribute("b");
+    textR = colorElement.GetIntAttribute("textR");
+    textG = colorElement.GetIntAttribute("textG");
+    textB = colorElement.GetIntAttribute("textB");
 
-    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textR" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textR", &textR );}
-    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textG" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textG", &textG );}
-    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textB" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textB", &textB );}
+    com1 = element.GetChild("comment", 0, "Com1").GetValue().GetString();
+    com2 = element.GetChild("comment2", 0, "Com2").GetValue().GetString();
 }
 
 gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)

@@ -28,6 +28,7 @@ namespace gd { class ImageManager; }
 namespace gd { class Automatism; }
 namespace gd { class AutomatismsSharedData; }
 namespace gd { class BaseEvent; }
+namespace gd { class SerializerElement; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -362,7 +363,7 @@ public:
     bool LoadFromFile(const std::string & filename);
 
     /**
-     * Called to save the layout to a TiXmlElement.
+     * Called to save the project to a TiXmlElement.
      *
      * "Dirty" flag is set to false when save is done.
      */
@@ -372,6 +373,18 @@ public:
      * Called to load the layout from a TiXmlElement.
      */
     void LoadFromXml(const TiXmlElement * element);
+
+    /**
+     * \brief Called to serialize the project to a TiXmlElement.
+     *
+     * "Dirty" flag is set to false when serialization is done.
+     */
+    void SerializeTo(SerializerElement & element) const;
+
+    /**
+     * \brief Unserialize the project from an element.
+     */
+    void UnserializeFrom(const SerializerElement & element);
 
     #if defined(GD_IDE_ONLY)
 

@@ -23,8 +23,8 @@ namespace gd { class Platform; }
 class wxWindow;
 namespace gd { class EventsEditorItemsAreas; }
 namespace gd { class EventsEditorSelection; }
+namespace gd { class SerializerElement; }
 namespace gd { class Instruction; }
-class TiXmlElement;
 class wxDC;
 
 namespace gd
@@ -154,17 +154,15 @@ public:
     /** \name Serialization
      */
     ///@{
+    /**
+     * \brief Serialize event.
+     */
+    virtual void SerializeTo(SerializerElement & element) const {};
 
     /**
-     * Save event to XML
+     * \brief Unserialize the event.
      */
-    virtual void SaveToXml(TiXmlElement * eventElem) const {}
-
-    /**
-     * Load event from XML
-     */
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem) {}
-
+    virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element) {};
     ///@}
 
     /** \name Common properties

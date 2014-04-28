@@ -11,7 +11,7 @@
 #include "GDCore/Events/EventsList.h"
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd
 {
@@ -89,14 +89,14 @@ public:
     virtual gd::EventsList & GetEvents() { return events; }
 
     /**
-     * \brief Load the object from xml
+     * \brief Serialize external events.
      */
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * element);
+    virtual void SerializeTo(SerializerElement & element) const;
 
     /**
-     * \brief Save the object to xml
+     * \brief Unserialize the external events.
      */
-    virtual void SaveToXml(TiXmlElement * element) const;
+    virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
 
 private:
 

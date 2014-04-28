@@ -31,32 +31,32 @@ public:
     /**
      * Change point position.
      */
-    void SetXY(int x_, int y_) { x = x_;y = y_; }
+    void SetXY(float x_, float y_) { x = x_;y = y_; }
 
     /**
      * Change point X position.
      */
-    void SetX(int x_) { x = x_; }
+    void SetX(float x_) { x = x_; }
 
     /**
      * Change point Y position.
      */
-    void SetY(int y_) { y = y_; }
+    void SetY(float y_) { y = y_; }
 
     /**
      * Get point X position.
      */
-    int GetX() const { return x; }
+    float GetX() const { return x; }
 
     /**
      * Get point Y position.
      */
-    int GetY() const { return y; }
+    float GetY() const { return y; }
 
 private:
     std::string name;
-    int x;
-    int y;
+    float x;
+    float y;
 };
 
 #endif // GDCORE_POINT_H

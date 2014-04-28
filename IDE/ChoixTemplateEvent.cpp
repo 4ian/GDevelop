@@ -295,8 +295,11 @@ void ChoixTemplateEvent::Refresh()
             ++i;
         }
 
-        if ( elem->FirstChildElement( "Events" ) != NULL )
-            gd::EventsListSerialization::LoadEventsFromXml(project, newTemplate.events, elem->FirstChildElement( "Events" ));
+        if ( elem->FirstChildElement( "Events" ) != NULL ) {
+            gd::SerializerElement serializedEvents;
+            gd::Serializer::UnserializeFromXML(serializedEvents,  elem->FirstChildElement( "Events" ));
+            gd::EventsListSerialization::UnserializeEventsFrom(project, newTemplate.events, serializedEvents);
+        }
         else
             gd::LogWarning( _( "The events of the template are missing." ) );
 

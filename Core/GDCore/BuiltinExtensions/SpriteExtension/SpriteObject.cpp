@@ -150,13 +150,13 @@ void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rende
 
     sf::Sprite sprite(associatedSprite->GetSFMLTexture()->texture);
 
-    float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/sprite.getLocalBounds().width : 1;
-    float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/sprite.getLocalBounds().height : 1;
+    float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
+    float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;
 
     sprite.setOrigin( associatedSprite->GetCentre().GetX(), associatedSprite->GetCentre().GetY() ); ;
     sprite.setRotation( shouldNotRotate ? 0 : instance.GetAngle() );
-    sprite.setPosition( instance.GetX() + (associatedSprite->GetCentre().GetX() - associatedSprite->GetOrigine().GetX())*abs(scaleX),
-                        instance.GetY() + (associatedSprite->GetCentre().GetY() - associatedSprite->GetOrigine().GetY())*abs(scaleY) );
+    sprite.setPosition( instance.GetX() + (associatedSprite->GetCentre().GetX() - associatedSprite->GetOrigine().GetX())*fabs(scaleX),
+                        instance.GetY() + (associatedSprite->GetCentre().GetY() - associatedSprite->GetOrigine().GetY())*fabs(scaleY) );
     sprite.setScale(scaleX, scaleY);
 
     renderTarget.draw(sprite);
@@ -179,8 +179,8 @@ sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instan
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;
 
-    return sf::Vector2f(associatedSprite->GetOrigine().GetX()*abs(scaleX),
-                        associatedSprite->GetOrigine().GetY()*abs(scaleY));
+    return sf::Vector2f(((float)associatedSprite->GetOrigine().GetX())*fabs(scaleX),
+                        ((float)associatedSprite->GetOrigine().GetY())*fabs(scaleY));
 }
 
 bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const

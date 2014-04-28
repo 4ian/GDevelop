@@ -2,7 +2,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Event.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "ExternalEvents.h"
 
 namespace gd
@@ -35,28 +35,20 @@ void ExternalEvents::Init(const ExternalEvents & externalEvents)
     events = *externalEvents.events.Clone();
 }
 
-void ExternalEvents::LoadFromXml(gd::Project & project, const TiXmlElement * element)
+void ExternalEvents::SerializeTo(SerializerElement & element) const
 {
-    if (!element) return;
-
-    name = element->Attribute( "Name" ) != NULL ? element->Attribute( "Name" ) : "";
-    associatedScene = element->Attribute( "AssociatedScene" ) != NULL ? element->Attribute( "AssociatedScene" ) : "";
-    lastChangeTimeStamp = element->Attribute( "LastChangeTimeStamp" ) != NULL ? atol(element->Attribute( "LastChangeTimeStamp" )) : 0;
-    if ( element->FirstChildElement("Events") != NULL )
-        gd::EventsListSerialization::LoadEventsFromXml(project, events, element->FirstChildElement("Events"));
+    element.SetAttribute("name", name);
+    element.SetAttribute("associatedLayout", associatedScene);
+    element.SetAttribute("lastChangeTimeStamp", (int)lastChangeTimeStamp);
+    gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 }
 
-void ExternalEvents::SaveToXml(TiXmlElement * element) const
+void ExternalEvents::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    if (!element) return;
-
-    element->SetAttribute("Name", name.c_str());
-    element->SetAttribute("AssociatedScene", associatedScene.c_str());
-    element->SetAttribute("LastChangeTimeStamp", lastChangeTimeStamp);
-
-    TiXmlElement * eventsElem = new TiXmlElement( "Events" );
-    element->LinkEndChild( eventsElem );
-    gd::EventsListSerialization::SaveEventsToXml(events, eventsElem);
+    name = element.GetStringAttribute("name", "", "Name");
+    associatedScene = element.GetStringAttribute("associatedLayout", "", "AssociatedScene");
+    lastChangeTimeStamp = element.GetIntAttribute("lastChangeTimeStamp", 0, "LastChangeTimeStamp");
+    gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events", 0, "Events"));
 }
 
 }

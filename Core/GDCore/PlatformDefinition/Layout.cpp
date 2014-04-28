@@ -16,6 +16,7 @@
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/CommonTools.h"
 
@@ -272,7 +273,9 @@ void Layout::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * eventsElem = new TiXmlElement( "Events" );
     scene->LinkEndChild( eventsElem );
-    gd::EventsListSerialization::SaveEventsToXml(GetEvents(), eventsElem);
+    gd::SerializerElement serializedEvents;
+    gd::EventsListSerialization::SerializeEventsTo(GetEvents(), serializedEvents);
+    gd::Serializer::SerializeToXML(serializedEvents, eventsElem);
 }
 #endif
 
@@ -320,8 +323,11 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
     }
 
     #if defined(GD_IDE_ONLY)
-    if ( elem->FirstChildElement( "Events" ) != NULL )
-        gd::EventsListSerialization::LoadEventsFromXml(project, GetEvents(), elem->FirstChildElement( "Events" ));
+    if ( elem->FirstChildElement( "Events" ) != NULL ) {
+        gd::SerializerElement serializedEvents;
+        gd::Serializer::UnserializeFromXML(serializedEvents, elem->FirstChildElement( "Events" ));
+        gd::EventsListSerialization::UnserializeEventsFrom(project, GetEvents(), serializedEvents);
+    }
     #endif
 
     if ( elem->FirstChildElement( "Variables" ) != NULL )

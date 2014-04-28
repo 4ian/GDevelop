@@ -8,6 +8,7 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
@@ -58,44 +59,18 @@ vector < vector<gd::Instruction>* > StandardEvent::GetAllActionsVectors()
     return allActions;
 }
 
-void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
+void StandardEvent::SerializeTo(SerializerElement & element) const
 {
-    //Les conditions
-    TiXmlElement * conditionsElem = new TiXmlElement( "Conditions" );
-    eventElem->LinkEndChild( conditionsElem );
-    gd::EventsListSerialization::SaveConditions(conditions, conditionsElem);
-
-    //Les actions
-    TiXmlElement * actionsElem = new TiXmlElement( "Actions" );
-    eventElem->LinkEndChild( actionsElem );
-    gd::EventsListSerialization::SaveActions(actions, actionsElem);
-
-    //Sous évènements
-    if ( !GetSubEvents().IsEmpty() )
-    {
-        TiXmlElement * subeventsElem;
-        subeventsElem = new TiXmlElement( "Events" );
-        eventElem->LinkEndChild( subeventsElem );
-
-        gd::EventsListSerialization::SaveEventsToXml(events, subeventsElem);
-    }
+    gd::EventsListSerialization::SaveConditions(conditions, element.AddChild("conditions"));
+    gd::EventsListSerialization::SaveActions(actions, element.AddChild("actions"));
+    gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 }
 
-void StandardEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
+void StandardEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    if ( eventElem == NULL ) return;
-
-    //Conditions
-    if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
-        gd::EventsListSerialization::OpenConditions(project, conditions, eventElem->FirstChildElement( "Conditions" ));
-
-    //Actions
-    if ( eventElem->FirstChildElement( "Actions" ) != NULL )
-        gd::EventsListSerialization::OpenActions(project, actions, eventElem->FirstChildElement( "Actions" ));
-
-    //Subevents
-    if ( eventElem->FirstChildElement( "Events" ) != NULL )
-        gd::EventsListSerialization::LoadEventsFromXml(project, events, eventElem->FirstChildElement( "Events" ));
+    gd::EventsListSerialization::OpenConditions(project, conditions, element.GetChild("conditions", 0, "Conditions"));
+    gd::EventsListSerialization::OpenActions(project, actions, element.GetChild("actions", 0, "Actions"));
+    gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events", 0, "Events"));
 }
 
 /**

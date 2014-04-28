@@ -6,11 +6,10 @@
 #define GDCORE_EVENTS_SERIALIZATION_H
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Events/Instruction.h"
-#include <boost/shared_ptr.hpp>
+#include "GDCore/Serialization/Serializer.h"
 #include <vector>
 namespace gd { class Project; }
 namespace gd { class EventsList; }
-class TiXmlElement;
 
 namespace gd
 {
@@ -27,34 +26,34 @@ public:
      * \param list The event list in which the events must be loaded.
      * \param events The TiXmlElement containing the events
      */
-    static void LoadEventsFromXml(gd::Project & project, gd::EventsList & list, const TiXmlElement * events);
+    static void UnserializeEventsFrom(gd::Project & project, gd::EventsList & list, const SerializerElement & events);
 
     /**
      * \brief Save an events list from a TiXmlElement
      * \param list The event list to be saved.
      * \param events The TiXmlElement in which the events must be saved.
      */
-    static void SaveEventsToXml(const gd::EventsList & list, TiXmlElement * events);
+    static void SerializeEventsTo(const gd::EventsList & list, SerializerElement & events);
 
     /**
      * \brief Load a list of conditions from a TiXmlElement
      */
-    static void OpenConditions(gd::Project & project, std::vector < gd::Instruction > & list, const TiXmlElement * elem);
+    static void OpenConditions(gd::Project & project, std::vector < gd::Instruction > & list, const SerializerElement & elem);
 
     /**
      * \brief Load a list of actions from a TiXmlElement
      */
-    static void OpenActions(gd::Project & project, std::vector < gd::Instruction > & list, const TiXmlElement * elem);
+    static void OpenActions(gd::Project & project, std::vector < gd::Instruction > & list, const SerializerElement & elem);
 
     /**
      * \brief Save a list of conditions to a TiXmlElement
      */
-    static void SaveConditions(const std::vector < gd::Instruction > & list, TiXmlElement * elem);
+    static void SaveConditions(const std::vector < gd::Instruction > & list, SerializerElement & elem);
 
     /**
      * \brief Save a list of actions to a TiXmlElement
      */
-    static void SaveActions(const std::vector < gd::Instruction > & list, TiXmlElement * elem);
+    static void SaveActions(const std::vector < gd::Instruction > & list, SerializerElement & elem);
 
     /**
      * \brief Internal method called when opening events created with GD2.x

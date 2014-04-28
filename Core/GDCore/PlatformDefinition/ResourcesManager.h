@@ -9,7 +9,7 @@
 #include <vector>
 namespace gd { class Project; }
 namespace gd { class ResourceFolder; }
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 class wxPaintDC;
 class wxPanel;
 
@@ -119,14 +119,14 @@ public:
     #endif
 
     /**
-     * \brief Load from an xml element.
+     * \brief Serialize the object
      */
-    virtual void LoadFromXml(const TiXmlElement * elem) {};
+    virtual void SerializeTo(SerializerElement & element) const {};
 
     /**
-     * \brief Save to an xml element.
+     * \brief Unserialize the objectt.
      */
-    virtual void SaveToXml(TiXmlElement * elem) const {};
+    virtual void UnserializeFrom(const SerializerElement & element) {};
 
 private:
     std::string kind;
@@ -201,15 +201,15 @@ public:
     virtual std::vector<std::string> GetAllProperties(gd::Project & project) const;
 
     /**
-     * Save to an xml element.
+     * \brief Serialize the object
      */
-    virtual void SaveToXml(TiXmlElement * elem) const;
+    void SerializeTo(SerializerElement & element) const;
     #endif
 
     /**
-     * Load from an xml element.
+     * \brief Unserialize the objectt.
      */
-    virtual void LoadFromXml(const TiXmlElement * elem);
+    void UnserializeFrom(const SerializerElement & element);
 
     bool smooth; ///< True if smoothing filter is applied
     bool alwaysLoaded; ///< True if the image must always be loaded in memory.
@@ -332,16 +332,17 @@ public:
      */
     std::vector<std::string> GetAllFolderList();
 
+
     /**
-     * \brief Save to an xml element.
+     * \brief Serialize the object
      */
-    void SaveToXml(TiXmlElement * elem) const;
+    void SerializeTo(SerializerElement & element) const;
     #endif
 
     /**
-     * \brief Load from an xml element.
+     * \brief Unserialize the objectt.
      */
-    void LoadFromXml(const TiXmlElement * elem);
+    void UnserializeFrom(const SerializerElement & element);
 
 private:
     void Init(const ResourcesManager & other);
@@ -415,14 +416,14 @@ public:
     virtual bool MoveResourceDownInList(const std::string & name);
 
     /**
-     * Load an xml element.
+     * \brief Serialize the object
      */
-    virtual void LoadFromXml(const TiXmlElement * elem, gd::ResourcesManager & parentManager);
+    void SerializeTo(SerializerElement & element) const;
 
     /**
-     * Save to an xml element.
+     * \brief Unserialize the objectt.
      */
-    virtual void SaveToXml(TiXmlElement * elem) const;
+    void UnserializeFrom(const SerializerElement & element, gd::ResourcesManager & parentManager);
 
 private:
     std::string name;

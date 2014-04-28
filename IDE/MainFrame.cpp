@@ -845,6 +845,12 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
                 if ( projectManager ) projectManager->OnRibbonCloseSelected(uselessEvent);
                 break;
             }
+            case 'Q':
+            {
+                wxCloseEvent uselessEvent;
+                OnClose(uselessEvent);
+                break;
+            }
             /*case 'G':
             {
                 if ( editorsNotebook->GetSelection() == editorsNotebook->GetPageCount()-1 )

@@ -82,9 +82,8 @@ public:
 
     virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
-
-    virtual void SaveToXml(TiXmlElement * eventElem) const;
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
+    virtual void SerializeTo(SerializerElement & element) const;
+    virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
 
 private:
     std::string target; ///< The name of the external events ( or scene ) to be included

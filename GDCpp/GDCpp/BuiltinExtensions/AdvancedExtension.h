@@ -9,17 +9,15 @@
 #include "GDCpp/ExtensionBase.h"
 
 /**
- * \brief Internal builtin extension providing advanced or special features.
+ * \brief Standard extension providing advanced or special features.
  *
  * \ingroup BuiltinExtensions
  */
 class AdvancedExtension : public ExtensionBase
 {
-    public:
-        AdvancedExtension();
-        virtual ~AdvancedExtension() {};
-    protected:
-    private:
+public:
+    AdvancedExtension();
+    virtual ~AdvancedExtension() {};
 };
 
 #endif // ADVANCEDEXTENSION_H

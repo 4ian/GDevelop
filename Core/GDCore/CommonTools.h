@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cmath>
 class wxString;
 
 namespace gd
@@ -98,6 +99,25 @@ std::vector <T> SplitString( const std::string & str, char separator )
     return array;
 }
 
+#ifdef __GNUC__
+/**
+ * Round the number to the nearest integer
+ * \ingroup CommonProgrammingTools
+ */
+inline int Round(float x)
+{
+    return round(x);
+}
+#else
+/**
+ * Round the number to the nearest integer
+ * \ingroup CommonProgrammingTools
+ */
+inline double Round( double d )
+{
+    return ( d >= 0 ? floor(d+0.5) : ceil(d-0.5) );
+}
+#endif
 }
 
 #endif // COMMONTOOLS_H

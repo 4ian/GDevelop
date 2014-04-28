@@ -3,27 +3,19 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
 #include "GDCpp/BuiltinExtensions/AdvancedExtension.h"
 #include "GDCpp/ExtensionBase.h"
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/BuiltinExtensions/AdvancedExtension.cpp"
+#endif
 
 AdvancedExtension::AdvancedExtension()
 {
-    SetExtensionInformation("BuiltinAdvanced",
-                          _("Advanced control features"),
-                          _("Built-in extension providing advanced control features."),
-                          "Florian Rival",
-                          "Freeware");
+    gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    AddCondition("Toujours",
-                 _("Always"),
-                 _("This condition returns always true ( and always false if contrary is checked )."),
-                 _("Always"),
-                 _("Other"),
-                 "res/conditions/toujours24.png",
-                 "res/conditions/toujours.png")
-    .AddCodeOnlyParameter("conditionInverted", "")
-    .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllConditions()["Toujours"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
     #endif
 }
 

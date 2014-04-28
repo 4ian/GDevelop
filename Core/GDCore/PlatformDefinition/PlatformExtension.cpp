@@ -149,6 +149,24 @@ std::vector < std::string > PlatformExtension::GetExtensionObjectsTypes() const
     return objects;
 }
 
+gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const std::string & objectType)
+{
+    if ( objectsInfos.find(objectType) != objectsInfos.end())
+        return objectsInfos.find(objectType)->second;
+
+    std::cout << "Warning: Object type \"" << objectType << "\" not found in an extension!" << std::endl;
+    return badObjectMetadata;
+}
+
+gd::AutomatismMetadata & PlatformExtension::GetAutomatismMetadata(const std::string & automatismType)
+{
+    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
+        return automatismsInfo.find(automatismType)->second;
+
+    std::cout << "Warning: Automatism type \"" << automatismType << "\" not found in an extension!" << std::endl;
+    return badAutomatismMetadata;
+}
+
 #if defined(GD_IDE_ONLY)
 std::vector < std::string > PlatformExtension::GetAutomatismsTypes() const
 {
@@ -254,28 +272,19 @@ std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStr
     return badStrExpressionsMetadata;
 }
 
-gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const std::string & objectType)
-{
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-        return objectsInfos.find(objectType)->second;
-
-    std::cout << "Warning: Object type \"" << objectType << "\" not found in an extension!" << std::endl;
-    return badObjectMetadata;
-}
-
-gd::AutomatismMetadata & PlatformExtension::GetAutomatismMetadata(const std::string & automatismType)
-{
-    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
-        return automatismsInfo.find(automatismType)->second;
-
-    std::cout << "Warning: Automatism type \"" << automatismType << "\" not found in an extension!" << std::endl;
-    return badAutomatismMetadata;
-}
-
 gd::BaseEventSPtr PlatformExtension::CreateEvent(std::string eventType) const
 {
-    if ( eventsInfos.find(eventType) != eventsInfos.end())
+    if ( eventsInfos.find(eventType) != eventsInfos.end()) {
+
+        if (eventsInfos.find(eventType)->second.instance == boost::shared_ptr<BaseEvent>()) {
+            std::cout << "ERROR: Extension " << name << " (" << nameSpace << ")"
+                << " claims to have event of type " << eventType
+                << " but the instance provided is NULL." << std::endl;
+            return boost::shared_ptr<gd::BaseEvent>();
+        }
+
         return eventsInfos.find(eventType)->second.instance->Clone();
+    }
 
     return boost::shared_ptr<gd::BaseEvent>();
 }

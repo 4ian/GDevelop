@@ -5,8 +5,8 @@
  * The <b>Game Develop Core</b> library contains the main concepts, classes and tools that are used by the platforms and the Game Develop IDE.<br>
  * This ensures that the IDE, or any tool based on Game Develop Core, is able to work with projects based on any arbitrary platform.
  *
- * Two official platforms are available for Game Develop: 
- *  - The C++ Platform ( GDCpp ) 
+ * Two official platforms are available for Game Develop:
+ *  - The C++ Platform ( GDCpp )
  *  - The JS Platform ( GDJS )
  *
  * \section aboutdoc About this documentation
@@ -15,8 +15,8 @@
  * If you want to develop an extension for an already existing platform ( like the C++ %Platform or the JS %Platform ), read <b>the documentation
  * of this platform</b>. You can however refer to this documentation when you need to work with something defined by Game Develop Core.
  *
- *  - [Open Game Develop C++ Platform documentation](../../../GDCpp/doc/Documentation/index.html) 
- *  - [Open Game Develop JS Platform documentation](../../../GDJS/docs/Platform Documentation/index.html) 
+ *  - [Open Game Develop C++ Platform documentation](../../../GDCpp/doc/Documentation/index.html)
+ *  - [Open Game Develop JS Platform documentation](../../../GDJS/docs/Platform Documentation/index.html)
  *
  * If you never used Game Develop Core before, take a look at \subpage platformAndExtensionsStructure.
  */
@@ -71,7 +71,7 @@
 /**
  * \defgroup IDEDialogs IDE Dialogs ( Pre-made dialogs to be used to implement a development environment )
  *
- * Pre-made dialogs to be used to implement a development environment 
+ * Pre-made dialogs to be used to implement a development environment
  */
 
 /**
@@ -89,14 +89,19 @@
 
 /**
  * \defgroup CommonProgrammingTools Common programming tools
- * 
+ *
  * Common functions and tools for programming.
  */
 
 /**
  * \defgroup TinyXml Integrated TinyXml library
- * 
+ *
  * See the full documentation of TinyXml [here](http://www.grinninglizard.com/tinyxmldocs/index.html).
+ */
+
+/**
+ * \defgroup SpriteObjectExtension Standard Sprite Object extension
+ * \ingroup BuiltinExtensions
  */
 
 /**

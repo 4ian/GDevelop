@@ -18,17 +18,12 @@ namespace gd {
 	void InitializePlatforms()
 	{
 		//TODO: Not sexy
-		std::cout << "Initializing GDC++ platform" << std::endl;
-		{
-		    boost::shared_ptr<gd::Platform> platform(&CppPlatform::Get());
-		    gd::PlatformManager::Get()->AddPlatform(platform);
-	    }
 		std::cout << "Initializing GDJS platform" << std::endl;
 	    {
 		    boost::shared_ptr<gd::Platform> platform(&JsPlatform::Get());
 		    gd::PlatformManager::Get()->AddPlatform(platform);
 	    }
-		std::cout << "Platforms initialization ended." << std::endl;
+		std::cout << "Platform initialization ended." << std::endl;
 	}
 };
 

@@ -3,16 +3,6 @@
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDCpp/Point.h"
-#include <string>
-
-using namespace std;
-
-Point::Point(const string & name_) :
-name(name_),
-x(0),
-y(0)
-{
-    //ctor
-}
-
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/BuiltinExtensions/SpriteExtension/Point.cpp"
+#endif

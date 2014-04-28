@@ -564,16 +564,16 @@ extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
  */
 
 /**
- * \defgroup BuiltinExtensions Built-in Game Develop extensions
+ * \defgroup BuiltinExtensions Standard Game Develop extensions
  */
 
 /**
- * \defgroup SpriteObjectExtension Built-in Sprite Object extension
+ * \defgroup SpriteObjectExtension Standard Sprite Object extension
  * \ingroup BuiltinExtensions
  */
 
 /**
- * \defgroup FileExtension Built-in File extension
+ * \defgroup FileExtension Standard File extension
  * \ingroup BuiltinExtensions
  */
 

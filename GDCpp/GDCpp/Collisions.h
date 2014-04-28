@@ -4,19 +4,16 @@
  */
 #ifndef COLLISIONS_H_INCLUDED
 #define COLLISIONS_H_INCLUDED
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include "GDCpp/SpriteObject.h"
-#include <cmath>
+#include "GDCpp/RuntimeSpriteObject.h"
 
 /**
  * \brief Pixel perfect collision test between two sprite objects
- * \ingroup SpriteObjectExtension
  * Alpha transparency, rotation and zooms are taken into account.
  *
  * \return true if the sprite are overlapping
+ *
+ * \ingroup GameEngine
+ * \ingroup SpriteObjectExtension
  */
 bool GD_API CheckCollision( const RuntimeSpriteObject* const objet1, const RuntimeSpriteObject* const objet2);
 

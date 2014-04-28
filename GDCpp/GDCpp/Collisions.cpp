@@ -2,14 +2,10 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
 #include <SFML/Graphics.hpp>
-#include "GDCpp/ImageManager.h"
-#include "GDCpp/Sprite.h"
-#include "GDCpp/SpriteObject.h"
+#include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
+#include "GDCore/PlatformDefinition/ImageManager.h"
+#include "GDCpp/RuntimeSpriteObject.h"
 #include "GDCpp/Collisions.h"
 
 bool PixelPerfectTest( const sf::Sprite& object1, const sf::Sprite& object2, sf::Uint8 AlphaLimit, const sf::Image & object1CollisionMask,  const sf::Image & object2CollisionMask )

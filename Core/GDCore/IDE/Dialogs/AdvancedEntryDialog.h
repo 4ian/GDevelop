@@ -21,49 +21,53 @@ namespace gd { class Layout; }
 namespace gd
 {
 
+/**
+ * \brief Dialog used to enter a math or string expression, with a button to open
+ * a full editor.
+ *
+ * \ingroup IDEDialogs
+ */
 class AdvancedTextEntryDialog: public wxDialog
 {
-	public:
-        enum MoreButtonType { None,  MathExpression, TextExpression };
+public:
+    enum MoreButtonType { None,  MathExpression, TextExpression };
 
-		AdvancedTextEntryDialog(wxWindow* parent, std::string caption, std::string description, std::string defaultText, MoreButtonType moreButtonType = None, gd::Project * project_ = NULL, gd::Layout * layout_ = NULL);
-		virtual ~AdvancedTextEntryDialog();
+	AdvancedTextEntryDialog(wxWindow* parent, std::string caption, std::string description, std::string defaultText, MoreButtonType moreButtonType = None, gd::Project * project_ = NULL, gd::Layout * layout_ = NULL);
+	virtual ~AdvancedTextEntryDialog();
 
-		//(*Declarations(AdvancedTextEntryDialog)
-		wxStaticText* descriptionTxt;
-		wxTextCtrl* textEdit;
-		wxButton* cancelBt;
-		wxButton* moreBt;
-		wxStaticLine* StaticLine1;
-		wxButton* okBt;
-		//*)
+	//(*Declarations(AdvancedTextEntryDialog)
+	wxStaticText* descriptionTxt;
+	wxTextCtrl* textEdit;
+	wxButton* cancelBt;
+	wxButton* moreBt;
+	wxStaticLine* StaticLine1;
+	wxButton* okBt;
+	//*)
 
-		std::string text;
+	std::string text;
 
-	protected:
+protected:
+	//(*Identifiers(AdvancedTextEntryDialog)
+	static const long ID_STATICTEXT1;
+	static const long ID_TEXTCTRL1;
+	static const long ID_STATICLINE1;
+	static const long ID_BUTTON1;
+	static const long ID_BUTTON2;
+	static const long ID_BUTTON3;
+	//*)
 
-		//(*Identifiers(AdvancedTextEntryDialog)
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICLINE1;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		static const long ID_BUTTON3;
-		//*)
+private:
+	//(*Handlers(AdvancedTextEntryDialog)
+	void OnmoreBtClick(wxCommandEvent& event);
+	void OnokBtClick(wxCommandEvent& event);
+	void OncancelBtClick(wxCommandEvent& event);
+	//*)
 
-	private:
+	MoreButtonType moreButtonType;
+	gd::Project * project;
+	gd::Layout * layout;
 
-		//(*Handlers(AdvancedTextEntryDialog)
-		void OnmoreBtClick(wxCommandEvent& event);
-		void OnokBtClick(wxCommandEvent& event);
-		void OncancelBtClick(wxCommandEvent& event);
-		//*)
-
-		MoreButtonType moreButtonType;
-		gd::Project * project;
-		gd::Layout * layout;
-
-		DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 }

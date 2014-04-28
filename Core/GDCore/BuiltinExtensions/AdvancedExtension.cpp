@@ -1,0 +1,32 @@
+/** \file
+ *  Game Develop
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+ */
+#include "AllBuiltinExtensions.h"
+#include "GDCore/Tools/Localization.h"
+
+using namespace std;
+namespace gd
+{
+
+void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(gd::PlatformExtension & extension)
+{
+    extension.SetExtensionInformation("BuiltinAdvanced",
+                          _("Advanced control features"),
+                          _("Built-in extension providing advanced control features."),
+                          "Florian Rival",
+                          "Freeware");
+
+    #if defined(GD_IDE_ONLY)
+    extension.AddCondition("Toujours",
+                 _("Always"),
+                 _("This condition returns always true ( and always false if contrary is checked )."),
+                 _("Always"),
+                 _("Other"),
+                 "res/conditions/toujours24.png",
+                 "res/conditions/toujours.png")
+        .AddCodeOnlyParameter("conditionInverted", "");
+    #endif
+}
+
+}

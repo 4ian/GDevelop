@@ -1,10 +1,9 @@
 #ifndef COMMONINSTRUCTIONSEXTENSION_H
 #define COMMONINSTRUCTIONSEXTENSION_H
-
 #include "GDCpp/ExtensionBase.h"
 
 /**
- * \brief Internal builtin-extension providing common events and conditions/actions.
+ * \brief Standard extension providing common events and conditions/actions.
  *
  * \ingroup BuiltinExtensions
  */
@@ -18,4 +17,3 @@ class CommonInstructionsExtension : public ExtensionBase
 };
 
 #endif // COMMONINSTRUCTIONSEXTENSION_H
-

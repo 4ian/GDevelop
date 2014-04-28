@@ -40,7 +40,7 @@
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
-#include "GDCpp/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

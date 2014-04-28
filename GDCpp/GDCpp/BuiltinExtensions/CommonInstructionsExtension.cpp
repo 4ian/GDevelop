@@ -5,6 +5,7 @@
 
 #include <string>
 #include <set>
+#include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -29,16 +30,15 @@
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCpp/ExtensionBase.h"
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/BuiltinExtensions/CommonInstructionsExtension.cpp"
+#endif
 
 using namespace std;
 
 CommonInstructionsExtension::CommonInstructionsExtension()
 {
-    SetExtensionInformation("BuiltinCommonInstructions",
-                          _("Standard events"),
-                          _("Built-in extension providing standard events."),
-                          "Florian Rival",
-                          "Freeware");
+    gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(*this);
 
     #if defined(GD_IDE_ONLY)
     {
@@ -115,15 +115,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-        AddCondition("Or",
-                   _("Or"),
-                   _("Return true if one of the sub conditions is true"),
-                   _("If one of these conditions is true:"),
-                   _("Advanced"),
-                   "res/conditions/or24.png",
-                   "res/conditions/or.png")
-            .SetCanHaveSubInstructions()
-            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+        GetAllConditions()["BuiltinCommonInstructions::Or"].codeExtraInformation
+            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
@@ -146,15 +139,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-        AddCondition("And",
-                   _("And"),
-                   _("Return true if all sub conditions are true"),
-                   _("If all of these conditions are true:"),
-                   _("Advanced"),
-                   "res/conditions/and24.png",
-                   "res/conditions/and.png")
-            .SetCanHaveSubInstructions()
-            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+        GetAllConditions()["BuiltinCommonInstructions::And"].codeExtraInformation
+            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
@@ -196,14 +182,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-        AddCondition("Not",
-                   _("Not"),
-                   _("Return the contrary of the result of the sub conditions"),
-                   _("Invert the logical result of these conditions:"),
-                   _("Advanced"),
-                   "res/conditions/not24.png",
-                   "res/conditions/not.png")
-            .SetCanHaveSubInstructions()
+        GetAllConditions()["BuiltinCommonInstructions::Not"]
             .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
@@ -218,14 +197,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
-        AddCondition("Once",
-                   _("Trigger once while true"),
-                   _("Run actions only once, for each time the conditions have been met."),
-                   _("Trigger once"),
-                   _("Advanced"),
-                   "res/conditions/once24.png",
-                   "res/conditions/once.png")
-            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+        GetAllConditions()["BuiltinCommonInstructions::Once"].codeExtraInformation
+            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
 
@@ -263,13 +236,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        AddEvent("Standard",
-                  _("Standard event"),
-                  _("Standard event: Actions are run if conditions are fulfilled."),
-                  "",
-                  "res/eventaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+        GetAllEvents()["BuiltinCommonInstructions::Standard"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -319,22 +287,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        AddEvent("Link",
-                  _("Link"),
-                  _("Link to some external events"),
-                  "",
-                  "res/lienaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::LinkEvent))
+        GetAllEvents()["BuiltinCommonInstructions::Link"]
                   .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
-    }
-
-    {
-        AddEvent("Comment",
-                  _("Comment"),
-                  _("Event displaying a text in the events editor"),
-                  "",
-                  "res/comment.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::CommentEvent));
     }
 
     {
@@ -388,13 +342,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        AddEvent("While",
-                  _("While"),
-                  _("The event is repeated while the conditions are true"),
-                  "",
-                  "res/while.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::WhileEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+        GetAllEvents()["BuiltinCommonInstructions::While"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -452,13 +401,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        AddEvent("Repeat",
-                  _("Repeat"),
-                  _("Event repeated a number of times"),
-                  "",
-                  "res/repeat.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+        GetAllEvents()["BuiltinCommonInstructions::Repeat"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -589,13 +533,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        AddEvent("ForEach",
-                  _("For each object"),
-                  _("Repeat the event for each specified object."),
-                  "",
-                  "res/foreach.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+        GetAllEvents()["BuiltinCommonInstructions::ForEach"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {

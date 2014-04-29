@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
 
@@ -30,52 +30,49 @@ void ObjectGroup::RemoveObject(const string & name)
     return;
 }
 
-void ObjectGroup::LoadFromXml(vector < gd::ObjectGroup > & list, const TiXmlElement * elem)
+void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, SerializerElement & element)
 {
-    const TiXmlElement * elemScene = elem->FirstChildElement("Groupe");
-
-    //Passage en revue des positions initiales
-    while ( elemScene )
+    element.ConsiderAsArrayOf("group");
+    for ( unsigned int j = 0;j < list.size();j++ )
     {
-        gd::ObjectGroup objectGroup;
+        SerializerElement & groupElement = element.AddChild("group");
 
-        if ( elemScene->Attribute( "nom" ) != NULL ) { objectGroup.SetName(elemScene->Attribute( "nom" ));}
+        groupElement.SetAttribute("name", list[j].GetName());
 
-        const TiXmlElement * objet = elemScene->FirstChildElement( "Objet" );
-        while ( objet )
-        {
-            string objetName;
-            if ( objet->Attribute( "nom" ) != NULL ) { objetName = objet->Attribute( "nom");}
-
-            objectGroup.AddObject(objetName);
-            objet = objet->NextSiblingElement();
-        }
-
-        list.push_back( objectGroup );
-
-        elemScene = elemScene->NextSiblingElement();
+        SerializerElement & objectsElement = groupElement.AddChild("objects");
+        objectsElement.ConsiderAsArrayOf("object");
+        vector < string > allObjects = list[j].GetAllObjectsNames();
+        for ( unsigned int k = 0;k < allObjects.size();k++ )
+            objectsElement.AddChild("object").SetAttribute( "name", allObjects[k] );
     }
 }
 
-void ObjectGroup::SaveToXml(const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets)
+void ObjectGroup::UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element)
 {
-    for ( unsigned int j = 0;j < list.size();j++ )
+    element.ConsiderAsArrayOf("group", "Groupe");
+    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
     {
-        TiXmlElement * grp;
+        SerializerElement & groupElement = element.GetChild(i);
+        gd::ObjectGroup objectGroup;
 
-        grp = new TiXmlElement( "Groupe" );
-        grpsobjets->LinkEndChild( grp );
-        grp->SetAttribute( "nom", list.at( j ).GetName().c_str() );
+        objectGroup.SetName(groupElement.GetStringAttribute("name", "", "nom"));
 
-        vector < string > allObjects = list.at(j).GetAllObjectsNames();
-        for ( unsigned int k = 0;k < allObjects.size();k++ )
+        //Compatibility with GD <= 3.3
+        if ( groupElement.HasChild("Objet") )
         {
-            TiXmlElement * objet;
-
-            objet = new TiXmlElement( "Objet" );
-            grp->LinkEndChild( objet );
-            objet->SetAttribute( "nom", allObjects.at(k).c_str() );
+            for (unsigned int j = 0; j < groupElement.GetChildrenCount("Objet"); ++j)
+                objectGroup.AddObject(groupElement.GetChild("Objet", j).GetStringAttribute("nom"));
         }
+        //End of compatibility code
+        else
+        {
+            SerializerElement & objectsElement = groupElement.GetChild("objects");
+            objectsElement.ConsiderAsArrayOf("object");
+            for (unsigned int j = 0; j < objectsElement.GetChildrenCount(); ++j)
+                objectGroup.AddObject(objectsElement.GetChild(j).GetStringAttribute("name"));
+        }
+
+        list.push_back( objectGroup );
     }
 }
 

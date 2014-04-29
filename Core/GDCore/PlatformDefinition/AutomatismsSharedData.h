@@ -9,7 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 class AutomatismsRuntimeSharedData;
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd
 {
@@ -52,15 +52,15 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Save the object to XML
+     * \brief Serialize automatisms shared data.
      */
-    virtual void SaveToXml(TiXmlElement * eventElem) const {}
+    virtual void SerializeTo(SerializerElement & element) const {};
     #endif
 
     /**
-     * \brief Load the object from XML
+     * \brief Unserialize the automatisms shared data.
      */
-    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+    virtual void UnserializeFrom(const SerializerElement & element) {};
 
     //TODO : GD C++ Platform specific code :
     /**

@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 namespace gd { class Camera; }
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd
 {
@@ -81,15 +81,15 @@ public:
     void EditLayer();
 
     /**
-     * \brief Save to xml
+     * \brief Serialize layer.
      */
-    void SaveToXml(TiXmlElement * element) const;
+    virtual void SerializeTo(SerializerElement & element) const;
     #endif
 
     /**
-     * \brief Load from xml
+     * \brief Unserialize the layer.
      */
-    void LoadFromXml(const TiXmlElement * element);
+    virtual void UnserializeFrom(const SerializerElement & element);
 
 private:
 

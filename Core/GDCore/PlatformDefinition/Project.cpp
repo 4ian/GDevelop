@@ -550,8 +550,11 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     #if defined(GD_IDE_ONLY)
     //Global object groups
     elem = rootElement->FirstChildElement( "ObjectGroups" );
-    if ( elem )
-        gd::ObjectGroup::LoadFromXml(GetObjectGroups(), elem);
+    if ( elem ) {
+        gd::SerializerElement serializedObjectsGroups;
+        gd::Serializer::UnserializeFromXML(serializedObjectsGroups, elem);
+        ObjectGroup::UnserializeFrom(GetObjectGroups(), serializedObjectsGroups);
+    }
     #endif
 
     //Global variables
@@ -884,7 +887,9 @@ void Project::SaveToXml(TiXmlElement * root) const
     //Global object groups
     TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
     root->LinkEndChild( globalObjectGroups );
-    gd::ObjectGroup::SaveToXml(GetObjectGroups(), globalObjectGroups);
+    gd::SerializerElement serializedObjectsGroups;
+    ObjectGroup::SerializeTo(GetObjectGroups(), serializedObjectsGroups);
+    gd::Serializer::SerializeToXML(serializedObjectsGroups, globalObjectGroups);
 
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );

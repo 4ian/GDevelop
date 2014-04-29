@@ -4,7 +4,7 @@
  */
 #include "GDCore/PlatformDefinition/Layer.h"
 #include "GDCore/IDE/Dialogs/EditLayerDialog.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
 
 namespace gd
@@ -30,70 +30,81 @@ void Layer::SetCameraCount(unsigned int n)
 }
 
 #if defined(GD_IDE_ONLY)
-void Layer::SaveToXml(TiXmlElement * element) const
+void Layer::SerializeTo(SerializerElement & element) const
 {
-    element->SetAttribute("Name", GetName().c_str());
-    if ( GetVisibility() )
-        element->SetAttribute("Visibility", "true");
-    else
-        element->SetAttribute("Visibility", "false");
+    element.SetAttribute("name", GetName());
+    element.SetAttribute("visibility", GetVisibility());
 
+    SerializerElement & camerasElement = element.AddChild("cameras");
+    camerasElement.ConsiderAsArrayOf("camera");
     for (unsigned int c = 0;c<GetCameraCount();++c)
     {
-        TiXmlElement * camera = new TiXmlElement( "Camera" );
-        element->LinkEndChild( camera );
+        SerializerElement & cameraElement = camerasElement.AddChild("camera");
+        cameraElement.SetAttribute("DefaultSize", GetCamera(c).UseDefaultSize());
+        cameraElement.SetAttribute("Width", GetCamera(c).GetWidth());
+        cameraElement.SetAttribute("Height", GetCamera(c).GetHeight());
 
-        camera->SetAttribute("DefaultSize", GetCamera(c).UseDefaultSize() ? "true" : "false");
-
-        camera->SetDoubleAttribute("Width", GetCamera(c).GetWidth());
-        camera->SetDoubleAttribute("Height", GetCamera(c).GetHeight());
-
-        camera->SetAttribute("DefaultViewport", GetCamera(c).UseDefaultViewport() ? "true" : "false");
-
-        camera->SetDoubleAttribute("ViewportLeft", GetCamera(c).GetViewportX1());
-        camera->SetDoubleAttribute("ViewportTop", GetCamera(c).GetViewportY1());
-        camera->SetDoubleAttribute("ViewportRight", GetCamera(c).GetViewportX2());
-        camera->SetDoubleAttribute("ViewportBottom", GetCamera(c).GetViewportY2());
+        cameraElement.SetAttribute("DefaultViewport", GetCamera(c).UseDefaultViewport());
+        cameraElement.SetAttribute("ViewportLeft", GetCamera(c).GetViewportX1());
+        cameraElement.SetAttribute("ViewportTop", GetCamera(c).GetViewportY1());
+        cameraElement.SetAttribute("ViewportRight", GetCamera(c).GetViewportX2());
+        cameraElement.SetAttribute("ViewportBottom", GetCamera(c).GetViewportY2());
     }
+
 }
 #endif
 
-void Layer::LoadFromXml(const TiXmlElement * element)
+/**
+ * \brief Unserialize the layer.
+ */
+void Layer::UnserializeFrom(const SerializerElement & element)
 {
-    if ( element->Attribute( "Name" ) != NULL ) SetName(element->Attribute( "Name" ));
-    SetVisibility( !(!element->Attribute( "Visibility" ) || std::string(element->Attribute( "Visibility" )) == "false") );
+    SetName(element.GetStringAttribute("name", "", "Name"));
+    SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
 
-    const TiXmlElement * elemCamera = element->FirstChildElement("Camera");
-    if ( !elemCamera ) SetCameraCount(1);
-
-    while (elemCamera)
+    //Compatibility with GD <= 3.3
+    if (element.HasChild("Camera"))
     {
-        SetCameraCount(GetCameraCount()+1);
-
-        if ( elemCamera->Attribute("DefaultSize") && elemCamera->Attribute("Width") && elemCamera->Attribute("Height") )
+        for (unsigned int i = 0; i < element.GetChildrenCount("Camera"); ++i)
         {
-            std::string defaultSize = elemCamera->Attribute("DefaultSize");
-            GetCamera(GetCameraCount()-1).SetUseDefaultSize(!(defaultSize == "false"));
-            GetCamera(GetCameraCount()-1).SetSize(ToFloat(elemCamera->Attribute("Width")), ToFloat(elemCamera->Attribute("Height")));
-        }
+            const SerializerElement & cameraElement = element.GetChild("Camera", i);
+            SetCameraCount(GetCameraCount()+1);
+            Camera & camera = GetCamera(GetCameraCount()-1);
 
-        if ( elemCamera->Attribute("DefaultViewport") && elemCamera->Attribute("ViewportLeft") && elemCamera->Attribute("ViewportTop") &&
-             elemCamera->Attribute("ViewportRight") && elemCamera->Attribute("ViewportBottom") )
+            camera.SetUseDefaultSize(cameraElement.GetBoolAttribute("DefaultSize", true));
+            camera.SetSize(cameraElement.GetDoubleAttribute("Width"), cameraElement.GetDoubleAttribute("Height"));
+
+            camera.SetUseDefaultViewport(cameraElement.GetBoolAttribute("DefaultViewport", true));
+            camera.SetViewport(cameraElement.GetDoubleAttribute("ViewportLeft"),
+                cameraElement.GetDoubleAttribute("ViewportTop"),
+                cameraElement.GetDoubleAttribute("ViewportRight"),
+                cameraElement.GetDoubleAttribute("ViewportBottom")
+                ); // (sf::Rect used Right and Bottom instead of Width and Height before)
+        }
+    }
+    //End of compatibility code
+    else
+    {
+        SerializerElement & camerasElement = element.GetChild("cameras");
+        camerasElement.ConsiderAsArrayOf("camera");
+        for (unsigned int i = 0; i < camerasElement.GetChildrenCount(); ++i)
         {
-            std::string defaultViewport = elemCamera->Attribute("DefaultViewport");
-            GetCamera(GetCameraCount()-1).SetUseDefaultViewport(!(defaultViewport == "false"));
-            GetCamera(GetCameraCount()-1).SetViewport(ToFloat(elemCamera->Attribute("ViewportLeft")),
-                                                                  ToFloat(elemCamera->Attribute("ViewportTop")),
-                                                                  ToFloat(elemCamera->Attribute("ViewportRight")),
-                                                                  ToFloat(elemCamera->Attribute("ViewportBottom"))
-                                                                  ); // (sf::Rect used Right and Bottom instead of Width and Height before. )
-        }
+            const SerializerElement & cameraElement = camerasElement.GetChild(i);
 
-        elemCamera = elemCamera->NextSiblingElement();
+            SetCameraCount(GetCameraCount()+1);
+            Camera & camera = GetCamera(GetCameraCount()-1);
+
+            camera.SetUseDefaultSize(cameraElement.GetBoolAttribute("defaultSize", true));
+            camera.SetSize(cameraElement.GetDoubleAttribute("width"), cameraElement.GetDoubleAttribute("height"));
+
+            camera.SetUseDefaultViewport(cameraElement.GetBoolAttribute("defaultViewport", true));
+            camera.SetViewport(cameraElement.GetDoubleAttribute("viewportLeft"),
+                cameraElement.GetDoubleAttribute("viewportTop"),
+                cameraElement.GetDoubleAttribute("viewportRight"),
+                cameraElement.GetDoubleAttribute("viewportBottom")); // (sf::Rect used Right and Bottom instead of Width and Height before)
+        }
     }
 }
-
-
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 /**
@@ -107,14 +118,14 @@ void Layer::EditLayer()
 #endif
 
 Camera::Camera() :
-defaultSize(true),
-defaultViewport(true),
-x1(0),
-y1(0),
-x2(1),
-y2(1),
-width(0),
-height(0)
+    defaultSize(true),
+    defaultViewport(true),
+    x1(0),
+    y1(0),
+    x2(1),
+    y2(1),
+    width(0),
+    height(0)
 {
 }
 

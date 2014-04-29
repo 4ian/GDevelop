@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 #include <utility>
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd
 {
@@ -59,8 +59,15 @@ public:
         return memberObjects;
     }
 
-    static void LoadFromXml(std::vector < gd::ObjectGroup > & list, const TiXmlElement * elem);
-    static void SaveToXml(const std::vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets);
+    /**
+     * \brief Serialize instances container.
+     */
+    static void SerializeTo(const std::vector < gd::ObjectGroup > & list, SerializerElement & element);
+
+    /**
+     * \brief Unserialize the instances container.
+     */
+    static void UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element);
 
 private:
     std::vector < std::string > memberObjects;

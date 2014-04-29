@@ -227,7 +227,7 @@ void InitialInstancesContainer::SerializeTo(SerializerElement & element) const
         }
 
         SerializerElement & stringPropElement = instanceElement.AddChild("stringProperties");
-        floatPropElement.ConsiderAsArrayOf("property");
+        stringPropElement.ConsiderAsArrayOf("property");
         for(std::map<std::string, std::string>::const_iterator stringInfo = (*it).stringInfos.begin(); stringInfo != (*it).stringInfos.end(); ++stringInfo)
         {
             stringPropElement.AddChild("property")

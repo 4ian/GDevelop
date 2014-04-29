@@ -230,12 +230,17 @@ void Layout::SaveToXml(TiXmlElement * scene) const
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     TiXmlElement * settings = new TiXmlElement( "UISettings" );
     scene->LinkEndChild( settings );
-    GetAssociatedLayoutEditorCanvasOptions().SaveToXml(settings);
+
+    gd::SerializerElement serializedSettings;
+    GetAssociatedLayoutEditorCanvasOptions().SerializeTo(serializedSettings);
+    gd::Serializer::SerializeToXML(serializedSettings, settings);
     #endif
 
     TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
     scene->LinkEndChild( grpsobjets );
-    ObjectGroup::SaveToXml(GetObjectGroups(), grpsobjets);
+    gd::SerializerElement serializedObjectsGroups;
+    ObjectGroup::SerializeTo(GetObjectGroups(), serializedObjectsGroups);
+    gd::Serializer::SerializeToXML(serializedObjectsGroups, grpsobjets);
 
     TiXmlElement * objets = new TiXmlElement( "Objets" );
     scene->LinkEndChild( objets );
@@ -247,7 +252,10 @@ void Layout::SaveToXml(TiXmlElement * scene) const
     {
         TiXmlElement * layer = new TiXmlElement( "Layer" );
         initialLayersElem->LinkEndChild( layer );
-        GetLayer(j).SaveToXml(layer);
+
+        gd::SerializerElement serializedVariables;
+        GetLayer(j).SerializeTo(serializedVariables);
+        gd::Serializer::SerializeToXML(serializedVariables, layer);
     }
 
     TiXmlElement * variables = new TiXmlElement( "Variables" );
@@ -266,7 +274,9 @@ void Layout::SaveToXml(TiXmlElement * scene) const
 
         autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
         autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
-        it->second->SaveToXml(autoSharedDatas);
+        gd::SerializerElement serializedData;
+        it->second->SerializeTo(serializedData);
+        gd::Serializer::SerializeToXML(serializedData, autoSharedDatas);
     }
 
     TiXmlElement * positions = new TiXmlElement( "Positions" );
@@ -297,12 +307,17 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
     if ( elem->Attribute( "disableInputWhenNotFocused" ) != NULL ) { disableInputWhenNotFocused = ToString(elem->Attribute( "disableInputWhenNotFocused" )) == "true"; }
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    associatedSettings.LoadFromXml(elem->FirstChildElement( "UISettings" ));
+    gd::SerializerElement serializedSettings;
+    gd::Serializer::UnserializeFromXML(serializedSettings, elem->FirstChildElement( "UISettings" ));
+    associatedSettings.UnserializeFrom(serializedSettings);
     #endif
 
     #if defined(GD_IDE_ONLY)
-    if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
-        ObjectGroup::LoadFromXml(GetObjectGroups(), elem->FirstChildElement( "GroupesObjets" ));
+    if ( elem->FirstChildElement( "GroupesObjets" ) != NULL ) {
+        gd::SerializerElement serializedObjectsGroups;
+        gd::Serializer::UnserializeFromXML(serializedObjectsGroups, elem->FirstChildElement( "GroupesObjets" ));
+        ObjectGroup::UnserializeFrom(GetObjectGroups(), serializedObjectsGroups);
+    }
     #endif
 
     if ( elem->FirstChildElement( "Objets" ) != NULL )
@@ -321,7 +336,9 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
         while ( elemLayer )
         {
             gd::Layer layer;
-            layer.LoadFromXml(elemLayer);
+            gd::SerializerElement serializedLayer;
+            gd::Serializer::UnserializeFromXML(serializedLayer, elemLayer);
+            layer.UnserializeFrom(serializedLayer);
 
             initialLayers.push_back(layer);
             elemLayer = elemLayer->NextSiblingElement();
@@ -351,7 +368,10 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
             if ( sharedDatas != boost::shared_ptr<gd::AutomatismsSharedData>() )
             {
                 sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
-                sharedDatas->LoadFromXml(elemSharedDatas);
+                gd::SerializerElement serializedData;
+                gd::Serializer::UnserializeFromXML(serializedData, elemSharedDatas);
+                sharedDatas->UnserializeFrom(serializedData);
+
                 automatismsInitialSharedDatas[sharedDatas->GetName()] = sharedDatas;
             }
 

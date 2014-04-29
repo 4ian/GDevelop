@@ -6,7 +6,7 @@
 #ifndef SCENECANVASSETTINGS_H
 #define SCENECANVASSETTINGS_H
 #include <string>
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd
 {
@@ -22,8 +22,20 @@ public:
     LayoutEditorCanvasOptions();
     virtual ~LayoutEditorCanvasOptions() {};
 
-    void LoadFromXml(const TiXmlElement * element);
-    void SaveToXml(TiXmlElement * element) const;
+    /** \name Serialization
+     */
+    ///@{
+
+    /**
+     * \brief Serialize instances container.
+     */
+    void SerializeTo(SerializerElement & element) const;
+
+    /**
+     * \brief Unserialize the instances container.
+     */
+    void UnserializeFrom(const SerializerElement & element);
+    ///@}
 
     bool grid; ///< True if grid activated in editor
     bool snap; ///< True if snap to grid activated in editor

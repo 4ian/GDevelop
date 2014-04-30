@@ -257,7 +257,7 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 
     gd::SerializerElement serializedEvents;
     gd::EventsListSerialization::SerializeEventsTo(events, serializedEvents);
-    gd::Serializer::SerializeToXML(serializedEvents, elemEvents);
+    gd::Serializer::ToXML(serializedEvents, elemEvents);
 
     wxFileDialog dialog( this, _( "Choose where save the template" ), "Templates", "", "Template (*.mgd)|*.mgd", wxFD_SAVE );
 

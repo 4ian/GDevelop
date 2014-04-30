@@ -6,7 +6,7 @@
 #define GDCORE_DIRECTION_H
 #include <vector>
 namespace gd { class Sprite; }
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 
 namespace gd {
 
@@ -92,9 +92,9 @@ public:
      */
     void SwapSprites(unsigned int firstSpriteIndex, unsigned int secondSpriteIndex);
 
-    void LoadFromXml(const TiXmlElement * element);
+    void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
-    void SaveToXml(TiXmlElement * element) const;
+    void SerializeTo(gd::SerializerElement & element) const;
     #endif
 
 private:

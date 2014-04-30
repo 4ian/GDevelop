@@ -534,92 +534,6 @@ private:
 
 #endif
 
-void Project::LoadFromXml(const TiXmlElement * rootElement)
-{
-    if ( rootElement == NULL ) return;
-
-    gd::SerializerElement rootSElement;
-    gd::Serializer::UnserializeFromXML(rootSElement, rootElement);
-    UnserializeFrom(rootSElement);
-
-    //Global objects
-    const TiXmlElement * elem = rootElement->FirstChildElement( "Objects" );
-    if ( elem )
-        LoadObjectsFromXml(*this, elem);
-
-    #if defined(GD_IDE_ONLY)
-    //Global object groups
-    elem = rootElement->FirstChildElement( "ObjectGroups" );
-    if ( elem ) {
-        gd::SerializerElement serializedObjectsGroups;
-        gd::Serializer::UnserializeFromXML(serializedObjectsGroups, elem);
-        ObjectGroup::UnserializeFrom(GetObjectGroups(), serializedObjectsGroups);
-    }
-    #endif
-
-    //Global variables
-    elem = rootElement->FirstChildElement( "Variables" );
-    if ( elem ) GetVariables().LoadFromXml(elem);
-
-    //Scenes
-    if ( rootElement->FirstChildElement( "Scenes" ) ) {
-        firstLayout = rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") ?
-            rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") : "";
-
-        elem = rootElement->FirstChildElement( "Scenes" ) ? rootElement->FirstChildElement( "Scenes" )->FirstChildElement() : NULL;
-        while ( elem )
-        {
-            std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
-
-            //Add a new layout
-            boost::shared_ptr<gd::Layout> layout = boost::shared_ptr<gd::Layout>(new gd::Layout);
-            if ( layout )
-            {
-                scenes.push_back(layout);
-                scenes.back()->SetName(layoutName);
-                scenes.back()->LoadFromXml(*this, elem);
-
-                //Compatibility code with GD 2.x
-                #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-                if ( GDMajorVersion <= 2 )
-                {
-                    SpriteObjectsPositionUpdater updater(*this, *scenes.back());
-                    gd::InitialInstancesContainer & instances = scenes.back()->GetInitialInstances();
-                    instances.IterateOverInstances(updater);
-
-                }
-                #endif
-                //End of compatibility code
-            }
-            else
-                std::cout << "ERROR : Unable to create a layout when loading a project!" << std::endl;
-
-            elem = elem->NextSiblingElement();
-        }
-    }
-
-    #if defined(GD_IDE_ONLY)
-
-    elem = rootElement->FirstChildElement( "ExternalSourceFiles" );
-    if ( elem )
-    {
-        const TiXmlElement * sourceFileElem = elem->FirstChildElement( "SourceFile" );
-        while (sourceFileElem)
-        {
-            boost::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
-            newSourceFile->LoadFromXml(sourceFileElem);
-            externalSourceFiles.push_back(newSourceFile);
-
-            sourceFileElem = sourceFileElem->NextSiblingElement();
-        }
-    }
-    #endif
-
-    #if defined(GD_IDE_ONLY)
-    dirty = false;
-    #endif
-}
-
 void Project::UnserializeFrom(const SerializerElement & element)
 {
     //Checking version
@@ -742,7 +656,33 @@ void Project::UnserializeFrom(const SerializerElement & element)
     }
     #endif
 
+    #if defined(GD_IDE_ONLY)
+    ObjectGroup::UnserializeFrom(GetObjectGroups(), element.GetChild("objectsGroups", 0, "ObjectGroups"));
+    #endif
     resourcesManager.UnserializeFrom(element.GetChild( "resources", 0, "Resources" ));
+    UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+    GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
+
+    const SerializerElement & layoutsElement = element.GetChild("layouts", 0, "Scenes");
+    layoutsElement.ConsiderAsArrayOf("layout", "Scene");
+    for(unsigned int i = 0;i<layoutsElement.GetChildrenCount();++i)
+    {
+        const SerializerElement & layoutElement = layoutsElement.GetChild(i);
+
+        gd::Layout & layout = InsertNewLayout(layoutElement.GetStringAttribute("name", "", "nom"), -1);
+        layout.UnserializeFrom(*this, layoutElement);
+
+        //Compatibility code with GD 2.x
+        #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+        if ( GDMajorVersion <= 2 )
+        {
+            SpriteObjectsPositionUpdater updater(*this, layout);
+            gd::InitialInstancesContainer & instances = layout.GetInitialInstances();
+            instances.IterateOverInstances(updater);
+        }
+        #endif
+        //End of compatibility code
+    }
 
     #if defined(GD_IDE_ONLY)
     const SerializerElement & externalEventsElement = element.GetChild("externalEvents", 0, "ExternalEvents");
@@ -750,9 +690,9 @@ void Project::UnserializeFrom(const SerializerElement & element)
     for(unsigned int i = 0;i<externalEventsElement.GetChildrenCount();++i)
     {
         const SerializerElement & externalEventElement = externalEventsElement.GetChild(i);
+
         gd::ExternalEvents & externalEvents = InsertNewExternalEvents(externalEventElement.GetStringAttribute("name", "", "Name"),
             GetExternalEventsCount());
-
         externalEvents.UnserializeFrom(*this, externalEventElement);
     }
     #endif
@@ -768,94 +708,19 @@ void Project::UnserializeFrom(const SerializerElement & element)
         externalLayouts.push_back(newExternalLayout);
     }
 
-    /*
-
-    //Global objects
-    elem = rootElement->FirstChildElement( "Objects" );
-    if ( elem )
-        LoadObjectsFromXml(*this, elem);
-
     #if defined(GD_IDE_ONLY)
-    //Global object groups
-    elem = rootElement->FirstChildElement( "ObjectGroups" );
-    if ( elem )
-        gd::ObjectGroup::LoadFromXml(GetObjectGroups(), elem);
-    #endif
-
-    //Global variables
-    elem = rootElement->FirstChildElement( "Variables" );
-    if ( elem ) GetVariables().LoadFromXml(elem);
-
-    //Scenes
-    if ( rootElement->FirstChildElement( "Scenes" ) ) {
-        firstLayout = rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") ?
-            rootElement->FirstChildElement( "Scenes" )->Attribute("firstScene") : "";
-
-        elem = rootElement->FirstChildElement( "Scenes" ) ? rootElement->FirstChildElement( "Scenes" )->FirstChildElement() : NULL;
-        while ( elem )
-        {
-            std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
-
-            //Add a new layout
-            boost::shared_ptr<gd::Layout> layout = boost::shared_ptr<gd::Layout>(new gd::Layout);
-            if ( layout )
-            {
-                scenes.push_back(layout);
-                scenes.back()->SetName(layoutName);
-                scenes.back()->LoadFromXml(*this, elem);
-
-                //Compatibility code with GD 2.x
-                #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-                if ( GDMajorVersion <= 2 )
-                {
-                    SpriteObjectsPositionUpdater updater(*this, *scenes.back());
-                    gd::InitialInstancesContainer & instances = scenes.back()->GetInitialInstances();
-                    instances.IterateOverInstances(updater);
-
-                }
-                #endif
-                //End of compatibility code
-            }
-            else
-                std::cout << "ERROR : Unable to create a layout when loading a project!" << std::endl;
-
-            elem = elem->NextSiblingElement();
-        }
-    }
-
-    #if defined(GD_IDE_ONLY)
-    //External events
-    elem = rootElement->FirstChildElement( "ExternalEvents" );
-    if ( elem )
+    const SerializerElement & externalSourceFilesElement = element.GetChild("externalSourceFiles", 0, "ExternalSourceFiles");
+    externalSourceFilesElement.ConsiderAsArrayOf("sourceFile", "SourceFile");
+    for(unsigned int i = 0;i<externalSourceFilesElement.GetChildrenCount();++i)
     {
-        const TiXmlElement * externalEventsElem = elem->FirstChildElement();
+        const SerializerElement & sourceFileElement = externalLayoutsElement.GetChild(i);
 
-        while ( externalEventsElem )
-        {
-            gd::ExternalEvents & externalEvents = InsertNewExternalEvents(externalEventsElem->Attribute("Name") ? externalEventsElem->Attribute("Name") : "", GetExternalEventsCount() );
-            externalEvents.LoadFromXml(*this, externalEventsElem);
-
-            externalEventsElem = externalEventsElem->NextSiblingElement();
-        }
+        boost::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
+        newSourceFile->UnserializeFrom(sourceFileElement);
+        externalSourceFiles.push_back(newSourceFile);
     }
 
-    elem = rootElement->FirstChildElement( "ExternalSourceFiles" );
-    if ( elem )
-    {
-        const TiXmlElement * sourceFileElem = elem->FirstChildElement( "SourceFile" );
-        while (sourceFileElem)
-        {
-            boost::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
-            newSourceFile->LoadFromXml(sourceFileElem);
-            externalSourceFiles.push_back(newSourceFile);
-
-            sourceFileElem = sourceFileElem->NextSiblingElement();
-        }
-    }
-    #endif
-*/
-
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    #if !defined(GD_NO_WX_GUI)
     if (!updateText.empty()) //TODO
     {
         ProjectUpdateDialog updateDialog(NULL, updateText);
@@ -864,64 +729,39 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     dirty = false;
     #endif
-}
 
-
-#if defined(GD_IDE_ONLY)
-void Project::SaveToXml(TiXmlElement * root) const
-{
-    gd::SerializerElement rootElement;
-    SerializeTo(rootElement);
-    gd::Serializer::SerializeToXML(rootElement, root);
-
-    //TODO: Temp
-    std::cout << "-- JSON output --" << std::endl;
-    std::cout << gd::Serializer::SerializeToJSON(rootElement) << std::endl;
-    std::cout << "-- End of JSON. --" << std::endl;
-
-    //Global objects
-    TiXmlElement * objects = new TiXmlElement( "Objects" );
-    root->LinkEndChild( objects );
-    SaveObjectsToXml(objects);
-
-    //Global object groups
-    TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
-    root->LinkEndChild( globalObjectGroups );
-    gd::SerializerElement serializedObjectsGroups;
-    ObjectGroup::SerializeTo(GetObjectGroups(), serializedObjectsGroups);
-    gd::Serializer::SerializeToXML(serializedObjectsGroups, globalObjectGroups);
-
-    //Global variables
-    TiXmlElement * variables = new TiXmlElement( "Variables" );
-    root->LinkEndChild( variables );
-    GetVariables().SaveToXml(variables);
-
-    //Scenes
-    TiXmlElement * scenes = new TiXmlElement( "Scenes" );
-    root->LinkEndChild( scenes );
-    scenes->SetAttribute("firstScene", firstLayout.c_str());
-    for ( unsigned int i = 0;i < GetLayoutCount();i++ )
-    {
-        TiXmlElement * scene = new TiXmlElement( "Scene" );
-        scenes->LinkEndChild( scene );
-        GetLayout(i).SaveToXml(scene);
-    }
-
-    //External source files
-    TiXmlElement * externalSourceFilesElem = new TiXmlElement( "ExternalSourceFiles" );
-    root->LinkEndChild( externalSourceFilesElem );
-    for (unsigned int i = 0;i<externalSourceFiles.size();++i)
-    {
-        TiXmlElement * sourceFile = new TiXmlElement( "SourceFile" );
-        externalSourceFilesElem->LinkEndChild( sourceFile );
-        externalSourceFiles[i]->SaveToXml(sourceFile);
-    }
-
-    #if defined(GD_IDE_ONLY)
-    dirty = false;
     #endif
 }
 
+bool Project::LoadFromFile(const std::string & filename)
+{
+    //Load the XML document structure
+    TiXmlDocument doc;
+    if ( !doc.LoadFile(filename.c_str()) )
+    {
+        std::string errorTinyXmlDesc = doc.ErrorDesc();
+        std::string error = gd::ToString(_( "Error while loading :" )) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
+
+        gd::LogError( error );
+        return false;
+    }
+
+    #if defined(GD_IDE_ONLY)
+    SetProjectFile(filename);
+    dirty = false;
+    #endif
+
+    TiXmlHandle hdl( &doc );
+    gd::SerializerElement rootElement;
+    gd::Serializer::FromXML(rootElement, hdl.FirstChildElement("Project").Element());
+
+    //Unserialize the whole project
+    UnserializeFrom(rootElement);
+
+    return true;
+}
+
+#if defined(GD_IDE_ONLY)
 void Project::SerializeTo(SerializerElement & element) const
 {
     SerializerElement & versionElement = element.AddChild("gdVersion");
@@ -956,6 +796,15 @@ void Project::SerializeTo(SerializerElement & element) const
         platformsElement.AddChild("platform").SetAttribute("name", platforms[i]->GetName());
 
     resourcesManager.SerializeTo(element.AddChild("resources"));
+    SerializeObjectsTo(element.AddChild("objects"));
+    ObjectGroup::SerializeTo(GetObjectGroups(), element.AddChild("objectsGroups"));
+    GetVariables().SerializeTo(element.AddChild("variables"));
+
+    element.SetAttribute("firstLayout", firstLayout);
+    gd::SerializerElement & layoutsElement = element.AddChild("layouts");
+    layoutsElement.ConsiderAsArrayOf("layout");
+    for ( unsigned int i = 0;i < GetLayoutCount();i++ )
+        GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
 
     SerializerElement & externalEventsElement = element.AddChild("externalEvents");
     externalEventsElement.ConsiderAsArrayOf("externalEvents");
@@ -967,58 +816,50 @@ void Project::SerializeTo(SerializerElement & element) const
     for (unsigned int i =0;i<externalLayouts.size();++i)
         externalLayouts[i]->SerializeTo(externalLayoutsElement.AddChild("externalLayout"));
 
-    /*
-    //Global objects
-    TiXmlElement * objects = new TiXmlElement( "Objects" );
-    root->LinkEndChild( objects );
-    SaveObjectsToXml(objects);
-
-    //Global object groups
-    TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
-    root->LinkEndChild( globalObjectGroups );
-    gd::ObjectGroup::SaveToXml(GetObjectGroups(), globalObjectGroups);
-
-    //Global variables
-    TiXmlElement * variables = new TiXmlElement( "Variables" );
-    root->LinkEndChild( variables );
-    GetVariables().SaveToXml(variables);
-
-    //Scenes
-    TiXmlElement * scenes = new TiXmlElement( "Scenes" );
-    root->LinkEndChild( scenes );
-    scenes->SetAttribute("firstScene", firstLayout.c_str());
-    for ( unsigned int i = 0;i < GetLayoutCount();i++ )
-    {
-        TiXmlElement * scene = new TiXmlElement( "Scene" );
-        scenes->LinkEndChild( scene );
-        GetLayout(i).SaveToXml(scene);
-    }
-
-    //External events
-    TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
-    root->LinkEndChild( externalEvents );
-    for ( unsigned int j = 0;j < GetExternalEventsCount();j++ )
-    {
-        TiXmlElement * externalEventsElem = new TiXmlElement( "ExternalEvents" );
-        externalEvents->LinkEndChild( externalEventsElem );
-        GetExternalEvents(j).SaveToXml(externalEventsElem);
-    }
-
-
-    //External source files
-    TiXmlElement * externalSourceFilesElem = new TiXmlElement( "ExternalSourceFiles" );
-    root->LinkEndChild( externalSourceFilesElem );
-    for (unsigned int i = 0;i<externalSourceFiles.size();++i)
-    {
-        TiXmlElement * sourceFile = new TiXmlElement( "SourceFile" );
-        externalSourceFilesElem->LinkEndChild( sourceFile );
-        externalSourceFiles[i]->SaveToXml(sourceFile);
-    }
+    SerializerElement & externalSourceFilesElement = element.AddChild("externalSourceFiles");
+    externalSourceFilesElement.ConsiderAsArrayOf("sourceFile");
+    for (unsigned int i =0;i<externalSourceFiles.size();++i)
+        externalSourceFiles[i]->SerializeTo(externalSourceFilesElement.AddChild("sourceFile"));
 
     #if defined(GD_IDE_ONLY)
     dirty = false;
     #endif
-    */
+}
+
+bool Project::SaveToFile(const std::string & filename)
+{
+    //Serialize the whole project
+    gd::SerializerElement rootElement;
+    SerializeTo(rootElement);
+
+    //Create the XML document structure...
+    TiXmlDocument doc;
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
+    doc.LinkEndChild( decl );
+
+    TiXmlElement * root = new TiXmlElement( "Project" );
+    doc.LinkEndChild( root );
+    gd::Serializer::ToXML(rootElement, root); //...and put the serialized project in it.
+
+    //Write XML to file
+    if ( !doc.SaveFile( filename.c_str() ) )
+    {
+        gd::LogError( _( "Unable to save file ")+filename+_("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        return false;
+    }
+
+    return true;
+}
+
+bool Project::ValidateObjectName(const std::string & name)
+{
+    std::string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    return !(name.find_first_not_of(allowedCharacter) != std::string::npos);
+}
+
+std::string Project::GetBadObjectNameWarning()
+{
+    return gd::ToString(_("Please use only letters, digits\nand underscores ( _ )."));
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
@@ -1156,63 +997,6 @@ void Project::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEve
     }
 }
 #endif
-
-bool Project::SaveToFile(const std::string & filename)
-{
-    //Create document structure
-    TiXmlDocument doc;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
-    doc.LinkEndChild( decl );
-
-    TiXmlElement * root = new TiXmlElement( "Project" );
-    doc.LinkEndChild( root );
-
-    SaveToXml(root);
-
-    //Wrie XML to file
-    if ( !doc.SaveFile( filename.c_str() ) )
-    {
-        gd::LogError( _( "Unable to save file ")+filename+_("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
-        return false;
-    }
-
-    return true;
-}
-
-bool Project::LoadFromFile(const std::string & filename)
-{
-    //Load document structure
-    TiXmlDocument doc;
-    if ( !doc.LoadFile(filename.c_str()) )
-    {
-        std::string errorTinyXmlDesc = doc.ErrorDesc();
-        std::string error = gd::ToString(_( "Error while loading :" )) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
-
-        gd::LogError( error );
-        return false;
-    }
-
-    SetProjectFile(filename);
-
-    TiXmlHandle hdl( &doc );
-    LoadFromXml(hdl.FirstChildElement().Element());
-
-    #if defined(GD_IDE_ONLY)
-    dirty = false;
-    #endif
-    return true;
-}
-
-bool Project::ValidateObjectName(const std::string & name)
-{
-    std::string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    return !(name.find_first_not_of(allowedCharacter) != std::string::npos);
-}
-
-std::string Project::GetBadObjectNameWarning()
-{
-    return gd::ToString(_("Please use only letters, digits\nand underscores ( _ )."));
-}
 #endif
 
 Project::Project(const Project & other)

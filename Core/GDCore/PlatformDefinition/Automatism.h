@@ -10,9 +10,9 @@
 namespace gd { class PropertyDescriptor; }
 namespace gd { class MainFrameWrapper; }
 #endif
+namespace gd { class SerializerElement; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
-class TiXmlElement;
 class wxWindow;
 class RuntimeObject;//TODO : C++ Platform specific code below
 class RuntimeScene;
@@ -86,15 +86,15 @@ public:
     virtual bool UpdateProperty(const std::string & name, const std::string & value, gd::Project & project) {return false;};
 
     /**
-     * \brief Save the object to XML
+     * \brief Serialize the automatism.
      */
-    virtual void SaveToXml(TiXmlElement * eventElem) const {}
+    virtual void SerializeTo(gd::SerializerElement & element) const {};
     #endif
 
     /**
-     * \brief Load the object from XML
+     * \brief Unserialize the automatism.
      */
-    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+    virtual void UnserializeFrom(const gd::SerializerElement & element) {};
 
     /** \name C++ Platform specific
      * Members functions related to automatisms of GD C++ Platform.

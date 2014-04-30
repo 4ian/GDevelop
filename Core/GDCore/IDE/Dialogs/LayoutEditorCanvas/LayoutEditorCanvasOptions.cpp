@@ -48,7 +48,7 @@ void LayoutEditorCanvasOptions::UnserializeFrom(const SerializerElement & elemen
     gridR = element.GetIntAttribute("gridR", 158);
     gridG = element.GetIntAttribute("gridG", 180);
     gridB = element.GetIntAttribute("gridB", 255);
-    zoomFactor = element.GetDoubleAttribute("zoomFactor", 1);
+    zoomFactor = element.GetDoubleAttribute("zoomFactor", 1.0);
     associatedLayout = element.GetStringAttribute("associatedLayout");
 }
 

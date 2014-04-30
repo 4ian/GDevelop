@@ -118,20 +118,6 @@ public:
      * Members functions related to saving and loading the object.
      */
     ///@{
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Called to save the layout to a TiXmlElement.
-     */
-    virtual void SaveToXml(TiXmlElement * element) const;
-    #endif
-
-    /**
-     * Called to load the layout from a TiXmlElement.
-     */
-    virtual void LoadFromXml(const TiXmlElement * element);
-    ///@}
-
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Serialize variable container.
@@ -143,6 +129,7 @@ public:
      * \brief Unserialize the variable container.
      */
     void UnserializeFrom(const SerializerElement & element);
+    ///@}
 
 private:
 

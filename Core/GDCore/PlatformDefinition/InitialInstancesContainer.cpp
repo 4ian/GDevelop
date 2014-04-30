@@ -8,7 +8,6 @@
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -42,7 +41,7 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
         newPosition.SetHasCustomSize(instanceElement.GetBoolAttribute("customSize", false, "personalizedSize"));
         newPosition.SetCustomWidth(instanceElement.GetDoubleAttribute("width"));
         newPosition.SetCustomHeight(instanceElement.GetDoubleAttribute("height"));
-        newPosition.SetZOrder(instanceElement.GetIntAttribute("plan"));
+        newPosition.SetZOrder(instanceElement.GetIntAttribute("zOrder", 0, "plan"));
         newPosition.SetLayer(instanceElement.GetStringAttribute("layer"));
         #if defined(GD_IDE_ONLY)
         newPosition.SetLocked(instanceElement.GetBoolAttribute( "locked", false ));

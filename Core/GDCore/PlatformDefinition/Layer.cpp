@@ -40,15 +40,15 @@ void Layer::SerializeTo(SerializerElement & element) const
     for (unsigned int c = 0;c<GetCameraCount();++c)
     {
         SerializerElement & cameraElement = camerasElement.AddChild("camera");
-        cameraElement.SetAttribute("DefaultSize", GetCamera(c).UseDefaultSize());
-        cameraElement.SetAttribute("Width", GetCamera(c).GetWidth());
-        cameraElement.SetAttribute("Height", GetCamera(c).GetHeight());
+        cameraElement.SetAttribute("defaultSize", GetCamera(c).UseDefaultSize());
+        cameraElement.SetAttribute("width", GetCamera(c).GetWidth());
+        cameraElement.SetAttribute("height", GetCamera(c).GetHeight());
 
-        cameraElement.SetAttribute("DefaultViewport", GetCamera(c).UseDefaultViewport());
-        cameraElement.SetAttribute("ViewportLeft", GetCamera(c).GetViewportX1());
-        cameraElement.SetAttribute("ViewportTop", GetCamera(c).GetViewportY1());
-        cameraElement.SetAttribute("ViewportRight", GetCamera(c).GetViewportX2());
-        cameraElement.SetAttribute("ViewportBottom", GetCamera(c).GetViewportY2());
+        cameraElement.SetAttribute("defaultViewport", GetCamera(c).UseDefaultViewport());
+        cameraElement.SetAttribute("viewportLeft", GetCamera(c).GetViewportX1());
+        cameraElement.SetAttribute("viewportTop", GetCamera(c).GetViewportY1());
+        cameraElement.SetAttribute("viewportRight", GetCamera(c).GetViewportX2());
+        cameraElement.SetAttribute("viewportBottom", GetCamera(c).GetViewportY2());
     }
 
 }

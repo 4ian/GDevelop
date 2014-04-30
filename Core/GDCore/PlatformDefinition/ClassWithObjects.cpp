@@ -6,7 +6,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd
 {
@@ -16,46 +16,41 @@ ClassWithObjects::ClassWithObjects()
 }
 
 #if defined(GD_IDE_ONLY)
-void ClassWithObjects::SaveObjectsToXml(TiXmlElement * element) const
+void ClassWithObjects::SerializeObjectsTo(SerializerElement & element) const
 {
+    element.ConsiderAsArrayOf("object");
     for ( unsigned int j = 0;j < initialObjects.size();j++ )
     {
-        TiXmlElement * objet = new TiXmlElement( "Objet" );
-        element->LinkEndChild( objet );
+        SerializerElement & objectElement = element.AddChild("object");
 
-        objet->SetAttribute( "nom", initialObjects.at( j )->GetName().c_str() );
-        objet->SetAttribute( "type", initialObjects.at( j )->GetType().c_str() );
+        objectElement.SetAttribute( "name", initialObjects[j]->GetName() );
+        objectElement.SetAttribute( "type", initialObjects[j]->GetType() );
 
-        initialObjects[j]->SaveToXml(objet);
+        initialObjects[j]->SerializeTo(objectElement);
     }
+
 }
 #endif
 
-void ClassWithObjects::LoadObjectsFromXml(gd::Project & project, const TiXmlElement * element)
+void ClassWithObjects::UnserializeObjectsFrom(gd::Project & project, const SerializerElement & element)
 {
-    const TiXmlElement * elemScene = element->FirstChildElement("Objet");
-
-    while ( elemScene )
+    initialObjects.clear();
+    element.ConsiderAsArrayOf("object", "Objet");
+    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
     {
-        //Nom
-        std::string name;
-        if ( elemScene->Attribute( "nom" ) != NULL ) { name = elemScene->Attribute( "nom" ); }
+        const SerializerElement & objectElement = element.GetChild(i);
 
-        std::string type = "Sprite"; //Compatibility with Game Develop 1.2 and inferior
-        if ( elemScene->Attribute( "type" ) != NULL ) { type = elemScene->Attribute( "type" ); }
-
-        //Objet vide
-        boost::shared_ptr<gd::Object> newObject = project.CreateObject(type, name);
+        std::string type = objectElement.GetStringAttribute("type");
+        boost::shared_ptr<gd::Object> newObject =
+            project.CreateObject(type, objectElement.GetStringAttribute("name", "", "nom"));
 
         if ( newObject != boost::shared_ptr<gd::Object>() )
         {
-            newObject->LoadFromXml(project, elemScene);
+            newObject->UnserializeFrom(project, objectElement);
             initialObjects.push_back( newObject );
         }
         else
-            std::cout << "Unknown object type:" << type << std::endl;
-
-        elemScene = elemScene->NextSiblingElement();
+            std::cout << "WARNING: Unknown object type \"" << type << "\"" << std::endl;
     }
 }
 

@@ -351,35 +351,9 @@ public:
      */
     ///@{
     /**
-     * \brief Save the project to a file.
-     *
-     * "Dirty" flag is set to false when save is done.
-     */
-    bool SaveToFile(const std::string & filename);
-
-    /**
      * \brief Load the project from a file.
      */
     bool LoadFromFile(const std::string & filename);
-
-    /**
-     * Called to save the project to a TiXmlElement.
-     *
-     * "Dirty" flag is set to false when save is done.
-     */
-    void SaveToXml(TiXmlElement * element) const;
-
-    /**
-     * Called to load the layout from a TiXmlElement.
-     */
-    void LoadFromXml(const TiXmlElement * element);
-
-    /**
-     * \brief Called to serialize the project to a TiXmlElement.
-     *
-     * "Dirty" flag is set to false when serialization is done.
-     */
-    void SerializeTo(SerializerElement & element) const;
 
     /**
      * \brief Unserialize the project from an element.
@@ -387,6 +361,19 @@ public:
     void UnserializeFrom(const SerializerElement & element);
 
     #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Save the project to a file.
+     *
+     * "Dirty" flag is set to false when save is done.
+     */
+    bool SaveToFile(const std::string & filename);
+
+    /**
+     * \brief Called to serialize the project to a TiXmlElement.
+     *
+     * "Dirty" flag is set to false when serialization is done.
+     */
+    void SerializeTo(SerializerElement & element) const;
 
     /**
      * \brief Return true if the project is marked as being modified (The IDE or application

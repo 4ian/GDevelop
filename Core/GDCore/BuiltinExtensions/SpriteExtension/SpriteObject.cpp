@@ -15,7 +15,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/ImageManager.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/CommonTools.h"
 
@@ -40,57 +40,66 @@ SpriteObject::~SpriteObject()
 {
 };
 
-void SpriteObject::DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
+
+void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    if ( elemScene->FirstChildElement( "Animations" ) == NULL ) return;
-
-    const TiXmlElement * animationElem = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
-
-    while ( animationElem )
+    const gd::SerializerElement & animationsElement = element.GetChild("animations", 0, "Animations");
+    animationsElement.ConsiderAsArrayOf("animation", "Animation");
+    for (unsigned int i = 0; i < animationsElement.GetChildrenCount(); ++i)
     {
+        const gd::SerializerElement & animationElement = animationsElement.GetChild(i);
         Animation newAnimation;
-        newAnimation.useMultipleDirections = (animationElem->Attribute( "typeNormal" )  != NULL && ToString(animationElem->Attribute( "typeNormal" )) == "true");
 
-        const TiXmlElement *elemObjetDirecScene = animationElem->FirstChildElement();
-        while ( elemObjetDirecScene )
+        newAnimation.useMultipleDirections = animationElement.GetBoolAttribute("useMultipleDirections", false, "typeNormal");
+
+        //Compatibility with GD <= 3.3
+        if (animationElement.HasChild("Direction"))
         {
-            Direction direction;
-            direction.LoadFromXml(elemObjetDirecScene);
+            for (unsigned int j = 0; j < animationElement.GetChildrenCount("Direction"); ++j)
+            {
+                Direction direction;
+                direction.UnserializeFrom(animationElement.GetChild("Direction", j));
 
-            newAnimation.SetDirectionsCount(newAnimation.GetDirectionsCount()+1);
-            newAnimation.SetDirection(direction, newAnimation.GetDirectionsCount()-1);
-            elemObjetDirecScene = elemObjetDirecScene->NextSiblingElement();
+                newAnimation.SetDirectionsCount(newAnimation.GetDirectionsCount()+1);
+                newAnimation.SetDirection(direction, newAnimation.GetDirectionsCount()-1);
+            }
+        }
+        //End of compatibility code
+        else
+        {
+            const gd::SerializerElement & directionsElement = animationElement.GetChild("directions");
+            directionsElement.ConsiderAsArrayOf("direction");
+            for (unsigned int j = 0; j < directionsElement.GetChildrenCount(); ++j)
+            {
+                Direction direction;
+                direction.UnserializeFrom(directionsElement.GetChild(j));
+
+                newAnimation.SetDirectionsCount(newAnimation.GetDirectionsCount()+1);
+                newAnimation.SetDirection(direction, newAnimation.GetDirectionsCount()-1);
+            }
         }
 
         AddAnimation( newAnimation );
-
-        animationElem = animationElem->NextSiblingElement();
     }
 }
 
 #if defined(GD_IDE_ONLY)
-void SpriteObject::DoSaveToXml(TiXmlElement * elem)
+void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
 {
     //Animations
-    TiXmlElement * animations = new TiXmlElement( "Animations" );
-    elem->LinkEndChild( animations );
-    TiXmlElement * animation;
-
+    gd::SerializerElement & animationsElement = element.AddChild("animations");
+    animationsElement.ConsiderAsArrayOf("animation");
     for ( unsigned int k = 0;k < GetAnimationsCount();k++ )
     {
-        animation = new TiXmlElement( "Animation" );
-        animations->LinkEndChild( animation );
+        gd::SerializerElement & animationElement = animationsElement.AddChild("animation");
 
-        animation->SetAttribute( "typeNormal", GetAnimation( k ).useMultipleDirections ? "true" : "false" );
+        animationElement.SetAttribute( "useMultipleDirections", GetAnimation(k).useMultipleDirections);
 
-        TiXmlElement * direction;
-        for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsCount();l++ )
+        gd::SerializerElement & directionsElement = animationElement.AddChild("directions");
+        directionsElement.ConsiderAsArrayOf("direction");
+        for ( unsigned int l = 0;l < GetAnimation(k).GetDirectionsCount();l++ )
         {
-            direction = new TiXmlElement( "Direction" );
-            animation->LinkEndChild( direction );
-
-            GetAnimation(k).GetDirection(l).SaveToXml(direction);
-
+            GetAnimation(k).GetDirection(l).SerializeTo(directionsElement.AddChild("direction"));
         }
     }
 }

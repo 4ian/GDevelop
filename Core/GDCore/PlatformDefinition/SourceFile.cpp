@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/SourceFile.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
 
 namespace gd
@@ -23,26 +23,18 @@ SourceFile::~SourceFile()
     //dtor
 }
 
-/**
- * Load from XML element
- */
-void SourceFile::LoadFromXml(const TiXmlElement * elem)
+void SourceFile::SerializeTo(SerializerElement & element) const
 {
-    filename = elem->Attribute("filename") ? elem->Attribute("filename") : NULL;
-    lastBuildTimeStamp = elem->Attribute("lastBuildTimeStamp") ? ToInt(elem->Attribute("lastBuildTimeStamp")) : 0;
-
-    if ( elem->Attribute("gdManaged") == NULL ) gdManaged = false;
-    else gdManaged = ToString(elem->Attribute("gdManaged")) == "true";
+    element.SetAttribute("filename", filename);
+    element.SetAttribute("lastBuildTimeStamp", (int)lastBuildTimeStamp);
+    element.SetAttribute("gdManaged", gdManaged);
 }
 
-/**
- * Save to XML element
- */
-void SourceFile::SaveToXml(TiXmlElement * elem)
+void SourceFile::UnserializeFrom(const SerializerElement & element)
 {
-    elem->SetAttribute("filename", filename.c_str());
-    elem->SetAttribute("lastBuildTimeStamp", lastBuildTimeStamp);
-    elem->SetAttribute("gdManaged", gdManaged ? "true" : "false");
+    filename = element.GetStringAttribute("filename");
+    lastBuildTimeStamp = element.GetIntAttribute("lastBuildTimeStamp");
+    gdManaged = element.GetBoolAttribute("gdManaged");
 }
 
 }

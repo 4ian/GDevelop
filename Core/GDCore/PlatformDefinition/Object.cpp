@@ -7,7 +7,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
@@ -136,58 +136,78 @@ void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarge
 }
 #endif
 
-void Object::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
+void Object::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
     //Name and type are already loaded.
+    objectVariables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
-    if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { objectVariables.LoadFromXml(elemScene->FirstChildElement( "Variables" )); }
-
-    if ( elemScene->FirstChildElement( "Automatism" ) != NULL )
+    //Compatibility with GD <= 3.3
+    if (element.HasChild("Automatism"))
     {
-        const TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
-        while ( elemAutomatism )
+        for (unsigned int i = 0; i < element.GetChildrenCount("Automatism"); ++i)
         {
-            std::string autoType = elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "";
-            std::string autoName = elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "";
+            SerializerElement & automatismElement = element.GetChild("Automatism", i);
+
+            std::string autoType = automatismElement.GetStringAttribute("type", "", "Type");
+            std::string autoName = automatismElement.GetStringAttribute("name", "", "Name");
 
             Automatism* automatism = project.CreateAutomatism(autoType);
             if ( automatism != NULL )
             {
                 automatism->SetName(autoName);
-                automatism->LoadFromXml(elemAutomatism);
+                automatism->UnserializeFrom(automatismElement);
                 automatisms[automatism->GetName()] = automatism;
             }
             else
-                std::cout << "Unknown automatism " << elemAutomatism->Attribute("Type") << std::endl;
+                std::cout << "WARNING: Unknown automatism " << automatismElement.GetStringAttribute("type") << std::endl;
+        }
+    }
+    //End of compatibility code
+    else
+    {
+        SerializerElement & automatismsElement = element.GetChild("automatisms");
+        automatismsElement.ConsiderAsArrayOf("automatism");
+        for (unsigned int i = 0; i < automatismsElement.GetChildrenCount(); ++i)
+        {
+            SerializerElement & automatismElement = automatismsElement.GetChild(i);
 
-            elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
+            std::string autoType = automatismElement.GetStringAttribute("type");
+            std::string autoName = automatismElement.GetStringAttribute("name");
+
+            Automatism* automatism = project.CreateAutomatism(autoType);
+            if ( automatism != NULL )
+            {
+                automatism->SetName(autoName);
+                automatism->UnserializeFrom(automatismElement);
+                automatisms[automatism->GetName()] = automatism;
+            }
+            else
+                std::cout << "WARNING: Unknown automatism " << automatismElement.GetStringAttribute("type") << std::endl;
         }
     }
 
-    DoLoadFromXml(project, elemScene);
+    DoUnserializeFrom(project, element);
 }
 
 #if defined(GD_IDE_ONLY)
-void Object::SaveToXml(TiXmlElement * elem)
+void Object::SerializeTo(SerializerElement & element) const
 {
     //Name and type are already saved.
+    objectVariables.SerializeTo(element.AddChild("variables"));
 
-    TiXmlElement * variables = new TiXmlElement( "Variables" );
-    elem->LinkEndChild( variables );
-    objectVariables.SaveToXml(variables);
-
+    SerializerElement & automatismsElement = element.AddChild("automatisms");
+    automatismsElement.ConsiderAsArrayOf("automatism");
     std::vector < std::string > allAutomatisms = GetAllAutomatismNames();
     for (unsigned int i = 0;i<allAutomatisms.size();++i)
     {
-        TiXmlElement * automatism = new TiXmlElement( "Automatism" );
-        elem->LinkEndChild( automatism );
-        automatism->SetAttribute( "Type", GetAutomatism(allAutomatisms[i]).GetTypeName().c_str() );
-        automatism->SetAttribute( "Name", GetAutomatism(allAutomatisms[i]).GetName().c_str() );
+        SerializerElement & automatismElement = automatismsElement.AddChild("automatism");
 
-        GetAutomatism(allAutomatisms[i]).SaveToXml(automatism);
+        automatismElement.SetAttribute( "type", GetAutomatism(allAutomatisms[i]).GetTypeName() );
+        automatismElement.SetAttribute( "name", GetAutomatism(allAutomatisms[i]).GetName() );
+        GetAutomatism(allAutomatisms[i]).SerializeTo(automatismElement);
     }
 
-    DoSaveToXml(elem);
+    DoSerializeTo(element);
 }
 #endif
 

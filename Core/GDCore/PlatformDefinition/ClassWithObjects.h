@@ -9,7 +9,7 @@
 #include <boost/shared_ptr.hpp>
 namespace gd { class Object; }
 namespace gd { class Project; }
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -125,14 +125,14 @@ public:
      */
     ///@{
     /**
-     * \brief Save the objects to xml
+     * \brief Serialize instances container.
      */
-    void SaveObjectsToXml(TiXmlElement * element) const;
+    void SerializeObjectsTo(SerializerElement & element) const;
 
     /**
-     * \brief Load the objects from xml
+     * \brief Unserialize the instances container.
      */
-    void LoadObjectsFromXml(gd::Project & project, const TiXmlElement * element);
+    void UnserializeObjectsFrom(gd::Project & project, const SerializerElement & element);
     ///@}
 
 protected:

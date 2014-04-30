@@ -15,6 +15,7 @@ namespace gd { class Layout; }
 namespace gd { class Sprite; }
 namespace gd { class Animation; }
 namespace gd { class MainFrameWrapper; }
+namespace gd { class SerializerElement; }
 namespace gd { class PropertyDescriptor; }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
@@ -107,9 +108,10 @@ public :
     ///@}
 
 private:
-    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
+
+    virtual void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
-    virtual void DoSaveToXml(TiXmlElement * elemScene);
+    virtual void DoSerializeTo(gd::SerializerElement & element) const;
     #endif
 
     const Sprite * GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate = NULL) const;

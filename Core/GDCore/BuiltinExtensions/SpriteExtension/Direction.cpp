@@ -7,7 +7,7 @@
 #include <vector>
 #include "GDCore/BuiltinExtensions/SpriteExtension/Direction.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -76,218 +76,127 @@ void Direction::RemoveAllSprites()
     sprites.clear();
 }
 
-void OpenPoint(Point & point, const TiXmlElement * elemPoint)
+void OpenPoint(Point & point, const gd::SerializerElement & element)
 {
-    if ( elemPoint->Attribute( "nom" ) != NULL ) { point.SetName(elemPoint->Attribute( "nom" ));}
-
-    if ( elemPoint->Attribute( "X" ) != NULL ) { int value; elemPoint->QueryIntAttribute("X", &value); point.SetX(value);}
-
-    if ( elemPoint->Attribute( "Y" ) != NULL ) { int value; elemPoint->QueryIntAttribute("Y", &value); point.SetY(value);}
-
+    point.SetName(element.GetStringAttribute("name", "", "nom"));
+    point.SetX(element.GetDoubleAttribute("x", 0, "X"));
+    point.SetY(element.GetDoubleAttribute("y", 0, "Y"));
 }
 
-void OpenPointsSprites(vector < Point > & points, const TiXmlElement * elem)
+void OpenPointsSprites(vector < Point > & points, const gd::SerializerElement & element)
 {
-    const TiXmlElement * elemPoint = elem->FirstChildElement("Point");
-    while ( elemPoint )
+    element.ConsiderAsArrayOf("point", "Point");
+    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
     {
         Point point("");
-
-        OpenPoint(point, elemPoint);
+        OpenPoint(point, element.GetChild(i));
 
         points.push_back(point);
-        elemPoint = elemPoint->NextSiblingElement();
     }
 }
 
-void Direction::LoadFromXml(const TiXmlElement * element)
+void Direction::UnserializeFrom(const gd::SerializerElement & element)
 {
-    if (element == NULL) return;
+    SetTimeBetweenFrames(element.GetDoubleAttribute("timeBetweenFrames", 1, "tempsEntre"));
+    SetLoop(element.GetBoolAttribute("looping", false, "boucle"));
 
-    float value = 0;
-    if ( element->Attribute( "tempsEntre" )  != NULL ) { element->QueryFloatAttribute( "tempsEntre" , &value );  }
-    else { cout << ( "Les informations le \"temps entre\" de la direction manquent" ); }
-    SetTimeBetweenFrames( value );
-
-    SetLoop( element->Attribute( "boucle" )  != NULL && ToString(element->Attribute( "boucle" )) == "true" );
-
-    if ( element->FirstChildElement("Sprites") != NULL )
+    const gd::SerializerElement & spritesElement = element.GetChild("sprites", 0, "Sprites");
+    spritesElement.ConsiderAsArrayOf("sprite", "Sprite");
+    for (unsigned int i = 0; i < spritesElement.GetChildrenCount(); ++i)
     {
-        const TiXmlElement * elemSprite = element->FirstChildElement("Sprites")->FirstChildElement("Sprite");
-        while ( elemSprite )
+        const gd::SerializerElement & spriteElement = spritesElement.GetChild(i);
+        Sprite sprite;
+
+        sprite.SetImageName(spriteElement.GetStringAttribute("image"));
+        OpenPointsSprites(sprite.GetAllNonDefaultPoints(), spriteElement.GetChild("points", 0, "Points"));
+
+        OpenPoint(sprite.GetOrigine(), spriteElement.GetChild("originPoint" , 0, "PointOrigine"));
+        OpenPoint(sprite.GetCentre(), spriteElement.GetChild("centerPoint" , 0, "PointCentre"));
+        sprite.SetCentreAutomatic(spriteElement.GetChild("centerPoint" , 0, "PointCentre").GetBoolAttribute("automatic", true));
+
+        if (spriteElement.HasChild("CustomCollisionMask"))
+            sprite.SetCollisionMaskAutomatic(!spriteElement.GetChild("CustomCollisionMask").GetBoolAttribute("custom", false));
+        else
+            sprite.SetCollisionMaskAutomatic(!spriteElement.GetBoolAttribute("hasCustomCollisionMask", false));
+
+        std::vector<Polygon2d> mask;
+        const gd::SerializerElement & collisionMaskElement = spriteElement.GetChild("customCollisionMask", 0, "CustomCollisionMask");
+        collisionMaskElement.ConsiderAsArrayOf("polygon", "Polygon");
+        for (unsigned int j = 0; j < collisionMaskElement.GetChildrenCount(); ++j)
         {
-            Sprite sprite;
-            if ( elemSprite->Attribute( "image" ) != NULL ) { sprite.SetImageName(elemSprite->Attribute( "image" ));}
-            else { cout <<( "Les informations concernant l'image d'un sprite manquent." ); }
+            Polygon2d polygon;
 
-            const TiXmlElement * elemPoints = elemSprite->FirstChildElement("Points");
-            if ( elemPoints != NULL )
-                OpenPointsSprites(sprite.GetAllNonDefaultPoints(), elemPoints);
-            else
-                cout <<( "Les points d'un sprite manque." );
-
-            const TiXmlElement * elemPointOrigine = elemSprite->FirstChildElement("PointOrigine");
-            if ( elemPointOrigine != NULL )
-                OpenPoint(sprite.GetOrigine(), elemPointOrigine);
-            else
-                cout <<( "Le point origine d'un sprite manque." );
-
-            const TiXmlElement * elemPointCentre = elemSprite->FirstChildElement("PointCentre");
-            if ( elemPointCentre != NULL )
+            const gd::SerializerElement & polygonElement = collisionMaskElement.GetChild(j);
+            polygonElement.ConsiderAsArrayOf("vertice", "Point");
+            for (unsigned int k = 0; k < polygonElement.GetChildrenCount(); ++k)
             {
-                OpenPoint(sprite.GetCentre(), elemPointCentre);
+                const gd::SerializerElement & verticeElement = polygonElement.GetChild(k);
 
-                sprite.SetCentreAutomatic( !(elemPointCentre->Attribute( "automatic" ) != NULL && string (elemPointCentre->Attribute( "automatic" )) == "false") );
+                polygon.vertices.push_back(sf::Vector2f(verticeElement.GetDoubleAttribute("x"),
+                    verticeElement.GetDoubleAttribute("y")));
             }
 
-            const TiXmlElement * customCollisionMaskElem= elemSprite->FirstChildElement("CustomCollisionMask");
-            if ( customCollisionMaskElem )
-            {
-                bool customCollisionMask = false;
-                if ( customCollisionMaskElem->Attribute("custom") && string (customCollisionMaskElem->Attribute("custom")) == "true")
-                    customCollisionMask = true;
-
-                sprite.SetCollisionMaskAutomatic(!customCollisionMask);
-
-                if ( customCollisionMask )
-                {
-                    std::vector<Polygon2d> mask;
-                    //-- Compatibility code with Game Develop 2.1.10904 and inferior
-                    const TiXmlElement * rectangleElem = customCollisionMaskElem->FirstChildElement("Rectangle");
-                    while ( rectangleElem )
-                    {
-                        if ( rectangleElem->Attribute("centerX") && rectangleElem->Attribute("centerY") && rectangleElem->Attribute("halfSizeX") && rectangleElem->Attribute("halfSizeY") )
-                        {
-                            float centerX = ToFloat(rectangleElem->Attribute("centerX"));
-                            float centerY = ToFloat(rectangleElem->Attribute("centerY"));
-                            float halfSizeX = ToFloat(rectangleElem->Attribute("halfSizeX"));
-                            float halfSizeY = ToFloat(rectangleElem->Attribute("halfSizeY"));
-
-                            Polygon2d polygon;
-                            polygon.vertices.push_back(sf::Vector2f(centerX-halfSizeX, centerY-halfSizeY));
-                            polygon.vertices.push_back(sf::Vector2f(centerX+halfSizeX, centerY-halfSizeY));
-                            polygon.vertices.push_back(sf::Vector2f(centerX+halfSizeX, centerY+halfSizeY));
-                            polygon.vertices.push_back(sf::Vector2f(centerX-halfSizeX, centerY+halfSizeY));
-                            mask.push_back(polygon);
-                        }
-
-                        rectangleElem = rectangleElem->NextSiblingElement();
-                    }
-                    //-- End of compatibility code
-
-                    const TiXmlElement * polygonElem = customCollisionMaskElem->FirstChildElement("Polygon");
-                    while ( polygonElem )
-                    {
-                        Polygon2d polygon;
-
-                        const TiXmlElement * pointElem = polygonElem->FirstChildElement("Point");
-                        while ( pointElem )
-                        {
-                            if ( pointElem->Attribute("x") && pointElem->Attribute("y") )
-                                polygon.vertices.push_back(sf::Vector2f(ToFloat(pointElem->Attribute("x")),ToFloat(pointElem->Attribute("y"))));
-
-                            pointElem = pointElem->NextSiblingElement();
-                        }
-
-                        mask.push_back(polygon);
-                        polygonElem = polygonElem->NextSiblingElement();
-                    }
-
-                    sprite.SetCustomCollisionMask(mask);
-                }
-
-            }
-
-            sprites.push_back(sprite);
-            elemSprite = elemSprite->NextSiblingElement();
+            mask.push_back(polygon);
         }
+        sprite.SetCustomCollisionMask(mask);
 
+        sprites.push_back(sprite);
     }
-}
+};
 
 #if defined(GD_IDE_ONLY)
-void SavePoint(const Point & point, TiXmlElement * elem)
+void SavePoint(const Point & point, gd::SerializerElement & element)
 {
-    if ( elem == NULL ) return;
-
-    elem->SetAttribute("nom", point.GetName().c_str());
-    elem->SetDoubleAttribute("X", point.GetX());
-    elem->SetDoubleAttribute("Y", point.GetY());
+    element.SetAttribute("name", point.GetName());
+    element.SetAttribute("x", point.GetX());
+    element.SetAttribute("y", point.GetY());
 }
 
-void SavePointsSprites(const vector < Point > & points, TiXmlElement * elem)
+void SavePointsSprites(const vector < Point > & points, gd::SerializerElement & element)
 {
+    element.ConsiderAsArrayOf("point");
     for (unsigned int i = 0;i<points.size();++i)
-    {
-        TiXmlElement * point = new TiXmlElement( "Point" );
-        elem->LinkEndChild( point );
-
-        SavePoint(points.at(i), point);
-    }
+        SavePoint(points[i], element.AddChild("point"));
 }
 
-void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elemSprites)
+void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerElement & element)
 {
+    element.ConsiderAsArrayOf("sprite");
     for (unsigned int i = 0;i<sprites.size();++i)
     {
-        TiXmlElement * sprite = new TiXmlElement( "Sprite" );
-        elemSprites->LinkEndChild( sprite );
+        gd::SerializerElement & spriteElement = element.AddChild("sprite");
 
-        sprite->SetAttribute("image", sprites.at(i).GetImageName().c_str());
+        spriteElement.SetAttribute("image", sprites[i].GetImageName());
+        SavePointsSprites(sprites[i].GetAllNonDefaultPoints(), spriteElement.AddChild("points"));
 
-        TiXmlElement * points = new TiXmlElement( "Points" );
-        sprite->LinkEndChild( points );
-        SavePointsSprites(sprites.at(i).GetAllNonDefaultPoints(), points);
+        SavePoint(sprites[i].GetOrigine(), spriteElement.AddChild("originPoint"));
+        SavePoint(sprites[i].GetCentre(), spriteElement.AddChild("centerPoint"));
+        spriteElement.GetChild("centerPoint").SetAttribute("automatic", sprites[i].IsCentreAutomatic());
 
-        TiXmlElement * pointOrigine = new TiXmlElement( "PointOrigine" );
-        sprite->LinkEndChild( pointOrigine );
-        SavePoint(sprites.at(i).GetOrigine(), pointOrigine);
+        spriteElement.SetAttribute("hasCustomCollisionMask", !sprites[i].IsCollisionMaskAutomatic());
 
-        TiXmlElement * pointCentre = new TiXmlElement( "PointCentre" );
-        sprite->LinkEndChild( pointCentre );
-        SavePoint(sprites.at(i).GetCentre(), pointCentre);
-        if ( sprites.at(i).IsCentreAutomatic() )
-            pointCentre->SetAttribute("automatic", "true");
-        else
-            pointCentre->SetAttribute("automatic", "false");
-
-        TiXmlElement * customCollisionMask = new TiXmlElement( "CustomCollisionMask" );
-        sprite->LinkEndChild( customCollisionMask );
-
-        customCollisionMask->SetAttribute("custom", "false");
-        if ( !sprites.at(i).IsCollisionMaskAutomatic() )
+        gd::SerializerElement & collisionMaskElement = spriteElement.AddChild("customCollisionMask");
+        collisionMaskElement.ConsiderAsArrayOf("polygon");
+        std::vector<Polygon2d> polygons = sprites[i].GetCollisionMask();
+        for (unsigned int j = 0;j<polygons.size();++j)
         {
-            customCollisionMask->SetAttribute("custom", "true");
-            std::vector<Polygon2d> polygons = sprites.at(i).GetCollisionMask();
-            for (unsigned int i = 0;i<polygons.size();++i)
+            gd::SerializerElement & polygonElement = collisionMaskElement.AddChild("polygon");
+            polygonElement.ConsiderAsArrayOf("vertice");
+            for (unsigned int k = 0;k<polygons[j].vertices.size();++k)
             {
-                TiXmlElement * polygon = new TiXmlElement( "Polygon" );
-                customCollisionMask->LinkEndChild(polygon);
-
-                for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
-                {
-                    TiXmlElement * point = new TiXmlElement( "Point" );
-                    polygon->LinkEndChild(point);
-
-                    point->SetAttribute("x", ToString(polygons[i].vertices[j].x).c_str());
-                    point->SetAttribute("y", ToString(polygons[i].vertices[j].y).c_str());
-                }
+                polygonElement.AddChild("vertice")
+                    .SetAttribute("x", polygons[j].vertices[k].x)
+                    .SetAttribute("y", polygons[j].vertices[k].y);
             }
         }
     }
 }
 
-void Direction::SaveToXml(TiXmlElement * direction) const
+void Direction::SerializeTo(gd::SerializerElement & element) const
 {
-    if ( direction == NULL ) return;
-
-    direction->SetAttribute( "boucle", IsLooping() ? "true" : "false" );
-    direction->SetDoubleAttribute( "tempsEntre", GetTimeBetweenFrames() );
-
-    TiXmlElement* spritesElem = new TiXmlElement( "Sprites" );
-    direction->LinkEndChild( spritesElem );
-    SaveSpritesDirection(sprites,spritesElem);
-
+    element.SetAttribute("loop", IsLooping());
+    element.SetAttribute("timeBetweenFrames", GetTimeBetweenFrames());
+    SaveSpritesDirection(sprites, element.AddChild("sprites"));
 }
 #endif
 

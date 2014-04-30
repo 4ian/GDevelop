@@ -83,13 +83,13 @@ public:
     /**
      * \brief Serialize layer.
      */
-    virtual void SerializeTo(SerializerElement & element) const;
+    void SerializeTo(SerializerElement & element) const;
     #endif
 
     /**
      * \brief Unserialize the layer.
      */
-    virtual void UnserializeFrom(const SerializerElement & element);
+    void UnserializeFrom(const SerializerElement & element);
 
 private:
 

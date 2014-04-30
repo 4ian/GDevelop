@@ -325,16 +325,17 @@ public:
      * Members functions related to saving and loading the object.
      */
     ///@{
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Serialize the layout.
+     */
+    void SerializeTo(SerializerElement & element) const;
+    #endif
 
     /**
-     * Called to save the layout to a TiXmlElement.
+     * \brief Unserialize the layout.
      */
-    void SaveToXml(TiXmlElement * element) const;
-
-    /**
-     * Called to load the layout from a TiXmlElement.
-     */
-    void LoadFromXml(gd::Project & project, const TiXmlElement * element);
+    void UnserializeFrom(gd::Project & project, const SerializerElement & element);
     ///@}
 
     //TODO: Send this to private part.

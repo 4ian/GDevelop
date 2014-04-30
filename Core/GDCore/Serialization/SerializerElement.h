@@ -37,6 +37,7 @@ public:
     void SetValue(int val) { valueUndefined = false; elementValue = SerializerValue(val); }
     void SetValue(unsigned int val) { valueUndefined = false; elementValue = SerializerValue((int)val); }
     void SetValue(double val) { valueUndefined = false; elementValue = SerializerValue(val); }
+    void SetValue(float val) { SetValue((double)val); }
 
 	/**
 	 * \brief Get the value of the element.

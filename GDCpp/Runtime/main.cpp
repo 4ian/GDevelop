@@ -24,11 +24,13 @@
 #include "GDCpp/CodeExecutionEngine.h"
 #include "GDCpp/CppPlatform.h"
 #include "GDCpp/ExtensionsLoader.h"
-#include "CompilationChecker.h"
 #include "GDCpp/Log.h"
 #include "GDCpp/Tools/AES.h"
+#include "GDCpp/Serialization/Serializer.h"
+#include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/tinyxml/tinyxml.h"
 #include "GDCpp/RuntimeGame.h"
+#include "CompilationChecker.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -112,13 +114,13 @@ int main( int argc, char *p_argv[] )
         }
 
         TiXmlHandle hdl(&doc);
-        game.LoadFromXml(hdl.FirstChildElement().Element());
+        gd::SerializerElement rootElement;
+        gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());
+        game.UnserializeFrom(rootElement);
 	}
 
     if ( game.GetLayoutCount() == 0 )
-    {
         return AbortWithMessage("No scene to be loaded. Aborting.");
-    }
 
     //Loading the code
     std::string codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;

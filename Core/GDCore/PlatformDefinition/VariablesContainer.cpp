@@ -134,25 +134,18 @@ void VariablesContainer::Swap(unsigned int firstVariableIndex, unsigned int seco
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
 }
-#endif
 
-
-void VariablesContainer::LoadFromXml(const TiXmlElement * rootElement)
+void VariablesContainer::SerializeTo(SerializerElement & element) const
 {
-    if ( rootElement == NULL ) return;
-
-    Clear();
-    const TiXmlElement * element = rootElement->FirstChildElement();
-    while ( element )
+    element.ConsiderAsArrayOf("variable");
+    for ( unsigned int j = 0;j < variables.size();j++ )
     {
-        Variable variable;
-        variable.LoadFromXml(element);
-        std::string name = element->Attribute( "Name" ) != NULL ? element->Attribute( "Name" ) : "";
-        Insert(name, variable, -1);
-
-        element = element->NextSiblingElement();
+        SerializerElement & variableElement = element.AddChild("variable");
+        variableElement.SetAttribute("name", variables[j].first);
+        variables[j].second.SerializeTo(variableElement);
     }
 }
+#endif
 
 void VariablesContainer::UnserializeFrom(const SerializerElement & element)
 {
@@ -167,32 +160,5 @@ void VariablesContainer::UnserializeFrom(const SerializerElement & element)
         Insert(variableElement.GetStringAttribute("name", "", "Name" ), variable, -1);
     }
 }
-
-#if defined(GD_IDE_ONLY)
-void VariablesContainer::SaveToXml(TiXmlElement * element) const
-{
-    if ( element == NULL ) return;
-
-    for ( unsigned int j = 0;j < variables.size();j++ )
-    {
-        TiXmlElement * variable = new TiXmlElement( "Variable" );
-        element->LinkEndChild( variable );
-
-        variable->SetAttribute("Name", variables[j].first.c_str());
-        variables[j].second.SaveToXml(variable);
-    }
-}
-
-void VariablesContainer::SerializeTo(SerializerElement & element) const
-{
-    element.ConsiderAsArrayOf("variable");
-    for ( unsigned int j = 0;j < variables.size();j++ )
-    {
-        SerializerElement & variableElement = element.AddChild("variable");
-        variableElement.SetAttribute("name", variables[j].first);
-        variables[j].second.SerializeTo(variableElement);
-    }
-}
-#endif
 
 }

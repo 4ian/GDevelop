@@ -8,7 +8,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-class TiXmlElement;
+namespace gd { class SerializerElement; }
 class BaseEvent;
 
 namespace gd
@@ -37,14 +37,14 @@ public:
     void SetFileName(std::string filename_) { filename = filename_; };
 
     /**
-     * Load from XML element
+     * \brief Serialize the source file.
      */
-    void LoadFromXml(const TiXmlElement * elem);
+    void SerializeTo(SerializerElement & element) const;
 
     /**
-     * Save to XML element
+     * \brief Unserialize the source file.
      */
-    void SaveToXml(TiXmlElement * elem);
+    void UnserializeFrom(const SerializerElement & element);
 
     /**
      * Set if the file is hidden from the user point of view and is only managed by Game Develop

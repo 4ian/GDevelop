@@ -17,7 +17,7 @@ namespace gd
 {
 
 #if !defined(EMSCRIPTEN)
-void Serializer::SerializeToXML(SerializerElement & element, TiXmlElement * xmlElement)
+void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 {
 	if(!xmlElement) return;
 
@@ -35,7 +35,7 @@ void Serializer::SerializeToXML(SerializerElement & element, TiXmlElement * xmlE
 			else if (attr.IsInt())
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetInt());
 			else if (attr.IsDouble())
-				xmlElement->SetAttribute(it->first.c_str(), attr.GetDouble());
+				xmlElement->SetDoubleAttribute(it->first.c_str(), attr.GetDouble());
 			else
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
 		}
@@ -48,7 +48,7 @@ void Serializer::SerializeToXML(SerializerElement & element, TiXmlElement * xmlE
 
 		    TiXmlElement * xmlChild = new TiXmlElement( children[i].first.c_str() );
 	        xmlElement->LinkEndChild( xmlChild );
-			SerializeToXML(*children[i].second, xmlChild);
+			ToXML(*children[i].second, xmlChild);
 		}
 	}
 	else
@@ -59,7 +59,7 @@ void Serializer::SerializeToXML(SerializerElement & element, TiXmlElement * xmlE
 
 }
 
-void Serializer::UnserializeFromXML(SerializerElement & element, const TiXmlElement * xmlElement)
+void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlElement)
 {
 	if(!xmlElement) return;
 
@@ -85,7 +85,7 @@ void Serializer::UnserializeFromXML(SerializerElement & element, const TiXmlElem
 		{
 			std::string name = child->Value();
 			SerializerElement & childElement = element.AddChild(name);
-			UnserializeFromXML(childElement, child);
+			FromXML(childElement, child);
 		}
 
 		child = child->NextSiblingElement();
@@ -118,7 +118,7 @@ namespace
 	}
 }
 
-std::string Serializer::SerializeToJSON(const SerializerElement & element)
+std::string Serializer::ToJSON(const SerializerElement & element)
 {
 	if (element.IsValueUndefined())
 	{
@@ -147,7 +147,7 @@ std::string Serializer::SerializeToJSON(const SerializerElement & element)
 				}
 
 		        if ( !firstChild ) str += ",";
-		        str += SerializeToJSON(*children[i].second);
+		        str += ToJSON(*children[i].second);
 
 		        firstChild = false;
 			}
@@ -177,7 +177,7 @@ std::string Serializer::SerializeToJSON(const SerializerElement & element)
 					continue;
 
 		        if ( !firstChild ) str += ",";
-		        str += "\""+children[i].first+"\": "+SerializeToJSON(*children[i].second);
+		        str += "\""+children[i].first+"\": "+ToJSON(*children[i].second);
 
 		        firstChild = false;
 			}

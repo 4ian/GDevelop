@@ -18,6 +18,7 @@ namespace gd { class MainFrameWrapper; }
 namespace gd { class ArbitraryResourceWorker; }
 namespace gd { class InitialInstance; }
 namespace sf { class RenderTarget; }
+namespace sf { class SerializerElement; }
 class wxWindow;
 class wxBitmap;
 
@@ -244,21 +245,22 @@ public:
     ///@}
 
     /** \name Serialization
-     * Members functions related to saving and loading the object
+     * Members functions related to serialization of the object
      */
     ///@{
-
-    /**
-     * \brief Load object from an xml element.
-     */
-    void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
-
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Save object to an xml element.
+     * \brief Serialize the object.
+     * \see DoSerializeTo
      */
-    void SaveToXml(TiXmlElement * elemScene);
+    void SerializeTo(SerializerElement & element) const;
     #endif
+
+    /**
+     * \brief Unserialize the object.
+     * \see DoUnserializeFrom
+     */
+    void UnserializeFrom(gd::Project & project, const SerializerElement & element);
     ///@}
 
 protected:
@@ -270,13 +272,13 @@ protected:
     /**
      * \brief Derived objects can redefine this method to load custom attributes.
      */
-    virtual void DoLoadFromXml(gd::Project & project, const TiXmlElement * elemScene) {};
+    virtual void DoUnserializeFrom(gd::Project & project, const SerializerElement & element) {};
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Derived objects can redefine this method to save custom attributes.
      */
-    virtual void DoSaveToXml(TiXmlElement * elemScene) {};
+    virtual void DoSerializeTo(SerializerElement & element) const {};
     #endif
 
     /**

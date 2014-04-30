@@ -297,7 +297,7 @@ void ChoixTemplateEvent::Refresh()
 
         if ( elem->FirstChildElement( "Events" ) != NULL ) {
             gd::SerializerElement serializedEvents;
-            gd::Serializer::UnserializeFromXML(serializedEvents,  elem->FirstChildElement( "Events" ));
+            gd::Serializer::FromXML(serializedEvents,  elem->FirstChildElement( "Events" ));
             gd::EventsListSerialization::UnserializeEventsFrom(project, newTemplate.events, serializedEvents);
         }
         else

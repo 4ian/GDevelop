@@ -6,6 +6,9 @@
 #include <string>
 #include <iostream>
 #include "GDCore/Tools/VersionWrapper.h"
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/Tools/Log.cpp"
+#endif
 
 void GD_API GDLogBanner()
 {

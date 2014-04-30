@@ -26,8 +26,8 @@ public:
      */
     ///@{
     #if !defined(EMSCRIPTEN)
-	static void SerializeToXML(SerializerElement & element, TiXmlElement * xmlElement);
-	static void UnserializeFromXML(SerializerElement & element, const TiXmlElement * xmlElement);
+	static void ToXML(SerializerElement & element, TiXmlElement * xmlElement);
+	static void FromXML(SerializerElement & element, const TiXmlElement * xmlElement);
 	#endif
     ///@}
 
@@ -37,8 +37,8 @@ public:
      * \warning Not available when compiling with emscripten.
      */
     ///@{
-	static std::string SerializeToJSON(const SerializerElement & element);
-	static SerializerElement UnserializeFromJSON(const std::string & json);
+	static std::string ToJSON(const SerializerElement & element);
+	static SerializerElement FromJSON(const std::string & json);
     ///@}
 
 private:

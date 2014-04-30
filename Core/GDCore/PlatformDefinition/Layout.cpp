@@ -17,7 +17,6 @@
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -210,173 +209,100 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
     }
 }
 
-void Layout::SaveToXml(TiXmlElement * scene) const
+void Layout::SerializeTo(SerializerElement & element) const
 {
-    if ( scene == NULL ) return;
-
-    scene->SetAttribute( "nom", GetName().c_str() );
-    scene->SetAttribute( "mangledName", GetMangledName().c_str() );
-    scene->SetDoubleAttribute( "r", GetBackgroundColorRed() );
-    scene->SetDoubleAttribute( "v", GetBackgroundColorGreen() );
-    scene->SetDoubleAttribute( "b", GetBackgroundColorBlue() );
-    scene->SetAttribute( "titre", GetWindowDefaultTitle().c_str() );
-    scene->SetDoubleAttribute( "oglFOV", oglFOV );
-    scene->SetDoubleAttribute( "oglZNear", oglZNear );
-    scene->SetDoubleAttribute( "oglZFar", oglZFar );
-    scene->SetAttribute( "standardSortMethod", standardSortMethod ? "true" : "false" );
-    scene->SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup ? "true" : "false" );
-    scene->SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused ? "true" : "false" );
+    element.SetAttribute( "nom", GetName());
+    element.SetAttribute( "mangledName", GetMangledName());
+    element.SetAttribute( "r", (int)GetBackgroundColorRed() );
+    element.SetAttribute( "v", (int)GetBackgroundColorGreen() );
+    element.SetAttribute( "b", (int)GetBackgroundColorBlue() );
+    element.SetAttribute( "title", GetWindowDefaultTitle());
+    element.SetAttribute( "oglFOV", oglFOV );
+    element.SetAttribute( "oglZNear", oglZNear );
+    element.SetAttribute( "oglZFar", oglZFar );
+    element.SetAttribute( "standardSortMethod", standardSortMethod);
+    element.SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup);
+    element.SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused);
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    TiXmlElement * settings = new TiXmlElement( "UISettings" );
-    scene->LinkEndChild( settings );
-
-    gd::SerializerElement serializedSettings;
-    GetAssociatedLayoutEditorCanvasOptions().SerializeTo(serializedSettings);
-    gd::Serializer::SerializeToXML(serializedSettings, settings);
+    GetAssociatedLayoutEditorCanvasOptions().SerializeTo(element.AddChild("uiSettings"));
     #endif
 
-    TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
-    scene->LinkEndChild( grpsobjets );
-    gd::SerializerElement serializedObjectsGroups;
-    ObjectGroup::SerializeTo(GetObjectGroups(), serializedObjectsGroups);
-    gd::Serializer::SerializeToXML(serializedObjectsGroups, grpsobjets);
+    ObjectGroup::SerializeTo(GetObjectGroups(), element.AddChild("objectsGroups"));
+    GetVariables().SerializeTo(element.AddChild("variables"));
+    GetInitialInstances().SerializeTo(element.AddChild("instances"));
+    SerializeObjectsTo(element.AddChild("objects"));
+    gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 
-    TiXmlElement * objets = new TiXmlElement( "Objets" );
-    scene->LinkEndChild( objets );
-    SaveObjectsToXml(objets);
-
-    TiXmlElement * initialLayersElem = new TiXmlElement( "Layers" );
-    scene->LinkEndChild( initialLayersElem );
+    SerializerElement & layersElement = element.AddChild("layers");
+    layersElement.ConsiderAsArrayOf("layer");
     for ( unsigned int j = 0;j < GetLayersCount();++j )
-    {
-        TiXmlElement * layer = new TiXmlElement( "Layer" );
-        initialLayersElem->LinkEndChild( layer );
+        GetLayer(j).SerializeTo(layersElement.AddChild("layer"));
 
-        gd::SerializerElement serializedVariables;
-        GetLayer(j).SerializeTo(serializedVariables);
-        gd::Serializer::SerializeToXML(serializedVariables, layer);
-    }
-
-    TiXmlElement * variables = new TiXmlElement( "Variables" );
-    scene->LinkEndChild( variables );
-    gd::SerializerElement serializedVariables;
-    GetVariables().SerializeTo(serializedVariables);
-    gd::Serializer::SerializeToXML(serializedVariables, variables);
-
-    TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
-    scene->LinkEndChild( autosSharedDatas );
+    SerializerElement & automatismDatasElement = element.AddChild("automatismsSharedData");
+    automatismDatasElement.ConsiderAsArrayOf("automatismSharedData");
     for (std::map<std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
-        TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
-        autosSharedDatas->LinkEndChild( autoSharedDatas );
+        SerializerElement & dataElement = automatismDatasElement.AddChild("automatismSharedData");
 
-        autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
-        autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
-        gd::SerializerElement serializedData;
-        it->second->SerializeTo(serializedData);
-        gd::Serializer::SerializeToXML(serializedData, autoSharedDatas);
+        dataElement.SetAttribute("type", it->second->GetTypeName());
+        dataElement.SetAttribute("name", it->second->GetName());
+        it->second->SerializeTo(dataElement);
     }
-
-    TiXmlElement * positions = new TiXmlElement( "Positions" );
-    scene->LinkEndChild( positions );
-    gd::SerializerElement serializedInstances;
-    GetInitialInstances().SerializeTo(serializedInstances);
-    gd::Serializer::SerializeToXML(serializedInstances, positions);
-
-    TiXmlElement * eventsElem = new TiXmlElement( "Events" );
-    scene->LinkEndChild( eventsElem );
-    gd::SerializerElement serializedEvents;
-    gd::EventsListSerialization::SerializeEventsTo(GetEvents(), serializedEvents);
-    gd::Serializer::SerializeToXML(serializedEvents, eventsElem);
 }
 #endif
 
-void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
+void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    if ( elem->Attribute( "r" ) != NULL && elem->Attribute( "v" ) != NULL && elem->Attribute( "b" ) != NULL)
-        SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" )));
-    SetWindowDefaultTitle( elem->Attribute( "titre" ) != NULL ? elem->Attribute( "titre" ) : "" );
-
-    if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &oglFOV); }
-    if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &oglZNear); }
-    if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &oglZFar); }
-    if ( elem->Attribute( "standardSortMethod" ) != NULL ) { standardSortMethod = ToString(elem->Attribute( "standardSortMethod" )) == "true"; }
-    if ( elem->Attribute( "stopSoundsOnStartup" ) != NULL ) { stopSoundsOnStartup = ToString(elem->Attribute( "stopSoundsOnStartup" )) == "true"; }
-    if ( elem->Attribute( "disableInputWhenNotFocused" ) != NULL ) { disableInputWhenNotFocused = ToString(elem->Attribute( "disableInputWhenNotFocused" )) == "true"; }
+    SetBackgroundColor(element.GetIntAttribute( "r" ), element.GetIntAttribute( "v" ), element.GetIntAttribute( "b" ));
+    SetWindowDefaultTitle( element.GetStringAttribute("title", "(Unnamed layout)", "Titre") );
+    oglFOV = element.GetDoubleAttribute("oglFOV");
+    oglZNear = element.GetDoubleAttribute("oglZNear");
+    oglZFar = element.GetDoubleAttribute("oglZFar");
+    standardSortMethod = element.GetBoolAttribute( "standardSortMethod" );
+    stopSoundsOnStartup = element.GetBoolAttribute( "stopSoundsOnStartup" );
+    disableInputWhenNotFocused = element.GetBoolAttribute( "disableInputWhenNotFocused" );
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    gd::SerializerElement serializedSettings;
-    gd::Serializer::UnserializeFromXML(serializedSettings, elem->FirstChildElement( "UISettings" ));
-    associatedSettings.UnserializeFrom(serializedSettings);
+    associatedSettings.UnserializeFrom(element.GetChild("uiSettings", 0, "UISettings"));
     #endif
 
     #if defined(GD_IDE_ONLY)
-    if ( elem->FirstChildElement( "GroupesObjets" ) != NULL ) {
-        gd::SerializerElement serializedObjectsGroups;
-        gd::Serializer::UnserializeFromXML(serializedObjectsGroups, elem->FirstChildElement( "GroupesObjets" ));
-        ObjectGroup::UnserializeFrom(GetObjectGroups(), serializedObjectsGroups);
-    }
+    gd::ObjectGroup::UnserializeFrom(objectGroups, element.GetChild( "objectsGroups", 0, "GroupesObjets" ));
+    gd::EventsListSerialization::UnserializeEventsFrom(project, GetEvents(), element.GetChild("events", 0, "Events"));
     #endif
 
-    if ( elem->FirstChildElement( "Objets" ) != NULL )
-        LoadObjectsFromXml(project, elem->FirstChildElement( "Objets" ));
+    UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
+    initialInstances.UnserializeFrom(element.GetChild("instances", 0, "Positions"));
+    variables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
-    if ( elem->FirstChildElement( "Positions" ) != NULL ) {
-        gd::SerializerElement serializedInstances;
-        gd::Serializer::UnserializeFromXML(serializedInstances, elem->FirstChildElement( "Positions" ));
-        initialInstances.UnserializeFrom(serializedInstances);
+    SerializerElement & layersElement = element.GetChild("layers", 0, "Layers");
+    layersElement.ConsiderAsArrayOf("layer", "Layer");
+    for (unsigned int i = 0; i < layersElement.GetChildrenCount(); ++i)
+    {
+        gd::Layer layer;
+
+        layer.UnserializeFrom(layersElement.GetChild(i));
+        initialLayers.push_back(layer);
     }
 
-    if ( elem->FirstChildElement( "Layers" ) != NULL )
+    SerializerElement & automatismsDataElement = element.GetChild("automatismsSharedData", 0, "AutomatismsSharedDatas");
+    automatismsDataElement.ConsiderAsArrayOf("automatismSharedData", "AutomatismSharedDatas");
+    for (unsigned int i = 0; i < automatismsDataElement.GetChildrenCount(); ++i)
     {
-        initialLayers.clear();
-        const TiXmlElement * elemLayer = elem->FirstChildElement( "Layers" )->FirstChildElement("Layer");
-        while ( elemLayer )
-        {
-            gd::Layer layer;
-            gd::SerializerElement serializedLayer;
-            gd::Serializer::UnserializeFromXML(serializedLayer, elemLayer);
-            layer.UnserializeFrom(serializedLayer);
+        SerializerElement & automatismDataElement = automatismsDataElement.GetChild(i);
+        std::string type = automatismDataElement.GetStringAttribute("type", "", "Type");
 
-            initialLayers.push_back(layer);
-            elemLayer = elemLayer->NextSiblingElement();
+        boost::shared_ptr<gd::AutomatismsSharedData> sharedData = project.CreateAutomatismSharedDatas(type);
+        if ( sharedData != boost::shared_ptr<gd::AutomatismsSharedData>() )
+        {
+            sharedData->SetName( automatismDataElement.GetStringAttribute("name", "", "Name") );
+            sharedData->UnserializeFrom(automatismDataElement);
+
+            automatismsInitialSharedDatas[sharedData->GetName()] = sharedData;
         }
 
-    }
-
-    #if defined(GD_IDE_ONLY)
-    if ( elem->FirstChildElement( "Events" ) != NULL ) {
-        gd::SerializerElement serializedEvents;
-        gd::Serializer::UnserializeFromXML(serializedEvents, elem->FirstChildElement( "Events" ));
-        gd::EventsListSerialization::UnserializeEventsFrom(project, GetEvents(), serializedEvents);
-    }
-    #endif
-
-    if ( elem->FirstChildElement( "Variables" ) != NULL )
-        variables.LoadFromXml(elem->FirstChildElement( "Variables" ));
-
-    if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
-    {
-        const TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
-        while ( elemSharedDatas != NULL )
-        {
-            std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
-            boost::shared_ptr<gd::AutomatismsSharedData> sharedDatas = project.CreateAutomatismSharedDatas(type);
-
-            if ( sharedDatas != boost::shared_ptr<gd::AutomatismsSharedData>() )
-            {
-                sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
-                gd::SerializerElement serializedData;
-                gd::Serializer::UnserializeFromXML(serializedData, elemSharedDatas);
-                sharedDatas->UnserializeFrom(serializedData);
-
-                automatismsInitialSharedDatas[sharedDatas->GetName()] = sharedDatas;
-            }
-
-            elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
-        }
     }
 }
 

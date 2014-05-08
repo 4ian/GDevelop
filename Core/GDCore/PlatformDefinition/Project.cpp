@@ -733,6 +733,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #endif
 }
 
+#if !defined(EMSCRIPTEN)
 bool Project::LoadFromFile(const std::string & filename)
 {
     //Load the XML document structure
@@ -753,13 +754,20 @@ bool Project::LoadFromFile(const std::string & filename)
 
     TiXmlHandle hdl( &doc );
     gd::SerializerElement rootElement;
-    gd::Serializer::FromXML(rootElement, hdl.FirstChildElement("Project").Element());
+
+    TiXmlElement * rootXmlElement = hdl.FirstChildElement("project").ToElement();
+    //Compatibility with GD <= 3.3
+    if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Project").ToElement();
+    if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Game").ToElement();
+    //End of compatibility code
+    gd::Serializer::FromXML(rootElement, rootXmlElement);
 
     //Unserialize the whole project
     UnserializeFrom(rootElement);
 
     return true;
 }
+#endif
 
 #if defined(GD_IDE_ONLY)
 void Project::SerializeTo(SerializerElement & element) const
@@ -826,6 +834,7 @@ void Project::SerializeTo(SerializerElement & element) const
     #endif
 }
 
+#if !defined(EMSCRIPTEN)
 bool Project::SaveToFile(const std::string & filename)
 {
     //Serialize the whole project
@@ -837,7 +846,7 @@ bool Project::SaveToFile(const std::string & filename)
     TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
     doc.LinkEndChild( decl );
 
-    TiXmlElement * root = new TiXmlElement( "Project" );
+    TiXmlElement * root = new TiXmlElement( "project" );
     doc.LinkEndChild( root );
     gd::Serializer::ToXML(rootElement, root); //...and put the serialized project in it.
 
@@ -850,6 +859,7 @@ bool Project::SaveToFile(const std::string & filename)
 
     return true;
 }
+#endif
 
 bool Project::ValidateObjectName(const std::string & name)
 {

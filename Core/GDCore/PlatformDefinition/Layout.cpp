@@ -211,7 +211,7 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
 
 void Layout::SerializeTo(SerializerElement & element) const
 {
-    element.SetAttribute( "nom", GetName());
+    element.SetAttribute( "name", GetName());
     element.SetAttribute( "mangledName", GetMangledName());
     element.SetAttribute( "r", (int)GetBackgroundColorRed() );
     element.SetAttribute( "v", (int)GetBackgroundColorGreen() );
@@ -256,7 +256,7 @@ void Layout::SerializeTo(SerializerElement & element) const
 void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
     SetBackgroundColor(element.GetIntAttribute( "r" ), element.GetIntAttribute( "v" ), element.GetIntAttribute( "b" ));
-    SetWindowDefaultTitle( element.GetStringAttribute("title", "(Unnamed layout)", "Titre") );
+    SetWindowDefaultTitle( element.GetStringAttribute("title", "(No title)", "titre") );
     oglFOV = element.GetDoubleAttribute("oglFOV");
     oglZNear = element.GetDoubleAttribute("oglZNear");
     oglZFar = element.GetDoubleAttribute("oglZFar");
@@ -277,6 +277,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     initialInstances.UnserializeFrom(element.GetChild("instances", 0, "Positions"));
     variables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
+    initialLayers.clear();
     SerializerElement & layersElement = element.GetChild("layers", 0, "Layers");
     layersElement.ConsiderAsArrayOf("layer", "Layer");
     for (unsigned int i = 0; i < layersElement.GetChildrenCount(); ++i)

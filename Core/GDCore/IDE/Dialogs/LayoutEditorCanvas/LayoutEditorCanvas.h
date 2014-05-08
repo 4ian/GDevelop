@@ -287,6 +287,7 @@ protected:
     static const long ID_ADDOBJMENU;
     static const long ID_DELOBJMENU;
     static const long ID_PROPMENU;
+    static const long ID_AUTOMENU;
     static const long ID_LAYERUPMENU;
     static const long ID_LAYERDOWNMENU;
     static const long ID_COPYMENU;
@@ -349,6 +350,7 @@ protected:
     virtual void OnCustomZoom200Selected(wxCommandEvent& event);
     virtual void OnCustomZoom500Selected(wxCommandEvent& event);
     virtual void OnPropObjSelected( wxCommandEvent & event );
+    virtual void OnAddAutoObjSelected( wxCommandEvent & event );
     virtual void OnLayerUpSelected( wxCommandEvent & event );
     virtual void OnLayerDownSelected( wxCommandEvent & event );
     virtual void OnCopySelected( wxCommandEvent & event );

@@ -36,7 +36,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("X position"));
+        .AddParameter("expression", _("X position"))
+        .SetManipulatedType("number");
 
     obj.AddAction("MettreX",
                    _("X position of an object"),
@@ -48,7 +49,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("PosY",
@@ -61,7 +63,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Y position"));
+        .AddParameter("expression", _("Y position"))
+        .SetManipulatedType("number");
 
     obj.AddAction("MettreY",
                    _("Y position of an object"),
@@ -73,7 +76,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
 
 
     obj.AddAction("MettreXY",
@@ -196,7 +200,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ChangeLayer",
@@ -222,7 +227,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("objectvar", _("Variable"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ModVarObjetTxt",
@@ -236,7 +242,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("objectvar", _("Variable"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("string", _("Text"));
+        .AddParameter("string", _("Text"))
+        .SetManipulatedType("string");
 
     obj.AddCondition("ObjectVariableChildExists",
              _("Child existence"),
@@ -294,7 +301,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Z order"));
+        .AddParameter("expression", _("Z order"))
+        .SetManipulatedType("number");
 
     obj.AddCondition("Layer",
                    _("Test the layer of an object"),
@@ -347,7 +355,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Speed"));
+        .AddParameter("expression", _("Speed"))
+        .SetManipulatedType("number");
 
     obj.AddCondition("AngleOfDisplacement",
                    _("Angle of moving"),
@@ -372,7 +381,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("objectvar", _("Variable"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"));
+        .AddParameter("expression", _("Value to test"))
+        .SetManipulatedType("number");
 
     obj.AddCondition("VarObjetTxt",
                    _("Text of an object's variable"),
@@ -385,7 +395,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("objectvar", _("Variable"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("string", _("Text to test"));
+        .AddParameter("string", _("Text to test"))
+        .SetManipulatedType("string");
 
     obj.AddCondition("VarObjetDef",
                    _("Variable defined"),
@@ -692,7 +703,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    "res/conditions/nbObjet.png")
         .AddParameter("objectList", _("Object"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"));
+        .AddParameter("expression", _("Value to test"))
+        .SetManipulatedType("number");
 
     extension.AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),

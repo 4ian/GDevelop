@@ -92,7 +92,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("X position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
 
 
@@ -107,7 +108,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Y position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
 
 

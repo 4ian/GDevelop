@@ -99,6 +99,11 @@ std::vector <T> SplitString( const std::string & str, char separator )
     return array;
 }
 
+inline double Pi()
+{
+    return 3.141592653589793238;
+}
+
 #ifdef __GNUC__
 /**
  * Round the number to the nearest integer

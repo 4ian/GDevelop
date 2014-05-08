@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <utility>
 #if !defined(EMSCRIPTEN)
 #include "GDCore/TinyXml/tinyxml.h"
 #endif
@@ -107,14 +108,25 @@ namespace
 	{
 		if (val.IsBoolean())
 			return val.GetBool() ? "true" : "false";
-		else if (val.IsString())
-			return "\""+val.GetString() + "\"";
 		else if (val.IsInt())
 			return gd::ToString(val.GetInt());
 		else if (val.IsDouble())
 			return gd::ToString(val.GetDouble());
 		else
-			return "\""+val.GetString() + "\"";
+		{
+			//String: Replace newlines and quotes
+			std::string str = val.GetString();
+
+			size_t pos = std::string::npos;
+			while((pos = str.find("\n")) < str.length()) {
+	            str.replace(pos, 1, "\\n" );
+			}
+			while((pos = str.find("\"")) < str.length()) {
+	            str.replace(pos, 1, "\\\"" );
+			}
+
+			return "\""+str+ "\"";
+		}
 	}
 }
 
@@ -191,5 +203,133 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 		return ValueToJSON(element.GetValue());
 	}
 }
+
+
+
+//Private functions for JSON parsing
+namespace
+{
+    size_t SkipBlankChar(const std::string & str, size_t pos)
+    {
+        const std::string blankChar = " \n";
+        return str.find_first_not_of(blankChar, pos);
+    }
+
+    /**
+     * Return the position of the end of the string. Blank are skipped if necessary
+     * @param str The string to be used
+     * @param startPos The start position
+     * @param strContent A reference to a string that will be filled with the string content.
+     */
+    size_t SkipString(const std::string & str, size_t startPos, std::string & strContent)
+    {
+        startPos = SkipBlankChar(str, startPos);
+        if ( startPos >= str.length() ) return std::string::npos;
+
+        size_t endPos = startPos;
+
+        if ( str[startPos] == '"' )
+        {
+            if ( startPos+1 >= str.length() ) return std::string::npos;
+
+            while (endPos == startPos || (str[endPos-1] == '\\'))
+            {
+                endPos = str.find_first_of('\"', endPos+1);
+                if ( endPos == std::string::npos ) return std::string::npos; //Invalid string
+            }
+
+            strContent = str.substr(startPos+1, endPos-1-startPos);
+            return endPos;
+        }
+
+        endPos = str.find_first_of(" \n,:");
+        if ( endPos >= str.length() ) return std::string::npos; //Invalid string
+
+        strContent = str.substr(startPos, endPos-1-startPos);
+        return endPos-1;
+    }
+
+    /**
+     * Parse a JSON string, starting from pos, and storing the result into the specified element.
+     * Note that the parsing is stopped as soon as a valid object is parsed.
+     * \return The position at the end of the valid object stored into the element.
+     */
+    size_t ParseJSONObject(const std::string & jsonStr, size_t startPos, gd::SerializerElement & element)
+    {
+        size_t pos = SkipBlankChar(jsonStr, startPos);
+        if ( pos >= jsonStr.length() ) return std::string::npos;
+
+        if ( jsonStr[pos] == '{' ) //Object
+        {
+            bool firstChild = true;
+            while ( firstChild || jsonStr[pos] == ',' )
+            {
+                pos++;
+                std::string childName;
+                pos = SkipString(jsonStr, pos, childName);
+
+                pos++;
+                pos = SkipBlankChar(jsonStr, pos);
+                if ( pos >= jsonStr.length() || jsonStr[pos] != ':' ) return std::string::npos;
+
+                pos++;
+                pos = ParseJSONObject(jsonStr, pos, element.AddChild(childName));
+
+                pos = SkipBlankChar(jsonStr, pos);
+                if ( pos >= jsonStr.length()) return std::string::npos;
+                firstChild = false;
+            }
+
+            if ( jsonStr[pos] != '}' ) return std::string::npos;
+            return pos+1;
+        }
+        else if ( jsonStr[pos] == '[' ) //Array
+        {
+            unsigned int index = 0;
+            while ( index == 0 || jsonStr[pos] == ',' )
+            {
+                pos++;
+                pos = ParseJSONObject(jsonStr, pos, element.AddChild(""));
+
+                pos = SkipBlankChar(jsonStr, pos);
+                if ( pos >= jsonStr.length()) return std::string::npos;
+                index++;
+            }
+
+            if ( jsonStr[pos] != ']' ) return std::string::npos;
+            return pos+1;
+        }
+        else if ( jsonStr[pos] == '"' ) //String
+        {
+            std::string str;
+            pos = SkipString(jsonStr, pos, str);
+            if ( pos >= jsonStr.length() ) return std::string::npos;
+
+            element.SetValue(str);
+            return pos+1;
+        }
+        else
+        {
+            std::string str;
+            size_t endPos = pos;
+            const std::string separators = " \n,}";
+            while (endPos < jsonStr.length() && separators.find_first_of(jsonStr[endPos]) == std::string::npos ) {
+                endPos++;
+            }
+
+            str = jsonStr.substr(pos, endPos-pos);
+            element.SetValue(ToDouble(str));
+            return endPos;
+        }
+    }
+}
+
+SerializerElement Serializer::FromJSON(const std::string & jsonStr)
+{
+	SerializerElement element;
+   	if ( !jsonStr.empty() ) gd::ParseJSONObject(jsonStr, 0, element);
+	return element;
+}
+
 
 }

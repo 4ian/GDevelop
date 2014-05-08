@@ -37,7 +37,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ChangeAnimation",
@@ -50,7 +51,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
 
 
     obj.AddAction("ChangeDirection",
@@ -63,7 +64,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
 
 
     obj.AddAction("ChangeSprite",
@@ -76,7 +77,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
 
 
     obj.AddAction("PauseAnimation",
@@ -138,7 +139,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
 
 
     obj.AddAction("ChangeScaleHeight",
@@ -151,7 +152,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
 
 
     obj.AddCondition("Animation",
@@ -164,7 +165,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Number to test"), "",false);
+        .AddParameter("expression", _("Number to test"), "",false)
+        .SetManipulatedType("number");
 
     obj.AddCondition("Direction",
                    _("Current direction"),
@@ -176,7 +178,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Direction to test"), "",false);
+        .AddParameter("expression", _("Direction to test"), "",false)
+        .SetManipulatedType("number");
 
     obj.AddCondition("Sprite",
                    _("Current frame"),
@@ -188,7 +191,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Animation frame to test"), "",false);
+        .AddParameter("expression", _("Animation frame to test"), "",false)
+        .SetManipulatedType("number");
 
     obj.AddCondition("AnimStopped",
                    _("Animation is paused"),
@@ -220,7 +224,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false);
+        .AddParameter("expression", _("Value to test"), "",false).SetManipulatedType("number");
 
     obj.AddCondition("ScaleHeight",
                    _("Scale on Y axis"),
@@ -232,7 +236,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false);
+        .AddParameter("expression", _("Value to test"), "",false).SetManipulatedType("number");
 
     obj.AddCondition("Opacity",
                    _("Opacity"),
@@ -244,7 +248,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false);
+        .AddParameter("expression", _("Value to test"), "",false)
+        .SetManipulatedType("number");
 
     obj.AddCondition("BlendMode",
                    _("Blend mode"),
@@ -256,7 +261,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false);
+        .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
+        .SetManipulatedType("number");
 
     obj.AddAction("CopyImageOnImageOfSprite",
                    _("Copy an image on the current one of an object"),

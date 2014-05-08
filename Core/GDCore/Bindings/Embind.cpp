@@ -21,6 +21,7 @@
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include <set>
@@ -161,6 +162,7 @@ EMSCRIPTEN_BINDINGS(gd_Project) {
         .function("validateObjectName", &Project::ValidateObjectName)
 
         .function("isDirty", &Project::IsDirty).function("setDirty", &Project::SetDirty)
+        .function("serializeTo", &Project::SerializeTo).function("unserializeFrom", &Project::UnserializeFrom)
         //Properties, for convenience only:
         .property("name", &Project::GetName, &Project::SetName)
         .property("author", &Project::GetAuthor, &Project::SetAuthor)
@@ -354,6 +356,17 @@ EMSCRIPTEN_BINDINGS(gd_PropertyDescriptor) {
         .function("getType", &PropertyDescriptor::GetType)
         .function("addExtraInfo", &PropertyDescriptor_AddExtraInfo, allow_raw_pointers())
         .function("getExtraInfo", &PropertyDescriptor::GetExtraInfo)
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_Serializer) {
+    class_<SerializerElement>("SerializerElement")
+        .constructor<>()
+        ;
+
+    class_<Serializer>("Serializer")
+        .class_function("toJSON", &Serializer::ToJSON)
+        .class_function("fromJSON", &Serializer::FromJSON)
         ;
 }
 

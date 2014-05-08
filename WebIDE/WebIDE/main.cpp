@@ -36,30 +36,12 @@ public:
 
 		return *project;
 	}
-
-	static std::string DumpProjectXml(gd::Project & project)
-	{
-	    TiXmlDocument doc;
-	    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
-	    doc.LinkEndChild( decl );
-
-	    TiXmlElement * root = new TiXmlElement( "Project" );
-	    doc.LinkEndChild( root );
-
-	    project.SaveToXml(root);
-
-		TiXmlPrinter printer;
-		doc.Accept( &printer );
-		return printer.CStr();
-	}
-
 };
 
 EMSCRIPTEN_BINDINGS(GD) {
     class_<ProjectHelper>("ProjectHelper")
 	    .class_function("createNewGDJSProject", &ProjectHelper::CreateNewGDJSProject)
-	    .class_function("dumpProjectXml", &ProjectHelper::DumpProjectXml)
-	    ;
+	  	;
 
     function("initializePlatforms", &InitializePlatforms);
 }

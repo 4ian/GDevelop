@@ -40,9 +40,15 @@ public:
     virtual ~ChooseAutomatismTypeDialog();
 
     /**
-     * Returns the selected automatism type.
+     * \brief Returns the selected automatism type.
      */
     const std::string & GetSelectedAutomatismType() const { return selectedAutomatismType; }
+
+    /**
+     * \brief Display the dialog and add the selected automatism to the object.
+     */
+    static bool ChooseAndAddAutomatismToObject(wxWindow * parent, gd::Project & project, gd::Object * object,
+        gd::Layout * layout, bool isGlobalObject);
 
 private:
 

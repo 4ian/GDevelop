@@ -5,7 +5,6 @@ module.exports = function(grunt) {
         mochacli: {
             options: {
                 require: ['expect.js'],
-                reporter: 'dot',
                 bail: true
             },
             all: ['test/*.js']

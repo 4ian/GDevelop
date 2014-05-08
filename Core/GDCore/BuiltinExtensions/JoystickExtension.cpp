@@ -29,8 +29,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
         .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("expression", _("Button"), "",false);
 
-
-
     extension.AddCondition("JoystickAxis",
                    _("Value of an axis of a joystick"),
                    _("Test the value of an axis of a joystick."),
@@ -42,9 +40,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
         .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("joyaxis", _("Axis"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false);
-
-
+        .AddParameter("expression", _("Value to test"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("GetJoystickAxis",
                    _("Get the value of the axis of a joystick"),
@@ -56,7 +53,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("joyaxis", _("Axis"), "",false)
-        .AddParameter("scenevar", _("Save result to scene variable"), "",false);
+        .AddParameter("scenevar", _("Save result to scene variable"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddExpression("GetJoystickAxis",
                    _("Joystick axis"),

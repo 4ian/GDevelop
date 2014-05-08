@@ -19,10 +19,13 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/CommonTools.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
@@ -277,6 +280,47 @@ void ChooseAutomatismTypeDialog::OnplatformChoiceSelect(wxCommandEvent& event)
 
     project.SetCurrentPlatform(project.GetUsedPlatforms()[event.GetInt()]->GetName());
     RefreshList();
+}
+
+bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * parent, gd::Project & project, gd::Object * object, gd::Layout * layout, bool isGlobalObject)
+{
+    gd::ChooseAutomatismTypeDialog dialog(parent, project);
+    if ( dialog.ShowModal() == 1)
+    {
+        //Find automatism metadata
+        boost::shared_ptr<gd::PlatformExtension> extension = boost::shared_ptr<gd::PlatformExtension> ();
+        std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
+        for (unsigned int i = 0;i<extensions.size();++i)
+        {
+            std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+            if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.GetSelectedAutomatismType()) != automatismsTypes.end() )
+                extension = extensions[i];
+        }
+        gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.GetSelectedAutomatismType());
+
+        //Add automatism to object
+        std::string autoName = metadata.GetDefaultName();
+        for (unsigned int j = 2;object->HasAutomatismNamed(autoName);++j)
+            autoName = metadata.GetDefaultName()+gd::ToString(j);
+
+        object->AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
+
+        //Let the scene know about the new automatism
+        if ( isGlobalObject && layout )
+            layout->UpdateAutomatismsSharedData(project);
+        else //Scene pointer is NULL: Update shared data of all layouts
+        {
+            for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+                project.GetLayout(i).UpdateAutomatismsSharedData(project);
+        }
+
+        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, isGlobalObject ? NULL : layout, *object, object->GetAutomatism(autoName));
+
+        return true;
+    }
+
+    return false;
 }
 
 }

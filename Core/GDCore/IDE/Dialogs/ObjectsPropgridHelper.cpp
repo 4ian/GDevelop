@@ -162,32 +162,8 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         }
         else if ( event.GetPropertyName() == "AUTO_ADD" )
         {
-            gd::ChooseAutomatismTypeDialog dialog(grid, project);
-            if ( dialog.ShowModal() == 1)
-            {
-                //Find automatism metadata
-                boost::shared_ptr<gd::PlatformExtension> extension = boost::shared_ptr<gd::PlatformExtension> ();
-                std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-                for (unsigned int i = 0;i<extensions.size();++i)
-                {
-                    std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-                    if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.GetSelectedAutomatismType()) != automatismsTypes.end() )
-                        extension = extensions[i];
-                }
-                gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.GetSelectedAutomatismType());
-
-                //Add automatism to object
-                std::string autoName = metadata.GetDefaultName();
-                for (unsigned int j = 2;object->HasAutomatismNamed(autoName);++j)
-                    autoName = metadata.GetDefaultName()+ToString(j);
-
-                object->AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
-                UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
-                for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, globalObject ? NULL : layout, *object, object->GetAutomatism(autoName));
-
-                return true;
-            }
+            return gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(grid, project,
+                object, layout, globalObject);
         }
         else if ( event.GetPropertyName() == "AUTO_REMOVE" )
         {

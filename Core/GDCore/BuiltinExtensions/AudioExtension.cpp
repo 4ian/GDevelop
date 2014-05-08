@@ -116,7 +116,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("ModVolumeMusicCanal",
                    _("Volume of the music on a channel"),
@@ -128,7 +129,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("ModGlobalVolume",
                    _("Game global volume"),
@@ -139,7 +141,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/volume.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("ModPitchSoundChannel",
                    _("Pitch of the sound of a channel"),
@@ -151,8 +154,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
-
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("ModPitchMusicChannel",
                    _("Pitch of the music on a channel"),
@@ -164,8 +167,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
-
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("ModPlayingOffsetSoundChannel",
                    _("Playing offset of the sound on a channel"),
@@ -177,7 +180,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("ModPlayingOffsetMusicChannel",
                    _("Playing offset of the music on a channel"),
@@ -189,7 +193,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddAction("PlaySound",
                    _("Play a sound"),
@@ -227,8 +232,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false);
 
-
-
     extension.AddCondition("MusicPaused",
                    _("A music is paused"),
                    _("Test if the music on the specified channel is paused."),
@@ -238,8 +241,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/musicpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false);
-
-
 
     extension.AddCondition("MusicStopped",
                    _("A music is stopped"),
@@ -251,7 +252,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false);
 
-
     extension.AddCondition("SoundPlaying",
                    _("A sound is being played"),
                    _("Test if the sound on a channel is being played."),
@@ -261,8 +261,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false);
-
-
 
     extension.AddCondition("SoundPaused",
                    _("A sound is paused"),
@@ -274,8 +272,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false);
 
-
-
     extension.AddCondition("SoundStopped",
                    _("A sound is stopped"),
                    _("Test if the sound on the specified channel is stopped."),
@@ -285,8 +281,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false);
-
-
 
     extension.AddCondition("SoundCanalVolume",
                    _("Volume of the sound on a channel"),
@@ -298,9 +292,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Volume to test"), "",false);
-
-
+        .AddParameter("expression", _("Volume to test"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddCondition("MusicCanalVolume",
                    _("Volume of the music on a channel"),
@@ -312,9 +305,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Volume to test"), "",false);
-
-
+        .AddParameter("expression", _("Volume to test"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddCondition("GlobalVolume",
                    _("Global volume"),
@@ -325,9 +317,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/volume.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Volume to test"), "",false);
-
-
+        .AddParameter("expression", _("Volume to test"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddCondition("SoundChannelPitch",
                    _("Pitch of the sound of a channel"),
@@ -339,9 +330,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Pitch to test"), "",false);
-
-
+        .AddParameter("expression", _("Pitch to test"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddCondition("MusicChannelPitch",
                    _("Pitch of the music on a channel"),
@@ -353,9 +343,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Pitch to test"), "",false);
-
-
+        .AddParameter("expression", _("Pitch to test"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddCondition("SoundChannelPlayingOffset",
                    _("Playing offset of the sound on a channel"),
@@ -367,9 +356,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Position ( in seconds )"), "",false);
-
-
+        .AddParameter("expression", _("Position ( in seconds )"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddCondition("MusicChannelPlayingOffset",
                    _("Playing offset of the music on a channel"),
@@ -381,7 +369,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Position ( in seconds )"), "",false);
+        .AddParameter("expression", _("Position ( in seconds )"), "",false)
+        .SetManipulatedType("number");
 
     extension.AddExpression("SoundChannelPlayingOffset", _("Sound playing offset"), _("Sound playing offset"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")

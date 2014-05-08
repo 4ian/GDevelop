@@ -81,6 +81,13 @@ bool SerializerElement::GetBoolAttribute(const std::string & name, bool defaultV
 		return attributes.find(name)->second.GetBool();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
 		return attributes.find(deprecatedName)->second.GetBool();
+	else {
+		if (HasChild(name, deprecatedName)) {
+			SerializerElement & child = GetChild(name, 0, deprecatedName);
+			if (!child.IsValueUndefined())
+				return child.GetValue().GetBool();
+		}
+	}
 
 	return defaultValue;
 }
@@ -97,6 +104,13 @@ std::string SerializerElement::GetStringAttribute(const std::string & name, std:
 		return attributes.find(name)->second.GetString();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
 		return attributes.find(deprecatedName)->second.GetString();
+	else {
+		if (HasChild(name, deprecatedName)) {
+			SerializerElement & child = GetChild(name, 0, deprecatedName);
+			if (!child.IsValueUndefined())
+				return child.GetValue().GetString();
+		}
+	}
 
 	return defaultValue;
 }
@@ -113,6 +127,13 @@ int SerializerElement::GetIntAttribute(const std::string & name, int defaultValu
 		return attributes.find(name)->second.GetInt();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
 		return attributes.find(deprecatedName)->second.GetInt();
+	else {
+		if (HasChild(name, deprecatedName)) {
+			SerializerElement & child = GetChild(name, 0, deprecatedName);
+			if (!child.IsValueUndefined())
+				return child.GetValue().GetInt();
+		}
+	}
 
 	return defaultValue;
 }
@@ -129,6 +150,13 @@ double SerializerElement::GetDoubleAttribute(const std::string & name, double de
 		return attributes.find(name)->second.GetDouble();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
 		return attributes.find(deprecatedName)->second.GetDouble();
+	else {
+		if (HasChild(name, deprecatedName)) {
+			SerializerElement & child = GetChild(name, 0, deprecatedName);
+			if (!child.IsValueUndefined())
+				return child.GetValue().GetDouble();
+		}
+	}
 
 	return defaultValue;
 }

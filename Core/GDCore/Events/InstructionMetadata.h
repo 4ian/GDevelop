@@ -111,9 +111,9 @@ public:
     bool IsHidden() const { return hidden; }
 
     /**
-     * Add a parameter to the instruction ( condition or action ) information class.
+     * \brief Add a parameter to the instruction ( condition or action ) information class.
      * \param type One of the type handled by Game Develop.
-     * This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
+     * This will also determine the type of the argument used when calling the function in the generated code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param description Description for parameter
      * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
      * \param parameterIsOptional true if the parameter must be optional, false otherwise.
@@ -121,14 +121,14 @@ public:
     InstructionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
-     * Add a parameter not displayed in editor.
+     * \brief Add a parameter not displayed in editor.
      * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
      */
     InstructionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
-     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     * \brief Set the default value used in editor (or if an optional parameter is empty during code generation) for the latest added parameter.
      *
      * \see AddParameter
      */
@@ -139,7 +139,7 @@ public:
     };
 
     /**
-     * \brief Defines information about how generate C++ code for an instruction
+     * \brief Defines information about how generate the code for an instruction
      */
     class ExtraInformation
     {
@@ -149,7 +149,7 @@ public:
         virtual ~ExtraInformation() {};
 
         /**
-         * Set the C++ function name which will be used when generating the C++ code.
+         * Set the function name which will be used when generating the code.
          */
         ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
@@ -158,7 +158,7 @@ public:
         }
 
         /**
-         * Declare if the instruction ( condition or action ) being declared is manipulating something in a standard way.
+         * Declare if the instruction being declared is somewhat manipulating in a standard way.
          */
         ExtraInformation & SetManipulatedType(const std::string & type_)
         {
@@ -227,6 +227,16 @@ public:
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
+
+    /**
+     * \brief Declare if the instruction being declared is somewhat manipulating in a standard way.
+     *
+     * Shortcut for "codeExtraInformation.SetManipulatedType(type)".
+     */
+    ExtraInformation & SetManipulatedType(const std::string & type_)
+    {
+        return codeExtraInformation.SetManipulatedType(type_);
+    }
 
     /** \brief DefaultConstructor.
      *

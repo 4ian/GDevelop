@@ -20,6 +20,7 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
@@ -72,6 +73,7 @@ const long LayoutEditorCanvas::idRibbonFullScreen = wxNewId();
 const long LayoutEditorCanvas::ID_ADDOBJMENU = wxNewId();
 const long LayoutEditorCanvas::ID_DELOBJMENU = wxNewId();
 const long LayoutEditorCanvas::ID_PROPMENU = wxNewId();
+const long LayoutEditorCanvas::ID_AUTOMENU = wxNewId();
 const long LayoutEditorCanvas::ID_LAYERUPMENU = wxNewId();
 const long LayoutEditorCanvas::ID_LAYERDOWNMENU = wxNewId();
 const long LayoutEditorCanvas::ID_COPYMENU = wxNewId();
@@ -164,6 +166,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
 	Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&LayoutEditorCanvas::OnMouseWheel);
     Connect(ID_DELOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnDeleteObjectSelected);
     Connect(ID_PROPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnPropObjSelected);
+    Connect(ID_AUTOMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnAddAutoObjSelected);
     Connect(ID_LAYERUPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnLayerUpSelected);
     Connect(ID_LAYERDOWNMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnLayerDownSelected);
     Connect(ID_COPYMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnCopySelected);
@@ -218,6 +221,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         deleteItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 
         contextMenu.Append(ID_PROPMENU, _("Properties"));
+        contextMenu.Append(ID_AUTOMENU, _("Add an automatims to the object"));
         contextMenu.AppendSeparator();
         contextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
         contextMenu.AppendSeparator();
@@ -622,6 +626,33 @@ void LayoutEditorCanvas::OnPropObjSelected(wxCommandEvent & event)
 {
     parentAuiManager->GetPane("PROPERTIES").Show();
     parentAuiManager->Update();
+}
+
+void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
+{
+    std::vector<gd::InitialInstance*> selection = GetSelection();
+    if (selection.empty()) return;
+
+    gd::Object * object = GetObjectLinkedToInitialInstance(*selection[0]);
+    bool globalObject = false;
+    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    {
+        if ( &project.GetObject(i) == object )
+        {
+            globalObject = true;
+            break;
+        }
+    }
+
+    gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
+        object, &layout, globalObject);
+
+    //Show the properties panel and ensure other editors are refreshed:
+    parentAuiManager->GetPane("PROPERTIES").Show();
+    parentAuiManager->Update();
+
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
 }
 
 /** \brief Tool class picking the smallest instance under the cursor.

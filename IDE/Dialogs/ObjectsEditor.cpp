@@ -25,6 +25,7 @@
 
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -52,11 +53,12 @@ namespace gd {
 const long ObjectsEditor::ID_TREECTRL1 = wxNewId();
 const long ObjectsEditor::ID_TEXTCTRL1 = wxNewId();
 const long ObjectsEditor::idMenuModObj = wxNewId();
+const long ObjectsEditor::idMenuAddAuto = wxNewId();
 const long ObjectsEditor::idMenuProp = wxNewId();
-const long ObjectsEditor::idMenuModName = wxNewId();
-const long ObjectsEditor::ID_SETGLOBALITEM = wxNewId();
 const long ObjectsEditor::idMenuAddObj = wxNewId();
 const long ObjectsEditor::idMenuDelObj = wxNewId();
+const long ObjectsEditor::idMenuModName = wxNewId();
+const long ObjectsEditor::ID_SETGLOBALITEM = wxNewId();
 const long ObjectsEditor::idMoveUp = wxNewId();
 const long ObjectsEditor::idMoveDown = wxNewId();
 const long ObjectsEditor::idMenuCopy = wxNewId();
@@ -120,14 +122,11 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	SetSizer(FlexGridSizer1);
 	editMenuI = new wxMenuItem((&contextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
 	contextMenu.Append(editMenuI);
+	MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add an automatism"), wxEmptyString, wxITEM_NORMAL);
+	contextMenu.Append(MenuItem13);
 	editPropMenuItem = new wxMenuItem((&contextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
 	editPropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
 	contextMenu.Append(editPropMenuItem);
-	editNameMenuI = new wxMenuItem((&contextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	editNameMenuI->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
-	contextMenu.Append(editNameMenuI);
-	MenuItem11 = new wxMenuItem((&contextMenu), ID_SETGLOBALITEM, _("Set as global object"), wxEmptyString, wxITEM_NORMAL);
-	contextMenu.Append(MenuItem11);
 	contextMenu.AppendSeparator();
 	addObjMenuI = new wxMenuItem((&contextMenu), idMenuAddObj, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
 	addObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
@@ -135,6 +134,11 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	delObjMenuI = new wxMenuItem((&contextMenu), idMenuDelObj, _("Delete\tDel"), wxEmptyString, wxITEM_NORMAL);
 	delObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	contextMenu.Append(delObjMenuI);
+	editNameMenuI = new wxMenuItem((&contextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
+	editNameMenuI->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
+	contextMenu.Append(editNameMenuI);
+	MenuItem11 = new wxMenuItem((&contextMenu), ID_SETGLOBALITEM, _("Set as global object"), wxEmptyString, wxITEM_NORMAL);
+	contextMenu.Append(MenuItem11);
 	contextMenu.AppendSeparator();
 	moveUpMenuI = new wxMenuItem((&contextMenu), idMoveUp, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
 	moveUpMenuI->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
@@ -202,11 +206,12 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemMenu);
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ObjectsEditor::OnsearchCtrlText);
 	Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuEditObjectSelected);
+	Connect(idMenuAddAuto,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuAddAutomatismSelected);
 	Connect(idMenuProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuPropertiesSelected);
-	Connect(idMenuModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuRenameSelected);
-	Connect(ID_SETGLOBALITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnSetGlobalSelected);
 	Connect(idMenuAddObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected);
 	Connect(idMenuDelObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
+	Connect(idMenuModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuRenameSelected);
+	Connect(ID_SETGLOBALITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnSetGlobalSelected);
 	Connect(idMoveUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMoveupSelected);
 	Connect(idMoveDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMoveDownSelected);
 	Connect(idMenuCopy,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCopySelected);
@@ -1301,6 +1306,30 @@ gd::ObjectGroup & ObjectsEditor::GetGroup(std::string name, std::vector<gd::Obje
 void ObjectsEditor::RemoveGroup(std::string name, std::vector<gd::ObjectGroup> & groups)
 {
     groups.erase(std::remove_if(groups.begin(), groups.end(), std::bind2nd(gd::GroupHasTheSameName(), name)), groups.end());
+}
+
+void ObjectsEditor::OnMenuAddAutomatismSelected(wxCommandEvent& event)
+{
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
+    if (!data) return;
+
+    if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
+    {
+	    bool globalObject = data->GetString() == "GlobalObject";
+	    gd::Object * object = GetSelectedObject();
+	    if ( !object ) return;
+
+	    if ( gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
+	        object, layout, globalObject))
+	        UpdateAssociatedPropertiesPanel();
+
+	    //Show and update the properties panel.
+	    if ( propPnl && propPnlManager ) {
+	    	propPnlManager->GetPane("PROPERTIES").Show();
+	    	propPnlManager->Update();
+		}
+	}
+	/*else: No object is selected, do nothing.*/
 }
 
 }

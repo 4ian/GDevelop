@@ -173,7 +173,7 @@ lastErrorPos(std::string::npos)
 	PFBt = new wxButton(mathPanel, ID_BUTTON7, _(")"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	GridSizer2->Add(PFBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button2 = new wxButton(mathPanel, ID_BUTTON13, _("^"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON13"));
-	Button2->SetToolTip(_("x^n raise x to power n"));
+	Button2->SetToolTip(_("pow(x,n) raise x to power n"));
 	GridSizer2->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button3 = new wxButton(mathPanel, ID_BUTTON14, _("E10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON14"));
 	GridSizer2->Add(Button3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -846,12 +846,12 @@ void EditExpressionDialog::OnValListItemDoubleClicked(wxTreeEvent& event)
 
 void EditExpressionDialog::OnButton2Click(wxCommandEvent& event)
 {
-	ExpressionEdit->AddText("^");
+	ExpressionEdit->AddText("pow(x,n)");
 }
 
 void EditExpressionDialog::OnButton3Click(wxCommandEvent& event)
 {
-	ExpressionEdit->AddText("E");
+	ExpressionEdit->AddText("exp(");
 }
 
 void EditExpressionDialog::OnBitmapButton2Click(wxCommandEvent& event)

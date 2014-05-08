@@ -119,7 +119,7 @@ void Variable::UnserializeFrom(const SerializerElement & element)
         childrenElement.ConsiderAsArrayOf("variable", "Variable");
         for (int i = 0; i < childrenElement.GetChildrenCount(); ++i)
         {
-            const SerializerElement & childElement = childElement.GetChild(i);
+            const SerializerElement & childElement = childrenElement.GetChild(i);
             std::string name = childElement.GetStringAttribute("name", "", "Name");
 
             gd::Variable childVariable;

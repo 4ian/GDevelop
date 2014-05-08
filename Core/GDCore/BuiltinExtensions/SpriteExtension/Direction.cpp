@@ -194,7 +194,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerEleme
 
 void Direction::SerializeTo(gd::SerializerElement & element) const
 {
-    element.SetAttribute("loop", IsLooping());
+    element.SetAttribute("looping", IsLooping());
     element.SetAttribute("timeBetweenFrames", GetTimeBetweenFrames());
     SaveSpritesDirection(sprites, element.AddChild("sprites"));
 }

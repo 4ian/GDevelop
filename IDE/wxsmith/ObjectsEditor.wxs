@@ -45,20 +45,14 @@
 				<label>Edit</label>
 				<handler function="OnMenuEditObjectSelected" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="idMenuAddAuto" variable="MenuItem13" member="yes">
+				<label>Add an automatism</label>
+				<handler function="OnMenuAddAutomatismSelected" entry="EVT_MENU" />
+			</object>
 			<object class="wxMenuItem" name="idMenuProp" variable="editPropMenuItem" member="no">
 				<label>Other properties</label>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;properties&quot;, 16)' />
 				<handler function="OnMenuPropertiesSelected" entry="EVT_MENU" />
-			</object>
-			<object class="wxMenuItem" name="idMenuModName" variable="editNameMenuI" member="no">
-				<label>Rename</label>
-				<accel>F2</accel>
-				<bitmap code='gd::SkinHelper::GetIcon(&quot;rename&quot;, 16)' />
-				<handler function="OnMenuRenameSelected" entry="EVT_MENU" />
-			</object>
-			<object class="wxMenuItem" name="ID_SETGLOBALITEM" variable="MenuItem11" member="yes">
-				<label>Set as global object</label>
-				<handler function="OnSetGlobalSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuAddObj" variable="addObjMenuI" member="no">
@@ -71,6 +65,16 @@
 				<accel>Del</accel>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 				<handler function="OnDeleteSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuModName" variable="editNameMenuI" member="no">
+				<label>Rename</label>
+				<accel>F2</accel>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;rename&quot;, 16)' />
+				<handler function="OnMenuRenameSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_SETGLOBALITEM" variable="MenuItem11" member="yes">
+				<label>Set as global object</label>
+				<handler function="OnSetGlobalSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMoveUp" variable="moveUpMenuI" member="yes">

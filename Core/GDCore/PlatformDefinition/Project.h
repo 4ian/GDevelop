@@ -350,10 +350,12 @@ public:
      * Members functions related to saving and loading the project.
      */
     ///@{
+    #if !defined(EMSCRIPTEN)
     /**
      * \brief Load the project from a file.
      */
     bool LoadFromFile(const std::string & filename);
+    #endif
 
     /**
      * \brief Unserialize the project from an element.
@@ -361,12 +363,14 @@ public:
     void UnserializeFrom(const SerializerElement & element);
 
     #if defined(GD_IDE_ONLY)
+    #if !defined(EMSCRIPTEN)
     /**
      * \brief Save the project to a file.
      *
      * "Dirty" flag is set to false when save is done.
      */
     bool SaveToFile(const std::string & filename);
+    #endif
 
     /**
      * \brief Called to serialize the project to a TiXmlElement.

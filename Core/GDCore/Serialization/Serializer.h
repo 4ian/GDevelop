@@ -41,10 +41,9 @@ public:
 	static SerializerElement FromJSON(const std::string & json);
     ///@}
 
+	virtual ~Serializer() {};
 private:
-	Serializer();
-	virtual ~Serializer();
-
+    Serializer() {};
 };
 
 }

@@ -84,11 +84,12 @@ protected:
     static const long ID_TREECTRL1;
     static const long ID_TEXTCTRL1;
     static const long idMenuModObj;
+    static const long idMenuAddAuto;
     static const long idMenuProp;
-    static const long idMenuModName;
-    static const long ID_SETGLOBALITEM;
     static const long idMenuAddObj;
     static const long idMenuDelObj;
+    static const long idMenuModName;
+    static const long ID_SETGLOBALITEM;
     static const long idMoveUp;
     static const long idMoveDown;
     static const long idMenuCopy;
@@ -133,6 +134,7 @@ private:
     wxTreeCtrl* objectsList;
     wxMenuItem* MenuItem11;
     wxMenuItem* copyMenuI;
+    wxMenuItem* MenuItem13;
     wxMenuItem* MenuItem10;
     wxMenuItem* MenuItem12;
     wxMenuItem* moveUpMenuI;
@@ -170,6 +172,7 @@ private:
     void OnSetGlobalSelected(wxCommandEvent& event);
     void OnSetFocus(wxFocusEvent& event);
     void OnobjectsListBeginDrag(wxTreeEvent& event);
+    void OnMenuAddAutomatismSelected(wxCommandEvent& event);
     //*)
     void OnHelpSelected(wxCommandEvent& event);
     wxTreeItemId AddObjectsToList(gd::ClassWithObjects & objects, bool globalObject);

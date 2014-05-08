@@ -201,7 +201,7 @@ namespace
         size_t pos = SkipBlankChar(jsonStr, startPos);
         if ( pos >= jsonStr.length() ) return std::string::npos;
 
-        if ( jsonStr[pos] == '{' ) //Structure
+        if ( jsonStr[pos] == '{' ) //Object
         {
             bool firstChild = true;
             while ( firstChild || jsonStr[pos] == ',' )

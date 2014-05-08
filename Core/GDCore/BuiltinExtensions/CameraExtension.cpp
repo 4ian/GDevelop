@@ -29,7 +29,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
 
 
@@ -44,7 +45,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
 
 
@@ -59,7 +61,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
     extension.AddAction("CameraY",
                    _("Camera center Y position"),
@@ -72,7 +75,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
     extension.AddCondition("CameraWidth",
                    _("Width of a camera"),
@@ -85,7 +89,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("layer", _("Layer"), "",false).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false);
+        .AddParameter("expression", _("Value to test"), "",false)
+        .SetManipulatedType("number");
 
 
 
@@ -100,7 +105,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false);
+        .AddParameter("expression", _("Value to test"), "",false)
+        .SetManipulatedType("number");
 
 
 
@@ -115,7 +121,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Value to test"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
 
 
@@ -130,7 +137,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
+        .AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0")
+        .SetManipulatedType("number");
 
     extension.AddAction("AddCamera",
                    _("Add a camera to a layer"),

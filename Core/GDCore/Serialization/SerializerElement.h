@@ -75,7 +75,7 @@ public:
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	SerializerElement & SetAttribute(const std::string & name, const char * value) { if (value) SetAttribute(name, std::string(value)); };
+	SerializerElement & SetAttribute(const std::string & name, const char * value) { if (value) SetAttribute(name, std::string(value)); return *this; };
 
 	/**
 	 * \brief Set the value of an attribute of the element

@@ -652,7 +652,11 @@ void LayoutEditorCanvas::UpdateSize()
         //Scene takes all the space available in edition mode.
 
         //This line is unnecessary and create a crash related to X on Linux.
-        //Window::SetSize(parentControl->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), parentControl->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
+        #if defined(WINDOWS)
+        Window::setSize(sf::Vector2u(
+            parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
+            parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0)));
+        #endif
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(parentControl->GetSize().GetWidth() - (vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
                               parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0));

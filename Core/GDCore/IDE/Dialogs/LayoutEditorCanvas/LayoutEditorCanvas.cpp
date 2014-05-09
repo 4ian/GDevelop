@@ -1383,12 +1383,12 @@ void LayoutEditorCanvas::OnFullScreenBtClick(wxCommandEvent & event)
 
 double LayoutEditorCanvas::GetMouseXOnLayout() const
 {
-    return convertCoords(sf::Mouse::getPosition(*this), editionView).x;
+    return mapPixelToCoords(sf::Mouse::getPosition(*this), editionView).x;
 }
 
 double LayoutEditorCanvas::GetMouseYOnLayout() const
 {
-    return convertCoords(sf::Mouse::getPosition(*this), editionView).y;
+    return mapPixelToCoords(sf::Mouse::getPosition(*this), editionView).y;
 }
 
 sf::Vector2f LayoutEditorCanvas::GetInitialInstanceSize(gd::InitialInstance & instance) const

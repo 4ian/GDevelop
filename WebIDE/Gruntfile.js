@@ -22,6 +22,16 @@ module.exports = function(grunt) {
           build: {
             src: [ buildDirectory+'GDWebIDE.js' ]
           }
+        },
+        compress: {
+          main: {
+            options: {
+              mode: 'gzip'
+            },
+            files: [
+              {expand: true, src: [buildDirectory+'/*.js'], dest: '.', ext: '.js.gz'}
+            ]
+          }
         }
     });
 
@@ -29,6 +39,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('build', [ 'clean', 'uglify' ]);
+    grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.registerTask('build', [ 'clean', 'compress' ]);
     grunt.registerTask('test', ['mochacli']);
 };

@@ -467,7 +467,7 @@ protected:
     bool altPressed;
     bool shiftPressed;
     double oldMouseX; ///< The mouse X position which was usually stored the last time a right click happened.
-    double oldMouseY; ///< The mouse X position which was usually stored the last time a right click happened.
+    double oldMouseY; ///< The mouse Y position which was usually stored the last time a right click happened.
     bool isMovingInstance;
     static const float gapBetweenButtonsAndRectangle = 5;
     static const float smallButtonSize = 5;

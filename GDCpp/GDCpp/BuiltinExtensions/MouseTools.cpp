@@ -40,7 +40,7 @@ double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & laye
 
     //Get view, and compute mouse position
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
-    return scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), view).x;
+    return scene.renderWindow->mapPixelToCoords(sf::Mouse::getPosition(*scene.renderWindow), view).x;
 }
 
 double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
@@ -50,7 +50,7 @@ double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & laye
 
     //Get view, and compute mouse position
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
-    return scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), view).y;
+    return scene.renderWindow->mapPixelToCoords(sf::Mouse::getPosition(*scene.renderWindow), view).y;
 }
 
 bool GD_API MouseButtonPressed( RuntimeScene & scene, const std::string & key )

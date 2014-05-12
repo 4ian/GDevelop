@@ -1110,6 +1110,9 @@ void EventsEditor::OneventsPanelKeyDown(wxKeyEvent& event)
                 break;
         }
     }
+
+    //Not a shortcut managed here, let the event propagates to the parent.
+    event.Skip();
 }
 
 /**

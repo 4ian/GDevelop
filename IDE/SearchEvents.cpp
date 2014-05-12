@@ -287,7 +287,7 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
 
 void SearchEvents::OnsearchEditText(wxCommandEvent& event)
 {
-    searchToReplaceEdit->SetValue(searchEdit->GetValue());
+    searchToReplaceEdit->ChangeValue(searchEdit->GetValue());
 
     resultsCountTxt->SetLabel("");
     nextBt->Enable(false);
@@ -296,7 +296,7 @@ void SearchEvents::OnsearchEditText(wxCommandEvent& event)
 
 void SearchEvents::OnsearchToReplaceEditText(wxCommandEvent& event)
 {
-    searchEdit->SetValue(searchToReplaceEdit->GetValue());
+    searchEdit->ChangeValue(searchToReplaceEdit->GetValue());
 }
 
 void SearchEvents::OnnextBtClick(wxCommandEvent&)

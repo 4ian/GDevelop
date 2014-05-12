@@ -443,6 +443,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 
     imagesList->SetDropTarget(new DndTextSpriteObjectEditor(*this));
 
+    animationsMenu.Delete(ID_MENUITEM3); //Rename option is unimplemented for now
+
     //Add a default animation if the object has none.
     if ( object.HasNoAnimations() )
     {

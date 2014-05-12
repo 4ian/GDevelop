@@ -1144,6 +1144,8 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
         return;
     }
 
+    bool eventIsOnlyForMe = false;
+
     if ( evt.GetKeyCode() == WXK_CONTROL )
         ctrlPressed = true;
     if ( evt.GetKeyCode() == WXK_SHIFT )
@@ -1161,6 +1163,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 
         ClearSelection();
         ChangesMade();
+        eventIsOnlyForMe = true;
     }
     else if ( evt.GetKeyCode() == WXK_DOWN )
     {
@@ -1168,6 +1171,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
         {
             it->first->SetY(it->first->GetY()+1);
         }
+        eventIsOnlyForMe = true;
     }
     else if ( evt.GetKeyCode() == WXK_UP )
     {
@@ -1175,6 +1179,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
         {
             it->first->SetY(it->first->GetY()-1);
         }
+        eventIsOnlyForMe = true;
     }
     else if ( evt.GetKeyCode() == WXK_RIGHT )
     {
@@ -1182,6 +1187,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
         {
             it->first->SetX(it->first->GetX()+1);
         }
+        eventIsOnlyForMe = true;
     }
     else if ( evt.GetKeyCode() == WXK_LEFT )
     {
@@ -1189,9 +1195,13 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
         {
             it->first->SetX(it->first->GetX()-1);
         }
+        eventIsOnlyForMe = true;
     }
 
-    evt.StopPropagation();
+    if (eventIsOnlyForMe)
+        evt.StopPropagation();
+    else
+        evt.Skip(); //Not a shortcut managed here, let the event propagates to the parent.
 }
 
 void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )

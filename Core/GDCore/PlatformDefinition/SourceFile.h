@@ -15,10 +15,11 @@ namespace gd
 {
 
 /**
- * \brief Internal class representing a "physical" source file.
+ * \brief Represents a "physical" source file.
  *
- * SourceFile represents a "physical" source file that must be compiled
- * so as to be used by the game as a dynamic extension.
+ * Source file can be compiled (or just integrated to the exported project)
+ * by platforms. Most of the time, special events are provided to use functions
+ * created in such files.
  */
 class GD_CORE_API SourceFile
 {
@@ -27,12 +28,12 @@ public:
     virtual ~SourceFile();
 
     /**
-     * Get the filename
+     * \brief Get the filename
      */
     std::string GetFileName() const { return filename; };
 
     /**
-     * Change the filename
+     * \brief Change the filename
      */
     void SetFileName(std::string filename_) { filename = filename_; };
 
@@ -47,17 +48,17 @@ public:
     void UnserializeFrom(const SerializerElement & element);
 
     /**
-     * Set if the file is hidden from the user point of view and is only managed by Game Develop
+     * \brief Set if the file is hidden from the user point of view and is only managed by Game Develop
      */
     void SetGDManaged(bool gdManaged_) { gdManaged = gdManaged_; };
 
     /**
-     * Return true if the file is hidden from the user point of view and is only managed by Game Develop
+     * \brief Return true if the file is hidden from the user point of view and is only managed by Game Develop
      */
     bool IsGDManaged() const { return gdManaged; };
 
     /**
-     * When a source file is GD-managed, it is usually created for a specific event ( C++ Code Event ).
+     * \brief When a source file is GD-managed, it is usually created for a specific event ( C++ Code Event ).
      *
      * Using this method, the event can store in the source file a (weak) pointer to itself,
      * so that we can show to the user the event if the compilation fails in the source file.
@@ -65,17 +66,28 @@ public:
     void SetAssociatedEvent(boost::weak_ptr<BaseEvent> event) { associatedGdEvent = event; };
 
     /**
-     * Return a (weak) pointer to the event associated to the source file, if any.
+     * \brief Return a (weak) pointer to the event associated to the source file, if any.
      *
      * \see SetAssociatedEvent
      */
     boost::weak_ptr<BaseEvent> GetAssociatedEvent() const { return associatedGdEvent; };
+
+    /**
+     * \brief Change the language of the source file
+     */
+    void SetLanguage(std::string lang) { language = lang; }
+
+    /**
+     * \brief Get the language of the source file
+     */
+    const std::string & SetLanguage() const { return language; }
 
 private:
 
     std::string filename; ///< Filename
     time_t lastBuildTimeStamp; ///< Time of the last build
     bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by Game Develop.
+    std::string language; ///< String identifying the language of this source file (typically C++ or Javascript).
     boost::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.
 };
 

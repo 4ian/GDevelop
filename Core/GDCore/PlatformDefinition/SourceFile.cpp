@@ -26,6 +26,7 @@ SourceFile::~SourceFile()
 void SourceFile::SerializeTo(SerializerElement & element) const
 {
     element.SetAttribute("filename", filename);
+    element.SetAttribute("language", language);
     element.SetAttribute("lastBuildTimeStamp", (int)lastBuildTimeStamp);
     element.SetAttribute("gdManaged", gdManaged);
 }
@@ -33,6 +34,7 @@ void SourceFile::SerializeTo(SerializerElement & element) const
 void SourceFile::UnserializeFrom(const SerializerElement & element)
 {
     filename = element.GetStringAttribute("filename");
+    language = element.GetStringAttribute("language", "C++");
     lastBuildTimeStamp = element.GetIntAttribute("lastBuildTimeStamp");
     gdManaged = element.GetBoolAttribute("gdManaged");
 }

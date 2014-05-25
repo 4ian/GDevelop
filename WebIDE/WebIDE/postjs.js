@@ -1,2 +1,2 @@
 Module = Module || {};
-gd = Module;
+var gd = Module;

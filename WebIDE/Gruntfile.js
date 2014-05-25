@@ -37,7 +37,7 @@ module.exports = function(grunt) {
               mode: 'gzip'
             },
             files: [
-              {expand: true, src: [buildDirectory+'/*.js'], dest: '.', ext: '.js.gz'}
+              {expand: true, src: [buildDirectory+'/libGD.js'], dest: '.', ext: '.js.gz'}
             ]
           }
         }

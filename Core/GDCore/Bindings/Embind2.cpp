@@ -37,10 +37,13 @@ namespace gd { //Workaround for emscripten to directly use strings instead of gd
 void Instruction_SetParameter(gd::Instruction & i, unsigned int nb, const std::string & val) { i.SetParameter(nb, val); };
 const std::string & Instruction_GetParameter(gd::Instruction & i, unsigned int nb) { return i.GetParameter(nb).GetPlainString(); };
 std::vector < Instruction > * Instruction_GetSubInstructions(gd::Instruction & i) { return &i.GetSubInstructions(); };
+void VectorInstruction_Remove(std::vector < Instruction > & v, unsigned int i) { v.erase(v.begin()+i); };
 }
 
 EMSCRIPTEN_BINDINGS(gd_Instruction) {
-    register_vector< Instruction >("VectorInstruction");
+    register_vector< Instruction >("VectorInstruction")
+        //"set, get, size, push_back" are already registered by register_vector
+        .function("remove", &VectorInstruction_Remove);
 
     class_<Instruction>("Instruction")
         .constructor<>()
@@ -79,7 +82,7 @@ EMSCRIPTEN_BINDINGS(gd_BaseEvent) {
         .constructor<>()
         .smart_ptr< boost::shared_ptr<BaseEvent> >()
         .function("clone", &BaseEvent::Clone)
-        .function("getType", &BaseEvent::GetType)
+        .function("getType", &BaseEvent::GetType).function("setType", &BaseEvent::SetType)
 	    .function("isExecutable", &BaseEvent::IsExecutable)
 	    .function("canHaveSubEvents", &BaseEvent::CanHaveSubEvents)
         .function("hasSubEvents", &BaseEvent::HasSubEvents)
@@ -146,7 +149,9 @@ EMSCRIPTEN_BINDINGS(gd_EventsList) {
         .function("insertEvents", &EventsList::InsertEvents)
         .function("getEventAt", &EventsList_GetEventAt, allow_raw_pointers())
         .function("removeEventAt", select_overload<void(size_t)>(&EventsList::RemoveEvent))
+        .function("removeEvent", select_overload<void(const gd::BaseEvent &)>(&EventsList::RemoveEvent))
         .function("getEventsCount", &EventsList::GetEventsCount)
+        .function("contains", &EventsList::Contains)
         .function("isEmpty", &EventsList::IsEmpty)
         .function("clear", &EventsList::Clear)
         ;

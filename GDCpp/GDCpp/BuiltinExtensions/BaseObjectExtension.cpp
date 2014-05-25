@@ -25,6 +25,12 @@ BaseObjectExtension::BaseObjectExtension()
     objectConditions["PosY"].codeExtraInformation.SetFunctionName("GetY").SetManipulatedType("number");
     objectActions["MettreY"].codeExtraInformation.SetFunctionName("SetY").SetManipulatedType("number").SetAssociatedGetter("GetY");
     objectActions["MettreXY"].codeExtraInformation.SetFunctionName("SetXY");
+    objectConditions["Angle"].codeExtraInformation.SetFunctionName("GetAngle");
+
+    objectActions["SetAngle"].codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle");
+    objectActions["Rotate"].codeExtraInformation.SetFunctionName("Rotate");
+    objectActions["RotateTowardAngle"].codeExtraInformation.SetFunctionName("RotateTowardAngle");
+    objectActions["RotateTowardPosition"].codeExtraInformation.SetFunctionName("RotateTowardPosition");
 
     objectActions["MettreAutourPos"].codeExtraInformation.SetFunctionName("PutAroundAPosition");
     objectActions["AddForceXY"].codeExtraInformation.SetFunctionName("AddForce");
@@ -69,7 +75,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["ForceX"].codeExtraInformation.SetFunctionName("TotalForceX");
     objectExpressions["ForceY"].codeExtraInformation.SetFunctionName("TotalForceY");
     objectExpressions["ForceAngle"].codeExtraInformation.SetFunctionName("TotalForceAngle");
-    objectExpressions["Angle"].codeExtraInformation.SetFunctionName("TotalForceAngle");
+    objectExpressions["Angle"].codeExtraInformation.SetFunctionName("GetAngle");
     objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("TotalForceLength");
     objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("TotalForceLength");
     objectExpressions["Width"].codeExtraInformation.SetFunctionName("GetWidth");

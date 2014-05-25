@@ -112,8 +112,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object to be rotated"), "Sprite", false)
         .AddParameter("expression", _("X position"), "",false)
-        .AddParameter("expression", _("Y position"), "",false);
-
+        .AddParameter("expression", _("Y position"), "",false)
+        .AddParameter("expression", _("Angular speed (degrees per second)"), "",false).SetDefaultValue("0")
+        .AddCodeOnlyParameter("currentScene", "")
+        .SetHidden(); //Deprecated
 
 
     obj.AddAction("ChangeScale",
@@ -170,8 +172,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
     obj.AddCondition("Direction",
                    _("Current direction"),
-                   _("Test the direction of the object"),
-                   _("The direction of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Compare the direction of the object. If 8 direction mode is activated for the sprite, the value taken for direction will be from 0 to 7. Otherwise, the direction is in degrees."),
+                   _("Direction of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Direction"),
                    "res/conditions/direction24.png",
                    "res/conditions/direction.png")
@@ -369,7 +371,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                    "res/actions/direction.png")
 
         .AddParameter("object", _("Object to be rotated"), "Sprite", false)
-        .AddParameter("objectPtr", _("Rotate toward this object"));
+        .AddParameter("objectPtr", _("Rotate toward this object"))
+        .AddParameter("expression", _("Angular speed (degrees per second)"), "",true).SetDefaultValue("0")
+        .AddCodeOnlyParameter("currentScene", "")
+        .SetHidden(); //Deprecated
 
 
     obj.AddCondition("SourisSurObjet",

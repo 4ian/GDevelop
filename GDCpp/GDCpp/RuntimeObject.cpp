@@ -4,6 +4,7 @@
  */
 #include <cstring>
 #include "GDCore/Tools/Localization.h"
+#include "GDCpp/BuiltinExtensions/MathematicalTools.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/Automatism.h"
@@ -11,6 +12,7 @@
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/PolygonCollision.h"
 #include "GDCpp/Polygon.h"
+#include "GDCore/CommonTools.h"
 #include <SFML/System.hpp>
 #include <iostream>
 
@@ -287,6 +289,43 @@ void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<Runti
     }
     SetX(GetX()+moveVector.x);
     SetY(GetY()+moveVector.y);
+}
+
+void RuntimeObject::RotateTowardPosition(float Xposition, float Yposition, float speed, RuntimeScene & scene)
+{
+    //Work around for a Visual C++ internal compiler error (!)
+    double y = Yposition - (GetDrawableY()+GetCenterY());
+    double x = Xposition - (GetDrawableX()+GetCenterX());
+    float angle = atan2(y,x) * 180.0 / gd::Pi();
+
+    RotateTowardAngle(angle, speed, scene);
+}
+
+void RuntimeObject::RotateTowardAngle(float angleInDegrees, float speed, RuntimeScene & scene)
+{
+    if (speed == 0)
+    {
+        SetAngle(angleInDegrees);
+        return;
+    }
+
+    float timeDelta = static_cast<double>(scene.GetElapsedTime())/1000000.0;
+    float angularDiff = GDpriv::MathematicalTools::angleDifference(GetAngle(), angleInDegrees);
+    bool diffWasPositive = angularDiff >= 0;
+
+    float newAngle = GetAngle()+(diffWasPositive ? -1.0 : 1.0)*speed*timeDelta;
+    if( GDpriv::MathematicalTools::angleDifference(newAngle, angleInDegrees) > 0 ^ diffWasPositive)
+        newAngle = angleInDegrees;
+    SetAngle(newAngle);
+
+    if ( GetAngle() != newAngle ) //Objects like sprite in 8 directions does not handle small increments...
+        SetAngle(angleInDegrees); //...so force them to be in the path angle anyway.
+}
+
+void RuntimeObject::Rotate(float speed, RuntimeScene & scene)
+{
+    float timeDelta = static_cast<double>(scene.GetElapsedTime())/1000000.0;
+    SetAngle(GetAngle()+speed*timeDelta);
 }
 
 bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)

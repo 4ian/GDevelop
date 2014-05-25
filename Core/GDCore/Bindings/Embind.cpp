@@ -195,6 +195,7 @@ EMSCRIPTEN_BINDINGS(gd_Object) {
     class_<Object>("Object")
         .constructor<const std::string &>()
         .function("clone", &Object::Clone, allow_raw_pointers())
+        .function("getType", &Object::GetType)
         .function("getName", &Object::GetName).function("setName", &Object::SetName)
         .function("getVariables", &Object_GetVariables, allow_raw_pointers())
         .function("getAllAutomatismNames", &Object::GetAllAutomatismNames)
@@ -202,7 +203,6 @@ EMSCRIPTEN_BINDINGS(gd_Object) {
         .function("getAutomatism", &Object_GetAutomatism, allow_raw_pointers())
         .function("removeAutomatism", &Object::RemoveAutomatism)
         .function("renameAutomatism", &Object::RenameAutomatism)
-        .function("addNewAutomatism", &Object::AddNewAutomatism, allow_raw_pointers())
         //Properties, for convenience only:
         .property("name", &Object::GetName, &Object::SetName)
         ;
@@ -322,6 +322,12 @@ EMSCRIPTEN_BINDINGS(gd_InitialInstancesContainer) {
         .allow_subclass<InitialInstanceFunctorWrapper>()
         ;
 
+    class_<HighestZOrderFinder, base<InitialInstanceFunctor> >("HighestZOrderFinder")
+        .function("invoke", &HighestZOrderFinder::operator())
+        .function("getHighestZOrder", &HighestZOrderFinder::GetHighestZOrder)
+        .function("restrictSearchToLayer", &HighestZOrderFinder::RestrictSearchToLayer)
+        ;
+
     class_<InitialInstancesContainer>("InitialInstancesContainer")
         .constructor<>()
         .function("create", &InitialInstancesContainer::Create)
@@ -367,6 +373,22 @@ EMSCRIPTEN_BINDINGS(gd_Serializer) {
     class_<Serializer>("Serializer")
         .class_function("toJSON", &Serializer::ToJSON)
         .class_function("fromJSON", &Serializer::FromJSON)
+        ;
+}
+
+
+namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
+float Vector2f_GetX(const sf::Vector2f & v) { return v.x; }
+float Vector2f_GetY(const sf::Vector2f & v) { return v.y; }
+void Vector2f_SetX(sf::Vector2f & v, float x) { v.x = x; }
+void Vector2f_SetY(sf::Vector2f & v, float y) { v.y = y; }
+}
+
+EMSCRIPTEN_BINDINGS(sf_Vector2f) {
+    class_<sf::Vector2f>("Vector2f")
+        .constructor<>()
+        .property("x", &Vector2f_GetX, &Vector2f_SetX)
+        .property("y", &Vector2f_GetY, &Vector2f_SetY)
         ;
 }
 

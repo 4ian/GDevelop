@@ -243,4 +243,14 @@ InitialInstanceFunctor::~InitialInstanceFunctor()
 {
 };
 
+
+void HighestZOrderFinder::operator()(gd::InitialInstance & instance)
+{
+    if ( !layerRestricted || instance.GetLayer() == layerName)
+    {
+        if ( firstCall ) highestZOrder = instance.GetZOrder();
+        else highestZOrder = std::max(highestZOrder, instance.GetZOrder());
+    }
+}
+
 }

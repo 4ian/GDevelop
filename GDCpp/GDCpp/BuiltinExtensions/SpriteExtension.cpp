@@ -31,7 +31,7 @@ SpriteExtension::SpriteExtension()
     objectActions["ChangeSprite"].codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["PauseAnimation"].codeExtraInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["PlayAnimation"].codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["TourneVersPos"].codeExtraInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["TourneVersPos"].codeExtraInformation.SetFunctionName("RotateTowardPosition").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["ChangeScale"].codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["ChangeScaleWidth"].codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["ChangeScaleHeight"].codeExtraInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");

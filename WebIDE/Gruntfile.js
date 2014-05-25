@@ -9,10 +9,18 @@ module.exports = function(grunt) {
             },
             all: ['test/*.js']
         },
+        concat: {
+          options: {
+            separator: ';',
+          },
+          dist: {
+            src: [buildDirectory+'libGD.raw.js', 'WebIDE/postjs.js'],
+            dest: buildDirectory+'libGD.js',
+          },
+        },
         uglify: {
           build: {
             files: [
-                {src: [ 'WebIDE/**.js' ], dest:buildDirectory+'GDWebIDE.js'},
                 {src: [ buildDirectory+'libGD.js' ], dest:buildDirectory+'libGD.min.js'}
             ]
           }
@@ -20,7 +28,7 @@ module.exports = function(grunt) {
         clean: {
           options: { force: true },
           build: {
-            src: [ buildDirectory+'GDWebIDE.js' ]
+            src: [ buildDirectory+'libGD.js', buildDirectory+'libGD.min.js' ]
           }
         },
         compress: {
@@ -38,8 +46,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-mocha-cli');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.registerTask('build', [ 'clean', 'compress' ]);
+    grunt.registerTask('build', [ 'clean', 'concat', 'compress' ]);
     grunt.registerTask('test', ['mochacli']);
 };

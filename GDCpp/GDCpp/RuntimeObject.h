@@ -371,6 +371,10 @@ public:
     void AddForceToMoveAroundObject( RuntimeObject * object, float velocity, float length, float clearing );
     void PutAroundObject( RuntimeObject * object, float length, float angleInDegrees );
 
+    void RotateTowardPosition(float Xposition, float Yposition, float speed, RuntimeScene & scene);
+    void RotateTowardAngle(float angleInDegrees, float speed, RuntimeScene & scene);
+    void Rotate(float speed, RuntimeScene & scene);
+
     static gd::Variable & ReturnVariable(gd::Variable & variable) { return variable; };
     bool VariableExists(const std::string & variable);
     static double GetVariableValue(const gd::Variable & variable) { return variable.GetValue(); };

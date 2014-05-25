@@ -91,6 +91,17 @@ void EventsList::UnserializeFrom(gd::Project & project, const SerializerElement 
 	EventsListSerialization::UnserializeEventsFrom(project, *this, element);
 }
 
+bool EventsList::Contains(const gd::BaseEvent & eventToSearch, bool recursive) const
+{
+    for (unsigned int i = 0;i<GetEventsCount();++i)
+    {
+        if ( &GetEvent(i) == &eventToSearch) return true;
+        if ( recursive && GetEvent(i).CanHaveSubEvents() && GetEvent(i).GetSubEvents().Contains(eventToSearch) )
+            return true;
+    }
+
+    return false;
+}
 
 EventsList::EventsList(const EventsList & other)
 {

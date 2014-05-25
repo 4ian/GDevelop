@@ -1,0 +1,2 @@
+Module = Module || {};
+gd = Module;

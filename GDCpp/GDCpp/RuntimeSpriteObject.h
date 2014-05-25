@@ -137,8 +137,10 @@ public :
     bool IsFlippedX() const { return isFlippedX; };
     bool IsFlippedY() const { return isFlippedY; };
 
-    void TurnTowardPosition(float Xposition, float Yposition);
-    void TurnTowardObject( RuntimeObject * object );
+    /**
+     * Deprecated and only used internally by GD events generated code: Prefer using RotateTowardPosition.
+     */
+    void TurnTowardObject(RuntimeObject * object, RuntimeScene & scene);
 
     /**
      * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).
@@ -155,7 +157,7 @@ public :
 
 private:
 
-    //Animations, Directions et numéro de sprite actuel
+    //Animations, direction and current frame:
     unsigned int currentAnimation;
     unsigned int currentDirection;
     float currentAngle;
@@ -163,7 +165,7 @@ private:
     bool animationStopped;
     float timeElapsedOnCurrentSprite;
 
-    mutable gd::Sprite * ptrToCurrentSprite; //Ptr to the current sprite
+    mutable gd::Sprite * ptrToCurrentSprite; //Pointer to the current sprite
     mutable bool needUpdateCurrentSprite;
 
     std::vector < AnimationProxy > animations;

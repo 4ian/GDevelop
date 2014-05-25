@@ -84,7 +84,7 @@ std::vector < EventItem > EventsEditorSelection::GetAllSelectedEventsWithoutSubE
                 (*it2).event != boost::shared_ptr<gd::BaseEvent>() &&
                 (*it2).event->CanHaveSubEvents() )
             {
-                if ( FindInEventsAndSubEvents((*it2).event->GetSubEvents(), *(*it).event) )
+                if ( (*it2).event->GetSubEvents().Contains(*(*it).event) )
                     isAlreadyIncludedAsSubEvent = true;
 
             }
@@ -173,7 +173,7 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
             continue;
         }
 
-        if ( (*it).event == eventHighlighted.event || ((*it).event->CanHaveSubEvents() && FindInEventsAndSubEvents((*it).event->GetSubEvents(), *eventHighlighted.event)) )
+        if ( (*it).event == eventHighlighted.event || ((*it).event->CanHaveSubEvents() && (*it).event->GetSubEvents().Contains(*eventHighlighted.event)) )
         {
             return false;
         }
@@ -347,17 +347,6 @@ EventsEditorSelection::EventsEditorSelection(gd::EventsEditorRefreshCallbacks & 
 {
 }
 
-bool EventsEditorSelection::FindInEventsAndSubEvents(const gd::EventsList & list, const gd::BaseEvent & eventToSearch)
-{
-    for (unsigned int i = 0;i<list.size();++i)
-    {
-        if ( &list[i] == &eventToSearch) return true;
-        if ( list[i].CanHaveSubEvents() && FindInEventsAndSubEvents(list[i].GetSubEvents(), eventToSearch) )
-            return true;
-    }
-
-    return false;
-}
 
 bool EventsEditorSelection::FindInInstructionsAndSubInstructions(std::vector<gd::Instruction> & list, const gd::Instruction * instrToSearch)
 {

@@ -655,34 +655,6 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
         (*it)->InitialInstancesUpdated();
 }
 
-/** \brief Tool class picking the smallest instance under the cursor.
- */
-class HighestZOrderFinder : public gd::InitialInstanceFunctor
-{
-public:
-    HighestZOrderFinder() : highestZOrder(0), firstCall(true), layerRestricted(false) {};
-    virtual ~HighestZOrderFinder() {};
-
-    virtual void operator()(gd::InitialInstance & instance)
-    {
-        if ( !layerRestricted || instance.GetLayer() == layerName)
-        {
-            if ( firstCall ) highestZOrder = instance.GetZOrder();
-            else highestZOrder = std::max(highestZOrder, instance.GetZOrder());
-        }
-    }
-
-    void RestrictSearchToLayer(const std::string & layerName_) { layerName = layerName_; layerRestricted = true; };
-    int GetHighestZOrder() const { return highestZOrder; }
-
-private:
-    int highestZOrder;
-    bool firstCall;
-
-    bool layerRestricted; ///< If true, the search is restricted to the layer called \a layerName.
-    std::string layerName;
-};
-
 void LayoutEditorCanvas::AddObject(const std::string & objectName)
 {
     AddObject(objectName, GetMouseXOnLayout(), GetMouseYOnLayout());
@@ -711,7 +683,7 @@ void LayoutEditorCanvas::AddObject(const std::string & objectName, float x, floa
     }
 
     //Compute the Z order
-    HighestZOrderFinder zOrderFinder;
+    gd::HighestZOrderFinder zOrderFinder;
     zOrderFinder.RestrictSearchToLayer(currentLayer);
     instances.IterateOverInstances(zOrderFinder);
     newInstance.SetZOrder(zOrderFinder.GetHighestZOrder()+1);

@@ -305,17 +305,6 @@ void RuntimeSpriteObject::SetColor(const std::string & colorStr)
                ToInt(colors[2]) );
 }
 
-void RuntimeSpriteObject::TurnTowardPosition(float Xposition, float Yposition)
-{
-	//Work around for a Visual C++ internal compiler error (!)
-	double y = Yposition - (GetDrawableY()+GetCenterY());
-	double x = Xposition - (GetDrawableX()+GetCenterX());
-    float angle = atan2(y,x) * 180 / 3.14159;
-
-    SetAngle(angle);
-    return;
-}
-
 /**
  * Prepare the current sprite
  */
@@ -622,18 +611,12 @@ bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
     return false;
 }
 
-void RuntimeSpriteObject::TurnTowardObject( RuntimeObject * object )
+void RuntimeSpriteObject::TurnTowardObject(RuntimeObject * object, RuntimeScene & scene)
 {
     if (object == NULL) return;
 
-    //On se dirige vers le centre
-    float angle = atan2(
-    (object->GetDrawableY() + object->GetCenterY()) - (GetDrawableY()+GetCenterY()),
-    (object->GetDrawableX() + object->GetCenterX()) - (GetDrawableX()+GetCenterX())
-    ) * 180 / 3.14159;
-
-    SetAngle(angle);
-    return;
+    RotateTowardPosition(object->GetDrawableX() + object->GetCenterX(),
+        object->GetDrawableY() + object->GetCenterY(), 0, scene);
 }
 
 #if defined(GD_IDE_ONLY)

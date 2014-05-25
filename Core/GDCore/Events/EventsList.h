@@ -105,6 +105,18 @@ public:
      */
     void Clear() { return events.clear(); };
 
+    /** \name Utilities
+     * Utility methods
+     */
+    ///@{
+    /**
+     * Return true if the specified event exists in the list.
+     * \param event The event to searched for
+     * \param recursive Set it to false to prevent sub events to be inspected.
+     */
+    bool Contains(const gd::BaseEvent & eventToSearch, bool recursive = true) const;
+    ///@}
+
     /** \name std::vector API compatibility
      * These functions ensure that the class can be used just like a std::vector.
      */

@@ -26,6 +26,8 @@ namespace gd
  * for holding the instances. In this way, the container is not required
  * to provide a direct access to element based on an index. Instead,
  * the method IterateOverInstances is used to perform operations.
+ *
+ * \see gd::InitialInstanceFunctor
  */
 class GD_CORE_API InitialInstancesContainer
 {
@@ -161,6 +163,7 @@ private:
  * \brief Tool class to be used with gd::InitialInstancesContainer::IterateOverInstances.
  *
  * \see gd::InitialInstancesContainer
+ * \see gd::HighestZOrderFinder
  */
 class GD_CORE_API InitialInstanceFunctor
 {
@@ -169,6 +172,38 @@ public:
     virtual ~InitialInstanceFunctor();
 
     virtual void operator()(InitialInstance & instance) = 0;
+};
+
+/** \brief Tool class picking returning the highest Z order of instances on a layer.
+ *
+ * \see gd::InitialInstanceFunctor
+ * \see gd::InitialInstancesContainer
+ */
+class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor
+{
+public:
+    HighestZOrderFinder() : highestZOrder(0), firstCall(true), layerRestricted(false) {};
+    virtual ~HighestZOrderFinder() {};
+
+    virtual void operator()(gd::InitialInstance & instance);
+
+    /**
+     * \brief Restrict to instances on the specified layer.
+     */
+    void RestrictSearchToLayer(const std::string & layerName_) { layerName = layerName_; layerRestricted = true; };
+
+    /**
+     * \brief After calling the instances container iterate method with this functor,
+     * this method will return the highest Z order of the instances.
+     */
+    int GetHighestZOrder() const { return highestZOrder; }
+
+private:
+    int highestZOrder;
+    bool firstCall;
+
+    bool layerRestricted; ///< If true, the search is restricted to the layer called \a layerName.
+    std::string layerName;
 };
 
 }

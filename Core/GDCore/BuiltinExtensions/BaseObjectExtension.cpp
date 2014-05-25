@@ -27,8 +27,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     #if defined(GD_IDE_ONLY)
     obj.AddCondition("PosX",
-                   _("Test X position of an object"),
-                   _("Test the X position of the objext"),
+                   _("Compare X position of an object"),
+                   _("Compare the X position of the object."),
                    _("The X position of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Position"),
                    "res/conditions/position24.png",
@@ -54,8 +54,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
 
     obj.AddCondition("PosY",
-                   _("Test Y position of an object"),
-                   _("Test the Y position of an object"),
+                   _("Compare Y position of an object"),
+                   _("Compare the Y position of an object."),
                    _("The Y position of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Position"),
                    "res/conditions/position24.png",
@@ -109,12 +109,62 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("Distance"))
         .AddParameter("expression", _("Angle, in degrees"));
 
+    obj.AddAction("SetAngle",
+                   _("Angle"),
+                   _("Change the angle of rotation of an object."),
+                   _("Do _PARAM1__PARAM2_ to angle of _PARAM0_"),
+                   _("Angle"),
+                   "res/actions/direction24.png",
+                   "res/actions/direction.png")
+
+        .AddParameter("object", _("Object"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"));
+
+    obj.AddAction("Rotate",
+                   _("Rotate"),
+                   _("Rotate an object, clockwise if the angle if the speed is positive, counterclockwise otherwise."),
+                   _("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
+                   _("Angle"),
+                   "res/actions/direction24.png",
+                   "res/actions/direction.png")
+
+        .AddParameter("object", _("Object"), "", false)
+        .AddParameter("expression", _("Angular speed (in degrees per second)"), "",false)
+        .AddCodeOnlyParameter("currentScene", "");
+
+    obj.AddAction("RotateTowardAngle",
+                   _("Rotate toward angle"),
+                   _("Rotate an object towards an angle with the specified speed."),
+                   _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"),
+                   _("Angle"),
+                   "res/actions/direction24.png",
+                   "res/actions/direction.png")
+
+        .AddParameter("object", _("Object"), "", false)
+        .AddParameter("expression", _("Angle to rotate towards (in degrees)"), "",false)
+        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
+        .AddCodeOnlyParameter("currentScene", "");
+
+    obj.AddAction("RotateTowardPosition",
+                   _("Rotate toward position"),
+                   _("Rotate an object towards a position, with the specified speed."),
+                   _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second"),
+                   _("Angle"),
+                   "res/actions/direction24.png",
+                   "res/actions/direction.png")
+
+        .AddParameter("object", _("Object"), "", false)
+        .AddParameter("expression", _("X position"), "",false)
+        .AddParameter("expression", _("Y position"), "",false)
+        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
+        .AddCodeOnlyParameter("currentScene", "");
 
     obj.AddAction("AddForceXY",
                    _("Add a force to an object"),
                    _("Add a force to an object. The object will move according to\nall forces it owns. This action create the force with its X and Y coordinates."),
                    _("Add to _PARAM0_ a force of _PARAM1_ p/s on X axis and _PARAM2_ p/s on Y axis"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/force24.png",
                    "res/actions/force.png")
 
@@ -127,7 +177,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Add a force ( angle )"),
                    _("Add a force to an object. The object will move according to\nall forces it owns. This action creates the force using the specified angle and length."),
                    _("Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/force24.png",
                    "res/actions/force.png")
 
@@ -141,7 +191,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Add a force so as to move to a position"),
                    _("Add a force to an object so as it moves to the position."),
                    _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with a force of _PARAM3_ pixels"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/force24.png",
                    "res/actions/force.png")
 
@@ -156,7 +206,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Add a force so as to move around a position"),
                    _("Add a force to an object so as it rotates toward a position.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
                    _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_ deg/sec and _PARAM4_ pixels away"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/forceTourne24.png",
                    "res/actions/forceTourne.png")
 
@@ -165,14 +215,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("Y position of the center"))
         .AddParameter("expression", _("Speed (in Degrees per seconds)"))
         .AddParameter("expression", _("Distance (in pixels)"))
-        .AddParameter("expression", _("Damping (Default: 0)"));
+        .AddParameter("expression", _("Damping (Default: 0)"))
+        .SetHidden();
 
 
     obj.AddAction("Arreter",
                    _("Stop the object"),
                    _("Stop the object by deleting all its forces."),
                    _("Stop the object _PARAM0_"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/arreter24.png",
                    "res/actions/arreter.png")
 
@@ -191,7 +242,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddCodeOnlyParameter("currentScene","");
 
     obj.AddAction("ChangePlan",
-                   _("Change Z order of an object"),
+                   _("Z order"),
                    _("Modify the z order of an object"),
                    _("Do _PARAM1__PARAM2_ to z-Order of _PARAM0_"),
                    _("Z order"),
@@ -205,7 +256,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
 
     obj.AddAction("ChangeLayer",
-                   _("Change an object's layer"),
+                   _("Layer"),
                    _("Change the layer where is the object."),
                    _("Put _PARAM0_ on the layer _PARAM1_"),
                    _("Layers and cameras"),
@@ -269,7 +320,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
 
     obj.AddAction("Cache",
-                   _("Hide an object"),
+                   _("Hide"),
                    _("Hide the specified object."),
                    _("Hide the object _PARAM0_"),
                    _("Visibility"),
@@ -280,7 +331,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
 
     obj.AddAction("Montre",
-                   _("Show an object"),
+                   _("Show"),
                    _("Show the specified object"),
                    _("Show object _PARAM0_"),
                    _("Visibility"),
@@ -291,12 +342,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddCodeOnlyParameter("inlineCode", "false");
 
 
+    obj.AddCondition("Angle",
+                   _("Angle"),
+                   _("Compare angle of the specified object."),
+                   _("Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."),
+                   _("Angle"),
+                   "res/conditions/direction24.png",
+                   "res/conditions/direction.png")
+
+        .AddParameter("object", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to compare (in degrees)"))
+        .SetManipulatedType("number");
+
     obj.AddCondition("Plan",
-                   _("Test the Z order of an object"),
-                   _("Test the z-order of the specified object."),
-                   _("The Z Order of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                   _("Compare Z order"),
+                   _("Compare the z-order of the specified object."),
+                   _("Z Order of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Z order"),
-                   "res/conditions/planicon.png",
+                   "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
 
         .AddParameter("object", _("Object"))
@@ -305,7 +369,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .SetManipulatedType("number");
 
     obj.AddCondition("Layer",
-                   _("Test the layer of an object"),
+                   _("Compare layer"),
                    _("Test if the object is on the specified layer."),
                    _("_PARAM0_ is on layer _PARAM1_"),
                    _("Layer"),
@@ -336,20 +400,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"));
 
     obj.AddCondition("Arret",
-                   _("An object is stopped"),
+                   _("Object is stopped"),
                    _("Test if an object does not move"),
                    _("_PARAM0_ is stopped"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/conditions/arret24.png",
                    "res/conditions/arret.png")
 
         .AddParameter("object", _("Object"));
 
     obj.AddCondition("Vitesse",
-                   _("Speed of the object"),
+                   _("Speed"),
                    _("Compare the overall speed of an object"),
-                   _("The speed of _PARAM0_ is _PARAM1_ _PARAM2_"),
-                   _("Displacement"),
+                   _("Overall speed of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Movement"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
 
@@ -361,8 +425,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddCondition("AngleOfDisplacement",
                    _("Angle of moving"),
                    _("Compare the angle of displacement of an object"),
-                   _("The angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"),
-                   _("Displacement"),
+                   _("Angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"),
+                   _("Movement"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
 
@@ -438,7 +502,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Add a force so as to move to an object"),
                    _("Add a force to an object so as it moves to another."),
                    _("Move _PARAM0_ to _PARAM1_ with a force of _PARAM2_ pixels"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/forceVers24.png",
                    "res/actions/forceVers.png")
 
@@ -452,7 +516,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Add a force so as to move around an object"),
                    _("Add a force to an object so as it rotates around another.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
                    _("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_ deg/sec and _PARAM3_ pixels away"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/forceTourne24.png",
                    "res/actions/forceTourne.png")
 
@@ -482,7 +546,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Move an object away from another"),
                    _("Move an object away from another, using forces."),
                    _("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
 
@@ -508,7 +572,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddAction("SeparateFromObjects",
                    _("Separate two objects"),
                    _("Move an object away from another using their collision masks.\nBe sure to call this action on a reasonable number of objects so as\nnot to slow down the game."),
-                   _("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
+                   _("Move away _PARAM0_ of _PARAM1_ (only _PARAM0_ will move)"),
                    _("Position"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
@@ -523,51 +587,45 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddExpression("Y", _("Y position"), _("Y position of the object"), _("Position"), "res/actions/position.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceX", _("Average X coordinates of forces"), _("Average X coordinates of forces"), _("Displacement"), "res/actions/force.png")
+    obj.AddExpression("Angle", _("Angle"), _("Current angle, in degrees, of the object"), _("Angle"), "res/actions/direction.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceY", _("Average Y coordinates of forces"), _("Average Y coordinates of forces"), _("Displacement"), "res/actions/force.png")
+    obj.AddExpression("ForceX", _("Average X coordinates of forces"), _("Average X coordinates of forces"), _("Movement"), "res/actions/force.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceAngle", _("Average angle of the forces"), _("Average angle of the forces"), _("Displacement"), "res/actions/force.png")
+    obj.AddExpression("ForceY", _("Average Y coordinates of forces"), _("Average Y coordinates of forces"), _("Movement"), "res/actions/force.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Angle", _("Average angle of the forces"), _("Average angle of the forces"), _("Displacement"), "res/actions/force.png")
+    obj.AddExpression("ForceAngle", _("Average angle of the forces"), _("Average angle of the forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"));
+
+    obj.AddExpression("ForceLength", _("Average length of the forces"), _("Average length of the forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"));
+
+    obj.AddExpression("Longueur", _("Average length of the forces"), _("Average length of the forces"), _("Movement"), "res/actions/force.png")
         .AddParameter("object", _("Object"))
-
-        .SetHidden();
-
-    obj.AddExpression("ForceLength", _("Average length of the forces"), _("Average length of the forces"), _("Displacement"), "res/actions/force.png")
-        .AddParameter("object", _("Object"));
-
-    obj.AddExpression("Longueur", _("Average length of the forces"), _("Average length of the forces"), _("Displacement"), "res/actions/force.png")
-        .AddParameter("object", _("Object"))
-
         .SetHidden();
 
 
-    obj.AddExpression("Width", _("Object's width"), _("Object's width"), _("Size"), "res/actions/scaleWidth.png")
+    obj.AddExpression("Width", _("Width"), _("Width of the object"), _("Size"), "res/actions/scaleWidth.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Largeur", _("Object's width"), _("Object's width"), _("Size"), "res/actions/scaleWidth.png")
+    obj.AddExpression("Largeur", _("Width"), _("Width of the object"), _("Size"), "res/actions/scaleWidth.png")
         .AddParameter("object", _("Object"))
-
         .SetHidden();
 
-    obj.AddExpression("Height", _("Object's height"), _("Object's height"), _("Size"), "res/actions/scaleHeight.png")
+    obj.AddExpression("Height", _("Height"), _("Height of the object"), _("Size"), "res/actions/scaleHeight.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Hauteur", _("Object's height"), _("Object's height"), _("Size"), "res/actions/scaleHeight.png")
+    obj.AddExpression("Hauteur", _("Height"), _("Height of the object"), _("Size"), "res/actions/scaleHeight.png")
         .AddParameter("object", _("Object"))
-
         .SetHidden();
 
-    obj.AddExpression("ZOrder", _("Z order of an object"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
+    obj.AddExpression("ZOrder", _("Z order"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
         .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Plan", _("Z order of an object"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
+    obj.AddExpression("Plan", _("Z order"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
         .AddParameter("object", _("Object"))
-
         .SetHidden();
 
     obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
@@ -637,7 +695,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Make objects moving"),
                    _("Moves the objects according to the forces they have.Game Develop call this action at the end of the events by default."),
                    _("Make objects moving"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/actions/doMove24.png",
                    "res/actions/doMove.png")
         .AddCodeOnlyParameter("currentScene", "");
@@ -646,7 +704,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("An object is moving to another"),
                    _("Test if an object moves towards another.\nThe first object must move."),
                    _("_PARAM0_ is moving toward _PARAM1_"),
-                   _("Displacement"),
+                   _("Movement"),
                    "res/conditions/sedirige24.png",
                    "res/conditions/sedirige.png")
         .AddParameter("objectList", _("Object"))

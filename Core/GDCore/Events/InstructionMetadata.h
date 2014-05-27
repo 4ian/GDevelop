@@ -29,9 +29,41 @@ namespace gd
 class GD_CORE_API ParameterMetadata
 {
 public:
-
     ParameterMetadata();
     virtual ~ParameterMetadata() {};
+
+    /**
+     * \brief Return the type of the parameter.
+     * \see gd::ParameterMetadata::IsObject
+     */
+    const std::string & GetType() { return type; }
+
+    /**
+     * \brief Return an optional additional information, used for some parameters with special
+     * type (For example, it can contains the type of object accepted by the parameter).
+     */
+    const std::string & GetExtraInfo() { return supplementaryInformation; }
+
+    /**
+     * \brief Return true if the parameter is optional.
+     */
+    bool IsOptional() { return optional; }
+
+    /**
+     * \brief Return the description of the parameter
+     */
+    const std::string & GetDescription() { return description; }
+
+    /**
+     * \brief Return true if the parameter is only meant to be completed during compilation
+     * and must not be displayed to the user.
+     */
+    bool IsCodeOnly() { return codeOnly; }
+
+    /**
+     * \brief Get the default value for the parameter.
+     */
+    const std::string & GetDefaultValue() { return defaultValue; }
 
     std::string type; ///< Parameter type
     std::string supplementaryInformation; ///< Used if needed
@@ -43,6 +75,7 @@ public:
 
     /**
      * \brief Return true if the type of the parameter is "object", "objectPtr" or "objectList".
+     * \see gd::ParameterMetadata::GetType
      */
     static bool IsObject(const std::string & type) { return type == "object" || type == "objectPtr" || type == "objectList" || type == "objectListWithoutPicking"; }
 };
@@ -70,6 +103,8 @@ public:
     const std::string & GetDescription() const { return description; }
     const std::string & GetSentence() const { return sentence; }
     const std::string & GetGroup() const { return group; }
+    const ParameterMetadata & GetParameter(size_t i) const { return parameters[i]; }
+    size_t GetParametersCount() const { return parameters.size(); }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
     const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }

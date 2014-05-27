@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_OBJECTLISTDIALOGSHELPER_H
 #define GDCORE_OBJECTLISTDIALOGSHELPER_H
 
@@ -19,8 +19,8 @@ namespace gd
 {
 
 /**
- * \brief Utility class used to display objects lists into wxWidgets tree controls.
- * \todo Thumbnail support
+ * \brief Utility class used to display objects lists into controls.
+ * \todo Thumbnail support for wxWidgets
  *
  * \see ChooseObjectDialog
  *
@@ -34,7 +34,7 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_) {};
+    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true) {};
     virtual ~ObjectListDialogsHelper() {};
 
     void SetSearchText(std::string searchText_);
@@ -42,7 +42,13 @@ public:
     void SetGroupsAllowed(bool canSelectGroup) { groupsAllowed = canSelectGroup; }
 
     /**
-     * Update tree controls with objects and objects groups from the project and layout
+     * \brief Return a list of objects (and groups if allowed) that matches the criteria.
+     */
+    std::vector<std::string> GetMatchingObjects() const;
+
+    #if !defined(GD_NO_WX_GUI)
+    /**
+     * \brief Update tree controls with objects and objects groups from the project and layout
      * \param sceneObjectsList The wxTreeCtrl which will contain the layout objects
      * \param sceneGroupsList The wxTreeCtrl which will contain the layout groups
      * \param globalObjectsList The wxTreeCtrl which will contain the project objects
@@ -64,7 +70,7 @@ public:
      * \param searchText The text in the search box, which is used to filter objects
      */
     void RefreshList(wxTreeCtrl * objectsList);
-
+    #endif
 
 private:
     wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty);
@@ -78,6 +84,5 @@ private:
 };
 
 }
-
 #endif // GDCORE_OBJECTLISTDIALOGSHELPER_H
 #endif

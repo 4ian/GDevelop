@@ -71,4 +71,18 @@ EMSCRIPTEN_BINDINGS(gd_SpriteObject) {
     function("asSpriteObject", &AsSpriteObject, allow_raw_pointers());
 }
 
+namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
+float Vector2f_GetX(const sf::Vector2f & v) { return v.x; }
+float Vector2f_GetY(const sf::Vector2f & v) { return v.y; }
+void Vector2f_SetX(sf::Vector2f & v, float x) { v.x = x; }
+void Vector2f_SetY(sf::Vector2f & v, float y) { v.y = y; }
+}
+
+EMSCRIPTEN_BINDINGS(sf_Vector2f) {
+    class_<sf::Vector2f>("Vector2f")
+        .constructor<>()
+        .property("x", &Vector2f_GetX, &Vector2f_SetX)
+        .property("y", &Vector2f_GetY, &Vector2f_SetY)
+        ;
+}
 #endif

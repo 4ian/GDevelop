@@ -13,6 +13,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
@@ -32,6 +33,48 @@
 
 using namespace emscripten;
 using namespace gd;
+
+namespace gd { //Workaround for emscripten to directly use gd::PlatformExtension instead of shared pointers.
+PlatformExtension * VectorPlatformExtension_Get(std::vector<boost::shared_ptr<PlatformExtension> > & v, unsigned int i) { return v[i].get(); };
+unsigned int VectorPlatformExtension_Size(std::vector<boost::shared_ptr<PlatformExtension> > & v) { return v.size(); };
+}
+
+EMSCRIPTEN_BINDINGS(gd_PlatformExtension) {
+    class_<std::vector<boost::shared_ptr<PlatformExtension> > >("VectorPlatformExtension")
+        .function("size", &VectorPlatformExtension_Size)
+        .function("get", &VectorPlatformExtension_Get, allow_raw_pointers())
+        ;
+
+    class_<PlatformExtension>("PlatformExtension")
+        //Information about the extension:
+        .function("getFullName", &PlatformExtension::GetFullName)
+        .function("getName", &PlatformExtension::GetName)
+        .function("getDescription", &PlatformExtension::GetDescription)
+        .function("getAuthor", &PlatformExtension::GetAuthor)
+        .function("getLicense", &PlatformExtension::GetLicense)
+        .function("isBuiltin", &PlatformExtension::IsBuiltin)
+        .function("getNameSpace", &PlatformExtension::GetNameSpace)
+        //Accessing what's inside the extension:
+        .function("getExtensionObjectsTypes", &PlatformExtension::GetExtensionObjectsTypes)
+        .function("getAutomatismsTypes", &PlatformExtension::GetAutomatismsTypes)
+        .function("getObjectMetadata", &PlatformExtension::GetObjectMetadata)
+        .function("getAutomatismMetadata", &PlatformExtension::GetAutomatismMetadata)
+        //Actions, conditions and events:
+        .function("getAllEvents", &PlatformExtension::GetAllEvents)
+        .function("getAllActions", &PlatformExtension::GetAllActions)
+        .function("getAllConditions", &PlatformExtension::GetAllConditions)
+        .function("getAllExpressions", &PlatformExtension::GetAllExpressions)
+        .function("getAllStrExpressions", &PlatformExtension::GetAllStrExpressions)
+        .function("getAllActionsForObject", &PlatformExtension::GetAllActionsForObject)
+        .function("getAllConditionsForObject", &PlatformExtension::GetAllConditionsForObject)
+        .function("getAllExpressionsForObject", &PlatformExtension::GetAllExpressionsForObject)
+        .function("getAllStrExpressionsForObject", &PlatformExtension::GetAllStrExpressionsForObject)
+        .function("getAllActionsForAutomatism", &PlatformExtension::GetAllActionsForAutomatism)
+        .function("getAllConditionsForAutomatism", &PlatformExtension::GetAllConditionsForAutomatism)
+        .function("getAllExpressionsForAutomatism", &PlatformExtension::GetAllExpressionsForAutomatism)
+        .function("getAllStrExpressionsForAutomatism", &PlatformExtension::GetAllStrExpressionsForObject)
+        ;
+}
 
 namespace gd { //Workaround for emscripten to directly use strings instead of gd::Expression.
 void Instruction_SetParameter(gd::Instruction & i, unsigned int nb, const std::string & val) { i.SetParameter(nb, val); };
@@ -157,6 +200,10 @@ EMSCRIPTEN_BINDINGS(gd_EventsList) {
         ;
 }
 
+namespace gd {
+gd::ParameterMetadata * InstructionMetadata_GetParameter(InstructionMetadata & im, unsigned int i) { return &im.parameters[i]; }
+}
+
 EMSCRIPTEN_BINDINGS(gd_InstructionMetadata) {
     class_<InstructionMetadata>("InstructionMetadata")
         .function("getFullName", &InstructionMetadata::GetFullName)
@@ -165,13 +212,20 @@ EMSCRIPTEN_BINDINGS(gd_InstructionMetadata) {
         .function("getGroup", &InstructionMetadata::GetGroup)
         .function("canHaveSubInstructions", &InstructionMetadata::CanHaveSubInstructions)
         .function("setCanHaveSubInstructions", &InstructionMetadata::SetCanHaveSubInstructions)
-        //TODO
+        .function("getParameter", &InstructionMetadata_GetParameter, allow_raw_pointers())
+        .function("getParametersCount", &InstructionMetadata::GetParametersCount)
         ;
 }
 
 EMSCRIPTEN_BINDINGS(gd_ParameterMetadata) {
     class_<ParameterMetadata>("ParameterMetadata")
-        //TODO
+        .function("getType", &ParameterMetadata::GetType)
+        .function("getExtraInfo", &ParameterMetadata::GetExtraInfo)
+        .function("isOptional", &ParameterMetadata::IsOptional)
+        .function("getDescription", &ParameterMetadata::GetDescription)
+        .function("isCodeOnly", &ParameterMetadata::IsCodeOnly)
+        .function("getDefaultValue", &ParameterMetadata::GetDefaultValue)
+        .class_function("isObject", &ParameterMetadata::IsObject)
         ;
 }
 

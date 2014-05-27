@@ -14,6 +14,7 @@
 #if defined(EMSCRIPTEN)
 #include "Embind.h"
 #include <emscripten/bind.h>
+#include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -29,40 +30,6 @@
 using namespace emscripten;
 using namespace gd;
 
-namespace gd
-{
-namespace internal {
-    template<typename SetType>
-    struct SetAccess {
-        static val has(
-            const SetType& s,
-            typename SetType::value_type value
-        ) {
-            return val(s.find(value) != s.end());
-        }
-    };
-}
-
-/**
- * Utility function used to expose a std::set to Embind.
- */
-template<typename T>
-class_<std::set<T> > register_set(const char* name) {
-    typedef std::set<T> SetType;
-
-    return class_<std::set<T> >(name)
-        .template constructor<>()
-        //.function("insert", &SetType::insert)
-        .function("size", &SetType::size)
-        .function("has", &internal::SetAccess<SetType>::has)
-        ;
-}
-}
-
-EMSCRIPTEN_BINDINGS(gd_std_wrappers) {
-    register_vector<std::string>("VectorString");
-    register_set<std::string>("SetString");
-}
 
 EMSCRIPTEN_BINDINGS(gd_Platform) {
     class_<Platform>("Platform")
@@ -71,6 +38,8 @@ EMSCRIPTEN_BINDINGS(gd_Platform) {
 	    .function("getFullName", &Platform::GetFullName)
 	    .function("getSubtitle", &Platform::GetSubtitle)
         .function("getDescription", &Platform::GetDescription)
+        .function("isExtensionLoaded", &Platform::IsExtensionLoaded)
+        .function("getAllPlatformExtensions", &Platform::GetAllPlatformExtensions)
 	    .function("isExtensionLoaded", &Platform::IsExtensionLoaded)
 	    ;
 }
@@ -376,19 +345,13 @@ EMSCRIPTEN_BINDINGS(gd_Serializer) {
         ;
 }
 
-
-namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
-float Vector2f_GetX(const sf::Vector2f & v) { return v.x; }
-float Vector2f_GetY(const sf::Vector2f & v) { return v.y; }
-void Vector2f_SetX(sf::Vector2f & v, float x) { v.x = x; }
-void Vector2f_SetY(sf::Vector2f & v, float y) { v.y = y; }
-}
-
-EMSCRIPTEN_BINDINGS(sf_Vector2f) {
-    class_<sf::Vector2f>("Vector2f")
-        .constructor<>()
-        .property("x", &Vector2f_GetX, &Vector2f_SetX)
-        .property("y", &Vector2f_GetY, &Vector2f_SetY)
+EMSCRIPTEN_BINDINGS(gd_ObjectListDialogsHelper) {
+    class_<ObjectListDialogsHelper>("ObjectListDialogsHelper")
+        .constructor<const gd::Project &, const gd::Layout &>()
+        .function("setSearchText", &ObjectListDialogsHelper::SetSearchText)
+        .function("setAllowedObjectType", &ObjectListDialogsHelper::SetAllowedObjectType)
+        .function("setGroupsAllowed", &ObjectListDialogsHelper::SetGroupsAllowed)
+        .function("getMatchingObjects", &ObjectListDialogsHelper::GetMatchingObjects)
         ;
 }
 

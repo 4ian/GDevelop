@@ -203,11 +203,6 @@ std::map<std::string, gd::EventMetadata > & PlatformExtension::GetAllEvents()
 {
     return eventsInfos;
 }
-
-std::map<std::string, gd::AutomatismMetadata > & PlatformExtension::GetAllAutomatisms()
-{
-    return automatismsInfo;
-}
 std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForObject(std::string objectType)
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())

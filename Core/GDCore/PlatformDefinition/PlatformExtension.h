@@ -287,11 +287,6 @@ public:
      */
     std::map<std::string, gd::EventMetadata > & GetAllEvents();
 
-    /**
-     * \brief Return a map containing all the automatisms provided by the extension
-     */
-    std::map<std::string, gd::AutomatismMetadata > & GetAllAutomatisms();
-
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Return a reference to a map containing the names of the actions (in the first members) and the metadata associated with (in the second members).

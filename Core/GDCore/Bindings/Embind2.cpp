@@ -77,6 +77,7 @@ EMSCRIPTEN_BINDINGS(gd_PlatformExtension) {
 }
 
 namespace gd { //Workaround for emscripten to directly use strings instead of gd::Expression.
+gd::Instruction Instruction_Clone(gd::Instruction & i) { gd::Instruction n = i; return n; };
 void Instruction_SetParameter(gd::Instruction & i, unsigned int nb, const std::string & val) { i.SetParameter(nb, val); };
 const std::string & Instruction_GetParameter(gd::Instruction & i, unsigned int nb) { return i.GetParameter(nb).GetPlainString(); };
 std::vector < Instruction > * Instruction_GetSubInstructions(gd::Instruction & i) { return &i.GetSubInstructions(); };
@@ -90,6 +91,7 @@ EMSCRIPTEN_BINDINGS(gd_Instruction) {
 
     class_<Instruction>("Instruction")
         .constructor<>()
+        .function("clone", &Instruction_Clone)
         .function("getType", &Instruction::GetType).function("setType", &Instruction::SetType)
         .function("isInverted", &Instruction::IsInverted).function("setInverted", &Instruction::SetInverted)
         .function("getParameter", &Instruction_GetParameter).function("setParameter", &Instruction_SetParameter)

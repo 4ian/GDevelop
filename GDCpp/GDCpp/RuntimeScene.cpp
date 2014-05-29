@@ -503,10 +503,11 @@ public:
     {};
     virtual ~ObjectsFromInitialInstanceCreator() {};
 
-    virtual void operator()(gd::InitialInstance & initialInstance)
+    virtual void operator()(gd::InitialInstance * instancePtr)
     {
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        gd::InitialInstance & instance = *instancePtr;
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
 
         RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
@@ -517,28 +518,28 @@ public:
 
         if ( newObject != boost::shared_ptr<RuntimeObject> () )
         {
-            newObject->SetX( initialInstance.GetX() + xOffset );
-            newObject->SetY( initialInstance.GetY() + yOffset );
-            newObject->SetZOrder( initialInstance.GetZOrder() );
-            newObject->SetLayer( initialInstance.GetLayer() );
-            newObject->ExtraInitializationFromInitialInstance(initialInstance);
-            newObject->SetAngle( initialInstance.GetAngle() );
+            newObject->SetX( instance.GetX() + xOffset );
+            newObject->SetY( instance.GetY() + yOffset );
+            newObject->SetZOrder( instance.GetZOrder() );
+            newObject->SetLayer( instance.GetLayer() );
+            newObject->ExtraInitializationFromInitialInstance(instance);
+            newObject->SetAngle( instance.GetAngle() );
 
-            if ( initialInstance.HasCustomSize() )
+            if ( instance.HasCustomSize() )
             {
-                newObject->SetWidth(initialInstance.GetCustomWidth());
-                newObject->SetHeight(initialInstance.GetCustomHeight());
+                newObject->SetWidth(instance.GetCustomWidth());
+                newObject->SetHeight(instance.GetCustomHeight());
             }
 
             //Substitute initial variables specific to that object instance.
-            newObject->GetVariables().Merge(initialInstance.GetVariables());
+            newObject->GetVariables().Merge(instance.GetVariables());
 
             scene.objectsInstances.AddObject(newObject);
         }
         else
-            std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
+            std::cout << "Could not find and put object " << instance.GetObjectName() << std::endl;
 
-        if ( optionalMap ) (*optionalMap)[&initialInstance] = newObject;
+        if ( optionalMap ) (*optionalMap)[&instance] = newObject;
     }
 
 private:

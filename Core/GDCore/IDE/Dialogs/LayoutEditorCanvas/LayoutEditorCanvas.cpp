@@ -846,15 +846,16 @@ void LayoutEditorCanvas::DeleteInstances(std::vector<InitialInstance *> instance
 
 /** \brief Tool class collecting in a list all the instances that are inside the selectionRectangle of the layout editor canvas.
  */
-class InstancesInsideSelectionPicker : public gd::InitialInstanceFunctor
+class InstancesInAreaPicker : public gd::InitialInstanceFunctor
 {
 public:
-    InstancesInsideSelectionPicker(const LayoutEditorCanvas & editor_) : editor(editor_) {};
-    virtual ~InstancesInsideSelectionPicker() {};
+    InstancesInAreaPicker(const LayoutEditorCanvas & editor_) : editor(editor_), ignoreLockedInstances(false) {};
+    virtual ~InstancesInAreaPicker() {};
 
-    virtual void operator()(gd::InitialInstance & instance)
+    virtual void operator()(gd::InitialInstance * instancePtr)
     {
-        if ( instance.IsLocked() ) return;
+        gd::InitialInstance & instance = *instancePtr;
+        if ( ignoreLockedInstances && instance.IsLocked() ) return;
 
         sf::Vector2f size = editor.GetInitialInstanceSize(instance);
         sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
@@ -868,10 +869,12 @@ public:
     }
 
     std::vector<InitialInstance*> & GetSelectedList() { return selectedList; };
+    std::vector<InitialInstance*> & IgnoreLockedInstances() { ignoreLockedInstances = true; };
 
 private:
     const LayoutEditorCanvas & editor;
     std::vector<InitialInstance*> selectedList; ///< This list will be filled with the instances that are into the selectionRectangle
+    bool ignoreLockedInstances;
 };
 
 void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
@@ -941,7 +944,8 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
         }
 
         //Select the instances that are inside the selection rectangle
-        InstancesInsideSelectionPicker picker(*this);
+        InstancesInAreaPicker picker(*this);
+        picker.IgnoreLockedInstances();
         instances.IterateOverInstances(picker);
 
         for ( unsigned int i = 0; i<picker.GetSelectedList().size();++i)
@@ -1216,8 +1220,9 @@ public:
     };
     virtual ~SmallestInstanceUnderCursorPicker() {};
 
-    virtual void operator()(gd::InitialInstance & instance)
+    virtual void operator()(gd::InitialInstance * instancePtr)
     {
+        gd::InitialInstance & instance = *instancePtr;
         if ( pickLockedOnly != instance.IsLocked() ) return;
 
         sf::Vector2f size = editor.GetInitialInstanceSize(instance);

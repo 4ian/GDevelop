@@ -352,9 +352,16 @@ public:
     ///@{
     #if !defined(EMSCRIPTEN)
     /**
-     * \brief Load the project from a file.
+     * \brief Load the project from a XML file.
      */
     bool LoadFromFile(const std::string & filename);
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Load the project from a JSON file.
+     */
+    bool LoadFromJSONFile(const std::string & filename);
+    #endif
     #endif
 
     /**
@@ -365,11 +372,18 @@ public:
     #if defined(GD_IDE_ONLY)
     #if !defined(EMSCRIPTEN)
     /**
-     * \brief Save the project to a file.
+     * \brief Save the project to a XML file.
      *
      * "Dirty" flag is set to false when save is done.
      */
     bool SaveToFile(const std::string & filename);
+
+    /**
+     * \brief Save the project to a JSON file.
+     *
+     * "Dirty" flag is set to false when save is done.
+     */
+    bool SaveToJSONFile(const std::string & filename);
     #endif
 
     /**

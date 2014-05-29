@@ -494,7 +494,7 @@ protected:
     wxMenu platformsMenu;
 
     DECLARE_EVENT_TABLE()
-    friend class InstancesInsideSelectionPicker;
+    friend class InstancesInAreaPicker;
     friend class SmallestInstanceUnderCursorPicker;
 };
 

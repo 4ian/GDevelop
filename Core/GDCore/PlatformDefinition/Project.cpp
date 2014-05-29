@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <fstream>
 #include <stdio.h>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
@@ -504,8 +505,9 @@ public:
     {};
     virtual ~SpriteObjectsPositionUpdater() {};
 
-    virtual void operator()(gd::InitialInstance & instance)
+    virtual void operator()(gd::InitialInstance * instancePtr)
     {
+        gd::InitialInstance & instance = *instancePtr;
         gd::Object * object = NULL;
         if ( layout.HasObjectNamed(instance.GetObjectName()))
             object = &layout.GetObject(instance.GetObjectName());
@@ -569,6 +571,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     const SerializerElement & propElement = element.GetChild("properties", 0, "Info");
     SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
+    std::cout << "Unserializing" << GetName() << "..." << std::endl;
     SetDefaultWidth(propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt());
     SetDefaultHeight(propElement.GetChild("windowHeight", 0, "WindowH").GetValue().GetInt());
     SetMaximumFPS(propElement.GetChild("maxFPS", 0, "FPSmax").GetValue().GetInt());
@@ -594,18 +597,19 @@ void Project::UnserializeFrom(const SerializerElement & element)
     }
 
     #if defined(GD_IDE_ONLY)
+    currentPlatform = NULL;
+    std::string currentPlatformName = propElement.GetChild("currentPlatform").GetValue().GetString();
     const SerializerElement & platformsElement = propElement.GetChild("platforms", 0, "Platforms");
     platformsElement.ConsiderAsArrayOf("platform", "Platform");
     for(unsigned int i = 0;i<platformsElement.GetChildrenCount();++i)
     {
-        std::string current = propElement.GetChild("currentPlatform").GetValue().GetString();
-
         std::string name = platformsElement.GetChild(i).GetStringAttribute("name");
         gd::Platform * platform = gd::PlatformManager::Get()->GetPlatform(name);
 
         if ( platform ) {
             AddPlatform(*platform);
-            if ( platform->GetName() == current || current.empty() ) currentPlatform = platform;
+            if ( platform->GetName() == currentPlatformName || currentPlatformName.empty() )
+                currentPlatform = platform;
         }
         else {
             std::cout << "Platform \"" << name << "\" is unknown." << std::endl;
@@ -619,6 +623,8 @@ void Project::UnserializeFrom(const SerializerElement & element)
         currentPlatform = platforms.back();
     }
 
+    if (currentPlatform == NULL && !platforms.empty())
+        currentPlatform = platforms.back();
     #endif
 
     //Compatibility code
@@ -767,6 +773,28 @@ bool Project::LoadFromFile(const std::string & filename)
 
     return true;
 }
+
+#if defined(GD_IDE_ONLY)
+bool Project::LoadFromJSONFile(const std::string & filename)
+{
+    std::ifstream ifs(filename.c_str());
+    if (!ifs.is_open())
+    {
+        std::string error = gd::ToString(_( "Unable to open the file")) +_("Make sure the file exists and that you have the right to open the file.");
+        gd::LogError( error );
+        return false;
+    }
+
+    SetProjectFile(filename);
+    dirty = false;
+
+    std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+    gd::SerializerElement rootElement = gd::Serializer::FromJSON(str);
+    UnserializeFrom(rootElement);
+
+    return true;
+}
+#endif
 #endif
 
 #if defined(GD_IDE_ONLY)
@@ -800,8 +828,18 @@ void Project::SerializeTo(SerializerElement & element) const
 
     SerializerElement & platformsElement = propElement.AddChild("platforms");
     platformsElement.ConsiderAsArrayOf("platform");
-    for (unsigned int i =0;i<platforms.size();++i)
+    for (unsigned int i =0;i<platforms.size();++i) {
+        if (platforms[i] == NULL) {
+            std::cout << "ERROR: The project has a platform which is NULL.";
+            continue;
+        }
+
         platformsElement.AddChild("platform").SetAttribute("name", platforms[i]->GetName());
+    }
+    if (currentPlatform != NULL)
+        propElement.AddChild("currentPlatform").SetValue(currentPlatform->GetName());
+    else
+        std::cout << "ERROR: The project current platform is NULL.";
 
     resourcesManager.SerializeTo(element.AddChild("resources"));
     SerializeObjectsTo(element.AddChild("objects"));
@@ -857,6 +895,26 @@ bool Project::SaveToFile(const std::string & filename)
         return false;
     }
 
+    return true;
+}
+
+bool Project::SaveToJSONFile(const std::string & filename)
+{
+    //Serialize the whole project
+    gd::SerializerElement rootElement;
+    SerializeTo(rootElement);
+
+    //Write JSON to file
+    std::string str = gd::Serializer::ToJSON(rootElement);
+    ofstream ofs(filename.c_str());
+    if (!ofs.is_open())
+    {
+        gd::LogError( _( "Unable to save file ")+filename+_("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        return false;
+    }
+
+    ofs << str;
+    ofs.close();
     return true;
 }
 #endif

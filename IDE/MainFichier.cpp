@@ -164,9 +164,11 @@ void MainFrame::SetLastUsedFile(wxString file)
 void MainFrame::Open( string file )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
+    bool isJSON = wxString(file).EndsWith(".json");
 
     boost::shared_ptr<gd::Project> newProject(new gd::Project);
-    if ( newProject->LoadFromFile(file) )
+    if ( (!isJSON && newProject->LoadFromFile(file)) ||
+         (isJSON  && newProject->LoadFromJSONFile(file)) )
     {
         //Ensure working directory is set to the IDE one.
         wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
@@ -229,13 +231,12 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
         SaveAs();
     else
     {
-        if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
-            gd::LogError( _("Save failed!") );
-        else
+        if (Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()))
             gd::LogStatus(_("Save ended."));
+        else
+            gd::LogError( _("Save failed!") );
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
-
         return;
     }
 }
@@ -259,6 +260,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
+        //TODO: Factor using SaveAs.
         if ( games[i]->GetProjectFile().empty() || wxString(games[i]->GetProjectFile()).EndsWith(".autosave") )
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
@@ -269,7 +271,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
             std::string path = gd::ToString(fileDialog.GetPath());
 
             #if defined(LINUX) //Extension seems not be added with wxGTK?
-            if ( fileDialog.GetFilterIndex() == 0 && !path.empty() )
+            if ( fileDialog.GetFilterIndex() == 0 && !path.empty() && !fileDialog.GetPath().EndsWith(".json") )
                 path += ".gdg";
             #endif
 
@@ -279,7 +281,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
                 //oui, donc on l'enregistre
                 games[i]->SetProjectFile(path);
 
-                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {gd::LogError( _("Save failed!") );}
+                if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( _("Save failed!") );
                 SetLastUsedFile( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
@@ -289,7 +291,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         }
         else
         {
-            if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {gd::LogError( _("Save failed!") );}
+            if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( _("Save failed!") );
         }
     }
 
@@ -306,23 +308,32 @@ void MainFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
     SaveAs();
 }
 
+bool MainFrame::Save(gd::Project & project, wxString file)
+{
+    bool isJSON = file.EndsWith(".json");
+    bool success =
+        (!isJSON && project.SaveToFile(gd::ToString(file))) ||
+        (isJSON  && project.SaveToJSONFile(gd::ToString(file)));
+
+    return success;
+}
+
 void MainFrame::SaveAs()
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     if ( !CurrentGameIsValid() ) return;
 
-    //Affichage de la boite de dialogue
-    wxFileDialog fileDialog( this, _( "Choose where save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    //Display dialog box
+    wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
     fileDialog.ShowModal();
 
     std::string file = gd::ToString(fileDialog.GetPath());
     #if defined(LINUX) //Extension seems not be added with wxGTK?
-    if ( fileDialog.GetFilterIndex() == 0 && !file.empty() )
+    if ( fileDialog.GetFilterIndex() == 0 && !file.empty() && !fileDialog.GetPath().EndsWith(".json") )
         file += ".gdg";
     #endif
 
-    //A t on  un fichier à enregistrer ?
     if ( !file.empty() )
     {
         wxString oldPath = !GetCurrentGame()->GetProjectFile().empty() ? wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath() : "";
@@ -349,7 +360,7 @@ void MainFrame::SaveAs()
 
         GetCurrentGame()->SetProjectFile(file);
 
-        if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
+        if ( !Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()) )
         {
             gd::LogError( _("The project could not be saved properly!") );
         }

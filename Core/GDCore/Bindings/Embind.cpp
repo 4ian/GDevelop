@@ -105,7 +105,7 @@ std::vector < std::string > * Project_GetUsedExtensions(gd::Project & project) {
 }
 
 EMSCRIPTEN_BINDINGS(gd_Project) {
-    class_<Project>("Project")
+    class_<Project, base<ClassWithObjects> >("Project")
         .constructor<>()
         .function("getName", &Project::GetName).function("setName", &Project::SetName)
         .function("getAuthor", &Project::GetAuthor).function("setAuthor", &Project::SetAuthor)
@@ -193,6 +193,7 @@ namespace gd { //Workaround for emscripten not supporting methods returning a re
 gd::InitialInstancesContainer * Layout_GetInitialInstances(gd::Layout & l) { return &l.GetInitialInstances(); }
 gd::VariablesContainer * Layout_GetVariables(gd::Layout & l) { return &l.GetVariables(); }
 gd::Layer * Layout_GetLayer(gd::Layout & l, const std::string & name) { return &l.GetLayer(name); }
+gd::Layer * Layout_GetLayerAt(gd::Layout & l, unsigned int i) { return &l.GetLayer(i); }
 gd::EventsList * Layout_GetEvents(gd::Layout & l) { return &l.GetEvents(); }
 gd::Object * ClassWithObjects_GetObject(gd::ClassWithObjects & c, const std::string & name) { return &c.GetObject(name); }
 gd::Object * ClassWithObjects_GetObjectAt(gd::ClassWithObjects & c, unsigned int id) { return &c.GetObject(id); }
@@ -230,11 +231,23 @@ EMSCRIPTEN_BINDINGS(gd_Layout) {
         .function("insertNewLayer", &Layout::InsertNewLayer)
         .function("insertLayer", &Layout::InsertLayer)
         .function("getLayer", &Layout_GetLayer, allow_raw_pointers())
+        .function("getLayerAt", &Layout_GetLayerAt, allow_raw_pointers())
         .function("hasLayerNamed", &Layout::HasLayerNamed)
         .function("removeLayer", &Layout::RemoveLayer)
         .function("getLayersCount", &Layout::GetLayersCount)
         //Properties, for convenience only:
         .property("name", &Layout::GetName, &Layout::SetName)
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_Layer) {
+    class_<Layer>("Layer")
+        .constructor<>()
+        .function("getName", &Layer::GetName).function("setName", &Layer::SetName)
+        .function("getVisibility", &Layer::GetVisibility).function("setVisibility", &Layer::SetVisibility)
+        //Properties, for convenience only:
+        .property("name", &Layer::GetName, &Layer::SetName)
+        .property("visibility", &Layer::GetVisibility, &Layer::SetVisibility)
         ;
 }
 
@@ -278,7 +291,7 @@ gd::InitialInstance * InitialInstancesContainer_InsertNewInitialInstance(gd::Ini
 
 struct InitialInstanceFunctorWrapper : public wrapper<InitialInstanceFunctor> {
     EMSCRIPTEN_WRAPPER(InitialInstanceFunctorWrapper);
-    void operator()(InitialInstance & instance) {
+    void operator()(InitialInstance * instance) {
         return call<void>("invoke", instance);
     }
 };
@@ -287,12 +300,12 @@ struct InitialInstanceFunctorWrapper : public wrapper<InitialInstanceFunctor> {
 
 EMSCRIPTEN_BINDINGS(gd_InitialInstancesContainer) {
     class_<InitialInstanceFunctor>("InitialInstanceFunctor")
-        .function("invoke", &InitialInstanceFunctor::operator())
+        .function("invoke", &InitialInstanceFunctor::operator(), allow_raw_pointers())
         .allow_subclass<InitialInstanceFunctorWrapper>()
         ;
 
     class_<HighestZOrderFinder, base<InitialInstanceFunctor> >("HighestZOrderFinder")
-        .function("invoke", &HighestZOrderFinder::operator())
+        .function("invoke", &HighestZOrderFinder::operator(), allow_raw_pointers())
         .function("getHighestZOrder", &HighestZOrderFinder::GetHighestZOrder)
         .function("restrictSearchToLayer", &HighestZOrderFinder::RestrictSearchToLayer)
         ;

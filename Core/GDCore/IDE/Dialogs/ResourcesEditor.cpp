@@ -1031,6 +1031,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 
         project.GetResourcesManager().RemoveResource(imageName);
         RemoveImageFromTree( resourcesTree->GetRootItem(), imageName );
+        project.SetDirty();
     }
 }
 

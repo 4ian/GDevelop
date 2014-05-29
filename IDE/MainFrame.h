@@ -92,9 +92,9 @@ public:
     void SetCurrentGame(unsigned int i, bool refreshProjectManager = true);
 
     /**
-     *  \briefOpen a game from its filename
+     *  \brief Open a game from its filename
      */
-    void Open(string FichierJeu);
+    void Open(string filename);
 
     /**
      *  \briefOpen the new project dialog
@@ -239,6 +239,7 @@ public:
     void PrepareAutosave();
     void RealizeRibbonCustomButtons();
     void SetLastUsedFile(wxString file);
+    bool Save(gd::Project & project, wxString file);
 
 private:
 

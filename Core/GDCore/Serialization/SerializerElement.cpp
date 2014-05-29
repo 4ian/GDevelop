@@ -77,18 +77,21 @@ bool SerializerElement::GetBoolAttribute(const std::string & name, bool defaultV
 			std::cout << "WARNING: Getting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
 	}
 
-	if (attributes.find(name) != attributes.end())
+	if (attributes.find(name) != attributes.end()) {
 		return attributes.find(name)->second.GetBool();
-	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
-		return attributes.find(deprecatedName)->second.GetBool();
+	}
+	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end()) {
+		return attributes.find(deprecatedName)->second.GetBool();}
 	else {
 		if (HasChild(name, deprecatedName)) {
 			SerializerElement & child = GetChild(name, 0, deprecatedName);
-			if (!child.IsValueUndefined())
+			if (!child.IsValueUndefined()) {
 				return child.GetValue().GetBool();
+			}
 		}
 	}
 
+	std::cout << "Bool attribute \"" << name << "\" not found, returning " << defaultValue;
 	return defaultValue;
 }
 
@@ -204,7 +207,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 		if (children[i].second == boost::shared_ptr<SerializerElement>())
 			continue;
 
-		if (children[i].first == arrayOf || (!deprecatedArrayOf.empty() && children[i].first == deprecatedArrayOf))
+		if (children[i].first == arrayOf || children[i].first.empty() || (!deprecatedArrayOf.empty() && children[i].first == deprecatedArrayOf))
 		{
 			if (index == currentIndex)
 				return *children[i].second;
@@ -213,6 +216,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 		}
 	}
 
+	std::cout << "ERROR: Request out of bound child at index " << index << std::endl;
 	return nullElement;
 }
 
@@ -240,7 +244,7 @@ SerializerElement & SerializerElement::GetChild(std::string name, unsigned int i
 		if (children[i].second == boost::shared_ptr<SerializerElement>())
 			continue;
 
-		if (children[i].first == name || (!deprecatedName.empty() && children[i].first == deprecatedName))
+		if (children[i].first == name || (!arrayOf.empty() && children[i].first.empty()) || (!deprecatedName.empty() && children[i].first == deprecatedName))
 		{
 			if (index == currentIndex)
 				return *children[i].second;
@@ -273,8 +277,8 @@ unsigned int SerializerElement::GetChildrenCount(std::string name, std::string d
 		if (children[i].second == boost::shared_ptr<SerializerElement>())
 			continue;
 
-		if (children[i].first == name || (!deprecatedName.empty() && children[i].first == deprecatedName))
-				currentIndex++;
+		if (children[i].first == name || (!arrayOf.empty() && children[i].first.empty()) || (!deprecatedName.empty() && children[i].first == deprecatedName))
+			currentIndex++;
 	}
 
 	return currentIndex;

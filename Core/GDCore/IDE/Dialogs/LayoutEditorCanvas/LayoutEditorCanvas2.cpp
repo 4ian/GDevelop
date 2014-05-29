@@ -180,8 +180,9 @@ public:
     {};
     virtual ~InstancesRenderer() {};
 
-    virtual void operator()(gd::InitialInstance & instance)
+    virtual void operator()(gd::InitialInstance * instancePtr)
     {
+        gd::InitialInstance & instance = *instancePtr;
         gd::Object * associatedObject = editor.GetObjectLinkedToInitialInstance(instance);
         if ( !associatedObject ) return;
 

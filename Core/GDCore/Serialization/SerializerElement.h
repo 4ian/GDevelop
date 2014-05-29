@@ -32,11 +32,11 @@ public:
 	 * \brief Set the value of the element.
 	 */
     void SetValue(const SerializerValue & value) { valueUndefined = false; elementValue = value; }
-    void SetValue(bool val) { valueUndefined = false; elementValue = SerializerValue(val); }
-    void SetValue(std::string val) { valueUndefined = false; elementValue = SerializerValue(val); }
-    void SetValue(int val) { valueUndefined = false; elementValue = SerializerValue(val); }
-    void SetValue(unsigned int val) { valueUndefined = false; elementValue = SerializerValue((int)val); }
-    void SetValue(double val) { valueUndefined = false; elementValue = SerializerValue(val); }
+    void SetValue(bool val) { valueUndefined = false; elementValue.SetBool(val); }
+    void SetValue(std::string val) { valueUndefined = false; elementValue.SetString(val); }
+    void SetValue(int val) { valueUndefined = false; elementValue.SetInt(val); }
+    void SetValue(unsigned int val) { valueUndefined = false; elementValue.SetInt((int)val); }
+    void SetValue(double val) { valueUndefined = false; elementValue.SetDouble(val); }
     void SetValue(float val) { SetValue((double)val); }
 
 	/**
@@ -179,6 +179,7 @@ public:
      *
      * If no children name is specified, return the number of children being part of the array.
      * (ConsiderAsArrayOf must have been called before).
+     * Note that unnamed children are considered to be valid element of the array.
      *
      * \param name The name of the children.
      *

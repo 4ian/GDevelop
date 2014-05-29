@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <iomanip>
 #if !defined(EMSCRIPTEN)
 #include "GDCore/TinyXml/tinyxml.h"
 #endif
@@ -104,6 +105,98 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 
 namespace
 {
+
+	/**
+	 * Adapted from public domain library "jsoncpp" (http://sourceforge.net/projects/jsoncpp/).
+	 */
+	static inline bool isControlCharacter(char ch)
+	{
+	   return ch > 0 && ch <= 0x1F;
+	}
+
+	/**
+	 * Adapted from public domain library "jsoncpp" (http://sourceforge.net/projects/jsoncpp/).
+	 */
+	static bool containsControlCharacter( const char* str )
+	{
+	   while ( *str )
+	   {
+	      if ( isControlCharacter( *(str++) ) )
+	         return true;
+	   }
+	   return false;
+	}
+
+	/**
+	 * Tool function converting a string to a quoted string that can be inserted into
+	 * a JSON file.
+	 * Adapted from public domain library "jsoncpp" (http://sourceforge.net/projects/jsoncpp/).
+	 */
+	std::string StringToQuotedJSONString( const char *value )
+	{
+	   if (value == NULL)
+	      return "";
+	   // Not sure how to handle unicode...
+	   if (strpbrk(value, "\"\\\b\f\n\r\t") == NULL && !containsControlCharacter( value ))
+	      return std::string("\"") + value + "\"";
+	   // We have to walk value and escape any special characters.
+	   // Appending to std::string is not efficient, but this should be rare.
+	   // (Note: forward slashes are *not* rare, but I am not escaping them.)
+	   std::string::size_type maxsize = strlen(value)*2 + 3; // allescaped+quotes+NULL
+	   std::string result;
+	   result.reserve(maxsize); // to avoid lots of mallocs
+	   result += "\"";
+	   for (const char* c=value; *c != 0; ++c)
+	   {
+	      switch(*c)
+	      {
+	         case '\"':
+	            result += "\\\"";
+	            break;
+	         case '\\':
+	            result += "\\\\";
+	            break;
+	         case '\b':
+	            result += "\\b";
+	            break;
+	         case '\f':
+	            result += "\\f";
+	            break;
+	         case '\n':
+	            result += "\\n";
+	            break;
+	         case '\r':
+	            result += "\\r";
+	            break;
+	         case '\t':
+	            result += "\\t";
+	            break;
+	         //case '/':
+	            // Even though \/ is considered a legal escape in JSON, a bare
+	            // slash is also legal, so I see no reason to escape it.
+	            // (I hope I am not misunderstanding something.
+	            // blep notes: actually escaping \/ may be useful in javascript to avoid </
+	            // sequence.
+	            // Should add a flag to allow this compatibility mode and prevent this
+	            // sequence from occurring.
+	         default:
+	            if ( isControlCharacter( *c ) )
+	            {
+	               std::ostringstream oss;
+	               oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*c);
+	               result += oss.str();
+	            }
+	            else
+	            {
+	               result += *c;
+	            }
+	            break;
+	      }
+	   }
+	   result += "\"";
+	   return result;
+	}
+
 	std::string ValueToJSON(const SerializerValue & val)
 	{
 		if (val.IsBoolean())
@@ -113,20 +206,7 @@ namespace
 		else if (val.IsDouble())
 			return gd::ToString(val.GetDouble());
 		else
-		{
-			//String: Replace newlines and quotes
-			std::string str = val.GetString();
-
-			size_t pos = std::string::npos;
-			while((pos = str.find("\n")) < str.length()) {
-	            str.replace(pos, 1, "\\n" );
-			}
-			while((pos = str.find("\"")) < str.length()) {
-	            str.replace(pos, 1, "\\\"" );
-			}
-
-			return "\""+str+ "\"";
-		}
+			return StringToQuotedJSONString(val.GetString().c_str());
 	}
 }
 
@@ -215,6 +295,76 @@ namespace
         return str.find_first_not_of(blankChar, pos);
     }
 
+
+	/**
+	 * Adapted from https://github.com/hjiang/jsonxx
+	 */
+	std::string DecodeString(const std::string & original)
+	{
+		std::string value;
+		value.reserve(original.size());
+		std::istringstream input("\""+original+"\"");
+
+	    char ch = '\0', delimiter = '"';
+	    input.get(ch);
+	    if (ch != delimiter) return "";
+
+	    while(!input.eof() && input.good()) {
+	        input.get(ch);
+	        if (ch == delimiter) {
+	            break;
+	        }
+	        if (ch == '\\') {
+	            input.get(ch);
+	            switch(ch) {
+	                case '\\':
+	                case '/':
+	                    value.push_back(ch);
+	                    break;
+	                case 'b':
+	                    value.push_back('\b');
+	                    break;
+	                case 'f':
+	                    value.push_back('\f');
+	                    break;
+	                case 'n':
+	                    value.push_back('\n');
+	                    break;
+	                case 'r':
+	                    value.push_back('\r');
+	                    break;
+	                case 't':
+	                    value.push_back('\t');
+	                    break;
+	                case 'u': {
+	                        int i;
+	                        std::stringstream ss;
+	                        for( i = 0; (!input.eof() && input.good()) && i < 4; ++i ) {
+	                            input.get(ch);
+	                            ss << ch;
+	                        }
+	                        if( input.good() && (ss >> i) )
+	                            value.push_back(i);
+	                    }
+	                    break;
+	                default:
+	                    if (ch != delimiter) {
+	                        value.push_back('\\');
+	                        value.push_back(ch);
+	                    } else value.push_back(ch);
+	                    break;
+	            }
+	        } else {
+	            value.push_back(ch);
+	        }
+	    }
+	    if (input && ch == delimiter) {
+	        return value;
+	    } else {
+	        return "";
+	    }
+	}
+
     /**
      * Return the position of the end of the string. Blank are skipped if necessary
      * @param str The string to be used
@@ -238,14 +388,14 @@ namespace
                 if ( endPos == std::string::npos ) return std::string::npos; //Invalid string
             }
 
-            strContent = str.substr(startPos+1, endPos-1-startPos);
+            strContent = DecodeString(str.substr(startPos+1, endPos-1-startPos));
             return endPos;
         }
 
         endPos = str.find_first_of(" \n,:");
         if ( endPos >= str.length() ) return std::string::npos; //Invalid string
 
-        strContent = str.substr(startPos, endPos-1-startPos);
+        strContent = DecodeString(str.substr(startPos, endPos-1-startPos));
         return endPos-1;
     }
 
@@ -265,6 +415,8 @@ namespace
             while ( firstChild || jsonStr[pos] == ',' )
             {
                 pos++;
+                if (pos < jsonStr.length() && jsonStr[pos] == '}' ) break;
+
                 std::string childName;
                 pos = SkipString(jsonStr, pos, childName);
 
@@ -280,7 +432,10 @@ namespace
                 firstChild = false;
             }
 
-            if ( jsonStr[pos] != '}' ) return std::string::npos;
+            if ( jsonStr[pos] != '}' ) {
+                std::cout << "Parsing error: Object not properly formed.";
+                return std::string::npos;
+            }
             return pos+1;
         }
         else if ( jsonStr[pos] == '[' ) //Array
@@ -289,26 +444,36 @@ namespace
             while ( index == 0 || jsonStr[pos] == ',' )
             {
                 pos++;
+                if (pos < jsonStr.length() && jsonStr[pos] == ']' ) break;
                 pos = ParseJSONObject(jsonStr, pos, element.AddChild(""));
 
                 pos = SkipBlankChar(jsonStr, pos);
-                if ( pos >= jsonStr.length()) return std::string::npos;
+                if ( pos >= jsonStr.length()) {
+                    std::cout << "Parsing error: element of array not properly formed.";
+                    return std::string::npos;
+                }
                 index++;
             }
 
-            if ( jsonStr[pos] != ']' ) return std::string::npos;
+            if ( jsonStr[pos] != ']' ) {
+                std::cout << "Parsing error: array not properly ended";
+                return std::string::npos;
+            }
             return pos+1;
         }
         else if ( jsonStr[pos] == '"' ) //String
         {
             std::string str;
             pos = SkipString(jsonStr, pos, str);
-            if ( pos >= jsonStr.length() ) return std::string::npos;
+            if ( pos >= jsonStr.length() ) {
+                std::cout << "Parsing error: Invalid string";
+                return std::string::npos;
+            }
 
             element.SetValue(str);
             return pos+1;
         }
-        else
+        else //Number or boolean
         {
             std::string str;
             size_t endPos = pos;
@@ -318,7 +483,12 @@ namespace
             }
 
             str = jsonStr.substr(pos, endPos-pos);
-            element.SetValue(ToDouble(str));
+            if ( str == "true" )
+            	element.SetValue(true);
+            else if ( str == "false" )
+            	element.SetValue(false);
+            else
+            	element.SetValue(ToDouble(str));
             return endPos;
         }
     }

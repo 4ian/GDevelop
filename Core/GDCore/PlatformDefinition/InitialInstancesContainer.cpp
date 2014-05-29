@@ -74,7 +74,7 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
 void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
-        func(*it);
+        func(&(*it));
 }
 
 namespace
@@ -102,7 +102,7 @@ void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialIns
 
     std::sort(sortedInstances.begin(), sortedInstances.end(), gd::InstancesZOrderSort());
     for (unsigned int i = 0;i<sortedInstances.size();++i)
-        func(*sortedInstances[i]);
+        func(sortedInstances[i]);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -244,8 +244,9 @@ InitialInstanceFunctor::~InitialInstanceFunctor()
 };
 
 
-void HighestZOrderFinder::operator()(gd::InitialInstance & instance)
+void HighestZOrderFinder::operator()(gd::InitialInstance * instancePtr)
 {
+    gd::InitialInstance & instance = *instancePtr;
     if ( !layerRestricted || instance.GetLayer() == layerName)
     {
         if ( firstCall ) highestZOrder = instance.GetZOrder();

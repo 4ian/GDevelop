@@ -96,7 +96,7 @@ public:
                         const std::string & sentence,
                         const std::string & group,
                         const std::string & icon,
-                        const std::string & smallicon);
+                        const std::string & smallIcon);
     virtual ~InstructionMetadata() {};
 
     const std::string & GetFullName() const { return fullname; }
@@ -109,6 +109,8 @@ public:
     const wxBitmap & GetBitmapIcon() const { return icon; }
     const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }
 #endif
+    const std::string & GetIconFilename() const { return iconFilename; }
+    const std::string & GetSmallIconFilename() const { return smallIconFilename; }
     bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
     /**
@@ -290,6 +292,8 @@ private:
     wxBitmap icon;
     wxBitmap smallicon;
 #endif
+    std::string iconFilename;
+    std::string smallIconFilename;
     bool canHaveSubInstructions;
     std::string extensionNamespace;
     bool hidden;

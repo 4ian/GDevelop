@@ -212,6 +212,8 @@ EMSCRIPTEN_BINDINGS(gd_InstructionMetadata) {
         .function("getDescription", &InstructionMetadata::GetDescription)
         .function("getSentence", &InstructionMetadata::GetSentence)
         .function("getGroup", &InstructionMetadata::GetGroup)
+        .function("getIconFilename", &InstructionMetadata::GetIconFilename)
+        .function("getSmallIconFilename", &InstructionMetadata::GetSmallIconFilename)
         .function("canHaveSubInstructions", &InstructionMetadata::CanHaveSubInstructions)
         .function("setCanHaveSubInstructions", &InstructionMetadata::SetCanHaveSubInstructions)
         .function("getParameter", &InstructionMetadata_GetParameter, allow_raw_pointers())

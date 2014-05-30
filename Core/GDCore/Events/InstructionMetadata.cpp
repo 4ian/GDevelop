@@ -26,11 +26,13 @@ InstructionMetadata::InstructionMetadata(const std::string & extensionNamespace_
                         const std::string & sentence_,
                         const std::string & group_,
                         const std::string & icon_,
-                        const std::string & smallicon_) :
+                        const std::string & smallIcon_) :
 fullname(fullname_),
 description(description_),
 sentence(sentence_),
 group(group_),
+iconFilename(icon_),
+smallIconFilename(smallIcon_),
 canHaveSubInstructions(false),
 extensionNamespace(extensionNamespace_),
 hidden(false)

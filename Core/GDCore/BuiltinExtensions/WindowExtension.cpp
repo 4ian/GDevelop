@@ -37,12 +37,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
     extension.AddAction("SetFullScreen",
                    _("De/activate fullscreen"),
                    _("This action activate or desactivate fullscreen."),
-                   _("Activate fullscreen :  _PARAM1_"),
+                   _("Activate fullscreen:  _PARAM1_ (Keep aspect ratio: _PARAM2_)"),
                    _("Game's window"),
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Activate fullscreen"), "",false);
+        .AddParameter("yesorno", _("Activate fullscreen"), "",false)
+        .AddParameter("yesorno", _("Keep aspect ratio (HTML5 games only, yes by default)"), "",true).SetDefaultValue("yes");
+
+    extension.AddAction("SetWindowMargins",
+                   _("Change window's margins"),
+                   _("This action change the margins, in pixels, of the game's window."),
+                   _("Set margins of game window to _PARAM1_;_PARAM2_;_PARAM3_;_PARAM4_"),
+                   _("Game's window"),
+                   "res/actions/window24.png",
+                   "res/actions/window.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("expression", _("Top"), "",false)
+        .AddParameter("expression", _("Right"), "",false)
+        .AddParameter("expression", _("Bottom"), "",false)
+        .AddParameter("expression", _("Left"), "",false);
 
     extension.AddAction("SetWindowSize",
                    _("Change the size of the screen"),
@@ -55,6 +69,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddParameter("expression", _("Width"), "",false)
         .AddParameter("expression", _("Height"), "",false)
         .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."), "",false);
+
     extension.AddAction("SetWindowIcon",
                    _("Change window's icon"),
                    _("This action change the icon of the game's window."),

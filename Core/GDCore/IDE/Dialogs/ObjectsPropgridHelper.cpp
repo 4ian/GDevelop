@@ -282,7 +282,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
                 }
             }
 
-            for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+            for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
             {
                 gd::Layout & layout = project.GetLayout(i);
                 if ( layout.HasObjectNamed(oldName) ) continue;
@@ -332,7 +332,7 @@ void ObjectsPropgridHelper::UpdateAutomatismsSharedData(gd::Project & project, g
         scene->UpdateAutomatismsSharedData(project);
     else //Scene pointer is NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+        for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
             project.GetLayout(i).UpdateAutomatismsSharedData(project);
     }
 }

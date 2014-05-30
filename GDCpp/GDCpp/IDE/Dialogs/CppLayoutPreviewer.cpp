@@ -160,7 +160,7 @@ void CppLayoutPreviewer::OnUpdate()
                 mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
             else if ( retourEvent != -1 )
             {
-                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < editor.GetProject().GetLayoutCount())
+                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < editor.GetProject().GetLayoutsCount())
                     mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + editor.GetProject().GetLayout(retourEvent).GetName() + "\"");
             }
         }

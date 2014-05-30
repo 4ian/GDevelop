@@ -99,6 +99,7 @@ EMSCRIPTEN_BINDINGS(gd_VariablesContainer) {
 
 namespace gd { //Workaround for emscripten not supporting methods returning a reference (objects are returned by copy in JS).
 gd::Layout * Project_GetLayout(gd::Project & project, const std::string & name) { return &project.GetLayout(name); }
+gd::Layout * Project_GetLayoutAt(gd::Project & project, unsigned int i) { return &project.GetLayout(i); }
 gd::VariablesContainer * Project_GetVariables(gd::Project & project) { return &project.GetVariables(); }
 gd::Layout * Project_InsertNewLayout(gd::Project & project, const std::string & name, unsigned int pos) { return &project.InsertNewLayout(name, pos); }
 std::vector < std::string > * Project_GetUsedExtensions(gd::Project & project) { return &project.GetUsedExtensions(); }
@@ -122,6 +123,8 @@ EMSCRIPTEN_BINDINGS(gd_Project) {
 
         .function("hasLayoutNamed", &Project::HasLayoutNamed)
         .function("getLayout", gd::Project_GetLayout, allow_raw_pointers())
+        .function("getLayoutAt", gd::Project_GetLayoutAt, allow_raw_pointers())
+        .function("getLayoutsCount", &gd::Project::GetLayoutsCount)
         .function("insertNewLayout", &Project_InsertNewLayout, allow_raw_pointers())
         .function("removeLayout", &Project::RemoveLayout)
         .function("getFirstLayout", &Project::GetFirstLayout).function("setFirstLayout", &Project::SetFirstLayout)

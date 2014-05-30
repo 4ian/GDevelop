@@ -570,7 +570,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                 }
             }
 
-            for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+            for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
             {
                 gd::Layout & layout = project.GetLayout(i);
                 if ( layout.HasObjectNamed(oldName) ) continue;
@@ -623,7 +623,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                 gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, *layout, layout->GetEvents(), oldName, newName);
             else
             {
-                for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+                for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
                 {
                     gd::Layout & layout = project.GetLayout(i);
                     if (std::find_if( layout.GetObjectGroups().begin(),

@@ -85,7 +85,7 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
     }
 
     //Add all the object files of the game
-    for (unsigned int l= 0;l<game.GetLayoutCount();++l)
+    for (unsigned int l= 0;l<game.GetLayoutsCount();++l)
     {
         std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
         task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
@@ -202,7 +202,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     //Add scenes resources
-    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
+    for ( unsigned int i = 0;i < game.GetLayoutsCount();i++ )
     {
         for (unsigned int j = 0;j<game.GetLayout(i).GetObjects().size();++j) //Add objects resources
         	game.GetLayout(i).GetObjects()[j]->ExposeResources(resourcesMergingHelper);
@@ -219,7 +219,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         game.GetObjects()[j]->ExposeResources(resourcesMergingHelper);
 
     //Compile all scene events to object files
-    for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
     {
         if ( game.GetLayout(i).GetProfiler() ) game.GetLayout(i).GetProfiler()->profilingActivated = false;
 
@@ -257,7 +257,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         else
             diagnosticManager.OnMessage(gd::ToString(_("Compiling scene ")+game.GetLayout(i).GetName()+_(" succeeded")));
 
-        diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(game.GetLayoutCount())*50.0 );
+        diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(game.GetLayoutsCount())*50.0 );
     }
 
     //Now copy resources

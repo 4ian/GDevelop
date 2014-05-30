@@ -448,7 +448,7 @@ void ProjectManager::Refresh()
         //Scenes
         gdTreeItemProjectData * scenesItemData = new gdTreeItemProjectData("Scenes", "", mainEditor.games[i].get());
         wxTreeItemId scenesItem = projectsTree->AppendItem(projectItem, _("Scenes"), 1 ,1, scenesItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->GetLayoutCount();++j)
+        for (unsigned int j = 0;j<mainEditor.games[i]->GetLayoutsCount();++j)
         {
             gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", mainEditor.games[i]->GetLayout(j).GetName(), mainEditor.games[i].get());
             projectsTree->AppendItem(scenesItem, mainEditor.games[i]->GetLayout(j).GetName(), 1 ,1, sceneItemData);
@@ -992,7 +992,7 @@ void ProjectManager::OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
 
-    AddLayoutToProject(mainEditor.GetCurrentGame().get(), mainEditor.GetCurrentGame()->GetLayoutCount());
+    AddLayoutToProject(mainEditor.GetCurrentGame().get(), mainEditor.GetCurrentGame()->GetLayoutsCount());
 
     Refresh();
 }
@@ -1006,7 +1006,7 @@ void ProjectManager::OnaddSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    AddLayoutToProject(game, game->GetLayoutCount());
+    AddLayoutToProject(game, game->GetLayoutsCount());
 
     Refresh();
 }
@@ -1324,7 +1324,7 @@ void ProjectManager::CloseGame(gd::Project * project)
         if ( sceneEditorPtr != NULL )
         {
             bool sceneBelongToGame = false;
-            for (unsigned int i = 0;i<project->GetLayoutCount();++i)
+            for (unsigned int i = 0;i<project->GetLayoutsCount();++i)
             {
             	if ( &project->GetLayout(i) == &sceneEditorPtr->GetLayout() )
                     sceneBelongToGame = true;
@@ -1988,7 +1988,7 @@ void ProjectManager::OnSceneMoveUpSelected(wxCommandEvent& event)
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
     unsigned int index = game->GetLayoutPosition(data->GetSecondString());
-    if ( index >= game->GetLayoutCount() || index == 0 )
+    if ( index >= game->GetLayoutsCount() || index == 0 )
         return;
 
     //Swap the scenes
@@ -2015,7 +2015,7 @@ void ProjectManager::OnSceneMoveDownSelected(wxCommandEvent& event)
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
     unsigned int index = game->GetLayoutPosition(data->GetSecondString());
-    if ( index >= game->GetLayoutCount()-1 )
+    if ( index >= game->GetLayoutsCount()-1 )
         return;
 
     //Swap the scenes

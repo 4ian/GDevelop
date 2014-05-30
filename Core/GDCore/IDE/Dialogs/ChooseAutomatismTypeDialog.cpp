@@ -310,7 +310,7 @@ bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * paren
             layout->UpdateAutomatismsSharedData(project);
         else //Scene pointer is NULL: Update shared data of all layouts
         {
-            for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+            for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
                 project.GetLayout(i).UpdateAutomatismsSharedData(project);
         }
 

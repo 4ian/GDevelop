@@ -135,7 +135,7 @@ game(game_)
 	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
         linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
 
-    for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
     	linkedNameEdit->Append(game.GetLayout(i).GetName());
 }
 

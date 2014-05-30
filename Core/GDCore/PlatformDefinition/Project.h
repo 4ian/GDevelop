@@ -324,7 +324,7 @@ public:
     /**
      * \brief Return the number of layouts.
      */
-    unsigned int GetLayoutCount() const;
+    unsigned int GetLayoutsCount() const;
 
     /**
      * \brief Must add a new empty layout called "name" at the specified position in the layout list.

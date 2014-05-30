@@ -77,7 +77,7 @@ void MainFrame::CreateNewProject()
 
             //Ensure working directory is set to the IDE one.
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
-            if ( newProject->GetLayoutCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
+            if ( newProject->GetLayoutsCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
         }
         else gd::LogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
     }

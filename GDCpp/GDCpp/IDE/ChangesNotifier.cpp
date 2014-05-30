@@ -26,7 +26,7 @@ void ChangesNotifier::OnObjectEdited(gd::Project & game, gd::Layout * scene, gd:
         scene->SetRefreshNeeded();
     else //Scene pointer is not NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
             game.GetLayout(i).SetRefreshNeeded();
     }
 }
@@ -71,7 +71,7 @@ void ChangesNotifier::OnAutomatismEdited(gd::Project & game, gd::Layout * scene,
         scene->SetRefreshNeeded();
     else //Scene pointer is not NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
             game.GetLayout(i).SetRefreshNeeded();
     }
 }
@@ -98,7 +98,7 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & game, gd::Layout * 
         scene->SetRefreshNeeded();
     else //Scene pointer is NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
         {
             game.GetLayout(i).SetRefreshNeeded();
             game.GetLayout(i).SetCompilationNeeded();
@@ -247,7 +247,7 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
     }
     else //Scene pointer is NULL: Mark all scenes as modified
     {
-        for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
         {
             game.GetLayout(i).SetRefreshNeeded();
             game.GetLayout(i).SetCompilationNeeded();

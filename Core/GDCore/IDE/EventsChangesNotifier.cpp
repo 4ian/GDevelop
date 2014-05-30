@@ -23,7 +23,7 @@ void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, 
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnEventsModified(project, layout);
 
     //Notify others scenes, which include the changed scene ( even indirectly ), that their events has changed
-    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
     {
         if ( &project.GetLayout(i) == &layout ) continue;
 
@@ -66,7 +66,7 @@ void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & 
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnEventsModified(project, externalEvents);
 
     //Notify scenes, which include the external events ( even indirectly ), that their events has changed
-    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
     {
         std::vector< gd::Layout* > notUsed;
         std::vector< gd::ExternalEvents * > linkedExternalEvents;

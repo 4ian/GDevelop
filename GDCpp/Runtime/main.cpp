@@ -119,7 +119,7 @@ int main( int argc, char *p_argv[] )
         game.UnserializeFrom(rootElement);
 	}
 
-    if ( game.GetLayoutCount() == 0 )
+    if ( game.GetLayoutsCount() == 0 )
         return AbortWithMessage("No scene to be loaded. Aborting.");
 
     //Loading the code
@@ -178,7 +178,7 @@ int main( int argc, char *p_argv[] )
 
         if ( returnCode == -2 ) //Quit the game
             scenePlayed.running = false;
-        else if ( returnCode != -1 && returnCode < game.GetLayoutCount()) //Change the scene being played
+        else if ( returnCode != -1 && returnCode < game.GetLayoutsCount()) //Change the scene being played
         {
             RuntimeScene emptyScene(&window, &runtimeGame);
             scenePlayed = emptyScene; //Clear the scene

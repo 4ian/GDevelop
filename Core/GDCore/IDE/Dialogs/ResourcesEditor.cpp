@@ -524,7 +524,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
             /*{
                 //Search in scenes resources
                 ImagesUsedInventorizer inventorizer;
-                for ( unsigned int i = 0;i < project.GetLayoutCount();i++ )
+                for ( unsigned int i = 0;i < project.GetLayoutsCount();i++ )
                 {
                     for (unsigned int j = 0;j<project.GetLayout(i).GetObjects().size();++j)
                         project.GetLayout(i).GetObjects()[j]->ExposeResources(inventorizer);
@@ -987,7 +987,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
     //Search in scenes resources
     ImagesUsedInventorizer inventorizer;
-    for ( unsigned int i = 0;i < project.GetLayoutCount();i++ )
+    for ( unsigned int i = 0;i < project.GetLayoutsCount();i++ )
     {
         for (unsigned int j = 0;j<project.GetLayout(i).GetObjectsCount();++j)
         	project.GetLayout(i).GetObject(j).ExposeResources(inventorizer);

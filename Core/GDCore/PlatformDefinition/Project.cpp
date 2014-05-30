@@ -239,7 +239,7 @@ unsigned int Project::GetLayoutPosition(const std::string & name) const
     }
     return std::string::npos;
 }
-unsigned int Project::GetLayoutCount() const
+unsigned int Project::GetLayoutsCount() const
 {
     return scenes.size();
 }
@@ -849,7 +849,7 @@ void Project::SerializeTo(SerializerElement & element) const
     element.SetAttribute("firstLayout", firstLayout);
     gd::SerializerElement & layoutsElement = element.AddChild("layouts");
     layoutsElement.ConsiderAsArrayOf("layout");
-    for ( unsigned int i = 0;i < GetLayoutCount();i++ )
+    for ( unsigned int i = 0;i < GetLayoutsCount();i++ )
         GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
 
     SerializerElement & externalEventsElement = element.AddChild("externalEvents");
@@ -944,7 +944,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 
     //Add layouts resources
-    for ( unsigned int s = 0;s < GetLayoutCount();s++ )
+    for ( unsigned int s = 0;s < GetLayoutsCount();s++ )
     {
         for (unsigned int j = 0;j<GetLayout(s).GetObjectsCount();++j) //Add objects resources
         	GetLayout(s).GetObject(j).ExposeResources(worker);

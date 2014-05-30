@@ -160,7 +160,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     }
     if ( ScenesCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.GetLayoutCount();i++)
+        for(unsigned int i = 0;i<secondGame.GetLayoutsCount();i++)
         {
             if ( game.HasLayoutNamed(secondGame.GetLayout(i).GetName() ))
             {
@@ -175,7 +175,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
                 }
             }
             else
-                game.InsertLayout(secondGame.GetLayout(i), game.GetLayoutCount());
+                game.InsertLayout(secondGame.GetLayout(i), game.GetLayoutsCount());
         }
     }
     if ( objectsCheck->GetValue() )

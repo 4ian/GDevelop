@@ -124,7 +124,7 @@ std::string DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene()
     }
 
     std::string sceneName;
-    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
+    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
     {
         //For each layout, compute the dependencies and the dependencies which are not coming from a top level event.
         DependenciesAnalyzer analyzer(project, project.GetLayout(i));

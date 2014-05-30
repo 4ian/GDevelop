@@ -160,7 +160,7 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
         dirEdit->SetValue(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+DeleteInvalidCharacters(gameToCompile.GetName()));
     }
 
-    if ( gameToCompile.GetLayoutCount() == 0 )
+    if ( gameToCompile.GetLayoutsCount() == 0 )
     {
         CompilBt->Enable(false);
         statusTxt->SetLabel(_("The game is empty: Add a scene using the project manager."));

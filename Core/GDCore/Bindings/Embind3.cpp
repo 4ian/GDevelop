@@ -38,21 +38,22 @@ EMSCRIPTEN_BINDINGS(gd_SpriteObject) {
     class_<Sprite>("Sprite")
         .constructor<>()
         .function("setImageName", &Sprite::SetImageName)
-        .function("getImageName", &Sprite::GetImageName)
+        .function("getImageName", select_overload<std::string &()>(&Sprite::GetImageName))
         //TODO: Some methods are not exported
         ;
 
     class_<Direction>("Direction")
         .constructor<>()
+        .function("addSprite", &Direction::AddSprite)
         .function("getSprite", &Direction_GetSprite, allow_raw_pointers())
         .function("getSpritesCount", &Direction::GetSpritesCount)
         .function("hasNoSprites", &Direction::HasNoSprites)
+        .function("removeSprite", &Direction::RemoveSprite)
         .function("removeAllSprites", &Direction::RemoveAllSprites)
         .function("isLooping", &Direction::IsLooping)
         .function("setLoop", &Direction::SetLoop)
         .function("getTimeBetweenFrames", &Direction::GetTimeBetweenFrames)
         .function("setTimeBetweenFrames", &Direction::SetTimeBetweenFrames)
-        //TODO: Some methods are not exported
         ;
 
     class_<Animation>("Animation")

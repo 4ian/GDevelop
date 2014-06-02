@@ -22,6 +22,7 @@
 #include <wx/filename.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/Events/CodeCompilationHelpers.h"
 #include "GDCpp/DatFile.h"
@@ -162,7 +163,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     //Used to handle all files which must be exported
-    gd::ResourcesMergingHelper resourcesMergingHelper;
+    gd::ResourcesMergingHelper resourcesMergingHelper(NativeFileSystem::Get());
     resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(gameToCompile.GetProjectFile()).GetPath()));
 
     wxLogNull noLogPlease;

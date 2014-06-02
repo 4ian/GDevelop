@@ -19,6 +19,13 @@ namespace gd {
 	 */
 	void InitializePlatforms()
 	{
+		static bool initialized = false;
+		if (initialized) {
+			std::cout << "ERROR: You're calling initializePlatforms again, but initialization was already done!" << std::endl;
+			return;
+		}
+
+		initialized = true;
 		std::cout << "Initializing GDJS platform" << std::endl;
 	    {
 		    boost::shared_ptr<gd::Platform> platform(&JsPlatform::Get());

@@ -15,6 +15,7 @@
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/NewProjectDialog.h"
@@ -61,7 +62,8 @@ void MainFrame::CreateNewProject()
             {
                 newProject->SetProjectFile(dialog.GetChosenTemplateFile());
                 newProject->LoadFromFile(newProject->GetProjectFile());
-                gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, gd::ToString(targetDirectory), false);
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, gd::NativeFileSystem::Get(),
+                    gd::ToString(targetDirectory), false);
             }
             else
                 newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
@@ -351,7 +353,8 @@ void MainFrame::SaveAs()
             if ( dlg.ShowModal() == wxID_YES )
             {
                 wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
-                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), gd::ToString(newPath), true, &progressDialog);
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), NativeFileSystem::Get(),
+                    gd::ToString(newPath), true, &progressDialog);
             }
 
             if ( dlg.IsCheckBoxChecked() )

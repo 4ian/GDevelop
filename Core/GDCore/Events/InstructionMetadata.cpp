@@ -42,9 +42,9 @@ hidden(false)
     {
         icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY);
     } else { icon = wxBitmap(24,24);}
-    if ( wxFile::Exists(smallicon_) )
+    if ( wxFile::Exists(smallIcon_) )
     {
-        smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
+        smallicon = wxBitmap(smallIcon_, wxBITMAP_TYPE_ANY);
     } else { smallicon = wxBitmap(16,16);}
 #endif
 }

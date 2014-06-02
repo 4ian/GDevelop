@@ -14,6 +14,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
@@ -125,7 +126,7 @@ gd::RepeatEvent * AsRepeatEvent(gd::BaseEvent * e) { return static_cast<gd::Repe
 EMSCRIPTEN_BINDINGS(gd_BaseEvent) {
     class_<BaseEvent>("BaseEvent")
         .constructor<>()
-        .smart_ptr< boost::shared_ptr<BaseEvent> >()
+        .smart_ptr< boost::shared_ptr<BaseEvent> >("BaseEventSPtr")
         .function("clone", &BaseEvent::Clone)
         .function("getType", &BaseEvent::GetType).function("setType", &BaseEvent::SetType)
 	    .function("isExecutable", &BaseEvent::IsExecutable)
@@ -281,6 +282,81 @@ EMSCRIPTEN_BINDINGS(gd_EventsRefactorer) {
 
 EMSCRIPTEN_BINDINGS(gd_EventsCodeGenerator) {
     class_<EventsCodeGenerator>("EventsCodeGenerator")
+        ;
+}
+
+struct AbstractFileSystemWrapper : public wrapper<AbstractFileSystem> {
+    EMSCRIPTEN_WRAPPER(AbstractFileSystemWrapper);
+    virtual void MkDir(const std::string & path) {
+        return call<void>("mkDir", path);
+    }
+    virtual bool DirExists(const std::string & path) {
+        return call<bool>("dirExists", path);
+    }
+    virtual bool ClearDir(const std::string & path) {
+        return call<bool>("clearDir", path);
+    }
+    virtual std::string GetTempDir() {
+        return call<std::string>("getTempDir");
+    }
+    virtual std::string FileNameFrom(const std::string & file) {
+        return call<std::string>("fileNameFrom", file);
+    }
+    virtual std::string DirNameFrom(const std::string & file) {
+        return call<std::string>("dirNameFrom", file);
+    }
+    virtual bool MakeAbsolute(std::string & filename, const std::string & baseDirectory) {
+        filename = call<std::string>("getAbsolute", filename, baseDirectory);
+        return true;
+    }
+    virtual bool MakeRelative(std::string & filename, const std::string & baseDirectory) {
+        filename = call<std::string>("getRelative", filename, baseDirectory);
+        return true;
+    }
+    virtual bool IsAbsolute(const std::string & file) {
+        return call<bool>("isAbsolute", file);
+    }
+    virtual bool CopyFile(const std::string & file, const std::string & destination) {
+        return call<bool>("copyFile", file, destination);
+    }
+    virtual bool WriteToFile(const std::string & file, const std::string & content) {
+        return call<bool>("writeToFile", file, content);
+    }
+    virtual std::string ReadFile(const std::string & file) {
+        return call<std::string>("readFile", file);
+    }
+    virtual std::vector<std::string> ReadDir(const std::string & path, const std::string & ext) {
+        return call< std::vector<std::string> >("readDir", path, ext);
+    }
+    virtual bool FileExists(const std::string & file) {
+        return call<bool>("fileExists", file);
+    }
+};
+
+namespace gd {
+bool AbstractFileSystem_MakeAbsolute(AbstractFileSystem & fs, std::string * filename,
+    const std::string & baseDirectory) { return fs.MakeAbsolute(*filename, baseDirectory); }
+bool AbstractFileSystem_MakeRelative(AbstractFileSystem & fs, std::string * filename,
+    const std::string & baseDirectory) { return fs.MakeRelative(*filename, baseDirectory); }
+}
+
+EMSCRIPTEN_BINDINGS(gd_AbstractFileSystem) {
+    class_<AbstractFileSystem>("AbstractFileSystem")
+        .function("mkDir", &AbstractFileSystem::MkDir)
+        .function("dirExists", &AbstractFileSystem::DirExists)
+        .function("clearDir", &AbstractFileSystem::ClearDir)
+        .function("getTempDir", &AbstractFileSystem::GetTempDir)
+        .function("fileNameFrom", &AbstractFileSystem::FileNameFrom)
+        .function("dirNameFrom", &AbstractFileSystem::DirNameFrom)
+        .function("makeAbsolute", &AbstractFileSystem_MakeAbsolute, allow_raw_pointers())
+        .function("makeRelative", &AbstractFileSystem_MakeRelative, allow_raw_pointers())
+        .function("isAbsolute", &AbstractFileSystem::IsAbsolute)
+        .function("copyFile", &AbstractFileSystem::CopyFile)
+        .function("writeToFile", &AbstractFileSystem::WriteToFile)
+        .function("readFile", &AbstractFileSystem::ReadFile)
+        .function("ReadDir", &AbstractFileSystem::ReadFile)
+        .function("fileExists", &AbstractFileSystem::FileExists)
+        .allow_subclass<AbstractFileSystemWrapper>("AbstractFileSystemWrapper")
         ;
 }
 #endif

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #include "ProjectResourcesCopier.h"
 #include <map>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -14,6 +13,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/IDE/ResourcesAbsolutePathChecker.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"
@@ -24,23 +24,27 @@ using namespace std;
 namespace gd
 {
 
-bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, std::string destinationDirectory, bool updateOriginalProject,
-                                                wxProgressDialog * optionalProgressDialog, bool askAboutAbsoluteFilenames,
-                                                bool preserveDirectoryStructure)
+bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, AbstractFileSystem & fs,
+    std::string destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog,
+    bool askAboutAbsoluteFilenames, bool preserveDirectoryStructure)
 {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //Check if there are some resources with absolute filenames
-    gd::ResourcesAbsolutePathChecker absolutePathChecker;
+    gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
     originalProject.ExposeResources(absolutePathChecker);
-    bool copyAlsoResourcesWithAbsolutePath = ( !askAboutAbsoluteFilenames ||
-                                               (absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
-                                               wxMessageBox(_("Some resources are using absolute filenames.\nDo you want them to be copied in the new folder of the project? If you choose No, they won't be modified."),
-                                                            _("Some resources are using absolute filenames."),
-                                                            wxYES_NO | wxICON_QUESTION) == wxYES ));
+    bool copyAlsoResourcesWithAbsolutePath = !askAboutAbsoluteFilenames;
+
+    #if !defined(GD_NO_WX_GUI)
+    if ( !copyAlsoResourcesWithAbsolutePath )
+    {
+        copyAlsoResourcesWithAbsolutePath = absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
+            wxMessageBox(_("Some resources are using absolute filenames.\nDo you want them to be copied in the new folder of the project? If you choose No, they won't be modified."),
+            _("Some resources are using absolute filenames."), wxYES_NO | wxICON_QUESTION) == wxYES;
+    }
+    #endif
 
     //Get the resources to be copied
-    gd::ResourcesMergingHelper resourcesMergingHelper;
-    resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(originalProject.GetProjectFile()).GetPath()));
+    gd::ResourcesMergingHelper resourcesMergingHelper(fs);
+    resourcesMergingHelper.SetBaseDirectory(fs.DirNameFrom(originalProject.GetProjectFile()));
     resourcesMergingHelper.PreserveDirectoriesStructure(preserveDirectoryStructure);
     resourcesMergingHelper.PreserveAbsoluteFilenames(!copyAlsoResourcesWithAbsolutePath);
 
@@ -61,31 +65,30 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     {
         if ( !it->first.empty() )
         {
+            #if !defined(GD_NO_WX_GUI)
             if ( optionalProgressDialog )
             {
                 if ( !optionalProgressDialog->Update(i/static_cast<float>(resourcesNewFilename.size())*100.0f, _("Exporting ")+it->second) )
                     return false; //User choose to abort.
             }
+            #endif
 
             //Create the destination filename
-            wxFileName destinationFile(destinationDirectory + "/" + it->second);
-            destinationFile.Normalize();
+            std::string destinationFile(destinationDirectory + "/" + it->second);
+            fs.MakeAbsolute(destinationFile, destinationDirectory);
 
-            if ( destinationFile.GetFullPath() != it->first )
+            if ( destinationFile != it->first )
             {
                 //Be sure the directory exists
-                if ( !wxDirExists(destinationFile.GetPath()) ) gd::RecursiveMkDir::MkDir(destinationFile.GetPath());
+                std::string dir = fs.DirNameFrom(destinationFile);
+                if ( !fs.DirExists(dir) ) fs.MkDir(dir);
 
                 //We can now copy the file
-                bool copySucceeded = false;
+                if ( !fs.CopyFile(it->first, destinationFile) )
                 {
-                    wxLogNull noLogPlease;
-                    copySucceeded = wxCopyFile( it->first, destinationFile.GetFullPath(), true );
+                    gd::LogWarning( gd::ToString(_( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile+_("\".")));
                 }
-                if ( !copySucceeded )
-                {
-                    gd::LogWarning( gd::ToString(_( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile.GetFullPath()+_("\".")));
-                }
+                std::cout << "Copied " << it->first << " to " << destinationFile << std::endl;
             }
         }
 
@@ -93,11 +96,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     }
 
     return true;
-#else
-    gd::LogError(_("You tried to use ProjectResourcesCopier::CopyAllResourcesTo which is currently unsupported when wxwidgets support is disabled."));
-    return false;
-#endif
 }
 
 }
-#endif

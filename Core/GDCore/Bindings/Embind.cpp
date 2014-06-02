@@ -175,6 +175,7 @@ EMSCRIPTEN_BINDINGS(gd_Object) {
         .function("getAutomatism", &Object_GetAutomatism, allow_raw_pointers())
         .function("removeAutomatism", &Object::RemoveAutomatism)
         .function("renameAutomatism", &Object::RenameAutomatism)
+        .function("serializeTo", &Object::SerializeTo).function("unserializeFrom", &Object::UnserializeFrom)
         //Properties, for convenience only:
         .property("name", &Object::GetName, &Object::SetName)
         ;
@@ -304,7 +305,7 @@ struct InitialInstanceFunctorWrapper : public wrapper<InitialInstanceFunctor> {
 EMSCRIPTEN_BINDINGS(gd_InitialInstancesContainer) {
     class_<InitialInstanceFunctor>("InitialInstanceFunctor")
         .function("invoke", &InitialInstanceFunctor::operator(), allow_raw_pointers())
-        .allow_subclass<InitialInstanceFunctorWrapper>()
+        .allow_subclass<InitialInstanceFunctorWrapper>("InitialInstanceFunctorWrapper")
         ;
 
     class_<HighestZOrderFinder, base<InitialInstanceFunctor> >("HighestZOrderFinder")

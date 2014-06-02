@@ -2,11 +2,11 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef RESOURCESABSOLUTEPATHCHECKER_H
 #define RESOURCESABSOLUTEPATHCHECKER_H
 
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include <string>
 
 namespace gd
@@ -22,7 +22,7 @@ namespace gd
 class GD_CORE_API ResourcesAbsolutePathChecker : public ArbitraryResourceWorker
 {
 public:
-    ResourcesAbsolutePathChecker() : ArbitraryResourceWorker(), hasAbsoluteFilenames(false) {};
+    ResourcesAbsolutePathChecker(AbstractFileSystem & fileSystem) : ArbitraryResourceWorker(), hasAbsoluteFilenames(false), fs(fileSystem) {};
     virtual ~ResourcesAbsolutePathChecker() {};
 
     /**
@@ -40,9 +40,9 @@ public:
 
 private:
     bool hasAbsoluteFilenames;
+    AbstractFileSystem & fs;
 };
 
 }
 
 #endif // RESOURCESABSOLUTEPATHCHECKER_H
-#endif

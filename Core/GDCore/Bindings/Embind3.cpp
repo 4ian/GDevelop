@@ -37,7 +37,9 @@ gd::Sprite * Direction_GetSprite(gd::Direction & d, unsigned int i) { return &d.
 EMSCRIPTEN_BINDINGS(gd_SpriteObject) {
     class_<Sprite>("Sprite")
         .constructor<>()
-        //TODO
+        .function("setImageName", &Sprite::SetImageName)
+        .function("getImageName", &Sprite::GetImageName)
+        //TODO: Some methods are not exported
         ;
 
     class_<Direction>("Direction")
@@ -46,7 +48,11 @@ EMSCRIPTEN_BINDINGS(gd_SpriteObject) {
         .function("getSpritesCount", &Direction::GetSpritesCount)
         .function("hasNoSprites", &Direction::HasNoSprites)
         .function("removeAllSprites", &Direction::RemoveAllSprites)
-        //TODO
+        .function("isLooping", &Direction::IsLooping)
+        .function("setLoop", &Direction::SetLoop)
+        .function("getTimeBetweenFrames", &Direction::GetTimeBetweenFrames)
+        .function("setTimeBetweenFrames", &Direction::SetTimeBetweenFrames)
+        //TODO: Some methods are not exported
         ;
 
     class_<Animation>("Animation")

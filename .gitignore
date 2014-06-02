@@ -11,6 +11,7 @@
 /Binaries/.build-debug
 /Binaries/.build-dev
 /Binaries/.embuild
+/Binaries/.embuild-debug
 /Binaries/Releases/*.exe
 /Binaries/Releases/*.7z
 /Binaries/Releases/*.tar.bz2
@@ -38,6 +39,5 @@
 /Binaries/**/JsPlatform/*.dll.a
 *.autosave
 /Binaries/Output/WebIDE/Release
-
+/Binaries/Output/WebIDE/Debug
 /Binaries/Output/WebIDE/libGD.raw.js
-/Binaries/.embuild-debug

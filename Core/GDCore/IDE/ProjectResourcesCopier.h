@@ -2,11 +2,11 @@
  *  Game Develop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
-#if !defined(EMSCRIPTEN)
 #ifndef PROJECTRESOURCESCOPIER_H
 #define PROJECTRESOURCESCOPIER_H
 #include <string>
 namespace gd { class Project; }
+namespace gd { class AbstractFileSystem; }
 class wxProgressDialog;
 
 namespace gd
@@ -24,6 +24,7 @@ public:
      * \brief Copy all resources files of a \a project to a the specified \a destinationDirectory.
      *
      * \param project The project to be used
+     * \param fs The abstract file system to be used
      * \param destinationDirectory The directory where resources must be copied to
      * \param updateOriginalProject If set to true, \a project will be updated with the new resources filenames.
      * \param optionalProgressDialog An optional pointer to a wxProgressDialog. Can be NULL.
@@ -34,12 +35,11 @@ public:
      *
      * \return true if no error happened
      */
-    static bool CopyAllResourcesTo(gd::Project & project, std::string destinationDirectory, bool updateOriginalProject,
-                                   wxProgressDialog * optionalProgressDialog = NULL, bool askAboutAbsoluteFilenames = true,
-                                   bool preserveDirectoryStructure = true);
+    static bool CopyAllResourcesTo(gd::Project & project, gd::AbstractFileSystem & fs,
+        std::string destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog = NULL,
+        bool askAboutAbsoluteFilenames = true, bool preserveDirectoryStructure = true);
 };
 
 }
 
 #endif // PROJECTRESOURCESCOPIER_H
-#endif

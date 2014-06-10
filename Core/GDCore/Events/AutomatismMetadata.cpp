@@ -37,11 +37,12 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
     SetDefaultName(std::string(defaultName_));
     SetGroup(group_);
     className = className_;
+    iconFilename = icon24x24;
 #if !defined(GD_NO_WX_GUI)
-    if ( gd::SkinHelper::IconExists(icon24x24, 24) )
-        SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
-    else if ( wxFile::Exists(icon24x24) )
-        SetBitmapIcon(wxBitmap(icon24x24, wxBITMAP_TYPE_ANY));
+    if ( gd::SkinHelper::IconExists(iconFilename, 24) )
+        SetBitmapIcon(gd::SkinHelper::GetIcon(iconFilename, 24));
+    else if ( wxFile::Exists(iconFilename) )
+        SetBitmapIcon(wxBitmap(iconFilename, wxBITMAP_TYPE_ANY));
     else {
         std::cout << "Warning: The icon file for automatism \"" << name_
             << " was not found in the current skin icons"

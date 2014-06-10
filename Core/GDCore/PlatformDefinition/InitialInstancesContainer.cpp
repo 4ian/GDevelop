@@ -249,8 +249,17 @@ void HighestZOrderFinder::operator()(gd::InitialInstance * instancePtr)
     gd::InitialInstance & instance = *instancePtr;
     if ( !layerRestricted || instance.GetLayer() == layerName)
     {
-        if ( firstCall ) highestZOrder = instance.GetZOrder();
-        else highestZOrder = std::max(highestZOrder, instance.GetZOrder());
+        if ( firstCall )
+        {
+            highestZOrder = instance.GetZOrder();
+            lowestZOrder = instance.GetZOrder();
+            firstCall = false;
+        }
+        else
+        {
+            if (highestZOrder < instance.GetZOrder()) highestZOrder = instance.GetZOrder();
+            if (lowestZOrder > instance.GetZOrder()) lowestZOrder = instance.GetZOrder();
+        }
     }
 }
 

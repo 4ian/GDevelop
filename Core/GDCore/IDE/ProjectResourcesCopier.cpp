@@ -33,6 +33,8 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     originalProject.ExposeResources(absolutePathChecker);
     bool copyAlsoResourcesWithAbsolutePath = !askAboutAbsoluteFilenames;
 
+    std::cout << "Copying all ressources to " << destinationDirectory;
+
     #if !defined(GD_NO_WX_GUI)
     if ( !copyAlsoResourcesWithAbsolutePath )
     {
@@ -63,6 +65,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
+    std::cout << "Resource:" << it->first << std::endl;
         if ( !it->first.empty() )
         {
             #if !defined(GD_NO_WX_GUI)

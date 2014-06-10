@@ -56,7 +56,7 @@ class GD_CORE_API CompilationInfo
     int sfmlMajorVersion;
     int sfmlMinorVersion;
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     int wxWidgetsMajorVersion;
     int wxWidgetsMinorVersion;
     int wxWidgetsReleaseNumber;
@@ -425,6 +425,16 @@ private:
 
 
 #if defined(GD_IDE_ONLY)
+
+#if !defined(GD_NO_WX_GUI)
+    #define GD_COMPLETE_WX_COMPILATION_INFORMATION() compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION; \
+    compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION; \
+    compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER; \
+    compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
+#else
+    #define GD_COMPLETE_WX_COMPILATION_INFORMATION() ;
+#endif
+
 /** \brief Macro used by extensions in their constructor to declare how they have been compiled.
  * \see gd::CompilationInfo
  */
@@ -434,10 +444,7 @@ private:
     compilationInfo.sfmlMinorVersion = 0; \
     compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
     compilationInfo.sizeOfpInt = sizeof(int*); \
-    compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION; \
-    compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION; \
-    compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER; \
-    compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER; \
+    GD_COMPLETE_WX_COMPILATION_INFORMATION() \
     compilationInfo.gccMajorVersion = __GNUC__; \
     compilationInfo.gccMinorVersion = __GNUC_MINOR__; \
     compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__; \

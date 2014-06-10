@@ -103,7 +103,7 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
         }
     }
 }
-
+#if !defined(EMSCRIPTEN)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
     std::cout << "Reloading resources for" << name;
@@ -191,6 +191,7 @@ sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instan
     return sf::Vector2f(((float)associatedSprite->GetOrigine().GetX())*fabs(scaleX),
                         ((float)associatedSprite->GetOrigine().GetY())*fabs(scaleY));
 }
+#endif
 
 bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {

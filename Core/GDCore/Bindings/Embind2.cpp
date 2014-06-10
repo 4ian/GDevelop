@@ -15,7 +15,10 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/ProjectResourcesAdder.h"
 #include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/EventsParametersLister.h"
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/Events/Instruction.h"
@@ -31,6 +34,7 @@
 #include "GDCore/Events/ObjectMetadata.h"
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/Serialization/Serializer.h"
 
 using namespace emscripten;
 using namespace gd;
@@ -200,6 +204,8 @@ EMSCRIPTEN_BINDINGS(gd_EventsList) {
         .function("contains", &EventsList::Contains)
         .function("isEmpty", &EventsList::IsEmpty)
         .function("clear", &EventsList::Clear)
+        .function("serializeTo", &EventsList::SerializeTo)
+        .function("unserializeFrom", &EventsList::UnserializeFrom)
         ;
 }
 
@@ -231,6 +237,16 @@ EMSCRIPTEN_BINDINGS(gd_ParameterMetadata) {
         .function("isCodeOnly", &ParameterMetadata::IsCodeOnly)
         .function("getDefaultValue", &ParameterMetadata::GetDefaultValue)
         .class_function("isObject", &ParameterMetadata::IsObject)
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_AutomatismMetadata) {
+    class_<AutomatismMetadata>("AutomatismMetadata")
+        .function("getFullName", &AutomatismMetadata::GetFullName)
+        .function("getDefaultName", &AutomatismMetadata::GetDefaultName)
+        .function("getDescription", &AutomatismMetadata::GetDescription)
+        .function("getGroup", &AutomatismMetadata::GetGroup)
+        .function("getIconFilename", &AutomatismMetadata::GetIconFilename)
         ;
 }
 
@@ -270,6 +286,11 @@ EMSCRIPTEN_BINDINGS(gd_InstructionSentenceFormatter) {
         .function("labelFromType", &InstructionSentenceFormatter::LabelFromType)
         ;
 }
+/*
+namespace gd {
+gd::ParameterMetadata * EventsRefactorer_ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
+    std::string toReplace, std::string newString, bool matchCase, bool inConditions, bool inActions) { return &im.parameters[i]; }
+}*/
 
 EMSCRIPTEN_BINDINGS(gd_EventsRefactorer) {
     class_<EventsRefactorer>("EventsRefactorer")
@@ -357,6 +378,24 @@ EMSCRIPTEN_BINDINGS(gd_AbstractFileSystem) {
         .function("ReadDir", &AbstractFileSystem::ReadFile)
         .function("fileExists", &AbstractFileSystem::FileExists)
         .allow_subclass<AbstractFileSystemWrapper>("AbstractFileSystemWrapper")
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_ProjectResourcesAdder) {
+    class_<ProjectResourcesAdder>("ProjectResourcesAdder")
+        .class_function("addAllMissingImages", &ProjectResourcesAdder::AddAllMissingImages)
+        ;
+}
+
+EMSCRIPTEN_BINDINGS(gd_ArbitraryEventsWorker) {
+    class_<ArbitraryEventsWorker>("ArbitraryEventsWorker")
+        .function("launch", &ArbitraryEventsWorker::Launch)
+        ;
+}
+EMSCRIPTEN_BINDINGS(gd_EventsParametersLister) {
+    class_<EventsParametersLister, base<ArbitraryEventsWorker> >("EventsParametersLister")
+        .constructor<gd::Project &>()
+        .function("getParametersAndTypes", &EventsParametersLister::GetParametersAndTypes)
         ;
 }
 #endif

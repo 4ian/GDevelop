@@ -20,6 +20,8 @@ namespace gd
 /**
  * \brief Perform a search over a project or a layout, searching for layout, global or object variables.
  *
+ * \todo Refactor this class using ArbitraryEventsWorker!
+ *
  * \ingroup IDE
  */
 class EventsVariablesFinder

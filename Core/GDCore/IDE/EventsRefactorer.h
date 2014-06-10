@@ -42,6 +42,10 @@ public:
  *
  * Class containing functions to do refactoring tasks on events
  * like changing an object name, deleting an object...
+ *
+ * \todo Refactor this class using ArbitraryEventsWorker!
+ *
+ * \ingroup IDE
  */
 class GD_CORE_API EventsRefactorer
 {

@@ -141,6 +141,7 @@ public:
      */
     bool SetCentreAutomatic(bool enabled);
 
+    #if !defined(EMSCRIPTEN)
     /** \name Sprite runtime management
      * Functions used by the C++ game engine.
      */
@@ -176,12 +177,15 @@ public:
      */
     void MakeSpriteOwnsItsImage();
     ///@}
+    #endif
 
 private:
 
+    #if !defined(EMSCRIPTEN)
     sf::Sprite sfmlSprite; ///< Displayed SFML sprite
     boost::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
+    #endif
     std::string image; ///< Name of the image to be loaded in Image Manager.
 
     bool automaticCollisionMask; ///< True to use the custom collision mask. Otherwise, a basic bounding box is returned by GetCollisionMask()

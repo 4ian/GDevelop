@@ -182,7 +182,7 @@ public:
 class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor
 {
 public:
-    HighestZOrderFinder() : highestZOrder(0), firstCall(true), layerRestricted(false) {};
+    HighestZOrderFinder() : highestZOrder(0), lowestZOrder(0), firstCall(true), layerRestricted(false) {};
     virtual ~HighestZOrderFinder() {};
 
     virtual void operator()(gd::InitialInstance * instance);
@@ -198,8 +198,15 @@ public:
      */
     int GetHighestZOrder() const { return highestZOrder; }
 
+    /**
+     * \brief After calling the instances container iterate method with this functor,
+     * this method will return the lowest Z order of the instances.
+     */
+    int GetLowestZOrder() const { return lowestZOrder; }
+
 private:
     int highestZOrder;
+    int lowestZOrder;
     bool firstCall;
 
     bool layerRestricted; ///< If true, the search is restricted to the layer called \a layerName.

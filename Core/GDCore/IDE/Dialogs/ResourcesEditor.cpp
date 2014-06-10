@@ -985,6 +985,8 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
+    //TODO: Factor me using gd::Project::ExposeResources
+
     //Search in scenes resources
     ImagesUsedInventorizer inventorizer;
     for ( unsigned int i = 0;i < project.GetLayoutsCount();i++ )

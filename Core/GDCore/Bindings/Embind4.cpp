@@ -85,10 +85,13 @@ class_<std::map<T, U> > register_map_extra(class_<std::map<T, U> > theMap) {
 EMSCRIPTEN_BINDINGS(gd_std_wrappers) {
     register_vector<std::string>("VectorString");
     register_set<std::string>("SetString");
+    register_map_extra(register_map<std::string, std::string>("MapStringString"));
     register_map_extra(register_map<std::string, gd::EventMetadata>("MapStringEventMetadata"));
     register_map_extra(register_map<std::string, gd::InstructionMetadata>("MapStringInstructionMetadata"));
     register_map_extra(register_map<std::string, gd::ExpressionMetadata>("MapStringExpressionMetadata"));
     register_map_extra(register_map<std::string, gd::StrExpressionMetadata>("MapStringStrExpressionMetadata"));
+    register_map_extra(register_map<std::string, gd::PropertyDescriptor>("MapStringPropertyDescriptor"));
+
 }
 
 #endif

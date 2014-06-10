@@ -16,7 +16,9 @@ namespace gd
 Point Sprite::badPoint("");
 
 Sprite::Sprite() :
+#if !defined(EMSCRIPTEN)
     hasItsOwnImage(false),
+#endif
     automaticCollisionMask(true),
     origine("origine"),
     centre("centre"),
@@ -90,14 +92,17 @@ bool Sprite::SetCentreAutomatic(bool enabled)
 {
     automaticCentre = enabled;
 
+    #if !defined(EMSCRIPTEN)
     if ( automaticCentre )
         centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
+    #endif
 
     return true;
 }
 
 std::vector<Polygon2d> Sprite::GetCollisionMask() const
 {
+#if !defined(EMSCRIPTEN)
     if ( automaticCollisionMask )
     {
         std::vector<Polygon2d> mask;
@@ -111,10 +116,17 @@ std::vector<Polygon2d> Sprite::GetCollisionMask() const
         mask.push_back(rectangle);
         return mask;
     }
+#endif
 
     return customCollisionMask;
 }
 
+void Sprite::SetCustomCollisionMask(const std::vector<Polygon2d> & collisionMask)
+{
+    customCollisionMask = collisionMask;
+}
+
+#if !defined(EMSCRIPTEN)
 void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
 {
     sfmlImage = image_;
@@ -134,10 +146,6 @@ void Sprite::MakeSpriteOwnsItsImage()
         hasItsOwnImage = true;
     }
 }
-
-void Sprite::SetCustomCollisionMask(const std::vector<Polygon2d> & collisionMask)
-{
-    customCollisionMask = collisionMask;
-}
+#endif
 
 }

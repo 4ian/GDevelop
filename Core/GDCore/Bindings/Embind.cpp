@@ -108,12 +108,20 @@ std::vector < std::string > * Project_GetUsedExtensions(gd::Project & project) {
 EMSCRIPTEN_BINDINGS(gd_Project) {
     class_<Project, base<ClassWithObjects> >("Project")
         .constructor<>()
-        .function("getName", &Project::GetName).function("setName", &Project::SetName)
-        .function("getAuthor", &Project::GetAuthor).function("setAuthor", &Project::SetAuthor)
-        .function("getMainWindowDefaultWidth", &Project::GetMainWindowDefaultWidth).function("setDefaultWidth", &Project::SetDefaultWidth)
-        .function("getMainWindowDefaultHeight", &Project::GetMainWindowDefaultHeight).function("setDefaultHeight", &Project::SetDefaultHeight)
-        .function("getMaximumFPS", &Project::GetMaximumFPS).function("setMaximumFPS", &Project::SetMaximumFPS)
-        .function("getMinimumFPS", &Project::GetMinimumFPS).function("setMinimumFPS", &Project::SetMinimumFPS)
+        .function("getName", &Project::GetName)
+        .function("setName", &Project::SetName)
+        .function("getAuthor", &Project::GetAuthor)
+        .function("setAuthor", &Project::SetAuthor)
+        .function("getProjectFile", &Project::GetProjectFile)
+        .function("setProjectFile", &Project::SetProjectFile)
+        .function("getMainWindowDefaultWidth", &Project::GetMainWindowDefaultWidth)
+        .function("setDefaultWidth", &Project::SetDefaultWidth)
+        .function("getMainWindowDefaultHeight", &Project::GetMainWindowDefaultHeight)
+        .function("setDefaultHeight", &Project::SetDefaultHeight)
+        .function("getMaximumFPS", &Project::GetMaximumFPS)
+        .function("setMaximumFPS", &Project::SetMaximumFPS)
+        .function("getMinimumFPS", &Project::GetMinimumFPS)
+        .function("setMinimumFPS", &Project::SetMinimumFPS)
 
         .function("addPlatform", &Project::AddPlatform)
         .function("getCurrentPlatform", &Project::GetCurrentPlatform)
@@ -150,9 +158,10 @@ EMSCRIPTEN_BINDINGS(gd_Automatism) {
     class_<Automatism>("Automatism")
         .constructor<>()
         .function("clone", &Automatism::Clone, allow_raw_pointers())
-        .function("getName", &Automatism::GetName).function("setName", &Automatism::SetName)
+        .function("getName", &Automatism::GetName)
+        .function("setName", &Automatism::SetName)
         .function("getTypeName", &Automatism::GetTypeName)
-        .function("getProperties", &Automatism::GetTypeName)
+        .function("getProperties", &Automatism::GetProperties)
         .function("updateProperty", &Automatism::UpdateProperty)
         ;
 }
@@ -168,14 +177,18 @@ EMSCRIPTEN_BINDINGS(gd_Object) {
         .constructor<const std::string &>()
         .function("clone", &Object::Clone, allow_raw_pointers())
         .function("getType", &Object::GetType)
-        .function("getName", &Object::GetName).function("setName", &Object::SetName)
+        .function("setType", &Object::SetType)
+        .function("getName", &Object::GetName)
+        .function("setName", &Object::SetName)
         .function("getVariables", &Object_GetVariables, allow_raw_pointers())
         .function("getAllAutomatismNames", &Object::GetAllAutomatismNames)
         .function("hasAutomatismNamed", &Object::HasAutomatismNamed)
+        .function("addNewAutomatism", &Object::AddNewAutomatism, allow_raw_pointers())
         .function("getAutomatism", &Object_GetAutomatism, allow_raw_pointers())
         .function("removeAutomatism", &Object::RemoveAutomatism)
         .function("renameAutomatism", &Object::RenameAutomatism)
-        .function("serializeTo", &Object::SerializeTo).function("unserializeFrom", &Object::UnserializeFrom)
+        .function("serializeTo", &Object::SerializeTo)
+        .function("unserializeFrom", &Object::UnserializeFrom)
         //Properties, for convenience only:
         .property("name", &Object::GetName, &Object::SetName)
         ;
@@ -309,8 +322,10 @@ EMSCRIPTEN_BINDINGS(gd_InitialInstancesContainer) {
         ;
 
     class_<HighestZOrderFinder, base<InitialInstanceFunctor> >("HighestZOrderFinder")
+        .constructor<>()
         .function("invoke", &HighestZOrderFinder::operator(), allow_raw_pointers())
         .function("getHighestZOrder", &HighestZOrderFinder::GetHighestZOrder)
+        .function("getLowestZOrder", &HighestZOrderFinder::GetLowestZOrder)
         .function("restrictSearchToLayer", &HighestZOrderFinder::RestrictSearchToLayer)
         ;
 
@@ -338,8 +353,6 @@ PropertyDescriptor * PropertyDescriptor_AddExtraInfo(PropertyDescriptor &p, cons
 }
 
 EMSCRIPTEN_BINDINGS(gd_PropertyDescriptor) {
-    register_map<std::string, gd::PropertyDescriptor>("MapStringPropertyDescriptor");
-
     class_<PropertyDescriptor>("PropertyDescriptor")
         .constructor<std::string>()
         .function("setValue", &PropertyDescriptor_SetValue, allow_raw_pointers())

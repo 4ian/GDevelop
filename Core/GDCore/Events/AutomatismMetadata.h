@@ -106,6 +106,7 @@ public:
     const std::string & GetDefaultName() const { return defaultName; }
     const std::string & GetDescription() const  { return description; }
     const std::string & GetGroup() const  { return group; }
+    const std::string & GetIconFilename() const { return iconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
 #endif
@@ -129,6 +130,7 @@ private:
     std::string defaultName;
     std::string description;
     std::string group;
+    std::string iconFilename;
 #if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
 #endif

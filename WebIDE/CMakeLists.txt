@@ -86,6 +86,6 @@ set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE
 #Linker files
 ###
 
-#Nothing.
 target_link_libraries(GD GDCore)
 target_link_libraries(GD GDJS)
+target_link_libraries(GD PlatformAutomatism)

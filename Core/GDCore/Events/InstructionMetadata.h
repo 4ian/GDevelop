@@ -36,34 +36,34 @@ public:
      * \brief Return the type of the parameter.
      * \see gd::ParameterMetadata::IsObject
      */
-    const std::string & GetType() { return type; }
+    const std::string & GetType() const { return type; }
 
     /**
      * \brief Return an optional additional information, used for some parameters with special
      * type (For example, it can contains the type of object accepted by the parameter).
      */
-    const std::string & GetExtraInfo() { return supplementaryInformation; }
+    const std::string & GetExtraInfo() const { return supplementaryInformation; }
 
     /**
      * \brief Return true if the parameter is optional.
      */
-    bool IsOptional() { return optional; }
+    bool IsOptional() const { return optional; }
 
     /**
      * \brief Return the description of the parameter
      */
-    const std::string & GetDescription() { return description; }
+    const std::string & GetDescription() const { return description; }
 
     /**
      * \brief Return true if the parameter is only meant to be completed during compilation
      * and must not be displayed to the user.
      */
-    bool IsCodeOnly() { return codeOnly; }
+    bool IsCodeOnly() const { return codeOnly; }
 
     /**
      * \brief Get the default value for the parameter.
      */
-    const std::string & GetDefaultValue() { return defaultValue; }
+    const std::string & GetDefaultValue() const { return defaultValue; }
 
     std::string type; ///< Parameter type
     std::string supplementaryInformation; ///< Used if needed

@@ -89,3 +89,7 @@ set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/WebIDE/${CMAKE_BUILD_TYPE
 target_link_libraries(GD GDCore)
 target_link_libraries(GD GDJS)
 target_link_libraries(GD PlatformAutomatism)
+target_link_libraries(GD DestroyOutsideAutomatism)
+target_link_libraries(GD TiledSpriteObject)
+target_link_libraries(GD DraggableAutomatism)
+target_link_libraries(GD TopDownMovementAutomatism)

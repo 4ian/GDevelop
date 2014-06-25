@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
 #include <string>
@@ -11,6 +12,7 @@
 #if !defined(GD_NO_WX_GUI)
 #include <fstream>
 #include <wx/filename.h>
+#include <iostream>
 #include <wx/log.h>
 #include <wx/filefn.h>
 #endif
@@ -46,19 +48,16 @@ bool NativeFileSystem::MakeAbsolute(std::string & fn, const std::string & baseDi
 {
     wxFileName filename = wxFileName::FileName(fn);
     bool success = filename.MakeAbsolute(baseDirectory);
-    if (success)
-    {
-    	fn = ToString(filename.GetFullPath());
-    	return true;
-    }
-
-    return false;
+    fn = ToString(filename.GetFullPath());
+    return success;
 }
 
 bool NativeFileSystem::MakeRelative(std::string & fn, const std::string & baseDirectory)
 {
     wxFileName filename = wxFileName::FileName(fn);
-	bool success = filename.MakeRelativeTo(baseDirectory);
+    std::cout << "MAKRELATIVE CALLED on:" << filename.GetFullPath() << "and base: " << baseDirectory;
+    bool success = filename.MakeRelativeTo(baseDirectory);
+    std::cout << "s:" << success << "f:" << filename.GetFullPath();
     if (success)
     {
     	fn = ToString(filename.GetFullPath(wxPATH_UNIX));

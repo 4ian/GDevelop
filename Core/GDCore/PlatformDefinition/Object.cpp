@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
@@ -192,7 +193,8 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
 #if defined(GD_IDE_ONLY)
 void Object::SerializeTo(SerializerElement & element) const
 {
-    //Name and type are already saved.
+    element.SetAttribute( "name", GetName() );
+    element.SetAttribute( "type", GetType() );
     objectVariables.SerializeTo(element.AddChild("variables"));
 
     SerializerElement & automatismsElement = element.AddChild("automatisms");

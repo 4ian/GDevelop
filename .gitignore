@@ -1,6 +1,8 @@
 /GDJS
 /GDSDK
 /Extensions
+/GDCpp/docs/Documentation
+/Core/docs/Documentation
 /ExtLibs/boost
 /ExtLibs/SFML
 /ExtLibs/wxwidgets
@@ -10,6 +12,7 @@
 /Binaries/.build
 /Binaries/.build-debug
 /Binaries/.build-dev
+/Binaries/.build-test
 /Binaries/.embuild
 /Binaries/.embuild-debug
 /Binaries/Releases/*.exe
@@ -29,6 +32,7 @@
 *.dll
 *.exe
 *.a
+*.so
 *.bc
 /Binaries/**/MinGW32
 /Binaries/**/CppPlatform/Runtime

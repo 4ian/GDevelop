@@ -7,7 +7,7 @@ namespace gd { class Project; }
 
 /**
  * \brief Internal IDE class which can be used by wxTreeCtrl, to attach
- * information ( two string and a pointer to a project ) to an item
+ * information (two string and/or a pointer to a project) to an item.
  */
 class gdTreeItemProjectData : public wxTreeItemData
 {

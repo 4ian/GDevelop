@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #ifndef GDCORE_VARIABLEPARSER_H
 #define GDCORE_VARIABLEPARSER_H
@@ -23,7 +24,7 @@ namespace gd
  * Usage example:
 \code
     //...
-    
+
     //VariableCodeGenerationCallbacks is a class inheriting from gd::VariableParserCallbacks
     VariableCodeGenerationCallbacks callbacks(output, *this, context, VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
 
@@ -35,7 +36,7 @@ namespace gd
  * Here is the parsed grammar:   <br>
  * S -> VarName X  <br>
  * X -> e | . S | [StringExpression] X   <br>
- * 
+ *
  * where e = nothing ( end of expression ), StringExpression = A valid string expression and
  * S is the start.
  *
@@ -68,7 +69,7 @@ private:
     void S();
     void X();
 
-    /** 
+    /**
      * \brief Skip the string expression, starting from the current position.
      * \return The string expression skipped. currentPosition is now put on the closing bracket.
      */

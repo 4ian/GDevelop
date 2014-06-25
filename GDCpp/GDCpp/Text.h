@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #ifndef TEXT_H
 #define TEXT_H
@@ -11,7 +12,9 @@ using namespace std;
 
 /**
  * \brief Old class for drawing objects.
+ *
  * \deprecated Do not use this anymore, but the TextObject extension instead.
+ * \todo Delete me in a few months.
  */
 class GD_API Text
 {

@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #ifndef GDCORE_LINKEVENT_H
 #define GDCORE_LINKEVENT_H

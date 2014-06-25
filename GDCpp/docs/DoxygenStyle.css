@@ -1,0 +1,38 @@
+body {
+        background-color: #E5E5E5;
+        color: black;
+        margin: 0;
+}
+
+div.contents {
+        margin-bottom: 10px;
+        padding: 12px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 1100px;
+        background-color: white;
+        border-radius: 8px;
+}
+
+#projectbrief
+{
+	font: 90% Tahoma, Arial,sans-serif;
+}
+
+#titlearea {
+        background-color: #331045;
+        color: white;
+}
+
+#projectname {
+    font: 200% Tahoma,Arial,sans-serif;
+}
+
+hr.footer {
+        display: none;
+}
+
+.footer {
+        background-color: #331045;
+        color: white;
+}

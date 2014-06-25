@@ -51,8 +51,8 @@
  * the possibility of declaring debugger related functions ).<br>
  * <br>
  * A single dynamic library file can contains an extension for more than one platform: You just have to declare a class deriving from gd::PlatformExtension
- * for each platform supported, and a pair of creation/destruction functions for each platform ( The names of these functions can vary. The C++ platform
- * is excepting functions called "CreateGDExtension" and "DestroyGDExtension" while JS Platform search for functions called "CreateGDJSExtension" and "DestroyGDJSExtension" ).
+ * for each platform supported, and a pair of creation/destruction functions for each platform (The names of these functions can vary. The C++ platform
+ * expects functions called "CreateGDExtension" and "DestroyGDExtension" while JS Platform search for functions called "CreateGDJSExtension" and "DestroyGDJSExtension").
  *
  */
 

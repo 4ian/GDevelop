@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
@@ -20,7 +21,7 @@ namespace gd
 {
 
 /**
- * \brief Singleton class which can be used by the IDE and the editors to access to the clipboard
+ * \brief Singleton class which can be used by the IDE and the editors to access to a (fake) clipboard.
  */
 class GD_CORE_API Clipboard
 {

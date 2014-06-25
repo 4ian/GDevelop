@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
 /*
@@ -41,7 +42,21 @@ using namespace gd;
 
 namespace gd { //Workaround for emscripten to directly use gd::PlatformExtension instead of shared pointers.
 PlatformExtension * VectorPlatformExtension_Get(std::vector<boost::shared_ptr<PlatformExtension> > & v, unsigned int i) { return v[i].get(); };
-unsigned int VectorPlatformExtension_Size(std::vector<boost::shared_ptr<PlatformExtension> > & v) { return v.size(); };
+unsigned int VectorPlatformExtension_Size(const std::vector<boost::shared_ptr<PlatformExtension> > & v) { return v.size(); };
+
+std::map<std::string, gd::EventMetadata > * PlatformExtension_GetAllEvents(PlatformExtension & e) { return &e.GetAllEvents();};
+std::map<std::string, gd::InstructionMetadata > * PlatformExtension_GetAllActions(PlatformExtension & e) { return &e.GetAllActions();};
+std::map<std::string, gd::InstructionMetadata > * PlatformExtension_GetAllConditions(PlatformExtension & e) { return &e.GetAllConditions();};
+std::map<std::string, gd::ExpressionMetadata > * PlatformExtension_GetAllExpressions(PlatformExtension & e) { return &e.GetAllExpressions();};
+std::map<std::string, gd::StrExpressionMetadata > * PlatformExtension_GetAllStrExpressions(PlatformExtension & e) { return &e.GetAllStrExpressions();};
+std::map<std::string, gd::InstructionMetadata > * PlatformExtension_GetAllActionsForObject(PlatformExtension & e, std::string objectType) { return &e.GetAllActionsForObject(objectType);};
+std::map<std::string, gd::InstructionMetadata > * PlatformExtension_GetAllConditionsForObject(PlatformExtension & e, std::string objectType) { return &e.GetAllConditionsForObject(objectType);};
+std::map<std::string, gd::ExpressionMetadata > * PlatformExtension_GetAllExpressionsForObject(PlatformExtension & e, std::string objectType) { return &e.GetAllExpressionsForObject(objectType);};
+std::map<std::string, gd::StrExpressionMetadata > * PlatformExtension_GetAllStrExpressionsForObject(PlatformExtension & e, std::string objectType) { return &e.GetAllStrExpressionsForObject(objectType);};
+std::map<std::string, gd::InstructionMetadata > * PlatformExtension_GetAllActionsForAutomatism(PlatformExtension & e, std::string autoType) { return &e.GetAllActionsForAutomatism(autoType);};
+std::map<std::string, gd::InstructionMetadata > * PlatformExtension_GetAllConditionsForAutomatism(PlatformExtension & e, std::string autoType) { return &e.GetAllConditionsForAutomatism(autoType);};
+std::map<std::string, gd::ExpressionMetadata > * PlatformExtension_GetAllExpressionsForAutomatism(PlatformExtension & e, std::string autoType) { return &e.GetAllExpressionsForAutomatism(autoType);};
+std::map<std::string, gd::StrExpressionMetadata > * PlatformExtension_GetAllStrExpressionsForAutomatism(PlatformExtension & e, std::string autoType) { return &e.GetAllStrExpressionsForAutomatism(autoType);};
 }
 
 EMSCRIPTEN_BINDINGS(gd_PlatformExtension) {
@@ -65,19 +80,19 @@ EMSCRIPTEN_BINDINGS(gd_PlatformExtension) {
         .function("getObjectMetadata", &PlatformExtension::GetObjectMetadata)
         .function("getAutomatismMetadata", &PlatformExtension::GetAutomatismMetadata)
         //Actions, conditions and events:
-        .function("getAllEvents", &PlatformExtension::GetAllEvents)
-        .function("getAllActions", &PlatformExtension::GetAllActions)
-        .function("getAllConditions", &PlatformExtension::GetAllConditions)
-        .function("getAllExpressions", &PlatformExtension::GetAllExpressions)
-        .function("getAllStrExpressions", &PlatformExtension::GetAllStrExpressions)
-        .function("getAllActionsForObject", &PlatformExtension::GetAllActionsForObject)
-        .function("getAllConditionsForObject", &PlatformExtension::GetAllConditionsForObject)
-        .function("getAllExpressionsForObject", &PlatformExtension::GetAllExpressionsForObject)
-        .function("getAllStrExpressionsForObject", &PlatformExtension::GetAllStrExpressionsForObject)
-        .function("getAllActionsForAutomatism", &PlatformExtension::GetAllActionsForAutomatism)
-        .function("getAllConditionsForAutomatism", &PlatformExtension::GetAllConditionsForAutomatism)
-        .function("getAllExpressionsForAutomatism", &PlatformExtension::GetAllExpressionsForAutomatism)
-        .function("getAllStrExpressionsForAutomatism", &PlatformExtension::GetAllStrExpressionsForObject)
+        .function("getAllEvents", &PlatformExtension_GetAllEvents, allow_raw_pointers())
+        .function("getAllActions", &PlatformExtension_GetAllActions, allow_raw_pointers())
+        .function("getAllConditions", &PlatformExtension_GetAllConditions, allow_raw_pointers())
+        .function("getAllExpressions", &PlatformExtension_GetAllExpressions, allow_raw_pointers())
+        .function("getAllStrExpressions", &PlatformExtension_GetAllStrExpressions, allow_raw_pointers())
+        .function("getAllActionsForObject", &PlatformExtension_GetAllActionsForObject, allow_raw_pointers())
+        .function("getAllConditionsForObject", &PlatformExtension_GetAllConditionsForObject, allow_raw_pointers())
+        .function("getAllExpressionsForObject", &PlatformExtension_GetAllExpressionsForObject, allow_raw_pointers())
+        .function("getAllStrExpressionsForObject", &PlatformExtension_GetAllStrExpressionsForObject, allow_raw_pointers())
+        .function("getAllActionsForAutomatism", &PlatformExtension_GetAllActionsForAutomatism, allow_raw_pointers())
+        .function("getAllConditionsForAutomatism", &PlatformExtension_GetAllConditionsForAutomatism, allow_raw_pointers())
+        .function("getAllExpressionsForAutomatism", &PlatformExtension_GetAllExpressionsForAutomatism, allow_raw_pointers())
+        .function("getAllStrExpressionsForAutomatism", &PlatformExtension_GetAllStrExpressionsForObject, allow_raw_pointers())
         ;
 }
 
@@ -139,7 +154,6 @@ EMSCRIPTEN_BINDINGS(gd_BaseEvent) {
         .function("getSubEvents", &BaseEvent_GetSubEvents, allow_raw_pointers())
         .function("isDisabled", &BaseEvent::IsDisabled)
         .function("setDisabled", &BaseEvent::SetDisabled)
-        //TODO: Render??
 	    ;
 
     class_<StandardEvent, base<BaseEvent> >("StandardEvent")

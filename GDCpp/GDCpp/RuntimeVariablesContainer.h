@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
 #ifndef RUNTIMEVARIABLESCONTAINER_H
@@ -60,7 +61,7 @@ public:
     bool Has(const std::string & name) const { return variables.find(name) != variables.end(); }
 
     #if defined(GD_IDE_ONLY)
-    /** 
+    /**
      * \brief Return the number of variables in the container.
      */
     unsigned int Count() { return variables.size(); }

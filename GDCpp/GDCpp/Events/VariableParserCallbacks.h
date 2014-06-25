@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY)
 #ifndef VARIABLEPARSERCALLBACKS_H
@@ -15,7 +16,16 @@
  *
  * Usage example:
  \code
- 
+    VariableCodeGenerationCallbacks callbacks(output, eventsCodeGenerator, context, VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
+
+    gd::VariableParser parser(parameter);
+    if ( !parser.Parse(callbacks) )
+    {
+        //Error during parsing the variable name:
+        output = "runtimeContext->GetSceneVariables().GetBadVariable()";
+    }
+
+    //"output" now contains the C++ code to return the variable.
  \endcode
  */
 class VariableCodeGenerationCallbacks : public gd::VariableParserCallbacks
@@ -35,7 +45,7 @@ public:
      * \param context The current code generation context.
      * \param scope The scope of the variable being accessed: LAYOUT_VARIABLE, PROJECT_VARIABLE.
      */
-    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_, 
+    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_,
         gd::EventsCodeGenerationContext & context_, const VariableScope & scope_);
     /**
 
@@ -45,7 +55,7 @@ public:
      * \param context The current code generation context.
      * \param object The name of the object
      */
-    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_, 
+    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_,
         gd::EventsCodeGenerationContext & context_, const std::string & object);
 
     /**

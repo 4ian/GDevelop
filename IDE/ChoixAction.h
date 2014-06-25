@@ -1,10 +1,11 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
  */
 
-#ifndef CHOIXACTION_H
-#define CHOIXACTION_H
+#ifndef CHOOSEACTIONDIALOG_H
+#define CHOOSEACTIONDIALOG_H
 
 //(*Headers(ChoixAction)
 #include <wx/treectrl.h>

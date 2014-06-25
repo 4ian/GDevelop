@@ -12,6 +12,11 @@
 #include <wx/dialog.h>
 //*)
 
+/**
+ * \brief Dialog displaying information about the latest version available.
+ *
+ * \see UpdateChecker
+ */
 class MAJ: public wxDialog
 {
 	public:

@@ -9,12 +9,12 @@ set /p destDir=
 if %destDir%=="" (set destDir="D:\Florian\Machines virtuelles\Dossier Partage")
 
 echo.
-echo -Clear destination before copying? 
+echo -Clear destination before copying?
 echo ( Type anything to clear destination, Press enter to copy without clearing )
 set erase=""
 set /p erase=
-if NOT %erase%=="" (if exist %destDir%\GameDevelop2 rmdir %destDir%\GameDevelop2 /S /Q)
-if NOT %erase%=="" mkdir %destDir%\GameDevelop2
+if NOT %erase%=="" (if exist %destDir%\GameDevelop3 rmdir %destDir%\GameDevelop3 /S /Q)
+if NOT %erase%=="" mkdir %destDir%\GameDevelop3
 
 echo -Copy files...
 xcopy ..\* %destDir%\GameDevelop2\* /S /E /EXCLUDE:FilesExcludedFromCopy /D /Y

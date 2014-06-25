@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
 #ifndef GDCORE_SERIALIZER_H
@@ -15,14 +16,25 @@ namespace gd
 /**
  * \brief The class used to save/load projects and GDCore classes
  * from/to XML or JSON.
+ *
+ * Usage example, with TinyXML:
+ \code
+    //Unserialize from a XML string:
+    TiXmlDocument doc;
+    if ( !doc.Parse(xmlString.c_str()) )
+        return false; //Error in XML file!
+
+    TiXmlHandle hdl(&doc);
+    gd::SerializerElement rootElement;
+    gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());
+    game.UnserializeFrom(rootElement);
+ \endcode
  */
 class GD_CORE_API Serializer
 {
 public:
     /** \name XML serialization.
      * Serialize a SerializerElement from/to XML.
-     *
-     * \warning Not available when compiling with emscripten.
      */
     ///@{
     #if !defined(EMSCRIPTEN)
@@ -33,8 +45,6 @@ public:
 
     /** \name JSON serialization.
      * Serialize a SerializerElement from/to JSON.
-     *
-     * \warning Not available when compiling with emscripten.
      */
     ///@{
 	static std::string ToJSON(const SerializerElement & element);

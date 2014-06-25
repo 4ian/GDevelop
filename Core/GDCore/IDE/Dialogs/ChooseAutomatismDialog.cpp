@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -102,7 +103,6 @@ ChooseAutomatismDialog::~ChooseAutomatismDialog()
 
 void ChooseAutomatismDialog::RefreshList()
 {
-	std::cout << "RefreshList for " << automatismTypeAllowed << std::endl;
     std::string search = ToString(searchCtrl->GetValue());
     bool searching = search.empty() ? false : true;
 
@@ -112,9 +112,6 @@ void ChooseAutomatismDialog::RefreshList()
 	for (unsigned int i = 0;i<automatisms.size();++i)
 	{
 	    std::string automatismName = automatisms[i];
-		std::cout << "Name" << automatismName << std::endl;
-
-		std::cout << "Type:" << gd::GetTypeOfAutomatism(project, layout, automatismName) << std::endl;
 
 		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == gd::GetTypeOfAutomatism(project, layout, automatismName)) &&
              (!searching || (searching && boost::to_upper_copy(automatismName).find(boost::to_upper_copy(search)) != std::string::npos) ))

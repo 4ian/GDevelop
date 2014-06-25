@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
 /*
@@ -30,7 +31,6 @@
 using namespace emscripten;
 using namespace gd;
 
-
 EMSCRIPTEN_BINDINGS(gd_Platform) {
     class_<Platform>("Platform")
         .constructor<>()
@@ -38,9 +38,9 @@ EMSCRIPTEN_BINDINGS(gd_Platform) {
 	    .function("getFullName", &Platform::GetFullName)
 	    .function("getSubtitle", &Platform::GetSubtitle)
         .function("getDescription", &Platform::GetDescription)
-        .function("isExtensionLoaded", &Platform::IsExtensionLoaded)
         .function("getAllPlatformExtensions", &Platform::GetAllPlatformExtensions)
 	    .function("isExtensionLoaded", &Platform::IsExtensionLoaded)
+        .function("createObject", &Platform::CreateObject);
 	    ;
 }
 
@@ -164,6 +164,9 @@ EMSCRIPTEN_BINDINGS(gd_Automatism) {
         .function("getProperties", &Automatism::GetProperties)
         .function("updateProperty", &Automatism::UpdateProperty)
         ;
+
+    function("getAutomatismsOfObject", gd::GetAutomatismsOfObject);
+    function("getTypeOfAutomatism", gd::GetTypeOfAutomatism);
 }
 
 

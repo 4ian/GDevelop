@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
  */
 #ifndef EDITORSCENE_H
 #define EDITORSCENE_H
@@ -32,7 +33,7 @@ class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
 
 /**
- * \brief Panel containing the main editors of a layout
+ * \brief Panel containing all the editors of a layout.
  */
 class EditorScene: public wxPanel
 {

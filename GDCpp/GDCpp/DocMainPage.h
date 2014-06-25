@@ -303,7 +303,7 @@
                                   _("Text object"),
                                   _("Extension allowing to use an object displaying a text."),
                                   "Florian Rival",
-                                  "zlib/libpng License ( Open Source )");
+                                  "zlib/libpng License (Open Source)");
  * \endcode
 
 The first parameter is the name of the extension. Choose carefully the name of the extension, as projects are directly referring to it.

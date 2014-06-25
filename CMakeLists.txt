@@ -1,5 +1,5 @@
 #This is the CMake file used to build Game Develop.
-#For more information, see the Readme.txt file.
+#For more information, see the Readme.md file.
 
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)
@@ -10,6 +10,19 @@ IF(NOT WIN32)
 	SET(CMAKE_SKIP_BUILD_RPATH  FALSE) #Avoid errors when packaging for linux.
 ENDIF()
 
+# Macro for defining an option
+macro(gd_set_option var default type docstring)
+    if(NOT DEFINED ${var})
+        set(${var} ${default})
+    endif()
+    set(${var} ${${var}} CACHE ${type} ${docstring} FORCE)
+endmacro()
+gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build Game Develop Core library, FALSE to use the already compiled binaries")
+gd_set_option(BUILD_GDCPP TRUE BOOL "TRUE to build Game Develop C++ Platform")
+gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build Game Develop JS Platform")
+gd_set_option(BUILD_IDE TRUE BOOL "TRUE to build the IDE")
+gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
+
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
@@ -19,22 +32,23 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	ENDIF()
 ENDIF()
 
+
 #Add all the CMakeLists:
-IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Core/CMakeLists.txt")
+IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Core/CMakeLists.txt" AND BUILD_CORE)
 	ADD_SUBDIRECTORY(Core)
 ENDIF()
-IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/CMakeLists.txt")
+IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/CMakeLists.txt" AND BUILD_GDJS)
 	ADD_SUBDIRECTORY(GDJS)
 ENDIF()
 IF (NOT EMSCRIPTEN) #Disable GDCpp and the IDE when compiling with emscripten
-	IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/CMakeLists.txt")
+	IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/CMakeLists.txt"  AND BUILD_GDCPP)
 		ADD_SUBDIRECTORY(GDCpp)
 	ENDIF()
-	IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/IDE/CMakeLists.txt")
+	IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/IDE/CMakeLists.txt"  AND BUILD_IDE)
 		ADD_SUBDIRECTORY(IDE)
 	ENDIF()
 ENDIF()
-IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Extensions/CMakeLists.txt")
+IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Extensions/CMakeLists.txt"  AND BUILD_EXTENSIONS)
 	ADD_SUBDIRECTORY(Extensions)
 ENDIF()
 IF (EMSCRIPTEN)

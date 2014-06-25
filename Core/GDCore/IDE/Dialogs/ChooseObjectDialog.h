@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -27,7 +28,7 @@ namespace gd
 {
 
 /**
- * \brief Dialog used to choose an object ( or a group ) among project/layout objects or groups.
+ * \brief Dialog used to choose an object (or a group) among project/layout objects or groups.
  *
  * \ingroup IDEDialogs
  */

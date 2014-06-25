@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -119,7 +120,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
         .AddParameter("object", _("Object"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
 
     obj.AddAction("Rotate",
                    _("Rotate"),

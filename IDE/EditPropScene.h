@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
  */
 
 #ifndef EDITPROPSCENE_H
@@ -22,6 +23,11 @@
 namespace gd { class Layout; }
 namespace gd { class Layout; }
 
+/**
+ * \brief Dialog showing the properties of a scene.
+ *
+ * \todo Use the properties grid of the project manager instead of this custom dialog.
+ */
 class EditPropScene: public wxDialog
 {
 	public:

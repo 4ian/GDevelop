@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #ifndef SHADERMANAGER_H
 #define SHADERMANAGER_H
@@ -13,6 +14,8 @@ namespace gd { class Project; }
 
 /**
  * \brief Still work in progress class to manage shaders
+ *
+ * \todo Unfinished class.
  *
  * \ingroup GameEngine
  */

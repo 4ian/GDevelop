@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
  */
 
 #ifndef GDIDE_MAINFRAME_H
@@ -195,7 +196,6 @@ public:
     void OnMenuItem23Selected(wxCommandEvent& event);
     void OnMenuForumSelected(wxCommandEvent& event);
     void OnMenuSiteSelected(wxCommandEvent& event);
-    void OnMenuFusionSelected(wxCommandEvent& event);
     void OnMenuItem36Selected(wxCommandEvent& event);
     void OnMenuTutoSelected(wxCommandEvent& event);
     void OnDecomposeGIFSelected(wxCommandEvent& event);

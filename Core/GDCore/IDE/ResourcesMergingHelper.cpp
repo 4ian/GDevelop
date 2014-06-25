@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
 #include "ResourcesMergingHelper.h"
@@ -34,7 +35,7 @@ void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
         if ( resourcesNewFilename.find(resourceFullFilename) == resourcesNewFilename.end() )
         {
             //We want to preserve the directory structure : Keep paths relative to the base directory
-            std::string relativeFilename = resourceFilename;
+            std::string relativeFilename = resourceFullFilename;
             if ( fs.MakeRelative(relativeFilename, baseDirectory) )
                 resourcesNewFilename[resourceFullFilename] = relativeFilename;
             else //Unless the filename cannot be made relative. In this case:

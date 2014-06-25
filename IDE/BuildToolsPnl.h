@@ -12,7 +12,7 @@ class BuildMessagesPnl;
 
 /**
  * \brief Designed to handheld all GUI related to code compilation.
- * Automatically create its child and associate it if necessary with the needed classes ( CodeCompiler )
+ * Automatically create its child and associate it if necessary with the needed classes (CodeCompiler)
  *
  * \see CodeCompiler
  * \see BuildProgressPnl
@@ -20,30 +20,30 @@ class BuildMessagesPnl;
  */
 class BuildToolsPnl: public wxPanel
 {
-	public:
+public:
 
-		BuildToolsPnl(wxWindow* parent, ProjectManager * projectManager);
-		virtual ~BuildToolsPnl();
+	BuildToolsPnl(wxWindow* parent, ProjectManager * projectManager);
+	virtual ~BuildToolsPnl();
 
-		//(*Declarations(BuildToolsPnl)
-		wxNotebook* notebook;
-		//*)
+	//(*Declarations(BuildToolsPnl)
+	wxNotebook* notebook;
+	//*)
 
-		BuildProgressPnl * buildProgressPnl;
-		BuildMessagesPnl * buildMessagesPnl;
+	BuildProgressPnl * buildProgressPnl;
+	BuildMessagesPnl * buildMessagesPnl;
 
-	protected:
+protected:
 
-		//(*Identifiers(BuildToolsPnl)
-		static const long ID_NOTEBOOK1;
-		//*)
+	//(*Identifiers(BuildToolsPnl)
+	static const long ID_NOTEBOOK1;
+	//*)
 
-	private:
+private:
 
-		//(*Handlers(BuildToolsPnl)
-		//*)
+	//(*Handlers(BuildToolsPnl)
+	//*)
 
-		DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 #endif

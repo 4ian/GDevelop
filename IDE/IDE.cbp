@@ -564,12 +564,6 @@
 		<Unit filename="ExtensionBugReportDlg.h" />
 		<Unit filename="ExternalEventsEditor.cpp" />
 		<Unit filename="ExternalEventsEditor.h" />
-		<Unit filename="Fusion.cpp">
-			<Option virtualFolder="Editeur principal/Fichier/" />
-		</Unit>
-		<Unit filename="Fusion.h">
-			<Option virtualFolder="Editeur principal/Fichier/" />
-		</Unit>
 		<Unit filename="Game_Develop_EditorApp.cpp">
 			<Option virtualFolder="Racine/" />
 		</Unit>
@@ -582,8 +576,6 @@
 		<Unit filename="GeneratePassword.h">
 			<Option virtualFolder="Editeurs/Editeur Scene/EditorEvents/Edition evenement/Choix/" />
 		</Unit>
-		<Unit filename="ImageEditor.cpp" />
-		<Unit filename="ImageEditor.h" />
 		<Unit filename="ImportImage.cpp">
 			<Option virtualFolder="Editeur principal/Outils/" />
 		</Unit>
@@ -742,14 +734,12 @@
 					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" fwddecl="0" i18n="1" name="SigneModification" language="CPP" />
 					<wxDialog wxs="wxsmith/SigneTest.wxs" src="SigneTest.cpp" hdr="SigneTest.h" fwddecl="0" i18n="1" name="SigneTest" language="CPP" />
 					<wxDialog wxs="wxsmith/BugReport.wxs" src="BugReport.cpp" hdr="BugReport.h" fwddecl="0" i18n="1" name="BugReport" language="CPP" />
-					<wxDialog wxs="wxsmith/Fusion.wxs" src="Fusion.cpp" hdr="Fusion.h" fwddecl="0" i18n="1" name="Fusion" language="CPP" />
 					<wxDialog wxs="wxsmith/MAJ.wxs" src="MAJ.cpp" hdr="MAJ.h" fwddecl="0" i18n="1" name="MAJ" language="CPP" />
 					<wxDialog wxs="wxsmith/CreateTemplate.wxs" src="CreateTemplate.cpp" hdr="CreateTemplate.h" fwddecl="0" i18n="1" name="CreateTemplate" language="CPP" />
 					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" fwddecl="0" i18n="1" name="GeneratePassword" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorScene.wxs" src="EditorScene.cpp" hdr="EditorScene.h" fwddecl="0" i18n="1" name="EditorScene" language="CPP" />
 					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" fwddecl="0" i18n="1" name="EditObjectGroup" language="CPP" />
 					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" fwddecl="0" i18n="1" name="ImportImage" language="CPP" />
-					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" fwddecl="0" i18n="1" name="ImageEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/TrueOrFalse.wxs" src="TrueOrFalse.cpp" hdr="TrueOrFalse.h" fwddecl="0" i18n="1" name="TrueOrFalse" language="CPP" />
 					<wxDialog wxs="wxsmith/SearchEvents.wxs" src="SearchEvents.cpp" hdr="SearchEvents.h" fwddecl="0" i18n="1" name="SearchEvents" language="CPP" />
 					<wxDialog wxs="wxsmith/GridSetup.wxs" src="GridSetup.cpp" hdr="GridSetup.h" fwddecl="0" i18n="1" name="GridSetup" language="CPP" />

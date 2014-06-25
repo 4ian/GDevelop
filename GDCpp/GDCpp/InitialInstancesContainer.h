@@ -1,11 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
-#ifndef INITIALINSTANCESCONTAINER_H
-#define INITIALINSTANCESCONTAINER_H
 
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-
-#endif // INITIALINSTANCESCONTAINER_H
-

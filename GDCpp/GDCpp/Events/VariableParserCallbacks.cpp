@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY)
 #include <string>
@@ -55,16 +56,16 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 	}
 	else if ( scope == PROJECT_VARIABLE ) {
 		output = "runtimeContext->GetGameVariables()";
-		variables = &codeGenerator.GetProject().GetVariables();	
+		variables = &codeGenerator.GetProject().GetVariables();
 	}
-	else { 
+	else {
 	    std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(object, context);
 
 	    output = "RuntimeVariablesContainer::GetBadVariablesContainer()";
 	    for (unsigned int i = 0;i<realObjects.size();++i)
 	    {
         	context.ObjectsListNeeded(realObjects[i]);
-        	
+
 	        //Generate the call to GetVariables() method.
 	        if ( context.GetCurrentObject() == realObjects[i] && !context.GetCurrentObject().empty())
 	            output = codeGenerator.GetObjectListName(realObjects[i], context)+"[i]->GetVariables()";
@@ -90,7 +91,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 			return;
 		}
 	}
-	
+
 	output += ".Get(\""+variableName+"\")";
 }
 
@@ -105,7 +106,7 @@ void VariableCodeGenerationCallbacks::OnChildSubscript(std::string stringExpress
     gd::CallbacksForGeneratingExpressionCode callbacks(argumentCode, codeGenerator, context);
 
     gd::ExpressionParser parser(stringExpression);
-    if ( !parser.ParseStringExpression(codeGenerator.GetPlatform(), 
+    if ( !parser.ParseStringExpression(codeGenerator.GetPlatform(),
     	codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) )
     {
         cout << "Error in text expression" << parser.firstErrorStr << endl;

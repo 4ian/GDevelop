@@ -1,15 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop C++ Platform
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 
-#ifndef POSITION_H
-#define POSITION_H
-
-#include <string>
-#include <map>
-
 #include "GDCore/PlatformDefinition/InitialInstance.h"
-
-#endif // POSITION_H
-

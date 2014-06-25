@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "ObjectsPropgridHelper.h"
@@ -316,7 +317,24 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
         }
 
         gd::Automatism & automatism = object->GetAutomatism(autoName);
-        if ( !automatism.UpdateProperty(ToString(event.GetProperty()->GetLabel()), ToString(event.GetPropertyValue().GetString()), project) )
+        std::string value = ToString(event.GetPropertyValue().GetString());
+
+        //Special case for enums.
+        if ( wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()) ) {
+            std::map<std::string, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
+            const std::vector<std::string> & choices = properties[ToString(event.GetProperty()->GetLabel())].GetExtraInfo();
+
+            unsigned int id = event.GetPropertyValue().GetLong();
+            if (id < choices.size()) {
+                value = choices[id];
+                std::cout << "deduced" << value;
+
+            }
+        }
+        std::cout << "VALUE" << value;
+
+
+        if ( !automatism.UpdateProperty(ToString(event.GetProperty()->GetLabel()), value, project) )
         {
             event.Veto();
             return false;

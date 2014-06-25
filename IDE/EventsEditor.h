@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
  */
 
 #ifndef EVENTSEDITOR_H
@@ -62,7 +63,7 @@ public:
      * \param parent Parent window
      * \param game Game the events belongs to
      * \param scene Scene to be edited.
-     * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
+     * \param mainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
     EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene,
         gd::MainFrameWrapper & mainFrameWrapper_ );
@@ -74,7 +75,7 @@ public:
      * \param game Game the events belongs to
      * \param scene Scene to be used as if the external events were included to. Used to get objects, variables...
      * \param externalEvents The events external events to be edited.
-     * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
+     * \param mainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
     EventsEditor(wxWindow* parent, gd::Project & game, gd::Layout & scene,
         gd::ExternalEvents & externalEvents, gd::MainFrameWrapper & mainFrameWrapper_ );

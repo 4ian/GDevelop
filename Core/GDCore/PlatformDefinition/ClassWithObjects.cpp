@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
  */
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -21,12 +22,7 @@ void ClassWithObjects::SerializeObjectsTo(SerializerElement & element) const
     element.ConsiderAsArrayOf("object");
     for ( unsigned int j = 0;j < initialObjects.size();j++ )
     {
-        SerializerElement & objectElement = element.AddChild("object");
-
-        objectElement.SetAttribute( "name", initialObjects[j]->GetName() );
-        objectElement.SetAttribute( "type", initialObjects[j]->GetType() );
-
-        initialObjects[j]->SerializeTo(objectElement);
+        initialObjects[j]->SerializeTo(element.AddChild("object"));
     }
 
 }

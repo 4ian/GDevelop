@@ -4,7 +4,7 @@
 * included files.
  */
 //Extensions writers: Please do not use these functions: There are meant to be used
-//for ease the writing
+//for ease the writing of C++ code inside Game Develop!
 
 #include <vector>
 #include "GDCpp/RuntimeObject.h"

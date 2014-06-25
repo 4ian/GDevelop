@@ -18,46 +18,46 @@ using namespace std;
 
 class ChoixBouton: public wxDialog
 {
-	public:
+public:
 
-		ChoixBouton(wxWindow* parent, string pBouton);
-		virtual ~ChoixBouton();
+	ChoixBouton(wxWindow* parent, string pBouton);
+	virtual ~ChoixBouton();
 
-		//(*Declarations(ChoixBouton)
-		wxButton* OkBt;
-		wxStaticBitmap* StaticBitmap1;
-		wxButton* CancelBt;
-		wxRadioBox* RadioBox1;
-		wxHyperlinkCtrl* helpBt;
-		wxPanel* TestPanel;
-		//*)
+	//(*Declarations(ChoixBouton)
+	wxButton* OkBt;
+	wxStaticBitmap* StaticBitmap1;
+	wxButton* CancelBt;
+	wxRadioBox* RadioBox1;
+	wxHyperlinkCtrl* helpBt;
+	wxPanel* TestPanel;
+	//*)
 
-		string bouton;
+	string bouton;
 
-	protected:
+protected:
 
-		//(*Identifiers(ChoixBouton)
-		static const long ID_RADIOBOX1;
-		static const long ID_PANEL1;
-		static const long ID_STATICBITMAP2;
-		static const long ID_HYPERLINKCTRL1;
-		static const long ID_BUTTON2;
-		static const long ID_BUTTON1;
-		//*)
+	//(*Identifiers(ChoixBouton)
+	static const long ID_RADIOBOX1;
+	static const long ID_PANEL1;
+	static const long ID_STATICBITMAP2;
+	static const long ID_HYPERLINKCTRL1;
+	static const long ID_BUTTON2;
+	static const long ID_BUTTON1;
+	//*)
 
-	private:
+private:
 
-		//(*Handlers(ChoixBouton)
-		void OnRadioBox1Select(wxCommandEvent& event);
-		void OnOkBtClick(wxCommandEvent& event);
-		void OnCancelBtClick(wxCommandEvent& event);
-		void OnTestPanelLeftUp(wxMouseEvent& event);
-		void OnTestPanelMiddleUp(wxMouseEvent& event);
-		void OnTestPanelRightDown(wxMouseEvent& event);
-		void OnhelpBtClick(wxCommandEvent& event);
-		//*)
+	//(*Handlers(ChoixBouton)
+	void OnRadioBox1Select(wxCommandEvent& event);
+	void OnOkBtClick(wxCommandEvent& event);
+	void OnCancelBtClick(wxCommandEvent& event);
+	void OnTestPanelLeftUp(wxMouseEvent& event);
+	void OnTestPanelMiddleUp(wxMouseEvent& event);
+	void OnTestPanelRightDown(wxMouseEvent& event);
+	void OnhelpBtClick(wxCommandEvent& event);
+	//*)
 
-		DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 #endif

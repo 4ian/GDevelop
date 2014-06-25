@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release - Edittime" />
-	<File name="ImageEditor.cpp" open="0" top="0" tabpos="86" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="557" topLine="0" />
-		</Cursor>
-	</File>
 	<File name="CreateTemplate.cpp" open="0" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="401" topLine="17" />
@@ -19,11 +14,6 @@
 	<File name="ConsoleManager.h" open="0" top="0" tabpos="115" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1005" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="ImageEditor.h" open="0" top="0" tabpos="193" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="411" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="ConsoleManager.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -121,11 +111,6 @@
 			<Cursor1 position="78" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="Fusion.cpp" open="0" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="433" topLine="21" />
-		</Cursor>
-	</File>
 	<File name="CodeEditor.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="14044" topLine="292" />
@@ -144,11 +129,6 @@
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="259" topLine="11" />
-		</Cursor>
-	</File>
-	<File name="Fusion.h" open="0" top="0" tabpos="166" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="426" topLine="11" />
 		</Cursor>
 	</File>
 	<File name="ChoixTemplateEvent.h" open="0" top="0" tabpos="45" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">

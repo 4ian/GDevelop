@@ -1,6 +1,7 @@
-/** \file
- *  Game Develop
- *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
  */
 
 #include <iostream>
@@ -56,6 +57,8 @@
 #include "BuildToolsPnl.h"
 #include "Preferences.h"
 #include "ExternalEventsEditor.h"
+#include "mp3ogg.h"
+#include "ImportImage.h"
 #include "Dialogs/HtmlViewerPnl.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
 #include "Dialogs/HelpViewerDlg.h"
@@ -968,4 +971,33 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
 void MainFrame::RefreshNews()
 {
     startPage->RefreshNewsUsingUpdateChecker();
+}
+
+void MainFrame::OnMenuItem23Selected(wxCommandEvent& event)
+{
+    mp3ogg dialog(this);
+    dialog.ShowModal();
+}
+
+void MainFrame::OnDecomposeGIFSelected(wxCommandEvent& event)
+{
+    ImportImage dialog(this, 0);
+    dialog.ShowModal();
+}
+
+void MainFrame::OnDecomposeRPGSelected(wxCommandEvent& event)
+{
+    ImportImage dialog(this, 1);
+    dialog.ShowModal();
+}
+
+void MainFrame::OnDecomposeSSSelected(wxCommandEvent& event)
+{
+    ImportImage dialog(this, 2);
+    dialog.ShowModal();
+}
+
+void MainFrame::OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt)
+{
+    evt.PopupMenu(&decomposerContextMenu);
 }

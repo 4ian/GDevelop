@@ -1,8 +1,10 @@
 /GDJS
 /GDSDK
 /Extensions
-/GDCpp/docs/Documentation
-/Core/docs/Documentation
+/docs/GDJS Runtime Documentation
+/docs/GDJS Documentation
+/docs/GDCpp Documentation
+/docs/GDCore Documentation
 /ExtLibs/boost
 /ExtLibs/SFML
 /ExtLibs/wxwidgets

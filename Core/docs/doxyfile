@@ -933,7 +933,7 @@ HTML_EXTRA_STYLESHEET  = DoxygenStyle.css
 # files. In the HTML_STYLESHEET file, use the file name only. Also note that
 # the files will be copied as-is; there are no commands or markers available.
 
-HTML_EXTRA_FILES       = images/*.png
+HTML_EXTRA_FILES       = images/compilerInstall1.png images/compilerInstall2.png images/compilerInstall3.png images/createnew1.png images/createnew2.png images/createnew3.png images/createnew4.png images/createnew5.png images/createnew6.png images/createnew7.png images/extensiondir.png images/gdlogo.png images/glogo.png images/usecmake1.png images/usecmake2.png images/usecmake3.png
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output.
 # Doxygen will adjust the colors in the style sheet and background images

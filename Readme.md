@@ -19,12 +19,12 @@ About directory structure
 * GDSDK: Game Develop SDK for building extensions or platforms: Generated using a script.
 
 * scripts: Various scripts, notably scripts to package GD (ReleaseProcedure* scripts).
+* docs: Directory where the documentation is generated. To avoid you to generate it by yourself, it is also [available here](https://github.com/4ian/GD-Documentation).
 
 How to build
 ------------
 
-Refer to the SDK available on http://www.compilgames.net which has a nice pre-built HTML documentation
-inside GDCpp folder, or download GDJS on http://www.github.com/4ian and also check the documentation.
+Full and detailed instructions are in the getting started page of the [documentation available here](https://github.com/4ian/GD-Documentation)
 
 Basically:
 * Install and launch [CMake].
@@ -34,13 +34,18 @@ as the directory where to build. Files will be output in Binaries/Output anyway.
 be sure to use the compiler shipped on compilgames.net for better compatibility.
 * Generate the Makefile (or [Ninja] build file) and launch it.
 
+Documentation
+-------------
+
+The documentation is available on http://4ian.github.io/GD-Documentation.
+
 License
 -------
 
-* The IDE (in the IDE folder) licensed with GPL v3.
-* The Core library, the native and HTML5 platforms (respectively Core, GDCpp and GDJS folders) are LGPL.
+* The IDE (in the IDE folder) is licensed with GPL v3.
+* The Core library, the native and HTML5 platforms (respectively Core, GDCpp and GDJS folders) are LGPL v3.
 * Extensions (in the Extensions folder) are using zlib/libpng license.
-
+* The name, Game Develop, and its logo are the exclusive property of Florian Rival.
 
 [CMake]:http://www.cmake.org/
 [Ninja]:http://martine.github.io/ninja/

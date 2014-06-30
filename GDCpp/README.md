@@ -1,0 +1,31 @@
+Game Develop C++ Platform
+=========================
+
+Game Develop C++ Platform (GDcpp) is a platform for developing native games with Game Develop.
+
+Getting started
+---------------
+
+First, take a look at the *Readme.md* at the root of the repository and the [developer documentation](http://4ian.github.io/GD-Documentation/).
+
+This platform uses the same files for exposing its functionalities to the IDE and for the game engine. When compiled the game engine only, a define is set (*GD_IDE_ONLY*). Look at the code using this define to check if the code will be included or not into the game engine:
+
+    #if defined(GD_IDE_ONLY)
+        //Code that will be only exposed to the IDE, and not compiled for games.
+    #endif
+    //Code that will be available for compiled games as well as when compiled for the IDE.
+
+
+The documentation of this specific platform and the game engine is available [here](http://4ian.github.io/GD-Documentation/GDCpp%20Documentation).
+
+Contributing
+------------
+
+Any contribution is welcome! Whether you want to submit a bug report, a feature request
+or any pull request so as to add a nice feature, do not hesitate to get in touch.
+
+License
+-------
+
+Game Develop C++ Platform is distributed under the GNU LGPL license: See license.txt for
+more information.

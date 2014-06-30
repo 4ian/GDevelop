@@ -160,8 +160,7 @@
  *
  * \section downloadGD Download and extract Game Develop for Linux
  *
- * If you didn't already downloaded Game Develop for Linux, do it now from [the official website](http://www.compilgames.net/) or
- * even directly from [this link](http://www.compilgames.net/dl/gdlinux.tar.bz2).<br>
+ * If you didn't already downloaded Game Develop for Linux, do it now from [the official website](http://www.compilgames.net/).
  *
  * Then extract all the files inside the <b>GameDevelop</b> folder inside the *Binaries/Output/Release_Linux/ * folder
  * of the SDK. ( You should have files like libGDCore.so now present in Binaries/Output/Release_Linux )

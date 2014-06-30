@@ -1,0 +1,14 @@
+{
+    "name": "Game Develop JS Runtime API",
+    "description": "Game Develop JS Runtime: An engine for developing javascript based games using Game Develop",
+    "version": "1",
+    "url": "http://www.compilgames.net",
+    "paths":["../Runtime"],
+    "options": {
+        "outdir": "../../docs/GDJS Runtime Documentation",
+        "exclude": "libs",
+        "paths":["../Runtime"],
+        "themedir": "yuidoc-bootstrap-theme",
+        "helpers": ["yuidoc-bootstrap-theme/helpers/helpers.js"]
+    }
+}

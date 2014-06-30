@@ -1,0 +1,5 @@
+Extensions are provided under the zlib/libpng License.
+See the notice at the top of each source file for any particular information.
+
+For external libraries, refer to the readme or license file included in their
+directories

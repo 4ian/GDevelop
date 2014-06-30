@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="ProjectExportDialog">
+		<title>Export the project</title>
+		<id_arg>0</id_arg>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>1</growablerows>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
+							<cols>3</cols>
+							<growablecols>0</growablecols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+									<cols>2</cols>
+									<growablecols>1</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+											<label>Export folder:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+											<cols>3</cols>
+											<growablecols>0</growablecols>
+											<growablerows>0</growablerows>
+											<object class="sizeritem">
+												<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="dirEdit" member="yes">
+													<size>201,23</size>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON5" variable="browseBt" member="yes">
+													<label>...</label>
+													<size>30,23</size>
+													<handler function="OnbrowseBtClick" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<option>1</option>
+									</object>
+									<object class="spacer">
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+										<size>4,9</size>
+									</object>
+									<object class="sizeritem">
+										<object class="wxCheckBox" name="ID_CHECKBOX1" variable="minifyCheck" member="yes">
+											<label>Minify and optimize</label>
+											<checked>1</checked>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT2" variable="statusTxt" member="yes">
+							<label></label>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT1" variable="status2Txt" member="yes">
+							<label></label>
+						</object>
+						<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+							<label>Note</label>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+									<cols>1</cols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText1" member="yes">
+											<label>When the exportation is done, send the files to your website &#x0A;( you need a web hosting ) and just go to the website to start &#x0A;the game.</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="HyperlinkCtrl1" member="yes">
+											<label>Click here to learn more about how to export your project</label>
+											<url>http://wiki.compilgames.net/doku.php/en/game__develop/tutorials/howtodistribute</url>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
+					<size>10,-1</size>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+							<cols>3</cols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
+									<bitmap code='gd::SkinHelper::GetIcon(&quot;help&quot;, 16)' />
+									<style>wxNO_BORDER</style>
+								</object>
+								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="helpBt" member="yes">
+									<label>Help</label>
+									<tooltip>Display help about this window</tooltip>
+									<handler function="OnhelpBtClick" entry="EVT_HYPERLINK" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON2" variable="closeBt" member="yes">
+							<label>Close</label>
+							<handler function="OncloseBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON1" variable="exportBt" member="yes">
+							<label>Export</label>
+							<handler function="OnexportBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

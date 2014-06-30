@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+  <object class="wxBitmap" name="cocoonjslogo">..\..\Binaries\Output\Release_Windows\res\cocoonjslogo.png</object>
+  <object class="wxBitmap" name="gdsharelogo">..\..\Binaries\Output\Release_Windows\res\gdsharelogo.png</object>
+  <object class="wxBitmap" name="helpicon">..\..\Binaries\Output\Release_Windows\res\helpicon.png</object>
+  <object class="wxBitmap" name="intelxdklogo">..\..\Binaries\Output\Release_Windows\res\intelxdklogo.png</object>
+</resource>

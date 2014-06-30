@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SPARK (not to compile)" />
+		<Option platforms="" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="SPARK" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug Win32" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-W" />
+					<Add option="-O0" />
+					<Add directory="$(SolutionDir)\include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(SolutionDir)\include" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="$(NoInherit)" />
+				</Linker>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="SPARK" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release Win32" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-W" />
+					<Add directory="$(SolutionDir)\include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(SolutionDir)\include" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="$(NoInherit)" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="..\..\..\include\Core\SPK_ArrayBuffer.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Buffer.h" />
+		<Unit filename="..\..\..\include\Core\SPK_BufferHandler.h" />
+		<Unit filename="..\..\..\include\Core\SPK_DEF.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Emitter.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Factory.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Group.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Model.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Modifier.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Particle.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Pool.h" />
+		<Unit filename="..\..\..\include\Core\SPK_RegWrapper.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Registerable.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Renderer.h" />
+		<Unit filename="..\..\..\include\Core\SPK_System.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Transformable.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Vector3D.h" />
+		<Unit filename="..\..\..\include\Core\SPK_Zone.h" />
+		<Unit filename="..\..\..\include\Extensions\Emitters\SPK_NormalEmitter.h" />
+		<Unit filename="..\..\..\include\Extensions\Emitters\SPK_RandomEmitter.h" />
+		<Unit filename="..\..\..\include\Extensions\Emitters\SPK_SphericEmitter.h" />
+		<Unit filename="..\..\..\include\Extensions\Emitters\SPK_StraightEmitter.h" />
+		<Unit filename="..\..\..\include\Extensions\Modifiers\SPK_Collision.h" />
+		<Unit filename="..\..\..\include\Extensions\Modifiers\SPK_Destroyer.h" />
+		<Unit filename="..\..\..\include\Extensions\Modifiers\SPK_LinearForce.h" />
+		<Unit filename="..\..\..\include\Extensions\Modifiers\SPK_ModifierGroup.h" />
+		<Unit filename="..\..\..\include\Extensions\Modifiers\SPK_Obstacle.h" />
+		<Unit filename="..\..\..\include\Extensions\Modifiers\SPK_PointMass.h" />
+		<Unit filename="..\..\..\include\Extensions\Renderers\SPK_LineRendererInterface.h" />
+		<Unit filename="..\..\..\include\Extensions\Renderers\SPK_Oriented2DRendererInterface.h" />
+		<Unit filename="..\..\..\include\Extensions\Renderers\SPK_Oriented3DRendererInterface.h" />
+		<Unit filename="..\..\..\include\Extensions\Renderers\SPK_PointRendererInterface.h" />
+		<Unit filename="..\..\..\include\Extensions\Renderers\SPK_QuadRendererInterface.h" />
+		<Unit filename="..\..\..\include\Extensions\Zones\SPK_AABox.h" />
+		<Unit filename="..\..\..\include\Extensions\Zones\SPK_Cylinder.h" />
+		<Unit filename="..\..\..\include\Extensions\Zones\SPK_Line.h" />
+		<Unit filename="..\..\..\include\Extensions\Zones\SPK_Plane.h" />
+		<Unit filename="..\..\..\include\Extensions\Zones\SPK_Point.h" />
+		<Unit filename="..\..\..\include\Extensions\Zones\SPK_Sphere.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRRBuffer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRRLineRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRRPointRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRRQuadRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRRRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRRSystem.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\Irrlicht\SPK_IRR_DEF.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GLExtHandler.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GLLineRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GLLineTrailRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GLPointRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GLQuadRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GLRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\OpenGL\SPK_GL_DEF.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFMLDrawableRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFMLLineRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFMLPointRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFMLQuadRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFMLRenderer.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFMLSystem.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFML_DEF.h" />
+		<Unit filename="..\..\..\include\RenderingAPIs\SFML\SPK_SFML_GLOBAL.h" />
+		<Unit filename="..\..\..\include\SPK.h" />
+		<Unit filename="..\..\..\include\SPK_GL.h" />
+		<Unit filename="..\..\..\include\SPK_IRR.h" />
+		<Unit filename="..\..\..\include\SPK_SFML.h" />
+		<Unit filename="..\..\..\src\Core\SPK_BufferHandler.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_DEF.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Emitter.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Factory.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Group.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Model.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Modifier.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Particle.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Registerable.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Renderer.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_System.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Transformable.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Vector3D.cpp" />
+		<Unit filename="..\..\..\src\Core\SPK_Zone.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Emitters\SPK_NormalEmitter.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Emitters\SPK_RandomEmitter.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Emitters\SPK_SphericEmitter.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Emitters\SPK_StraightEmitter.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Modifiers\SPK_Collision.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Modifiers\SPK_Destroyer.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Modifiers\SPK_LinearForce.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Modifiers\SPK_ModifierGroup.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Modifiers\SPK_Obstacle.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Modifiers\SPK_PointMass.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Renderers\SPK_Oriented3DRendererInterface.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Renderers\SPK_QuadRendererInterface.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_AABox.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_Circle2D.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_Cylinder.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_Line.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_Plane.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_Point.cpp" />
+		<Unit filename="..\..\..\src\Extensions\Zones\SPK_Sphere.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\Irrlicht\SPK_IRRBuffer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\Irrlicht\SPK_IRRLineRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\Irrlicht\SPK_IRRPointRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\Irrlicht\SPK_IRRQuadRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\Irrlicht\SPK_IRRRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\Irrlicht\SPK_IRRSystem.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\OpenGL\SPK_GLExtHandler.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\OpenGL\SPK_GLLineRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\OpenGL\SPK_GLLineTrailRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\OpenGL\SPK_GLPointRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\OpenGL\SPK_GLQuadRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\OpenGL\SPK_GLRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\SFML\SPK_SFMLDrawableRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\SFML\SPK_SFMLLineRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\SFML\SPK_SFMLPointRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\SFML\SPK_SFMLQuadRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\SFML\SPK_SFMLRenderer.cpp" />
+		<Unit filename="..\..\..\src\RenderingAPIs\SFML\SPK_SFMLSystem.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

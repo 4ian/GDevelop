@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="TimedEventEditorDlg">
+		<title>Timed event</title>
+		<id_arg>0</id_arg>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+							<bg>wxSYS_COLOUR_WINDOW</bg>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+								<cols>3</cols>
+								<object class="sizeritem">
+									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
+										<bitmap>Extensions/timedevent64.png</bitmap>
+										<style>wxNO_BORDER</style>
+									</object>
+									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+										<label>Conditions and actions wiill only be executed&#x0A;when the event is executed for a certain amount of time.</label>
+										<style>wxALIGN_CENTRE</style>
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
+							<size>10,-1</size>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+							<label>Execute conditions and actions after ( in seconds ):</label>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+							<cols>3</cols>
+							<growablecols>0</growablecols>
+							<object class="sizeritem">
+								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="timeoutEdit" member="yes" />
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="expressionBt" member="yes">
+									<bitmap>res/expressionicon.png</bitmap>
+									<default>1</default>
+									<handler function="OnexpressionBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+							<label>Name of the event ( optional ) :</label>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+							<cols>3</cols>
+							<growablecols>0</growablecols>
+							<object class="sizeritem">
+								<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="nameEdit" member="yes" />
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+					<size>10,-1</size>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+					<cols>3</cols>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON1" variable="okBt" member="yes">
+							<label>Ok</label>
+							<handler function="OnokBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON2" variable="cancelBt" member="yes">
+							<label>Cancel</label>
+							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

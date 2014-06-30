@@ -1,0 +1,31 @@
+<div>
+    <h3>APIs</h3>
+    <div id="sidebar">
+        <ul id="main-nav" class="nav nav-tabs" style="margin-bottom:0;">
+            <li class="active"><a href="#classes" data-toggle="tab">Classes</a></li>
+            <li><a href="#modules" data-toggle="tab">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" placeholder="Type to filter APIs">
+        </div>
+
+        <div class="tab-content" style="border: 1px solid #DDD; border-top:0;">
+            <div class="tab-pane active" id="classes">
+                <ul id="api-classes" class="nav nav-list">
+                    {{#publicClasses classes}}
+                        <li><a href="{{../projectRoot}}classes/{{name}}.html">{{displayName}}</a></li>
+                    {{/publicClasses}}
+                </ul>
+            </div>
+
+            <div class="tab-pane" id="modules">
+                <ul id="api-modules" class="nav nav-list">
+                    {{#allModules}}
+                        <li><a href="{{../projectRoot}}modules/{{name}}.html">{{displayName}}</a></li>
+                    {{/allModules}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="LightObstacleAutomatismEditor">
+		<id_arg>0</id_arg>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>3</cols>
+		</object>
+	</object>
+</wxsmith>
+
+
+
+
+
+
+

@@ -1,0 +1,76 @@
+All demos :
+*********
+
+Esp : Quits
+Del : Reinitialises the particles systems
+F1 : Changes the text display (full -> fps only -> nothing)
+wheel : Zooms in and out (not all demos)
+Mouse : Rotates around (not all demos)
+
+
+
+openGL Demos :
+************
+
+Pause : Pauses the particles systems
+F2 : Displays the bounding boxes for particle groups or not
+F4 : Changes the renderers (normal -> basic (points) -> none)
+F5 : Displays or hides the environment
+
+
+
+SFML Demo :
+*********
+
+F2 : Displays or hide the grid
+F3 : Displays or hide the background
+F4 : Pauses the particles systems
+F5 : Destroys all fires
+Left click on an occupied tile : Destroys the fire
+Left click on an emtu tile : Creates a fire
+Space : Generates smoke or not
+
+
+
+Fire Demo :
+*********
+
+Space : Generates smoke or not
+
+
+
+Rain Demo :
+*********
+
+Cursor keys : Moves around
++/- : Changes the rain intensity
+
+
+
+Fountain Demo :
+*************
+
+Space : Switches between high an low graphics
+
+
+
+Flakes Demo :
+***********
+
++/- : Changes the number of particles
+Space : Spreads particles
+
+
+
+Writing Demo :
+************
+
+Left drag : Draws particles
+
+
+
+Tuto 1 :
+******
+
+space : spawn fireworks
+

@@ -1,0 +1,137 @@
+<div id="event_{{name}}" class="events item{{#if access}} {{access}}{{/if}}{{#if deprecated}} deprecated{{/if}}{{#if extended_from}} inherited{{/if}}">
+    <h3 class="name"><code>{{name}}</code></h3>
+    <span class="type">{{#crossLink type}}{{/crossLink}}</span>
+
+    {{#if deprecated}}
+        <span class="flag deprecated"{{#if deprecationMessage}} title="{{deprecationMessage}}"{{/if}}>deprecated</span>
+    {{/if}}
+
+    {{#if access}}
+        <span class="flag {{access}}">{{access}}</span>
+    {{/if}}
+
+    {{#if final}}
+        <span class="flag final">final</span>
+    {{/if}}
+
+    {{#if static}}
+        <span class="flag static">static</span>
+    {{/if}}
+
+    <div class="meta">
+        {{#if overwritten_from}}
+            <p>Inherited from
+            <a href="{{crossLinkRaw overwritten_from/class}}#event_{{overwritten_from/name}}">
+                {{overwritten_from/class}}
+            </a>
+            {{#if foundAt}}
+            but overwritten in
+            {{/if}}
+        {{else}}
+            {{#if extended_from}}
+                <p>Inherited from
+                <a href="{{crossLinkRaw extended_from}}#event_{{name}}">{{extended_from}}</a>:
+            {{else}}
+                {{#providedBy}}
+                    <p>Provided by the <a href="../modules/{{.}}.html">{{.}}</a> module.</p>
+                {{/providedBy}}
+                <p>
+                {{#if foundAt}}
+                Defined in
+                {{/if}}
+            {{/if}}
+        {{/if}}
+        {{#if foundAt}}
+        <a href="{{foundAt}}">`{{{file}}}:{{{line}}}`</a>
+        {{/if}}
+        </p>
+
+        {{#if deprecationMessage}}
+            <p>Deprecated: {{deprecationMessage}}</p>
+        {{/if}}
+
+        {{#if since}}
+            <p>Available since {{since}}</p>
+        {{/if}}
+    </div>
+
+    <div class="description">
+        {{{eventDescription}}}
+    </div>
+
+    {{#if params}}
+        <div class="params">
+            <h4>Event Payload:</h4>
+
+            <ul class="params-list">
+            {{#params}}
+                <li class="param">
+                    {{#if optional}}
+                        <code class="param-name optional">[{{name}}{{#if optdefault}}={{optdefault}}{{/if}}]</code>
+                        <span class="type">{{#crossLink type}}{{/crossLink}}</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    {{else}}
+                        <code class="param-name">{{name}}</code>
+                        <span class="type">{{#crossLink type}}{{/crossLink}}</span>
+                    {{/if}}
+
+                    {{#if multiple}}
+                        <span class="flag multiple" title="This parameter may occur one or more times.">Multiple</span>
+                    {{/if}}
+
+                    <div class="param-description">
+                        {{{description}}}
+                    </div>
+
+                    {{#if props}}
+                        <ul class="params-list">
+                            {{#props}}
+                            <li class="param">
+                                {{#if optional}}
+                                    <code class="param-name optional">[{{name}}{{#if optdefault}}={{optdefault}}{{/if}}]</code>
+                                    <span class="type">{{#crossLink type}}{{/crossLink}}</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                {{else}}
+                                    <code class="param-name">{{name}}</code>
+                                    <span class="type">{{#crossLink type}}{{/crossLink}}</span>
+                                {{/if}}
+
+                                <div class="param-description">
+                                    {{{description}}}
+                                </div>
+
+                                {{#if props}}
+                                    <ul class="params-list">
+                                        {{#props}}
+                                        <li class="param">
+                                            <code class="param-name">{{name}}</code>
+                                            <span class="type">{{#crossLink type}}{{/crossLink}}</span>
+
+                                            <div class="param-description">
+                                                {{{description}}}
+                                            </div>
+                                        </li>
+                                        {{/props}}
+                                    </ul>
+                                {{/if}}
+                            </li>
+                            {{/props}}
+                        </ul>
+                    {{/if}}
+                </li>
+            {{/params}}
+            </ul>
+        </div>
+    {{/if}}
+
+
+    {{#example}}
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                {{{.}}}
+            </div>
+        </div>
+    {{/example}}
+</div>

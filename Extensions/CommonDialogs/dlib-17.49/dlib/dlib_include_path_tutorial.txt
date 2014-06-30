@@ -1,0 +1,20 @@
+#error "Don't put the dlib folder in your include path"
+/*
+  You are getting this error because you have added the dlib folder to your
+  compiler's include search path.  
+
+  You should *NOT* add the dlib folder itself to your compiler's include path. 
+  Doing so will cause the build to fail because of name collisions (such as 
+  dlib/string.h and string.h from the standard library). Instead you should 
+  add the folder that contains the dlib folder to your include search path 
+  and then use include statements of the form #include <dlib/queue.h> or
+  #include "dlib/queue.h".  This will ensure that everything builds correctly.
+
+  XCode:
+  	The XCode IDE often puts all folders that it knows about into 
+	the compiler search path.  So if you are using XCode then either 
+	don't drag the whole dlib folder into the project or alternatively 
+	modify your XCode project settings to not auto-add all folders to 
+	the include path.  Instead just make sure that the dlib folder is 
+	itself inside a folder in your include path.  
+*/

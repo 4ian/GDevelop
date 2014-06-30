@@ -15,7 +15,7 @@
  *
  * -# \subpage setupDevEnv
  * -# \subpage overview
- * -# \subpage WriteANewExtension
+ * -# \subpage writeANewExtension
  *
  * \section aboutdoc About this documentation
  *
@@ -257,13 +257,13 @@
  *
  * Refer to these pages for more information about extensions:
  *  - \subpage AboutExtensionCpp
- *  - \subpage WriteANewExtension
+ *  - \subpage writeANewExtension
  */
 
 /**
- * \page WriteANewExtension Write a new extension
+ * \page writeANewExtension Write a new extension
  *
- * \section WriteANewExtension_createNewExtension Create a new extension
+ * \section writeANewExtension_createNewExtension Create a new extension
  *
  * Creation of a new extension can be made by following these steps :<br>
  *
@@ -280,7 +280,7 @@
  * <br>
  * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake).
  *
- * \section WriteANewExtension_installExtension Use the extension with Game Develop
+ * \section writeANewExtension_installExtension Use the extension with Game Develop
  *
  * To make your extension usable with %Game Develop, you have to:
  * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *Game Develop folder*.

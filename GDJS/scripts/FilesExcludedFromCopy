@@ -1,0 +1,15 @@
+\bin\
+\obj\
+gmon.out
+SVN Repository
+Binaries\
+\.cccc\
+\doc\
+.depend
+wxsmith\
+CommonDialogs\dlib-17.49\docs
+CommonDialogs\dlib-17.49\examples
+CommonDialogs\dlib-17.49\documentation.htm
+dlib-17.12
+Skeleton-Object\
+Widgets-Extension\

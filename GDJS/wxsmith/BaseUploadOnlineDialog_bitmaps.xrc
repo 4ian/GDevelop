@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+  <object class="wxBitmap" name="helpicon">..\..\Binaries\Output\Release_Windows\res\helpicon.png</object>
+</resource>

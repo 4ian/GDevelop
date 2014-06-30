@@ -16,17 +16,17 @@ About directory structure
 * Extensions: Sources files of extensions. (For C++ or JS platform)
 
 * Binaries: Binaries are generated in Binaries/Output. Binaries/Releases contains the installer exes and compressed files containing Game Develop releases.
-* GDSDK: Game Develop SDK for building extensions or platforms: Generated using a script.
 
 * scripts: Various scripts, notably scripts to package GD (ReleaseProcedure* scripts).
-* docs: Directory where the documentation is generated. To avoid you to generate it by yourself, it is also [available here](https://github.com/4ian/GD-Documentation).
+* docs: Directory where the documentation is generated. To avoid you to generate it by yourself, it is [available here](http://4ian.github.io/GD-Documentation).
 
 How to build
 ------------
 
-Full and detailed instructions are in the getting started page of the [documentation available here](https://github.com/4ian/GD-Documentation)
+Full and detailed instructions are in the getting started page of the [documentation available here](http://4ian.github.io/GD-Documentation)
 
 Basically:
+
 * Install and launch [CMake].
 * Choose this directory as the source directory, and a hidden directory like Binaries/.build
 as the directory where to build. Files will be output in Binaries/Output anyway.

@@ -8,15 +8,15 @@
  *
  * ### Game Develop Core documentation
  * Some classes and features are provided by the *Game Develop Core library*: When you're working with a class in the <code>gd</code>
- * namespace, read the [GDCore documentation here](..\GDCore Documentation\index.html).
+ * namespace, read the [GDCore documentation here](../GDCore Documentation/index.html).
  *
  * \section gettingstarted Getting started
- * Please refer to the getting started guide in the [GDCore documentation](..\GDCore Documentation\index.html).<br>
- * You can then read the \subpage OverviewOfGDCpp.
+ * Please refer to the getting started guide in the [GDCore documentation](../GDCore Documentation/index.html).<br>
+ * You can then read the \subpage overviewOfGDCpp.
  */
 
 /**
- * \page OverviewOfGDCpp Overview of the C++ Platform
+ * \page overviewOfGDCpp Overview of the C++ Platform
  *
  * \section gameEngine Some important classes from the game engine
  *

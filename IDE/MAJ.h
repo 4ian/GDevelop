@@ -1,3 +1,8 @@
+/*
+ * Game Develop IDE
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU General Public License.
+ */
 #ifndef MAJ_H
 #define MAJ_H
 

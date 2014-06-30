@@ -20,7 +20,7 @@
 /Binaries/Releases/*.tar.bz2
 /Binaries/Releases/*.tar.lzma
 /Binaries/Releases/*.zip
-/WebIDE/node_modules/
+/WebIDE
 *.depend
 *.layout
 *.xgdwe
@@ -45,3 +45,4 @@
 /Binaries/Output/WebIDE/Release
 /Binaries/Output/WebIDE/Debug
 /Binaries/Output/WebIDE/libGD.raw.js
+/WebIDE

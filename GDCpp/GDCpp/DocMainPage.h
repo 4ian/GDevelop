@@ -12,11 +12,11 @@
  *
  * \section gettingstarted Getting started
  * Please refer to the getting started guide in the [GDCore documentation](../GDCore Documentation/index.html).<br>
- * You can then read the \subpage OverviewOfGDCpp.
+ * You can then read the \subpage overviewOfGDCpp.
  */
 
 /**
- * \page OverviewOfGDCpp Overview of the C++ Platform
+ * \page overviewOfGDCpp Overview of the C++ Platform
  *
  * \section gameEngine Some important classes from the game engine
  *

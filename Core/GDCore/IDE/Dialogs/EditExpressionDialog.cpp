@@ -10,7 +10,7 @@
 //(*InternalHeaders(EditExpressionDialog)
 #include <wx/bitmap.h>
 #include <wx/font.h>
-#include "GDCore/Tools/Localization.h"
+#include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -150,7 +150,7 @@ lastErrorPos(std::string::npos)
 	centerPanel->SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(centerPanel);
 	FlexGridSizer1->SetSizeHints(centerPanel);
-	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("PaneName")).Caption(_("Pane caption")).CaptionVisible(false).CloseButton(false).Center().DockFixed().Floatable(false).Movable(false).PaneBorder(false));
+	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("PaneName")).DefaultPane().Caption(_("Pane caption")).CaptionVisible(false).CloseButton(false).Center().DockFixed().Floatable(false).Movable(false).PaneBorder(false));
 	mathPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
@@ -276,31 +276,31 @@ lastErrorPos(std::string::npos)
 	mathPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(mathPanel);
 	FlexGridSizer3->SetSizeHints(mathPanel);
-	mgr->AddPane(mathPanel, wxAuiPaneInfo().Name(_T("mathPane")).Caption(_("Mathematical functions and operators")).CaptionVisible().CloseButton(false).Bottom().Resizable(false));
+	mgr->AddPane(mathPanel, wxAuiPaneInfo().Name(_T("mathPane")).DefaultPane().Caption(_("Mathematical functions and operators")).CaptionVisible().CloseButton(false).Bottom().Resizable(false));
 	objectsPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
-	ObjList = new wxTreeCtrl(objectsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjList = new wxTreeCtrl(objectsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer4->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	AddPropBt = new wxButton(objectsPanel, ID_BUTTON10, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer4->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objectsPanel->SetSizer(FlexGridSizer4);
 	FlexGridSizer4->Fit(objectsPanel);
 	FlexGridSizer4->SetSizeHints(objectsPanel);
-	mgr->AddPane(objectsPanel, wxAuiPaneInfo().Name(_T("objectsPane")).Caption(_("Objects functions")).CaptionVisible().CloseButton(false).Bottom());
+	mgr->AddPane(objectsPanel, wxAuiPaneInfo().Name(_T("objectsPane")).DefaultPane().Caption(_("Objects functions")).CaptionVisible().CloseButton(false).Bottom());
 	freeFunctionsPanel = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
 	FlexGridSizer5->AddGrowableRow(0);
-	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(178,147), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
+	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(178,147), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
 	FlexGridSizer5->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	AddValBt = new wxButton(freeFunctionsPanel, ID_BUTTON11, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
 	FlexGridSizer5->Add(AddValBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	freeFunctionsPanel->SetSizer(FlexGridSizer5);
 	FlexGridSizer5->Fit(freeFunctionsPanel);
 	FlexGridSizer5->SetSizeHints(freeFunctionsPanel);
-	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Other functions")).CaptionVisible().CloseButton(false).Bottom());
+	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).DefaultPane().Caption(_("Other functions")).CaptionVisible().CloseButton(false).Bottom());
 	mgr->Update();
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnOkBtClick);

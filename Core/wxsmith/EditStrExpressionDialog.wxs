@@ -126,6 +126,7 @@
 									<item2></item2>
 								</items_text>
 								<size>195,177</size>
+								<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 								<handler function="OnObjListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 								<handler function="OnObjListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 							</object>
@@ -172,6 +173,7 @@
 									<item2></item2>
 								</items_text>
 								<size>195,177</size>
+								<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 								<handler function="OnTreeCtrl1ItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 								<handler function="OnTreeCtrl1SelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 							</object>

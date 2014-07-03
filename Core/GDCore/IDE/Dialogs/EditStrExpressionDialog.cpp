@@ -7,7 +7,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 //(*InternalHeaders(EditStrExpressionDialog)
 #include <wx/bitmap.h>
-#include "GDCore/Tools/Localization.h"
+#include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -106,31 +106,31 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	centerPanel->SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(centerPanel);
 	FlexGridSizer1->SetSizeHints(centerPanel);
-	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("centerPane")).Caption(_("Pane caption")).CaptionVisible(false).CloseButton(false).Center().DockFixed().Floatable(false).Movable(false).PaneBorder(false));
+	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("centerPane")).DefaultPane().Caption(_("Pane caption")).CaptionVisible(false).CloseButton(false).Center().DockFixed().Floatable(false).Movable(false).PaneBorder(false));
 	objectsFunctionsPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(0);
-	ObjList = new wxTreeCtrl(objectsFunctionsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjList = new wxTreeCtrl(objectsFunctionsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer7->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	AddPropBt = new wxButton(objectsFunctionsPanel, ID_BUTTON10, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer7->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objectsFunctionsPanel->SetSizer(FlexGridSizer7);
 	FlexGridSizer7->Fit(objectsFunctionsPanel);
 	FlexGridSizer7->SetSizeHints(objectsFunctionsPanel);
-	mgr->AddPane(objectsFunctionsPanel, wxAuiPaneInfo().Name(_T("objectsFunctionsPane")).Caption(_("Objects functions")).CaptionVisible().Bottom());
+	mgr->AddPane(objectsFunctionsPanel, wxAuiPaneInfo().Name(_T("objectsFunctionsPane")).DefaultPane().Caption(_("Objects functions")).CaptionVisible().Bottom());
 	freeFunctionsPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
 	FlexGridSizer10->AddGrowableRow(0);
-	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
+	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(195,177), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
 	FlexGridSizer10->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	AddFunctionBt = new wxButton(freeFunctionsPanel, ID_BUTTON7, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer10->Add(AddFunctionBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	freeFunctionsPanel->SetSizer(FlexGridSizer10);
 	FlexGridSizer10->Fit(freeFunctionsPanel);
 	FlexGridSizer10->SetSizeHints(freeFunctionsPanel);
-	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Other functions")).CaptionVisible().Bottom());
+	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).DefaultPane().Caption(_("Other functions")).CaptionVisible().Bottom());
 	mgr->Update();
 	Center();
 

@@ -423,12 +423,18 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             std::string allJsFiles;
             for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
             {
+                std::string jsFile = "";
                 if ( fs.FileExists(jsPlatformDir+"Runtime/"+*include) )
                     allJsFiles += "\""+jsPlatformDir+"Runtime/"+*include+"\" ";
                 else if ( fs.FileExists(jsPlatformDir+"Runtime/Extensions/"+*include) )
                     allJsFiles += "\""+jsPlatformDir+"Runtime/Extensions/"+*include+"\" ";
                 else if ( fs.FileExists(*include) )
                     allJsFiles += "\""+*include+"\" ";
+
+                if ( fs.FileSize(jsFile) <= 600*1024)
+                    allJsFiles += "\""+*include+"\" ";
+                else
+                    notMinifiedFiles.push_back(allJsFiles);
             }
 
             cmd += allJsFiles;
@@ -441,6 +447,10 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             {
                 std::cout << "Execution of \"UglifyJS\" failed (Command line : " << cmd << ")." << std::endl;
                 std::cout << "Output: ";
+                for (size_t i = 0;i<output.size();++i)
+                    std::cout << output[i] << std::endl;
+                for (size_t i = 0;i<errors.size();++i)
+                    std::cout << errors[i] << std::endl;
 
                 gd::LogWarning(_("The exported script could not be minified.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
                 minify = false;

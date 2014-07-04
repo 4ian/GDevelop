@@ -236,7 +236,7 @@ bool Exporter::ExportIntelXDKIndexFile(gd::Project & project, std::string export
         std::string str = fs.ReadFile("./JsPlatform/Runtime/XDKProject.xdk");
 
         //Complete the project file
-        std::string nowTimeStamp = gd::ToString(wxDateTime::Now().GetTicks());
+        std::string nowTimeStamp = gd::ToString(wxDateTime::Now().GetTicks())+"000"; //Beware, timestamp is in ms.
         size_t pos = str.find("\"GDJS_LAST_MODIFIED\"");
         if ( pos < str.length() )
             str = str.replace(pos, 20, nowTimeStamp);
@@ -248,7 +248,7 @@ bool Exporter::ExportIntelXDKIndexFile(gd::Project & project, std::string export
         }
         pos = str.find("\"GDJS_CREATION\"");
         if ( pos < str.length() )
-            str = str.replace(pos, 20, nowTimeStamp);
+            str = str.replace(pos, 15, nowTimeStamp);
         else
         {
             std::cout << "Unable to find \"GDJS_CREATION\" in the project file." << std::endl;

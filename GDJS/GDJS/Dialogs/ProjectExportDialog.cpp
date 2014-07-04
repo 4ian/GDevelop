@@ -21,9 +21,8 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     BaseProjectExportDialog(parent),
     project(project_)
 {
-    //TODO: Remove when CocoonJS and IntelXDK support is fully working.
+    //TODO: Remove when CocoonJS support is fully working.
     exportChoice->RemovePage(3);
-    exportChoice->RemovePage(2);
 
     exportFolderEdit->AutoCompleteDirectories();
     if ( wxDirExists(project.GetLastCompilationDirectory()) )

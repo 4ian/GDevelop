@@ -408,17 +408,17 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
     //Includes files :
     if ( minify )
     {
-        std::string javaExec = GetJavaExecutablePath();
-        if ( javaExec.empty() || !fs.FileExists(javaExec) )
+        std::string nodeExec = GetNodeExecutablePath();
+        if ( nodeExec.empty() || !fs.FileExists(nodeExec) )
         {
-            std::cout << "Java executable not found." << std::endl;
-            gd::LogWarning(_("The exported script could not be minified : Check that the Java Runtime Environment is installed."));
+            std::cout << "Node.js executable not found." << std::endl;
+            gd::LogWarning(_("The exported script could not be minified: Please check that you installed Node.js on your system."));
             minify = false;
         }
         else
         {
             std::string jsPlatformDir = gd::ToString(wxGetCwd()+"/JsPlatform/");
-            std::string cmd = javaExec+" -jar \""+jsPlatformDir+"Tools/compiler.jar\" --js ";
+            std::string cmd = nodeExec+" \""+jsPlatformDir+"Tools/uglify-js/bin/uglifyjs\" ";
 
             std::string allJsFiles;
             for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
@@ -432,31 +432,17 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             }
 
             cmd += allJsFiles;
-            cmd += "--js_output_file \""+exportDir+"/code.js\"";
+            cmd += "-o \""+exportDir+"/code.js\"";
 
             wxArrayString output;
             wxArrayString errors;
             long res = wxExecute(cmd, output, errors);
             if ( res != 0 )
             {
-                std::cout << "Execution of the closure compiler failed ( Command line : " << cmd << ")." << std::endl;
+                std::cout << "Execution of \"UglifyJS\" failed (Command line : " << cmd << ")." << std::endl;
                 std::cout << "Output: ";
-                bool outOfMemoryError = false;
-                for (size_t i = 0;i<output.size();++i)
-                {
-                    outOfMemoryError |= output[i].find("OutOfMemoryError") < output[i].length();
-                    std::cout << output[i] << std::endl;
-                }
-                for (size_t i = 0;i<errors.size();++i)
-                {
-                    outOfMemoryError |= errors[i].find("OutOfMemoryError") < errors[i].length();
-                    std::cout << errors[i] << std::endl;
-                }
 
-                if ( outOfMemoryError)
-                    gd::LogWarning(_("The exported script could not be minified: It seems that the script is too heavy and need too much memory to be minified.\n\nTry using sub events and reduce the number of events."));
-                else
-                    gd::LogWarning(_("The exported script could not be minified.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
+                gd::LogWarning(_("The exported script could not be minified.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
                 minify = false;
             }
             else
@@ -698,27 +684,26 @@ std::string Exporter::GetProjectExportButtonLabel()
 }
 
 #if !defined(GD_NO_WX_GUI)
-std::string Exporter::GetJavaExecutablePath()
+std::string Exporter::GetNodeExecutablePath()
 {
     std::vector<std::string> guessPaths;
     wxString userPath;
-    if ( wxConfigBase::Get()->Read("Paths/Java" , &userPath) && !userPath.empty() )
+    if ( wxConfigBase::Get()->Read("Paths/Node" , &userPath) && !userPath.empty() )
         guessPaths.push_back(gd::ToString(userPath));
     else
     {
         #if defined(WINDOWS)
 
         //Try some common paths.
-        guessPaths.push_back("C:/Program Files/java/jre7/bin/java.exe");
-        guessPaths.push_back("C:/Program Files (x86)/java/jre7/bin/java.exe");
-        guessPaths.push_back("C:/Program Files/java/jre6/bin/java.exe");
-        guessPaths.push_back("C:/Program Files (x86)/java/jre6/bin/java.exe");
+        guessPaths.push_back("C:/Program Files/nodejs/node.exe");
+        guessPaths.push_back("C:/Program Files (x86)/nodejs/node.exe");
 
         #elif defined(LINUX)
-        guessPaths.push_back("/usr/bin/java");
-        guessPaths.push_back("/usr/local/bin/java");
+        guessPaths.push_back("/usr/bin/env/node");
+        guessPaths.push_back("/usr/bin/node");
+        guessPaths.push_back("/usr/local/bin/node");
         #else
-            #warning Please complete this so as to return a path to the Java executable.
+            #warning Please complete this so as to return a path to the Node executable.
         #endif
     }
 

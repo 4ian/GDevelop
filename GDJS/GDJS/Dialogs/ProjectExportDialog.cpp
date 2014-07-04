@@ -37,8 +37,8 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     wxConfigBase::Get()->Read("Export/JS platform/LatestExportType", &latestPage, 0);
     exportChoice->SetSelection(latestPage);
 
-    hasJava = !Exporter::GetJavaExecutablePath().empty();
-    if ( !hasJava )
+    hasNode = !Exporter::GetNodeExecutablePath().empty();
+    if ( !hasNode )
     {
         minifyCheck->Disable();
         minifyCheck->SetValue(false);
@@ -106,7 +106,7 @@ std::string ProjectExportDialog::GetExportDir()
 
 bool ProjectExportDialog::RequestMinify()
 {
-    if (!hasJava) return false;
+    if (!hasNode) return false;
     return GetExportType() != Normal || minifyCheck->GetValue();
 }
 

@@ -33,6 +33,7 @@
 #include "GDJS/Dialogs/ProjectExportDialog.h"
 #include "GDJS/Dialogs/UploadOnlineDialog.h"
 #include "GDJS/Dialogs/CocoonJSUploadDialog.h"
+#include "GDJS/Dialogs/IntelXDKPackageDialog.h"
 #undef CopyFile //Disable an annoying macro
 
 namespace gdjs
@@ -430,11 +431,6 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
                     allJsFiles += "\""+jsPlatformDir+"Runtime/Extensions/"+*include+"\" ";
                 else if ( fs.FileExists(*include) )
                     allJsFiles += "\""+*include+"\" ";
-
-                if ( fs.FileSize(jsFile) <= 600*1024)
-                    allJsFiles += "\""+*include+"\" ";
-                else
-                    notMinifiedFiles.push_back(allJsFiles);
             }
 
             cmd += allJsFiles;
@@ -665,9 +661,8 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
     }
     else if ( exportForIntelXDK )
     {
-        //TODO: Not finished.
-        /*CocoonJSUploadDialog uploadDialog(NULL, exportDir+wxFileName::GetPathSeparator()+"packaged_game.zip");
-        uploadDialog.ShowModal();*/
+        IntelXDKPackageDialog packageDialog(NULL, exportDir);
+        packageDialog.ShowModal();
     }
     else
     {

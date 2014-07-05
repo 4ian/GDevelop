@@ -475,3 +475,113 @@ BaseCocoonJSUploadDialog::~BaseCocoonJSUploadDialog()
     m_button108->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseCocoonJSUploadDialog::OnCloseBtClicked), NULL, this);
     
 }
+
+BaseIntelXDKPackageDialog::BaseIntelXDKPackageDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCB65InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer873 = new wxFlexGridSizer(  0, 1, 0, 0);
+    flexGridSizer873->SetFlexibleDirection( wxBOTH );
+    flexGridSizer873->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer873->AddGrowableCol(0);
+    flexGridSizer873->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer873);
+    
+    cocoonjslogoPanel274 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
+    cocoonjslogoPanel274->SetBackgroundColour(wxColour(wxT("rgb(51,16,69)")));
+    
+    flexGridSizer873->Add(cocoonjslogoPanel274, 0, wxALL|wxALIGN_CENTER, 5);
+    
+    wxFlexGridSizer* flexGridSizer63385 = new wxFlexGridSizer(  0, 2, 0, 0);
+    flexGridSizer63385->SetFlexibleDirection( wxBOTH );
+    flexGridSizer63385->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    cocoonjslogoPanel274->SetSizer(flexGridSizer63385);
+    
+    m_staticBitmap57496 = new wxStaticBitmap(cocoonjslogoPanel274, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("intelxdklogo")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer63385->Add(m_staticBitmap57496, 0, wxALL, 0);
+    
+    m_staticText1017 = new wxStaticText(this, wxID_ANY, _("You can now open Intel XDK. Download it here if it is not installed yet:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer873->Add(m_staticText1017, 0, wxALL, 5);
+    
+    m_hyperLink1048 = new wxHyperlinkCtrl(this, wxID_ANY, _("xdk-software.intel.com"), wxT("http://xdk-software.intel.com"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink1048->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink1048->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink1048->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer873->Add(m_hyperLink1048, 0, wxALL|wxALIGN_CENTER, 5);
+    
+    wxFlexGridSizer* flexGridSizer19109 = new wxFlexGridSizer(  0, 1, 0, 0);
+    flexGridSizer19109->SetFlexibleDirection( wxBOTH );
+    flexGridSizer19109->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer19109->AddGrowableCol(0);
+    flexGridSizer19109->AddGrowableRow(0);
+    
+    flexGridSizer873->Add(flexGridSizer19109, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticText1511110 = new wxStaticText(this, wxID_ANY, _("Then, open the project which was saved at this location on your computer:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer19109->Add(m_staticText1511110, 0, wxALL, 5);
+    
+    packageLocationEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxTE_READONLY);
+    
+    flexGridSizer19109->Add(packageLocationEdit, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 5);
+    
+    m_staticText10611 = new wxStaticText(this, wxID_ANY, _("In the \"Build\" tab, select \"Android\" or \"Crosswalk for Android\".\nFill in all the fields and XDK will be able to package your game into a native Android or iOS application."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer873->Add(m_staticText10611, 0, wxALL, 5);
+    
+    wxFlexGridSizer* flexGridSizer5014 = new wxFlexGridSizer(  0, 3, 0, 0);
+    flexGridSizer5014->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5014->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5014->AddGrowableCol(0);
+    
+    flexGridSizer873->Add(flexGridSizer5014, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    
+    wxFlexGridSizer* flexGridSizer5115 = new wxFlexGridSizer(  0, 3, 0, 0);
+    flexGridSizer5115->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5115->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5115->AddGrowableRow(0);
+    
+    flexGridSizer5014->Add(flexGridSizer5115, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+    
+    ID_STATICBITMAP216 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("helpicon")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer5115->Add(ID_STATICBITMAP216, 1, wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    ID_HYPERLINKCTRL117 = new wxHyperlinkCtrl(this, wxID_ANY, _("Detailed explanation available on the wiki"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    ID_HYPERLINKCTRL117->SetToolTip(_("Display help about this window"));
+    ID_HYPERLINKCTRL117->SetNormalColour(wxColour(wxT("#0000FF")));
+    ID_HYPERLINKCTRL117->SetHoverColour(wxColour(wxT("#0000FF")));
+    ID_HYPERLINKCTRL117->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer5115->Add(ID_HYPERLINKCTRL117, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    m_button10812 = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_button10812->SetDefault();
+    m_button10812->SetToolTip(_("Close this dialog"));
+    
+    flexGridSizer5014->Add(m_button10812, 0, wxALL|wxALIGN_RIGHT, 5);
+    
+    SetSizeHints(500,300);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    Centre(wxBOTH);
+    // Connect events
+    m_button10812->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseIntelXDKPackageDialog::OnCloseClicked), NULL, this);
+    
+}
+
+BaseIntelXDKPackageDialog::~BaseIntelXDKPackageDialog()
+{
+    m_button10812->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseIntelXDKPackageDialog::OnCloseClicked), NULL, this);
+    
+}

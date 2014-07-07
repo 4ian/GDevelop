@@ -2,6 +2,8 @@ Game Develop
 ============
 2008-2014 Florian Rival (Florian.Rival@gmail.com / http://www.FlorianRival.com)
 
+![Game Develop logo](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/gdlogo.png "Game Develop logo")
+
 Game Develop is a full featured, open source game development software, allowing to create any kind of 2D game
 without needing any knowledge in a specific programming language. All the game logic is made thanks to an
 intuitive and powerful event based system.

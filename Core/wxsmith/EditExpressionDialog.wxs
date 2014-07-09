@@ -523,6 +523,7 @@
 									<item2></item2>
 								</items_text>
 								<size>195,177</size>
+								<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 								<handler function="OnObjListItemDoubleClicked" entry="EVT_TREE_ITEM_ACTIVATED" />
 								<handler function="OnObjListItemActivated" entry="EVT_TREE_SEL_CHANGED" />
 							</object>
@@ -570,6 +571,7 @@
 									<item2></item2>
 								</items_text>
 								<size>178,147</size>
+								<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 								<handler function="OnValListItemDoubleClicked" entry="EVT_TREE_ITEM_ACTIVATED" />
 								<handler function="OnValListItemActivated" entry="EVT_TREE_SEL_CHANGED" />
 							</object>

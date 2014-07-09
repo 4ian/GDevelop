@@ -55,9 +55,7 @@ bool NativeFileSystem::MakeAbsolute(std::string & fn, const std::string & baseDi
 bool NativeFileSystem::MakeRelative(std::string & fn, const std::string & baseDirectory)
 {
     wxFileName filename = wxFileName::FileName(fn);
-    std::cout << "MAKRELATIVE CALLED on:" << filename.GetFullPath() << "and base: " << baseDirectory;
     bool success = filename.MakeRelativeTo(baseDirectory);
-    std::cout << "s:" << success << "f:" << filename.GetFullPath();
     if (success)
     {
     	fn = ToString(filename.GetFullPath(wxPATH_UNIX));

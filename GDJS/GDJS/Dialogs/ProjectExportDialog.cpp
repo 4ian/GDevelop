@@ -21,9 +21,8 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     BaseProjectExportDialog(parent),
     project(project_)
 {
-    //TODO: Remove when CocoonJS and IntelXDK support is fully working.
+    //TODO: Remove when CocoonJS support is fully working.
     exportChoice->RemovePage(3);
-    exportChoice->RemovePage(2);
 
     exportFolderEdit->AutoCompleteDirectories();
     if ( wxDirExists(project.GetLastCompilationDirectory()) )
@@ -38,8 +37,8 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     wxConfigBase::Get()->Read("Export/JS platform/LatestExportType", &latestPage, 0);
     exportChoice->SetSelection(latestPage);
 
-    hasJava = !Exporter::GetJavaExecutablePath().empty();
-    if ( !hasJava )
+    hasNode = !Exporter::GetNodeExecutablePath().empty();
+    if ( !hasNode )
     {
         minifyCheck->Disable();
         minifyCheck->SetValue(false);
@@ -107,7 +106,7 @@ std::string ProjectExportDialog::GetExportDir()
 
 bool ProjectExportDialog::RequestMinify()
 {
-    if (!hasJava) return false;
+    if (!hasNode) return false;
     return GetExportType() != Normal || minifyCheck->GetValue();
 }
 

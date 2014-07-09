@@ -2,6 +2,8 @@ Game Develop
 ============
 2008-2014 Florian Rival (Florian.Rival@gmail.com / http://www.FlorianRival.com)
 
+![Game Develop logo](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/gdlogo.png "Game Develop logo")
+
 Game Develop is a full featured, open source game development software, allowing to create any kind of 2D game
 without needing any knowledge in a specific programming language. All the game logic is made thanks to an
 intuitive and powerful event based system.
@@ -23,15 +25,14 @@ About directory structure
 How to build
 ------------
 
-Full and detailed instructions are in the getting started page of the [documentation available here](http://4ian.github.io/GD-Documentation)
+Full and detailed instructions are in the getting started page of the [documentation available here](http://4ian.github.io/GD-Documentation).
 
 Basically:
 
 * Install and launch [CMake].
 * Choose this directory as the source directory, and a hidden directory like Binaries/.build
 as the directory where to build. Files will be output in Binaries/Output anyway.
-* Be sure to have 3rd party libraries downloaded and extract in *ExtLibs* folder. On Windows,
-be sure to use the compiler shipped on compilgames.net for better compatibility.
+* Be sure to have [3rd party libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) downloaded and extract in *ExtLibs* folder. On Windows, be sure to use the same version of [the compiler](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) for better compatibility.
 * Generate the Makefile (or [Ninja] build file) and launch it.
 
 Documentation

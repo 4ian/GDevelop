@@ -62,10 +62,10 @@ public:
 
     #if !defined(GD_NO_WX_GUI)
     /**
-     * \brief Try to locate the Java Executable. ( The JRE must be installed ).
-     * \return An empty string if not found, a full path to the java executable otherwise.
+     * \brief Try to locate the Node.js executable. (Node must be installed in a standard folder).
+     * \return An empty string if not found, a full path to the node executable otherwise.
      */
-    static std::string GetJavaExecutablePath();
+    static std::string GetNodeExecutablePath();
     #endif
 
 private:

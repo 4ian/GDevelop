@@ -112,4 +112,27 @@ public:
     virtual ~BaseCocoonJSUploadDialog();
 };
 
+
+class BaseIntelXDKPackageDialog : public wxDialog
+{
+protected:
+    wxPanel* cocoonjslogoPanel274;
+    wxStaticBitmap* m_staticBitmap57496;
+    wxStaticText* m_staticText1017;
+    wxHyperlinkCtrl* m_hyperLink1048;
+    wxStaticText* m_staticText1511110;
+    wxTextCtrl* packageLocationEdit;
+    wxStaticText* m_staticText10611;
+    wxStaticBitmap* ID_STATICBITMAP216;
+    wxHyperlinkCtrl* ID_HYPERLINKCTRL117;
+    wxButton* m_button10812;
+
+protected:
+    virtual void OnCloseClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    BaseIntelXDKPackageDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Package the game with Intel XDK"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~BaseIntelXDKPackageDialog();
+};
+
 #endif

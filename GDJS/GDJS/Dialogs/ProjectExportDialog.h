@@ -55,7 +55,7 @@ protected:
 
     wxString DeleteInvalidCharacters(const wxString & directoryName) const;
     gd::Project & project;
-    bool hasJava;
+    bool hasNode;
 };
 
 }

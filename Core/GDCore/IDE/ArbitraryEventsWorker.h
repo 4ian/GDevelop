@@ -19,7 +19,7 @@ namespace gd
 
 /**
  * \brief ArbitraryEventsWorker is an abstract class used to browse events (and instructions)
- * and some work on them. Can be used to implement refactoring for example.
+ * and do some work on them. Can be used to implement refactoring for example.
  *
  * \ingroup IDE
  */

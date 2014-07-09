@@ -17,6 +17,8 @@
  * -# \subpage overview
  * -# \subpage writeANewExtension
  *
+ * You can also read \subpage recommendedToolsAndConventions.
+ *
  * \section aboutdoc About this documentation
  *
  * If you never used Game Develop Core before, take a look at \subpage overview.
@@ -44,6 +46,9 @@
  * <b>GNU/Linux</b>
  * -# \subpage installLinux
  * -# \subpage installAndUseCMake
+ *
+ * See the recommended tools and conventions for working on Game Develop on this page:
+ * \subpage recommendedToolsAndConventions
  */
 
 /**
@@ -112,16 +117,16 @@
  *
  * \subsection installAndUseCMake_use_gui Using the GUI
  *
- * - Start the CMake user interface ( _cmake-gui_ ). Choose the GDSDK directory as the source directory, and Binaries/.build as the directory where to build the binaries:
+ * - Start the CMake user interface ( _cmake-gui_ ). Choose the GD root directory as the source directory, and Binaries/.build as the directory where to build the binaries:
 
  \image html usecmake1.png
 
  * - Click on *Configure*. If asked to create the build directory, answer yes. Choose then your favorite generator: *MinGW Makefiles* (on Windows) or *Unix Makefiles* (on Linux) generate a traditional Makefile that can be built using the
- * *mingw32-make* ( on Windows) or *make* ( on Linux ) command. You can also choose the *Ninja* generator to use the [Ninja build system](http://martine.github.io/ninja/).
+ * *mingw32-make* (on Windows) or *make* (on Linux) command. You can also choose the *Ninja* generator to use the [Ninja build system](http://martine.github.io/ninja/).
 
   \image html usecmake2.png
 
- * - When you click on Finish, CMake do a first configuration. Adjust any variable if necessary ( no changes is needed by default ), then click on Generate.
+ * - When you click on Finish, CMake do a first configuration. Adjust any variable if necessary (no changes is needed by default), then click on Generate.
 
   \image html usecmake3.png
 
@@ -193,9 +198,96 @@
  * Note that you need to have GTK+ 2.0 or GTK+ 3.0 development file installed (in your package manager, search for the *libgtk2.0-dev* or *libgtk-3-dev* package and install it).
  *
  * \subsection installcmake Install CMake
- * You'll need CMake to build the extensions: See more on the page on how to install and use CMake.
+ * You'll need CMake to build the extensions: See more on \subpage useAndInstallCmake.
  */
 
+/**
+ * \page recommendedToolsAndConventions Recommended tools and advices to work with GD
+ *
+ * \section texteditor Text editor
+ *
+ * Game Develop is compiled thanks to CMake which can generate *Makefiles* or a project file for most popular IDE available.<br>
+ *
+ * [Sublime Text](http://www.sublimetext.com/) is a very nice text editor for programmers:
+ * *"You'll love the slick user interface, extraordinary features and amazing performance."*. <br>
+ * It has nice features like shortcut to search for a file at an amazing speed (just type a few letters of the file name you're searching for),
+ * multiple selection, plugins for better C++ and Javascript support.
+ *
+ * Take a look at it if you're unsure about which IDE to use. If you're more familiar with another IDE,
+ * ask CMake to generate a project file for it.
+ *
+ * ------
+ *
+ * \section designers Visual designers for IDE or GDCore dialogs
+ *
+ * \subsection oldDesigner "Old" dialogs created with wxSmith
+ * If you want to edit a dialog, first search if there is a file called *filename*.wxs in the folder *wxsmith* (in GDCore,
+ * GDCpp or IDE). If it is present, the dialog was made using the wxSmith visual designer integrated into the Code::Blocks IDE:
+ *  - Download [Code::Blocks](http://www.codeblocks.org/) and launch it.
+ *  - Open the .cbp in GDCore, GDCpp or IDE folder.
+ *  - In the tab "Resources", locate the dialog to edit.
+ *
+ * \subsection newDesigner "New" dialogs created with wxCrafter
+ *
+ * New dialogs are designed using [wxCrafter](wxcrafter.codelite.org/). Download and launch it.
+ *
+ * All dialogs of GDCore, GDCpp, GDJS or the IDE created using wxCrafter are stored into a single .wxcp file in
+ * the wxsmith folder, next to files of dialogs created with wxSmith.<br>
+ * For example, open *GDJS/wxsmith/GDJS.wxcp*.
+ *
+ * You can edit and add new dialogs. Do not forget to click on "Generate code" if you made any change.
+ *
+ * wxCrafter creates base classes for dialog (their names start by *Base*), and any code must be inserted into
+ * a derived class. See examples in *GDJS*.
+ *
+ * ------
+ *
+ * \section git Git and GitHub
+ *
+ * Git is an amazing *version control system*. If you never used it before, take a look at some tutorials, there
+ * are plenty of them on the internet.<br>
+ * Windows users could be interested in using [TortoiseGit](code.google.com/p/tortoisegit) or the official
+ * [GitHub client](https://windows.github.com/).
+ *
+ * \subsection pullrequest Submitting code thanks to Pull Request.
+ *
+ * Using *Pull request*, you can easily submit your changes so that they are integrated into the official
+ * Game Develop repository (http://github.com/4ian/gd).
+ *
+ * See this article on *GitHub help* about pull requests: https://help.github.com/articles/using-pull-requests.<br>
+ * Pull requests are extremely easy to use and the best way to contribute to GD!
+ *
+ * ------
+ *
+ * \section codingstyle Coding style
+ *
+ * As a rule of thumb, try to retain the original coding style used in a file when editing it, or look at other
+ * files when creating a new extension/dialog/feature/class.
+ *
+ * For both C++ and Javascript, *code indentation* should be 4 spaces (or tab set to a width of 4 spaces).<br>
+ * Lines should be cutted when reaching column 110 so that two files can be displayed side-by-side on a same screen.
+ * When cutting a line, indent the new lines with an additional 4 spaces.
+ *
+ * \subsection cpp C++
+ *
+ * *Naming* conventions:
+ *  - Classes should be *CamelCase* (starting with a capital).
+ *  - All variables (including member variables) should be *camelCase* (no capital for the first letter).
+ *  - All functions (including class methods) should be *CamelCase* (starting with a capital).
+ *
+ * *Comments*:
+ *  - Comment your classes and functions using *Doxygen* comments.
+ *
+ * \subsection js Javascript
+ *
+ * *Naming* conventions:
+ *  - "Classes" should be *CamelCase* (starting with a capital).
+ *  - All variables (including member variables) should be *camelCase* (no capital for the first letter).
+ *  - All functions (including class methods) should be *camelCase* (no capital for the first letter).
+ *
+ * *Comments*:
+ *  - Comment your classes and functions using *yuidoc* comments.
+ */
 
 /**
  * \page overview Overview of GDCore

@@ -26,7 +26,7 @@ ninja
 cd ..\..
 
 echo.
-echo --Ensuring headers and pch up-to-date for release
+echo --Ensuring GDC++ headers and pch up-to-date for release
 cd IDE/scripts
 call UpdateHeadersAndPCHRelease.bat
 cd ..\..
@@ -49,20 +49,6 @@ cd Binaries\Output\Release_Windows\
 IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "C:\Program Files (x86)\7-Zip\7z.exe" a ..\..\Releases\gd3xxxx.7z * > ..\..\..\scripts\logs\7zArchiveLog.txt
 IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 cd ..\..\..
-
-echo.
-echo --Launching release procedure for SDK
-cd scripts
-SET CURRENTDIR="%cd%"
-call ReleaseProcedureForSDK.bat
-cd %CURRENTDIR%
-
-cd ..
-echo --Generating SDK archive > CON
-if exist Binaries\Releases\GDSDK.7z (del Binaries\Releases\GDSDK.7z)
-IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "C:\Program Files (x86)\7-Zip\7z.exe" a Binaries\Releases\GDSDK.7z GDSDK\* > scripts\logs\SDKArchiveLog.txt
-IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
-cd scripts
 
 echo. >CON
 echo Finished. Do not forget to : >CON

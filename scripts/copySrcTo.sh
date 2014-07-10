@@ -1,1 +1,0 @@
-rsync --exclude-from=FilesExcludedFromCopy ../* ../../GameDevelop2-ubuntu-build -r --progress -u

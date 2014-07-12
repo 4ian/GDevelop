@@ -51,7 +51,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
              "res/conditions/var24.png",
              "res/conditions/var.png")
         .AddParameter("scenevar", _("Variable"))
-        .AddParameter("string", _("Name of the child"));
+        .AddParameter("string", _("Name of the child"))
+        .MarkAsAdvanced();
 
     extension.AddCondition("GlobalVariableChildExists",
              _("Child existence"),
@@ -61,7 +62,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
              "res/conditions/var24.png",
              "res/conditions/var.png")
         .AddParameter("globalvar", _("Variable"))
-        .AddParameter("string", _("Name of the child"));
+        .AddParameter("string", _("Name of the child"))
+        .MarkAsAdvanced();
 
     extension.AddCondition("VarSceneDef",
                    _("Test if a scene variable is defined"),
@@ -84,6 +86,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("globalvar", _("Variable"))
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to compare"))
+        .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     extension.AddCondition("VarGlobalTxt",
@@ -96,6 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("globalvar", _("Variable"))
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("string", _("Text to compare"))
+        .MarkAsAdvanced()
         .SetManipulatedType("string");
 
     extension.AddCondition("VarGlobalDef",
@@ -107,8 +111,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Variable"))
+        .MarkAsAdvanced()
         .SetHidden();
-
 
     extension.AddAction("ModVarScene",
                _("Value of a variable"),
@@ -144,6 +148,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("globalvar", _("Variable"))
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
+        .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     extension.AddAction("ModVarGlobalTxt",
@@ -156,6 +161,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("globalvar", _("Variable"))
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("string", _("Text"))
+        .MarkAsAdvanced()
         .SetManipulatedType("string");
 
     extension.AddAction("VariableRemoveChild",
@@ -166,7 +172,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("scenevar", _("Variable"))
-        .AddParameter("string", _("Child's name"));
+        .AddParameter("string", _("Child's name"))
+        .MarkAsAdvanced();
 
     extension.AddAction("GlobalVariableRemoveChild",
                _("Remove a child"),
@@ -176,7 +183,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("globalvar", _("Variable"))
-        .AddParameter("string", _("Child's name"));
+        .AddParameter("string", _("Child's name"))
+        .MarkAsAdvanced();
 
     extension.AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")
         .AddParameter("scenevar", _("Variable"));

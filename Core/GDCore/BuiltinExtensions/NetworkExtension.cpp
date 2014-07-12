@@ -27,13 +27,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
             "res/actions/net24.png",
             "res/actions/net.png")
         .AddParameter("string", _(".php page URL ( Don't forget the protocol http:// ) "), "",false)
-        .AddParameter("password", _("Password"), "",false)
-        .AddParameter("string", _("Data 1"), "",false)
-        .AddParameter("string", _("Data 2"), "",true)
-        .AddParameter("string", _("Data 3"), "",true)
-        .AddParameter("string", _("Data 4"), "",true)
-        .AddParameter("string", _("Data 5"), "",true)
-        .AddParameter("string", _("Data 6"), "",true)
+        .AddParameter("password", _("Password"), "", false)
+        .AddParameter("string", _("Data 1"), "", false)
+        .AddParameter("string", _("Data 2"), "", true)
+        .AddParameter("string", _("Data 3"), "", true)
+        .AddParameter("string", _("Data 4"), "", true)
+        .AddParameter("string", _("Data 5"), "", true)
+        .AddParameter("string", _("Data 6"), "", true)
         .SetHidden();
 
     extension.AddAction("SendRequest",
@@ -48,7 +48,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
         .AddParameter("string", _("Request body content"), "", false )
         .AddParameter("string", _("Method: \"POST\" or \"GET\" (if empty, GET will be used)"), "", true ).SetDefaultValue("\"GET\"")
         .AddParameter("string", _("Content type (application/x-www-form-urlencoded by default)"), "", true )
-        .AddParameter("scenevar", _("Store the response in this variable"), "", true );
+        .AddParameter("scenevar", _("Store the response in this variable"), "", true )
+        .MarkAsComplex();
 
     extension.AddAction("DownloadFile",
             _("Download a file"),
@@ -69,7 +70,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
             "res/actions/net24.png",
             "res/actions/net.png")
         .AddParameter("string", _("JSON string"), "",false)
-        .AddParameter("scenevar", _("Variable where store the JSON object"), "",false);
+        .AddParameter("scenevar", _("Variable where store the JSON object"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddStrExpression("ToJSON",
                        _("Convert to JSON"),

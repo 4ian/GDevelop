@@ -76,4 +76,3 @@ SpriteExtension::SpriteExtension()
     GetAllConditions()["Collision"].codeExtraInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
     #endif
 }
-

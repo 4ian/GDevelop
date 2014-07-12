@@ -41,6 +41,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
+        .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     extension.AddCondition("TimerPaused",
@@ -51,9 +52,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                    "res/conditions/timerPaused24.png",
                    "res/conditions/timerPaused.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Timer's name"));
-
-
+        .AddParameter("string", _("Timer's name"))
+        .MarkAsAdvanced();
 
     extension.AddAction("ResetTimer",
                    _("Reset a timer"),
@@ -73,7 +73,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                    "res/actions/pauseTimer24.png",
                    "res/actions/pauseTimer.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Timer's name"));
+        .AddParameter("string", _("Timer's name"))
+        .MarkAsAdvanced();
 
     extension.AddAction("UnPauseTimer",
                    _("Unpause a timer"),
@@ -83,7 +84,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                    "res/actions/unPauseTimer24.png",
                    "res/actions/unPauseTimer.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Timer's name"));
+        .AddParameter("string", _("Timer's name"))
+        .MarkAsAdvanced();
 
     extension.AddAction("RemoveTimer",
                    _("Delete a timer"),
@@ -93,7 +95,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                    "res/actions/timer24.png",
                    "res/actions/timer.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Timer's name"));
+        .AddParameter("string", _("Timer's name"))
+        .MarkAsAdvanced();
 
     extension.AddAction("ChangeTimeScale",
                    _("Change time scale"),
@@ -103,7 +106,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                    "res/actions/time24.png",
                    "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Scale ( 1 : Default, 2 : Faster, 0.5 : Slower... )"));
+        .AddParameter("expression", _("Scale (1 : Default, 2 : Faster, 0.5 : Slower...)"));
 
     extension.AddExpression("TimeDelta", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "");

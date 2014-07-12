@@ -37,7 +37,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Expression generating the key to test"), "",false);
+        .AddParameter("string", _("Expression generating the key to test"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddCondition("AnyKeyPressed",
                    _("Any key is pressed"),

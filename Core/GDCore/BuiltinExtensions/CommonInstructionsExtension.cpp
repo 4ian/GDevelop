@@ -35,7 +35,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
                _("Advanced"),
                "res/conditions/or24.png",
                "res/conditions/or.png")
-        .SetCanHaveSubInstructions();
+        .SetCanHaveSubInstructions()
+        .MarkAsAdvanced();
 
     extension.AddCondition("And",
                _("And"),
@@ -44,7 +45,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
                _("Advanced"),
                "res/conditions/and24.png",
                "res/conditions/and.png")
-        .SetCanHaveSubInstructions();
+        .SetCanHaveSubInstructions()
+        .MarkAsAdvanced();
 
     extension.AddCondition("Not",
                _("Not"),
@@ -53,7 +55,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
                _("Advanced"),
                "res/conditions/not24.png",
                "res/conditions/not.png")
-        .SetCanHaveSubInstructions();
+        .SetCanHaveSubInstructions()
+        .MarkAsAdvanced();
 
     extension.AddCondition("Once",
                _("Trigger once while true"),

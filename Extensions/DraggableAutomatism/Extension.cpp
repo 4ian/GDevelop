@@ -52,7 +52,7 @@ void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
 
     aut.AddCondition("Dragged",
                    _("Being dragged"),
-                   _("Return true if the object is being dragged"),
+                   _("Check if the object is being dragged"),
                    _("_PARAM0_ is being dragged"),
                    "",
                    "CppPlatform/Extensions/draggableicon24.png",

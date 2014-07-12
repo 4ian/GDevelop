@@ -26,7 +26,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(gd::P
                  _("Other"),
                  "res/conditions/toujours24.png",
                  "res/conditions/toujours.png")
-        .AddCodeOnlyParameter("conditionInverted", "");
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .MarkAsAdvanced();
     #endif
 }
 

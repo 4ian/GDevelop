@@ -29,7 +29,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtensio
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Name of the external layout"), "",false)
         .AddParameter("expression", _("X position of the origin"), "",true).SetDefaultValue("0")
-        .AddParameter("expression", _("Y position of the origin"), "",true).SetDefaultValue("0");
+        .AddParameter("expression", _("Y position of the origin"), "",true).SetDefaultValue("0")
+        .MarkAsAdvanced();
     #endif
 }
 

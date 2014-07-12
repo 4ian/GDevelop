@@ -36,7 +36,8 @@ iconFilename(icon_),
 smallIconFilename(smallIcon_),
 canHaveSubInstructions(false),
 extensionNamespace(extensionNamespace_),
-hidden(false)
+hidden(false),
+usageComplexity(5)
 {
 #if !defined(GD_NO_WX_GUI)
     if ( wxFile::Exists(icon_) )

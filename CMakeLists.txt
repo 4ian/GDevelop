@@ -31,6 +31,20 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 		SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
 	ENDIF()
 ENDIF()
+IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ExtLibs/boost")
+	message( SEND_ERROR "Boost was not extracted in ExtLibs/boost. Refer to the documentation to get the download link (http://4ian.github.io/GD-Documentation)." )
+ENDIF()
+IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ExtLibs/SFML")
+	message( SEND_ERROR "SFML was not extracted and compiled in ExtLibs/SFML. Refer to the documentation to get the download link (http://4ian.github.io/GD-Documentation)." )
+ELSEIF(WIN32)
+	IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ExtLibs/SFML/build-mingw-release/lib")
+		message("It seems that SFML was not built! Make sure that SFML libraries are built into ExtLibs/SFML/build-mingw-release/lib")
+	ENDIF()
+ELSEIF(NOT EMSCRIPTEN)
+	IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ExtLibs/SFML/build-linux/lib")
+		message( SEND_ERROR "It seems that SFML was not built! Make sure that SFML libraries are built into ExtLibs/SFML/build-linux/lib")
+	ENDIF()
+ENDIF()
 
 
 #Add all the CMakeLists:

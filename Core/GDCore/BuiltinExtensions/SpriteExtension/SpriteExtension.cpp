@@ -1,7 +1,7 @@
 /*
  * Game Develop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the GNU Lesser General Public LicenFse.
  */
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -39,8 +39,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
+        .MarkAsSimple()
         .SetManipulatedType("number");
-
 
     obj.AddAction("ChangeAnimation",
                    _("Change the animation"),
@@ -52,8 +52,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
-
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsSimple()
+        .SetManipulatedType("number");
 
     obj.AddAction("ChangeDirection",
                    _("Change the direction"),
@@ -65,7 +66,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ChangeSprite",
@@ -78,8 +81,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
-
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
 
     obj.AddAction("PauseAnimation",
                    _("Pause the animation"),
@@ -89,7 +93,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", _("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .MarkAsSimple();
 
 
     obj.AddAction("PlayAnimation",
@@ -100,8 +105,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", _("Object"), "Sprite", false);
-
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .MarkAsSimple();
 
     obj.AddAction("TourneVersPos",
                    _("Rotate an object toward a position"),
@@ -129,7 +134,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false);
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsAdvanced();
 
 
     obj.AddAction("ChangeScaleWidth",
@@ -142,7 +148,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ChangeScaleHeight",
@@ -155,7 +163,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false).SetManipulatedType("number");
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("Animation",
@@ -169,6 +179,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Number to test"), "",false)
+        .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("Direction",
@@ -195,17 +206,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Animation frame to test"), "",false)
+        .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("AnimStopped",
-                   _("Animation is paused"),
+                   _("Animation paused"),
                    _("Test if the animation of an object is paused"),
                    _("The animation of _PARAM0_ is paused"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
-        .AddParameter("object", _("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .MarkAsSimple();
 
     obj.AddCondition("AnimationEnded",
                    _("Animation finished"),
@@ -215,7 +228,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
-        .AddParameter("object", _("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .MarkAsSimple();
 
     obj.AddCondition("ScaleWidth",
                    _("Scale on X axis"),
@@ -227,7 +241,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false).SetManipulatedType("number");
+        .AddParameter("expression", _("Value to test"), "",false)
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
 
     obj.AddCondition("ScaleHeight",
                    _("Scale on Y axis"),
@@ -239,11 +255,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false).SetManipulatedType("number");
+        .AddParameter("expression", _("Value to test"), "",false)
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
 
     obj.AddCondition("Opacity",
                    _("Opacity"),
-                   _("Compare the opacity of an object"),
+                   _("Compare the opacity of an object, between 0 (fully transparent) to 255 (opaque)"),
                    _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Visibility"),
                    "res/conditions/opacity24.png",
@@ -252,6 +270,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Value to test"), "",false)
+        .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddCondition("BlendMode",
@@ -265,6 +284,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
+        .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddAction("CopyImageOnImageOfSprite",
@@ -281,8 +301,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("expression", _("X position"), "",false)
         .AddParameter("expression", _("Y position"), "",false)
         .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false);
-
-
 
     obj.AddAction("CreateMaskFromColorOnActualImage", //Actual is indeed a mistake : Current should have been chosen.
                    _("Make a color of the image of an object transparent"),
@@ -310,14 +328,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
     obj.AddAction("ChangeBlendMode",
                    _("Blend mode"),
-                   _("Change the number of the blend mode of an object.\nThe default blend mode is 0 ( Alpha )."),
+                   _("Change the number of the blend mode of an object.\nThe default blend mode is 0 (Alpha)."),
                    _("Change Blend mode of _PARAM0_ to _PARAM1_"),
                    _("Effects"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false);
+        .AddParameter("expression", _("Mode (0 : Alpha, 1 : Add, 2 : Multiply, 3 : None)"), "",false)
+        .MarkAsSimple();
 
 
     obj.AddAction("FlipX",
@@ -329,7 +348,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                    "res/actions/flipX.png")
 
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("yesorno", _("Activate flipping"), "",false);
+        .AddParameter("yesorno", _("Activate flipping"), "",false)
+        .MarkAsSimple();
 
 
     obj.AddAction("FlipY",
@@ -341,7 +361,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                    "res/actions/flipY.png")
 
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("yesorno", _("Activate flipping"), "",false);
+        .AddParameter("yesorno", _("Activate flipping"), "",false)
+        .MarkAsSimple();
 
     obj.AddCondition("FlippedX",
                    _("Horizontally flipped"),
@@ -388,7 +409,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes");
+        .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes")
+        .MarkAsSimple();
 
     obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
         .SetHidden()

@@ -27,7 +27,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
-        .AddParameter("string", _("Group"), "",false);
+        .AddParameter("string", _("Group"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddAction("LoadFile",
                    _("Load a structured file in memory"),
@@ -36,7 +37,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
-        .AddParameter("file", _("File"), "",false);
+        .AddParameter("file", _("File"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddAction("UnloadFile",
                    _("Close a structured file"),
@@ -45,7 +47,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    _("Storage"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
-        .AddParameter("file", _("File"), "",false);
+        .AddParameter("file", _("File"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddAction("EcrireFichierExp",
                    _("Write a value"),
@@ -101,7 +104,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    "res/actions/delete24.png",
                    "res/actions/delete.png")
         .AddParameter("file", _("Filename"), "",false)
-        .AddParameter("string", _("Group"), "",false);
+        .AddParameter("string", _("Group"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddAction("DeleteFichier",
                    _("Delete a file"),
@@ -119,7 +123,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    _("Files"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
-        .AddParameter("file", _("Filename"), "",false);
+        .AddParameter("file", _("Filename"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddAction("LaunchFile",
                    _("Launch a file"),
@@ -128,7 +133,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    _("Files"),
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
-        .AddParameter("file", _("Filename"), "",false);
+        .AddParameter("file", _("Filename"), "",false)
+        .MarkAsAdvanced();
 
     extension.AddAction("ExecuteCmd",
                    _("Execute a command"),
@@ -137,7 +143,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                    _("Files"),
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
-        .AddParameter("string", _("Command"), "",false);
+        .AddParameter("string", _("Command"), "",false)
+        .MarkAsAdvanced();
     #endif
 }
 

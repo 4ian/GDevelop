@@ -177,6 +177,40 @@ public:
     };
 
     /**
+     * \brief Consider that the instruction is easy for an user to understand.
+     */
+    InstructionMetadata & MarkAsSimple()
+    {
+        usageComplexity = 2;
+        return *this;
+    }
+
+    /**
+     * \brief Consider that the instruction is harder for an user to understand
+     * than a normal instruction.
+     */
+    InstructionMetadata & MarkAsAdvanced()
+    {
+        usageComplexity = 7;
+        return *this;
+    }
+
+    /**
+     * \brief Consider that the instruction is complex for an user to understand.
+     */
+    InstructionMetadata & MarkAsComplex()
+    {
+        usageComplexity = 9;
+        return *this;
+    }
+
+    /**
+     * \brief Return the usage complexity of this instruction for the user,
+     * from 0 (simple&easy to use) to 10 (complex to understand).
+     */
+    int GetUsageComplexity() const { return usageComplexity; }
+
+    /**
      * \brief Defines information about how generate the code for an instruction
      */
     class ExtraInformation
@@ -284,7 +318,6 @@ public:
 
     std::vector < ParameterMetadata > parameters;
 private:
-
     std::string fullname;
     std::string description;
     std::string sentence;
@@ -298,6 +331,7 @@ private:
     bool canHaveSubInstructions;
     std::string extensionNamespace;
     bool hidden;
+    int usageComplexity; ///< Evaluate the instruction from 0 (simple&easy to use) to 10 (complex to understand)
 };
 
 }

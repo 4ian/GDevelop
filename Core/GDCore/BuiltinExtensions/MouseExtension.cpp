@@ -27,7 +27,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        .AddCodeOnlyParameter("currentScene", "");
+        .AddCodeOnlyParameter("currentScene", "")
+        .MarkAsAdvanced();
 
     extension.AddAction("CentreSourisY",
                    _("Center mouse verticaly"),
@@ -37,7 +38,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        .AddCodeOnlyParameter("currentScene", "");
+        .AddCodeOnlyParameter("currentScene", "")
+        .MarkAsAdvanced();
 
     extension.AddAction("CacheSouris",
                    _("Hide the cursor"),
@@ -46,7 +48,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    _("Mouse"),
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
-        .AddCodeOnlyParameter("currentScene", "");
+        .AddCodeOnlyParameter("currentScene", "")
+        .MarkAsAdvanced();
 
     extension.AddAction("MontreSouris",
                    _("Show the cursor"),
@@ -56,7 +59,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        .AddCodeOnlyParameter("currentScene", "");
+        .AddCodeOnlyParameter("currentScene", "")
+        .MarkAsAdvanced();
 
     extension.AddAction("SetSourisXY",
                    _("Position the cursor of the mouse"),
@@ -68,7 +72,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("X position"))
-        .AddParameter("expression", _("Y position"));
+        .AddParameter("expression", _("Y position"))
+        .MarkAsAdvanced();
 
     extension.AddAction("CentreSouris",
                    _("Center the mouse"),
@@ -78,8 +83,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        .AddCodeOnlyParameter("currentScene", "");
-
+        .AddCodeOnlyParameter("currentScene", "")
+        .MarkAsAdvanced();
 
     extension.AddCondition("SourisX",
                    _("X position of the mouse"),
@@ -96,8 +101,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
         .SetManipulatedType("number");
 
-
-
     extension.AddCondition("SourisY",
                    _("Y position of the mouse"),
                    _("Test the Y position of the cursor."),
@@ -112,8 +115,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
         .SetManipulatedType("number");
 
-
-
     extension.AddCondition("SourisBouton",
                    _("Mouse button"),
                    _("Test if the choosen button of the mouse is pressed."),
@@ -122,15 +123,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("mouse", _("Button to test"));
-
-
+        .AddParameter("mouse", _("Button to test"))
+        .MarkAsSimple();
 
     extension.AddExpression("MouseX", _("X position of the mouse"), _("X position of the mouse"), _("Mouse"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
-
 
     extension.AddExpression("SourisX", _("X position of the mouse"), _("X position of the mouse"), _("Mouse"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")

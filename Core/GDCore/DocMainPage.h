@@ -178,8 +178,14 @@
  *
  * \subsection sfml SFML
  *
- * %Game Develop may uses some specific version of SFML library. You can download a precompiled package for linux here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
- * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
+ * %Game Develop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
+ *
+ * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which Game Develop is distributed officially:
+ *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs (located at the root of the SDK).
+ *  - If you compile GD for another version of Ubuntu or a different distro, extract the archive inside the folder ExtLibs, and *recompile* SFML using CMake into
+ *  a folder called **build-linux**. It's easy, just follow [this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php). Again, be sure
+ *  to build the binaries into **ExtLibs/SFML/build-linux**.
+ *
  * \subsection boost Boost
 
  * Boost version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
@@ -198,7 +204,7 @@
  * Note that you need to have GTK+ 2.0 or GTK+ 3.0 development file installed (in your package manager, search for the *libgtk2.0-dev* or *libgtk-3-dev* package and install it).
  *
  * \subsection installcmake Install CMake
- * You'll need CMake to build the extensions: See more on \subpage useAndInstallCmake.
+ * You'll need CMake to build Game Develop: See more on \subpage installAndUseCMake.
  */
 
 /**

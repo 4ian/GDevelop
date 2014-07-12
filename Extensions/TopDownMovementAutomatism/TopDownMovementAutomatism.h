@@ -38,7 +38,7 @@ namespace gd { class SerializerElement; }
 class RuntimeScenePlatformData;
 
 /**
- * \brief Compute path for objects avoiding obstacles
+ * \brief Allow to move an object in 4 or 8 directions.
  */
 class GD_EXTENSION_API TopDownMovementAutomatism : public Automatism
 {
@@ -56,13 +56,13 @@ public:
     bool IsObjectRotated() { return rotateObject; }
     float GetAngleOffset() { return angleOffset; };
 
-    bool SetAllowDiagonals(bool allowDiagonals_) { allowDiagonals = allowDiagonals_; };
-    float SetAcceleration(float acceleration_) { acceleration = acceleration_; };
-    float SetDeceleration(float deceleration_) { deceleration = deceleration_; };
-    float SetMaxSpeed(float maxSpeed_) { maxSpeed = maxSpeed_; };
-    float SetAngularMaxSpeed(float angularMaxSpeed_) { angularMaxSpeed = angularMaxSpeed_; };
-    bool SetRotateObject(bool rotateObject_) { rotateObject = rotateObject_; };
-    float SetAngleOffset(float angleOffset_) { angleOffset = angleOffset_; };
+    void SetAllowDiagonals(bool allowDiagonals_) { allowDiagonals = allowDiagonals_; };
+    void SetAcceleration(float acceleration_) { acceleration = acceleration_; };
+    void SetDeceleration(float deceleration_) { deceleration = deceleration_; };
+    void SetMaxSpeed(float maxSpeed_) { maxSpeed = maxSpeed_; };
+    void SetAngularMaxSpeed(float angularMaxSpeed_) { angularMaxSpeed = angularMaxSpeed_; };
+    void SetRotateObject(bool rotateObject_) { rotateObject = rotateObject_; };
+    void SetAngleOffset(float angleOffset_) { angleOffset = angleOffset_; };
 
     bool IsMoving() { return xVelocity != 0 || yVelocity != 0; };
     float GetSpeed();

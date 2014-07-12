@@ -31,11 +31,12 @@
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
-// Platform-specific includes. Be sure to include them at the end as it seems to be some incompatibilities with SFML's WindowStyle.hpp
+// Platform-specific includes. Be sure to include them at the end as it seems
+// to be some incompatibilities with SFML's WindowStyle.hpp
 #ifdef __WXGTK__
     #include <gdk/gdkx.h>
     #include <gtk/gtk.h>
-    #include <wx/gtk/private/win_gtk.h> //If this file is unable during compilation, then you must manually locate the "gtk/private" folder it in the wxWidgets folder and copy it into the folder where wx is installed.
+    #include "GDCore/IDE/wxTools/win_gtk.h"
 #endif
 
 //(*InternalHeaders(LayoutEditorCanvas)

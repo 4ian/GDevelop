@@ -1032,9 +1032,13 @@ bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString&
 {
     std::vector<std::string > command = gd::SplitString<std::string>(ToString(text), ';');
 
-    if ( command.size() < 3 ) //"Normal" drop to insert an image.
-    	editor.AddImageToCurrentAnimation(text);
-    else if ( command[0] == "COPYANDADDRESOURCES") //This is a "special" drop coming from the resource library dialog
+	//"Normal" drop of one or more images.
+    if (command.size() >= 2 && command[0] == "NORMAL") {
+    	for (unsigned int i = 1;i<command.size();++i)
+    		editor.AddImageToCurrentAnimation(command[i], /*refresh=*/i == command.size()-1);
+    }
+	//This is a "special" drop coming from the resource library dialog
+    else if (command.size() >= 3 && command[0] == "COPYANDADDRESOURCES")
     {
     	if (!editor.resourcesEditorPnl) return true;
 
@@ -1047,6 +1051,8 @@ bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString&
         for (unsigned int i = 0;i<names.size();++i)
     		editor.AddImageToCurrentAnimation(names[i], /*refresh=*/i == names.size()-1);
     }
+	else
+		std::cout << "Drop was triggered but the command was not understood" << std::endl;
 
     return true;
 }

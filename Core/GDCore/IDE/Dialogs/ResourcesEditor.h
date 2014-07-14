@@ -54,9 +54,12 @@ public:
     std::vector<std::string> CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDir);
 
     /**
-     * Must be called by DndTextResourcesEditor when an item from the editor has been dropped into this same editor.
+     * \brief Called by DndTextResourcesEditor when one or more resources from the editor has been dropped
+     * into this same editor.
+     *
+     * \see DndTextResourcesEditor
      */
-    void TriggerDrop(wxCoord x, wxCoord y);
+    void TriggerDrop(wxCoord x, wxCoord y, std::vector<std::string > resources);
 
     //Item sélectionné dans la liste
     wxTreeItemId m_itemSelected;

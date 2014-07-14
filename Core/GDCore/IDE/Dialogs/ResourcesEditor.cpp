@@ -564,24 +564,14 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Modification d'une image déjà existante
-////////////////////////////////////////////////////////////
 void ResourcesEditor::OnModNameImageBtClick( wxCommandEvent& event )
 {
     if ( m_itemSelected.IsOk() && resourcesTree->GetChildrenCount( m_itemSelected ) == 0 )
-    {
         resourcesTree->EditLabel( m_itemSelected );
-    }
     else
-    {
         gd::LogStatus( _( "No image selected" ) );
-    }
 }
 
-////////////////////////////////////////////////////////////
-/// Affichage du menu
-////////////////////////////////////////////////////////////
 void ResourcesEditor::OnresourcesTreeItemMenu( wxTreeEvent& event )
 {
     //Editor have focus
@@ -599,17 +589,11 @@ void ResourcesEditor::OnresourcesTreeItemMenu( wxTreeEvent& event )
         PopupMenu( &emptyMenu );
 }
 
-////////////////////////////////////////////////////////////
-/// Affichage du menu ( plus d'options )
-////////////////////////////////////////////////////////////
 void ResourcesEditor::OnMoreOptions( wxCommandEvent& event )
 {
     PopupMenu( &ContextMenu );
 }
 
-////////////////////////////////////////////////////////////
-/// Clic sur le bouton de rafraichissement
-////////////////////////////////////////////////////////////
 void ResourcesEditor::OnRefreshBtClick( wxCommandEvent& event )
 {
     Refresh();
@@ -825,7 +809,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
             {
                 if ( project.GetResourcesManager().HasResource(propertyNewValue) )
                 {
-                    gd::LogWarning( _( "Unable to rename the image : another image has already this name." ) );
+                    gd::LogWarning( _( "Unable to rename the image: another image has already this name." ) );
                     event.Veto();
                     return;
                 }
@@ -838,7 +822,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
             {
                 if ( project.GetResourcesManager().HasFolder(propertyNewValue) )
                 {
-                    gd::LogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
+                    gd::LogWarning( _( "Unable to rename the folder: another folder has already this name." ) );
                     event.Veto();
                     return;
                 }
@@ -887,7 +871,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( project.GetResourcesManager().HasFolder(newName) )
             {
-                gd::LogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
+                gd::LogWarning( _( "Unable to rename the folder: another folder has already this name." ) );
                 event.Veto();
                 return;
             }
@@ -901,7 +885,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( project.GetResourcesManager().HasResource(newName) )
             {
-                gd::LogWarning( _( "Unable to rename the image : another image has already this name." ) );
+                gd::LogWarning( _( "Unable to rename the image: another image has already this name." ) );
                 event.Veto();
                 return;
             }
@@ -1220,7 +1204,7 @@ void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
     }
 }
 
-void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y)
+void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y, std::vector<std::string > resources)
 {
     m_itemSelected = resourcesTree->HitTest(wxPoint(x,y));
     if ( !m_itemSelected.IsOk() ) return;
@@ -1229,7 +1213,7 @@ void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y)
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData( m_itemSelected ));
     if ( !data ) return;
 
-    std::cout << "TODO : DropON" << data->GetSecondString();
+    std::cout << "TODO: Unimplemented drop of resources";
 
     //Move an image
     /*if ( data->GetString() == "Image" )
@@ -1306,23 +1290,29 @@ void ResourcesEditor::OnsearchCtrlText(wxCommandEvent& event)
 
 void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
 {
-    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
-    if ( !data ) return;
+    wxArrayTreeItemIds selection;
+    resourcesTree->GetSelections(selection);
 
-    //Move an image
-    if ( data->GetString() == "Image" )
+    wxString draggedImagesPartialCommand;
+    for (unsigned int i = 0;i<selection.size();++i)
     {
+        gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
+        if ( !data ) continue;
 
-        std::string currentFolderName;
-        wxTreeItemId currentFolderItem = GetSelectedFolderItem();
-        gd::TreeItemStringData * currentFolderData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData( currentFolderItem ));
-        if ( currentFolderData && currentFolderData->GetString() == "Folder" )
-            currentFolderName = currentFolderData->GetSecondString();
+        //Move an image
+        if ( data->GetString() == "Image" )
+        {
+            draggedImagesPartialCommand += ";"+resourcesTree->GetItemText(selection[i]);
+        }
+    }
 
-        wxTextDataObject name(/*"DRAG;"+currentFolderName+";"+*/gd::ToString( resourcesTree->GetItemText( event.GetItem() )));
-        wxDropSource dragSource( this );
-        dragSource.SetData( name );
-        dragSource.DoDragDrop( true );
+    if (!draggedImagesPartialCommand.empty())
+    {
+        //Start dragging one or more images.
+        wxTextDataObject name("NORMAL"+draggedImagesPartialCommand);
+        wxDropSource dragSource(this);
+        dragSource.SetData(name);
+        dragSource.DoDragDrop(true);
         event.Veto();
     }
 }

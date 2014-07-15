@@ -77,7 +77,9 @@ int main( int argc, char *p_argv[] )
     //Load resource file
     gd::RessourcesLoader * resLoader = gd::RessourcesLoader::Get();
     if ( !resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
-           && !resLoader->SetResourceFile( executablePath+"/gam.egd" ) )
+           && !resLoader->SetResourceFile( executableNameOnly+".egd" )
+           && !resLoader->SetResourceFile( executablePath+"/gam.egd" )
+           && !resLoader->SetResourceFile( "gam.egd" ) )
     {
         return AbortWithMessage("Unable to load resources. Aborting.");
     }

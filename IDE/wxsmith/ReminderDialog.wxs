@@ -110,7 +110,7 @@
 									<growablerows>2</growablerows>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-											<label>A crowdfunding campaign was launched for Game Develop.&#x0A;Help us bring GD to MacOS, improve the support of Ubuntu&#x0A;and create an export option to publish games to iOS and &#x0A;Android!&#x0A;&#x0A;Contributors will get premium access to the beta versions&#x0A;when new features (OS X/Android/iOS support...)&#x0A;will be released!</label>
+											<label>Game Develop is an open source software:&#x0A;You can use it freely, but its development costs a&#x0A;lot of time, as well as money.&#x0A;&#x0A;If Game Develop proves to be useful to you, you&#x0A;can support its authors by donating or contributing&#x0A;to the project:</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -118,8 +118,8 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="HyperlinkCtrl2" member="yes">
-											<label>Contribute to the campaign on Indiegogo</label>
-											<handler function="OnHyperlinkCtrl2Click" entry="EVT_HYPERLINK" />
+											<label>Donate or contribute to Game Develop</label>
+											<handler function="OnHyperlinkCtrl1Click" entry="EVT_HYPERLINK" />
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

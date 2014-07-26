@@ -86,7 +86,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-														<label>Support, assistance, answers to the suggestions on:</label>
+														<label>Contribute and get help on:</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -151,7 +151,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-												<value>·Game Develop&#x0A;&#x0A;Game Develop is a freeware, meaning it is totally free.&#x0A;&#x0A;-You can use the software, for personal or commercial use.&#x0A;-The software is provided &apos;as-is&apos;, without any express or implied warranty.&#x0A;-You can distribute the software to anybody provided you don&apos;t require money for it, you don&apos;t claim to be the author and you distribute the entire software with its installer.&#x0A;-You must not try to decompile the software.&#x0A;&#x0A;·Games created with Game Develop&#x0A;&#x0A;-The author of Game Develop is not liable for games made with the software.&#x0A;-If you created a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.&#x0A;&#x0A;·If you have any questions, contact the author : CompilGames@gmail.com</value>
+												<value>Game Develop is an open source software:&#x0A;&#x0A;  * The IDE is distributed under the GPL v3 license.&#x0A;  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.&#x0A;  * Extensions are distributed under the zlib/libpng license.&#x0A;  * The name, Game Develop, and its logo are the exclusive property of Florian Rival.&#x0A;&#x0A;About games created with Game Develop&#x0A;&#x0A;Games exported with Game Develop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with Game Develop. In particular, you are not forced to make your game open source.</value>
 												<size>272,51</size>
 												<style>wxTE_MULTILINE|wxTE_READONLY</style>
 											</object>

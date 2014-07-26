@@ -130,7 +130,7 @@
 
   \image html usecmake3.png
 
- * - You can then launch a terminal/command prompt, go to the *.build* folder ( `cd SDKFolder/Binaries/.build` ) and launch the build
+ * - You can then launch a terminal/command prompt, go to the *.build* folder ( `cd GDRootFolder/Binaries/.build` ) and launch the build
  * using the generator you've choosen: `mingw32-make`, or `make` on Linux.
  *
  * Binaries are created into *Binaries/Output/Release_{OS}* folder, where {OS} can be Windows or Linux for example.
@@ -140,24 +140,23 @@
  * Using the commandline with CMake is also easy:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
- * cd SDKFolder/Binaries
+ * cd GDRootFolder/Binaries
  * mkdir .build
  * cd .build
- * cmake .. -G "MinGW Makefiles"
+ * cmake ../.. -G "MinGW Makefiles"
  * mingw32-make
  * ~~~~~~~~~~~~~~~~~~~~~
  *
  * or using the fast [Ninja build system](http://martine.github.io/ninja/) :
  * ~~~~~~~~~~~~~~~~~~~~~
- * cd SDKFolder/Binaries
+ * cd GDRootFolder/Binaries
  * mkdir .build
  * cd .build
- * cmake .. -G "Ninja"
+ * cmake ../.. -G "Ninja"
  * ninja
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * Binaries are of course also created into *Binaries/Output/Release_{OS}* folder.<br>
- * (For linux, this is the directory where you put the files of Game Develop)
+ * Binaries are of course also created into *Binaries/Output/Release_{OS}* folder.
  */
 
 /**
@@ -181,7 +180,7 @@
  * %Game Develop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
  *
  * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which Game Develop is distributed officially:
- *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs (located at the root of the SDK).
+ *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs.
  *  - If you compile GD for another version of Ubuntu or a different distro, extract the archive inside the folder ExtLibs, and *recompile* SFML using CMake into
  *  a folder called **build-linux**. It's easy, just follow [this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php). Again, be sure
  *  to build the binaries into **ExtLibs/SFML/build-linux**.
@@ -196,7 +195,7 @@
  * First extract the archive inside the folder ExtLibs. <br>
  * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
  * \code
- * ./configure --enable-ribbon
+ * ./configure --enable-ribbon --enable-webview
  * make
  * sudo make install
  * \endcode

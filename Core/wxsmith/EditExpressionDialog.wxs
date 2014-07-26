@@ -192,7 +192,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON13" variable="Button2" member="yes">
-										<label>^</label>
+										<label>pow</label>
 										<size>25,23</size>
 										<tooltip>pow(x,n) raise x to power n</tooltip>
 										<handler function="OnButton2Click" entry="EVT_BUTTON" />

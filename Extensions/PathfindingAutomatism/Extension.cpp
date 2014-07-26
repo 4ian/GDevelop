@@ -323,7 +323,7 @@ public:
             aut.AddCondition("DiagonalsAllowed",
                            _("Diagonals moves"),
                            _("Return true if the object is allowed to do diagonal moves on the path"),
-                           _("Diagnolas moved allowed for _PARAM0_"),
+                           _("Diagonal moves allowed for _PARAM0_"),
                            _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")

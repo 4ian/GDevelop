@@ -105,7 +105,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer7->AddGrowableRow(0);
 	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/website16.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer7->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, assistance, answers to the suggestions on:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Contribute and get help on:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer7->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL2, _("www.compilgames.net"), _("http://www.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer7->Add(HyperlinkCtrl1, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -126,7 +126,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("·Game Develop\n\nGame Develop is a freeware, meaning it is totally free.\n\n-You can use the software, for personal or commercial use.\n-The software is provided \'as-is\', without any express or implied warranty.\n-You can distribute the software to anybody provided you don\'t require money for it, you don\'t claim to be the author and you distribute the entire software with its installer.\n-You must not try to decompile the software.\n\n·Games created with Game Develop\n\n-The author of Game Develop is not liable for games made with the software.\n-If you created a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.\n\n·If you have any questions, contact the author : CompilGames@gmail.com"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("Game Develop is an open source software:\n\n  * The IDE is distributed under the GPL v3 license.\n  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.\n  * Extensions are distributed under the zlib/libpng license.\n  * The name, Game Develop, and its logo are the exclusive property of Florian Rival.\n\nAbout games created with Game Develop\n\nGames exported with Game Develop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with Game Develop. In particular, you are not forced to make your game open source."), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer11->Add(TextCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer11);
 	FlexGridSizer11->Fit(Panel2);

@@ -86,11 +86,11 @@ ReminderDialog::ReminderDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	FlexGridSizer5->AddGrowableRow(0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer6->AddGrowableRow(2);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A crowdfunding campaign was launched for Game Develop.\nHelp us bring GD to MacOS, improve the support of Ubuntu\nand create an export option to publish games to iOS and \nAndroid!\n\nContributors will get premium access to the beta versions\nwhen new features (OS X/Android/iOS support...)\nwill be released!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Game Develop is an open source software:\nYou can use it freely, but its development costs a\nlot of time, as well as money.\n\nIf Game Develop proves to be useful to you, you\ncan support its authors by donating or contributing\nto the project:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl2 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Contribute to the campaign on Indiegogo"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	HyperlinkCtrl2 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Donate or contribute to Game Develop"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer6->Add(HyperlinkCtrl2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer6->Add(0,0,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer6->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	neverBt = new wxButton(this, ID_BUTTON1, _("Never show again ;)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
@@ -108,7 +108,7 @@ ReminderDialog::ReminderDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos
 
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ReminderDialog::OnfeedbackEditText);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ReminderDialog::OnsendBtClick);
-	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ReminderDialog::OnHyperlinkCtrl2Click);
+	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ReminderDialog::OnHyperlinkCtrl1Click);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ReminderDialog::OnneverBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ReminderDialog::OnlaterBtClick);
 	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&ReminderDialog::OnClose);
@@ -154,28 +154,10 @@ void ReminderDialog::OpenLink(wxString link)
 
 void ReminderDialog::OnHyperlinkCtrl1Click(wxCommandEvent& event)
 {
-/*
-Associated text:
-Game Develop is a "Pay what you want" software:\nYou can use it freely, but its development costs a\nlot of time, as well as money.\n\nIf Game Develop proves to be useful to you, you\ncan support its author by paying anything you want:
-*/
-
     wxString link = _("http://www.compilgames.net/donate.php");
     if ( !link.StartsWith("http://www.compilgames.net/") ) link = "http://www.compilgames.net/donate.php";
 
-    link += "?utm_source=GD&utm_medium=ReminderDialog&utm_campaign=paywhatyouwant";
-    link += "&utm_content="+imageId;
-
-    OpenLink(link);
-    wxConfigBase::Get()->Write("Startup/Reminder", -1);
-    EndModal(0);
-}
-
-void ReminderDialog::OnHyperlinkCtrl2Click(wxCommandEvent& event)
-{
-    wxString link = "http://www.indiegogo.com/projects/game-develop/x/6586688";
-
-    wxString lang = _("en");
-    link += "?utm_source=software&utm_medium=reminder"+lang+"&utm_campaign=reminder";
+    link += "?utm_source=GD&utm_medium=ReminderDialog&utm_campaign=donateorcontribute";
     link += "&utm_content="+imageId;
 
     OpenLink(link);

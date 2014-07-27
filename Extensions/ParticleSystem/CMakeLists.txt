@@ -76,17 +76,6 @@ IF(NOT TARGET GDCpp_Runtime)
 	 	#set_property(TARGET GDCpp_Runtime PROPERTY IMPORTED_IMPLIB ${GDCpp_Runtime_lib_dir}/libGDCpp.so.a)
 	ENDIF(WIN32)
 ENDIF()
-IF(NOT TARGET SPARK)
-	add_library(SPARK SHARED IMPORTED)
-	add_library(SPARK_GL SHARED IMPORTED)
-	IF(WIN32)
-		set_property(TARGET SPARK PROPERTY IMPORTED_IMPLIB  ${CMAKE_CURRENT_SOURCE_DIR}/SPARK/lib/mingw/static/libSPARK.a)
-	 	set_property(TARGET SPARK_GL PROPERTY IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/SPARK/lib/mingw/static/libSPARK_GL.a)
-	ELSE()
-		set_property(TARGET SPARK PROPERTY IMPORTED_LOCATION  ${CMAKE_CURRENT_SOURCE_DIR}/SPARK/lib/gcc/static/libSPARK.a)
-	 	set_property(TARGET SPARK_GL PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/SPARK/lib/gcc/static/libSPARK_GL.a)
-	ENDIF(WIN32)
-ENDIF()
 
 #Defines
 ###
@@ -126,7 +115,7 @@ ENDIF(WIN32)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files * "SPARK/src/SPK_All.cpp" "SPARK/src/SPK_GL_All.cpp") #Also compiles the SPARK particle engine files.
 
 add_library(ParticleSystem SHARED ${source_files})
 add_library(ParticleSystem_Runtime SHARED ${source_files})
@@ -156,7 +145,6 @@ set_target_properties(ParticleSystem_Runtime PROPERTIES RUNTIME_OUTPUT_NAME "Par
 ###
 target_link_libraries(ParticleSystem GDCore)
 target_link_libraries(ParticleSystem GDCpp)
-target_link_libraries(ParticleSystem SPARK_GL SPARK)
 IF(WIN32)
 	target_link_libraries(ParticleSystem ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/libsfml-graphics.a ${sfml_lib_dir}/libsfml-window.a ${sfml_lib_dir}/libsfml-network.a ${sfml_lib_dir}/libsfml-system.a)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -176,7 +164,6 @@ ENDIF(WIN32)
 #Linker files for the GD C++ Runtime extension
 ###
 target_link_libraries(ParticleSystem_Runtime GDCpp_Runtime)
-target_link_libraries(ParticleSystem_Runtime SPARK_GL SPARK)
 IF(WIN32)
 	target_link_libraries(ParticleSystem_Runtime ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/libsfml-graphics.a ${sfml_lib_dir}/libsfml-window.a ${sfml_lib_dir}/libsfml-network.a ${sfml_lib_dir}/libsfml-system.a)
 	target_link_libraries(ParticleSystem_Runtime ws2_32 user32 opengl32 glu32)

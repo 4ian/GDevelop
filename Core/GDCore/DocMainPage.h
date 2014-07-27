@@ -183,7 +183,8 @@
  *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs.
  *  - If you compile GD for another version of Ubuntu or a different distro, extract the archive inside the folder ExtLibs, and *recompile* SFML using CMake into
  *  a folder called **build-linux**. It's easy, just follow [this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php). Again, be sure
- *  to build the binaries into **ExtLibs/SFML/build-linux**.
+ *  to build the binaries into **ExtLibs/SFML/build-linux**. If you have difficulties, read this page: \subpage buildSFML, it details the dependencies you need
+ *  to install.
  *
  * \subsection boost Boost
 
@@ -191,8 +192,15 @@
  * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
  * \subsection wxWidgets wxWidgets
 
- * wxWidgets version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/wxWidgetslinux.7z <br>
- * First extract the archive inside the folder ExtLibs. <br>
+ * wxWidgets version used by %Game Develop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2 <br>
+ * First extract the archive inside the folder ExtLibs.
+ *
+ * Be sure to have GTK+ 3.0 and WebKitGTK development files installed:
+ * \code
+ * sudo apt-get install libgtk-3-dev
+ * sudo apt-get install libwebkitgtk-3.0-dev
+ * \endcode
+ *
  * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
  * \code
  * ./configure --enable-ribbon --enable-webview
@@ -200,10 +208,53 @@
  * sudo make install
  * \endcode
  *
- * Note that you need to have GTK+ 2.0 or GTK+ 3.0 development file installed (in your package manager, search for the *libgtk2.0-dev* or *libgtk-3-dev* package and install it).
- *
  * \subsection installcmake Install CMake
  * You'll need CMake to build Game Develop: See more on \subpage installAndUseCMake.
+ */
+
+/**
+ * \page buildSFML (Linux) Manually build SFML
+ *
+ * If you're compiling Game Develop for another distro that is the not the distro for which Game Develop is officially distributed
+ * (i.e: The latest Ubuntu), you have to recompile SFML.
+ *
+ * \section downloadSFML Download SFML
+ *
+ * Download the SFML archive from this page: \ref installLinux
+ *
+ * Extract it in ExtLibs folder. Go in the SFML directory that was created, and delete **build-linux** folder (it's the
+ * folder where SFML was built for Ubuntu).
+ *
+ * \section installDep Install dependencies and build SFML
+ *
+ * You'll surely have to install dependencies so that SFML can be built. On Ubuntu, here are the commands to be launched
+ * to install all dependencies:
+\code
+sudo apt-get install libopenal-dev
+sudo apt-get install libjpeg-dev
+sudo apt-get install libglew-dev
+sudo apt-get install libudev-dev
+sudo apt-get install libxrandr-dev
+sudo apt-get install libsndfile1-dev
+sudo apt-get install libglu1-mesa-dev
+\endcode
+ *
+ * Then, use CMake to build SFML: Follow **[this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php)** from the
+ * official SFML website. Just be sure to build SFML into a folder called **build-linux**.
+ *
+ * Most of the time, you just have to launch CMake in the build-linux folder:
+ * \code
+ * cd ExtLibs/SFML
+ * mkdir build-linux
+ * cd build-linux
+ * cmake ..
+ * make
+ * \endcode
+ *
+ * Remember that it is mandatory to have this **build-linux** folder as Game Develop will use the libraries created into this folder.
+ * Pay attention to it if you use the GUI version of CMake.
+ *
+ * If you have errors when launching cmake, make sure you have installed all dependencies.²
  */
 
 /**

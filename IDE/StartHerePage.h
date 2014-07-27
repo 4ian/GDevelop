@@ -53,6 +53,7 @@ public:
 	wxHyperlinkCtrl* recent7Bt;
 	wxStaticBitmap* StaticBitmap13;
 	wxStaticBitmap* StaticBitmap18;
+	wxStaticText* StaticText4;
 	wxHyperlinkCtrl* googleplusLink;
 	wxStaticBitmap* StaticBitmap3;
 	wxHyperlinkCtrl* HyperlinkCtrl7;
@@ -66,6 +67,7 @@ protected:
 
 	//(*Identifiers(StartHerePage)
 	static const long ID_STATICBITMAP1;
+	static const long ID_STATICTEXT6;
 	static const long ID_STATICTEXT2;
 	static const long ID_STATICBITMAP18;
 	static const long ID_HYPERLINKCTRL12;

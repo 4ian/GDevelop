@@ -44,7 +44,8 @@ void HtmlViewerPnl::OpenURL(wxString url)
 
 void HtmlViewerPnl::GoBack()
 {
-    Custom1->GoBack();
+	if (Custom1->CanGoBack())
+    	Custom1->GoBack();
 }
 
 void HtmlViewerPnl::GoForward()

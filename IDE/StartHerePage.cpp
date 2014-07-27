@@ -27,6 +27,7 @@ using namespace gd;
 
 //(*IdInit(StartHerePage)
 const long StartHerePage::ID_STATICBITMAP1 = wxNewId();
+const long StartHerePage::ID_STATICTEXT6 = wxNewId();
 const long StartHerePage::ID_STATICTEXT2 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP18 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL12 = wxNewId();
@@ -99,6 +100,9 @@ mainEditor(mainEditor_)
 	FlexGridSizer10->AddGrowableRow(0);
 	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/GD-logo-simple.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer10->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT6, _("The open source, codingless game creator"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText4->SetForegroundColour(wxColour(95,95,95));
+	FlexGridSizer10->Add(StaticText4, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer10, 1, wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);

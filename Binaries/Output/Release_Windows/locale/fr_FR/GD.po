@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Game Develop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 17:17+0200\n"
+"POT-Creation-Date: 2014-07-26 22:59+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Florian Rival <Florian.rival@gmail.com>\n"
 "Language-Team: Florian \"4ian\" Rival <Florian.rival@gmail.com>\n"
@@ -264,13 +264,13 @@ msgid "Enter a file name :"
 msgstr "Entrez le nom d'un fichier :"
 
 #: d:\florian\programmation\gamedevelop3\ide\choicefile.cpp:66
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:281
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:287
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:293
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:299
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:305
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:311
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:317
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:285
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:291
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:297
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:303
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:309
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:315
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:321
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\newprojectdialog.cpp:82
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\projectexportdialog.cpp:111
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:215
@@ -1468,8 +1468,8 @@ msgid "Thanks to all the community and users of Game Develop"
 msgstr "Merci à toute la communauté et utilisateurs de Game Develop"
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:327
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:217
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:239
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:221
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:243
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:157
 msgid "http://www.compilgames.net/donate.php"
 msgstr "http://www.compilgames.net/donateFR.php"
@@ -2968,7 +2968,7 @@ msgstr "Plan"
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:168
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:191
 #: d:\florian\programmation\gamedevelop3\ide\mainframe_files.cpp:135
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:392
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:396
 msgid "Open an example"
 msgstr "Ouvrir un exemple"
 
@@ -3145,7 +3145,7 @@ msgid "Show the properties of the resource"
 msgstr "Affiche les propriétés de la ressource"
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:399
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:136
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:140
 msgid "Open the online help"
 msgstr "Ouvrir l'aide en ligne"
 
@@ -3945,7 +3945,7 @@ msgid ": Italic"
 msgstr ": Italique"
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:1040
-msgid "Game Develop must be relaunched to make some changes effective."
+msgid "Game Develop must be relaunched to apply changes."
 msgstr ""
 "Game Develop doit être relancé pour prendre en compte certaines "
 "modifications."
@@ -4527,88 +4527,92 @@ msgstr "!= ( différent de )"
 msgid "Choose the comparison operator"
 msgstr "Choisir l'opérateur de comparaison"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:108
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:103
+msgid "The open source, codingless game creator"
+msgstr "Le logiciel open source de création sans programmation"
+
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:112
 msgid "Getting started"
 msgstr "Commencer"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:116
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:120
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\newprojectdialog.cpp:55
 msgid "Create a new project"
 msgstr "Créer un nouveau projet"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:120
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:124
 msgid "Read the Getting Started page"
 msgstr "Lire le guide de démarrage"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:124
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:128
 msgid "Read the tutorials"
 msgstr "Lire le tutoriel"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:128
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:132
 msgid "Links"
 msgstr "Liens"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:136
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:140
 msgid "http://www.wiki.compilgames.net"
 msgstr "http://www.wiki.compilgames.net"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:140
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:144
 msgid "Go on the forum"
 msgstr "Accéder au forum"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:140
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:144
 msgid "http://www.forum.compilgames.net"
 msgstr "http://www.forum.compilgames.net"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:145
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:149
 msgid "Facebook page"
 msgstr "Page Facebook"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:149
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:153
 msgid "Google+ page"
 msgstr "Page Google+"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:156
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:160
 msgid "Recent projects"
 msgstr "Projets récents"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:164
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:168
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:172
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:176
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:180
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:184
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:188
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:192
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\editexpressiondialog.cpp:162
 msgid "-"
 msgstr "-"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:195
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:199
 msgid "Community news"
 msgstr "News de la communauté"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:201
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:259
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:205
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:263
 msgid "No news for now!"
 msgstr "Pas de news pour le moment !"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:205
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:209
 msgid "NewsLink1"
 msgstr "NewsLink1"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:207
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:211
 msgid "NewsLink2"
 msgstr "NewsLink2"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:217
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:221
 msgid "If you like Game Develop, you can make a donation to the author."
 msgstr "Vous appréciez Game Develop ? Aidez l'auteur en faisant un don."
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:244
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:248
 msgid "en"
 msgstr "fr"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:375
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:379
 msgid ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_getstart"
@@ -4616,7 +4620,7 @@ msgstr ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_getstart"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:380
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:384
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials"
 msgstr "http://wiki.compilgames.net/doku.php/game_develop/tutoriels"
 
@@ -9292,6 +9296,13 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:559
 msgid "Detailed explanation available on the wiki"
 msgstr "Explication détaillée sur le wiki"
+
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\intelxdkpackagedialog.cpp:13
+msgid ""
+"http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/"
+"howtouseintelxdk"
+msgstr ""
+"http://wiki.compilgames.net/doku.php/game_develop/tutoriels/utiliserintelxdk"
 
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\uploadonlinedialog.cpp:13
 #: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:55
@@ -24807,13 +24818,6 @@ msgstr ""
 #~ msgid "Use this size as default size for new scene cameras ?"
 #~ msgstr ""
 #~ "Utiliser cette taille pour la taille par défaut des caméras des scènes ?"
-
-#~ msgid ""
-#~ "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/"
-#~ "howtodistribute"
-#~ msgstr ""
-#~ "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/"
-#~ "distribution/compilation"
 
 #~ msgid ""
 #~ "Another instance of Game Develop is already running. Drag and drop a file "

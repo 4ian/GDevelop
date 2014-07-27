@@ -1037,7 +1037,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        gd::LogMessage(_("Game Develop must be relaunched to make some changes effective."));
+        gd::LogMessage(_("Game Develop must be relaunched to apply changes."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());

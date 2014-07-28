@@ -10,6 +10,8 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include <string>
 
+#undef CopyFile
+
 using namespace std;
 
 namespace gd

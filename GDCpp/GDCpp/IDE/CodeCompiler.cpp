@@ -74,9 +74,9 @@ std::string CodeCompilerCall::GetFullCall() const
         std::vector<std::string> standardsIncludeDirs;
         #if defined(WINDOWS)
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.8.1/include");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.8.1/include/c++");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.8.1/include/c++/mingw32");
         #elif defined(LINUX)
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i686-linux-gnu/");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/lib/gcc/i686-linux-gnu/4.7/include");

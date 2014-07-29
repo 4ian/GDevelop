@@ -394,7 +394,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object to be rotated"), "Sprite", false)
         .AddParameter("objectPtr", _("Rotate toward this object"))
-        .AddParameter("expression", _("Angular speed (degrees per second)"), "",true).SetDefaultValue("0")
         .AddCodeOnlyParameter("currentScene", "")
         .SetHidden(); //Deprecated
 

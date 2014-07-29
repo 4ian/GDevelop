@@ -116,6 +116,7 @@ int main( int argc, char *p_argv[] )
             return AbortWithMessage("Unable to parse game data. Aborting.");
         }
 
+        std::cout << "display:" << uncryptedSrc.c_str();
         TiXmlHandle hdl(&doc);
         gd::SerializerElement rootElement;
         gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());
@@ -153,8 +154,6 @@ int main( int argc, char *p_argv[] )
 
     //Create main window
     sf::RenderWindow window;
-    window.setFramerateLimit( game.GetMaximumFPS() );
-    window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
 
     RuntimeGame runtimeGame;
     runtimeGame.LoadFromProject(game);
@@ -172,6 +171,8 @@ int main( int argc, char *p_argv[] )
 
     window.create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
     window.setActive(true);
+    window.setFramerateLimit( game.GetMaximumFPS() );
+    window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
     scenePlayed.ChangeRenderWindow(&window);
 
     //Game main loop
@@ -190,7 +191,7 @@ int main( int argc, char *p_argv[] )
                 return AbortWithMessage("Unable to load scene \"" + game.GetLayout(returnCode).GetName() + "\". Aborting.");
 
             if (!scenePlayed.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-                                                                              "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scenePlayed.GetName())) )
+                "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scenePlayed.GetName())))
             {
                 return AbortWithMessage("Unable to setup execution engine for scene \"" + scenePlayed.GetName() + "\". Aborting.");
             }

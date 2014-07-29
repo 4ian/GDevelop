@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "TiledSpriteObject.h"
+#include <iostream>
 #include <boost/version.hpp>
 
 void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
@@ -201,7 +202,7 @@ public:
     Extension()
     {
         DeclareTiledSpriteObjectExtension(*this);
-        AddRuntimeObject(GetObjectMetadata("TiledSpriteObject::RuntimeTiledSpriteObject"),
+        AddRuntimeObject(GetObjectMetadata("TiledSpriteObject::TiledSprite"),
             "RuntimeTiledSpriteObject", CreateRuntimeTiledSpriteObject, DestroyRuntimeTiledSpriteObject);
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

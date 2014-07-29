@@ -1,0 +1,35 @@
+/*
+ * Game Develop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the GNU Lesser General Public License.
+ */
+#ifndef GDCORE_PROJECTSTRIPPER_H
+#define GDCORE_PROJECTSTRIPPER_H
+namespace gd { class Project; }
+
+namespace gd
+{
+
+/**
+ * \brief Tool class providing methods to strip useless data for a project
+ * after it has been exported.
+ */
+class GD_CORE_API ProjectStripper
+{
+public:
+    /**
+     * \brief Create a stripped version of the project for export:
+     * Objects groups are deleted as well as all events.
+     *
+     * \param project The project to be stripped.
+     */
+    static void StripProject(gd::Project & project);
+
+private:
+    ProjectStripper() {};
+    virtual ~ProjectStripper() {};
+};
+
+}
+
+#endif // GDCORE_PROJECTSTRIPPER_H

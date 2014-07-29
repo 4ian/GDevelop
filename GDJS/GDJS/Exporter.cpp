@@ -27,6 +27,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
+#include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/CommonTools.h"
 #include "GDJS/Exporter.h"
 #include "GDJS/EventsCodeGenerator.h"
@@ -85,7 +86,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
         return false;
 
     //Strip the project ( *after* generating events as the events may use strioped things ( objects groups... ) )
-    StripProject(exportedProject);
+    gd::ProjectStripper::StripProject(exportedProject);
     exportedProject.SetFirstLayout(layout.GetName());
 
     //Export the project
@@ -500,18 +501,6 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
     return true;
 }
 
-void Exporter::StripProject(gd::Project & strippedProject)
-{
-    strippedProject.GetObjectGroups().clear();
-    while ( strippedProject.GetExternalEventsCount() > 0 ) strippedProject.RemoveExternalEvents(strippedProject.GetExternalEvents(0).GetName());
-
-    for (unsigned int i = 0;i<strippedProject.GetLayoutsCount();++i)
-    {
-        strippedProject.GetLayout(i).GetObjectGroups().clear();
-        strippedProject.GetLayout(i).GetEvents().Clear();
-    }
-}
-
 void Exporter::ExportResources(gd::AbstractFileSystem & fs, gd::Project & project, std::string exportDir, wxProgressDialog * progressDialog)
 {
     gd::ProjectResourcesCopier::CopyAllResourcesTo(project, fs, exportDir, true, progressDialog, false, false);
@@ -577,7 +566,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         #endif
 
         //Strip the project (*after* generating events as the events may use stripped things like objects groups...)...
-        StripProject(exportedProject);
+        gd::ProjectStripper::StripProject(exportedProject);
 
         #if !defined(GD_NO_WX_GUI)
         progressDialog.Update(70, _("Exporting files..."));

@@ -71,14 +71,6 @@ public:
 private:
 
     /**
-     * \brief Create a stripped version of the project for export: Objects groups are deleted as well as all events.
-     *
-     * \param project The project to be stripped.
-     * \param layout Optional layout name. If not empty, all layouts will be removed except this layout.
-     */
-    static void StripProject(gd::Project & project);
-
-    /**
      * \brief Export a project to JSON
      *
      * \param fs The abstract file system to use to write the file

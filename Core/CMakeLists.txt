@@ -135,3 +135,14 @@ ELSEIF (NOT EMSCRIPTEN)
 	target_link_libraries(GDCore ${wxWidgets_LIBRARIES})
 	target_link_libraries(GDCore ${GTK3_LIBRARIES})
 ENDIF(WIN32)
+
+#Tests
+###
+
+file(
+    GLOB_RECURSE
+    test_source_files
+    tests/*
+)
+add_executable(GDCore_tests ${test_source_files})
+target_link_libraries(GDCore_tests GDCore)

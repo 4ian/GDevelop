@@ -10,7 +10,7 @@
 IntelXDKPackageDialog::IntelXDKPackageDialog(wxWindow* parent, wxString packageLocation)
     : BaseIntelXDKPackageDialog(parent)
 {
-	ID_HYPERLINKCTRL117->SetLabel(_("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"));
+	ID_HYPERLINKCTRL117->SetURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"));
 	packageLocationEdit->SetValue(packageLocation);
 }
 

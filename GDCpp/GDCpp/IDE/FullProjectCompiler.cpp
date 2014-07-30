@@ -36,11 +36,12 @@
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCpp/IDE/ExecutableIconChanger.h"
 #include "GDCpp/IDE/BaseProfiler.h"
-#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/CppPlatform.h"
 
@@ -188,7 +189,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     //Create a separate copy of the game in memory, as we're going to apply it some modifications ( i.e changing resources path )
-    Game game = gameToCompile;
+    gd::Project game = gameToCompile;
 
     //Prepare resources to copy
     diagnosticManager.OnMessage( gd::ToString( _("Preparing resources...") ));
@@ -280,7 +281,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     wxSafeYield();
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 1 out of 3" )));
-    game.SaveToFile(static_cast<string>( tempDir + "/GDProjectSrcFile.gdg" ));
+    gd::Project strippedProject = game;
+    gd::ProjectStripper::StripProject(strippedProject);
+    strippedProject.SaveToFile(static_cast<string>( tempDir + "/GDProjectSrcFile.gdg" ));
     diagnosticManager.OnPercentUpdate(80);
 
     wxSafeYield();

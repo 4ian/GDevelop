@@ -116,7 +116,6 @@ int main( int argc, char *p_argv[] )
             return AbortWithMessage("Unable to parse game data. Aborting.");
         }
 
-        std::cout << "display:" << uncryptedSrc.c_str();
         TiXmlHandle hdl(&doc);
         gd::SerializerElement rootElement;
         gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());

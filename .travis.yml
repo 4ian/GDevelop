@@ -1,0 +1,12 @@
+language: cpp
+compiler:
+  - gcc
+
+install:
+  - cmake -BBuild
+  - cd Build
+  - make
+  - cd ..
+script:
+  - cd Build/Core
+  - ./GDCore_tests

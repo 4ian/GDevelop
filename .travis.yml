@@ -3,10 +3,11 @@ compiler:
   - gcc
 
 install:
-  - cmake -BBuild
-  - cd Build
+  - mkdir .build
+  - cd .build
+  - cmake ..
   - make
   - cd ..
 script:
-  - cd Build/Core
+  - cd .build/Core
   - ./GDCore_tests

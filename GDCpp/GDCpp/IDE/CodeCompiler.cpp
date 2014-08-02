@@ -50,6 +50,7 @@ std::string CodeCompilerCall::GetFullCall() const
     std::string baseDir = CodeCompiler::Get()->GetBaseDirectory();
 
     std::vector<std::string> args;
+    args.push_back("-std=gnu++11"); //Enable C++11 with some extensions.
     #if defined(WINDOWS)
     args.push_back("-m32");
     args.push_back("-nostdinc");

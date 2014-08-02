@@ -6,6 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef RECURSIVEMKDIR_H
 #define RECURSIVEMKDIR_H
+
 class wxString;
 
 namespace gd

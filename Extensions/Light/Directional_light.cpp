@@ -1,6 +1,7 @@
 #include "Directional_light.h"
 #include <cmath>
 #include <iostream>
+#include "GDCore/CommonTools.h"
 #include <SFML/Graphics.hpp>
 
 Directional_light::Directional_light() : Light()
@@ -24,8 +25,8 @@ void Directional_light::Generate(std::vector<Wall*> &m_wall)
 {
     shapes.clear();
 
-    float angle     = m_angle * M_PI / 180;
-    float o_angle   = m_opening_angle * M_PI / 180;
+    float angle     = m_angle * gd::Pi() / 180;
+    float o_angle   = m_opening_angle * gd::Pi() / 180;
 
     AddTriangle(sf::Vector2f((m_radius*cos(angle + o_angle * 0.5))
                             ,(m_radius*sin(angle + o_angle * 0.5))) ,

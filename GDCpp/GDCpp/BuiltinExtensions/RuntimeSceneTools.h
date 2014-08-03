@@ -114,7 +114,7 @@ const std::string& GD_API GetVariableString(const gd::Variable & variable);
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen);
+void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen, bool);
 
 /**
  * Only used internally by GD events generated code.

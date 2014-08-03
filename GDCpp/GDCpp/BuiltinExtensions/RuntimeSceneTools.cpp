@@ -259,7 +259,7 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
     #endif
 }
 
-void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen)
+void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen, bool)
 {
     #if !defined(GD_IDE_ONLY)
     if ( fullscreen && !scene.RenderWindowIsFullScreen() )

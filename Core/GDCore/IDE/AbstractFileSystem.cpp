@@ -126,7 +126,7 @@ std::vector<std::string> NativeFileSystem::ReadDir(const std::string & path, con
     wxString file = wxFindFirstFile( path + "/*" );
     while ( !file.empty() )
     {
-        if ( upperExt.empty() || file.Upper().EndsWith("."+upperExt) )
+        if ( upperExt.empty() || file.Upper().EndsWith(upperExt) )
             results.push_back(gd::ToString(file));
 
         file = wxFindNextFile();

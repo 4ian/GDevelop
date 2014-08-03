@@ -84,6 +84,13 @@ public:
 
     virtual std::string ReadFile(const std::string & file) = 0;
 
+    /**
+     * \brief Return a vector containing the files in the specified path
+     *
+     * \param path The path to read
+     * \param extension If specified, only file finishing with this extension will be returned
+     * \return A vector with all the matched files
+     */
     virtual std::vector<std::string> ReadDir(const std::string & path, const std::string & extension = "") = 0;
 
 protected:

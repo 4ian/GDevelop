@@ -258,7 +258,7 @@ void PhysicsAutomatism::OnDeActivate()
 /**
  * Set a body to be static
  */
-void PhysicsAutomatism::SetStatic(RuntimeScene & scene )
+void PhysicsAutomatism::SetStatic(RuntimeScene & scene)
 {
     dynamic = false;
 
@@ -269,7 +269,7 @@ void PhysicsAutomatism::SetStatic(RuntimeScene & scene )
 /**
  * Set a body to be dynamic
  */
-void PhysicsAutomatism::SetDynamic(RuntimeScene & scene )
+void PhysicsAutomatism::SetDynamic(RuntimeScene & scene)
 {
     dynamic = true;
 
@@ -281,7 +281,7 @@ void PhysicsAutomatism::SetDynamic(RuntimeScene & scene )
 /**
  * Set rotation to be fixed
  */
-void PhysicsAutomatism::SetFixedRotation(RuntimeScene & scene )
+void PhysicsAutomatism::SetFixedRotation(RuntimeScene & scene)
 {
     fixedRotation = true;
 
@@ -292,7 +292,7 @@ void PhysicsAutomatism::SetFixedRotation(RuntimeScene & scene )
 /**
  * Set rotation to be free
  */
-void PhysicsAutomatism::SetFreeRotation(RuntimeScene & scene )
+void PhysicsAutomatism::SetFreeRotation(RuntimeScene & scene)
 {
     fixedRotation = false;
 
@@ -303,7 +303,7 @@ void PhysicsAutomatism::SetFreeRotation(RuntimeScene & scene )
 /**
  * Consider object as bullet, for better collision handling
  */
-void PhysicsAutomatism::SetAsBullet(RuntimeScene & scene )
+void PhysicsAutomatism::SetAsBullet(RuntimeScene & scene)
 {
     isBullet = true;
 
@@ -314,7 +314,7 @@ void PhysicsAutomatism::SetAsBullet(RuntimeScene & scene )
 /**
  * Don't consider object as bullet, for faster collision handling
  */
-void PhysicsAutomatism::DontSetAsBullet(RuntimeScene & scene )
+void PhysicsAutomatism::DontSetAsBullet(RuntimeScene & scene)
 {
     isBullet = false;
 
@@ -472,7 +472,7 @@ void PhysicsAutomatism::SetGravity( float xGravity, float yGravity, RuntimeScene
 {
     if ( !body ) CreateBody(scene);
 
-    runtimeScenesPhysicsDatas->world->SetGravity(b2Vec2( xGravity*runtimeScenesPhysicsDatas->GetInvScaleX(), -yGravity*runtimeScenesPhysicsDatas->GetInvScaleY()));
+    runtimeScenesPhysicsDatas->world->SetGravity(b2Vec2(xGravity, -yGravity));
 }
 
 

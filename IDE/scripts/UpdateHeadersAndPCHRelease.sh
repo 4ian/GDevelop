@@ -4,6 +4,15 @@ echo
 echo Tool for updating include directory for Release target.
 echo
 
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include/GDCpp
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include/Core
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include/boost
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include/boost/boost
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include/SFML/
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/include/SFML/include
+mkdir ../../Binaries/Output/Release_Linux/CppPlatform/Extensions/include
+
 echo -Copying files...
 # rm ../../Binaries/Output/Release_Linux/CppPlatform/include/*.* -r
 

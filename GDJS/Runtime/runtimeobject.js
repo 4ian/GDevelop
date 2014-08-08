@@ -288,7 +288,7 @@ gdjs.RuntimeObject.prototype.rotate = function(speed, runtimeScene) {
  *
  * @method setZOrder
  * @param z {Number} The new Z order position of the object
- */
+ */@
 gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 };
@@ -621,7 +621,7 @@ gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
         }
         else
         {
-            this._forces[i].setLength(this._forces[i].getLength() - this._forces[i].getLength() * ( 1 - this._forces[i].getClearing() ) * elapsedTime)
+            this._forces[i].setLength(this._forces[i].getLength() - this._forces[i].getLength() * ( 1 - this._forces[i].getClearing() ) * elapsedTime);
             ++i;
         }
     }

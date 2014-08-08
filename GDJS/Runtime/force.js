@@ -21,7 +21,7 @@ gdjs.Force = function(x,y, clearing)
     this._angle = Math.atan2(y,x)*180/3.14159;
     this._length = Math.sqrt(x*x+y*y);
     this._dirty = false;
-    this._clearing = clearing
+    this._clearing = clearing;
 }
 
 /**

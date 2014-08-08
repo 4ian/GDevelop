@@ -288,7 +288,7 @@ gdjs.RuntimeObject.prototype.rotate = function(speed, runtimeScene) {
  *
  * @method setZOrder
  * @param z {Number} The new Z order position of the object
- */@
+ */
 gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 };

@@ -101,7 +101,6 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
     propPnl(NULL),
     propPnlManager(NULL)
 {
-    std::cout << "b" << std::endl;
 	//(*Initialize(ObjectsEditor)
 	wxMenuItem* delObjMenuI;
 	wxMenuItem* editNameMenuI;

@@ -23,7 +23,7 @@ class GD_CORE_API SerializerElement
 {
 public:
 	SerializerElement();
-	virtual ~SerializerElement() {};
+	virtual ~SerializerElement();
 
     /** \name Value
      * Methods related to the value of the element, if any.
@@ -206,6 +206,7 @@ public:
 	 */
     void HideWarnings() { hideWarning = true; };
 
+	static SerializerElement nullElement;
 private:
 
 	bool valueUndefined; ///< If true, the element does not have a value.
@@ -216,7 +217,6 @@ private:
 	mutable std::string arrayOf;
 	mutable std::string deprecatedArrayOf;
 	bool hideWarning;
-	static SerializerElement nullElement;
 };
 
 }

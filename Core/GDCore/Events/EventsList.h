@@ -31,7 +31,7 @@ public:
     EventsList& operator=(const EventsList & rhs);
 
     /**
-     * \brief Return a pointer to a copy of the layout.
+     * \brief Return a pointer to a copy of the event list.
      */
     EventsList * Clone() const { return new EventsList(*this); };
 

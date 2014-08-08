@@ -13,6 +13,9 @@ SerializerElement::SerializerElement() :
 {
 }
 
+SerializerElement::~SerializerElement() {
+}
+
 const SerializerValue & SerializerElement::GetValue() const
 {
 	if (valueUndefined && attributes.find("value") != attributes.end())
@@ -253,7 +256,7 @@ SerializerElement & SerializerElement::GetChild(std::string name, unsigned int i
 		}
 	}
 
-	std::cout << "WARNING: Child named " << name << " was not found." << std::endl;
+	std::cout << "Child " << name << " not found in SerializerElement::GetChild" << std::endl;
 	return nullElement;
 }
 

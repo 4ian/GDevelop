@@ -237,6 +237,7 @@ sudo apt-get install libudev-dev
 sudo apt-get install libxrandr-dev
 sudo apt-get install libsndfile1-dev
 sudo apt-get install libglu1-mesa-dev
+sudo apt-get install libfreetype6-dev
 \endcode
  *
  * Then, use CMake to build SFML: Follow **[this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php)** from the

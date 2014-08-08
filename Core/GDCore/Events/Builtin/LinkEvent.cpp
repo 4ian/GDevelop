@@ -106,8 +106,6 @@ void LinkEvent::UnserializeFrom(gd::Project & project, const SerializerElement &
     SerializerElement & includeElement = element.GetChild("include", 0, "Limites");
     SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
         includeElement.GetIntAttribute("end"));
-    std::cout << "Include all events " << includeElement.GetBoolAttribute("includeAll", true) << std::endl;
-    std::cout << "Include all events " << includeElement.GetBoolAttribute("includeAll") << std::endl;
     SetIncludeAllEvents(includeElement.GetBoolAttribute("includeAll", true));
 
     SetTarget(element.GetChild("target", 0, "Scene").GetValue().GetString());

@@ -352,7 +352,7 @@ gdjs.RuntimeScene.prototype.updateObjectsForces = function(objects) {
 
 				obj.setX(obj.getX() + averageForce.getX()*this._elapsedTime/1000);
 				obj.setY(obj.getY() + averageForce.getY()*this._elapsedTime/1000);
-				obj.updateForces();
+				obj.updateForces(this._elapsedTime/1000);
 			}
 		}
 	}

@@ -1,20 +1,14 @@
 language: cpp
 compiler:
   - gcc
+  - clang
 
 install:
 #Download and compile dependencies
   - cd ExtLibs
   - sudo apt-get install p7zip-full
   #SFML
-  - sudo apt-get install libopenal-dev
-  - sudo apt-get install libjpeg-dev
-  - sudo apt-get install libglew-dev
-  - sudo apt-get install libudev-dev
-  - sudo apt-get install libxrandr-dev
-  - sudo apt-get install libsndfile1-dev
-  - sudo apt-get install libglu1-mesa-dev
-  - sudo apt-get install libfreetype6-dev
+  - sudo apt-get install libopenal-dev libjpeg-dev libglew-dev libudev-dev libxrandr-dev libsndfile1-dev libglu1-mesa-dev libfreetype6-dev
   - wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
   - 7za x SFML.7z > /dev/null
   - cd SFML
@@ -37,5 +31,5 @@ install:
   - make
   - cd ..
 script:
-  - cd .build/Core
+  - cd .build-tests/Core
   - ./GDCore_tests

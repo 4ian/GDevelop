@@ -29,7 +29,7 @@ public:
     virtual ~JsCodeEvent() {};
 
     JsCodeEvent& operator=(const JsCodeEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new JsCodeEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new JsCodeEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}

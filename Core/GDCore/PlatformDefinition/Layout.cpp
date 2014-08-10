@@ -60,6 +60,7 @@ Layout::Layout() :
     compilationNeeded(true)
     #endif
 {
+    std::cout << "     ** Layout ctor " << this << std::endl;
     gd::Layer layer;
     layer.SetCameraCount(1);
     initialLayers.push_back(layer);

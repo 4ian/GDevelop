@@ -34,7 +34,7 @@ public:
     virtual ~ForEachEvent() {};
 
     ForEachEvent& operator=(const ForEachEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new ForEachEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new ForEachEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 

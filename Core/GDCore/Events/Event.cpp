@@ -109,7 +109,7 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
 
 BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(BaseEventSPtr event)
 {
-    gd::BaseEventSPtr copy = event->Clone();
+    gd::BaseEventSPtr copy(event->Clone());
     //Original event is either the original event of the copied event, or the event copied.
     copy->originalEvent = event->originalEvent.expired() ? event : event->originalEvent;
 

@@ -3,11 +3,6 @@ cmake_policy(SET CMP0015 NEW)
 
 project(GDCore)
 
-SET(CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1)
-SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1)
-SET(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES 1)
-SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 1)
-
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
@@ -52,7 +47,7 @@ include_directories(${boost_include_dir})
 include_directories(${sfml_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
-ELSEIF (NOT EMSCRIPTEN)
+ELSEIF (NOT NO_GUI)
 	find_package(wxWidgets COMPONENTS core base ribbon webview stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
 	find_package(PkgConfig REQUIRED)
@@ -65,9 +60,11 @@ ENDIF(WIN32)
 #Defines
 ###
 add_definitions( -DGD_IDE_ONLY )
-IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
-	add_definitions( -DGD_NO_WX_GUI )
+IF (EMSCRIPTEN)
 	add_definitions( -DEMSCRIPTEN )
+ENDIF()
+IF (NO_GUI)
+	add_definitions( -DGD_NO_WX_GUI )
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	add_definitions( -DDEBUG )
@@ -95,7 +92,9 @@ ELSE()
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK3_CFLAGS_OTHER})
+	IF (NOT NO_GUI)
+		add_definitions(${GTK3_CFLAGS_OTHER})
+	ENDIF()
 ENDIF(WIN32)
 
 #The target
@@ -121,7 +120,7 @@ set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMA
 
 #Linker files
 ###
-IF(WIN32)
+IF(WIN32 AND NOT NO_GUI)
 target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/libsfml-graphics.a ${sfml_lib_dir}/libsfml-window.a ${sfml_lib_dir}/libsfml-network.a ${sfml_lib_dir}/libsfml-system.a)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 		target_link_libraries(GDCore ${wxwidgets_lib_dir}/libwxmsw29ud_xrc.a ${wxwidgets_lib_dir}/libwxmsw29ud_stc.a ${wxwidgets_lib_dir}/libwxmsw29ud_richtext.a ${wxwidgets_lib_dir}/libwxmsw29ud_propgrid.a ${wxwidgets_lib_dir}/libwxmsw29ud_ribbon.a ${wxwidgets_lib_dir}/libwxmsw29ud_aui.a ${wxwidgets_lib_dir}/libwxmsw29ud_adv.a ${wxwidgets_lib_dir}/libwxmsw29ud_html.a ${wxwidgets_lib_dir}/libwxmsw29ud_core.a ${wxwidgets_lib_dir}/libwxbase29ud_xml.a ${wxwidgets_lib_dir}/libwxbase29ud_net.a ${wxwidgets_lib_dir}/libwxexpatd.a ${wxwidgets_lib_dir}/libwxbase29ud.a ${wxwidgets_lib_dir}/libwxpngd.a ${wxwidgets_lib_dir}/libwxjpegd.a ${wxwidgets_lib_dir}/libwxzlibd.a ${wxwidgets_lib_dir}/libwxtiffd.a)
@@ -130,19 +129,20 @@ target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/lib
 	ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 	target_link_libraries(GDCore ws2_32 user32 opengl32 glu32)
-ELSEIF (NOT EMSCRIPTEN)
+ELSEIF (NOT NO_GUI)
 	target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
 	target_link_libraries(GDCore ${wxWidgets_LIBRARIES})
 	target_link_libraries(GDCore ${GTK3_LIBRARIES})
-ENDIF(WIN32)
+ENDIF()
 
 #Tests
 ###
-
-file(
-    GLOB_RECURSE
-    test_source_files
-    tests/*
-)
-add_executable(GDCore_tests ${test_source_files})
-target_link_libraries(GDCore_tests GDCore)
+if(BUILD_TESTS)
+	file(
+	    GLOB_RECURSE
+	    test_source_files
+	    tests/*
+	)
+	add_executable(GDCore_tests ${test_source_files})
+	target_link_libraries(GDCore_tests GDCore)
+endif()

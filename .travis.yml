@@ -3,9 +3,9 @@ compiler:
   - gcc
 
 install:
-  - mkdir .build
-  - cd .build
-  - cmake ..
+  - mkdir .build-tests
+  - cd .build-tests
+  - cmake -DBUILD_GDCPP=FALSE -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_EXTENSIONS=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..
   - make
   - cd ..
 script:

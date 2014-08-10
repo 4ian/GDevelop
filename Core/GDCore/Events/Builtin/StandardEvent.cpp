@@ -128,7 +128,10 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
  */
 void StandardEvent::Init(const StandardEvent & event)
 {
+    std::cout << "cloningsub" << this << std::endl;
     events = *event.events.Clone();
+    std::cout << "ENDcloningsub" << this << ";";
+    std::cout << "this.actionsCount=" << actions.size() << std::endl;
 
     conditions = event.conditions;
     actions = event.actions;
@@ -140,6 +143,7 @@ void StandardEvent::Init(const StandardEvent & event)
 StandardEvent::StandardEvent(const StandardEvent & event) :
 BaseEvent(event)
 {
+    std::cout << "standard cpy to " << this << "from" << &event << std::endl;
     Init(event);
 }
 
@@ -148,6 +152,7 @@ BaseEvent(event)
  */
 StandardEvent& StandardEvent::operator=(const StandardEvent & event)
 {
+    std::cout << "standard op= to " << this << "from" << &event << std::endl;
     if ( this != &event )
     {
         BaseEvent::operator=(event);

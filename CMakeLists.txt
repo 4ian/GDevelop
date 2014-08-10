@@ -22,6 +22,8 @@ gd_set_option(BUILD_GDCPP TRUE BOOL "TRUE to build Game Develop C++ Platform")
 gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build Game Develop JS Platform")
 gd_set_option(BUILD_IDE TRUE BOOL "TRUE to build the IDE")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
+gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
+gd_set_option(NO_GUI FALSE BOOL "TRUE to build without any GUI (no wxWidgets GUI, no SFML)")
 
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")

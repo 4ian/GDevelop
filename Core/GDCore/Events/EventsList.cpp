@@ -106,11 +106,13 @@ bool EventsList::Contains(const gd::BaseEvent & eventToSearch, bool recursive) c
 
 EventsList::EventsList(const EventsList & other)
 {
+    std::cout << "copyctor list" << this << "from" << &other << std::endl;
     Init(other);
 }
 
 EventsList & EventsList::operator=(const EventsList & other)
 {
+    std::cout << "operator= list" << this << "from" << &other << std::endl;
     if ( this != &other )
         Init(other);
 

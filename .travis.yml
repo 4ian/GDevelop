@@ -5,7 +5,7 @@ compiler:
 install:
 #Download dependencies
   - cd ExtLibs
-  - sudo apt-get install p7zip
+  - sudo apt-get install p7zip-full
   - wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
   - 7za x SFML.7z
   - wget http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z

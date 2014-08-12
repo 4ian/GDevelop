@@ -496,7 +496,7 @@
 														}, {
 															"type":	"string",
 															"m_label":	"Max value:",
-															"m_value":	"100"
+															"m_value":	"10000"
 														}],
 													"m_events":	[],
 													"m_children":	[]
@@ -650,7 +650,7 @@
 														}, {
 															"type":	"string",
 															"m_label":	"Max value:",
-															"m_value":	"100"
+															"m_value":	"10000"
 														}],
 													"m_events":	[],
 													"m_children":	[]
@@ -804,7 +804,7 @@
 														}, {
 															"type":	"string",
 															"m_label":	"Max value:",
-															"m_value":	"100"
+															"m_value":	"10000"
 														}],
 													"m_events":	[],
 													"m_children":	[]
@@ -958,7 +958,7 @@
 														}, {
 															"type":	"string",
 															"m_label":	"Max value:",
-															"m_value":	"100"
+															"m_value":	"10000"
 														}],
 													"m_events":	[],
 													"m_children":	[]
@@ -1112,7 +1112,7 @@
 														}, {
 															"type":	"string",
 															"m_label":	"Max value:",
-															"m_value":	"100"
+															"m_value":	"10000"
 														}],
 													"m_events":	[],
 													"m_children":	[]
@@ -1266,7 +1266,7 @@
 														}, {
 															"type":	"string",
 															"m_label":	"Max value:",
-															"m_value":	"100"
+															"m_value":	"10000"
 														}],
 													"m_events":	[],
 													"m_children":	[]
@@ -1621,7 +1621,7 @@
 									"gbSpan":	"1,1",
 									"gbPosition":	"0,0",
 									"m_styles":	["wxHSCROLL", "wxVSCROLL"],
-									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
 											"type":	"winid",
 											"m_label":	"ID:",
@@ -1881,7 +1881,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Max value:",
-													"m_value":	"100"
+													"m_value":	"1000000"
 												}],
 											"m_events":	[],
 											"m_children":	[]
@@ -2035,7 +2035,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Max value:",
-													"m_value":	"100"
+													"m_value":	"10000000"
 												}],
 											"m_events":	[],
 											"m_children":	[]

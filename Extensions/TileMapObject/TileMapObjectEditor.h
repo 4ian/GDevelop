@@ -51,6 +51,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
 		virtual void OnUpdateClicked(wxCommandEvent& event);
 		virtual void OnMapUpdateButtonClicked(wxCommandEvent& event);
 
+		void OnTileSetSelectionChanged(TileSelectionEvent &event);
+
 	private:
 		void SetTileSet(const std::string &tileSetName);
 		wxBitmap GetwxBitmapFromImageResource(gd::Resource & resource);

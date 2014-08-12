@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+wxDEFINE_EVENT(TILE_SELECTION_CHANGED, TileSelectionEvent);
+
 TileSetPanel::TileSetPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) : 
     wxScrolledWindow(parent, id, pos, size, style),
     m_tileSetBitmap(NULL),
@@ -99,6 +101,12 @@ void TileSetPanel::OnLeftButtonPressed(wxMouseEvent& event)
 
     //Select the tile
     GetTileAt(mousePos, m_selectedCol, m_selectedRow);
+
+    //Send the event
+    TileSelectionEvent newEvent(TILE_SELECTION_CHANGED, GetId(), std::make_pair<int, int>(m_selectedCol, m_selectedRow));
+    newEvent.SetEventObject(this);
+    ProcessWindowEvent(newEvent);
+
     Refresh();
 }
 
@@ -109,6 +117,13 @@ wxPoint TileSetPanel::GetPositionOfTile(int column, int row)
 
 void TileSetPanel::GetTileAt(wxPoint position, int &tileCol, int &tileRow)
 {
+    if(m_tileSize.GetWidth() == 0 || m_tileSize.GetHeight() == 0)
+    {
+        tileCol = 0;
+        tileRow = 0;
+        return;
+    }
+
     tileCol = (int)(position.x / (m_tileSize.GetWidth() + m_tileMargins.GetWidth()));
     tileRow = (int)(position.y / (m_tileSize.GetHeight() + m_tileMargins.GetHeight()));
 }

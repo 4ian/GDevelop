@@ -6,6 +6,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
+#include "TileSetPanel.h"
  
 class TileMapPanel : public wxScrolledWindow
 {
@@ -21,6 +23,9 @@ class TileMapPanel : public wxScrolledWindow
         wxSize tileMargins;
 
     } m_tileSetInfo;
+
+    //Tile to be inserted
+    std::pair<int, int> m_tileToBeInserted;
 
     //Info about the TileMap (the level map)
     std::vector< std::vector< std::pair<int, int> > > m_map;
@@ -42,6 +47,8 @@ public:
     void Update(); //Refresh and recreate tile cache.
 
     virtual void OnDraw(wxDC& dc);
+
+    void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
 protected:
     void OnLeftButtonPressed(wxMouseEvent& event);

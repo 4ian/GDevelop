@@ -71,7 +71,7 @@
                       <style>wxSP_ARROW_KEYS</style>
                       <value>0</value>
                       <min>0</min>
-                      <max>100</max>
+                      <max>10000</max>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -91,7 +91,7 @@
                       <style>wxSP_ARROW_KEYS</style>
                       <value>0</value>
                       <min>0</min>
-                      <max>100</max>
+                      <max>10000</max>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -111,7 +111,7 @@
                       <style>wxSP_ARROW_KEYS</style>
                       <value>0</value>
                       <min>0</min>
-                      <max>100</max>
+                      <max>10000</max>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -131,7 +131,7 @@
                       <style>wxSP_ARROW_KEYS</style>
                       <value>0</value>
                       <min>0</min>
-                      <max>100</max>
+                      <max>10000</max>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -154,7 +154,7 @@
                       </tooltip>
                       <value>0</value>
                       <min>0</min>
-                      <max>100</max>
+                      <max>10000</max>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -177,7 +177,7 @@
                       </tooltip>
                       <value>0</value>
                       <min>0</min>
-                      <max>100</max>
+                      <max>10000</max>
                     </object>
                   </object>
                 </object>
@@ -248,7 +248,7 @@
             </object>
           </object>
           <object class="sizeritem">
-            <flag>wxALL</flag>
+            <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
             <object class="wxScrolledWindow" name="m_tileMapPanel" subclass="TileMapPanel">
               <style>wxHSCROLL|wxVSCROLL</style>
@@ -284,7 +284,7 @@
                   <style>wxSP_ARROW_KEYS</style>
                   <value>0</value>
                   <min>0</min>
-                  <max>100</max>
+                  <max>1000000</max>
                 </object>
               </object>
               <object class="sizeritem">
@@ -304,7 +304,7 @@
                   <style>wxSP_ARROW_KEYS</style>
                   <value>0</value>
                   <min>0</min>
-                  <max>100</max>
+                  <max>10000000</max>
                 </object>
               </object>
               <object class="sizeritem">

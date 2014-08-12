@@ -1,11 +1,16 @@
 #include "TileMapPanel.h"
 
+#include <iostream>
+
 TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) :
     wxScrolledWindow(parent, id, pos, size, style),
     m_tileSetInfo(),
+    m_tileToBeInserted(-1, -1),
     m_map()
 {
     SetMapSize(0, 0);
+
+    Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnLeftButtonPressed), NULL, this);
 }
 
 TileMapPanel::~TileMapPanel()
@@ -71,7 +76,7 @@ void TileMapPanel::OnDraw(wxDC& dc)
     {
         for(int row = 0; row < m_map[0].size(); row++)
         {
-            if(m_map[col][row] == std::make_pair<int, int>(-1, -1))
+            if(m_map[col][row].first == -1 || m_map[col][row].second == -1)
                 continue;
 
             dc.DrawBitmap(m_bitmapCache[m_map[col][row]], GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y);
@@ -79,9 +84,24 @@ void TileMapPanel::OnDraw(wxDC& dc)
     }
 }
 
+void TileMapPanel::OnTileSetSelectionChanged(TileSelectionEvent &event)
+{
+    std::cout << event.GetSelectedTile().first << ";" << event.GetSelectedTile().second << std::endl;
+    m_tileToBeInserted = event.GetSelectedTile();
+}
+
 void TileMapPanel::OnLeftButtonPressed(wxMouseEvent& event)
 {
+    int currentColumn, currentRow;
+    wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());
+    GetTileAt(mousePos, currentColumn, currentRow);
 
+    if(currentColumn >= m_map.size() || currentRow >= m_map[0].size())
+        return;
+
+    m_map[currentColumn][currentRow] = m_tileToBeInserted;
+
+    Refresh();
 }
 
 wxPoint TileMapPanel::GetPositionOfTile(int column, int row)

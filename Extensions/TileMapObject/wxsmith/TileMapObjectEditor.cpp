@@ -58,7 +58,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer17->Add(m_staticText35, 0, wxALL, 5);
     
     m_tileColumnsSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
-    m_tileColumnsSpin->SetRange(0, 100);
+    m_tileColumnsSpin->SetRange(0, 10000);
     m_tileColumnsSpin->SetValue(0);
     
     flexGridSizer17->Add(m_tileColumnsSpin, 0, wxALL, 5);
@@ -68,7 +68,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer17->Add(m_staticText41, 0, wxALL, 5);
     
     m_tileRowsSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
-    m_tileRowsSpin->SetRange(0, 100);
+    m_tileRowsSpin->SetRange(0, 10000);
     m_tileRowsSpin->SetValue(0);
     
     flexGridSizer17->Add(m_tileRowsSpin, 0, wxALL, 5);
@@ -78,7 +78,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer17->Add(m_staticText19, 0, wxALL, 5);
     
     m_tileWidthSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
-    m_tileWidthSpin->SetRange(0, 100);
+    m_tileWidthSpin->SetRange(0, 10000);
     m_tileWidthSpin->SetValue(0);
     
     flexGridSizer17->Add(m_tileWidthSpin, 0, wxALL, 5);
@@ -88,7 +88,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer17->Add(m_staticText43, 0, wxALL, 5);
     
     m_tileHeightSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
-    m_tileHeightSpin->SetRange(0, 100);
+    m_tileHeightSpin->SetRange(0, 10000);
     m_tileHeightSpin->SetValue(0);
     
     flexGridSizer17->Add(m_tileHeightSpin, 0, wxALL, 5);
@@ -99,7 +99,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     m_horizontalMarginsSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_horizontalMarginsSpin->SetToolTip(_("Horizontal margins"));
-    m_horizontalMarginsSpin->SetRange(0, 100);
+    m_horizontalMarginsSpin->SetRange(0, 10000);
     m_horizontalMarginsSpin->SetValue(0);
     
     flexGridSizer17->Add(m_horizontalMarginsSpin, 0, wxALL, 5);
@@ -110,7 +110,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     m_verticalMarginsSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_verticalMarginsSpin->SetToolTip(_("Vertical margins"));
-    m_verticalMarginsSpin->SetRange(0, 100);
+    m_verticalMarginsSpin->SetRange(0, 10000);
     m_verticalMarginsSpin->SetValue(0);
     
     flexGridSizer17->Add(m_verticalMarginsSpin, 0, wxALL, 5);
@@ -150,7 +150,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_tileMapPanel = new TileMapPanel(this, wxID_ANY, wxDefaultPosition, wxSize(400, 550), wxHSCROLL|wxVSCROLL);
     m_tileMapPanel->SetScrollRate(5, 5);
     
-    flexGridSizer7->Add(m_tileMapPanel, 0, wxALL, 5);
+    flexGridSizer7->Add(m_tileMapPanel, 0, wxALL|wxEXPAND, 5);
     
     wxFlexGridSizer* flexGridSizer89 = new wxFlexGridSizer(0, 5, 0, 0);
     flexGridSizer89->SetFlexibleDirection( wxBOTH );
@@ -163,7 +163,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer89->Add(m_staticText93, 0, wxALL, 5);
     
     m_mapWidthSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
-    m_mapWidthSpin->SetRange(0, 100);
+    m_mapWidthSpin->SetRange(0, 1000000);
     m_mapWidthSpin->SetValue(0);
     
     flexGridSizer89->Add(m_mapWidthSpin, 0, wxALL, 5);
@@ -173,7 +173,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer89->Add(m_staticText97, 0, wxALL, 5);
     
     m_mapHeightSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
-    m_mapHeightSpin->SetRange(0, 100);
+    m_mapHeightSpin->SetRange(0, 10000000);
     m_mapHeightSpin->SetValue(0);
     
     flexGridSizer89->Add(m_mapHeightSpin, 0, wxALL, 5);

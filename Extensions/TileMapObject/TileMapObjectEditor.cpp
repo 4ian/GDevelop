@@ -51,7 +51,7 @@ game(game_),
 mainFrameWrapper(mainFrameWrapper_),
 object(object_)
 {
-	
+	m_tileSetPanel->Connect(TILE_SELECTION_CHANGED, TileSelectionEventHandler(TileMapObjectEditor::OnTileSetSelectionChanged), NULL, this);
 }
 
 TileMapObjectEditor::~TileMapObjectEditor()
@@ -96,6 +96,11 @@ void TileMapObjectEditor::OnUpdateClicked(wxCommandEvent& event)
 void TileMapObjectEditor::OnMapUpdateButtonClicked(wxCommandEvent& event)
 {
 	m_tileMapPanel->SetMapSize(m_mapWidthSpin->GetValue(), m_mapHeightSpin->GetValue());
+}
+
+void TileMapObjectEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
+{
+	m_tileMapPanel->OnTileSetSelectionChanged(event);
 }
 
 void TileMapObjectEditor::SetTileSet(const std::string &tileSetName)

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <SFML/Graphics.hpp>
+#include "GDCore/CommonTools.h"
 #include "Light.h"
 
 Light::Light()
@@ -170,7 +171,7 @@ void Light::Generate(std::vector <Wall*> &m_wall)
     shapes.clear();
 
     // buf est l'angle de chaque triangle, c'est donc 2pi divisé par le nombre de triangles
-    float buf=(M_PI*2)/(float)m_quality;
+    float buf=(gd::Pi()*2)/(float)m_quality;
 
     // On ajoute tous les triangles qui composent la lumière
     for(int i=0;i<m_quality;i++)

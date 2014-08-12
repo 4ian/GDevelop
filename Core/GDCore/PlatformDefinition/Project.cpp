@@ -44,6 +44,8 @@
 #include <wx/filename.h>
 #endif
 
+#undef CopyFile
+
 using namespace std;
 
 namespace gd

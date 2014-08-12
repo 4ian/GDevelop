@@ -46,6 +46,8 @@ ELSEIF(NOT EMSCRIPTEN)
 	ENDIF()
 ENDIF()
 
+#Enable C++11
+set(CMAKE_CXX_FLAGS "-std=gnu++11 ${CMAKE_CXX_FLAGS}")
 
 #Add all the CMakeLists:
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Core/CMakeLists.txt" AND BUILD_CORE)

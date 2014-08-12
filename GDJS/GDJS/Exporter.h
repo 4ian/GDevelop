@@ -9,6 +9,7 @@
 #include <string>
 #include <set>
 #include "GDCore/IDE/ProjectExporter.h"
+#undef CopyFile
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class AbstractFileSystem; }

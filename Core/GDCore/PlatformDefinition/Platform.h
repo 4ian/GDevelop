@@ -12,6 +12,7 @@
 #include <map>
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
+#undef CreateEvent
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }

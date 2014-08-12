@@ -25,7 +25,7 @@ bool RecursiveMkDir::MkDir(wxString directory)
 
         if ( !wxDirExists(currentDir) )
         {
-            wxMkDir(currentDir+"/", 0777);
+            wxMkDir(wxString(currentDir+"/"), 0777);
         }
     }
 

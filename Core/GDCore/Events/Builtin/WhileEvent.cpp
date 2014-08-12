@@ -182,7 +182,7 @@ gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::
  */
 void WhileEvent::Init(const WhileEvent & event)
 {
-    events = *event.events.Clone();
+    events = event.events;
 
     whileConditions = event.whileConditions;
     conditions = event.conditions;

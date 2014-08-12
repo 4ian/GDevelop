@@ -338,7 +338,7 @@ void Layout::Init(const Layout & other)
     }
 
     #if defined(GD_IDE_ONLY)
-    events = *other.events.Clone();
+    events = other.events;
     objectGroups = other.objectGroups;
 
     compiledEventsFile = other.compiledEventsFile;

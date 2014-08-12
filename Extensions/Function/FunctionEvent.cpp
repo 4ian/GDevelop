@@ -172,7 +172,7 @@ gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, g
  */
 void FunctionEvent::Init(const FunctionEvent & event)
 {
-    events = *event.events.Clone();
+    events = event.events;
     name = event.name;
     objectsPassedAsArgument = event.objectsPassedAsArgument;
     conditions = event.conditions;

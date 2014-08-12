@@ -167,7 +167,7 @@ gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, gd
  */
 void ForEachEvent::Init(const ForEachEvent & event)
 {
-    events = *event.events.Clone();
+    events = event.events;
 
     conditions = event.conditions;
     actions = event.actions;

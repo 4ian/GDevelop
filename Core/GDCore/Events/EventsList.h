@@ -31,11 +31,6 @@ public:
     EventsList& operator=(const EventsList & rhs);
 
     /**
-     * \brief Return a pointer to a copy of the layout.
-     */
-    EventsList * Clone() const { return new EventsList(*this); };
-
-    /**
      * \brief Insert the specified event to the list
      * \note The event passed by parameter is copied.
      * \param event The event that must be copied and inserted into the list

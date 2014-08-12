@@ -29,7 +29,7 @@ public:
     virtual ~RepeatEvent() {};
 
     RepeatEvent& operator=(const RepeatEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new RepeatEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new RepeatEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 

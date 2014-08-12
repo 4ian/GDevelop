@@ -53,7 +53,7 @@ public:
     virtual ~FunctionEvent() {};
 
     FunctionEvent& operator=(const FunctionEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new FunctionEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new FunctionEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 

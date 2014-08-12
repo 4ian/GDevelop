@@ -32,7 +32,7 @@ public:
     virtual ~WhileEvent() {};
 
     WhileEvent& operator=(const WhileEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new WhileEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new WhileEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 

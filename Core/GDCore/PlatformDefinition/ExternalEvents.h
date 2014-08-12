@@ -31,18 +31,6 @@ public:
     ExternalEvents& operator=(const ExternalEvents & rhs);
 
     /**
-     * Must return a pointer to a copy of the layout.
-     *
-     * \note A such method is useful when the IDE must store a copy of a ExternalEvents derived class ( e.g. for Clipboard ) so as to avoid slicing
-     *
-     * Typical implementation example:
-     * \code
-     * return new MyExternalEventsClass(*this);
-     * \endcode
-     */
-    virtual ExternalEvents * Clone() const { return new ExternalEvents(*this); };
-
-    /**
      * \brief Get external events name
      */
     virtual const std::string & GetName() const {return name;};

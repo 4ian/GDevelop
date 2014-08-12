@@ -102,7 +102,6 @@ Project::Project() :
 
 Project::~Project()
 {
-    //dtor
 }
 
 boost::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, const std::string & name, const std::string & platformName)
@@ -572,7 +571,6 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     const SerializerElement & propElement = element.GetChild("properties", 0, "Info");
     SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
-    std::cout << "Unserializing" << GetName() << "..." << std::endl;
     SetDefaultWidth(propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt());
     SetDefaultHeight(propElement.GetChild("windowHeight", 0, "WindowH").GetValue().GetInt());
     SetMaximumFPS(propElement.GetChild("maxFPS", 0, "FPSmax").GetValue().GetInt());
@@ -1070,11 +1068,13 @@ void Project::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEve
 
 Project::Project(const Project & other)
 {
+    std::cout << "Init" << this << "from " << &other << std::endl;
     Init(other);
 }
 
 Project& Project::operator=(const Project & other)
 {
+    std::cout << "Init" << this << "from " << &other << std::endl;
     if ( this != &other )
         Init(other);
 

@@ -22,11 +22,23 @@ namespace gd
 
 /**
  * \brief Singleton class which can be used by the IDE and the editors to access to a (fake) clipboard.
+ * 
+ * All objects stored in this clipboard are stored by copy. Getter returns a copy of the stored objects,
+ * and can only be called if "Has" method returns true (otherwise, behavior is undefined).
  */
 class GD_CORE_API Clipboard
 {
 public:
+    /**
+     * \brief Return the unique clipboard instance.
+     */
     static Clipboard * Get();
+
+    /**
+     * @brief Destroy the unique clipboard instance. 
+     * 
+     * No need to call this method except at the end of the application.
+     */
     static void DestroySingleton();
 
     void SetObject( const gd::Object * object );
@@ -42,12 +54,12 @@ public:
     gd::Layout * GetLayout();
     bool HasLayout() { return hasLayout; };
 
-    void SetExternalEvents( const gd::ExternalEvents * events );
-    gd::ExternalEvents * GetExternalEvents();
+    void SetExternalEvents( const gd::ExternalEvents & events );
+    gd::ExternalEvents GetExternalEvents();
     bool HasExternalEvents() { return hasExternalEvents; };
 
-    void SetExternalLayout( const gd::ExternalLayout * layout );
-    gd::ExternalLayout * GetExternalLayout();
+    void SetExternalLayout( const gd::ExternalLayout & layout );
+    gd::ExternalLayout GetExternalLayout();
     bool HasExternalLayout() { return hasExternalLayout; };
 
     void SetConditions( const std::vector<gd::Instruction> & conditions );
@@ -80,13 +92,13 @@ private:
     bool hasInstructions;
     bool instructionsAreConditions;
 
-    gd::ExternalEvents * externalEventsCopied;
+    gd::ExternalEvents * externalEventsCopied; ///< Stored using a pointer to avoid including the full header file.
     bool hasExternalEvents;
 
-    gd::ExternalLayout * externalLayoutCopied;
+    gd::ExternalLayout * externalLayoutCopied; ///< Stored using a pointer to avoid including the full header file.
     bool hasExternalLayout;
 
-    gd::Layout * layoutCopied;
+    gd::Layout * layoutCopied; ///< Stored using a pointer to avoid including the full header file.
     bool hasLayout;
 
     gd::ObjectGroup objectGroupCopied;

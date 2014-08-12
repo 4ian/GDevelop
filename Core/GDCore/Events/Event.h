@@ -53,10 +53,10 @@ public:
      *
      * Typical implementation example:
      * \code
-     * return boost::shared_ptr<gd::BaseEvent>(new MyEventClass(*this));
+     * return new MyEventClass(*this);
      * \endcode
      */
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new BaseEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new BaseEvent(*this);}
 
     /** \name Event properties
      * Members functions to be overridden by derived classes to expose the event properties

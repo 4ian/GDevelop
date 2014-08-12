@@ -1,10 +1,25 @@
-cd ../Binaries/.build
-ninja
+
+#Build
+DIRECTORY="../Binaries/.build"
+if [ ! -d "../Binaries/.build" ]; then
+DIRECTORY="../Binaries/build"
+fi	
+if [ -d "$DIRECTORY" ]; then
+	cd "$DIRECTORY"
+	if [ -f "build.ninha" ]; then
+		ninja
+	fi
+	if [ -f "Makefile" ]; then
+		make
+	fi
+else
+	echo "Unable to find your build directory, just make sure that GD is compiled in Release_Linux"
+fi
 cd ../../IDE/scripts/
-./UpdateHeadersAndPCHRelease.sh
+sh ./UpdateHeadersAndPCHRelease.sh
 cd ../../scripts
-sh CopyWindowsToLinuxReleaseFiles
+sh CopyWindowsToLinuxReleaseFiles.sh
 cd ../GDJS/scripts/
-./CopyRuntimeToGD.sh
+sh ./CopyRuntimeToGD.sh
 cd ../../Binaries/Packaging
-./PackageForUbuntu.sh
+sh ./PackageForUbuntu.sh

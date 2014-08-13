@@ -102,7 +102,7 @@ gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avo
  * @param elapsedTime {Number} The time elapsedTime since the last frame, in <b>seconds</b>.
  */
 gdjs.RuntimeObject.prototype.updateTime = function(elapsedTime) {
-    //Nothing to do.
+    //Update the forces
 };
 
 /**
@@ -516,16 +516,16 @@ gdjs.RuntimeObject.prototype.getCenterY = function() {
  * @private
  * @param x {Number} The x coordinates of the force
  * @param y {Number} The y coordinates of the force
- * @param isTemporary {Boolean} Set if the force is temporary or not.
+ * @param clearing {Number} Set the force clearing
  */
-gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, isTemporary) {
+gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, clearing) {
     if ( gdjs.RuntimeObject.forcesGarbage.length === 0 )
-        return new gdjs.Force(x, y, isTemporary);
+        return new gdjs.Force(x, y, clearing);
     else {
         var recycledForce = gdjs.RuntimeObject.forcesGarbage.pop();
         recycledForce.setX(x);
         recycledForce.setY(y);
-        recycledForce.setTemporary(isTemporary);
+        recycledForce.setClearing(clearing);
         return recycledForce;
     }
 };
@@ -535,10 +535,10 @@ gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, isTemporary) {
  * @method addForce
  * @param x {Number} The x coordinates of the force
  * @param y {Number} The y coordinates of the force
- * @param isPermanent {Boolean} Set if the force is permanent or not.
+ * @param clearing {Number} Set the force clearing
  */
-gdjs.RuntimeObject.prototype.addForce = function(x,y, isPermanent) {
-    this._forces.push(this._getRecycledForce(x, y, !isPermanent));
+gdjs.RuntimeObject.prototype.addForce = function(x,y, clearing) {
+    this._forces.push(this._getRecycledForce(x, y, clearing));
 };
 
 /**
@@ -546,13 +546,13 @@ gdjs.RuntimeObject.prototype.addForce = function(x,y, isPermanent) {
  * @method addPolarForce
  * @param angle {Number} The angle of the force
  * @param len {Number} The length of the force
- * @param isPermanent {Boolean} Set if the force is permanent or not.
+ * @param clearing {Number} Set the force clearing
  */
-gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, isPermanent) {
+gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {
     var forceX = Math.cos(angle/180*3.14159)*len;
     var forceY = Math.sin(angle/180*3.14159)*len;
 
-    this._forces.push(this._getRecycledForce(forceX, forceY, !isPermanent));
+    this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
 };
 
 /**
@@ -561,16 +561,16 @@ gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, isPermanent) {
  * @param x {Number} The target x position
  * @param y {Number} The target y position
  * @param len {Number} The force length, in pixels.
- * @param isPermanent {Boolean} Set if the force is permanent or not.
+ * @param clearing {Number} Set the force clearing
  */
-gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, isPermanent) {
+gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, clearing) {
 
     var angle = Math.atan2(y - (this.getDrawableY()+this.getCenterY()),
                            x - (this.getDrawableX()+this.getCenterX()));
 
     var forceX = Math.cos(angle)*len;
     var forceY = Math.sin(angle)*len;
-    this._forces.push(this._getRecycledForce(forceX, forceY, !isPermanent));
+    this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
 };
 
 /**
@@ -579,14 +579,14 @@ gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, isPerma
  * @method addForceTowardObject
  * @param obj The target object
  * @param len {Number} The force length, in pixels.
- * @param isPermanent {Boolean} Set if the force is permanent or not.
+ * @param clearing {Number} Set the force clearing
  */
-gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, isPermanent) {
+gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, clearing) {
     if ( obj == null ) return;
 
     this.addForceTowardPosition(obj.getDrawableX()+obj.getCenterX(),
                                 obj.getDrawableY()+obj.getCenterY(),
-                                len, isPermanent);
+                                len, clearing);
 };
 
 /**
@@ -612,14 +612,16 @@ gdjs.RuntimeObject.prototype.hasNoForces = function() {
  *
  * @method updateForces
  */
-gdjs.RuntimeObject.prototype.updateForces = function() {
+gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
     for(var i = 0;i<this._forces.length;) {
-
-        if ( this._forces[i].isTemporary() ) {
+        if(this._forces[i].getLength() < 0.001)
+        {
             gdjs.RuntimeObject.forcesGarbage.push(this._forces[i]);
             this._forces.remove(i);
         }
-        else {
+        else
+        {
+            this._forces[i].setLength(this._forces[i].getLength() - this._forces[i].getLength() * ( 1 - this._forces[i].getClearing() ) * elapsedTime);
             ++i;
         }
     }

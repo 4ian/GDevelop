@@ -138,3 +138,21 @@ ELSE()
 		target_link_libraries(GDJS ${GTK3_LIBRARIES})
 	ENDIF(WIN32)
 ENDIF()
+
+#Post build tasks
+###
+IF(EMSCRIPTEN)
+	#Nothing.
+ELSE()
+	IF(WIN32)
+		add_custom_command(TARGET GDJS
+			POST_BUILD
+			COMMAND "CopyRuntimeToGD.bat"
+			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
+	ELSE()
+		add_custom_command(TARGET GDJS
+			POST_BUILD
+			COMMAND sh "CopyRuntimeToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
+			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
+	ENDIF()
+ENDIF()

@@ -1586,7 +1586,7 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::Get()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalEvents(game->GetExternalEvents(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
@@ -1602,7 +1602,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::Get()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalEvents(game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1631,8 +1631,9 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     gd::Project * game;
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
+    if (!Clipboard::Get()->HasExternalEvents()) return;
 
-    gd::ExternalEvents & newEvents = *Clipboard::Get()->GetExternalEvents();
+    gd::ExternalEvents newEvents = Clipboard::Get()->GetExternalEvents();
 
     //Finding a new, unique name for the events
     string newName = newEvents.GetName();
@@ -1791,7 +1792,7 @@ void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::Get()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalLayout(game->GetExternalLayout(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
@@ -1807,7 +1808,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Clipboard::Get()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::Get()->SetExternalLayout(game->GetExternalLayout(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1836,8 +1837,9 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     gd::Project * game;
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
+    if (!Clipboard::Get()->HasExternalLayout()) return;
 
-    gd::ExternalLayout & newExternalLayout = *Clipboard::Get()->GetExternalLayout();
+    gd::ExternalLayout newExternalLayout = Clipboard::Get()->GetExternalLayout();
 
     //Finding a new, unique name for the events
     string newName = newExternalLayout.GetName();

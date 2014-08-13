@@ -1,0 +1,35 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+install:
+#Download and compile dependencies
+  - cd ExtLibs
+  - sudo apt-get install p7zip-full
+  #SFML
+  - sudo apt-get install libopenal-dev libjpeg-dev libglew-dev libudev-dev libxrandr-dev libsndfile1-dev libglu1-mesa-dev libfreetype6-dev
+  - wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
+  - 7za x SFML.7z > /dev/null
+  - cd SFML
+  - mkdir build-linux
+  - cd build-linux
+  - cmake ..
+  - make
+  - sudo make install
+  - cd ..
+  - cd ..
+  #Boost
+  - wget http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z
+  - 7za x boost_1_55_0.7z > /dev/null
+  - mv boost_1_55_0 boost
+  - cd ..
+#Compile the tests only
+  - mkdir .build-tests
+  - cd .build-tests
+  - cmake -DBUILD_GDCPP=FALSE -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_EXTENSIONS=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..
+  - make
+  - cd ..
+script:
+  - cd .build-tests/Core
+  - ./GDCore_tests

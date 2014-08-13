@@ -343,7 +343,7 @@ void EventsEditor::Init(wxWindow* parent)
         listContextPanel->SetSize(5+16+5,listContextPanel->GetSize().y);
     }
 
-    latestState = *events->Clone();
+    latestState = *events;
 }
 
 void EventsEditor::RecreateCustomEventsMenu()
@@ -1149,9 +1149,9 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
 {
     if ( updateHistory )
     {
-        history.push_back(*latestState.Clone());
+        history.push_back(latestState);
         redoHistory.clear();
-        latestState = *events->Clone();
+        latestState = *events;
     }
 
     if ( !noNeedForSceneRecompilation )
@@ -1611,7 +1611,6 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Insert events
         gd::EventsList eventsToPaste = gd::Clipboard::Get()->GetEvents();
-        std::cout << "EventToPaste" << eventsToPaste.size();
         eventsList->InsertEvents(eventsToPaste, 0, (size_t)-1, position);
 
         if ( !eventsToPaste.IsEmpty() ) ChangesMadeOnEvents();
@@ -1623,11 +1622,11 @@ void EventsEditor::OnundoMenuSelected(wxCommandEvent& event)
 {
     if ( history.empty() ) return;
 
-    redoHistory.push_back(*events->Clone());
-    *events = *history.back().Clone();
+    redoHistory.push_back(*events);
+    *events = history.back();
     history.pop_back();
 
-    latestState = *events->Clone();
+    latestState = *events;
 
     Refresh();
     UpdateRibbonBars();
@@ -1638,11 +1637,11 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 {
     if ( redoHistory.empty() ) return;
 
-    history.push_back(*events->Clone());
-    *events = *redoHistory.back().Clone();
+    history.push_back(*events);
+    *events = redoHistory.back();
     redoHistory.pop_back();
 
-    latestState = *events->Clone();
+    latestState = *events;
 
     Refresh();
     UpdateRibbonBars();

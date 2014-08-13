@@ -166,7 +166,7 @@ gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, gd:
  */
 void RepeatEvent::Init(const RepeatEvent & event)
 {
-    events = *event.events.Clone();
+    events = event.events;
 
     conditions = event.conditions;
     actions = event.actions;

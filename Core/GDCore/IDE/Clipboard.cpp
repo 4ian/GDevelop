@@ -24,9 +24,12 @@ Clipboard::Clipboard() :
 objectCopied(NULL),
 hasObject(false),
 hasEvents(false),
-hasExternalEvents(false),
 hasInstructions(false),
 instructionsAreConditions(true),
+externalEventsCopied(NULL),
+hasExternalEvents(false),
+externalLayoutCopied(NULL),
+hasExternalLayout(false),
 layoutCopied(NULL),
 hasLayout(false),
 hasObjectGroup(false),
@@ -71,13 +74,13 @@ gd::Object * Clipboard::GetObject()
 
 void Clipboard::SetEvents( const gd::EventsList & events )
 {
-    eventsCopied = *events.Clone();
+    eventsCopied = events;
     hasEvents = true;
 }
 
 gd::EventsList Clipboard::GetEvents()
 {
-    return *eventsCopied.Clone();
+    return eventsCopied;
 }
 
 void Clipboard::SetLayout( const gd::Layout * layout )
@@ -94,32 +97,28 @@ gd::Layout * Clipboard::GetLayout()
     return layoutCopied->Clone();
 }
 
-void Clipboard::SetExternalEvents( const gd::ExternalEvents * events )
+void Clipboard::SetExternalEvents( const gd::ExternalEvents & events )
 {
-    if ( events == NULL ) return;
-
-    externalEventsCopied = events->Clone();
+    if (externalEventsCopied) delete externalEventsCopied;
+    externalEventsCopied = new gd::ExternalEvents(events);
     hasExternalEvents = true;
 }
 
-gd::ExternalEvents * Clipboard::GetExternalEvents()
+gd::ExternalEvents Clipboard::GetExternalEvents()
 {
-    if ( externalEventsCopied == NULL ) return NULL;
-    return externalEventsCopied->Clone();
+    return *externalEventsCopied;
 }
 
-void Clipboard::SetExternalLayout( const gd::ExternalLayout * layout )
+void Clipboard::SetExternalLayout( const gd::ExternalLayout & layout )
 {
-    if ( layout == NULL ) return;
-
-    externalLayoutCopied = layout->Clone();
+    if (externalLayoutCopied) delete externalLayoutCopied;
+    externalLayoutCopied = new gd::ExternalLayout(layout);
     hasExternalLayout = true;
 }
 
-gd::ExternalLayout * Clipboard::GetExternalLayout()
+gd::ExternalLayout Clipboard::GetExternalLayout()
 {
-    if ( externalLayoutCopied == NULL ) return NULL;
-    return externalLayoutCopied->Clone();
+    return *externalLayoutCopied;
 }
 
 void Clipboard::SetConditions( const std::vector<gd::Instruction> & conditions )

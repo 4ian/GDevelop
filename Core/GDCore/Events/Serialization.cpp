@@ -188,7 +188,7 @@ void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, Event
         event->SetDisabled(eventElem.GetBoolAttribute("disabled"));
         event->folded = eventElem.GetBoolAttribute("folded");
 
-        list.InsertEvent(*event, list.GetEventsCount());
+        list.InsertEvent(event, list.GetEventsCount());
     }
 }
 

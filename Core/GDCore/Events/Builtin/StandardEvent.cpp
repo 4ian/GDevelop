@@ -128,7 +128,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
  */
 void StandardEvent::Init(const StandardEvent & event)
 {
-    events = *event.events.Clone();
+    events = event.events;
 
     conditions = event.conditions;
     actions = event.actions;

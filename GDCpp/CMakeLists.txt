@@ -177,3 +177,21 @@ ELSE()
 		target_link_libraries(GDCpp_Runtime_exe GLU GL)
 	ENDIF(WIN32)
 ENDIF()
+
+#Post build tasks
+###
+IF(EMSCRIPTEN)
+	#Nothing.
+ELSE()
+	IF(WIN32)
+		add_custom_command(TARGET GDCpp
+			POST_BUILD
+			COMMAND "UpdateHeadersANDPCH${CMAKE_BUILD_TYPE}.bat"
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+	ELSE()
+		add_custom_command(TARGET GDCpp
+			POST_BUILD
+			COMMAND sh "CopyHeadersToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/
+			WORKING_DIRECTORY ${GD_base_dir}/GDCpp/scripts)
+	ENDIF()
+ENDIF()

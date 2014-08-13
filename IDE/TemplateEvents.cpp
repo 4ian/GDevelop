@@ -12,7 +12,7 @@
  */
 void TemplateEvents::Init(const TemplateEvents & other)
 {
-    events = *other.events.Clone();
+    events = other.events;
     name = other.name;
     desc = other.desc;
     parameters = other.parameters;

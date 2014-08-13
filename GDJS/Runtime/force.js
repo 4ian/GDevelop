@@ -12,16 +12,16 @@
  * @constructor
  * @param x The initial x component
  * @param y The initial y component
- * @param isTemporary true if the force must be temporary
+ * @param clearing The clearing
  */
-gdjs.Force = function(x,y, isTemporary)
+gdjs.Force = function(x,y, clearing)
 {
     this._x = x || 0;
     this._y = y || 0;
     this._angle = Math.atan2(y,x)*180/3.14159;
     this._length = Math.sqrt(x*x+y*y);
     this._dirty = false;
-    this._temporary = !!isTemporary;
+    this._clearing = clearing;
 }
 
 /**
@@ -90,8 +90,8 @@ gdjs.Force.prototype.setLength = function(len) {
 	}
 
 	this._length = len;
-	this._x = Math.cos(angle/180*3.14159)*this._length;
-	this._y = Math.sin(angle/180*3.14159)*this._length;
+	this._x = Math.cos(this._angle/180*3.14159)*this._length;
+	this._y = Math.sin(this._angle/180*3.14159)*this._length;
 }
 
 /**
@@ -127,17 +127,16 @@ gdjs.Force.prototype.getLength = function() {
 
 /**
  * Return true if the force is temporary, false if it is permanent.
- * @method isTemporary
+ * @method getClearing
  */
-gdjs.Force.prototype.isTemporary = function() {
-	return this._temporary;
+gdjs.Force.prototype.getClearing = function() {
+	return this._clearing;
 }
 
 /**
- * Set if the force is temporary or not.
- * @method setTemporary
- * @param enable {Boolean} true if the force must be temporary
+ * Set if the force clearing.
+ * @method setClearing
  */
-gdjs.Force.prototype.setTemporary = function(enable) {
-	this._temporary = !!enable;
+gdjs.Force.prototype.setClearing = function(clearing) {
+	this._clearing
 }

@@ -32,7 +32,7 @@ void ExternalEvents::Init(const ExternalEvents & externalEvents)
     name = externalEvents.GetName();
     associatedScene = externalEvents.GetAssociatedLayout();
     lastChangeTimeStamp = externalEvents.GetLastChangeTimeStamp();
-    events = *externalEvents.events.Clone();
+    events = externalEvents.events;
 }
 
 void ExternalEvents::SerializeTo(SerializerElement & element) const

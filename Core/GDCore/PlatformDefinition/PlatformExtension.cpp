@@ -279,7 +279,7 @@ gd::BaseEventSPtr PlatformExtension::CreateEvent(std::string eventType) const
             return boost::shared_ptr<gd::BaseEvent>();
         }
 
-        return eventsInfos.find(eventType)->second.instance->Clone();
+        return gd::BaseEventSPtr(eventsInfos.find(eventType)->second.instance->Clone());
     }
 
     return boost::shared_ptr<gd::BaseEvent>();

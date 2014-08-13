@@ -32,7 +32,7 @@ public:
     virtual ~StandardEvent();
 
     StandardEvent& operator=(const StandardEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new StandardEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new StandardEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 

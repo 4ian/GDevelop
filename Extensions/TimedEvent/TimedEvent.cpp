@@ -187,7 +187,7 @@ gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, gd::P
  */
 void TimedEvent::Init(const TimedEvent & event)
 {
-    events = *event.events.Clone();
+    events = event.events;
 
     name = event.name;
     timeout = event.timeout;

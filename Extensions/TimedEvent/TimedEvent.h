@@ -53,7 +53,7 @@ public:
     virtual ~TimedEvent();
 
     TimedEvent& operator=(const TimedEvent & event);
-    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new TimedEvent(*this));}
+    virtual gd::BaseEvent * Clone() const { return new TimedEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 

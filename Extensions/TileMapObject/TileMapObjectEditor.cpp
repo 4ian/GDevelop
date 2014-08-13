@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
+#include <wx/textdlg.h> 
 
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
@@ -52,6 +53,8 @@ mainFrameWrapper(mainFrameWrapper_),
 object(object_)
 {
 	m_tileSetPanel->Connect(TILE_SELECTION_CHANGED, TileSelectionEventHandler(TileMapObjectEditor::OnTileSetSelectionChanged), NULL, this);
+
+	UpdateLayerChoice();
 }
 
 TileMapObjectEditor::~TileMapObjectEditor()
@@ -98,6 +101,23 @@ void TileMapObjectEditor::OnMapUpdateButtonClicked(wxCommandEvent& event)
 	m_tileMapPanel->SetMapSize(m_mapWidthSpin->GetValue(), m_mapHeightSpin->GetValue());
 }
 
+void TileMapObjectEditor::OnLayerAddButtonClicked(wxCommandEvent& event)
+{
+	m_tileMapPanel->AddLayer(m_tileMapPanel->GetCurrentLayer() + 1);
+	m_tileMapPanel->SetCurrentLayer(m_tileMapPanel->GetCurrentLayer() + 1);
+	UpdateLayerChoice();
+}
+
+void TileMapObjectEditor::OnLayerChoiceChanged(wxCommandEvent& event)
+{
+	m_tileMapPanel->SetCurrentLayer(m_layerChoice->GetSelection());
+}
+
+void TileMapObjectEditor::OnLayerDeleteButtonClicked(wxCommandEvent& event)
+{
+
+}
+
 void TileMapObjectEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
 {
 	m_tileMapPanel->OnTileSetSelectionChanged(event);
@@ -121,6 +141,16 @@ void TileMapObjectEditor::SetTileSet(const std::string &tileSetName)
 	{
 		tileSetBitmap = NULL;
 	}
+}
+
+void TileMapObjectEditor::UpdateLayerChoice()
+{
+	m_layerChoice->Clear();
+	for(int layerId = 0; layerId < m_tileMapPanel->GetLayersCount(); layerId++)
+	{
+		m_layerChoice->Append(wxString::FromDouble(layerId, 0));
+	}
+	m_layerChoice->SetSelection(m_tileMapPanel->GetCurrentLayer());
 }
 
 wxBitmap TileMapObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resource)

@@ -21,11 +21,9 @@
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
-#include <wx/pen.h>
-#include <wx/aui/auibar.h>
-#include <map>
-#include <wx/menu.h>
-#include <wx/toolbar.h>
+#include <wx/choice.h>
+#include <wx/arrstr.h>
+#include <wx/bmpbuttn.h>
 #include "../TileMapPanel.h"
 
 class TileMapObjectEditorBase : public wxDialog
@@ -46,7 +44,10 @@ protected:
     wxSpinCtrl* m_verticalMarginsSpin;
     wxTextCtrl* m_imageNameTextCtrl;
     wxButton* m_updateButton;
-    wxAuiToolBar* m_auibar70;
+    wxStaticText* m_staticText105;
+    wxChoice* m_layerChoice;
+    wxBitmapButton* m_bmpButton111;
+    wxBitmapButton* m_bmpButton115;
     TileMapPanel* m_tileMapPanel;
     wxStaticText* m_staticText93;
     wxSpinCtrl* m_mapWidthSpin;
@@ -60,6 +61,9 @@ protected:
 
 protected:
     virtual void OnUpdateClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerAddButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerDeleteButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMapUpdateButtonClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:

@@ -42,7 +42,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     staticBoxSizer33->Add(flexGridSizer5, 1, wxALL|wxEXPAND, 5);
     
-    m_tileSetPanel = new TileSetPanel(this, wxID_ANY, wxDefaultPosition, wxSize(300,350), wxHSCROLL|wxVSCROLL);
+    m_tileSetPanel = new TileSetPanel(this, wxID_ANY, wxDefaultPosition, wxSize(300,350), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
     m_tileSetPanel->SetScrollRate(5, 5);
     
     flexGridSizer5->Add(m_tileSetPanel, 0, wxALL|wxEXPAND, 5);
@@ -139,13 +139,30 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer3->Add(flexGridSizer7, 1, wxALL|wxEXPAND, 5);
     
-    m_auibar70 = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE);
-    m_auibar70->SetToolBitmapSize(wxSize(16,16));
+    wxFlexGridSizer* flexGridSizer103 = new wxFlexGridSizer(1, 0, 0, 0);
+    flexGridSizer103->SetFlexibleDirection( wxBOTH );
+    flexGridSizer103->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer7->Add(m_auibar70, 0, wxALL|wxEXPAND, 5);
+    flexGridSizer7->Add(flexGridSizer103, 1, wxALL|wxEXPAND, 5);
     
-    m_auibar70->AddTool(wxID_ANY, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
-    m_auibar70->Realize();
+    m_staticText105 = new wxStaticText(this, wxID_ANY, _("Current layer:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer103->Add(m_staticText105, 0, wxALL, 5);
+    
+    wxArrayString m_layerChoiceArr;
+    m_layerChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), m_layerChoiceArr, 0);
+    
+    flexGridSizer103->Add(m_layerChoice, 0, wxALL, 5);
+    
+    m_bmpButton111 = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("addicon")), wxDefaultPosition, wxSize(-1,-1), wxBU_AUTODRAW);
+    m_bmpButton111->SetToolTip(_("Add a layer after the current one"));
+    
+    flexGridSizer103->Add(m_bmpButton111, 0, wxALL, 5);
+    
+    m_bmpButton115 = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("deleteicon")), wxDefaultPosition, wxSize(-1,-1), wxBU_AUTODRAW);
+    m_bmpButton115->SetToolTip(_("Delete current layer"));
+    
+    flexGridSizer103->Add(m_bmpButton115, 0, wxALL, 5);
     
     m_tileMapPanel = new TileMapPanel(this, wxID_ANY, wxDefaultPosition, wxSize(400, 550), wxHSCROLL|wxVSCROLL);
     m_tileMapPanel->SetScrollRate(5, 5);
@@ -206,6 +223,9 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     Centre(wxBOTH);
     // Connect events
     m_updateButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnUpdateClicked), NULL, this);
+    m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
+    m_bmpButton111->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerAddButtonClicked), NULL, this);
+    m_bmpButton115->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerDeleteButtonClicked), NULL, this);
     m_mapUpdateButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnMapUpdateButtonClicked), NULL, this);
     
 }
@@ -213,6 +233,9 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
 TileMapObjectEditorBase::~TileMapObjectEditorBase()
 {
     m_updateButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnUpdateClicked), NULL, this);
+    m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
+    m_bmpButton111->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerAddButtonClicked), NULL, this);
+    m_bmpButton115->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerDeleteButtonClicked), NULL, this);
     m_mapUpdateButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnMapUpdateButtonClicked), NULL, this);
     
 }

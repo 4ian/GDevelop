@@ -38,7 +38,7 @@
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
                 <object class="wxScrolledWindow" name="m_tileSetPanel" subclass="TileSetPanel">
-                  <style>wxHSCROLL|wxVSCROLL</style>
+                  <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
                   <size>300,350</size>
                   <scrollrate>5,5</scrollrate>
                 </object>
@@ -228,22 +228,61 @@
           <hgap>0</hgap>
           <growablecols>0</growablecols>
           <growablerows>1</growablerows>
-          <object class="sizeritem">
+          <object class="sizeritem" name="flexGridSizer103">
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
-            <object class="wxAuiToolBar" name="m_auibar70">
-              <style>wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE</style>
-              <bg/>
-              <fg/>
-              <bitmapsize>16,16</bitmapsize>
-              <object class="tool" name="m_toolbarItem74">
-                <label>
-                  <![CDATA[Tool Label]]>
-                </label>
-                <longhelp>
-                  <![CDATA[]]>
-                </longhelp>
-                <bitmap>C:/Users/Victor/AppData/Local/Temp/placeholder16.png</bitmap>
+            <option>1</option>
+            <object class="wxFlexGridSizer">
+              <cols>0</cols>
+              <rows>1</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols/>
+              <growablerows/>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_staticText105">
+                  <label>
+                    <![CDATA[Current layer:]]>
+                  </label>
+                  <style/>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxChoice" name="m_layerChoice">
+                  <style/>
+                  <content/>
+                  <selection>
+                    <![CDATA[]]>
+                  </selection>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxBitmapButton" name="m_bmpButton111">
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/addicon.png</bitmap>
+                  <style>wxBU_AUTODRAW</style>
+                  <tooltip>
+                    <![CDATA[Add a layer after the current one]]>
+                  </tooltip>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxBitmapButton" name="m_bmpButton115">
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/deleteicon.png</bitmap>
+                  <style>wxBU_AUTODRAW</style>
+                  <tooltip>
+                    <![CDATA[Delete current layer]]>
+                  </tooltip>
+                  <default>0</default>
+                </object>
               </object>
             </object>
           </object>

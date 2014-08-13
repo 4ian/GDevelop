@@ -1,6 +1,8 @@
 #include "TileSetPanel.h"
 
 #include <iostream>
+#include <wx/dcbuffer.h>
+#include "GDCore/IDE/CommonBitmapManager.h"
 
 wxDEFINE_EVENT(TILE_SELECTION_CHANGED, TileSelectionEvent);
 
@@ -14,6 +16,8 @@ TileSetPanel::TileSetPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     m_selectedCol(-1),
     m_selectedRow(-1)
 {
+    SetBackgroundStyle(wxBG_STYLE_PAINT);
+
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileSetPanel::OnLeftButtonPressed), NULL, this);
 }
 
@@ -55,15 +59,20 @@ void TileSetPanel::Update()
 
 void TileSetPanel::OnDraw(wxDC& dc)
 {
+    //Get the viewport
+    wxPoint minPos = GetViewStart();
+    int width, height;
+    GetVirtualSize(&width, &height);
+    wxPoint maxPos = minPos + wxPoint(width, height);
+
+    //Draw the background
+    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+    dc.DrawRectangle(minPos.x, minPos.y, width, height);
+
     if(m_tileSetBitmap)
     {
         //Draw the bitmap
         dc.DrawBitmap(*m_tileSetBitmap, 0, 0, false);
-
-        wxPoint minPos = GetViewStart();
-        int width, height;
-        GetVirtualSize(&width, &height);
-        wxPoint maxPos = minPos + wxPoint(width, height);
 
         //Draw the lines
         dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));

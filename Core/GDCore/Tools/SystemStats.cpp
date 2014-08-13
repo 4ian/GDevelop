@@ -40,7 +40,7 @@ size_t SystemStats::GetUsedVirtualMemory()
     return result;
 #elif defined(WINDOWS)
     PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
     SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
     return virtualMemUsedByMe;
 #else

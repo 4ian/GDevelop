@@ -1,10 +1,6 @@
-Game Develop
-============
-2008-2014 Florian Rival (Florian.Rival@gmail.com / http://www.FlorianRival.com)
-
 ![Game Develop logo](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/gdlogo.png "Game Develop logo")
 
-Game Develop is a full featured, open source game development software, allowing to create any kind of 2D game
+Game Develop is a full featured, open source game development software, allowing to create HTML5 and native games
 without needing any knowledge in a specific programming language. All the game logic is made thanks to an
 intuitive and powerful event based system.
 
@@ -22,7 +18,7 @@ About directory structure
 * scripts: Various scripts, notably scripts to package GD (ReleaseProcedure* scripts).
 * docs: Directory where the documentation is generated. To avoid you to generate it by yourself, it is [available here](http://4ian.github.io/GD-Documentation).
 
-How to build
+How to build [![Build Status](https://travis-ci.org/4ian/GD.svg?branch=master)](https://travis-ci.org/4ian/GD)
 ------------
 
 Full and detailed instructions are in the getting started page of the [documentation available here](http://4ian.github.io/GD-Documentation).
@@ -39,6 +35,13 @@ Documentation
 -------------
 
 The documentation is available on http://4ian.github.io/GD-Documentation.
+
+Links
+-----
+
+* [Game Develop forums](http://forum.compilgames.net)
+* [Game Develop homepage](http://www.compilgames.net)
+* [Game Develop wiki](http://wiki.compilgames.net), and in particular [How to translate GD](http://www.wiki.compilgames.net/doku.php/en/game_develop/articles/translate_gd).
 
 License
 -------

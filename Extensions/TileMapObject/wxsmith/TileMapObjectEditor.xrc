@@ -240,7 +240,7 @@
               <growablecols/>
               <growablerows/>
               <object class="sizeritem">
-                <flag>wxALL</flag>
+                <flag>wxALL|wxALIGN_CENTER</flag>
                 <border>5</border>
                 <object class="wxStaticText" name="m_staticText105">
                   <label>
@@ -263,8 +263,8 @@
               <object class="sizeritem">
                 <flag>wxALL</flag>
                 <border>5</border>
-                <object class="wxBitmapButton" name="m_bmpButton111">
-                  <bitmap>../../../Binaries/Output/Release_Windows/res/addicon.png</bitmap>
+                <object class="wxBitmapButton" name="m_layerAddButton">
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/add16.png</bitmap>
                   <style>wxBU_AUTODRAW</style>
                   <tooltip>
                     <![CDATA[Add a layer after the current one]]>
@@ -275,13 +275,42 @@
               <object class="sizeritem">
                 <flag>wxALL</flag>
                 <border>5</border>
-                <object class="wxBitmapButton" name="m_bmpButton115">
-                  <bitmap>../../../Binaries/Output/Release_Windows/res/deleteicon.png</bitmap>
+                <object class="wxBitmapButton" name="m_layerDeleteButton">
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</bitmap>
                   <style>wxBU_AUTODRAW</style>
                   <tooltip>
                     <![CDATA[Delete current layer]]>
                   </tooltip>
                   <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxBitmapButton" name="m_layerUpButton">
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/up16.png</bitmap>
+                  <style>wxBU_AUTODRAW</style>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxBitmapButton" name="m_layerDownButton">
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/down16.png</bitmap>
+                  <style>wxBU_AUTODRAW</style>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxCheckBox" name="m_hideUpperLayerCheck">
+                  <style/>
+                  <label>
+                    <![CDATA[Hide upper layers]]>
+                  </label>
+                  <checked>0</checked>
                 </object>
               </object>
             </object>
@@ -291,7 +320,7 @@
             <border>5</border>
             <object class="wxScrolledWindow" name="m_tileMapPanel" subclass="TileMapPanel">
               <style>wxHSCROLL|wxVSCROLL</style>
-              <size>400, 550</size>
+              <size>500, 550</size>
               <scrollrate>5,5</scrollrate>
             </object>
           </object>

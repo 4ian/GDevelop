@@ -32,6 +32,7 @@ class TileMapPanel : public wxScrolledWindow
 
     //Tile to be inserted
     std::pair<int, int> m_tileToBeInserted;
+    bool m_hideUpperLayers;
 
     //Info about the TileMap (the level map)
     // m_map[layer][column][row]
@@ -72,6 +73,9 @@ public:
      */
     void SetMapSize(int columns, int rows);
 
+    void HideUpperLayers(bool enable);
+    bool AreUpperLayersHidden() const;
+
     /**
      * Get the current layer
      */
@@ -93,6 +97,12 @@ public:
      * \param asCopyOf Create the layer as a copy of that layer. (Set to -1 to create a blank layer)
      */
     void AddLayer(int pos, int asCopyOf = -1);
+
+    /**
+     * Remove a layer
+     * \param pos The layer to delete
+     */
+    void RemoveLayer(int pos);
 
     /**
      * Refresh and recreate tile cache.

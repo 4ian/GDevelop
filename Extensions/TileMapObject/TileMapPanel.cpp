@@ -6,6 +6,7 @@ TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     wxScrolledWindow(parent, id, pos, size, style),
     m_tileSetInfo(),
     m_tileToBeInserted(-1, -1),
+    m_hideUpperLayers(false),
     m_map(),
     m_mapCurrentLayer(),
     m_bitmapCache()
@@ -50,9 +51,21 @@ void TileMapPanel::SetMapSize(int columns, int rows)
     UpdateMapSize();
 }
 
+void TileMapPanel::HideUpperLayers(bool enable)
+{
+    m_hideUpperLayers = enable;
+    Refresh();
+}
+
+bool TileMapPanel::AreUpperLayersHidden() const
+{
+    return m_hideUpperLayers;
+}
+
 void TileMapPanel::SetCurrentLayer(int currentLayer)
 {
     m_mapCurrentLayer = currentLayer;
+    Refresh();
 }
 
 int TileMapPanel::GetLayersCount() const
@@ -74,6 +87,15 @@ void TileMapPanel::AddLayer(int pos, int asCopyOf)
     }
 
     UpdateMapSize();
+    Refresh();
+}
+
+void TileMapPanel::RemoveLayer(int pos)
+{
+    m_map.erase(m_map.begin() + pos);
+
+    UpdateMapSize();
+    Refresh();
 }
 
 void TileMapPanel::Update()
@@ -101,7 +123,7 @@ void TileMapPanel::OnDraw(wxDC& dc)
     dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
 
     //Draw the tiles
-    for(int layer = 0; layer < m_map.size(); layer++)
+    for(int layer = 0; m_hideUpperLayers ? layer <= GetCurrentLayer() : layer < m_map.size(); layer++)
     {
         for(int col = 0; col < m_map[layer].tiles.size(); col++)
         {

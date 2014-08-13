@@ -24,6 +24,7 @@
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include <wx/bmpbuttn.h>
+#include <wx/checkbox.h>
 #include "../TileMapPanel.h"
 
 class TileMapObjectEditorBase : public wxDialog
@@ -46,8 +47,11 @@ protected:
     wxButton* m_updateButton;
     wxStaticText* m_staticText105;
     wxChoice* m_layerChoice;
-    wxBitmapButton* m_bmpButton111;
-    wxBitmapButton* m_bmpButton115;
+    wxBitmapButton* m_layerAddButton;
+    wxBitmapButton* m_layerDeleteButton;
+    wxBitmapButton* m_layerUpButton;
+    wxBitmapButton* m_layerDownButton;
+    wxCheckBox* m_hideUpperLayerCheck;
     TileMapPanel* m_tileMapPanel;
     wxStaticText* m_staticText93;
     wxSpinCtrl* m_mapWidthSpin;
@@ -64,6 +68,9 @@ protected:
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerAddButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerDeleteButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerUpButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerDownButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMapUpdateButtonClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:

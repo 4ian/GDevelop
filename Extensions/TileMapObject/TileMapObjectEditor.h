@@ -40,31 +40,34 @@ class ResourcesEditor;
 
 class TileMapObjectEditor: public TileMapObjectEditorBase
 {
-	public:
+    public:
 
-		TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
-		virtual ~TileMapObjectEditor();
+        TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
+        virtual ~TileMapObjectEditor();
 
-	protected:
-		virtual void OnTileSetPanelErase(wxEraseEvent& event);
-		virtual void OnTileSetPanelPaint(wxPaintEvent& event);
-		virtual void OnUpdateClicked(wxCommandEvent& event);
-		virtual void OnMapUpdateButtonClicked(wxCommandEvent& event);
-		virtual void OnLayerAddButtonClicked(wxCommandEvent& event);
-		virtual void OnLayerChoiceChanged(wxCommandEvent& event);
-		virtual void OnLayerDeleteButtonClicked(wxCommandEvent& event);
-		void OnTileSetSelectionChanged(TileSelectionEvent &event);
+    protected:
+        virtual void OnTileSetPanelErase(wxEraseEvent& event);
+        virtual void OnTileSetPanelPaint(wxPaintEvent& event);
+        virtual void OnUpdateClicked(wxCommandEvent& event);
+        virtual void OnMapUpdateButtonClicked(wxCommandEvent& event);
+        virtual void OnLayerAddButtonClicked(wxCommandEvent& event);
+        virtual void OnLayerChoiceChanged(wxCommandEvent& event);
+        virtual void OnLayerDeleteButtonClicked(wxCommandEvent& event);
+        virtual void OnLayerDownButtonClicked(wxCommandEvent& event);
+        virtual void OnLayerUpButtonClicked(wxCommandEvent& event);
+        virtual void OnHideUpperLayerChecked(wxCommandEvent& event);
+        void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
-	private:
-		void SetTileSet(const std::string &tileSetName);
-		void UpdateLayerChoice();
-		wxBitmap GetwxBitmapFromImageResource(gd::Resource & resource);
+    private:
+        void SetTileSet(const std::string &tileSetName);
+        void UpdateLayerChoice();
+        wxBitmap GetwxBitmapFromImageResource(gd::Resource & resource);
 
-		wxBitmap *tileSetBitmap;
+        wxBitmap *tileSetBitmap;
 
-		gd::Project & game;
-		gd::MainFrameWrapper & mainFrameWrapper;
-		TileMapObject & object;
+        gd::Project & game;
+        gd::MainFrameWrapper & mainFrameWrapper;
+        TileMapObject & object;
 };
 
 #endif

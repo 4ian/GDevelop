@@ -56,7 +56,6 @@ ELSEIF (NOT NO_GUI)
 	link_directories(${GTK3_LIBRARY_DIRS})
 ENDIF(WIN32)
 
-
 #Defines
 ###
 add_definitions( -DGD_IDE_ONLY )
@@ -128,7 +127,7 @@ target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/lib
 		target_link_libraries(GDCore ${wxwidgets_lib_dir}/libwxmsw29u_xrc.a ${wxwidgets_lib_dir}/libwxmsw29u_stc.a ${wxwidgets_lib_dir}/libwxmsw29u_richtext.a ${wxwidgets_lib_dir}/libwxmsw29u_propgrid.a ${wxwidgets_lib_dir}/libwxmsw29u_ribbon.a ${wxwidgets_lib_dir}/libwxmsw29u_aui.a ${wxwidgets_lib_dir}/libwxmsw29u_adv.a ${wxwidgets_lib_dir}/libwxmsw29u_html.a ${wxwidgets_lib_dir}/libwxmsw29u_core.a ${wxwidgets_lib_dir}/libwxbase29u_xml.a ${wxwidgets_lib_dir}/libwxbase29u_net.a ${wxwidgets_lib_dir}/libwxexpat.a ${wxwidgets_lib_dir}/libwxbase29u.a ${wxwidgets_lib_dir}/libwxpng.a ${wxwidgets_lib_dir}/libwxjpeg.a ${wxwidgets_lib_dir}/libwxzlib.a ${wxwidgets_lib_dir}/libwxtiff.a)
 	ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
-	target_link_libraries(GDCore ws2_32 user32 opengl32 glu32)
+	target_link_libraries(GDCore ws2_32 user32 opengl32 glu32 psapi)
 ELSEIF (NOT NO_GUI)
 	target_link_libraries(GDCore ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
 	target_link_libraries(GDCore ${wxWidgets_LIBRARIES})

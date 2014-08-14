@@ -8,12 +8,7 @@
 #include <vector>
 
 #include "TileSetPanel.h"
-
-struct TileMapLayer
-{
-    ///Contains all tiles, the column is the first index and the row is the second. the pair contains the tile position into the TileSet.
-    std::vector< std::vector< std::pair<int, int> > > tiles;
-};
+#include "TileMap.h"
  
 class TileMapPanel : public wxScrolledWindow
 {
@@ -34,11 +29,7 @@ class TileMapPanel : public wxScrolledWindow
     std::pair<int, int> m_tileToBeInserted;
     bool m_hideUpperLayers;
 
-    //Info about the TileMap (the level map)
-    // m_map[layer][column][row]
-    std::vector<TileMapLayer> m_map;
-    int m_mapWidth;
-    int m_mapHeight;
+    TileMap *m_tilemap;
     int m_mapCurrentLayer;
 
     //Cache containing all tileset pre-separated wxBitmaps
@@ -47,6 +38,11 @@ class TileMapPanel : public wxScrolledWindow
 public:
     TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=wxHSCROLL|wxVSCROLL);
     ~TileMapPanel();
+
+    /**
+     * Set the tilemap edited by the TileMapPanel;
+     */
+    void SetTileMap(TileMap *tilemap);
 
     /**
      * Set the tileset to be used by the map
@@ -68,11 +64,6 @@ public:
      */
     void SetTileSetMargins(wxSize tileMargins);
 
-    /**
-     * Set the map size (columns, rows)
-     */
-    void SetMapSize(int columns, int rows);
-
     void HideUpperLayers(bool enable);
     bool AreUpperLayersHidden() const;
 
@@ -87,27 +78,14 @@ public:
     void SetCurrentLayer(int currentLayer);
 
     /**
-     * Return the number of layers
-    **/
-    int GetLayersCount() const;
-
-    /**
-     * Add a new layer
-     * \param pos Where to create the layer (next layers will be moved after)
-     * \param asCopyOf Create the layer as a copy of that layer. (Set to -1 to create a blank layer)
-     */
-    void AddLayer(int pos, int asCopyOf = -1);
-
-    /**
-     * Remove a layer
-     * \param pos The layer to delete
-     */
-    void RemoveLayer(int pos);
-
-    /**
      * Refresh and recreate tile cache.
      */
     void Update();
+
+    /**
+     * Update the scrollbars.
+     */
+    void UpdateScrollBars();
 
     virtual void OnDraw(wxDC& dc);
 
@@ -117,9 +95,6 @@ protected:
     void OnLeftButtonPressed(wxMouseEvent& event);
 
 private:
-
-    void UpdateMapSize();
-
     wxPoint GetPositionOfTile(int column, int row);
     void GetTileAt(wxPoint position, int &tileCol, int &tileRow);
 };

@@ -1,25 +1,29 @@
 #include "TileMapPanel.h"
 
 #include <iostream>
+#include <wx/dcbuffer.h>
+#include "GDCore/IDE/CommonBitmapManager.h"
 
 TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) :
     wxScrolledWindow(parent, id, pos, size, style),
     m_tileSetInfo(),
     m_tileToBeInserted(-1, -1),
     m_hideUpperLayers(false),
-    m_map(),
+    m_tilemap(NULL),
     m_mapCurrentLayer(),
     m_bitmapCache()
 {
-    SetMapSize(0, 0);
-    AddLayer(0);
-
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnLeftButtonPressed), NULL, this);
 }
 
 TileMapPanel::~TileMapPanel()
 {
 
+}
+
+void TileMapPanel::SetTileMap(TileMap *tilemap)
+{
+    m_tilemap = tilemap;
 }
 
 void TileMapPanel::SetTileSet(wxBitmap *tileSetBitmap)
@@ -43,14 +47,6 @@ void TileMapPanel::SetTileSetMargins(wxSize tileMargins)
     m_tileSetInfo.tileMargins = tileMargins;
 }
 
-void TileMapPanel::SetMapSize(int columns, int rows)
-{
-    m_mapWidth = columns;
-    m_mapHeight = rows;
-
-    UpdateMapSize();
-}
-
 void TileMapPanel::HideUpperLayers(bool enable)
 {
     m_hideUpperLayers = enable;
@@ -65,36 +61,6 @@ bool TileMapPanel::AreUpperLayersHidden() const
 void TileMapPanel::SetCurrentLayer(int currentLayer)
 {
     m_mapCurrentLayer = currentLayer;
-    Refresh();
-}
-
-int TileMapPanel::GetLayersCount() const
-{
-    return m_map.size();
-}
-
-void TileMapPanel::AddLayer(int pos, int asCopyOf)
-{
-    if(asCopyOf == -1)
-    {
-        //New layer
-        m_map.insert(m_map.begin() + pos, TileMapLayer());
-    }
-    else
-    {
-        //Copy of another layer
-        m_map.insert(m_map.begin() + pos, TileMapLayer(m_map[asCopyOf]));
-    }
-
-    UpdateMapSize();
-    Refresh();
-}
-
-void TileMapPanel::RemoveLayer(int pos)
-{
-    m_map.erase(m_map.begin() + pos);
-
-    UpdateMapSize();
     Refresh();
 }
 
@@ -118,38 +84,47 @@ void TileMapPanel::Update()
     Refresh();
 }
 
+void TileMapPanel::UpdateScrollBars()
+{
+    SetScrollbars(1, 1, m_tilemap->GetColumnsCount() * m_tileSetInfo.tileSize.GetWidth(), m_tilemap->GetRowsCount() * m_tileSetInfo.tileSize.GetHeight());
+}
+
 void TileMapPanel::OnDraw(wxDC& dc)
 {
+    wxPoint minPos = GetViewStart();
+    int width, height;
+    GetVirtualSize(&width, &height);
+    wxPoint maxPos = minPos + wxPoint(width, height);
+
+    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+    dc.DrawRectangle(minPos.x, minPos.y, width, height);
+
     dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
 
     //Draw the tiles
-    for(int layer = 0; m_hideUpperLayers ? layer <= GetCurrentLayer() : layer < m_map.size(); layer++)
+    for(int layer = 0; m_hideUpperLayers ? layer <= GetCurrentLayer() : layer < m_tilemap->GetLayersCount(); layer++)
     {
-        for(int col = 0; col < m_map[layer].tiles.size(); col++)
+        for(int col = 0; col < m_tilemap->GetColumnsCount(); col++)
         {
-            for(int row = 0; row < m_map[layer].tiles[0].size(); row++)
+            for(int row = 0; row < m_tilemap->GetRowsCount(); row++)
             {
-                if(m_map[layer].tiles[col][row].first == -1 || m_map[layer].tiles[col][row].second == -1)
+                if(m_tilemap->GetTile(layer, col, row).first == -1 || m_tilemap->GetTile(layer, col, row).second == -1)
                     continue;
     
-                dc.DrawBitmap(m_bitmapCache[m_map[layer].tiles[col][row]], GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y);
+                dc.DrawBitmap(m_bitmapCache[m_tilemap->GetTile(layer, col, row)], GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y);
             }
         }
     }
 
     //Draw the grid
-    wxPoint minPos = GetViewStart();
-    int width, height;
-    GetVirtualSize(&width, &height);
-    wxPoint maxPos = minPos + wxPoint(width, height);
-    if(m_map.size() != 0)
+    if(m_tilemap->GetLayersCount() != 0)
     {
-        for(int col = 0; col < m_mapWidth; col++)
+        for(int col = 0; col < m_tilemap->GetColumnsCount(); col++)
         {
             dc.DrawLine(col * m_tileSetInfo.tileSize.GetWidth(), minPos.y,
                         col * m_tileSetInfo.tileSize.GetWidth(), maxPos.y);
     
-            for(int row = 0; row < m_mapHeight; row++)
+            for(int row = 0; row < m_tilemap->GetRowsCount(); row++)
             {
                 dc.DrawLine(minPos.x, row * m_tileSetInfo.tileSize.GetHeight(),
                             maxPos.x, row * m_tileSetInfo.tileSize.GetHeight());
@@ -170,26 +145,12 @@ void TileMapPanel::OnLeftButtonPressed(wxMouseEvent& event)
     wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());
     GetTileAt(mousePos, currentColumn, currentRow);
 
-    if(currentColumn >= m_mapWidth || currentRow >= m_mapHeight)
+    if(currentColumn >= m_tilemap->GetColumnsCount() || currentRow >= m_tilemap->GetRowsCount())
         return;
 
-    m_map[m_mapCurrentLayer].tiles[currentColumn][currentRow] = m_tileToBeInserted;
+    m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted);
 
     Refresh();
-}
-
-void TileMapPanel::UpdateMapSize()
-{
-    for(int layer = 0; layer < m_map.size(); layer++)
-    {
-        for(int col = 0; col < m_map[layer].tiles.size(); col++)
-        {
-            m_map[layer].tiles[col].resize(m_mapHeight, std::make_pair<int, int>(-1, -1));
-        }
-        m_map[layer].tiles.resize(m_mapWidth, std::vector< std::pair<int, int> >(m_mapHeight, std::make_pair<int, int>(-1, -1)));
-
-        SetScrollbars(1, 1, m_mapWidth * m_tileSetInfo.tileSize.GetWidth(), m_mapHeight * m_tileSetInfo.tileSize.GetHeight());
-    }
 }
 
 wxPoint TileMapPanel::GetPositionOfTile(int column, int row)

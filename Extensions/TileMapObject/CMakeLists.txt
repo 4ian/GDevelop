@@ -124,12 +124,14 @@ include_directories(.)
 set(source_files
 	Extension.cpp
 	TileMapObject.cpp
+	TileMap.cpp
 	)
 
 set(gdide_source_files
 	TileMapObjectEditor.cpp
 	TileSetPanel.cpp
 	TileMapPanel.cpp
+	TileMap.cpp
 	wxsmith/TileMapObjectEditor.cpp
 	wxsmith/TileMapObjectEditor.xrc
 	wxsmith/TileMapObjectEditor_wxsmith_bitmaps.cpp)

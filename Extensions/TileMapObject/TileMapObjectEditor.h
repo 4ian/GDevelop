@@ -33,6 +33,8 @@ freely, subject to the following restrictions:
 
 #include <wx/bitmap.h>
 
+#include "TileMap.h"
+
 namespace gd { class Project; }
 class TileMapObject;
 namespace gd { class MainFrameWrapper; }
@@ -68,6 +70,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         gd::Project & game;
         gd::MainFrameWrapper & mainFrameWrapper;
         TileMapObject & object;
+
+        TileMap tileMap;
 };
 
 #endif

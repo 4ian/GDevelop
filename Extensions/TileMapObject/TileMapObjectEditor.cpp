@@ -50,8 +50,10 @@ TileMapObjectEditorBase(parent),
 tileSetBitmap(NULL),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_),
-object(object_)
+object(object_),
+tileMap()
 {
+    m_tileMapPanel->SetTileMap(&tileMap);
     m_tileSetPanel->Connect(TILE_SELECTION_CHANGED, TileSelectionEventHandler(TileMapObjectEditor::OnTileSetSelectionChanged), NULL, this);
 
     UpdateLayerChoice();
@@ -94,16 +96,19 @@ void TileMapObjectEditor::OnUpdateClicked(wxCommandEvent& event)
 
     m_tileSetPanel->Update();
     m_tileMapPanel->Update();
+    m_tileMapPanel->UpdateScrollBars();
 }
 
 void TileMapObjectEditor::OnMapUpdateButtonClicked(wxCommandEvent& event)
 {
-    m_tileMapPanel->SetMapSize(m_mapWidthSpin->GetValue(), m_mapHeightSpin->GetValue());
+    tileMap.SetSize(m_mapWidthSpin->GetValue(), m_mapHeightSpin->GetValue());
+    m_tileMapPanel->UpdateScrollBars();
+    m_tileMapPanel->Refresh();
 }
 
 void TileMapObjectEditor::OnLayerAddButtonClicked(wxCommandEvent& event)
 {
-    m_tileMapPanel->AddLayer(m_tileMapPanel->GetCurrentLayer() + 1);
+    tileMap.AddLayer(m_tileMapPanel->GetCurrentLayer() + 1);
     m_tileMapPanel->SetCurrentLayer(m_tileMapPanel->GetCurrentLayer() + 1);
     UpdateLayerChoice();
 }
@@ -115,22 +120,22 @@ void TileMapObjectEditor::OnLayerChoiceChanged(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnLayerDeleteButtonClicked(wxCommandEvent& event)
 {
-    if(m_tileMapPanel->GetLayersCount() > 1)
-        m_tileMapPanel->RemoveLayer(m_tileMapPanel->GetCurrentLayer());
+    if(tileMap.GetLayersCount() > 1)
+        tileMap.RemoveLayer(m_tileMapPanel->GetCurrentLayer());
 
-    if(m_tileMapPanel->GetCurrentLayer() >= m_tileMapPanel->GetLayersCount())
-        m_tileMapPanel->SetCurrentLayer(m_tileMapPanel->GetLayersCount() - 1);
+    if(m_tileMapPanel->GetCurrentLayer() >= tileMap.GetLayersCount())
+        m_tileMapPanel->SetCurrentLayer(tileMap.GetLayersCount() - 1);
 
     UpdateLayerChoice();
 }
 
 void TileMapObjectEditor::OnLayerDownButtonClicked(wxCommandEvent& event)
 {
-    if(m_tileMapPanel->GetCurrentLayer() + 1 < m_tileMapPanel->GetLayersCount())
+    if(m_tileMapPanel->GetCurrentLayer() + 1 < tileMap.GetLayersCount())
     {
         //Move the layer down
-        m_tileMapPanel->AddLayer(m_tileMapPanel->GetCurrentLayer() + 2, m_tileMapPanel->GetCurrentLayer());
-        m_tileMapPanel->RemoveLayer(m_tileMapPanel->GetCurrentLayer());
+        tileMap.AddLayer(m_tileMapPanel->GetCurrentLayer() + 2, m_tileMapPanel->GetCurrentLayer());
+        tileMap.RemoveLayer(m_tileMapPanel->GetCurrentLayer());
         m_tileMapPanel->SetCurrentLayer(m_tileMapPanel->GetCurrentLayer() + 1);
     }
 
@@ -142,8 +147,8 @@ void TileMapObjectEditor::OnLayerUpButtonClicked(wxCommandEvent& event)
     if(m_tileMapPanel->GetCurrentLayer() > 0)
     {
         //Move the layer down
-        m_tileMapPanel->AddLayer(m_tileMapPanel->GetCurrentLayer() - 1, m_tileMapPanel->GetCurrentLayer());
-        m_tileMapPanel->RemoveLayer(m_tileMapPanel->GetCurrentLayer() + 1);
+        tileMap.AddLayer(m_tileMapPanel->GetCurrentLayer() - 1, m_tileMapPanel->GetCurrentLayer());
+        tileMap.RemoveLayer(m_tileMapPanel->GetCurrentLayer() + 1);
         m_tileMapPanel->SetCurrentLayer(m_tileMapPanel->GetCurrentLayer() - 1);
     }
 
@@ -183,7 +188,7 @@ void TileMapObjectEditor::SetTileSet(const std::string &tileSetName)
 void TileMapObjectEditor::UpdateLayerChoice()
 {
     m_layerChoice->Clear();
-    for(int layerId = 0; layerId < m_tileMapPanel->GetLayersCount(); layerId++)
+    for(int layerId = 0; layerId < tileMap.GetLayersCount(); layerId++)
     {
         m_layerChoice->Append(wxString::FromDouble(layerId, 0));
     }

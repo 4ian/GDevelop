@@ -147,8 +147,7 @@ ELSE()
 	IF(WIN32)
 		add_custom_command(TARGET GDJS
 			POST_BUILD
-			COMMAND "CopyRuntimeToGD.bat"
-			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
+			COMMAND "${GD_base_dir}/GDJS/scripts/CopyRuntimeToGD.bat")
 	ELSE()
 		add_custom_command(TARGET GDJS
 			POST_BUILD

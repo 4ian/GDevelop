@@ -186,8 +186,7 @@ ELSE()
 	IF(WIN32)
 		add_custom_command(TARGET GDCpp
 			POST_BUILD
-			COMMAND "UpdateHeadersANDPCH${CMAKE_BUILD_TYPE}.bat"
-			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+			COMMAND "${GD_base_dir}/GDCpp/scripts/CopyHeadersToGD.bat" "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform")
 	ELSE()
 		add_custom_command(TARGET GDCpp
 			POST_BUILD

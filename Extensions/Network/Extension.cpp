@@ -95,7 +95,7 @@ public:
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::StopListening").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::ActStopListening").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("SendValue",
                        _("Send a value"),

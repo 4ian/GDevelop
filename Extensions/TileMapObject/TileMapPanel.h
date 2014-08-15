@@ -9,31 +9,17 @@
 
 #include "TileSetPanel.h"
 #include "TileMap.h"
+#include "TileSet.h"
  
 class TileMapPanel : public wxScrolledWindow
 {
-    //Info about the TileSet (the texture containing all tiles);
-    struct TileSetInfo
-    {
-        TileSetInfo() : tileSetBitmap(NULL), tileColumns(0), tileRows(0), tileSize(0, 0), tileMargins(0, 0) {};
-
-        wxBitmap* tileSetBitmap;
-        int tileColumns;
-        int tileRows;
-        wxSize tileSize;
-        wxSize tileMargins;
-
-    } m_tileSetInfo;
-
     //Tile to be inserted
-    std::pair<int, int> m_tileToBeInserted;
+    int m_tileToBeInserted;
     bool m_hideUpperLayers;
 
+    TileSet *m_tileset;
     TileMap *m_tilemap;
     int m_mapCurrentLayer;
-
-    //Cache containing all tileset pre-separated wxBitmaps
-    std::map<std::pair<int, int>, wxBitmap> m_bitmapCache; //First int represents the column, the second the row.
 
 public:
     TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=wxHSCROLL|wxVSCROLL);
@@ -47,22 +33,7 @@ public:
     /**
      * Set the tileset to be used by the map
      */
-    void SetTileSet(wxBitmap *tileSetBitmap);
-
-    /**
-     * Set the number of columns and rows of the tileset
-     */
-    void SetTileSetCount(int columns, int rows);
-
-    /**
-     * Set the size of tiles
-     */
-    void SetTileSetSize(wxSize tileSize);
-
-    /**
-     * Set the margins between tiles
-     */
-    void SetTileSetMargins(wxSize tileMargins);
+    void SetTileSet(TileSet *tileset);
 
     void HideUpperLayers(bool enable);
     bool AreUpperLayersHidden() const;
@@ -81,11 +52,6 @@ public:
      * Refresh and recreate tile cache.
      */
     void Update();
-
-    /**
-     * Update the scrollbars.
-     */
-    void UpdateScrollBars();
 
     virtual void OnDraw(wxDC& dc);
 

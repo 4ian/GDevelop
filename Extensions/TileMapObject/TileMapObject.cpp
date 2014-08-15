@@ -76,7 +76,7 @@ void TileMapObject::DoSerializeTo(gd::SerializerElement & element) const
 
 void TileMapObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    texture = project.GetImageManager()->GetSFMLTexture(textureName);
+    texture = project.GetImageManager()->GetSFMLTexture("rpg.png");
 }
 #endif
 

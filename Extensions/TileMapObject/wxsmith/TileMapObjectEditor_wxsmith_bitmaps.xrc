@@ -1,7 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
-  <object class="wxBitmap" name="add16">..\..\..\Binaries\Output\Release_Windows\res\icons_default\add16.png</object>
-  <object class="wxBitmap" name="down16">..\..\..\Binaries\Output\Release_Windows\res\icons_default\down16.png</object>
-  <object class="wxBitmap" name="remove16">..\..\..\Binaries\Output\Release_Windows\res\icons_default\remove16.png</object>
-  <object class="wxBitmap" name="up16">..\..\..\Binaries\Output\Release_Windows\res\icons_default\up16.png</object>
-</resource>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1"/>

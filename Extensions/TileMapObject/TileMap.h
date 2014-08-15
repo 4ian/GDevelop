@@ -12,7 +12,7 @@
  */
 struct TileMapLayer
 {
-    std::vector< std::vector< std::pair<int, int> > > tiles; ///< Contains all tiles, the column is the first index and the row is the second. 
+    std::vector< std::vector< int > > tiles; ///< Contains all tiles, the column is the first index and the row is the second. 
     														 ///  the pair contains the tile position into the TileSet.
 };
 
@@ -26,33 +26,15 @@ public:
 	TileMap();
 	~TileMap();
 
-	/**
-     * Add a new layer
-     * \param pos Where to create the layer (next layers will be moved after)
-     * \param asCopyOf Create the layer as a copy of that layer. (Set to -1 to create a blank layer)
-     */
-    void AddLayer(int pos, int asCopyOf = -1);
-
-    /**
-     * Remove a layer
-     * \param pos The layer to delete
-     */
-    void RemoveLayer(int pos);
-
     /**
      * Get a tile
      */
-    std::pair<int, int> GetTile(int layer, int col, int row) const;
+    int GetTile(int layer, int col, int row) const;
 
     /**
      * Set a tile
      */
-    void SetTile(int layer, int col, int row, std::pair<int, int> tile);
-
-    /**
-     * \return the number of layers in the tilemap.
-     */
-    int GetLayersCount() const;
+    void SetTile(int layer, int col, int row, int tile);
 
     /**
      * \return the number of rows in the tilemap.

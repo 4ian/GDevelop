@@ -23,7 +23,6 @@
 #include <wx/button.h>
 #include <wx/choice.h>
 #include <wx/arrstr.h>
-#include <wx/bmpbuttn.h>
 #include <wx/checkbox.h>
 #include "../TileMapPanel.h"
 
@@ -31,10 +30,6 @@ class TileMapObjectEditorBase : public wxDialog
 {
 protected:
     TileSetPanel* m_tileSetPanel;
-    wxStaticText* m_staticText35;
-    wxSpinCtrl* m_tileColumnsSpin;
-    wxStaticText* m_staticText41;
-    wxSpinCtrl* m_tileRowsSpin;
     wxStaticText* m_staticText19;
     wxSpinCtrl* m_tileWidthSpin;
     wxStaticText* m_staticText43;
@@ -47,10 +42,6 @@ protected:
     wxButton* m_updateButton;
     wxStaticText* m_staticText105;
     wxChoice* m_layerChoice;
-    wxBitmapButton* m_layerAddButton;
-    wxBitmapButton* m_layerDeleteButton;
-    wxBitmapButton* m_layerUpButton;
-    wxBitmapButton* m_layerDownButton;
     wxCheckBox* m_hideUpperLayerCheck;
     TileMapPanel* m_tileMapPanel;
     wxStaticText* m_staticText93;
@@ -66,10 +57,6 @@ protected:
 protected:
     virtual void OnUpdateClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnLayerAddButtonClicked(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnLayerDeleteButtonClicked(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnLayerUpButtonClicked(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnLayerDownButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMapUpdateButtonClicked(wxCommandEvent& event) { event.Skip(); }
 

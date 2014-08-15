@@ -57,46 +57,6 @@
                   <object class="sizeritem">
                     <flag>wxALL</flag>
                     <border>5</border>
-                    <object class="wxStaticText" name="m_staticText35">
-                      <label>
-                        <![CDATA[Number of tiles:]]>
-                      </label>
-                      <style/>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <object class="wxSpinCtrl" name="m_tileColumnsSpin">
-                      <style>wxSP_ARROW_KEYS</style>
-                      <value>0</value>
-                      <min>0</min>
-                      <max>10000</max>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <object class="wxStaticText" name="m_staticText41">
-                      <label>
-                        <![CDATA[x]]>
-                      </label>
-                      <style/>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <object class="wxSpinCtrl" name="m_tileRowsSpin">
-                      <style>wxSP_ARROW_KEYS</style>
-                      <value>0</value>
-                      <min>0</min>
-                      <max>10000</max>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
                     <object class="wxStaticText" name="m_staticText19">
                       <label>
                         <![CDATA[Size of tiles:]]>
@@ -254,52 +214,20 @@
                 <border>5</border>
                 <object class="wxChoice" name="m_layerChoice">
                   <style/>
-                  <content/>
+                  <content>
+                    <item>
+                      <![CDATA[Back]]>
+                    </item>
+                    <item>
+                      <![CDATA[Middle]]>
+                    </item>
+                    <item>
+                      <![CDATA[Top]]>
+                    </item>
+                  </content>
                   <selection>
                     <![CDATA[]]>
                   </selection>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>5</border>
-                <object class="wxBitmapButton" name="m_layerAddButton">
-                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/add16.png</bitmap>
-                  <style>wxBU_AUTODRAW</style>
-                  <tooltip>
-                    <![CDATA[Add a layer after the current one]]>
-                  </tooltip>
-                  <default>0</default>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>5</border>
-                <object class="wxBitmapButton" name="m_layerDeleteButton">
-                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</bitmap>
-                  <style>wxBU_AUTODRAW</style>
-                  <tooltip>
-                    <![CDATA[Delete current layer]]>
-                  </tooltip>
-                  <default>0</default>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>5</border>
-                <object class="wxBitmapButton" name="m_layerUpButton">
-                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/up16.png</bitmap>
-                  <style>wxBU_AUTODRAW</style>
-                  <default>0</default>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>5</border>
-                <object class="wxBitmapButton" name="m_layerDownButton">
-                  <bitmap>../../../Binaries/Output/Release_Windows/res/icons_default/down16.png</bitmap>
-                  <style>wxBU_AUTODRAW</style>
-                  <default>0</default>
                 </object>
               </object>
               <object class="sizeritem">

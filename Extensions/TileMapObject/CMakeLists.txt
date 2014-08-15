@@ -125,6 +125,7 @@ set(source_files
 	Extension.cpp
 	TileMapObject.cpp
 	TileMap.cpp
+	TileSet.cpp
 	)
 
 set(gdide_source_files

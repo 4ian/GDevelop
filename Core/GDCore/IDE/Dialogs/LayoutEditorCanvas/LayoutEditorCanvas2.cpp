@@ -651,14 +651,13 @@ void LayoutEditorCanvas::UpdateSize()
 
     if ( editing )
     {
-        //Scene takes all the space available in edition mode.
+        if ( parentControl->GetSize().GetWidth() <= 0 || parentControl->GetSize().GetHeight() <= 0)
+            return;
 
-        //This line is unnecessary and create a crash related to X on Linux.
-        #if defined(WINDOWS)
+        //Scene takes all the space available in edition mode.
         Window::setSize(sf::Vector2u(
             parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
             parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0)));
-        #endif
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(parentControl->GetSize().GetWidth() - (vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
                               parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0));
@@ -670,8 +669,6 @@ void LayoutEditorCanvas::UpdateSize()
         //Scene has the size of the project's window size in preview mode.
         Window::setSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
         wxWindowBase::SetClientSize(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
-
-        //TODO : if ( externalWindow ) externalWindow->SetSizeOfRenderingZone(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
 
         //Scene is centered in preview mode
         wxWindowBase::SetPosition(wxPoint((parentControl->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,

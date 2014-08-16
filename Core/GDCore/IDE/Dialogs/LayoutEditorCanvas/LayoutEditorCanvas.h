@@ -367,9 +367,11 @@ protected:
     virtual double GetMouseXOnLayout() const;
     virtual double GetMouseYOnLayout() const;
 
-    //Rendering methods. The rendering during preview is done by previewScene.
+    //Rendering methods.
     void RenderEdittime();
     void RenderGrid();
+    void RenderWindowMask();
+    void RenderInitialWindowBorder();
     void AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
     void DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
     void DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle );

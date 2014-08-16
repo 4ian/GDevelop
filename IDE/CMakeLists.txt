@@ -154,5 +154,9 @@ ELSE()
 			POST_BUILD
 			COMMAND sh "CopyWindowsToLinuxReleaseFiles.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
 			WORKING_DIRECTORY ${GD_base_dir}/scripts)
+		add_custom_command(TARGET GDIDE
+			POST_BUILD
+			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
 	ENDIF()
 ENDIF()

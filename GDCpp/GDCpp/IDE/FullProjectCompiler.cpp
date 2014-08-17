@@ -201,7 +201,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         diagnosticManager.OnMessage( gd::ToString(_("Preparing resources...")), allResources[i] );
 
         if ( game.GetResourcesManager().GetResource(allResources[i]).UseFile() )
-            resourcesMergingHelper.ExposeResource(game.GetResourcesManager().GetResource(allResources[i]).GetFile());
+            resourcesMergingHelper.ExposeResource(game.GetResourcesManager().GetResource(allResources[i]));
     }
 
     //Add scenes resources

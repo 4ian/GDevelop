@@ -14,6 +14,7 @@
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}
 namespace gd {class EventsList;}
+namespace gd {class Resource;}
 
 namespace gd
 {
@@ -39,7 +40,8 @@ public:
 
     virtual void ExposeImage(std::string & imageName) = 0;
     virtual void ExposeShader(std::string & shaderName) = 0;
-    virtual void ExposeResource(std::string & resource) = 0;
+    virtual void ExposeFile(std::string & resourceFileName) = 0;
+    void ExposeResource(gd::Resource & resource);
 };
 
 /**

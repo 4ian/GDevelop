@@ -9,7 +9,7 @@
 namespace gd
 {
 
-void gd::ResourcesUnmergingHelper::ExposeResource(std::string & resourceFilename)
+void gd::ResourcesUnmergingHelper::ExposeFile(std::string & resourceFilename)
 {
     if ( resourceFilename.empty() ) return;
 

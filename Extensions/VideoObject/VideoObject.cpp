@@ -214,7 +214,7 @@ bool VideoObject::DrawEdittime(sf::RenderTarget& renderTarget)
 
 void VideoObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    worker.ExposeResource(videoFile);
+    worker.ExposeFile(videoFile);
 }
 
 bool VideoObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const

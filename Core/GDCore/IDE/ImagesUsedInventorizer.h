@@ -30,7 +30,7 @@ class ImagesUsedInventorizer : public gd::ArbitraryResourceWorker
 
         std::set<std::string> & GetAllUsedImages() { return allUsedImages; };
 
-        virtual void ExposeResource(std::string & resource) {};
+        virtual void ExposeFile(std::string & resource) {};
         virtual void ExposeImage(std::string & imageName) {allUsedImages.insert(imageName);};
         virtual void ExposeShader(std::string & shaderName) {};
 

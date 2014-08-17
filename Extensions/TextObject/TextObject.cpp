@@ -139,7 +139,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement & element) const
 
 void TextObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    worker.ExposeResource(fontName);
+    worker.ExposeFile(fontName);
 }
 
 bool TextObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const

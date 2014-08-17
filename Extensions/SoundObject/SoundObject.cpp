@@ -178,7 +178,7 @@ bool SoundObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, 
 
 void SoundObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    worker.ExposeResource(fileName);
+    worker.ExposeFile(fileName);
 }
 
 bool SoundObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const

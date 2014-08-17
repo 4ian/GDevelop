@@ -760,7 +760,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
         {
             if ( propertyName == "File" )
             {
-                project.GetResourcesManager().GetResource(data->GetSecondString()).GetFile() = propertyNewValue;
+                project.GetResourcesManager().GetResource(data->GetSecondString()).SetFile(propertyNewValue);
                 previewPanel->Refresh();
                 previewPanel->Update();
             }

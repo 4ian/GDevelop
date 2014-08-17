@@ -56,25 +56,27 @@ public:
     /**
      * \brief Return true if the resource use a file.
      *
-     * \see GetFile
+     * \see gd::Resource::GetFile
+     * \see gd::Resource::SetFile
      */
     virtual bool UseFile() { return false; }
 
     /**
-     * \brief Return, if applicable, a reference to the string containing the file used by the resource.
+     * \brief Return, if applicable, the string containing the file used by the resource.
      * The file is relative to the project directory.
      *
-     * \see UseFile
-     */
-    virtual std::string & GetFile() {return badStr;};
-
-    /**
-     * \brief Return, if applicable, a reference to the string containing the file used by the resource.
-     * The file is relative to the project directory.
-     *
-     * \see UseFile
+     * \see gd::Resource::UseFile
+     * \see gd::Resource::SetFile
      */
     virtual const std::string & GetFile() const {return badStr;};
+
+    /**
+     * \brief Change, if applicable, the file of the resource.
+     *
+     * \see gd::Resource::UseFile
+     * \see gd::Resource::GetFile
+     */
+    virtual void SetFile(const std::string & newFile) {};
 
     /**
      * \brief Return, if applicable, a string containing the absolute filename of the resource.
@@ -82,21 +84,21 @@ public:
     std::string GetAbsoluteFile(const gd::Project & game) const;
 
     /**
-     * \brief Called when a property must be edited ( i.e: it was double clicked )
+     * \brief Called when a property must be edited (i.e: it was double clicked in a property grid)
      *
      * \return true if the resource was changed
      */
     virtual bool EditProperty(gd::Project & project, const std::string & property) { return true; };
 
     /**
-     * \brief Called when a property must be changed ( i.e: its value was changed in the property grid )
+     * \brief Called when a property must be changed (i.e: its value was changed in a property grid)
      *
      * \return true if the resource was changed
      */
     virtual bool ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue) { return true; };
 
     /**
-     * \brief Must return a description of the main property provided by the resource ( Example : "Image file" )
+     * \brief Must return a description of the main property provided by the resource (example : "Image file")
      */
     virtual void GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const { return; };
 
@@ -153,12 +155,12 @@ public:
     /**
      * Return the file used by the resource.
      */
-    virtual std::string & GetFile() {return file;};
+    virtual const std::string & GetFile() const {return file;};
 
     /**
-     * Return the file used by the resource.
+     * Change the file of the resource.
      */
-    virtual const std::string & GetFile() const {return file;};
+    virtual void SetFile(const std::string & newFile);
 
     #if defined(GD_IDE_ONLY)
     virtual bool UseFile() { return true; }

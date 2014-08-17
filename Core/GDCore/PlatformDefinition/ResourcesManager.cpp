@@ -138,7 +138,7 @@ bool ResourcesManager::AddResource(const std::string & name, const std::string &
     if ( HasResource(name) ) return false;
 
     boost::shared_ptr<ImageResource> image(new ImageResource);
-    image->GetFile() = filename;
+    image->SetFile(filename);
     image->SetName(name);
 
     resources.push_back(image);
@@ -157,19 +157,6 @@ std::vector<std::string> ResourceFolder::GetAllResourcesList()
 
 bool ImageResource::EditProperty(gd::Project & project, const std::string & property)
 {
-    /*if ( property == "file" )
-    {
-        wxFileDialog dialog( NULL, _( "Choose the image file" ), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_OPEN );
-        if ( dialog.ShowModal() == wxID_OK )
-        {
-            wxFileName filename = wxFileName::FileName(dialog.GetPath());
-            filename.MakeRelativeTo(wxFileName::FileName(project.GetProjectFile()).GetPath());
-            file = ToString(filename.GetFullPath());
-
-            return true;
-        }
-    }*/
-
     return false;
 }
 
@@ -606,12 +593,21 @@ void ResourcesManager::SerializeTo(SerializerElement & element) const
 }
 #endif
 
+void ImageResource::SetFile(const std::string & newFile)
+{
+    file = newFile;
+
+    //Convert all backslash to slashs.
+    while (file.find('\\') != std::string::npos)
+        file.replace(file.find('\\'), 1, "/");
+}
+
 void ImageResource::UnserializeFrom(const SerializerElement & element)
 {
     alwaysLoaded = element.GetBoolAttribute("alwaysLoaded");
     smooth = element.GetBoolAttribute("smoothed");
     SetUserAdded( element.GetBoolAttribute("userAdded") );
-    file = element.GetStringAttribute("file");
+    SetFile(element.GetStringAttribute("file"));
 }
 
 #if defined(GD_IDE_ONLY)

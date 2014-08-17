@@ -11,7 +11,7 @@
 namespace gd
 {
 
-void ResourcesAbsolutePathChecker::ExposeResource(std::string & resourceFilename)
+void ResourcesAbsolutePathChecker::ExposeFile(std::string & resourceFilename)
 {
     if ( fs.IsAbsolute(resourceFilename) )
         hasAbsoluteFilenames = true;

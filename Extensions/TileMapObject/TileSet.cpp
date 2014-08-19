@@ -1,5 +1,6 @@
 #include "TileSet.h"
 
+#include <algorithm> 
 #include <iostream>
 #ifdef GD_IDE_ONLY
 #include <wx/file.h>
@@ -10,13 +11,6 @@
 TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture(), m_dirty(true)
 {
 
-}
-
-TileSet::TileSet(const TileSet &other) : m_dirty(true)
-{
-    textureName = other.textureName;
-    tileSize = other.tileSize;
-    tileSpacing = other.tileSpacing;
 }
 
 TileSet::~TileSet()

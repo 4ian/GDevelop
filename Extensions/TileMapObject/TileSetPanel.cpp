@@ -39,7 +39,7 @@ void TileSetPanel::Update()
 
 void TileSetPanel::OnPaint(wxPaintEvent& event)
 {
-    wxBufferedPaintDC dc(this);
+    wxAutoBufferedPaintDC dc(this);
     DoPrepareDC(dc);
 
     //Get the viewport

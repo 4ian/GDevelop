@@ -24,7 +24,6 @@ class TileSet
 
 public:
     TileSet();
-    TileSet(const TileSet &other);
     ~TileSet();
 
     std::string textureName; ///< The texture name.

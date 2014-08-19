@@ -13,6 +13,8 @@ TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     m_tilemap(NULL),
     m_mapCurrentLayer(0)
 {
+    SetBackgroundStyle(wxBG_STYLE_PAINT);
+
     Connect(wxEVT_PAINT, wxPaintEventHandler(TileMapPanel::OnPaint), NULL, this);
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnLeftButtonPressed), NULL, this);
 }
@@ -66,7 +68,7 @@ void TileMapPanel::OnTileSetSelectionChanged(TileSelectionEvent &event)
 
 void TileMapPanel::OnPaint(wxPaintEvent& event)
 {
-    wxBufferedPaintDC dc(this);
+    wxAutoBufferedPaintDC dc(this);
     DoPrepareDC(dc);
 
     wxPoint minPos = GetViewStart();

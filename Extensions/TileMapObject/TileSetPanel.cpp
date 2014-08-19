@@ -14,6 +14,7 @@ TileSetPanel::TileSetPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 
+    Connect(wxEVT_PAINT, wxPaintEventHandler(TileSetPanel::OnPaint), NULL, this);
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileSetPanel::OnLeftButtonPressed), NULL, this);
 }
 
@@ -36,8 +37,11 @@ void TileSetPanel::Update()
     Refresh();
 }
 
-void TileSetPanel::OnDraw(wxDC& dc)
+void TileSetPanel::OnPaint(wxPaintEvent& event)
 {
+    wxBufferedPaintDC dc(this);
+    DoPrepareDC(dc);
+
     //Get the viewport
     wxPoint minPos = GetViewStart();
     int width, height;

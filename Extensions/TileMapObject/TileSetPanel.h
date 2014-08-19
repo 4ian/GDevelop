@@ -43,9 +43,8 @@ public:
 
     void Update(); //Refresh.
 
-    virtual void OnDraw(wxDC& dc);
-
 protected:
+    void OnPaint(wxPaintEvent& event);
     void OnLeftButtonPressed(wxMouseEvent& event);
 
 private:

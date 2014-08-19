@@ -13,6 +13,7 @@ TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     m_tilemap(NULL),
     m_mapCurrentLayer(0)
 {
+    Connect(wxEVT_PAINT, wxPaintEventHandler(TileMapPanel::OnPaint), NULL, this);
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnLeftButtonPressed), NULL, this);
 }
 
@@ -58,8 +59,16 @@ void TileMapPanel::Update()
     Refresh();
 }
 
-void TileMapPanel::OnDraw(wxDC& dc)
+void TileMapPanel::OnTileSetSelectionChanged(TileSelectionEvent &event)
 {
+    m_tileToBeInserted = event.GetSelectedTile();
+}
+
+void TileMapPanel::OnPaint(wxPaintEvent& event)
+{
+    wxBufferedPaintDC dc(this);
+    DoPrepareDC(dc);
+
     wxPoint minPos = GetViewStart();
     int width, height;
     GetVirtualSize(&width, &height);
@@ -100,11 +109,6 @@ void TileMapPanel::OnDraw(wxDC& dc)
                         maxPos.x, row * m_tileset->tileSize.y);
         }
     }
-}
-
-void TileMapPanel::OnTileSetSelectionChanged(TileSelectionEvent &event)
-{
-    m_tileToBeInserted = event.GetSelectedTile();
 }
 
 void TileMapPanel::OnLeftButtonPressed(wxMouseEvent& event)

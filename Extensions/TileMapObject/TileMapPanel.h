@@ -53,11 +53,10 @@ public:
      */
     void Update();
 
-    virtual void OnDraw(wxDC& dc);
-
     void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
 protected:
+    void OnPaint(wxPaintEvent& event);
     void OnLeftButtonPressed(wxMouseEvent& event);
 
 private:

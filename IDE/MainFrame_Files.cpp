@@ -213,9 +213,9 @@ void MainFrame::Open( string file )
 
         if (unknownExtensions != "")
         {
-            wxString errorMsg = _("One or ore extensions are used by the project but are not installed for the platform used by the project :\n")
-                                + unknownExtensions
-                                + _("\nSome objects, actions, conditions or expressions can be unavailable or not working.");
+            wxString errorMsg = _("One or more extensions are used by the project but are not installed for the platform used by the project :\n")
+                + unknownExtensions
+                + _("\nSome objects, actions, conditions or expressions can be unavailable or not working.");
             gd::LogWarning(gd::ToString(errorMsg));
         }
     }

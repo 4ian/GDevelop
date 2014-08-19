@@ -96,7 +96,7 @@ public:
      * Implementation example:
      * \code
      * worker.ExposeImage(myImage);
-     * worker.ExposeResource(myResourceFile);
+     * worker.ExposeFile(myResourceFile);
      * \endcode
      *
      * \see ArbitraryResourceWorker

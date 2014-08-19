@@ -683,7 +683,6 @@ void ResourcesEditor::UpdatePropertyGrid()
     {
         wxPGProperty * fileProperty = propertyGrid->Append( new gd::FileProperty(_("File"), "File", "") );
         fileProperty->SetAttribute(wxPG_FILE_DIALOG_TITLE, _("Choose the resource file"));
-        fileProperty->SetAttribute(wxPG_FILE_WILDCARD, _("All files | *.*"));
         fileProperty->SetAttribute(wxPG_FILE_INITIAL_PATH, wxFileName::FileName(project.GetProjectFile()).GetPath());
         fileProperty->SetAttribute(wxPG_FILE_SHOW_RELATIVE_PATH, wxFileName::FileName(project.GetProjectFile()).GetPath());
         propertyGrid->SetPropertyHelpString(fileProperty, _("File of the resource.\nThe filename is relative to the project directory."));
@@ -761,7 +760,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
         {
             if ( propertyName == "File" )
             {
-                project.GetResourcesManager().GetResource(data->GetSecondString()).GetFile() = propertyNewValue;
+                project.GetResourcesManager().GetResource(data->GetSecondString()).SetFile(propertyNewValue);
                 previewPanel->Refresh();
                 previewPanel->Update();
             }

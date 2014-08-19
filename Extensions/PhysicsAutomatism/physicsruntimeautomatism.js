@@ -440,9 +440,7 @@ gdjs.PhysicsRuntimeAutomatism.prototype.setGravity = function( xGravity, yGravit
 {
     if ( this._box2DBody === null ) this.createBody();
 
-    this._sharedData.world.SetGravity(this.b2Vec2(
-        xGravity*this._sharedData.invScaleX,
-        -yGravity*this._sharedData.invScaleY));
+    this._sharedData.world.SetGravity(this.b2Vec2(xGravity, -yGravity));
 };
 
 gdjs.PhysicsRuntimeAutomatism.prototype.addGearJointBetweenObjects = function( object, ratio )

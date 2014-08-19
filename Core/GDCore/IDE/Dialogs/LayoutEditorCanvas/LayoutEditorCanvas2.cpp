@@ -253,6 +253,7 @@ void LayoutEditorCanvas::RenderEdittime()
     guiElements.clear();
     InstancesRenderer renderer(*this, GetInitialInstanceUnderCursor(), guiElementsShapes);
 
+    //Render objects of each layer
     for (unsigned int layerIndex =0;layerIndex<layout.GetLayersCount();++layerIndex)
     {
         if ( layout.GetLayer(layerIndex).GetVisibility() )
@@ -275,6 +276,7 @@ void LayoutEditorCanvas::RenderEdittime()
     //Go back to "window" view before drawing GUI elements
     setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
 
+    RenderInitialWindowBorder();
     if ( options.grid ) RenderGrid();
 
     if ( renderer.drawResizeButtons )
@@ -310,48 +312,66 @@ void LayoutEditorCanvas::RenderEdittime()
     for (unsigned int i = 0;i<guiElementsShapes.size();++i)
     	draw(*guiElementsShapes[i]);
 
-    if ( options.windowMask )
-    {
-        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionView.getCenter().x-project.GetMainWindowDefaultWidth()/2,
-                                                                  editionView.getCenter().y-project.GetMainWindowDefaultHeight()/2,
-                                                                  editionView);
-
-        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionView.getCenter().x+project.GetMainWindowDefaultWidth()/2,
-                                                                  editionView.getCenter().y+project.GetMainWindowDefaultHeight()/2,
-                                                                  editionView);
-        sf::Color maskColor((layout.GetBackgroundColorRed()+128)%255, (layout.GetBackgroundColorGreen()+128)%255, (layout.GetBackgroundColorBlue()+128)%255, 128);
-
-        {
-            sf::RectangleShape mask(sf::Vector2f(getSize().x, rectangleOrigin.y));
-            mask.setPosition(0, 0);
-            mask.setFillColor(maskColor);
-            draw(mask);
-        }
-        {
-            sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, getSize().y-rectangleOrigin.y));
-            mask.setPosition(0, rectangleOrigin.y);
-            mask.setFillColor(maskColor);
-            draw(mask);
-        }
-        {
-            sf::RectangleShape mask(sf::Vector2f(getSize().x-rectangleEnd.x, getSize().y-rectangleOrigin.y));
-            mask.setPosition(rectangleEnd.x, rectangleOrigin.y);
-            mask.setFillColor(maskColor);
-            draw(mask);
-        }
-        {
-            sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, getSize().y-rectangleEnd.y));
-            mask.setPosition(rectangleOrigin.x, rectangleEnd.y);
-            mask.setFillColor(maskColor);
-            draw(mask);
-        }
-    }
+    if ( options.windowMask ) RenderWindowMask();
 
     setView(editionView);
     popGLStates();
     display();
 }
 
+void LayoutEditorCanvas::RenderWindowMask()
+{
+    sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionView.getCenter().x-project.GetMainWindowDefaultWidth()/2,
+        editionView.getCenter().y-project.GetMainWindowDefaultHeight()/2, editionView);
+
+    sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionView.getCenter().x+project.GetMainWindowDefaultWidth()/2,
+        editionView.getCenter().y+project.GetMainWindowDefaultHeight()/2, editionView);
+
+    sf::Color maskColor((layout.GetBackgroundColorRed()+128)%255,
+        (layout.GetBackgroundColorGreen()+128)%255,
+        (layout.GetBackgroundColorBlue()+128)%255, 128);
+
+    {
+        sf::RectangleShape mask(sf::Vector2f(getSize().x, rectangleOrigin.y));
+        mask.setPosition(0, 0);
+        mask.setFillColor(maskColor);
+        draw(mask);
+    }
+    {
+        sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, getSize().y-rectangleOrigin.y));
+        mask.setPosition(0, rectangleOrigin.y);
+        mask.setFillColor(maskColor);
+        draw(mask);
+    }
+    {
+        sf::RectangleShape mask(sf::Vector2f(getSize().x-rectangleEnd.x, getSize().y-rectangleOrigin.y));
+        mask.setPosition(rectangleEnd.x, rectangleOrigin.y);
+        mask.setFillColor(maskColor);
+        draw(mask);
+    }
+    {
+        sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, getSize().y-rectangleEnd.y));
+        mask.setPosition(rectangleOrigin.x, rectangleEnd.y);
+        mask.setFillColor(maskColor);
+        draw(mask);
+    }
+}
+
+void LayoutEditorCanvas::RenderInitialWindowBorder()
+{
+    sf::Color color((layout.GetBackgroundColorRed()+128)%255,
+        (layout.GetBackgroundColorGreen()+128)%255,
+        (layout.GetBackgroundColorBlue()+128)%255, 240);
+    sf::Vertex line[8] = {sf::Vertex(ConvertToWindowCoordinates(0, 0, editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(project.GetMainWindowDefaultWidth(), 0, editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(project.GetMainWindowDefaultWidth(), 0, editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight(), editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight(), editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(0, project.GetMainWindowDefaultHeight(), editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(0, project.GetMainWindowDefaultHeight(), editionView), color),
+        sf::Vertex(ConvertToWindowCoordinates(0, 0, editionView), color),};
+    draw(line, 8, sf::Lines);
+}
 
 void LayoutEditorCanvas::RenderGrid()
 {
@@ -651,14 +671,13 @@ void LayoutEditorCanvas::UpdateSize()
 
     if ( editing )
     {
-        //Scene takes all the space available in edition mode.
+        if ( parentControl->GetSize().GetWidth() <= 0 || parentControl->GetSize().GetHeight() <= 0)
+            return;
 
-        //This line is unnecessary and create a crash related to X on Linux.
-        #if defined(WINDOWS)
+        //Scene takes all the space available in edition mode.
         Window::setSize(sf::Vector2u(
             parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
             parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0)));
-        #endif
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(parentControl->GetSize().GetWidth() - (vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
                               parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0));
@@ -670,8 +689,6 @@ void LayoutEditorCanvas::UpdateSize()
         //Scene has the size of the project's window size in preview mode.
         Window::setSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
         wxWindowBase::SetClientSize(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
-
-        //TODO : if ( externalWindow ) externalWindow->SetSizeOfRenderingZone(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
 
         //Scene is centered in preview mode
         wxWindowBase::SetPosition(wxPoint((parentControl->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,

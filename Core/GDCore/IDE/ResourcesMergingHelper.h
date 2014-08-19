@@ -56,7 +56,7 @@ public:
     /**
      * Resources merging helper collects all resources filenames and update these filenames.
      */
-    virtual void ExposeResource(std::string & resource);
+    virtual void ExposeFile(std::string & resource);
 
     virtual void ExposeImage(std::string & imageName) {};
     virtual void ExposeShader(std::string & shaderName) {};

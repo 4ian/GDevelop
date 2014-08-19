@@ -46,3 +46,4 @@
 /Binaries/Output/WebIDE/Debug
 /Binaries/Output/WebIDE/libGD.raw.js
 /WebIDE
+!/GDCpp/scripts/bcp.exe

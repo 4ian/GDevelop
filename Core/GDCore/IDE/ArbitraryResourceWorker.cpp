@@ -12,6 +12,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 
@@ -19,6 +20,17 @@ using namespace std;
 
 namespace gd
 {
+
+void ArbitraryResourceWorker::ExposeResource(gd::Resource & resource)
+{
+    if (!resource.UseFile()) return;
+
+    std::string file = resource.GetFile();
+    ExposeFile(file);
+    if (file != resource.GetFile())
+        resource.SetFile(file);
+}
+
 
 ArbitraryResourceWorker::~ArbitraryResourceWorker()
 {

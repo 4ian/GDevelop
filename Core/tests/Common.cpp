@@ -30,6 +30,26 @@ TEST_CASE( "Project", "[common]" ) {
 	}
 }
 
+TEST_CASE( "Resources", "[common][resources]" ) {
+	SECTION("Basics") {
+        gd::ImageResource image;
+        image.SetName("MyResourceName");
+
+        REQUIRE(image.GetName() == "MyResourceName");
+	}
+	SECTION("Filename handling") {
+        gd::ImageResource image;
+        image.SetFile("MyResourceFile");
+        REQUIRE(image.GetFile() == "MyResourceFile");
+        image.SetFile("My/relative/ResourceFile");
+        REQUIRE(image.GetFile() == "My/relative/ResourceFile");
+        image.SetFile("..\\My\\windows\\style\\relative\\ResourceFile");
+        REQUIRE(image.GetFile() == "../My/windows/style/relative/ResourceFile");
+        image.SetFile("Lots\\\\Of\\\\\\..\\Backslashs");
+        REQUIRE(image.GetFile() == "Lots//Of///../Backslashs");
+	}
+}
+
 TEST_CASE( "EventsList", "[common][events]" ) {
 
 	SECTION("Basics") {
@@ -39,7 +59,7 @@ TEST_CASE( "EventsList", "[common][events]" ) {
 		list.InsertEvent(event1);
 		list.InsertEvent(event2);
 	    REQUIRE( &list.GetEvent(0) != &event1 ); //First event inserted by copy
-	    REQUIRE( &list.GetEvent(1) == event2.get() ); //Second event not copied	
+	    REQUIRE( &list.GetEvent(1) == event2.get() ); //Second event not copied
 	}
 
 	SECTION("Subevents") {

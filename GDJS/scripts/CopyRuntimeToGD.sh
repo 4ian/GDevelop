@@ -1,9 +1,14 @@
-echo "Copying GDJS Runtime files to Binaries/Output/release/JSPlatform/Runtime.."
-
-if [ ! -d ../../Binaries/Output/Release_Linux/JsPlatform/Runtime/ ]; then
-	mkdir ../../Binaries/Output/Release_Linux/JsPlatform/Runtime/
+#Get the destination, or copy by default to release directory
+DESTINATION=../../Binaries/Output/Release_Linux/JsPlatform/Runtime/
+if [ ! $# -eq 0 ]; then
+	DESTINATION=$1
 fi
-cp -R ../Runtime/* ../../Binaries/Output/Release_Linux/JsPlatform/Runtime/
-rsync -r -u --include=*.js --include=*/ --exclude=* ../../Extensions/  ../../Binaries/Output/Release_Linux/JsPlatform/Runtime/Extensions/
 
-echo "done."
+#Copy all js files
+echo "Copying GDJS and extensions runtime files (*.js) to '$DESTINATION'..."
+
+mkdir -p "$DESTINATION"
+cp -R ../Runtime/* "$DESTINATION"
+rsync -r -u --include=*.js --include=*/ --exclude=* ../../Extensions/  "$DESTINATION"/Extensions/
+
+echo "Done."

@@ -316,10 +316,12 @@ void CppLayoutPreviewer::OnPreviewProfilerBtClick( wxCommandEvent & event )
 
 void CppLayoutPreviewer::RenderCompilationScreen()
 {
+    //Ignore all events
     sf::Event event;
     while ( editor.pollEvent( event ) )
         ;
 
+    //Render the screen
     editor.clear(sf::Color(255,255,255));
 
     editor.pushGLStates();

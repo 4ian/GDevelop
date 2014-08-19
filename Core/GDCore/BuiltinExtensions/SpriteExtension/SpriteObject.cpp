@@ -107,7 +107,6 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
 #if !defined(EMSCRIPTEN)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    std::cout << "Reloading resources for" << name;
     for ( unsigned int j = 0; j < animations.size();j++ )
     {
         Animation & anim = animations[j];
@@ -121,7 +120,6 @@ void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
             }
         }
     }
-    std::cout << "END" << std::endl;
 }
 
 const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate) const

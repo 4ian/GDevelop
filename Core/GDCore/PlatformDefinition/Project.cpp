@@ -444,57 +444,7 @@ void Project::RemoveExternalLayout(const std::string & name)
     externalLayouts.erase(externalLayout);
 }
 
-#if defined(GD_IDE_ONLY)
-//Compatibility with GD2010498
-void OpenImagesFromGD2010498(gd::Project & game, const TiXmlElement * imagesElem, const TiXmlElement * dossierElem)
-{
-    //Images
-    while ( imagesElem )
-    {
-        ImageResource image;
-
-        if ( imagesElem->Attribute( "nom" ) != NULL ) { image.SetName(imagesElem->Attribute( "nom" )); }
-        if ( imagesElem->Attribute( "fichier" ) != NULL ) {image.GetFile() = imagesElem->Attribute( "fichier" ); }
-
-        image.smooth = true;
-        if ( imagesElem->Attribute( "lissage" ) != NULL && string(imagesElem->Attribute( "lissage" )) == "false")
-                image.smooth = false;
-
-        image.alwaysLoaded = false;
-        if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
-                image.alwaysLoaded = true;
-
-        game.GetResourcesManager().AddResource(image);
-        imagesElem = imagesElem->NextSiblingElement();
-    }
-
-    //Dossiers d'images
-    while ( dossierElem )
-    {
-        if ( dossierElem->Attribute( "nom" ) != NULL )
-        {
-            game.GetResourcesManager().CreateFolder( dossierElem->Attribute( "nom" ) );
-            ResourceFolder & folder = game.GetResourcesManager().GetFolder(dossierElem->Attribute( "nom" ));
-
-            const TiXmlElement *elemDossier = dossierElem;
-            if ( elemDossier->FirstChildElement( "Contenu" ) != NULL )
-            {
-                elemDossier = elemDossier->FirstChildElement( "Contenu" )->FirstChildElement();
-                while ( elemDossier )
-                {
-                    if ( elemDossier->Attribute( "nom" ) != NULL ) { folder.AddResource(elemDossier->Attribute( "nom" ), game.GetResourcesManager()); }
-
-                    elemDossier = elemDossier->NextSiblingElement();
-                }
-            }
-        }
-
-        dossierElem = dossierElem->NextSiblingElement();
-    }
-}
-//End of compatibility code
-
-#if !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 //Compatibility with GD2.x
 class SpriteObjectsPositionUpdater : public gd::InitialInstanceFunctor
 {
@@ -532,8 +482,6 @@ private:
     gd::Layout & layout;
 };
 //End of compatibility code
-#endif
-
 #endif
 
 void Project::UnserializeFrom(const SerializerElement & element)
@@ -936,7 +884,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     for ( unsigned int i = 0;i < resources.size() ;i++ )
     {
         if ( GetResourcesManager().GetResource(resources[i]).UseFile() )
-            worker.ExposeResource(GetResourcesManager().GetResource(resources[i]).GetFile());
+            worker.ExposeResource(GetResourcesManager().GetResource(resources[i]));
     }
     #if !defined(GD_NO_WX_GUI)
     wxSafeYield();

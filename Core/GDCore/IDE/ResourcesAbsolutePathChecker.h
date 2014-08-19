@@ -34,7 +34,7 @@ public:
     /**
      * Check if there is a resource with an absolute path
      */
-    virtual void ExposeResource(std::string & resource);
+    virtual void ExposeFile(std::string & resource);
 
     virtual void ExposeImage(std::string & imageName) {};
     virtual void ExposeShader(std::string & shaderName) {};

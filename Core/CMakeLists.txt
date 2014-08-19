@@ -3,6 +3,11 @@ cmake_policy(SET CMP0015 NEW)
 
 project(GDCore)
 
+SET(CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1) #Force use response file: useful for Ninja build system on Windows.
+SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1)
+SET(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES 1)
+SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 1)
+
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
@@ -145,5 +150,5 @@ if(BUILD_TESTS)
 	add_executable(GDCore_tests ${test_source_files})
 	target_link_libraries(GDCore_tests GDCore)
 	target_link_libraries(GDCore_tests ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
-	target_link_libraries(GDCore_tests GLU GL)	
+	target_link_libraries(GDCore_tests GLU GL)
 endif()

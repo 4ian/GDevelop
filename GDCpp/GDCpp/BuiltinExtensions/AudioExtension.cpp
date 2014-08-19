@@ -70,7 +70,7 @@ void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbitr
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
     {
         std::string parameter = action.GetParameter(1).GetPlainString();
-        worker.ExposeResource(parameter);
+        worker.ExposeFile(parameter);
         action.SetParameter(1, parameter);
     }
 }

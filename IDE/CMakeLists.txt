@@ -139,3 +139,24 @@ ELSE()
 	target_link_libraries(GDIDE ${GTK3_LIBRARIES})
 	target_link_libraries(GDIDE GLU GL)
 ENDIF(WIN32)
+
+
+#Post build tasks
+###
+IF(EMSCRIPTEN)
+	#Nothing.
+ELSE()
+
+	#Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
+	#output directory, and need to be copied.
+	IF(NOT WIN32)
+		add_custom_command(TARGET GDIDE
+			POST_BUILD
+			COMMAND sh "CopyWindowsToLinuxReleaseFiles.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+			WORKING_DIRECTORY ${GD_base_dir}/scripts)
+		add_custom_command(TARGET GDIDE
+			POST_BUILD
+			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+	ENDIF()
+ENDIF()

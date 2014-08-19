@@ -15,7 +15,7 @@
 namespace gd
 {
 
-void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
+void ResourcesMergingHelper::ExposeFile(std::string & resourceFilename)
 {
     if ( resourceFilename.empty() ) return;
 

@@ -608,13 +608,13 @@ gdjs.RuntimeObject.prototype.hasNoForces = function() {
 };
 
 /**
- * Called once a step by runtimeScene to remove temporary forces.
- *
+ * Called once a step by runtimeScene to update forces magnitudes and
+ * remove null ones.
  * @method updateForces
  */
 gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
     for(var i = 0;i<this._forces.length;) {
-        if(this._forces[i].getLength() < 0.001)
+        if(this._forces[i].getClearing() === 0 || this._forces[i].getLength() <= 0.001)
         {
             gdjs.RuntimeObject.forcesGarbage.push(this._forces[i]);
             this._forces.remove(i);

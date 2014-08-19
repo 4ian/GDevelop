@@ -1800,7 +1800,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                     }
 
                     gd::ImageResource image;
-                    image.GetFile() = file.GetFullPath();
+                    image.SetFile(ToString(file.GetFullPath()));
                     image.SetName(name);
                     image.SetUserAdded(false);
 

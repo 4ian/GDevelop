@@ -123,7 +123,7 @@ gdjs.Force.prototype.getLength = function() {
 	}
 
 	return this._length;
-}
+};
 
 /**
  * Return true if the force is temporary, false if it is permanent.
@@ -131,12 +131,12 @@ gdjs.Force.prototype.getLength = function() {
  */
 gdjs.Force.prototype.getClearing = function() {
 	return this._clearing;
-}
+};
 
 /**
  * Set if the force clearing.
  * @method setClearing
  */
 gdjs.Force.prototype.setClearing = function(clearing) {
-	this._clearing
-}
+	this._clearing = clearing;
+};

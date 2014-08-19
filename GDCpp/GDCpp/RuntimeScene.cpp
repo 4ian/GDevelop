@@ -392,14 +392,16 @@ bool RuntimeScene::UpdateTime()
 {
     //Update time elapsed since last frame
     realElapsedTime = clock.restart().asMicroseconds();
-    realElapsedTime -= pauseTime; //On enlève le temps de pause
+    realElapsedTime -= pauseTime;
 
-    //On modifie ce temps écoulé si il est trop bas.
+    //Make sure that the elapsed time is not beyond the limit (slow down the game if necessary)
     if ( game->GetMinimumFPS() != 0 && realElapsedTime > 1000000.0/static_cast<double>(game->GetMinimumFPS()) )
-        realElapsedTime = 1000000.0/static_cast<double>(game->GetMinimumFPS()); //On ralentit le jeu si les FPS sont trop bas.
+        realElapsedTime = 1000000.0/static_cast<double>(game->GetMinimumFPS());
 
-    elapsedTime = realElapsedTime*timeScale; //Le temps écoulé par le jeu est modifié suivant l'échelle du temps
+    //Apply time scale
+    elapsedTime = realElapsedTime*timeScale;
 
+    //Update timers
     timeFromStart += elapsedTime;
     pauseTime = 0;
 
@@ -450,6 +452,7 @@ RuntimeLayer & RuntimeScene::GetRuntimeLayer(const std::string & name)
  */
 void RuntimeScene::ManageObjectsAfterEvents()
 {
+    //Delete objects that were removed.
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
@@ -462,6 +465,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
         }
     }
 
+    //Update objects positions, forces and automatisms
     allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
@@ -486,6 +490,7 @@ void RuntimeScene::ManageObjectsBeforeEvents()
 
 void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 {
+    //Just store the next scene index:
     specialAction = scene;
 }
 

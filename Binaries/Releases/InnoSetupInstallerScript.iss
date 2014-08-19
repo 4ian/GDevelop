@@ -31,20 +31,20 @@ VersionInfoProductVersion=3.4
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
 
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags:
 Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
 
 [Components]
-Name: main; Description: Game Develop; Types: full compact custom; Flags: fixed
-Name: example; Description: Exemples; Types: full custom;Languages: french;
-Name: example; Description: Examples; Types: full custom;Languages: english;
-Name: example; Description: Ejemplos; Types: full custom;Languages: spanish;
-Name: res; Description: Ressources (Images, sons...); Types: full custom; Languages: french;
-Name: res; Description: Resources (images, sounds...); Types: full custom; Languages: english;
-Name: res; Description: Recursos (imágenes, sonidos ...); Types: full custom; Languages: spanish;
-
+Name: "main"; Description: "Game Develop"; Types: full compact custom; Flags: fixed
+Name: "example"; Description: "Exemples"; Types: full custom; Languages: french
+Name: "example"; Description: "Examples"; Types: full custom; Languages: english russian
+Name: "example"; Description: "Ejemplos"; Types: full custom; Languages: spanish
+Name: "res"; Description: "Ressources (Images, sons...)"; Types: full custom; Languages: french
+Name: "res"; Description: "Resources (images, sounds...)"; Types: full custom; Languages: english russian
+Name: "res"; Description: "Recursos (imágenes, sonidos ...)"; Types: full custom; Languages: spanish
 
 [Files]
 Source: ..\Output\Release_Windows\GDIDE.exe; DestDir: {app}; Flags: ignoreversion
@@ -61,6 +61,7 @@ Source: ..\Output\Release_Windows\icon.ico; DestDir: {app}; Flags: ignoreversion
 Source: ..\Output\Release_Windows\SelectLanguage-en.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: english; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-fr.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: french ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-es.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: spanish ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-ru.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: russian ; Components: main
 
 [Icons]
 Name: {group}\Game Develop; Filename: {app}\GDIDE.exe; WorkingDir: {app}

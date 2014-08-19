@@ -296,7 +296,7 @@ void CodeCompiler::StartTheNextTask()
     currentTaskProcess->Redirect();
     if ( wxExecute(currentTask.compilerCall.GetFullCall(), wxEXEC_ASYNC, currentTaskProcess) == 0 )
     {
-        gd::LogError(_("Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every file needed are present."));
+        gd::LogError(_("Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every needed file are present."));
         delete currentTaskProcess;
         currentTaskProcess = NULL;
     }
@@ -598,7 +598,6 @@ CodeCompiler::CodeCompiler() :
     //maxGarbageThread(2),
     lastTaskFailed(false)
 {
-    std::cout << "Create";
     Connect(wxID_ANY, processEndedEventType, (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &CodeCompiler::ProcessEndedWork);
 }
 

@@ -89,7 +89,7 @@ objectChanged(true)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
 	FlexGridSizer6->AddGrowableRow(0);
-	toolbarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+	toolbarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
 	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	toolbar->AddTool(ID_AUITOOLBARITEM1, _("Play the scene"), wxBitmap(wxImage(_T("res/starticon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Play the scene"), _("Play the scene"), NULL);
@@ -164,6 +164,7 @@ objectChanged(true)
 	Connect(ID_EXTLIST,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnExtensionListItemActivated);
 
     gd::SkinHelper::ApplyCurrentSkin(*toolbar);
+    toolbar->Realize();
 
     font = *wxNORMAL_FONT;
     font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -704,7 +705,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
         return;
     }
 
-    string variableValue = string(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")).mb_str());
+    string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")));
 
     scene.GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -714,7 +715,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
  */
 void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 {
-    string variableName = string(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")).mb_str());
+    string variableName = ToString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")));
 
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().Has(variableName) )
@@ -723,7 +724,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
         return;
     }
 
-    string variableValue = string(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")).mb_str());
+    string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")));
 
     scene.game->GetVariables().Get(variableName).SetString(variableValue);
 }

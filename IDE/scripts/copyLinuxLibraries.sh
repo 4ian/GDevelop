@@ -5,6 +5,8 @@ if [ ! $# -eq 0 ]; then
 fi
 SFML_LIB_DIR=../../ExtLibs/SFML/build-linux/lib/
 WX_LIB_DIR=../../ExtLibs/wxWidgets/lib/
+SYS_LIB_DIR1=/usr/lib/x86_64-linux-gnu/
+SYS_LIB_DIR2=/lib/x86_64-linux-gnu/
 
 if [ -d $SFML_LIB_DIR ]; then
 	echo "Copying SFML files to '$DESTINATION'..."
@@ -17,6 +19,27 @@ if [ -d $SFML_LIB_DIR ]; then
 	mv "$DESTINATION"/libsfml-system.so.2.1 "$DESTINATION"/libsfml-system.so.2
 else
 	echo "SFML lib files not found in '$SFML_LIB_DIR', skipping it..."
+fi
+
+copy_lib() {
+	if [ -f "$SYS_LIB_DIR1"/$1 ]; then
+		cp "$SYS_LIB_DIR1"/$1 "$DESTINATION"
+	else
+		if [ -f "$SYS_LIB_DIR2"/$1 ]; then
+			cp "$SYS_LIB_DIR2"/$1 "$DESTINATION"
+		else
+			echo "$1 not found in '$SYS_LIB_DIR1' or '$SYS_LIB_DIR2', skipping it..."
+		fi
+	fi
+}
+if [ -d $SYS_LIB_DIR ]; then
+	echo "Copying libraries (SFML dependencies) to '$DESTINATION'..."
+	copy_lib "libfreetype.so.6"
+	copy_lib "libudev.so.1"
+	copy_lib "libFLAC.so.8"
+	copy_lib "libGLEW.so.1.10"
+	copy_lib "libopenal.so.1"
+	copy_lib "libsndfile.so.1"
 fi
 
 if [ -d $WX_LIB_DIR ]; then
@@ -39,5 +62,6 @@ if [ -d $WX_LIB_DIR ]; then
 else
 	echo "WxWidgets lib files not found in '$WX_LIB_DIR', skipping it..."
 fi
+
 
 echo "Done."

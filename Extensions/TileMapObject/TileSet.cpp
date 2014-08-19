@@ -7,12 +7,12 @@
 #include <wx/filename.h>
 #endif
 
-TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture()
+TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture(), m_dirty(true)
 {
 
 }
 
-TileSet::TileSet(const TileSet &other)
+TileSet::TileSet(const TileSet &other) : m_dirty(true)
 {
     textureName = other.textureName;
     tileSize = other.tileSize;
@@ -26,6 +26,8 @@ TileSet::~TileSet()
 
 void TileSet::LoadResources(gd::Project &game)
 {
+    m_dirty = true;
+
     if(game.GetResourcesManager().HasResource(textureName))
     {
         gd::ImageResource & image = dynamic_cast<gd::ImageResource&>(game.GetResourcesManager().GetResource(textureName));
@@ -55,6 +57,8 @@ void TileSet::LoadResources(gd::Project &game)
 
 void TileSet::Generate()
 {
+    m_dirty = true;
+
     if(!m_tilesetTexture)
         return;
 
@@ -101,6 +105,7 @@ void TileSet::Generate()
     }
 
     std::cout << "OK" << std::endl;
+    m_dirty = false;
 }
 
 int TileSet::GetTileIDFromPosition(sf::Vector2f position)

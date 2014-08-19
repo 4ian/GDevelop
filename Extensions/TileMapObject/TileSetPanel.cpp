@@ -31,7 +31,8 @@ void TileSetPanel::SetTileSet(TileSet *tileset)
 
 void TileSetPanel::Update()
 {
-    SetScrollbars(1, 1, m_tileset->GetSize().x, m_tileset->GetSize().y);
+    SetScrollRate(1, 1);
+    SetVirtualSize(m_tileset->GetSize().x, m_tileset->GetSize().y);
     Refresh();
 }
 
@@ -47,7 +48,7 @@ void TileSetPanel::OnDraw(wxDC& dc)
     dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(minPos.x, minPos.y, width, height);
 
-    if(m_tileset)
+    if(m_tileset && !m_tileset->IsDirty())
     {
         //Draw the bitmap
         dc.DrawBitmap(m_tileset->GetWxBitmap(), 0, 0, false);

@@ -52,7 +52,9 @@ void TileMapPanel::Update()
 {
     if(!m_tilemap || !m_tileset)
         return;
-    SetScrollbars(1, 1, m_tilemap->GetColumnsCount() * m_tileset->tileSize.x, m_tilemap->GetRowsCount() * m_tileset->tileSize.y);
+    SetScrollRate(1, 1);
+    SetVirtualSize(m_tilemap->GetColumnsCount() * m_tileset->tileSize.x, m_tilemap->GetRowsCount() * m_tileset->tileSize.y);
+    
     Refresh();
 }
 
@@ -66,7 +68,7 @@ void TileMapPanel::OnDraw(wxDC& dc)
     dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
     dc.DrawRectangle(minPos.x, minPos.y, width, height);
 
-    if(!m_tilemap || !m_tileset)
+    if(!m_tilemap || !m_tileset || m_tileset->IsDirty())
         return;
 
     dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));

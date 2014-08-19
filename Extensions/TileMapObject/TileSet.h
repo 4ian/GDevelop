@@ -32,6 +32,11 @@ public:
     sf::Vector2f tileSpacing; ///< Space between tile on the tileset texture.
 
     /**
+     * Returns true if the tileset hasn't been loaded and generated from a picture.
+     */
+    bool IsDirty() const {return m_dirty;};
+
+    /**
      * Load the image for the tilemap.
      */
     void LoadResources(gd::Project &game);
@@ -88,6 +93,8 @@ private:
     wxBitmap m_tilesetBitmap;
     std::vector<wxBitmap> m_bitmaps;
     #endif
+
+    bool m_dirty;
 
 };
 

@@ -20,6 +20,7 @@ void ResourcesMergingHelper::ExposeFile(std::string & resourceFilename)
     if ( resourceFilename.empty() ) return;
 
     std::string resourceFullFilename = resourceFilename;
+    resourceFullFilename = gd::AbstractFileSystem::NormalizeSeparator(resourceFullFilename); //Protect against \ on Linux.
     fs.MakeAbsolute(resourceFullFilename, baseDirectory);
 
     if (!preserveDirectoriesStructure)

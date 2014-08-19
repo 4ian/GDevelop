@@ -34,6 +34,9 @@
 *.a
 *.so
 *.bc
+/Binaries/Output/Release_Linux/**
+!/Binaries/Output/Release_Linux/Start Game Develop.sh
+!/Binaries/Output/Release_Linux/CppPlatform/
 /Binaries/**/MinGW32
 /Binaries/**/CppPlatform/Runtime
 /Binaries/**/CppPlatform/include

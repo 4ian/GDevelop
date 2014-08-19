@@ -44,7 +44,7 @@ public:
     /**
      * \brief Change the content of the variable, considered as a string.
      */
-    virtual void SetString(const std::string & newStr)
+    void SetString(const std::string & newStr)
     {
         str = newStr;
         isNumber = false;
@@ -59,7 +59,7 @@ public:
     /**
      * \brief Change the content of the variable, considered as a number.
      */
-    virtual void SetValue(double val)
+    void SetValue(double val)
     {
         value = val;
         isNumber = true;
@@ -106,7 +106,7 @@ public:
     /**
      * \brief Return true if the variable is a structure and has the specified child.
      */
-    virtual bool HasChild(const std::string & name) const;
+    bool HasChild(const std::string & name) const;
 
     /**
      * \brief Return the child with the specified name.
@@ -114,7 +114,7 @@ public:
      * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
      */
-    virtual Variable & GetChild(const std::string & name);
+    Variable & GetChild(const std::string & name);
 
     /**
      * \brief Return the child with the specified name.
@@ -122,7 +122,7 @@ public:
      * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
      */
-    virtual const Variable & GetChild(const std::string & name) const;
+    const Variable & GetChild(const std::string & name) const;
 
     /**
      * \brief Remove the child with the specified name.

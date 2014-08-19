@@ -40,6 +40,7 @@ freely, subject to the following restrictions:
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 namespace gd { class MainFrameWrapper; }
 #endif
@@ -155,6 +156,14 @@ void TextObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrame
     dialog.ShowModal();
 }
 #endif
+
+void TextObject::SetFontFilename(const std::string & fontFilename)
+{
+    fontName = fontFilename;
+    #if defined(GD_IDE_ONLY)
+    fontName = gd::AbstractFileSystem::NormalizeSeparator(fontName);
+    #endif
+};
 
 /* RuntimeTextObject : */
 

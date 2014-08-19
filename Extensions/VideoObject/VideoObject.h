@@ -75,7 +75,7 @@ public :
     virtual void OnPositionChanged();
 
     /**
-     * Change the video file loaded when a call is made to LoadRuntimeResources
+     * Change the video filename
      */
     void SetVideoFile(std::string file) { videoFile = file; }
 

@@ -26,6 +26,19 @@ public:
     virtual ~AbstractFileSystem();
 
     /**
+     * \brief Make sure that only slash are used as a path separator:
+     * all backslashs are converted to forward slashs.
+     *
+     * Use this method when you get a filename from a file dialog for example:
+     * it ensures that filenames will be usable from Windows to Linux (as long
+     * as the filename is not an absolute path).
+     *
+     * @param filename The filename to normalize
+     * @return The normalized filename.
+     */
+    static std::string NormalizeSeparator(std::string filename);
+
+    /**
      * \brief Create the specified directory.
      * \param path The directory to create.
      */

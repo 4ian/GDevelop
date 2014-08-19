@@ -35,7 +35,7 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::st
     if ( alreadyLoadedImages.find(name) != alreadyLoadedImages.end() && !alreadyLoadedImages.find(name)->second.expired() )
         return alreadyLoadedImages.find(name)->second.lock();
 
-    std::cout << "ImageManager: Loading " << name;
+    std::cout << "ImageManager: Loading " << name << ".";
 
     //Load only an image when necessary
     try
@@ -50,14 +50,13 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::st
         if ( preventUnloading ) unloadingPreventer.push_back(texture); //If unload prevention is activated, add the image to the list dedicated to prevent images from being unloaded.
         #endif
 
-        std::cout << "." << std::endl;
         return texture;
     }
     catch(...)
     {
     }
 
-    cout << ". Image not found." << endl;
+    cout << " Resource not found." << endl;
 
     return badTexture;
 }

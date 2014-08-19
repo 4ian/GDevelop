@@ -77,7 +77,7 @@ public :
     float GetZPos() const { return zPos; };
     void SetZPos(float zpos_) { zPos = zpos_; };
 
-    void SetSoundFileName(const std::string & soundfilename) { fileName = soundfilename; };
+    void SetSoundFileName(const std::string & soundfilename);
     const std::string & GetSoundFileName() const { return fileName; };
 
     void SetSoundType(const std::string & type_) {type = type_;};

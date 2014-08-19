@@ -85,7 +85,7 @@ public :
 
     /** \brief Change the font filename.
      */
-    void SetFontFilename(const std::string & fontFilename) { fontName = fontFilename; };
+    void SetFontFilename(const std::string & fontFilename);
 
     bool IsBold() const { return bold; };
     void SetBold(bool enable) { bold = enable; };

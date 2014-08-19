@@ -39,6 +39,7 @@ freely, subject to the following restrictions:
 #include "SoundWrapperBase.h"
 
 #if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
@@ -131,6 +132,15 @@ void SoundObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerE
     SetLooping(element.GetChild("loop", 0, "Loop").GetValue().GetBool());
     SetZPos(element.GetChild("zPos", 0, "ZPos").GetValue().GetDouble());
 }
+
+
+void SoundObject::SetSoundFileName(const std::string & soundfilename)
+{
+    fileName = soundfilename;
+    #if defined(GD_IDE_ONLY)
+    fileName = gd::AbstractFileSystem::NormalizeSeparator(fileName);
+    #endif
+};
 
 #if defined(GD_IDE_ONLY)
 void SoundObject::DoSerializeTo(gd::SerializerElement & element) const

@@ -62,7 +62,7 @@ VideoObject::~VideoObject()
 
 void VideoObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    videoFile = element.GetStringAttribute("videoFile");
+    SetVideoFile(element.GetStringAttribute("videoFile"));
     looping = element.GetBoolAttribute("looping");
     opacity = element.GetFloatAttribute("opacity");
 
@@ -91,6 +91,14 @@ bool VideoObject::LoadRuntimeResources(const RuntimeScene & scene, const gd::Ima
 {
     ReloadVideo();
     return true;
+}
+
+void VideObject::SetVideoFile(std::string file)
+{
+    videoFile = file;
+    #if defined(GD_IDE_ONLY)
+    videoFile = gd::AbstractFileSystem::NormalizeSeparator(videoFile);
+    #endif
 }
 
 void VideoObject::ReloadVideo()

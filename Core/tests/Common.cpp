@@ -11,6 +11,7 @@
 #include "GDCore/Tools/SystemStats.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -27,6 +28,47 @@ TEST_CASE( "Project", "[common]" ) {
 		gd::Project project;
 		project.SetName("myname");
 	    REQUIRE( project.GetName() == "myname" );
+	}
+}
+
+TEST_CASE( "Variable", "[common]" ) {
+	SECTION("Basics") {
+		gd::Variable variable;
+		variable.SetValue(50);
+	    REQUIRE( variable.GetValue() == 50 );
+	    REQUIRE( variable == 50 );
+	    REQUIRE( variable.IsNumber() == true );
+	    REQUIRE( variable.IsStructure() == false );
+
+		variable.SetString("MyString");
+	    REQUIRE( variable.GetString() == "MyString" );
+	    REQUIRE( variable == "MyString" );
+	    REQUIRE( variable.IsNumber() == false );
+	    REQUIRE( variable.IsStructure() == false );
+	}
+	SECTION("Conversions") {
+		gd::Variable variable;
+		variable.SetValue(50);
+	    REQUIRE( variable.GetString() == "50" ); //Used as a string...
+	    REQUIRE( variable.IsNumber() == false ); //...so consider as a string
+
+		variable.SetValue("MyString");
+	    REQUIRE( variable.GetValue() == 0 ); //Used as a number...
+	    REQUIRE( variable.IsNumber() == true ); //...so consider as a number
+	}
+	SECTION("Use with int and string like semantics") {
+		gd::Variable variable;
+		variable = 50;
+	    REQUIRE( variable.GetValue() == 50 );
+	    REQUIRE( variable.IsNumber() == true );
+
+		variable = "MyString";
+	    REQUIRE( variable.GetString() == "MyString" );
+	    REQUIRE( variable.IsNumber() == false );
+
+	    variable = std::string("MyRealStdString");
+	    REQUIRE( variable.GetString() == "MyRealStdString" );
+	    REQUIRE( variable.IsNumber() == false );
 	}
 }
 

@@ -24,6 +24,17 @@ AbstractFileSystem::~AbstractFileSystem()
 {
 }
 
+std::string gd::AbstractFileSystem::NormalizeSeparator(std::string filename)
+{
+    std::string file = filename;
+
+    //Convert all backslash to slashs.
+    while (file.find('\\') != std::string::npos)
+        file.replace(file.find('\\'), 1, "/");
+
+    return file;
+}
+
 #if !defined(GD_NO_WX_GUI)
 NativeFileSystem *NativeFileSystem::singleton = NULL;
 

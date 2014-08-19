@@ -52,7 +52,7 @@ TEST_CASE( "Variable", "[common]" ) {
 	    REQUIRE( variable.GetString() == "50" ); //Used as a string...
 	    REQUIRE( variable.IsNumber() == false ); //...so consider as a string
 
-		variable.SetValue("MyString");
+		variable.SetString("MyString");
 	    REQUIRE( variable.GetValue() == 0 ); //Used as a number...
 	    REQUIRE( variable.IsNumber() == true ); //...so consider as a number
 	}

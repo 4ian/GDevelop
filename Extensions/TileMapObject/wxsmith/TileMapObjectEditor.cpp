@@ -23,26 +23,23 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer3 = new wxFlexGridSizer(2, 2, 0, 0);
-    flexGridSizer3->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3->AddGrowableCol(1);
-    flexGridSizer3->AddGrowableRow(0);
-    this->SetSizer(flexGridSizer3);
+    m_auimgr178 = new wxAuiManager;
+    m_auimgr178->SetManagedWindow( this );
+    m_auimgr178->SetFlags( wxAUI_MGR_LIVE_RESIZE|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_ALLOW_ACTIVE_PANE|wxAUI_MGR_ALLOW_FLOATING);
+    m_auimgr178->GetArtProvider()->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
     
-    wxStaticBoxSizer* staticBoxSizer33 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Tileset sheet")), wxVERTICAL);
+    m_tilesetPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
     
-    flexGridSizer3->Add(staticBoxSizer33, 1, wxALL|wxEXPAND, 5);
+    m_auimgr178->AddPane(m_tilesetPanel, wxAuiPaneInfo().Caption(_("Tileset")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(400,550).MinSize(400,550).CaptionVisible(true).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer5 = new wxFlexGridSizer(6, 1, 0, 0);
     flexGridSizer5->SetFlexibleDirection( wxBOTH );
     flexGridSizer5->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5->AddGrowableCol(0);
     flexGridSizer5->AddGrowableRow(0);
+    m_tilesetPanel->SetSizer(flexGridSizer5);
     
-    staticBoxSizer33->Add(flexGridSizer5, 1, wxALL|wxEXPAND, 5);
-    
-    m_tileSetPanel = new TileSetPanel(this, wxID_ANY, wxDefaultPosition, wxSize(300,350), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
+    m_tileSetPanel = new TileSetPanel(m_tilesetPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
     m_tileSetPanel->SetScrollRate(5, 5);
     
     flexGridSizer5->Add(m_tileSetPanel, 0, wxALL|wxEXPAND, 5);
@@ -53,42 +50,42 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer5->Add(flexGridSizer17, 1, wxALL|wxEXPAND, 5);
     
-    m_staticText19 = new wxStaticText(this, wxID_ANY, _("Size of tiles:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText19 = new wxStaticText(m_tilesetPanel, wxID_ANY, _("Size of tiles:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer17->Add(m_staticText19, 0, wxALL, 5);
     
-    m_tileWidthSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
+    m_tileWidthSpin = new wxSpinCtrl(m_tilesetPanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_tileWidthSpin->SetRange(0, 10000);
     m_tileWidthSpin->SetValue(0);
     
     flexGridSizer17->Add(m_tileWidthSpin, 0, wxALL, 5);
     
-    m_staticText43 = new wxStaticText(this, wxID_ANY, _("x"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText43 = new wxStaticText(m_tilesetPanel, wxID_ANY, _("x"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer17->Add(m_staticText43, 0, wxALL, 5);
     
-    m_tileHeightSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
+    m_tileHeightSpin = new wxSpinCtrl(m_tilesetPanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_tileHeightSpin->SetRange(0, 10000);
     m_tileHeightSpin->SetValue(0);
     
     flexGridSizer17->Add(m_tileHeightSpin, 0, wxALL, 5);
     
-    m_staticText81 = new wxStaticText(this, wxID_ANY, _("Margins"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText81 = new wxStaticText(m_tilesetPanel, wxID_ANY, _("Margins:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer17->Add(m_staticText81, 0, wxALL, 5);
     
-    m_horizontalMarginsSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
+    m_horizontalMarginsSpin = new wxSpinCtrl(m_tilesetPanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_horizontalMarginsSpin->SetToolTip(_("Horizontal margins"));
     m_horizontalMarginsSpin->SetRange(0, 10000);
     m_horizontalMarginsSpin->SetValue(0);
     
     flexGridSizer17->Add(m_horizontalMarginsSpin, 0, wxALL, 5);
     
-    m_staticText85 = new wxStaticText(this, wxID_ANY, _("x"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText85 = new wxStaticText(m_tilesetPanel, wxID_ANY, _("x"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer17->Add(m_staticText85, 0, wxALL, 5);
     
-    m_verticalMarginsSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
+    m_verticalMarginsSpin = new wxSpinCtrl(m_tilesetPanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_verticalMarginsSpin->SetToolTip(_("Vertical margins"));
     m_verticalMarginsSpin->SetRange(0, 10000);
     m_verticalMarginsSpin->SetValue(0);
@@ -103,13 +100,25 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer5->Add(flexGridSizer13, 1, wxALL|wxEXPAND, 5);
     
-    m_imageNameTextCtrl = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_imageNameTextCtrl = new wxTextCtrl(m_tilesetPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer13->Add(m_imageNameTextCtrl, 0, wxALL|wxEXPAND, 5);
     
-    m_updateButton = new wxButton(this, wxID_ANY, _("Update tileset"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_updateButton = new wxButton(m_tilesetPanel, wxID_ANY, _("Update tileset"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer5->Add(m_updateButton, 0, wxALL|wxEXPAND, 5);
+    
+    m_mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
+    
+    m_auimgr178->AddPane(m_mainPanel, wxAuiPaneInfo().Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(600,800).MinSize(600,800).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgr178->Update();
+    
+    wxFlexGridSizer* flexGridSizer200 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer200->SetFlexibleDirection( wxBOTH );
+    flexGridSizer200->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer200->AddGrowableCol(0);
+    flexGridSizer200->AddGrowableRow(0);
+    m_mainPanel->SetSizer(flexGridSizer200);
     
     wxFlexGridSizer* flexGridSizer7 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer7->SetFlexibleDirection( wxBOTH );
@@ -117,7 +126,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer7->AddGrowableCol(0);
     flexGridSizer7->AddGrowableRow(1);
     
-    flexGridSizer3->Add(flexGridSizer7, 1, wxALL|wxEXPAND, 5);
+    flexGridSizer200->Add(flexGridSizer7, 1, wxALL|wxEXPAND, 5);
     
     wxFlexGridSizer* flexGridSizer103 = new wxFlexGridSizer(1, 0, 0, 0);
     flexGridSizer103->SetFlexibleDirection( wxBOTH );
@@ -125,7 +134,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer7->Add(flexGridSizer103, 1, wxALL|wxEXPAND, 5);
     
-    m_staticText105 = new wxStaticText(this, wxID_ANY, _("Current layer:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText105 = new wxStaticText(m_mainPanel, wxID_ANY, _("Current layer:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer103->Add(m_staticText105, 0, wxALL|wxALIGN_CENTER, 5);
     
@@ -133,16 +142,16 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_layerChoiceArr.Add(wxT("Back"));
     m_layerChoiceArr.Add(wxT("Middle"));
     m_layerChoiceArr.Add(wxT("Top"));
-    m_layerChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), m_layerChoiceArr, 0);
+    m_layerChoice = new wxChoice(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), m_layerChoiceArr, 0);
     
     flexGridSizer103->Add(m_layerChoice, 0, wxALL, 5);
     
-    m_hideUpperLayerCheck = new wxCheckBox(this, wxID_ANY, _("Hide upper layers"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_hideUpperLayerCheck = new wxCheckBox(m_mainPanel, wxID_ANY, _("Hide upper layers"), wxDefaultPosition, wxSize(-1,-1), 0);
     m_hideUpperLayerCheck->SetValue(false);
     
     flexGridSizer103->Add(m_hideUpperLayerCheck, 0, wxALL|wxEXPAND, 5);
     
-    m_tileMapPanel = new TileMapPanel(this, wxID_ANY, wxDefaultPosition, wxSize(500, 550), wxHSCROLL|wxVSCROLL);
+    m_tileMapPanel = new TileMapPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxHSCROLL|wxVSCROLL);
     m_tileMapPanel->SetScrollRate(5, 5);
     
     flexGridSizer7->Add(m_tileMapPanel, 0, wxALL|wxEXPAND, 5);
@@ -153,48 +162,47 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer7->Add(flexGridSizer89, 1, wxALL|wxEXPAND, 5);
     
-    m_staticText93 = new wxStaticText(this, wxID_ANY, _("Tilemap size:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText93 = new wxStaticText(m_mainPanel, wxID_ANY, _("Tilemap size:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer89->Add(m_staticText93, 0, wxALL, 5);
     
-    m_mapWidthSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
+    m_mapWidthSpin = new wxSpinCtrl(m_mainPanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_mapWidthSpin->SetRange(0, 1000000);
     m_mapWidthSpin->SetValue(0);
     
     flexGridSizer89->Add(m_mapWidthSpin, 0, wxALL, 5);
     
-    m_staticText97 = new wxStaticText(this, wxID_ANY, _("x"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText97 = new wxStaticText(m_mainPanel, wxID_ANY, _("x"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer89->Add(m_staticText97, 0, wxALL, 5);
     
-    m_mapHeightSpin = new wxSpinCtrl(this, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
+    m_mapHeightSpin = new wxSpinCtrl(m_mainPanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(-1,-1), wxSP_ARROW_KEYS);
     m_mapHeightSpin->SetRange(0, 10000000);
     m_mapHeightSpin->SetValue(0);
     
     flexGridSizer89->Add(m_mapHeightSpin, 0, wxALL, 5);
     
-    m_staticText101 = new wxStaticText(this, wxID_ANY, _("tiles"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText101 = new wxStaticText(m_mainPanel, wxID_ANY, _("tiles"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer89->Add(m_staticText101, 0, wxALL, 5);
     
-    m_mapUpdateButton = new wxButton(this, wxID_ANY, _("Update tilemap size"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_mapUpdateButton = new wxButton(m_mainPanel, wxID_ANY, _("Update tilemap size"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer7->Add(m_mapUpdateButton, 0, wxALL|wxEXPAND, 5);
     
-    flexGridSizer3->Add(0, 0, 1, wxALL, 5);
-    
     m_stdBtnSizer60 = new wxStdDialogButtonSizer();
     
-    flexGridSizer3->Add(m_stdBtnSizer60, 0, wxALL|wxEXPAND, 5);
+    flexGridSizer200->Add(m_stdBtnSizer60, 0, wxALL|wxEXPAND, 5);
     
-    m_button62 = new wxButton(this, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_button62 = new wxButton(m_mainPanel, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
     m_stdBtnSizer60->AddButton(m_button62);
     
-    m_button64 = new wxButton(this, wxID_CANCEL, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_button64 = new wxButton(m_mainPanel, wxID_CANCEL, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
     m_stdBtnSizer60->AddButton(m_button64);
     m_stdBtnSizer60->Realize();
     
-    SetSizeHints(-1,-1);
+    SetMinSize( wxSize(850,550) );
+    SetSizeHints(850,550);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
@@ -214,4 +222,7 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     m_hideUpperLayerCheck->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
     m_mapUpdateButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnMapUpdateButtonClicked), NULL, this);
     
+    m_auimgr178->UnInit();
+    delete m_auimgr178;
+
 }

@@ -41,6 +41,9 @@ class wxBitmap;
 class wxWindow;
 #endif
 
+#include "TileMap.h"
+#include "TileSet.h"
+
 /**
  * TileMap Object
  */
@@ -68,10 +71,7 @@ public :
     virtual void SetWidth(float newWidth) { width = newWidth; };
     virtual void SetHeight(float newHeight) { height = newHeight; };
 
-    void SetTexture(const std::string & newTextureName) { textureName = newTextureName; };
-    const std::string & GetTexture() const { return textureName; };
 
-    std::string textureName;
 
 private:
 

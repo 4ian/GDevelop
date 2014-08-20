@@ -13,8 +13,10 @@
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
 #include <wx/artprov.h>
+#include <wx/aui/framemanager.h>
+#include <wx/aui/dockart.h>
+#include <wx/panel.h>
 #include <wx/sizer.h>
-#include <wx/statbox.h>
 #include <wx/scrolwin.h>
 #include "../TileSetPanel.h"
 #include <wx/stattext.h>
@@ -29,6 +31,8 @@
 class TileMapObjectEditorBase : public wxDialog
 {
 protected:
+    wxAuiManager* m_auimgr178;
+    wxPanel* m_tilesetPanel;
     TileSetPanel* m_tileSetPanel;
     wxStaticText* m_staticText19;
     wxSpinCtrl* m_tileWidthSpin;
@@ -40,6 +44,7 @@ protected:
     wxSpinCtrl* m_verticalMarginsSpin;
     wxTextCtrl* m_imageNameTextCtrl;
     wxButton* m_updateButton;
+    wxPanel* m_mainPanel;
     wxStaticText* m_staticText105;
     wxChoice* m_layerChoice;
     wxCheckBox* m_hideUpperLayerCheck;
@@ -61,7 +66,7 @@ protected:
     virtual void OnMapUpdateButtonClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(850,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~TileMapObjectEditorBase();
 };
 

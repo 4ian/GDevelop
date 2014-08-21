@@ -16,9 +16,9 @@ TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 
     Connect(wxEVT_PAINT, wxPaintEventHandler(TileMapPanel::OnPaint), NULL, this);
-    Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnLeftButtonPressed), NULL, this);
-    Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(TileMapPanel::OnRightButtonPressed), NULL, this);
-    Connect(wxEVT_MOTION, wxMouseEventHandler(TileMapPanel::OnMouseMoved), NULL, this);
+    Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
+    Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
+    Connect(wxEVT_MOTION, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
 }
 
 TileMapPanel::~TileMapPanel()
@@ -115,7 +115,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
     }
 }
 
-void TileMapPanel::OnLeftButtonPressed(wxMouseEvent &event)
+void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
 {
     if(!m_tilemap || !m_tileset)
         return;
@@ -127,44 +127,18 @@ void TileMapPanel::OnLeftButtonPressed(wxMouseEvent &event)
 
     if(currentColumn >= m_tilemap->GetColumnsCount() || currentRow >= m_tilemap->GetRowsCount())
         return; //Stop if the position is out of range
-
-    //Add a tile to the current position
-    m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted);
-    Refresh();
-}
-
-void TileMapPanel::OnRightButtonPressed(wxMouseEvent &event)
-{
-    if(!m_tilemap || !m_tileset)
-        return;
-
-    //Get the current tile position (column and row)
-    int currentColumn, currentRow;
-    wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());
-    GetTileAt(mousePos, currentColumn, currentRow);
-
-    if(currentColumn >= m_tilemap->GetColumnsCount() || currentRow >= m_tilemap->GetRowsCount())
-        return; //Stop if the position is out of range
-
-    //Remove the tile
-    m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, -1);
-    Refresh();
-}
-
-void TileMapPanel::OnMouseMoved(wxMouseEvent &event)
-{
-    if(!m_tilemap || !m_tileset)
-        return;
 
     if(event.LeftIsDown()) //Left mouse button pressed
     {
         //Add a tile to the current position
-        OnLeftButtonPressed(event);
+        m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted);
+        Refresh();
     }
     else if(event.RightIsDown())
     {
         //Remove the tile
-        OnRightButtonPressed(event);
+        m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, -1);
+        Refresh();
     }
 }
 

@@ -57,9 +57,7 @@ public:
 
 protected:
     void OnPaint(wxPaintEvent &event);
-    void OnLeftButtonPressed(wxMouseEvent &event);
-    void OnRightButtonPressed(wxMouseEvent &event);
-    void OnMouseMoved(wxMouseEvent &event);
+    void OnMouseEvent(wxMouseEvent &event);
 
 private:
     wxPoint GetPositionOfTile(int column, int row);

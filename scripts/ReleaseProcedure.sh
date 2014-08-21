@@ -3,7 +3,7 @@
 DIRECTORY="../Binaries/.build"
 if [ ! -d "../Binaries/.build" ]; then
 DIRECTORY="../Binaries/build"
-fi	
+fi
 if [ -d "$DIRECTORY" ]; then
 	cd "$DIRECTORY"
 	if [ -f "build.ninha" ]; then
@@ -15,8 +15,8 @@ if [ -d "$DIRECTORY" ]; then
 else
 	echo "Unable to find your build directory, just make sure that GD is compiled in Release_Linux"
 fi
-cd ../../IDE/scripts/
-sh ./UpdateHeadersAndPCHRelease.sh
+cd ../../GDCpp/scripts/
+sh ./CopyHeadersToGD.sh
 cd ../../scripts
 sh CopyWindowsToLinuxReleaseFiles.sh
 cd ../GDJS/scripts/

@@ -58,6 +58,9 @@ tileMap(object.tileMap)
     m_tileMapPanel->SetTileMap(&tileMap);
     m_tileSetPanel->Connect(TILE_SELECTION_CHANGED, TileSelectionEventHandler(TileMapObjectEditor::OnTileSetSelectionChanged), NULL, this);
 
+    m_auimgr178->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
+    gd::SkinHelper::ApplyCurrentSkin(*m_auimgr178);
+
     UpdateLayerChoice();
 }
 

@@ -56,8 +56,10 @@ public:
     void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
 protected:
-    void OnPaint(wxPaintEvent& event);
-    void OnLeftButtonPressed(wxMouseEvent& event);
+    void OnPaint(wxPaintEvent &event);
+    void OnLeftButtonPressed(wxMouseEvent &event);
+    void OnRightButtonPressed(wxMouseEvent &event);
+    void OnMouseMoved(wxMouseEvent &event);
 
 private:
     wxPoint GetPositionOfTile(int column, int row);

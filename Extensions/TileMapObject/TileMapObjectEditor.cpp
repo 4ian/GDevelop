@@ -50,8 +50,8 @@ TileMapObjectEditorBase(parent),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_),
 object(object_),
-tileSet(),
-tileMap()
+tileSet(object.tileSet),
+tileMap(object.tileMap)
 {
     m_tileSetPanel->SetTileSet(&tileSet);
     m_tileMapPanel->SetTileSet(&tileSet);
@@ -114,6 +114,19 @@ void TileMapObjectEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
 void TileMapObjectEditor::UpdateLayerChoice()
 {
     m_layerChoice->SetSelection(m_tileMapPanel->GetCurrentLayer());
+}
+
+void TileMapObjectEditor::OnCancelButtonPressed(wxCommandEvent& event)
+{
+    EndModal(0);
+}
+
+void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
+{
+    object.tileSet = tileSet;
+    object.tileMap = tileMap;
+
+    EndModal(1);
 }
 
 #endif

@@ -151,7 +151,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer103->Add(m_hideUpperLayerCheck, 0, wxALL|wxEXPAND, 5);
     
-    m_tileMapPanel = new TileMapPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxHSCROLL|wxVSCROLL);
+    m_tileMapPanel = new TileMapPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
     m_tileMapPanel->SetScrollRate(5, 5);
     
     flexGridSizer7->Add(m_tileMapPanel, 0, wxALL|wxEXPAND, 5);
@@ -212,6 +212,8 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     m_hideUpperLayerCheck->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
     m_mapUpdateButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnMapUpdateButtonClicked), NULL, this);
+    m_button62->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnOkButtonPressed), NULL, this);
+    m_button64->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnCancelButtonPressed), NULL, this);
     
 }
 
@@ -221,6 +223,8 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     m_hideUpperLayerCheck->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
     m_mapUpdateButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnMapUpdateButtonClicked), NULL, this);
+    m_button62->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnOkButtonPressed), NULL, this);
+    m_button64->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnCancelButtonPressed), NULL, this);
     
     m_auimgr178->UnInit();
     delete m_auimgr178;

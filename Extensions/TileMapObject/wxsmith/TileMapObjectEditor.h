@@ -64,6 +64,8 @@ protected:
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMapUpdateButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOkButtonPressed(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCancelButtonPressed(wxCommandEvent& event) { event.Skip(); }
 
 public:
     TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(850,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);

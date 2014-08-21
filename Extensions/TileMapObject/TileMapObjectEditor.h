@@ -55,6 +55,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual void OnMapUpdateButtonClicked(wxCommandEvent& event);
         virtual void OnLayerChoiceChanged(wxCommandEvent& event);
         virtual void OnHideUpperLayerChecked(wxCommandEvent& event);
+        virtual void OnCancelButtonPressed(wxCommandEvent& event);
+        virtual void OnOkButtonPressed(wxCommandEvent& event);
         void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
     private:

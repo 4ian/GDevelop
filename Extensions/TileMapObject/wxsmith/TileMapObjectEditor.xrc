@@ -288,7 +288,7 @@
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
                   <object class="wxScrolledWindow" name="m_tileMapPanel" subclass="TileMapPanel">
-                    <style>wxHSCROLL|wxVSCROLL</style>
+                    <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
                     <scrollrate>5,5</scrollrate>
                   </object>
                 </object>

@@ -51,72 +51,119 @@ freely, subject to the following restrictions:
 
 using namespace std;
 
+namespace
+{
+    sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
+    {
+        sf::VertexArray vertexArray(sf::Quads);
+        int tileWidth = tileSet.tileSize.x;
+        int tileHeight = tileSet.tileSize.y;
+
+        if(tileSet.IsDirty())
+            return vertexArray;
+
+        int vertexs = 0;
+
+        for(int layer = 0; layer < 3; layer++)
+        {
+            for(int col = 0; col < tileMap.GetColumnsCount(); col++)
+            {
+                for(int row = 0; row < tileMap.GetRowsCount(); row++)
+                {
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        continue;
+
+                    vertexs += 4;
+
+                    TileTextureCoords coords = tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row));
+                    {
+                        sf::Vertex vertex(sf::Vector2f(col * tileWidth, row * tileHeight), coords.topLeft);
+                        vertexArray.append(vertex);
+                    }
+                    {
+                        sf::Vertex vertex(sf::Vector2f(col * tileWidth, (row + 1) * tileHeight), coords.bottomLeft);
+                        vertexArray.append(vertex);
+                    }
+                    {
+                        sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, (row + 1) * tileHeight), coords.bottomRight);
+                        vertexArray.append(vertex);
+                    }
+                    {
+                        sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, row * tileHeight), coords.topRight);
+                        vertexArray.append(vertex);
+                    }
+                }
+            }
+        }
+
+        std::cout << "Generated " << vertexs << " vertexes." << std::endl;
+
+        return vertexArray;
+    }
+}
+
 TileMapObject::TileMapObject(std::string name_) :
     Object(name_),
-    textureName(""),
-    width(32),
-    height(32)
+    tileSet(),
+    tileMap(),
+    vertexArray(sf::Quads)
 {
 }
 
 void TileMapObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    textureName = element.GetStringAttribute("texture");
+    /*textureName = element.GetStringAttribute("texture");
     width = element.GetDoubleAttribute("width", 128);
-    height = element.GetDoubleAttribute("height", 128);
+    height = element.GetDoubleAttribute("height", 128);*/
+}
+
+float TileMapObject::GetWidth() const
+{
+    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+        return 200.f;
+    else
+        return tileMap.GetColumnsCount() * tileSet.tileSize.x;
+}
+
+float TileMapObject::GetHeight() const
+{
+    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+        return 150.f;
+    else
+        return tileMap.GetRowsCount() * tileSet.tileSize.y;
 }
 
 #if defined(GD_IDE_ONLY)
 void TileMapObject::DoSerializeTo(gd::SerializerElement & element) const
 {
-    element.SetAttribute("texture", textureName);
+    /*element.SetAttribute("texture", textureName);
     element.SetAttribute("width", width);
-    element.SetAttribute("height", height);
+    element.SetAttribute("height", height);*/
 }
 
 void TileMapObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    texture = project.GetImageManager()->GetSFMLTexture("rpg.png");
+    tileSet.LoadResources(project);
+    tileSet.Generate();
+    vertexArray = GenerateVertexArray(tileSet, tileMap);
 }
 #endif
 
-namespace
-{
-    sf::Vector2f RotatePoint(sf::Vector2f point, float angle)
-    {
-        float t,
-              cosa = cos(-angle),
-              sina = sin(-angle); //We want a clockwise rotation
-
-        t = point.x;
-        point.x = t*cosa + point.y*sina;
-        point.y = -t*sina + point.y*cosa;
-
-        return point;
-    }
-}
-
 RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object) :
     RuntimeObject(scene, object),
-    width(32),
-    height(32),
-    xOffset(0),
-    yOffset(),
-    angle(0)
+    tileSet(),
+    tileMap(),
+    vertexArray(sf::Quads)
 {
-    const TileMapObject & panelSpriteObject = static_cast<const TileMapObject&>(object);
+    const TileMapObject & tileMapObject = static_cast<const TileMapObject&>(object);
 
-    SetWidth(panelSpriteObject.GetWidth());
-    SetHeight(panelSpriteObject.GetHeight());
+    tileSet = tileMapObject.tileSet;
+    tileMap = tileMapObject.tileMap;
 
-    textureName = panelSpriteObject.textureName;
-    ChangeAndReloadImage(textureName, scene);
-}
-
-void RuntimeTileMapObject::ChangeAndReloadImage(const std::string &txtName, const RuntimeScene &scene)
-{
-    textureName = txtName;
-    texture = scene.GetImageManager()->GetSFMLTexture(textureName);
+    //Load the tileset and generate the vertex array
+    tileSet.LoadResources(*(scene.game));
+    tileSet.Generate();
+    vertexArray = GenerateVertexArray(tileSet, tileMap);
 }
 
 /**
@@ -126,26 +173,47 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
-    if(!texture) return true;
 
-    sf::Vector2f centerPosition = sf::Vector2f(GetX()+GetCenterX(),GetY()+GetCenterY());
-    float angleInRad = angle*3.14159/180.0;
-    texture->texture.setRepeated(true);
-    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset))};
+    //Construct the transform
+    sf::Transform transform;
+    transform.translate(GetX(), GetY());
+    
+    //Unsmooth the texture
+    bool wasSmooth = tileSet.GetTexture().isSmooth();
+    tileSet.GetTexture().setSmooth(false);
 
-    window.draw(vertices, 4, sf::Quads, &texture->texture);
-    texture->texture.setRepeated(false);
+    //Draw the tilemap
+    window.draw(vertexArray, sf::RenderStates(&tileSet.GetTexture()));
+
+    tileSet.GetTexture().setSmooth(wasSmooth);
 
     return true;
+}
+
+
+float RuntimeTileMapObject::GetWidth() const
+{
+    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+        return 200.f;
+    else
+        return tileMap.GetColumnsCount() * tileSet.tileSize.x;
+}
+
+float RuntimeTileMapObject::GetHeight() const
+{
+    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+        return 150.f;
+    else
+        return tileMap.GetRowsCount() * tileSet.tileSize.y;
 }
 
 #if defined(GD_IDE_ONLY)
 sf::Vector2f TileMapObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
-    return sf::Vector2f(width,height);
+    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+        return sf::Vector2f(200.f, 150.f);
+    else
+        return sf::Vector2f(tileMap.GetColumnsCount() * tileSet.tileSize.x, tileMap.GetRowsCount() * tileSet.tileSize.y);
 }
 
 /**
@@ -153,28 +221,26 @@ sf::Vector2f TileMapObject::GetInitialInstanceDefaultSize(gd::InitialInstance & 
  */
 void TileMapObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    if(!texture) return;
+    if(tileSet.IsDirty())
+        return;
 
-    float width = instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultSize(instance, project, layout).x;
-    float height = instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultSize(instance, project, layout).y;
-    float xOffset = 0;
-    float yOffset = 0;
+    //Construct the transform
+    sf::Transform transform;
+    transform.translate(instance.GetX(), instance.GetY());
 
-    sf::Vector2f centerPosition = sf::Vector2f(instance.GetX()+width/2, instance.GetY()+height/2);
-    float angleInRad = instance.GetAngle()*3.14159/180.0;
-    texture->texture.setRepeated(true);
-    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset))};
+    //Unsmooth the texture
+    bool wasSmooth = tileSet.GetTexture().isSmooth();
+    tileSet.GetTexture().setSmooth(false);
 
-    renderTarget.draw(vertices, 4, sf::Quads, &texture->texture);
-    texture->texture.setRepeated(false);
+    //Draw the tilemap
+    renderTarget.draw(vertexArray, sf::RenderStates(sf::BlendAlpha, transform, &tileSet.GetTexture(), NULL));
+
+    tileSet.GetTexture().setSmooth(wasSmooth);
 }
 
 void TileMapObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    worker.ExposeImage(textureName);
+    worker.ExposeImage(tileSet.textureName);
 }
 
 bool TileMapObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
@@ -196,23 +262,17 @@ void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFr
 
 void RuntimeTileMapObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Angle");       value = ToString(angle);}
+
 }
 
 bool RuntimeTileMapObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if      ( propertyNb == 0 ) {width = ToFloat(newValue);}
-    else if ( propertyNb == 1 ) {height = ToFloat(newValue);}
-    else if ( propertyNb == 2 ) {angle = ToFloat(newValue);}
-
     return true;
 }
 
 unsigned int RuntimeTileMapObject::GetNumberOfProperties() const
 {
-    return 3;
+    return 0;
 }
 #endif
 

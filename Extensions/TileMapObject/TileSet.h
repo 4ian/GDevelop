@@ -10,6 +10,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <GDCore/PlatformDefinition/ImageManager.h>
 #include <GDCore/PlatformDefinition/Project.h>
+#include <GDCpp/RuntimeGame.h>
 
 struct TileTextureCoords
 {
@@ -39,6 +40,7 @@ public:
      * Load the image for the tilemap.
      */
     void LoadResources(gd::Project &game);
+    void LoadResources(RuntimeGame &game);
 
     /**
      * Generate the tile texture coords and temporary bitmaps for the IDE.
@@ -62,6 +64,16 @@ public:
      */
     const wxBitmap& GetTileBitmap(int id) const;
 #endif
+
+    /**
+     * Returns the SFML texture.
+     */
+    sf::Texture& GetTexture();
+
+    /**
+     * Returns the SFML texture (read-only).
+     */
+    const sf::Texture& GetTexture() const;
 
     /**
      * Get the tile texture coords (four sf::Vector2f) from its ID

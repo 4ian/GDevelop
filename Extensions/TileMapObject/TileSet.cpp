@@ -18,6 +18,12 @@ TileSet::~TileSet()
 
 }
 
+void TileSet::LoadResources(RuntimeGame &game)
+{
+    m_dirty = true;
+    m_tilesetTexture = game.GetImageManager()->GetSFMLTexture(textureName);
+}
+
 void TileSet::LoadResources(gd::Project &game)
 {
     m_dirty = true;
@@ -82,8 +88,8 @@ void TileSet::Generate()
                                                row * (tileSize.y + tileSpacing.y));
             tileCoords.bottomRight = sf::Vector2f(col * (tileSize.x + tileSpacing.x) + tileSize.x,
                                                   row * (tileSize.y + tileSpacing.y) + tileSize.y);
-            tileCoords.topRight = sf::Vector2f(col * (tileSize.x + tileSpacing.x),
-                                               row * (tileSize.y + tileSpacing.y) + tileSize.y);
+            tileCoords.bottomLeft = sf::Vector2f(col * (tileSize.x + tileSpacing.x),
+                                                 row * (tileSize.y + tileSpacing.y) + tileSize.y);
             m_coords.push_back(tileCoords);
 
 #ifdef GD_IDE_ONLY
@@ -134,6 +140,16 @@ const wxBitmap& TileSet::GetTileBitmap(int id) const
 }
 
 #endif
+
+sf::Texture& TileSet::GetTexture()
+{
+    return m_tilesetTexture->texture;
+}
+
+const sf::Texture& TileSet::GetTexture() const
+{
+    return m_tilesetTexture->texture;
+}
 
 TileTextureCoords TileSet::GetTileTextureCoords(int id) const
 {

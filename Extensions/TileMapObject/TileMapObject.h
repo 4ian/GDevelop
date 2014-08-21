@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include <boost/shared_ptr.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 class SFMLTextureWrapper;
 class RuntimeScene;
 namespace gd { class ImageManager; }
@@ -65,13 +66,15 @@ public :
     virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
     #endif
 
-    virtual float GetWidth() const { return width; };
-    virtual float GetHeight() const { return height; };
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
 
-    virtual void SetWidth(float newWidth) { width = newWidth; };
-    virtual void SetHeight(float newHeight) { height = newHeight; };
+    virtual void SetWidth(float newWidth) {};
+    virtual void SetHeight(float newHeight) {};
 
-
+    TileSet tileSet;
+    TileMap tileMap;
+    std::string textureName;
 
 private:
 
@@ -80,11 +83,7 @@ private:
     virtual void DoSerializeTo(gd::SerializerElement & element) const;
     #endif
 
-    float width;
-    float height;
-    bool smooth;
-
-    boost::shared_ptr<SFMLTextureWrapper> texture;
+    sf::VertexArray vertexArray;
 };
 
 class GD_EXTENSION_API RuntimeTileMapObject : public RuntimeObject
@@ -97,21 +96,14 @@ public :
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
-    virtual float GetWidth() const { return width; };
-    virtual float GetHeight() const { return height; };
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
 
-    virtual float GetAngle() const {return angle;};
-    virtual bool SetAngle(float ang) {angle = ang; return true;};
+    virtual float GetAngle() const {return 0;};
+    virtual bool SetAngle(float ang) {return false;};
 
-    virtual void SetWidth(float newWidth) { width = newWidth; };
-    virtual void SetHeight(float newHeight) { height = newHeight; };
-
-    void SetXOffset(float xOffset_) { xOffset = xOffset_; };
-    float GetXOffset() const { return xOffset; };
-    void SetYOffset(float yOffset_) { yOffset = yOffset_; };
-    float GetYOffset() const { return yOffset; };
-
-    void ChangeAndReloadImage(const std::string &texture, const RuntimeScene &scene);
+    virtual void SetWidth(float newWidth) {};
+    virtual void SetHeight(float newHeight) {};
 
     #if defined(GD_IDE_ONLY)
     virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
@@ -119,16 +111,12 @@ public :
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
-    std::string textureName;
+    TileSet tileSet;
+    TileMap tileMap;
 
 private:
 
-    float width;
-    float height;
-    float angle;
-    bool smooth;
-    float xOffset;
-    float yOffset;
+    sf::VertexArray vertexArray;
 
     boost::shared_ptr<SFMLTextureWrapper> texture;
 };

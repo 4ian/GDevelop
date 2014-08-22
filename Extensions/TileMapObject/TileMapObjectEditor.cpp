@@ -61,6 +61,15 @@ tileMap(object.tileMap)
     m_auimgr178->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
     gd::SkinHelper::ApplyCurrentSkin(*m_auimgr178);
 
+    //Load properties into the editor
+    m_imageNameTextCtrl->SetValue(tileSet.textureName);
+    m_tileWidthSpin->SetValue(tileSet.tileSize.x);
+    m_tileHeightSpin->SetValue(tileSet.tileSize.y);
+    m_horizontalMarginsSpin->SetValue(tileSet.tileSpacing.x);
+    m_verticalMarginsSpin->SetValue(tileSet.tileSpacing.y);
+    m_mapWidthSpin->SetValue(tileMap.GetColumnsCount());
+    m_mapHeightSpin->SetValue(tileMap.GetRowsCount());
+
     UpdateLayerChoice();
 }
 

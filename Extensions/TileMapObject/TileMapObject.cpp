@@ -187,7 +187,7 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
     tileSet.GetTexture().setSmooth(false);
 
     //Draw the tilemap
-    window.draw(vertexArray, sf::RenderStates(&tileSet.GetTexture()));
+    window.draw(vertexArray, sf::RenderStates(sf::BlendAlpha, transform, &tileSet.GetTexture(), NULL));
 
     tileSet.GetTexture().setSmooth(wasSmooth);
 

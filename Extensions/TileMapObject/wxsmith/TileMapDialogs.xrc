@@ -6,7 +6,7 @@
     <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
     <size>850,550</size>
     <object class="wxAuiManager">
-      <flags>271</flags>
+      <flags>285</flags>
       <sashsize>-1</sashsize>
       <pane-border-size>-1</pane-border-size>
       <sash-colour/>
@@ -19,7 +19,7 @@
       <gradient-type>wxAUI_GRADIENT_NONE</gradient-type>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[TILESETPANEL]]>
         </name>
         <caption>
           <![CDATA[Tileset]]>
@@ -38,7 +38,7 @@
         <maxbtn>0</maxbtn>
         <pinbtn>0</pinbtn>
         <toolbar-pane>0</toolbar-pane>
-        <object class="wxPanel" name="m_tilesetPanel">
+        <object class="wxPanel" name="m_tileSetPropertiesPanel">
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
@@ -46,7 +46,24 @@
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>0</growablerows>
+            <growablerows>1</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>5</border>
+              <object class="wxToolBar" name="m_tileSetToolBar">
+                <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
+                <bitmapsize>32,32</bitmapsize>
+                <object class="tool" name="m_toolbarItem2541">
+                  <label>
+                    <![CDATA[Configure the tileset]]>
+                  </label>
+                  <longhelp>
+                    <![CDATA[]]>
+                  </longhelp>
+                  <bitmap>../../../Binaries/Output/Release_Windows/res/ribbon_default/pref32.png</bitmap>
+                </object>
+              </object>
+            </object>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>5</border>
@@ -81,8 +98,8 @@
                   <border>5</border>
                   <object class="wxSpinCtrl" name="m_tileWidthSpin">
                     <style>wxSP_ARROW_KEYS</style>
-                    <value>0</value>
-                    <min>0</min>
+                    <value>24</value>
+                    <min>1</min>
                     <max>10000</max>
                   </object>
                 </object>
@@ -101,8 +118,8 @@
                   <border>5</border>
                   <object class="wxSpinCtrl" name="m_tileHeightSpin">
                     <style>wxSP_ARROW_KEYS</style>
-                    <value>0</value>
-                    <min>0</min>
+                    <value>24</value>
+                    <min>1</min>
                     <max>10000</max>
                   </object>
                 </object>
@@ -190,7 +207,7 @@
       </object>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[MAINPANEL]]>
         </name>
         <caption>
           <![CDATA[]]>

@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #ifndef TILEMAPOBJECTEDITOR_H
 #define TILEMAPOBJECTEDITOR_H
 
-#include "wxsmith/TileMapObjectEditor.h"
+#include "wxsmith/TileMapDialogs.h"
 
 #include <wx/bitmap.h>
 

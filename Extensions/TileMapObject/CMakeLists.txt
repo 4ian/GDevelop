@@ -133,9 +133,9 @@ set(gdide_source_files
 	TileSetPanel.cpp
 	TileMapPanel.cpp
 	TileMap.cpp
-	wxsmith/TileMapObjectEditor.cpp
-	wxsmith/TileMapObjectEditor.xrc
-	wxsmith/TileMapObjectEditor_wxsmith_bitmaps.cpp)
+	wxsmith/TileMapDialogs.cpp
+	wxsmith/TileMapDialogs.xrc
+	wxsmith/TileMapDialogs_wxsmith_bitmaps.cpp)
 
 add_library(TileMapObject SHARED ${source_files} ${gdide_source_files})
 set_target_properties(TileMapObject PROPERTIES COMPILE_DEFINITIONS "${TileMapObject_extra_definitions}")

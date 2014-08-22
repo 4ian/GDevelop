@@ -27,10 +27,13 @@ freely, subject to the following restrictions:
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
+#include <iostream>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
 #include <wx/textdlg.h> 
+#include <wx/settings.h>
+#include <wx/config.h>
 
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
@@ -42,8 +45,6 @@ freely, subject to the following restrictions:
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "TileMapObjectEditor.h"
 #include "TileMapObject.h"
-
-#include <iostream>
 
 TileMapObjectEditor::TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 TileMapObjectEditorBase(parent),
@@ -58,8 +59,20 @@ tileMap(object.tileMap)
     m_tileMapPanel->SetTileMap(&tileMap);
     m_tileSetPanel->Connect(TILE_SELECTION_CHANGED, TileSelectionEventHandler(TileMapObjectEditor::OnTileSetSelectionChanged), NULL, this);
 
+    //Set a nice GUI theme
     m_auimgr178->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
     gd::SkinHelper::ApplyCurrentSkin(*m_auimgr178);
+    m_auimgr178->Update();
+
+    //Load the perspective
+    if(wxConfigBase::Get()->HasEntry("/TileMapObjectEditor/TileSetPane"))
+    {
+        wxString tileSetPaneInfo;
+        wxConfigBase::Get()->Read("/TileMapObjectEditor/TileSetPane", &tileSetPaneInfo);
+        m_auimgr178->LoadPaneInfo(tileSetPaneInfo, m_auimgr178->GetPane(m_tileSetPropertiesPanel));
+    }
+    m_auimgr178->GetPane(m_tileSetPropertiesPanel).Dock();
+    m_auimgr178->Update();
 
     //Load properties into the editor
     m_imageNameTextCtrl->SetValue(tileSet.textureName);
@@ -75,6 +88,7 @@ tileMap(object.tileMap)
 
 TileMapObjectEditor::~TileMapObjectEditor()
 {
+    wxConfigBase::Get()->Write("/TileMapObjectEditor/TileSetPane", m_auimgr178->SavePaneInfo(m_auimgr178->GetPane(m_tileSetPropertiesPanel)));
 }
 
 void TileMapObjectEditor::OnTileSetPanelErase(wxEraseEvent& event)

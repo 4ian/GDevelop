@@ -10,6 +10,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <GDCore/PlatformDefinition/ImageManager.h>
 #include <GDCore/PlatformDefinition/Project.h>
+#include <GDCore/Serialization/SerializerElement.h>
 #include <GDCpp/RuntimeGame.h>
 
 struct TileTextureCoords
@@ -94,6 +95,18 @@ public:
      * Returns the number of rows of the tileset
      */
     int GetRowsCount() const;
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Serialize the tileset into the given element
+     */
+    void SerializeTo(gd::SerializerElement &element) const;
+    #endif
+
+    /**
+     * Unserialize the tileset from the given element
+     */
+    void UnserializeFrom(const gd::SerializerElement &element);
 
 private:
 

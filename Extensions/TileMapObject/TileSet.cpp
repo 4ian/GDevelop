@@ -173,3 +173,25 @@ int TileSet::GetRowsCount() const
 {
     return (m_tilesetTexture->texture.getSize().y + tileSpacing.y) / (tileSize.y + tileSpacing.y);
 }
+
+#if defined(GD_IDE_ONLY)
+void TileSet::SerializeTo(gd::SerializerElement &element) const
+{
+    element.SetAttribute("textureName", textureName);
+    element.SetAttribute("tileSizeX", tileSize.x);
+    element.SetAttribute("tileSizeY", tileSize.y);
+    element.SetAttribute("tileSpacingX", tileSpacing.x);
+    element.SetAttribute("tileSpacingY", tileSpacing.y);
+}
+#endif
+
+void TileSet::UnserializeFrom(const gd::SerializerElement &element)
+{
+    textureName = element.GetStringAttribute("textureName", "");
+    tileSize.x = element.GetIntAttribute("tileSizeX", 32);
+    tileSize.y = element.GetIntAttribute("tileSizeY", 32);
+    tileSpacing.x = element.GetIntAttribute("tileSpacingX", 0);
+    tileSpacing.y = element.GetIntAttribute("tileSpacingY", 0);
+
+    m_dirty = true;
+}

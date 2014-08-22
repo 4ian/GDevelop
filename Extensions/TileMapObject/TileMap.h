@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <GDCore/Serialization/SerializerElement.h>
 
 /**
  * \brief Represents a TileMap layer.
@@ -13,7 +14,7 @@
 struct TileMapLayer
 {
     std::vector< std::vector< int > > tiles; ///< Contains all tiles, the column is the first index and the row is the second. 
-    														 ///  the pair contains the tile position into the TileSet.
+    										 ///  the pair contains the tile position into the TileSet.
 };
 
 /**
@@ -50,6 +51,18 @@ public:
      * Set size of the tilemap.
      */
     void SetSize(int columns, int rows);
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Serialize the tilemap into the given element
+     */
+    void SerializeTo(gd::SerializerElement &element) const;
+    #endif
+
+    /**
+     * Unserialize the tilemap from the given element
+     */
+    void UnserializeFrom(const gd::SerializerElement &element);
 
 private:
 	void UpdateMapSize();

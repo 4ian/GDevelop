@@ -112,9 +112,14 @@ TileMapObject::TileMapObject(std::string name_) :
 
 void TileMapObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    /*textureName = element.GetStringAttribute("texture");
-    width = element.GetDoubleAttribute("width", 128);
-    height = element.GetDoubleAttribute("height", 128);*/
+    if(element.HasChild("tileSet"))
+    {
+        tileSet.UnserializeFrom(element.GetChild("tileSet"));
+    }
+    if(element.HasChild("tileMap"))
+    {
+        tileMap.UnserializeFrom(element.GetChild("tileMap"));
+    }
 }
 
 float TileMapObject::GetWidth() const
@@ -136,9 +141,8 @@ float TileMapObject::GetHeight() const
 #if defined(GD_IDE_ONLY)
 void TileMapObject::DoSerializeTo(gd::SerializerElement & element) const
 {
-    /*element.SetAttribute("texture", textureName);
-    element.SetAttribute("width", width);
-    element.SetAttribute("height", height);*/
+    tileSet.SerializeTo(element.AddChild("tileSet"));
+    tileMap.SerializeTo(element.AddChild("tileMap"));
 }
 
 void TileMapObject::LoadResources(gd::Project & project, gd::Layout & layout)

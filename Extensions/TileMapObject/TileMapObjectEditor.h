@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #ifndef TILEMAPOBJECTEDITOR_H
 #define TILEMAPOBJECTEDITOR_H
 
-#include "wxsmith/TileMapDialogs.h"
+#include "TileMapDialogs.h"
 
 #include <wx/bitmap.h>
 
@@ -49,9 +49,7 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual ~TileMapObjectEditor();
 
     protected:
-        virtual void OnTileSetPanelErase(wxEraseEvent& event);
-        virtual void OnTileSetPanelPaint(wxPaintEvent& event);
-        virtual void OnUpdateClicked(wxCommandEvent& event);
+        virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event);
         virtual void OnMapUpdateButtonClicked(wxCommandEvent& event);
         virtual void OnLayerChoiceChanged(wxCommandEvent& event);
         virtual void OnHideUpperLayerChecked(wxCommandEvent& event);

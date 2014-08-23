@@ -48,12 +48,13 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
     GetVirtualSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
-    //Draw the background
-    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
-    dc.DrawRectangle(minPos.x, minPos.y, width, height);
-
     if(m_tileset && !m_tileset->IsDirty())
     {
+        //Draw the background
+        dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+        dc.DrawRectangle(minPos.x, minPos.y, width, height);
+
+
         //Draw the bitmap
         dc.DrawBitmap(m_tileset->GetWxBitmap(), 0, 0, false);
 
@@ -84,6 +85,13 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             dc.DrawRectangle(GetPositionOfTile(m_selectedCol, m_selectedRow), wxSize(m_tileset->tileSize.x, m_tileset->tileSize.y));
         }
+    }
+    else
+    {
+        //Draw a white background with a text
+        dc.SetBrush(*wxWHITE_BRUSH);
+        dc.DrawRectangle(minPos.x, minPos.y, width, height);
+        dc.DrawText(_("You haven't selected a tileset yet.\nClick on \"Configure the tileset\" to choose one."), minPos.x + 16, minPos.y + 16);
     }
 }
 

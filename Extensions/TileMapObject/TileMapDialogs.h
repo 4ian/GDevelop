@@ -19,15 +19,17 @@
 #include <wx/sizer.h>
 #include <wx/toolbar.h>
 #include <wx/scrolwin.h>
-#include "../TileSetPanel.h"
+#include "TileSetPanel.h"
 #include <wx/stattext.h>
-#include <wx/spinctrl.h>
-#include <wx/textctrl.h>
-#include <wx/button.h>
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include <wx/checkbox.h>
-#include "../TileMapPanel.h"
+#include "TileMapPanel.h"
+#include <wx/spinctrl.h>
+#include <wx/button.h>
+#include <wx/textctrl.h>
+#include <wx/bmpbuttn.h>
+#include <wx/statbmp.h>
 
 class TileMapObjectEditorBase : public wxDialog
 {
@@ -41,16 +43,6 @@ protected:
     wxPanel* m_tileSetPropertiesPanel;
     wxToolBar* m_tileSetToolBar;
     TileSetPanel* m_tileSetPanel;
-    wxStaticText* m_staticText19;
-    wxSpinCtrl* m_tileWidthSpin;
-    wxStaticText* m_staticText43;
-    wxSpinCtrl* m_tileHeightSpin;
-    wxStaticText* m_staticText81;
-    wxSpinCtrl* m_horizontalMarginsSpin;
-    wxStaticText* m_staticText85;
-    wxSpinCtrl* m_verticalMarginsSpin;
-    wxTextCtrl* m_imageNameTextCtrl;
-    wxButton* m_updateButton;
     wxPanel* m_mainPanel;
     wxStaticText* m_staticText105;
     wxChoice* m_layerChoice;
@@ -67,7 +59,7 @@ protected:
     wxButton* m_button64;
 
 protected:
-    virtual void OnUpdateClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMapUpdateButtonClicked(wxCommandEvent& event) { event.Skip(); }
@@ -77,6 +69,42 @@ protected:
 public:
     TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(850,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~TileMapObjectEditorBase();
+};
+
+
+class TileSetConfigurationEditorBase : public wxDialog
+{
+protected:
+    wxAuiManager* m_auimgr;
+    wxPanel* m_mainPanel;
+    wxStaticText* m_staticText335;
+    wxStaticText* m_staticText337;
+    wxStaticText* m_staticText287;
+    wxTextCtrl* m_textureNameTextCtrl;
+    wxBitmapButton* m_setTextureButton;
+    wxStaticBitmap* m_staticBitmap331;
+    wxStaticText* m_staticText301;
+    wxSpinCtrl* m_tileWidthSpin;
+    wxStaticText* m_staticText307;
+    wxSpinCtrl* m_tileHeightSpin;
+    wxStaticText* m_staticText311;
+    wxStaticText* m_staticText313;
+    wxSpinCtrl* m_spacingWidthSpin;
+    wxStaticText* m_staticText325;
+    wxSpinCtrl* m_spacingHeightSpin;
+    wxStaticText* m_staticText329;
+    wxStdDialogButtonSizer* m_stdBtnSizer2713;
+    wxButton* m_okButton4;
+    wxButton* m_cancelButton5;
+
+protected:
+    virtual void OnSetTextureButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOkButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCancelButtonClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    TileSetConfigurationEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tileset configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,400), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    virtual ~TileSetConfigurationEditorBase();
 };
 
 #endif

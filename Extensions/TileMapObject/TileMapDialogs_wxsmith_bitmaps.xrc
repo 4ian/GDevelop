@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+  <object class="wxBitmap" name="TileMapExplainPicture">..\..\Binaries\Output\Release_Windows\res\TileMapExplainPicture.png</object>
+  <object class="wxBitmap" name="image16">..\..\Binaries\Output\Release_Windows\res\icons_default\image16.png</object>
+  <object class="wxBitmap" name="pref32">..\..\Binaries\Output\Release_Windows\res\ribbon_default\pref32.png</object>
+</resource>

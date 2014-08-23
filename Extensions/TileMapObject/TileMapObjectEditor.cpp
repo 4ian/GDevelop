@@ -43,8 +43,10 @@ freely, subject to the following restrictions:
 #include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+
 #include "TileMapObjectEditor.h"
 #include "TileMapObject.h"
+#include "TileSetConfigurationEditor.h"
 
 TileMapObjectEditor::TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 TileMapObjectEditorBase(parent),
@@ -75,11 +77,6 @@ tileMap(object.tileMap)
     m_auimgr178->Update();
 
     //Load properties into the editor
-    m_imageNameTextCtrl->SetValue(tileSet.textureName);
-    m_tileWidthSpin->SetValue(tileSet.tileSize.x);
-    m_tileHeightSpin->SetValue(tileSet.tileSize.y);
-    m_horizontalMarginsSpin->SetValue(tileSet.tileSpacing.x);
-    m_verticalMarginsSpin->SetValue(tileSet.tileSpacing.y);
     m_mapWidthSpin->SetValue(tileMap.GetColumnsCount());
     m_mapHeightSpin->SetValue(tileMap.GetRowsCount());
 
@@ -89,31 +86,6 @@ tileMap(object.tileMap)
 TileMapObjectEditor::~TileMapObjectEditor()
 {
     wxConfigBase::Get()->Write("/TileMapObjectEditor/TileSetPane", m_auimgr178->SavePaneInfo(m_auimgr178->GetPane(m_tileSetPropertiesPanel)));
-}
-
-void TileMapObjectEditor::OnTileSetPanelErase(wxEraseEvent& event)
-{
-
-}
-
-void TileMapObjectEditor::OnTileSetPanelPaint(wxPaintEvent& event)
-{
-    
-}
-
-void TileMapObjectEditor::OnUpdateClicked(wxCommandEvent& event)
-{
-    std::string imageName = ToString(m_imageNameTextCtrl->GetValue());
-    tileSet.textureName = imageName;
-    tileSet.tileSize.x = m_tileWidthSpin->GetValue();
-    tileSet.tileSize.y = m_tileHeightSpin->GetValue();
-    tileSet.tileSpacing.x = m_horizontalMarginsSpin->GetValue();
-    tileSet.tileSpacing.y = m_verticalMarginsSpin->GetValue();
-    tileSet.LoadResources(game);
-    tileSet.Generate();
-
-    m_tileSetPanel->Update();
-    m_tileMapPanel->Update();
 }
 
 void TileMapObjectEditor::OnMapUpdateButtonClicked(wxCommandEvent& event)
@@ -155,5 +127,16 @@ void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
     EndModal(1);
 }
 
-#endif
+void TileMapObjectEditor::OnTileSetConfigureButtonClicked(wxCommandEvent& event)
+{
+    TileSetConfigurationEditor dialog(this, tileSet, game, mainFrameWrapper);
+    dialog.ShowModal();
 
+    tileSet.LoadResources(game);
+    tileSet.Generate();
+
+    m_tileSetPanel->Update();
+    m_tileMapPanel->Update();
+}
+
+#endif

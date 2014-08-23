@@ -47,6 +47,7 @@ freely, subject to the following restrictions:
 #include "TileMapObjectEditor.h"
 #include "TileMapObject.h"
 #include "TileSetConfigurationEditor.h"
+#include "TileMapConfigurationEditor.h"
 
 TileMapObjectEditor::TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 TileMapObjectEditorBase(parent),
@@ -76,22 +77,12 @@ tileMap(object.tileMap)
     m_auimgr178->GetPane(m_tileSetPropertiesPanel).Dock();
     m_auimgr178->Update();
 
-    //Load properties into the editor
-    m_mapWidthSpin->SetValue(tileMap.GetColumnsCount());
-    m_mapHeightSpin->SetValue(tileMap.GetRowsCount());
-
     UpdateLayerChoice();
 }
 
 TileMapObjectEditor::~TileMapObjectEditor()
 {
     wxConfigBase::Get()->Write("/TileMapObjectEditor/TileSetPane", m_auimgr178->SavePaneInfo(m_auimgr178->GetPane(m_tileSetPropertiesPanel)));
-}
-
-void TileMapObjectEditor::OnMapUpdateButtonClicked(wxCommandEvent& event)
-{
-    tileMap.SetSize(m_mapWidthSpin->GetValue(), m_mapHeightSpin->GetValue());
-    m_tileMapPanel->Update();
 }
 
 void TileMapObjectEditor::OnLayerChoiceChanged(wxCommandEvent& event)
@@ -101,7 +92,7 @@ void TileMapObjectEditor::OnLayerChoiceChanged(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnHideUpperLayerChecked(wxCommandEvent& event)
 {
-    m_tileMapPanel->HideUpperLayers(m_hideUpperLayerCheck->GetValue());
+    m_tileMapPanel->HideUpperLayers(m_mainPanelToolbar->GetToolState(HIDE_UPPER_LAYERS_TOOL_ID));
 }
 
 void TileMapObjectEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
@@ -136,6 +127,14 @@ void TileMapObjectEditor::OnTileSetConfigureButtonClicked(wxCommandEvent& event)
     tileSet.Generate();
 
     m_tileSetPanel->Update();
+    m_tileMapPanel->Update();
+}
+
+void TileMapObjectEditor::OnChangeMapSizeButtonClicked(wxCommandEvent& event)
+{
+    TileMapConfigurationEditor dialog(this, tileMap);
+    dialog.ShowModal();
+
     m_tileMapPanel->Update();
 }
 

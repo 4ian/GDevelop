@@ -748,7 +748,6 @@ void LayoutEditorCanvas::UpdateScrollbars()
 }
 void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 {
-    std::cout << "Size:" << GetClientSize().GetWidth()/options.zoomFactor << ";" << GetClientSize().GetHeight()/options.zoomFactor << std::endl;
     editionView.setSize(GetClientSize().GetWidth()/options.zoomFactor, GetClientSize().GetHeight()/options.zoomFactor);
 }
 

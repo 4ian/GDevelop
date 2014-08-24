@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Game Develop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 22:59+0200\n"
+"POT-Creation-Date: 2014-08-19 23:56+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Florian Rival <Florian.rival@gmail.com>\n"
 "Language-Team: Florian \"4ian\" Rival <Florian.rival@gmail.com>\n"
@@ -160,7 +160,7 @@ msgstr "Merci pour avoir rapporté l'erreur !"
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:708
 #: d:\florian\programmation\gamedevelop3\extensions\primitivedrawing\extension.cpp:265
 #: d:\florian\programmation\gamedevelop3\extensions\primitivedrawing\extension.cpp:279
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:235
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:243
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\fileextension.cpp:40
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\fileextension.cpp:50
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\fileextension.cpp:60
@@ -216,10 +216,10 @@ msgid "( %ld seconds )"
 msgstr "( %ld secondes )"
 
 #: d:\florian\programmation\gamedevelop3\ide\buildprogresspnl.cpp:95
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:577
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:580
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\projectexportdialog.cpp:212
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\projectexportdialog.cpp:213
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:670
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:659
 msgid "Compilation finished"
 msgstr "Compilation terminée"
 
@@ -264,13 +264,13 @@ msgid "Enter a file name :"
 msgstr "Entrez le nom d'un fichier :"
 
 #: d:\florian\programmation\gamedevelop3\ide\choicefile.cpp:66
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:285
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:291
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:297
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:303
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:309
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:315
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:321
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:286
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:292
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:298
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:304
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:310
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:316
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:322
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\newprojectdialog.cpp:82
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\projectexportdialog.cpp:111
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:215
@@ -308,8 +308,8 @@ msgstr "Le nom du fichier est relatif à l'emplacement du fichier .gdg du jeu."
 #: d:\florian\programmation\gamedevelop3\ide\signemodification.cpp:47
 #: d:\florian\programmation\gamedevelop3\ide\signetest.cpp:55
 #: d:\florian\programmation\gamedevelop3\ide\trueorfalse.cpp:54
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:289
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:291
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:288
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:290
 #: d:\florian\programmation\gamedevelop3\ide\wxstedit\src\stedlgs.cpp:409
 #: d:\florian\programmation\gamedevelop3\ide\wxstedit\src\stedlgs.cpp:1081
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\compilationerrordialog.cpp:90
@@ -594,7 +594,7 @@ msgstr "Choisissez un objet dans la liste"
 #: d:\florian\programmation\gamedevelop3\ide\choixcondition.cpp:147
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:412
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:144
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:193
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:194
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:244
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:598
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:668
@@ -1000,7 +1000,7 @@ msgid "All templates"
 msgstr "Tous les modèles"
 
 #: d:\florian\programmation\gamedevelop3\ide\choixtemplateevent.cpp:270
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:751
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:697
 msgid "Error while loading :"
 msgstr "Erreur lors du chargement : "
 
@@ -1027,8 +1027,8 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:63
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:128
 #: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:437
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:178
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:284
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:177
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:283
 #: d:\florian\programmation\gamedevelop3\ide\wxstedit\src\stemenum.cpp:247
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas.cpp:236
 msgid "Copy"
@@ -1037,8 +1037,8 @@ msgstr "Copier"
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:66
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:129
 #: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:438
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:181
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:285
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:180
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:284
 #: d:\florian\programmation\gamedevelop3\ide\wxstedit\src\stemenum.cpp:246
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas.cpp:239
 msgid "Cut"
@@ -1047,9 +1047,9 @@ msgstr "Couper"
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:69
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:130
 #: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:439
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:184
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:193
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:286
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:183
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:192
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:285
 #: d:\florian\programmation\gamedevelop3\ide\wxstedit\src\stemenum.cpp:248
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\instancesadvancedpastedialog.cpp:77
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas.cpp:242
@@ -1074,7 +1074,7 @@ msgstr "Enregistrer"
 
 #: d:\florian\programmation\gamedevelop3\ide\codeeditor.cpp:126
 #: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:435
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:282
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:281
 msgid "Clipboard"
 msgstr "Presse papiers"
 
@@ -1412,14 +1412,18 @@ msgid "Constantine Shvetsov: Awesome design of icons"
 msgstr "Constantine Shvetsov: Design des icones"
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:231
+msgid "Airvikar: Russian translation"
+msgstr "Airvikar: Traduction russe"
+
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:234
 msgid "Franco Maciel: Spanish translation"
 msgstr "Franco Maciel: Traduction espagnole"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:233
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:236
 msgid "MillionthVector : Graphics of various examples."
 msgstr "MillionthVector : Graphismes de l'exemple Shoot"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:236
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:239
 msgid ""
 "Diego Schiavon : English translation of the tutorial and Indiegogo Ubuntu "
 "contributor"
@@ -1427,74 +1431,74 @@ msgstr ""
 "Diego Schiavon : Traduction anglaise du tutoriel et contributeur Ubuntu "
 "Indiegogo"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:238
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:241
 msgid "Thomas Flecy: Original Sound object extension"
 msgstr "Thomas Flecy : Version originale de l'extension Objet son"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:240
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:243
 msgid "Fernando José Martínez López : Spanish translation of the tutorial"
 msgstr "Fernando José Martínez López : Traduction espagnole du tutoriel"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:242
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:245
 msgid "conceptgame : Indiegogo super contributor. Thanks!"
 msgstr "conceptgame : Indiegogo super contributeur. Merci!"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:244
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:247
 msgid "Images and other icons:"
 msgstr "Images et icones :"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:246
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:249
 msgid "Some icons came from Crystal Project Icons by Everaldo Coelho"
 msgstr ""
 "Quelques icones proviennent de Crystal Project Icons par Everaldo Coelho"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:248
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:251
 msgid "Some icons came from Fugue Icons by Yusuke Kamiyamane"
 msgstr "Quelques icônes proviennent de Fugue Icons par Yusuke Kamiyamane"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:250
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:253
 msgid "Some images of examples came from images pack by Daniel Cook"
 msgstr ""
 "Des images des jeux d'exemples et des ressources sont issues des packs "
 "d'images de Daniel Cook"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:252
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:255
 msgid "Some images of examples came from images pack by Ari Feldman"
 msgstr ""
 "Des images des jeux d'exemples sont issues des packs d'images d'Ari Feldman"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:255
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:258
 msgid "Thanks to all the community and users of Game Develop"
 msgstr "Merci à toute la communauté et utilisateurs de Game Develop"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:327
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:330
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:221
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:243
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:157
 msgid "http://www.compilgames.net/donate.php"
 msgstr "http://www.compilgames.net/donateFR.php"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:336
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:339
 msgid "http://clang.llvm.org/"
 msgstr "http://clang.llvm.org/"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:341
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:344
 msgid "http://www.grinninglizard.com/tinyxml/"
 msgstr "http://www.grinninglizard.com/tinyxml/"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:346
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:349
 msgid "http://www.boost.org/"
 msgstr "http://www.boost.org/"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:352
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:355
 msgid "https://en.wikipedia.org/wiki/JavaScript"
 msgstr "https://fr.wikipedia.org/wiki/JavaScript"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:357
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:360
 msgid "http://jquery.com/"
 msgstr "http://jquery.com/"
 
-#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:362
+#: d:\florian\programmation\gamedevelop3\ide\credits.cpp:365
 msgid "http://www.pixijs.com/"
 msgstr "http://www.pixijs.com/"
 
@@ -1521,9 +1525,9 @@ msgstr "Pane caption"
 
 #: d:\florian\programmation\gamedevelop3\ide\editobjectgroup.cpp:104
 #: d:\florian\programmation\gamedevelop3\ide\editobjectgroup.cpp:126
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:131
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:187
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:270
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:130
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:186
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:269
 msgid "Add an object"
 msgstr "Ajouter un objet"
 
@@ -1532,7 +1536,7 @@ msgid "Delete the object"
 msgstr "Supprimer l'objet"
 
 #: d:\florian\programmation\gamedevelop3\ide\editobjectgroup.cpp:127
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:271
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:270
 msgid "Delete the selected object"
 msgstr "Supprimer l'objet selectionné"
 
@@ -1622,7 +1626,7 @@ msgstr "Editeur de calques"
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobjecteditor.cpp:133
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:157
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas.cpp:225
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:976
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:922
 msgid "Properties"
 msgstr "Propriétés"
 
@@ -1762,7 +1766,7 @@ msgstr "Ajouter une condition"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:206
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:235
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:257
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:159
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:158
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:188
 msgid "Delete\tDEL"
 msgstr "Retirer\tDEL"
@@ -1794,8 +1798,8 @@ msgstr "Refaire\tCtrl-Y"
 #: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:226
 #: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:424
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:381
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:174
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:271
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:173
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:270
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\dialogs\spriteobjecteditor.cpp:315
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\editlayerdialog.cpp:94
 msgid "Delete"
@@ -1945,7 +1949,7 @@ msgstr "Impossible de créer un évènement standard"
 msgid "Unable to create a comment event."
 msgstr "Impossible de créer un évènement commentaire."
 
-#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1654
+#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1653
 msgid ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_event"
@@ -1953,7 +1957,7 @@ msgstr ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_event"
 
-#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1662
+#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1661
 msgid ""
 "Please select events to use so as to create the template, and then click "
 "again on the Create button."
@@ -1961,11 +1965,11 @@ msgstr ""
 "Veuillez selectionner les évènements à utiliser pour créer le modèle, puis "
 "recliquez sur le bouton \"Créer\"."
 
-#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1682
+#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1681
 msgid "Please select an event before adding a template."
 msgstr "Veuillez choisir un évènement avant d'ajouter un modèle."
 
-#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1721
+#: d:\florian\programmation\gamedevelop3\ide\eventseditor.cpp:1720
 msgid ""
 "Profiling is not activated. Activate profiling thanks to the Profiling "
 "window when previewing a scene."
@@ -2718,16 +2722,16 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:276
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:280
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:284
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:62
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:74
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:88
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:101
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:115
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:129
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:142
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:156
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:169
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:183
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:63
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:75
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:89
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:102
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:116
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:130
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:143
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:157
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:170
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:184
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:62
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:74
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:86
@@ -2878,18 +2882,18 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:363
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:375
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:385
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:410
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:417
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:422
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:427
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:432
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:437
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:440
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:444
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:447
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:450
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:453
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:456
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:409
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:416
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:421
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:426
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:431
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:436
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:439
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:443
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:446
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:449
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:452
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:455
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\chooseobjecttypedialog.cpp:121
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\editexpressiondialog.cpp:536
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\editstrexpressiondialog.cpp:185
@@ -2936,8 +2940,8 @@ msgstr "Y"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:252
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:264
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:279
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:109
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:123
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:110
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:124
 #: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\tiledspriteobject.cpp:201
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:273
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:117
@@ -2968,7 +2972,7 @@ msgstr "Plan"
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:168
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:191
 #: d:\florian\programmation\gamedevelop3\ide\mainframe_files.cpp:135
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:396
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:397
 msgid "Open an example"
 msgstr "Ouvrir un exemple"
 
@@ -3107,7 +3111,7 @@ msgid "Delete the selected resource"
 msgstr "Supprimer la ressource selectionnée"
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:382
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1009
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1008
 msgid "Remove useless resources"
 msgstr "Suppression d'images inutiles"
 
@@ -3116,13 +3120,13 @@ msgid "Check if there are useless resources that can be removed"
 msgstr "Vérifier si des ressources inutiles peuvent être enlevées"
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:383
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:272
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:271
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\choosevariabledialog.cpp:150
 msgid "Move up"
 msgstr "Déplacer vers le haut"
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:384
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:273
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:272
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\choosevariabledialog.cpp:151
 msgid "Move down"
 msgstr "Déplacer vers le bas"
@@ -3237,7 +3241,7 @@ msgstr "Choisissez le projet à ouvrir"
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe_files.cpp:216
 msgid ""
-"One or ore extensions are used by the project but are not installed for the "
+"One or more extensions are used by the project but are not installed for the "
 "platform used by the project :\n"
 msgstr ""
 "Une ou plusieurs extensions sont utilisées par le projet mais ne sont pas "
@@ -3296,7 +3300,7 @@ msgstr "Le projet n'a pas pû être sauvegardé !"
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe_help.cpp:21
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:1498
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1960
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1962
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"
 msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"
 
@@ -3762,9 +3766,9 @@ msgstr "Bouton Fichier"
 #: d:\florian\programmation\gamedevelop3\extensions\primitivedrawing\extension.cpp:126
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:131
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:138
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:344
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:353
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:191
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:240
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:248
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\sceneextension.cpp:65
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\windowextension.cpp:33
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:326
@@ -3892,7 +3896,7 @@ msgstr "Nombre maximum de tâche en parallèle pour le compilateur :"
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:562
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:644
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:143
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:512
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:513
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:37
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:665
 msgid "General"
@@ -4010,7 +4014,7 @@ msgstr "Modifier les variables initiales"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:183
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:199
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:250
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:137
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:136
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:159
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:185
 msgid "Rename\tF2"
@@ -4025,35 +4029,35 @@ msgstr "Ajouter une scène"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:158
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:210
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:261
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:143
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:142
 msgid "Move up\tCtrl-Up"
 msgstr "Déplacer vers le haut\tCtrl-Up"
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:161
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:213
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:264
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:146
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:145
 msgid "Move down\tCtrl-Down"
 msgstr "Déplacer vers le bas\tCtrl-Down"
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:165
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:217
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:268
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:150
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:149
 msgid "Copy\tCtrl-C"
 msgstr "Copier\tCtrl-C"
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:168
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:220
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:271
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:153
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:152
 msgid "Cut\tCtrl-X"
 msgstr "Couper\tCtrl-X"
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:171
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:223
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:274
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:156
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:155
 msgid "Paste\tCtrl-V"
 msgstr "Coller \tCtrl-V"
 
@@ -4082,8 +4086,8 @@ msgstr "Ajouter des évènements externes"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:196
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:231
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:247
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:123
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:162
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:122
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:161
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:42
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:43
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:44
@@ -4227,10 +4231,10 @@ msgstr "Fichiers sources C++"
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:493
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:589
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:980
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:991
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:992
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1055
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:926
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:937
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:938
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1001
 msgid "Extensions"
 msgstr "Extensions"
 
@@ -4249,7 +4253,7 @@ msgid "Create or open a project using the ribbon."
 msgstr "Créez ou ouvrez un projet en utilisant le ruban."
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:689
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:564
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:567
 msgid "Unable to open "
 msgstr "Impossible d'ouvrir "
 
@@ -4260,7 +4264,7 @@ msgstr ", le fichier n'existe pas"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:724
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:781
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1487
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1738
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1739
 msgid "Unable to add a new tab !"
 msgstr "Impossible d'ajouter le nouvel onglet !"
 
@@ -4305,9 +4309,9 @@ msgstr "Impossible d'ajouter la nouvelle scène!"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1373
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1563
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1615
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1768
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1820
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1912
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1769
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1821
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1914
 msgid "Unable to delete a tab !"
 msgstr "Impossible de supprimer l'onglet !"
 
@@ -4320,9 +4324,9 @@ msgstr "Impossible de supprimer l'onglet !"
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1373
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1563
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1615
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1768
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1820
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1912
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1769
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1821
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1914
 #: d:\florian\programmation\gamedevelop3\extensions\pathautomatism\pathautomatismeditor.cpp:505
 #: d:\florian\programmation\gamedevelop3\extensions\pathautomatism\pathautomatismeditor.cpp:530
 #: d:\florian\programmation\gamedevelop3\extensions\pathautomatism\pathautomatismeditor.cpp:970
@@ -4336,8 +4340,8 @@ msgstr ""
 "doit être menée à terme avant de continuer..."
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1217
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1642
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1847
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1643
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1849
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:386
 msgid "Copy of"
 msgstr "Copie de"
@@ -4368,34 +4372,34 @@ msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1458
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1709
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1710
 msgid "Unable to found external events."
 msgstr "Evenements externes introuvables."
 
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1665
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1669
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1666
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1670
 msgid "External layout"
 msgstr "Agencement externe"
 
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1756
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1790
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1806
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1757
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1791
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1807
 msgid "Unable to found external layout."
 msgstr "Agencement externe introuvable."
 
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1870
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1872
 msgid "Choose one or more files to add"
 msgstr "Choisissez un ou plusieurs fichiers à ajouter"
 
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1870
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1872
 msgid "C++ sources|*.cpp;*.cxx|All files|*.*"
 msgstr "Sources C++|*.cpp;*.cxx|Tous les fichiers|*.*"
 
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1900
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1902
 msgid "File not found"
 msgstr "Fichier introuvable"
 
-#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1930
+#: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:1932
 msgid "Choose a file name"
 msgstr "Choisissez un nom de fichier"
 
@@ -4612,7 +4616,7 @@ msgstr "Vous appréciez Game Develop ? Aidez l'auteur en faisant un don."
 msgid "en"
 msgstr "fr"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:379
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:380
 msgid ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_getstart"
@@ -4620,7 +4624,7 @@ msgstr ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_getstart"
 
-#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:384
+#: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:385
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials"
 msgstr "http://wiki.compilgames.net/doku.php/game_develop/tutoriels"
 
@@ -4785,74 +4789,74 @@ msgstr "Créer un nouveau projet vierge"
 msgid "Choose a file for the project"
 msgstr "Choisissez un fichier pour le projet"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:125
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:124
 msgid "Add an automatism"
 msgstr "Ajouter un automatisme"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:127
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:719
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:126
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:718
 msgid "Other properties"
 msgstr "Autres propriétés"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:134
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:133
 msgid "Delete\tDel"
 msgstr "Supprimer\tDEL"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:140
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:139
 msgid "Set as global object"
 msgstr "Passer en objet global"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:159
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:158
 msgid "Delete all selected items"
 msgstr "Supprimer tous les élements selectionnés"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:165
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:279
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:164
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:278
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\dialogs\spriteobjecteditor.cpp:318
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\choosevariabledialog.cpp:109
 msgid "Rename"
 msgstr "Renommer"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:168
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:167
 msgid "Set as global group"
 msgstr "Passer en groupe global"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:171
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:190
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:170
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:189
 msgid "Add a group"
 msgstr "Ajouter un groupe"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:268
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:267
 msgid "Objects list"
 msgstr "Liste d'objets"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:270
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:269
 msgid "Add a new object to the list of the objects of the scene"
 msgstr "Ajouter un nouvel objet à la liste des objets de la scène"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:276
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:275
 msgid "Selected object"
 msgstr "Objet sélectionné"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:278
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:277
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:75
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas.cpp:501
 msgid "Edition"
 msgstr "Edition"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:278
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:277
 msgid "Edit the selected object"
 msgstr "Editer l'objet selectionné"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:279
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:278
 msgid "Rename the selected object"
 msgstr "Renommer l'objet selectionné"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:291
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:290
 msgid "Show the online help"
 msgstr "Ouvrir l'aide en ligne"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:298
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:297
 msgid ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_object"
@@ -4860,53 +4864,53 @@ msgstr ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_object"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:365
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:364
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectlistdialogshelper.cpp:201
 msgid "No objects"
 msgstr "Pas d'objets"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:394
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:393
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectlistdialogshelper.cpp:229
 msgid "No groups"
 msgstr "Pas de groupes"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:528
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:527
 msgid "Unable to rename the object : another object has already this name."
 msgstr "Impossible de renommer l'objet : un autre objet porte déjà ce nom."
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:537
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:536
 msgid "Invalid name"
 msgstr "Nom invalide"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:607
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:606
 msgid "Unable to rename the groupe : another group has already this name."
 msgstr "Impossible de renommer le groupe : un autre groupe porte déjà ce nom."
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:667
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:666
 msgid "Contents of group \""
 msgstr "Contenu du groupe \""
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:798
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:800
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas2.cpp:408
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas2.cpp:410
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:797
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:799
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas2.cpp:428
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas2.cpp:430
 msgid "NewObject"
 msgstr "NouvelObjet"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:829
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:828
 msgid "The object was correctly added"
 msgstr "L'objet a été correctement ajouté"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:839
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:844
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:838
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:843
 msgid "NewGroup"
 msgstr "NouveauGroupe"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:858
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:857
 msgid "The group was correctly added."
 msgstr "Le groupe a été correctement ajouté"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:869
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:868
 msgid ""
 "Delete also all references to this item in groups and events ( i.e. Actions "
 "and conditions using the object )?"
@@ -4914,7 +4918,7 @@ msgstr ""
 "Supprimer également toutes les références à cet élement dans les groupes et "
 "les évènements ( Soit les actions et conditions utilisant l'objet ) ?"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:870
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:869
 #, c-format
 msgid ""
 "Delete also all references to these %i items in groups and events ( i.e. "
@@ -4923,37 +4927,37 @@ msgstr ""
 "Supprimer également toutes les références aux %i élements dans les groupes "
 "et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:871
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:870
 #: d:\florian\programmation\gamedevelop3\extensions\pathautomatism\pathautomatismeditor.cpp:509
 msgid "Confirm deletion"
 msgstr "Confirmation de la suppression"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1132
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1134
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1158
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1160
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1131
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1133
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1157
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1159
 msgid "CopyOf"
 msgstr "CopieDe"
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1193
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1192
 msgid "There is already a global object with this name."
 msgstr "Il y a déjà un objet global avec ce nom."
 
-#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1219
+#: d:\florian\programmation\gamedevelop3\ide\dialogs\objectseditor.cpp:1218
 msgid "There is already a global object group with this name."
 msgstr "Il y a déjà un groupe d'objet global avec ce nom."
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\projectpropertiespnl.cpp:79
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:977
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1014
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1015
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:923
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:960
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:961
 msgid "Name of the project"
 msgstr "Nom du projet"
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\projectpropertiespnl.cpp:82
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1009
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1039
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1040
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:955
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:985
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:986
 msgid "Activate the use of C++ source files"
 msgstr "Activer l'utilisation de sources C++"
 
@@ -5438,7 +5442,7 @@ msgstr "Item"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:96
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:99
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:103
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:342
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:351
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\windowextension.cpp:35
 msgid "Font"
 msgstr "Font"
@@ -5460,7 +5464,7 @@ msgid "Typical fonts (* are known to be fixed width)"
 msgstr "Typical fonts (* are known to be fixed width)"
 
 #: d:\florian\programmation\gamedevelop3\ide\wxstedit\src\stedlgs_wdr.cpp:103
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:343
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:352
 msgid "Font Size"
 msgstr "Font Size"
 
@@ -7686,10 +7690,10 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:648
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:652
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:742
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:415
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:420
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:425
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:430
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:414
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:419
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:424
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:429
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\dialogs\spriteobjecteditor.cpp:334
 msgid "Position"
 msgstr "Position"
@@ -7717,8 +7721,8 @@ msgstr "Position"
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:160
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:238
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:252
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:452
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:455
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:451
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:454
 msgid "Size"
 msgstr "Taille"
 
@@ -7800,10 +7804,10 @@ msgid "Y coordinate of moving"
 msgstr "Déplacement en Y"
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\runtimespriteobject.cpp:626
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:442
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:446
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteobject.cpp:244
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteobject.cpp:253
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:441
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:445
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteobject.cpp:242
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteobject.cpp:251
 msgid "Animation"
 msgstr "Animation"
 
@@ -7812,8 +7816,8 @@ msgstr "Animation"
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:115
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:189
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:391
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:435
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:439
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:434
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:438
 msgid "Direction"
 msgstr "Direction"
 
@@ -7822,7 +7826,7 @@ msgstr "Direction"
 #: d:\florian\programmation\gamedevelop3\extensions\particlesystem\extensionsubdeclaration3.cpp:158
 #: d:\florian\programmation\gamedevelop3\extensions\particlesystem\extensionsubdeclaration3.cpp:170
 #: d:\florian\programmation\gamedevelop3\extensions\pathautomatism\pathautomatismeditor.cpp:199
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:449
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:448
 msgid "Image"
 msgstr "Image"
 
@@ -7830,9 +7834,9 @@ msgstr "Image"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:142
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:154
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:275
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:345
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:354
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:269
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:241
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:249
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:263
 msgid "Opacity"
 msgstr "Opacité"
@@ -7932,7 +7936,7 @@ msgstr "Risque de boucle infine"
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\codecompiler.cpp:299
 msgid ""
 "Unable to launch the internal compiler: Try to reinstall Game Develop to "
-"make sure that every file needed are present."
+"make sure that every needed file are present."
 msgstr ""
 "Impossible de lancer le compilateur interne : Essayez de réinstaller Game "
 "Develop pour être sûr que tous les fichiers nécessaires sont présents."
@@ -7949,45 +7953,45 @@ msgstr " dans le répertoire temporaire du compilateur.\n"
 msgid "Compile to a native executable"
 msgstr "Compiler le projet en exécutable"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:158
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:159
 msgid "Project compilation launching"
 msgstr "Lancement de la compilation du projet."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:161
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:162
 msgid "No chosen target system."
 msgstr "Pas de système cible défini."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:177
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:178
 msgid "Compilation waiting for other task to finish..."
 msgstr "Compilation en attente de la fin des tâches en cours..."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:194
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:200
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:195
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:201
 msgid "Preparing resources..."
 msgstr "Préparation des ressources..."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:228
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:260
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:229
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:261
 msgid "Compiling scene "
 msgstr "Compilation de la scène "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:228
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:229
 msgid "."
 msgstr "."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:253
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:254
 msgid "Compilation of scene "
 msgstr "La compilation de la scène "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:253
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:254
 msgid ""
 " failed: Please go on our website to report this error, joining this file:\n"
 msgstr ""
 " a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en "
 "joignant le fichier suivant:\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:255
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:393
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:256
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:396
 msgid ""
 "\n"
 "\n"
@@ -7999,60 +8003,60 @@ msgstr ""
 "Si vous pensez que l'erreur est liée à une extension, contactez son "
 "développeur."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:260
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:398
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:261
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:401
 msgid " succeeded"
 msgstr " effectuée avec succès."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:266
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:271
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:282
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:287
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:327
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:267
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:272
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:283
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:290
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:330
 msgid "Copying resources..."
 msgstr "Copie des ressources..."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:274
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:445
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:275
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:448
 msgid "Unable to copy "
 msgstr "Impossible de copier "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:274
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:356
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:445
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:462
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:275
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:359
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:448
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:465
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:472
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:468
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:475
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:478
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:483
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:481
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:486
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:505
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:489
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:508
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:511
 msgid " in compilation directory.\n"
 msgstr " dans le répertoire de compilation.\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:282
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:283
 msgid "Step 1 out of 3"
 msgstr "Etape 1 sur 3"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:287
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:290
 msgid "Step 2 out of 3"
 msgstr "Etape 2 sur 3"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:327
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:330
 msgid "Step 3 out of 3"
 msgstr "Etape 3 sur 3"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:356
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:359
 msgid "Unable to delete the file"
 msgstr "Impossible de supprimer le fichier "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:365
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:368
 msgid "Linking project files..."
 msgstr "Edition des liens des fichiers du projet..."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:391
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:394
 msgid ""
 "Linking of project failed: Please go on our website to report this error, "
 "joining this file:\n"
@@ -8060,71 +8064,71 @@ msgstr ""
 "L'édition des liens des fichiers du projet a échoué : Rendez vous sur notre "
 "site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:398
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:401
 msgid "Linking project "
 msgstr "Edition des liens du projet"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:402
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:405
 msgid "Exporting game..."
 msgstr "Exportation du jeu..."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:420
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:426
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:432
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:423
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:429
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:435
 msgid "Unable to copy extension "
 msgstr "Impossible de copier l'extension "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:420
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:423
 msgid " for Windows in compilation directory.\n"
 msgstr " pour Windows dans le répertoire de compilation.\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:426
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:429
 msgid " for Linux in compilation directory.\n"
 msgstr " pour Linux dans le répertoire de compilation.\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:432
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:435
 msgid " for Mac OS in compilation directory.\n"
 msgstr " pour Mac OS dans le répertoire de compilation.\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:452
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:455
 msgid "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n"
 msgstr ""
 "Impossible de copier les sources C++ compilées ( dynext.dxgd ) dans le "
 "répertoire de compilation.\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:462
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:465
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:472
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:468
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:475
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:478
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:483
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:481
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:486
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:505
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:489
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:508
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:511
 msgid "Unable to create "
 msgstr "Impossible de créer "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:495
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:498
 msgid "Unable to copy file"
 msgstr "Impossible de copier le fichier "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:495
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:498
 msgid " from compilation directory to final directory.\n"
 msgstr " depuis le répertoire de compilation vers le répertoire final.\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:511
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:514
 msgid "Exporting game... ( Compressing )"
 msgstr "Exportation du jeu... ( Compression )"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:532
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:535
 msgid "Unable to open 7zS.sfx"
 msgstr "Unable to open 7zS.sfx"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:548
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:551
 msgid "Unable to open config.txt"
 msgstr "Unable to open config.txt"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:602
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:605
 msgid ""
 "Game Develop is unable to find a temporary compilation directory.\n"
 "If compilation fail, go in the options and choose a temporary direction "
@@ -8135,31 +8139,31 @@ msgstr ""
 "Si la compilation échoue, allez dans les préférences et choisissez un "
 "répertoire temporaire où vous avez les droits d'écriture."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:602
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:605
 msgid "Compilation may fail!"
 msgstr "La compilation risque d'échouer."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:613
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:616
 msgid "Unable to create directory:"
 msgstr "Impossible de créer le répertoire : "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:619
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:622
 msgid "Unable to delete "
 msgstr "Impossible de supprimer "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:619
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:622
 msgid "in directory "
 msgstr "dans le répertoire "
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:629
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:632
 msgid "Compilation failed with these errors:"
 msgstr "La compilation a échoué avec ces erreurs :"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:635
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:638
 msgid "Compilation successed."
 msgstr "La compilation a terminé sans erreurs."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:648
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:651
 msgid "Progress:"
 msgstr "Avancement : "
 
@@ -8248,47 +8252,47 @@ msgstr ""
 "Afin que le problème soit corrigé, veuillez le rapporter au développeur de "
 "Game Develop, en joignant le fichier suivant :\n"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:351
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:375
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:353
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:377
 msgid "Debugger"
 msgstr "Debugger"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:360
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:376
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:362
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:378
 msgid "Profiling"
 msgstr "Performances"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:372
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:374
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:148
 msgid "Play"
 msgstr "Jouer"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:372
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:374
 msgid "Start the preview"
 msgstr "Lancer l'aperçu"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:373
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:375
 msgid "Play in a window"
 msgstr "Jouer dans une fenêtre"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:373
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:375
 msgid "Start the preview in an external window"
 msgstr "Lancer l'aperçu dans une fenêtre externe"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:374
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:376
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:170
 msgid "Pause"
 msgstr "Mettre en pause"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:374
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:376
 msgid "Pause the preview"
 msgstr "Mettre en pause l'aperçu"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:375
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:377
 msgid "Show the debugger to view the state of the game"
 msgstr "Ouvrir le débugger pour voir l'état du jeu"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:376
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:378
 msgid "Show the profiler to monitor performances"
 msgstr "Afficher le suivi des performances"
 
@@ -8349,43 +8353,43 @@ msgstr "Objet :"
 msgid "Delete this object"
 msgstr "Supprimer cet objet"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:176
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:177
 msgid "Frame per seconds ( FPS )"
 msgstr "Images par secondes ( FPS )"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:177
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:178
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\timeextension.cpp:111
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\timeextension.cpp:114
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\timeextension.cpp:118
 msgid "Time elapsed since the last image"
 msgstr "Temps depuis la dernière image"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:178
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:179
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\profiledlg.cpp:155
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:774
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:811
 msgid "Number of objects"
 msgstr "Nombre d'objets"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:179
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:180
 msgid "Resources count"
 msgstr "Nombres de ressources"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:180
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:181
 msgid "Window's size"
 msgstr "Taille de la fenêtre"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:181
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:182
 msgid "Position of the mouse over the window"
 msgstr "Position de la souris sur la fenêtre"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:182
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:183
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\timeextension.cpp:128
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\timeextension.cpp:132
 msgid "Time elapsed since the beginning of the scene"
 msgstr "Temps depuis le début de la scène"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:184
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:185
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\fileextension.cpp:85
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\fileextension.cpp:97
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\variablesextension.cpp:189
@@ -8393,33 +8397,33 @@ msgstr "Temps depuis le début de la scène"
 msgid "Scene variables"
 msgstr "Variable de la scène"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:288
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:289
 msgid " fps"
 msgstr " i/s"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:311
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:332
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:499
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:312
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:333
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:500
 msgid "(Structure)"
 msgstr "(Structure)"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:320
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:979
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:989
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:990
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1060
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:321
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:925
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:935
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:936
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1006
 msgid "Globals variables"
 msgstr "Variables globales"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:368
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:369
 msgid "objects"
 msgstr "objets"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:526
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:527
 msgid "Specific"
 msgstr "Spécifique"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:540
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:541
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:281
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:295
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:456
@@ -8445,26 +8449,26 @@ msgstr "Spécifique"
 msgid "Variables"
 msgstr "Variables"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:585
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:600
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:611
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:626
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:633
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:662
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:586
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:601
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:612
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:627
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:634
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:663
 msgid "Enter the new value"
 msgstr "Entrez la nouvelle valeur"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:585
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:600
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:626
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:633
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:662
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:586
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:601
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:627
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:634
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:663
 msgid "Editing a value"
 msgstr "Edition d'une valeur"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:589
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:604
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:666
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:590
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:605
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:667
 msgid ""
 "Unable to modify the value.\n"
 "The value entered is either incorrect or the property is read-only."
@@ -8472,51 +8476,51 @@ msgstr ""
 "Impossible de modifier la valeur.\n"
 "La valeur entrée peut être incorrecte, ou la propriété en lecture seule."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:611
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:612
 msgid "Editing a variable"
 msgstr "Edition d'une variable"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:698
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:717
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:699
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:718
 msgid "Type the name of the new variable"
 msgstr "Entrez le nom de la nouvelle variable"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:698
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:707
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:699
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:708
 msgid "Adding a scene variable"
 msgstr "Ajout d'une variable de la scène"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:703
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:722
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:704
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:723
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\choosevariabledialog.cpp:300
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\choosevariabledialog.cpp:489
 msgid "A variable with this name already exists!"
 msgstr "Une variable avec ce nom existe déjà"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:707
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:726
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:708
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:727
 msgid "Enter the value of the variable"
 msgstr "Entrez la valeur de la variable"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:717
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:726
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:718
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:727
 msgid "Adding a global variable"
 msgstr "Ajout d'une variable globale"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:750
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:751
 msgid "Unable to create object."
 msgstr "Impossible de créer l'objet."
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:754
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:755
 msgid "Enter the X position of the object"
 msgstr "Entrez la position X de l'objet"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:754
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:755
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:756
 msgid "Adding an object"
 msgstr "Ajout d'un objet"
 
-#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:755
+#: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\debuggergui.cpp:756
 msgid "Enter the object's Y position"
 msgstr "Entrez la position Y de l'objet"
 
@@ -8681,7 +8685,7 @@ msgid "Compiled project is now available in the export folder."
 msgstr "Le projet compilé est disponible dans le dossier d'export."
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\projectexportdialog.cpp:213
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:669
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:658
 msgid ""
 "Compilation achieved. Do you want to open the folder where the project has "
 "been compiled?"
@@ -8727,11 +8731,11 @@ msgstr "Plateforme native"
 msgid "C++ and OpenGL based games for Windows or Linux."
 msgstr "Jeux en C++ et basés sur OpenGL pour Windows ou Linux."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:398
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:399
 msgid "Unable to write "
 msgstr "Impossible d'écrire "
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:416
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:417
 msgid ""
 "The exported script could not be minified: Please check that you installed "
 "Node.js on your system."
@@ -8739,7 +8743,7 @@ msgstr ""
 "Le projet exporté n'a pas pû être minifié : Vérifiez que vous avez installé "
 "Node.js sur votre ordinateur."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:451
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:452
 msgid ""
 "The exported script could not be minified.\n"
 "\n"
@@ -8751,48 +8755,48 @@ msgstr ""
 "Peut être qu'une extension provoque cette erreur : Contactez le développeur "
 "si vous pensez que c'est le cas."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:544
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:533
 msgid "Export in progress ( 1/2 )"
 msgstr "Export en cours (1/2)"
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:544
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:533
 msgid "Exporting the project..."
 msgstr "Export du projet..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:564
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:553
 msgid "Export in progress ( 2/2 )"
 msgstr "Export en cours (2/2)"
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:565
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:554
 msgid "Exporting events..."
 msgstr "Exportation des évènements..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:571
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:560
 msgid "Error during exporting: Unable to export events ( "
 msgstr "Erreur durant l'export: Impossible d'exporter les évènements ( "
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:576
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:565
 msgid "Preparing the project..."
 msgstr "Préparation du projet..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:583
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:592
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:572
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:581
 msgid "Exporting files..."
 msgstr "Export des fichiers..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:592
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:581
 msgid "Exporting files and minifying them..."
 msgstr "Exportation des fichiers et minimisation..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:605
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:594
 msgid "Error during export:\n"
 msgstr "Erreur durant l'exportation:\n"
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:613
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:602
 msgid "Creating the zip file..."
 msgstr "Création du fichier zip..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:635
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:624
 msgid ""
 "Unable to finalize the creation of the zip file!\n"
 "\n"
@@ -8802,11 +8806,11 @@ msgstr ""
 "\n"
 "Le projet exporté ne sera pas mis dans un fichier compressé."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:638
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:627
 msgid "Cleaning files..."
 msgstr "Nettoyage des fichiers..."
 
-#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:688
+#: d:\florian\programmation\gamedevelop3\gdjs\gdjs\exporter.cpp:677
 msgid "Export to the web"
 msgstr "Exporter pour le web"
 
@@ -9886,11 +9890,11 @@ msgstr "Faire _PARAM2__PARAM3_ à l'attribut _PARAM1_ de l'élément _PARAM0_"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:115
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:150
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:260
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:64
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:90
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:117
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:144
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:171
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:65
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:91
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:118
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:145
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:172
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:150
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:164
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:178
@@ -10011,8 +10015,8 @@ msgstr "Décrypter le fichier _PARAM0_ en _PARAM1_ avec AES"
 
 #: d:\florian\programmation\gamedevelop3\extensions\box3dobject\box3dobject.cpp:376
 #: d:\florian\programmation\gamedevelop3\extensions\box3dobject\box3dobject.cpp:393
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:165
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:174
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:175
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:184
 msgid "Z"
 msgstr "Z"
 
@@ -10045,8 +10049,8 @@ msgstr "Roll"
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:80
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\panelspriteobject.cpp:311
 #: d:\florian\programmation\gamedevelop3\extensions\primitivedrawing\extension.cpp:250
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:56
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:68
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:57
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:69
 #: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\tiledspriteobject.cpp:199
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:627
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:630
@@ -10054,9 +10058,9 @@ msgstr "Roll"
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\cameraextension.cpp:180
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\windowextension.cpp:70
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\initialinstancespropgridhelper.cpp:94
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:982
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1018
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1019
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:928
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:964
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:965
 msgid "Width"
 msgstr "Largeur"
 
@@ -10068,8 +10072,8 @@ msgstr "Largeur"
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:106
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\panelspriteobject.cpp:312
 #: d:\florian\programmation\gamedevelop3\extensions\primitivedrawing\extension.cpp:251
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:82
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:95
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:83
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:96
 #: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\tiledspriteobject.cpp:200
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:634
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:637
@@ -10077,9 +10081,9 @@ msgstr "Largeur"
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\cameraextension.cpp:181
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\windowextension.cpp:71
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\initialinstancespropgridhelper.cpp:95
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:983
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1020
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1021
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:929
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:966
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:967
 msgid "Height"
 msgstr "Hauteur"
 
@@ -10200,7 +10204,7 @@ msgstr "Modifie la largeur d'une boite 3D."
 
 #: d:\florian\programmation\gamedevelop3\extensions\box3dobject\extension.cpp:68
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:70
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:58
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:59
 msgid "Do _PARAM1__PARAM2_ to the width of _PARAM0_"
 msgstr "Faire _PARAM1__PARAM2_ à la largeur de _PARAM0_"
 
@@ -10285,11 +10289,11 @@ msgstr "Faire _PARAM1__PARAM2_ à la largeur de _PARAM0_"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:114
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:149
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:259
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:63
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:89
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:116
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:143
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:170
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:64
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:90
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:117
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:144
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:171
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:149
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:177
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:205
@@ -10413,11 +10417,11 @@ msgstr "La largeur de _PARAM0_ est _PARAM1_ à _PARAM2_"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:126
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:161
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:271
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:75
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:102
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:130
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:157
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:184
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:76
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:103
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:131
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:158
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:185
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:163
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:191
 #: d:\florian\programmation\gamedevelop3\extensions\topdownmovementautomatism\extension.cpp:218
@@ -10542,11 +10546,11 @@ msgstr "Signe du test"
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:487
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:162
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:272
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:76
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:103
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:131
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:158
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:185
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:77
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:104
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:132
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:159
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:186
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:216
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:242
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:266
@@ -10571,7 +10575,7 @@ msgstr "Modifie la hauteur d'une boite 3D."
 
 #: d:\florian\programmation\gamedevelop3\extensions\box3dobject\extension.cpp:93
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:95
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:84
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:85
 msgid "Do _PARAM1__PARAM2_ to the height of _PARAM0_"
 msgstr "Faire _PARAM1__PARAM2_ à la hauteur de _PARAM0_"
 
@@ -10605,7 +10609,7 @@ msgstr "La profondeur de _PARAM0_ est _PARAM1_ à _PARAM2_"
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:111
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:233
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:320
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:202
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:212
 msgid "Z Position"
 msgstr "Position Z"
 
@@ -11464,7 +11468,7 @@ msgstr "Lier _PARAM1_ et _PARAM2_"
 
 #: d:\florian\programmation\gamedevelop3\extensions\linkedobjects\extension.cpp:62
 #: d:\florian\programmation\gamedevelop3\extensions\linkedobjects\extension.cpp:76
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:465
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:464
 msgid "Object 1"
 msgstr "Objet 1"
 
@@ -11472,7 +11476,7 @@ msgstr "Objet 1"
 #: d:\florian\programmation\gamedevelop3\extensions\linkedobjects\extension.cpp:77
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:733
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:746
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:466
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:465
 msgid "Object 2"
 msgstr "Objet 2"
 
@@ -11656,7 +11660,7 @@ msgstr "Envoyer le texte _PARAM1_ avec l'intitulé _PARAM0_ aux destinataires"
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:59
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:80
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:283
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:341
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:350
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\textobjecteditor.cpp:87
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:302
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\fileextension.cpp:73
@@ -11986,12 +11990,12 @@ msgstr "Modifie la largeur d'un objet Panneau à bordures."
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:109
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:122
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:135
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:59
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:71
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:85
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:98
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:112
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:126
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:60
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:72
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:86
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:99
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:113
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:127
 msgid "Size and angle"
 msgstr "Taille et angle"
 
@@ -12000,7 +12004,7 @@ msgid "Test the width of a Panel Sprite."
 msgstr "Teste la largeur d'un objet Panneau à bordures."
 
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:82
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:70
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:71
 msgid "The width of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "La largeur de _PARAM0_ est _PARAM1_ à _PARAM2_"
 
@@ -12013,7 +12017,7 @@ msgid "Test the height of a Panel Sprite."
 msgstr "Teste la hauteur d'un objet Panneau à bordures."
 
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:108
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:97
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:98
 msgid "The height of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "La hauteur de _PARAM0_ est _PARAM1_ à _PARAM2_"
 
@@ -12023,7 +12027,7 @@ msgstr "Modifie l'angle d'un objet Panneau à bordures."
 
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:121
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:254
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:111
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:112
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:223
 msgid "Do _PARAM1__PARAM2_ to the angle of _PARAM0_"
 msgstr "Faire _PARAM1__PARAM2_ à l'angle de _PARAM0_"
@@ -12034,7 +12038,7 @@ msgstr "Teste l'angle d'un objet Panneau à bordures."
 
 #: d:\florian\programmation\gamedevelop3\extensions\panelspriteobject\extension.cpp:134
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:266
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:125
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:126
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:236
 msgid "The angle of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "L'angle de _PARAM0_ est _PARAM1_ à _PARAM2_"
@@ -15394,7 +15398,7 @@ msgstr "L'amortissement linéaire de _PARAM0_ est _PARAM2_ à _PARAM3_"
 #: d:\florian\programmation\gamedevelop3\extensions\physicsautomatism\extension.cpp:416
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:787
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:790
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:462
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:461
 msgid "Collision"
 msgstr "Collision"
 
@@ -16470,7 +16474,7 @@ msgstr "Son positionnable dans l'espace."
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:72
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:181
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:300
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:198
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:208
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:285
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\audioextension.cpp:429
 msgid "Sound level"
@@ -16497,7 +16501,7 @@ msgstr "Faire _PARAM1__PARAM2_ au pitch de _PARAM0_"
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:98
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:207
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:310
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:200
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:210
 msgid "Attenuation"
 msgstr "Atténuation"
 
@@ -16512,7 +16516,7 @@ msgstr "Faire _PARAM1__PARAM2_ à l'atténuation de _PARAM0_"
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:124
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:246
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:162
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:236
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:244
 msgid "Automatic restart"
 msgstr "Bouclage"
 
@@ -16525,7 +16529,7 @@ msgid "Activate looping for _PARAM0_: _PARAM1_"
 msgstr "Jouer _PARAM0_ en boucle : _PARAM1_"
 
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:131
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:201
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:211
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobjecteditor.cpp:155
 msgid "Loop"
 msgstr "En boucle"
@@ -16599,7 +16603,7 @@ msgstr "L'atténuation de _PARAM0_ est _PARAM1_ à _PARAM2_"
 
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:220
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:315
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:199
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:209
 msgid "Minimal distance"
 msgstr "Distance minimale"
 
@@ -16640,7 +16644,7 @@ msgid "_PARAM0_ is being played"
 msgstr "_PARAM0_ est en train d'être joué"
 
 #: d:\florian\programmation\gamedevelop3\extensions\soundobject\extension.cpp:268
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:238
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:246
 msgid "Paused"
 msgstr "En pause"
 
@@ -16849,28 +16853,28 @@ msgstr "Direction en y de l'écouteur"
 msgid "Listener z direction"
 msgstr "Direction en z de l'écouteur"
 
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:201
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:211
 #: d:\florian\programmation\gamedevelop3\extensions\textentryobject\textentryobject.cpp:112
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:346
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:236
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:238
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:179
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:181
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:204
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:208
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:355
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:244
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:246
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:166
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:168
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:191
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:195
 msgid "Yes"
 msgstr "Oui"
 
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:201
-#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:210
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:211
+#: d:\florian\programmation\gamedevelop3\extensions\soundobject\soundobject.cpp:220
 #: d:\florian\programmation\gamedevelop3\extensions\textentryobject\textentryobject.cpp:112
 #: d:\florian\programmation\gamedevelop3\extensions\textentryobject\textentryobject.cpp:118
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:346
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:380
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:236
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:238
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:204
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:208
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:355
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:389
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:244
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:246
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:191
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:195
 msgid "No"
 msgstr "Non"
 
@@ -17152,7 +17156,7 @@ msgstr "L'opacité de _PARAM0_ est _PARAM1_ à _PARAM2_"
 
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:168
 #: d:\florian\programmation\gamedevelop3\extensions\textobject\extension.cpp:179
-#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:346
+#: d:\florian\programmation\gamedevelop3\extensions\textobject\textobject.cpp:355
 msgid "Smoothing"
 msgstr "Lissage"
 
@@ -17273,96 +17277,96 @@ msgstr "Police :"
 msgid "Choose the font"
 msgstr "Choisir la police"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:40
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:41
 #: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\jsextension.cpp:50
 msgid "Tiled Sprite Object"
 msgstr "Objet Mosaïque"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:41
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:42
 #: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\jsextension.cpp:51
 msgid "Extension allowing to use tiled sprite objects."
 msgstr ""
 "Extension permettant d'utiliser des objets affichant des images répétées en "
 "mosaïques, pour afficher par exemple des arrières plans."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:46
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:47
 msgid "Tiled Sprite"
 msgstr "Mosaïque"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:47
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:48
 msgid "Displays an image repeated over an area"
 msgstr "Afficher une image répétée sur toute une zone"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:57
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:58
 msgid "Modify the width of a Tiled Sprite."
 msgstr "Modifie la largeur d'un objet Mosaïque."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:69
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:70
 msgid "Test the width of a Tiled Sprite."
 msgstr "Teste la largeur d'un objet Mosaïque."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:83
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:84
 msgid "Modify the height of a Tiled Sprite."
 msgstr "Modifie la hauteur d'un objet Mosaïque."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:96
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:97
 msgid "Test the height of a Tiled Sprite."
 msgstr "Teste la hauteur d'un objet Mosaïque."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:110
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:111
 msgid "Modify the angle of a Tiled Sprite."
 msgstr "Modifie l'angle d'un objet Mosaïque."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:124
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:125
 msgid "Test the angle of a Tiled Sprite."
 msgstr "Teste l'angle d'un objet Mosaïque."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:136
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:150
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:137
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:151
 msgid "Image X Offset"
 msgstr "Décalage en X de l'image"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:137
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:138
 msgid "Modify the offset used on the X axis when displaying the image."
 msgstr "Modifier le décalage en X appliqué lors de l'affichage de l'image."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:138
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:139
 msgid "Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"
 msgstr "Faire _PARAM1__PARAM2_ au décalage en X de _PARAM0_"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:139
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:153
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:166
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:180
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:140
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:154
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:167
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:181
 msgid "Image offset"
 msgstr "Décalage de l'image"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:151
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:152
 msgid "Test the offset used on the X axis when displaying the image."
 msgstr "Tester le décalage en X appliqué lors de l'affichage de l'image."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:152
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:153
 msgid "The X offset of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "Le décalage en X de _PARAM0_ est _PARAM1__PARAM2_"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:163
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:177
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:164
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:178
 msgid "Image Y Offset"
 msgstr "Décalage de l'image en Y"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:164
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:165
 msgid "Modify the offset used on the Y axis when displaying the image."
 msgstr "Modifie le décalage en Y appliqué lors de l'affichage de l'image."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:165
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:166
 msgid "Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"
 msgstr "Faire _PARAM1__PARAM2_ au décalage en Y de _PARAM0_"
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:178
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:179
 msgid "Test the offset used on the Y axis when displaying the image."
 msgstr "Tester le décalage en Y appliqué lors de l'affichage de l'image."
 
-#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:179
+#: d:\florian\programmation\gamedevelop3\extensions\tiledspriteobject\extension.cpp:180
 msgid "The Y offset of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "Le décalage en Y de _PARAM0_ est _PARAM1__PARAM2_"
 
@@ -17695,7 +17699,7 @@ msgid "_PARAM0_ automatically restart"
 msgstr "_PARAM0_ redémarre automatiquement"
 
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:172
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:237
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:245
 msgid "Position in video"
 msgstr "Position dans la vidéo"
 
@@ -17783,7 +17787,7 @@ msgid "Current position in the video, in seconds."
 msgstr "Position actuelle dans la vidéo en secondes"
 
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\extension.cpp:281
-#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:239
+#: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobject.cpp:247
 msgid "Length"
 msgstr "Durée"
 
@@ -20643,7 +20647,7 @@ msgstr "Met le curseur au milieu de l'écran horizontalement."
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\mouseextension.cpp:142
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\mouseextension.cpp:148
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\mouseextension.cpp:156
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:406
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:405
 msgid "Mouse"
 msgstr "Souris"
 
@@ -21642,9 +21646,9 @@ msgstr "Faire _PARAM1__PARAM2_ au numéro de l'animation de _PARAM0_"
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:202
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:216
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:227
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:442
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:446
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:449
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:441
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:445
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:448
 msgid "Animations and images"
 msgstr "Animations et images"
 
@@ -21725,7 +21729,6 @@ msgid "Object to be rotated"
 msgstr "Objet à tourner"
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:122
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:397
 msgid "Angular speed (degrees per second)"
 msgstr "Vitesse angulaire (degrés par seconde)"
 
@@ -21997,11 +22000,11 @@ msgstr "Tourner _PARAM0_ vers _PARAM1_"
 msgid "Rotate toward this object"
 msgstr "Objet vers lequel se tourner"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:403
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:402
 msgid "The cursor is on an object"
 msgstr "Le curseur est sur un objet"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:404
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:403
 msgid ""
 "Test if the cursor is over a Sprite object. The test is accurate by default "
 "(check that the cursor is not on a transparent pixel)."
@@ -22009,58 +22012,58 @@ msgstr ""
 "Teste si le curseur survole un objet. Le test est précis par défaut "
 "( vérifie que le curseur n'est pas sur une zone transparente )."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:405
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:404
 msgid "The cursor is on _PARAM0_"
 msgstr "Le curseur est sur _PARAM0_"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:412
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:411
 msgid "Precise test ( yes by default )"
 msgstr "Test précis ? ( oui par défaut )"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:415
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:425
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:414
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:424
 msgid "X position of a point"
 msgstr "Position X d'un point"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:418
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:423
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:428
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:433
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:417
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:422
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:427
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:432
 msgid "Name of the point"
 msgstr "Nom du point"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:420
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:430
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:419
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:429
 msgid "Y position of a point"
 msgstr "Position Y d'un point"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:435
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:439
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:434
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:438
 msgid "Direction of the object"
 msgstr "Direction de l'objet"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:442
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:446
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:441
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:445
 msgid "Animation of the object"
 msgstr "Animation de l'objet"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:449
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:448
 msgid "Animation frame of the object"
 msgstr "Numéro de l'image de l'objet"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:452
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:451
 msgid "Scale of the width of an object"
 msgstr "Echelle de la taille en largeur"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:455
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:454
 msgid "Scale of the height of an object"
 msgstr "Echelle de la taille en hauteur"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:459
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:458
 msgid "Collision (Pixel perfect)"
 msgstr "Collision (Pixel perfect)"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:460
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:459
 msgid ""
 "The condition is true if there is a collision between the two objects.\n"
 "The test is pixel-perfect."
@@ -22070,7 +22073,7 @@ msgstr ""
 "Attention ! Cette condition est couteuse pour l'ordinateur en terme de "
 "perfomance."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:461
+#: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\spriteextension.cpp:460
 msgid "_PARAM0_ is in collision with _PARAM1_ (pixel perfect)"
 msgstr "_PARAM0_ est en collision avec _PARAM1_ (pixel perfect)"
 
@@ -22462,21 +22465,21 @@ msgstr "Attend ]"
 msgid ", repeat :"
 msgstr ", répéter :"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:145
-#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:146
-#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:169
+#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:143
+#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:144
+#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:167
 msgid "Link to "
 msgstr "Lien vers "
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:150
+#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:148
 msgid "Include all events"
 msgstr "Inclure tous les évènements"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:152
+#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:150
 msgid "Include events "
 msgstr "Inclure les évènements "
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:152
+#: d:\florian\programmation\gamedevelop3\core\gdcore\events\builtin\linkevent.cpp:150
 msgid " to "
 msgstr " à "
 
@@ -23417,10 +23420,10 @@ msgstr "Verrouillé"
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:50
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:75
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\objectspropgridhelper.cpp:76
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:979
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:980
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:989
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:991
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:925
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:926
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:935
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:937
 msgid "Click to edit..."
 msgstr "Cliquez pour éditer..."
 
@@ -23834,8 +23837,8 @@ msgid "No image selected"
 msgstr "Aucune image sélectionnée"
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:677
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:710
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:741
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:709
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:740
 msgid "(Multiple values)"
 msgstr "(Valeurs multiples)"
 
@@ -23843,11 +23846,7 @@ msgstr "(Valeurs multiples)"
 msgid "Choose the resource file"
 msgstr "Choisissez le fichier de la ressource"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:686
-msgid "All files | *.*"
-msgstr "Tous les fichiers | *.*"
-
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:689
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:688
 msgid ""
 "File of the resource.\n"
 "The filename is relative to the project directory."
@@ -23855,26 +23854,26 @@ msgstr ""
 "Fichier de la ressource.\n"
 "Le nom de fichier est relatif au répertoire du projet."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:700
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:699
 msgid "N/A"
 msgstr "N/A"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:812
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:888
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:811
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:887
 msgid "Unable to rename the image: another image has already this name."
 msgstr "Impossible de renommer l'image : une autre image porte déjà ce nom."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:825
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:874
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:824
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:873
 msgid "Unable to rename the folder: another folder has already this name."
 msgstr ""
 "Impossible de renommer le dossier : un autre dossier porte déjà ce nom."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:956
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:955
 msgid "All images"
 msgstr "Toutes les images"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1009
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1008
 msgid ""
 "These resources seems to be useless:\n"
 "Check resources to delete."
@@ -23882,7 +23881,7 @@ msgstr ""
 "Ces images ne semblent plus être utilisée dans le projet :\n"
 "Cochez les images à supprimer."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1038
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1037
 msgid ""
 "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/"
 "manual/edit_image"
@@ -23890,15 +23889,15 @@ msgstr ""
 "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/"
 "edit_image"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1065
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1064
 msgid "Choose the program for editing this kind of resource"
 msgstr "Choisissez le programme pour éditer ce type de ressource"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1065
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1064
 msgid "Programs (*.exe)|*.exe"
 msgstr "Programmes (*.exe)|*.exe"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1091
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1090
 msgid ""
 "Choose a resource in the\n"
 "list to display it.\n"
@@ -23908,7 +23907,7 @@ msgstr ""
 "la liste pour l'afficher.\n"
 "\n"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1092
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1091
 msgid ""
 "You can add and\n"
 "modify resources using the ribbon."
@@ -23916,7 +23915,7 @@ msgstr ""
 "Vous pouvez ajouter et\n"
 "modifier les ressources avec le ruban."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1092
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1091
 msgid ""
 "You can add and\n"
 "modify resources using the toolbar"
@@ -23924,8 +23923,8 @@ msgstr ""
 "Vous pouvez ajouter et\n"
 "modifier les ressources avec la barre d'outils"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1270
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1274
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1269
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\resourceseditor.cpp:1273
 msgid "New folder"
 msgstr "Nouveau dossier"
 
@@ -24116,7 +24115,7 @@ msgstr ""
 "Position %f;%f. SHIFT pour sélection multiple, clic droit pour plus "
 "d'options."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas2.cpp:739
+#: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\layouteditorcanvas\layouteditorcanvas2.cpp:757
 msgid ""
 "http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/"
 "manual/edit_layout"
@@ -24124,7 +24123,7 @@ msgstr ""
 "http://www.wiki.compilprojects.net/doku.php/project_develop/documentation/"
 "manual/edit_layout"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:553
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:500
 msgid ""
 "The version of Game Develop used to create this game seems to be a new "
 "version.\n"
@@ -24136,7 +24135,7 @@ msgstr ""
 "Le jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\n"
 "Vous devriez vérifier si une nouvelle version de Game Develop est disponible."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:560
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:507
 msgid ""
 "The version of Game Develop used to create this game seems to be greater.\n"
 "Game Develop may fail to open the game, or data may be missing.\n"
@@ -24146,7 +24145,7 @@ msgstr ""
 "Le jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\n"
 "Vous devriez vérifier si une nouvelle version de Game Develop est disponible."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:567
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:514
 msgid ""
 "The game was saved with version of Game Develop which is too old. Please "
 "open and save the game with one of the first version of Game Develop 2. You "
@@ -24157,7 +24156,7 @@ msgstr ""
 "( Téléchargeable sur le site officiel ),puis enregistrez le et réouvrez le "
 "avec cette version."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:635
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:581
 msgid ""
 "Sprite scaling has changed since GD 2: The resizing is made so that the "
 "origin point of the object won't move whatever the scale of the object.\n"
@@ -24166,7 +24165,7 @@ msgstr ""
 "redimensionnement est maintenant fait de façon à ce que le point d'origine "
 "ne bouge pas quelque soit la taille de l'objet.\n"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:636
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:582
 msgid ""
 "You may have to slightly change the position of some objects if you have "
 "changed their size.\n"
@@ -24176,11 +24175,11 @@ msgstr ""
 "modifié leurs tailles.\n"
 "\n"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:637
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:583
 msgid "Thank you for your understanding.\n"
 msgstr "Merci de votre compréhension.\n"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:660
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:606
 msgid ""
 "The project is using the pathfinding automatism. This automatism has been "
 "replaced by a new one:\n"
@@ -24188,7 +24187,7 @@ msgstr ""
 "Le projet utilise l'automatisme Recherche de chemin. Cet automatism a été "
 "remplacé par un nouveau:\n"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:661
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:607
 msgid ""
 "You must add the new 'Pathfinding' automatism to the objects that need to be "
 "moved, and add the 'Pathfinding Obstacle' to the objects that must act as "
@@ -24198,24 +24197,24 @@ msgstr ""
 "qui doivent être déplacés, et ajouter l'automatisme 'Obstacle pour la "
 "recherche de chemin' aux objets qui sont des obstacles."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:751
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:784
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:697
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:730
 msgid "Make sure the file exists and that you have the right to open the file."
 msgstr ""
 "Vérifiez que le fichier existe et que vous possédez les droits suffisants "
 "pour y accéder."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:784
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:730
 msgid "Unable to open the file"
 msgstr "Impossible d'ouvrir le fichier"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:895
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:913
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:841
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:859
 msgid "Unable to save file "
 msgstr "Impossible de sauver le fichier "
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:895
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:913
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:841
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:859
 msgid ""
 "!\n"
 "Check that the drive has enough free space, is not write-protected and that "
@@ -24225,7 +24224,7 @@ msgstr ""
 "Vérifiez que le fichier existe, que le disque comporte assez d'espace libre "
 "et qu'il n'est pas protégé en écriture."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:931
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:877
 msgid ""
 "Please use only letters, digits\n"
 "and underscores ( _ )."
@@ -24234,96 +24233,99 @@ msgstr ""
 "lettres, chiffres et\n"
 "underscore ( _ )."
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:978
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1016
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1017
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:924
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:962
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:963
 msgid "Author"
 msgstr "Auteur"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:981
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:927
 msgid "Window"
 msgstr "Fenêtre"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:984
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1022
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1023
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:930
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:968
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:969
 msgid "Vertical Synchronization"
 msgstr "Synchronisation verticale"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:985
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1024
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1045
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1046
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:931
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:970
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:991
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:992
 msgid "Limit the framerate"
 msgstr "Limiter le framerate"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:986
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:996
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:997
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1000
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1026
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1027
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1046
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:932
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:942
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:943
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:946
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:972
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:973
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:992
 msgid "Maximum FPS"
 msgstr "FPS maximum"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:987
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1028
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1029
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:933
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:974
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:975
 msgid "Minimum FPS"
 msgstr "FPS minimum"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1002
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:948
 msgid "Generation"
 msgstr "Génération"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1003
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1031
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1032
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:949
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:977
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:978
 msgid "Windows executable name"
 msgstr "Nom de l'executable Windows"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1004
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1033
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1034
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:950
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:979
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:980
 msgid "Windows executable icon"
 msgstr "Icone de l'executable Windows"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1005
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1035
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1036
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:951
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:981
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:982
 msgid "Linux executable name"
 msgstr "Nom de l'executable Linux"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1006
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1037
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1038
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:952
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:983
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:984
 msgid "Mac OS executable name"
 msgstr "Nom de l'executable Mac OS"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:1008
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:954
 msgid "C++ features"
 msgstr "Fonctionnalités C++"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:190
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:177
 msgid "Smooth the image"
 msgstr "Lisser l'image"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:191
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:178
 msgid "Set this to \"Yes\" to set a smooth filter on the image"
 msgstr "Mettre à \"Oui\" afin d'appliquer un lissage sur l'image"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:195
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:182
 msgid "Always loaded in memory"
 msgstr "Toujours conserver l'image en mémoire"
 
-#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:196
+#: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\resourcesmanager.cpp:183
 msgid ""
 "Set this to \"Yes\" to let the image always loaded in memory.\n"
 "Useful when the image is used by actions."
 msgstr ""
 "Mettre à \"Oui\" pour conserver l'image ne mémoire.\n"
 "Utile quand l'image est utilisée par des actions."
+
+#~ msgid "All files | *.*"
+#~ msgstr "Tous les fichiers | *.*"
 
 #~ msgid "Support, assistance, answers to the suggestions on:"
 #~ msgstr "Support, aide, réponses aux suggestions sur"

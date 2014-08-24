@@ -330,7 +330,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Bitmap Size:",
-													"m_value":	"32,32"
+													"m_value":	"16,16"
 												}, {
 													"type":	"string",
 													"m_label":	"Margins:",
@@ -376,7 +376,7 @@
 														}, {
 															"type":	"bitmapPicker",
 															"m_label":	"Bitmap File:",
-															"m_path":	"../../Binaries/Output/Release_Windows/res/ribbon_default/pref32.png"
+															"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/options16.png"
 														}, {
 															"type":	"filePicker",
 															"m_label":	"Disabled-Bitmap File",
@@ -431,7 +431,7 @@
 														}, {
 															"type":	"bitmapPicker",
 															"m_label":	"Bitmap File:",
-															"m_path":	"../../Binaries/Output/Release_Windows/res/editMask32.png"
+															"m_path":	"../../Binaries/Output/Release_Windows/res/maskEdit16.png"
 														}, {
 															"type":	"filePicker",
 															"m_label":	"Disabled-Bitmap File",
@@ -679,7 +679,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Bitmap Size:",
-													"m_value":	"24,24"
+													"m_value":	"16,16"
 												}, {
 													"type":	"string",
 													"m_label":	"Margins:",
@@ -725,7 +725,7 @@
 														}, {
 															"type":	"bitmapPicker",
 															"m_label":	"Bitmap File:",
-															"m_path":	"../../Binaries/Output/Release_Windows/res/ribbon_default/pref32.png"
+															"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/options16.png"
 														}, {
 															"type":	"filePicker",
 															"m_label":	"Disabled-Bitmap File",
@@ -836,7 +836,7 @@
 														}, {
 															"type":	"multi-string",
 															"m_label":	"Label:",
-															"m_value":	"Current layer:  "
+															"m_value":	"Current layer:"
 														}, {
 															"type":	"string",
 															"m_label":	"Wrap:",
@@ -977,7 +977,7 @@
 														}, {
 															"type":	"bitmapPicker",
 															"m_label":	"Bitmap File:",
-															"m_path":	"../../Binaries/Output/Release_Windows/res/ribbon_default/layers32.png"
+															"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/layer16.png"
 														}, {
 															"type":	"filePicker",
 															"m_label":	"Disabled-Bitmap File",

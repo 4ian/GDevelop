@@ -77,6 +77,13 @@ tileMap(object.tileMap)
     m_auimgr178->GetPane(m_tileSetPropertiesPanel).Dock();
     m_auimgr178->Update();
 
+    if(tileSet.textureName == "")
+    {
+        //This is probably a new object, open the tileset config dialog
+        wxCommandEvent fakeEvent;
+        OnTileSetConfigureButtonClicked(fakeEvent);
+    }
+
     UpdateLayerChoice();
 }
 

@@ -40,13 +40,13 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_tileSetPropertiesPanel->SetSizer(flexGridSizer5);
     
     m_tileSetToolBar = new wxToolBar(m_tileSetPropertiesPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
-    m_tileSetToolBar->SetToolBitmapSize(wxSize(32,32));
+    m_tileSetToolBar->SetToolBitmapSize(wxSize(16,16));
     
     flexGridSizer5->Add(m_tileSetToolBar, 0, wxALL, 5);
     
-    m_tileSetToolBar->AddTool(CONFIGURE_TILESET_TOOL_ID, _("Configure the tileset"), wxXmlResource::Get()->LoadBitmap(wxT("pref32")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    m_tileSetToolBar->AddTool(CONFIGURE_TILESET_TOOL_ID, _("Configure the tileset"), wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     
-    m_tileSetToolBar->AddTool(EDIT_MASK_TOOL_ID, _("Edit current tile collision mask"), wxXmlResource::Get()->LoadBitmap(wxT("editMask32")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    m_tileSetToolBar->AddTool(EDIT_MASK_TOOL_ID, _("Edit current tile collision mask"), wxXmlResource::Get()->LoadBitmap(wxT("maskEdit16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     m_tileSetToolBar->Realize();
     
     m_tileSetPanel = new TileSetPanel(m_tileSetPropertiesPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
@@ -67,11 +67,11 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_mainPanel->SetSizer(flexGridSizer200);
     
     m_mainPanelToolbar = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER);
-    m_mainPanelToolbar->SetToolBitmapSize(wxSize(24,24));
+    m_mainPanelToolbar->SetToolBitmapSize(wxSize(16,16));
     
     flexGridSizer200->Add(m_mainPanelToolbar, 0, wxALL, 5);
     
-    m_mainPanelToolbar->AddTool(CHANGE_MAP_SIZE_TOOL_ID, _("Change map size"), wxXmlResource::Get()->LoadBitmap(wxT("pref32")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    m_mainPanelToolbar->AddTool(CHANGE_MAP_SIZE_TOOL_ID, _("Change map size"), wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     
     m_mainPanelToolbar->AddSeparator();
     
@@ -88,7 +88,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     m_mainPanelToolbar->AddSeparator();
     
-    m_mainPanelToolbar->AddTool(HIDE_UPPER_LAYERS_TOOL_ID, _("Hide upper layers"), wxXmlResource::Get()->LoadBitmap(wxT("layers32")), wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+    m_mainPanelToolbar->AddTool(HIDE_UPPER_LAYERS_TOOL_ID, _("Hide upper layers"), wxXmlResource::Get()->LoadBitmap(wxT("layer16")), wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
     m_mainPanelToolbar->Realize();
     
     wxFlexGridSizer* flexGridSizer7 = new wxFlexGridSizer(4, 1, 0, 0);

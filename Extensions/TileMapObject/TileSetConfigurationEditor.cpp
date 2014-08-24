@@ -32,6 +32,9 @@ TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet
     m_tileHeightSpin->SetValue(tileSet.tileSize.y);
     m_spacingWidthSpin->SetValue(tileSet.tileSpacing.x);
     m_spacingHeightSpin->SetValue(tileSet.tileSpacing.y);
+
+    //Realize the resource editor toolbar again
+    resourcesEditorPnl->toolbar->Realize();
 }
 
 TileSetConfigurationEditor::~TileSetConfigurationEditor()

@@ -9,8 +9,8 @@ wxDEFINE_EVENT(TILE_SELECTION_CHANGED, TileSelectionEvent);
 TileSetPanel::TileSetPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) : 
     wxScrolledWindow(parent, id, pos, size, style),
     m_tileset(NULL),
-    m_selectedCol(-1),
-    m_selectedRow(-1)
+    m_selectedCol(0),
+    m_selectedRow(0)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 

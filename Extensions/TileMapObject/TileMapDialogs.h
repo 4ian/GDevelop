@@ -36,7 +36,7 @@ public:
     enum {
         CHANGE_MAP_SIZE_TOOL_ID = 1001,
         CONFIGURE_TILESET_TOOL_ID = 1002,
-        EDIT_MASK_TOOL_ID = 1003,
+        EDIT_TILE_TOOL_ID = 1003,
         HIDE_UPPER_LAYERS_TOOL_ID = 1004,
         ID_MAINPANEL = 1005,
         ID_TILESETPANEL = 1006,
@@ -57,6 +57,7 @@ protected:
 
 protected:
     virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnTileEditToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
@@ -124,6 +125,22 @@ protected:
 public:
     TileMapConfigurationEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tilemap size configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~TileMapConfigurationEditorBase();
+};
+
+
+class TileEditorBase : public wxPanel
+{
+protected:
+    wxToolBar* m_toolbar404;
+    wxScrolledWindow* m_tilePreviewPanel;
+
+protected:
+    virtual void OnPreviewPaint(wxPaintEvent& event) { event.Skip(); }
+    virtual void OnPreviewErase(wxEraseEvent& event) { event.Skip(); }
+
+public:
+    TileEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~TileEditorBase();
 };
 
 #endif

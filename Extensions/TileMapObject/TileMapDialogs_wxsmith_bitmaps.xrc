@@ -5,4 +5,5 @@
   <object class="wxBitmap" name="layer16">..\..\Binaries\Output\Release_Windows\res\icons_default\layer16.png</object>
   <object class="wxBitmap" name="maskEdit16">..\..\Binaries\Output\Release_Windows\res\maskEdit16.png</object>
   <object class="wxBitmap" name="options16">..\..\Binaries\Output\Release_Windows\res\icons_default\options16.png</object>
+  <object class="wxBitmap" name="pathfindingobstacleicon16">..\..\Binaries\Output\Release_Windows\CppPlatform\Extensions\pathfindingobstacleicon16.png</object>
 </resource>

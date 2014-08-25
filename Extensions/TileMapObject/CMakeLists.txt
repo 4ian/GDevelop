@@ -132,6 +132,7 @@ set(gdide_source_files
 	TileMapObjectEditor.cpp
 	TileSetConfigurationEditor.cpp
 	TileMapConfigurationEditor.cpp
+	TileEditor.cpp
 	TileSetPanel.cpp
 	TileMapPanel.cpp
 	TileMap.cpp

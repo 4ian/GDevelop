@@ -116,6 +116,7 @@ private:
     #ifdef GD_IDE_ONLY
     wxBitmap m_tilesetBitmap;
     std::vector<wxBitmap> m_bitmaps;
+    static wxBitmap m_invalidBitmap;
     #endif
 
     bool m_dirty;

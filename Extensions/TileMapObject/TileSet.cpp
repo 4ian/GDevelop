@@ -8,6 +8,10 @@
 #include <wx/filename.h>
 #endif
 
+#ifdef GD_IDE_ONLY
+wxBitmap TileSet::m_invalidBitmap = wxBitmap();
+#endif
+
 TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture(), m_dirty(true)
 {
 
@@ -136,7 +140,7 @@ const wxBitmap& TileSet::GetWxBitmap() const
 
 const wxBitmap& TileSet::GetTileBitmap(int id) const
 {
-    return m_bitmaps.at(id);
+    return (id < m_bitmaps.size() ? m_bitmaps.at(id) : m_invalidBitmap);
 }
 
 #endif

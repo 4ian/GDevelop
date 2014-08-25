@@ -40,6 +40,7 @@ namespace gd { class Project; }
 class TileMapObject;
 namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
+class TileEditor;
 
 class TileMapObjectEditor: public TileMapObjectEditorBase
 {
@@ -49,6 +50,7 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual ~TileMapObjectEditor();
 
     protected:
+    virtual void OnTileEditToolClicked(wxCommandEvent& event);
         virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event);
         virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event);
         virtual void OnLayerChoiceChanged(wxCommandEvent& event);
@@ -66,6 +68,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
 
         TileSet tileSet;
         TileMap tileMap;
+
+        TileEditor *m_tileEditorPanel;
 };
 
 #endif

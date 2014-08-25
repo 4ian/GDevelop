@@ -46,7 +46,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     m_tileSetToolBar->AddTool(CONFIGURE_TILESET_TOOL_ID, _("Configure the tileset"), wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     
-    m_tileSetToolBar->AddTool(EDIT_MASK_TOOL_ID, _("Edit current tile collision mask"), wxXmlResource::Get()->LoadBitmap(wxT("maskEdit16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    m_tileSetToolBar->AddTool(EDIT_TILE_TOOL_ID, _("Edit the selected tile"), wxXmlResource::Get()->LoadBitmap(wxT("maskEdit16")), wxNullBitmap, wxITEM_CHECK, _("Opens the tile editor to edit the tile collision mask."), wxT(""), NULL);
     m_tileSetToolBar->Realize();
     
     m_tileSetPanel = new TileSetPanel(m_tileSetPropertiesPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
@@ -66,7 +66,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer200->AddGrowableRow(1);
     m_mainPanel->SetSizer(flexGridSizer200);
     
-    m_mainPanelToolbar = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER);
+    m_mainPanelToolbar = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
     m_mainPanelToolbar->SetToolBitmapSize(wxSize(16,16));
     
     flexGridSizer200->Add(m_mainPanelToolbar, 0, wxALL, 5);
@@ -123,6 +123,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     Centre(wxBOTH);
     // Connect events
     this->Connect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
+    this->Connect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Connect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Connect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
@@ -134,6 +135,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
 TileMapObjectEditorBase::~TileMapObjectEditorBase()
 {
     this->Disconnect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
+    this->Disconnect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Disconnect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Disconnect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
@@ -401,5 +403,55 @@ TileMapConfigurationEditorBase::~TileMapConfigurationEditorBase()
 {
     m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnOkPressed), NULL, this);
     m_cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnCancelPressed), NULL, this);
+    
+}
+
+TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCF6DCInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer398 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer398->SetFlexibleDirection( wxBOTH );
+    flexGridSizer398->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer398->AddGrowableCol(0);
+    flexGridSizer398->AddGrowableRow(1);
+    this->SetSizer(flexGridSizer398);
+    
+    m_toolbar404 = new wxToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
+    m_toolbar404->SetToolBitmapSize(wxSize(16,16));
+    
+    flexGridSizer398->Add(m_toolbar404, 0, wxALL, 5);
+    
+    m_toolbar404->AddTool(wxID_ANY, _("Collidable"), wxXmlResource::Get()->LoadBitmap(wxT("pathfindingobstacleicon16")), wxNullBitmap, wxITEM_CHECK, _("Activates the collision mask for collision detection"), wxT(""), NULL);
+    m_toolbar404->Realize();
+    
+    m_tilePreviewPanel = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
+    m_tilePreviewPanel->SetScrollRate(5, 5);
+    
+    flexGridSizer398->Add(m_tilePreviewPanel, 0, wxALL|wxEXPAND, 5);
+    m_tilePreviewPanel->SetMinSize(wxSize(100,100));
+    
+    SetMinSize( wxSize(200,200) );
+    SetSizeHints(500,300);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    Centre(wxBOTH);
+    // Connect events
+    m_tilePreviewPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(TileEditorBase::OnPreviewPaint), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TileEditorBase::OnPreviewErase), NULL, this);
+    
+}
+
+TileEditorBase::~TileEditorBase()
+{
+    m_tilePreviewPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(TileEditorBase::OnPreviewPaint), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TileEditorBase::OnPreviewErase), NULL, this);
     
 }

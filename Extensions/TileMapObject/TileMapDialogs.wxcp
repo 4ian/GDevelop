@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	388,
+		"m_objCounter":	408,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxCF6DCInitBitmapResources",
 		"m_bitmapsFile":	"TileMapDialogs_wxsmith_bitmaps.cpp",
@@ -411,19 +411,19 @@
 													"m_properties":	[{
 															"type":	"winid",
 															"m_label":	"ID:",
-															"m_winid":	"EDIT_MASK_TOOL_ID"
+															"m_winid":	"EDIT_TILE_TOOL_ID"
 														}, {
 															"type":	"string",
 															"m_label":	"Name:",
-															"m_value":	"m_toolbarItem339"
+															"m_value":	"m_editTileTool"
 														}, {
 															"type":	"string",
 															"m_label":	"Label:",
-															"m_value":	"Edit current tile collision mask"
+															"m_value":	"Edit the selected tile"
 														}, {
 															"type":	"multi-string",
 															"m_label":	"Tooltip:",
-															"m_value":	""
+															"m_value":	"Opens the tile editor to edit the tile collision mask."
 														}, {
 															"type":	"string",
 															"m_label":	"Help String:",
@@ -439,14 +439,21 @@
 														}, {
 															"type":	"choice",
 															"m_label":	"Kind:",
-															"m_selection":	0,
+															"m_selection":	1,
 															"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
 														}, {
 															"type":	"bool",
 															"m_label":	"Construct the Dropdown Menu:",
 															"m_value":	true
 														}],
-													"m_events":	[],
+													"m_events":	[{
+															"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+															"m_eventClass":	"wxCommandEvent",
+															"m_eventHandler":	"wxCommandEventHandler",
+															"m_functionNameAndSignature":	"OnTileEditToolClicked(wxCommandEvent& event)",
+															"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+															"m_noBody":	false
+														}],
 													"m_children":	[]
 												}]
 										}, {
@@ -658,7 +665,7 @@
 											"border":	5,
 											"gbSpan":	"1,1",
 											"gbPosition":	"0,0",
-											"m_styles":	["wxTB_HORZ_TEXT", "wxTB_NODIVIDER"],
+											"m_styles":	["wxTB_HORZ_TEXT", "wxTB_NODIVIDER", "wxTB_FLAT"],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 											"m_properties":	[{
 													"type":	"winid",
@@ -3867,6 +3874,317 @@
 										}],
 									"m_children":	[]
 								}]
+						}]
+				}]
+		}, {
+			"m_type":	4407,
+			"proportion":	0,
+			"border":	5,
+			"gbSpan":	"1,1",
+			"gbPosition":	"0,0",
+			"m_styles":	["wxTAB_TRAVERSAL"],
+			"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+			"m_properties":	[{
+					"type":	"string",
+					"m_label":	"Size:",
+					"m_value":	"500,300"
+				}, {
+					"type":	"string",
+					"m_label":	"Minimum Size:",
+					"m_value":	"200,200"
+				}, {
+					"type":	"string",
+					"m_label":	"Name:",
+					"m_value":	"TileEditorBase"
+				}, {
+					"type":	"multi-string",
+					"m_label":	"Tooltip:",
+					"m_value":	""
+				}, {
+					"type":	"colour",
+					"m_label":	"Bg Colour:",
+					"colour":	"<Default>"
+				}, {
+					"type":	"colour",
+					"m_label":	"Fg Colour:",
+					"colour":	"<Default>"
+				}, {
+					"type":	"font",
+					"m_label":	"Font:",
+					"m_value":	""
+				}, {
+					"type":	"bool",
+					"m_label":	"Hidden",
+					"m_value":	false
+				}, {
+					"type":	"bool",
+					"m_label":	"Disabled",
+					"m_value":	false
+				}, {
+					"type":	"bool",
+					"m_label":	"Focused",
+					"m_value":	false
+				}, {
+					"type":	"string",
+					"m_label":	"Class Name:",
+					"m_value":	""
+				}, {
+					"type":	"string",
+					"m_label":	"Include File:",
+					"m_value":	""
+				}, {
+					"type":	"string",
+					"m_label":	"Style:",
+					"m_value":	""
+				}, {
+					"type":	"string",
+					"m_label":	"Title:",
+					"m_value":	""
+				}, {
+					"type":	"virtualFolderPicker",
+					"m_label":	"Virtual Folder:",
+					"m_path":	""
+				}, {
+					"type":	"choice",
+					"m_label":	"Centre:",
+					"m_selection":	1,
+					"m_options":	["", "wxBOTH", "wxVERTICAL", "wxHORIZONTAL"]
+				}, {
+					"type":	"string",
+					"m_label":	"Inherited Class",
+					"m_value":	"TileEditor"
+				}, {
+					"type":	"string",
+					"m_label":	"File:",
+					"m_value":	"TileEditor"
+				}, {
+					"type":	"string",
+					"m_label":	"Class Decorator",
+					"m_value":	""
+				}],
+			"m_events":	[],
+			"m_children":	[{
+					"m_type":	4403,
+					"proportion":	1,
+					"border":	5,
+					"gbSpan":	"1,1",
+					"gbPosition":	"0,0",
+					"m_styles":	[],
+					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Name:",
+							"m_value":	"flexGridSizer398"
+						}, {
+							"type":	"string",
+							"m_label":	"Style:",
+							"m_value":	""
+						}, {
+							"type":	"string",
+							"m_label":	"# Columns:",
+							"m_value":	"1"
+						}, {
+							"type":	"string",
+							"m_label":	"# Rows:",
+							"m_value":	"2"
+						}, {
+							"type":	"string",
+							"m_label":	"Growable columns:",
+							"m_value":	"0"
+						}, {
+							"type":	"string",
+							"m_label":	"Growable rows:",
+							"m_value":	"1"
+						}, {
+							"type":	"string",
+							"m_label":	"Horizontal gap:",
+							"m_value":	"0"
+						}, {
+							"type":	"string",
+							"m_label":	"Vertical gap:",
+							"m_value":	"0"
+						}],
+					"m_events":	[],
+					"m_children":	[{
+							"m_type":	4461,
+							"proportion":	0,
+							"border":	5,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	["wxTB_HORZ_TEXT", "wxTB_NODIVIDER", "wxTB_FLAT"],
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+							"m_properties":	[{
+									"type":	"winid",
+									"m_label":	"ID:",
+									"m_winid":	"wxID_ANY"
+								}, {
+									"type":	"string",
+									"m_label":	"Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_toolbar404"
+								}, {
+									"type":	"string",
+									"m_label":	"Tooltip:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Bitmap Size:",
+									"m_value":	"16,16"
+								}, {
+									"type":	"string",
+									"m_label":	"Margins:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Padding:",
+									"m_value":	"1"
+								}, {
+									"type":	"string",
+									"m_label":	"Separator Size:",
+									"m_value":	"5"
+								}],
+							"m_events":	[],
+							"m_children":	[{
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_toolbarItem406"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Collidable"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Activates the collision mask for collision detection"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	1,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[],
+									"m_children":	[]
+								}]
+						}, {
+							"m_type":	4440,
+							"proportion":	0,
+							"border":	5,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	["wxFULL_REPAINT_ON_RESIZE", "wxHSCROLL", "wxVSCROLL"],
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+							"m_properties":	[{
+									"type":	"winid",
+									"m_label":	"ID:",
+									"m_winid":	"wxID_ANY"
+								}, {
+									"type":	"string",
+									"m_label":	"Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"100,100"
+								}, {
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_tilePreviewPanel"
+								}, {
+									"type":	"multi-string",
+									"m_label":	"Tooltip:",
+									"m_value":	""
+								}, {
+									"type":	"colour",
+									"m_label":	"Bg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"colour",
+									"m_label":	"Fg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"font",
+									"m_label":	"Font:",
+									"m_value":	""
+								}, {
+									"type":	"bool",
+									"m_label":	"Hidden",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Disabled",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Focused",
+									"m_value":	false
+								}, {
+									"type":	"string",
+									"m_label":	"Class Name:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Include File:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Style:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Scroll Rate X:",
+									"m_value":	"5"
+								}, {
+									"type":	"string",
+									"m_label":	"Scroll Rate Y:",
+									"m_value":	"5"
+								}],
+							"m_events":	[{
+									"m_eventName":	"wxEVT_PAINT",
+									"m_eventClass":	"wxPaintEvent",
+									"m_eventHandler":	"wxPaintEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewPaint(wxPaintEvent& event)",
+									"m_description":	"Process a wxEVT_PAINT event",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_ERASE_BACKGROUND",
+									"m_eventClass":	"wxEraseEvent",
+									"m_eventHandler":	"wxEraseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewErase(wxEraseEvent& event)",
+									"m_description":	"Process a wxEVT_ERASE_BACKGROUND event.",
+									"m_noBody":	false
+								}],
+							"m_children":	[]
 						}]
 				}]
 		}]

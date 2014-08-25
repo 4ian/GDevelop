@@ -1,0 +1,25 @@
+{
+  "name": "GDJS-tests",
+  "version": "0.0.0",
+  "description": "Tests for the HTML5 engine of Game Develop",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start --browsers Firefox --single-run"
+  },
+  "keywords": [
+    "HTML5",
+    "games",
+    "engine",
+    "Game",
+    "Develop"
+  ],
+  "author": "Florian Rival",
+  "license": "LPGL",
+  "dependencies": {
+    "mocha": "^1.21.4",
+    "karma": "^0.12.22",
+    "karma-mocha": "^0.1.9",
+    "karma-firefox-launcher": "^0.1.3",
+    "expect.js": "^0.3.1"
+  }
+}

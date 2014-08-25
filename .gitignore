@@ -16,10 +16,11 @@
 /Binaries/.embuild
 /Binaries/.embuild-debug
 /Binaries/Releases/*.exe
-/Binaries/Releases/*.7z
-/Binaries/Releases/*.tar.bz2
-/Binaries/Releases/*.tar.lzma
-/Binaries/Releases/*.zip
+/Binaries/Releases/**/*.7z
+/Binaries/Releases/**/*.tar.bz2
+/Binaries/Releases/**/*.tar.lzma
+/Binaries/Releases/**/*.zip
+/Binaries/Releases/**/*.deb
 /WebIDE
 *.depend
 *.layout
@@ -50,3 +51,4 @@
 /Binaries/Output/WebIDE/libGD.raw.js
 /WebIDE
 !/GDCpp/scripts/bcp.exe
+/GDJS/tests/node_modules

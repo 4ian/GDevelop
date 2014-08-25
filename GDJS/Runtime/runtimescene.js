@@ -79,8 +79,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 	//Load layers
     var that = this;
 	gdjs.iterateOverArray(sceneData.layers, function(layerData) {
-		var name = layerData.name;
-		that._layers.put(name, new gdjs.Layer(name, that));
+		that._layers.put(layerData.name, new gdjs.Layer(layerData, that));
 		//console.log("Created layer : \""+name+"\".");
 	});
 

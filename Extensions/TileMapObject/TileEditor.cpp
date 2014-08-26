@@ -74,7 +74,20 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     if(!m_tileset || m_tileset->IsDirty()) //If no tileset, stop rendering here
         return;
 
+    //Draw the tile
     wxBitmap tileBitmap = m_tileset->GetTileBitmap(m_currentTile);
-
     dc.DrawBitmap(tileBitmap, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
+
+    //Draw the hitbox
+    dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
+    dc.SetPen(wxPen(wxColour(100,100,100)));
+
+    wxPointList list;
+    for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
+    {
+        list.push_back(new wxPoint(m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].x, 
+        						   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
+    }
+
+    dc.DrawPolygon(&list, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
 }

@@ -11,6 +11,7 @@
 #include <GDCore/PlatformDefinition/ImageManager.h>
 #include <GDCore/PlatformDefinition/Project.h>
 #include <GDCore/Serialization/SerializerElement.h>
+#include <GDCpp/Polygon.h>
 #include <GDCpp/RuntimeGame.h>
 
 struct TileTextureCoords
@@ -19,6 +20,17 @@ struct TileTextureCoords
     sf::Vector2f topRight;
     sf::Vector2f bottomRight;
     sf::Vector2f bottomLeft;
+};
+
+struct TileHitbox
+{
+    bool collidable;
+    Polygon2d hitbox;
+
+    /**
+     * Generates a default hitbox (rectangle of the size of the tile).
+     */
+    static TileHitbox Rectangle(sf::Vector2f tileSize);
 };
 
 class TileSet
@@ -49,9 +61,18 @@ public:
     void Generate();
 
     /**
-     * Return the tile ID according to its position
+     * Reset the hitbox for all tiles
+     */
+    void ResetHitboxes();
+
+    /**
+     * Return the tile ID according to its position.
      */
     int GetTileIDFromPosition(sf::Vector2f position);
+
+    /**
+     * Return the tile ID according to its row and column.
+     */
     int GetTileIDFromCell(int col, int row);
 
 #ifdef GD_IDE_ONLY
@@ -87,6 +108,17 @@ public:
     sf::Vector2u GetSize() const;
 
     /**
+     * Get the hitbox of a tile.
+     */
+    TileHitbox& GetTileHitbox(int id);
+    const TileHitbox& GetTileHitbox(int id) const;
+
+    /**
+     * Returns the number of tiles of the tileset.
+     */
+    int GetTilesCount() const {return GetColumnsCount()*GetRowsCount();};
+
+    /**
      * Returns the number of columns of the tileset
      */
     int GetColumnsCount() const;
@@ -110,11 +142,13 @@ public:
 
 private:
 
-    boost::shared_ptr<SFMLTextureWrapper> m_tilesetTexture;
-    std::vector<TileTextureCoords> m_coords;
+    boost::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
+    std::vector<TileTextureCoords> m_coords; ///< The tileset coords
+
+    std::vector<TileHitbox> m_hitboxes;
     
     #ifdef GD_IDE_ONLY
-    wxBitmap m_tilesetBitmap;
+    wxBitmap m_tilesetBitmap; ///< The tileset texture
     std::vector<wxBitmap> m_bitmaps;
     static wxBitmap m_invalidBitmap;
     #endif

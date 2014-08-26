@@ -144,11 +144,19 @@ void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnTileSetConfigureButtonClicked(wxCommandEvent& event)
 {
+    std::string oldTextureName = tileSet.textureName;
+
     TileSetConfigurationEditor dialog(this, tileSet, game, mainFrameWrapper);
     dialog.ShowModal();
 
     tileSet.LoadResources(game);
     tileSet.Generate();
+
+    if(oldTextureName != tileSet.textureName)
+    {
+        //Need to reset the hitboxes
+        tileSet.ResetHitboxes();
+    }
 
     m_tileSetPanel->Update();
     m_tileMapPanel->Update();

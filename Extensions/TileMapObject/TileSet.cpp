@@ -12,6 +12,16 @@
 wxBitmap TileSet::m_invalidBitmap = wxBitmap();
 #endif
 
+TileHitbox TileHitbox::Rectangle(sf::Vector2f tileSize)
+{
+    TileHitbox hitbox;
+    hitbox.collidable = true;
+    hitbox.hitbox = Polygon2d::CreateRectangle(tileSize.x, tileSize.y);
+    hitbox.hitbox.Move(tileSize.x/2.f, tileSize.y/2.f);
+
+    return hitbox;
+}
+
 TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture(), m_dirty(true)
 {
 
@@ -108,8 +118,21 @@ void TileSet::Generate()
         }
     }
 
+    //Puts the default hitbox for new tiles (if there are more tiles than before)
+    if(GetTilesCount() > m_hitboxes.size())
+        m_hitboxes.insert(m_hitboxes.end(), (GetTilesCount()-m_hitboxes.size()), TileHitbox::Rectangle(tileSize));
+
     std::cout << "OK" << std::endl;
     m_dirty = false;
+}
+
+void TileSet::ResetHitboxes()
+{
+    m_hitboxes.clear();
+    if(m_dirty)
+        return;
+
+    m_hitboxes.assign(GetTilesCount(), TileHitbox::Rectangle(tileSize));
 }
 
 int TileSet::GetTileIDFromPosition(sf::Vector2f position)
@@ -168,6 +191,16 @@ sf::Vector2u TileSet::GetSize() const
     return m_tilesetTexture->texture.getSize();
 }
 
+TileHitbox& TileSet::GetTileHitbox(int id)
+{
+    return m_hitboxes[id];
+}
+
+const TileHitbox& TileSet::GetTileHitbox(int id) const
+{
+    return m_hitboxes.at(id);
+}
+
 int TileSet::GetColumnsCount() const
 {
     return (m_tilesetTexture->texture.getSize().x + tileSpacing.x) / (tileSize.x + tileSpacing.x);
@@ -191,6 +224,8 @@ void TileSet::SerializeTo(gd::SerializerElement &element) const
 
 void TileSet::UnserializeFrom(const gd::SerializerElement &element)
 {
+    ResetHitboxes();
+
     textureName = element.GetStringAttribute("textureName", "");
     tileSize.x = element.GetIntAttribute("tileSizeX", 32);
     tileSize.y = element.GetIntAttribute("tileSizeY", 32);

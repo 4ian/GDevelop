@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #define TILEMAPOBJECT_H
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
+#include <GDCpp/Polygon.h>
 #include <boost/shared_ptr.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 class SFMLTextureWrapper;
@@ -111,12 +112,15 @@ public :
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
+
     TileSet tileSet;
     TileMap tileMap;
 
 private:
 
     sf::VertexArray vertexArray;
+    std::vector<Polygon2d> hitboxes;
 
     boost::shared_ptr<SFMLTextureWrapper> texture;
 };

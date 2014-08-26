@@ -100,6 +100,38 @@ namespace
 
         return vertexArray;
     }
+
+    std::vector<Polygon2d> GenerateHitboxes(TileSet &tileSet, TileMap &tileMap)
+    {
+        std::vector<Polygon2d> hitboxes;
+        int tileWidth = tileSet.tileSize.x;
+        int tileHeight = tileSet.tileSize.y;
+
+        if(tileSet.IsDirty())
+            return hitboxes;
+
+        std::cout << "Generating Hitboxes" << std::endl;
+
+        for(int layer = 0; layer < 3; layer++)
+        {
+            for(int col = 0; col < tileMap.GetColumnsCount(); col++)
+            {
+                for(int row = 0; row < tileMap.GetRowsCount(); row++)
+                {
+                    if(tileMap.GetTile(layer, col, row) == -1 || !tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).collidable)
+                        continue;
+
+                    std::vector<Polygon2d>::iterator newHitboxIt = hitboxes.insert(hitboxes.begin(), tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).hitbox);
+                    std::cout << "Collision mask at " << col * tileWidth << ";" << row * tileHeight << std::endl;
+                    newHitboxIt->Move(col * tileWidth, row * tileHeight);
+                }
+            }
+        }
+
+        std::cout << "Hitbox:OK" << std::endl;
+
+        return hitboxes;
+    }
 }
 
 TileMapObject::TileMapObject(std::string name_) :
@@ -168,6 +200,7 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
     tileSet.LoadResources(*(scene.game));
     tileSet.Generate();
     vertexArray = GenerateVertexArray(tileSet, tileMap);
+    hitboxes = GenerateHitboxes(tileSet, tileMap);
 }
 
 /**
@@ -279,6 +312,11 @@ unsigned int RuntimeTileMapObject::GetNumberOfProperties() const
     return 0;
 }
 #endif
+
+std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes() const
+{
+    return hitboxes;
+}
 
 void DestroyRuntimeTileMapObject(RuntimeObject * object)
 {

@@ -130,8 +130,17 @@ public:
 
 class TileEditorBase : public wxPanel
 {
+public:
+    enum {
+        ADD_POINT_TOOL_ID = 1001,
+        COLLIDABLE_TOOL_ID = 1002,
+        EDIT_POINT_TOOL_ID = 1003,
+        REMOVE_POINT_TOOL_ID = 1004,
+        RESET_MASK_TOOL_ID = 1005,
+    };
 protected:
     wxToolBar* m_toolbar404;
+    wxToolBar* m_toolbar418;
     wxScrolledWindow* m_tilePreviewPanel;
 
 protected:

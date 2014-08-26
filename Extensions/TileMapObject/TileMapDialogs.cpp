@@ -423,13 +423,35 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     flexGridSizer398->AddGrowableRow(1);
     this->SetSizer(flexGridSizer398);
     
+    wxFlexGridSizer* flexGridSizer416 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer416->SetFlexibleDirection( wxBOTH );
+    flexGridSizer416->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer416->AddGrowableCol(1);
+    flexGridSizer416->AddGrowableRow(0);
+    
+    flexGridSizer398->Add(flexGridSizer416, 1, wxALL|wxEXPAND, 5);
+    
     m_toolbar404 = new wxToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
     m_toolbar404->SetToolBitmapSize(wxSize(16,16));
     
-    flexGridSizer398->Add(m_toolbar404, 0, wxALL, 5);
+    flexGridSizer416->Add(m_toolbar404, 0, wxALL|wxEXPAND, 5);
     
-    m_toolbar404->AddTool(wxID_ANY, _("Collidable"), wxXmlResource::Get()->LoadBitmap(wxT("pathfindingobstacleicon16")), wxNullBitmap, wxITEM_CHECK, _("Activates the collision mask for collision detection"), wxT(""), NULL);
+    m_toolbar404->AddTool(COLLIDABLE_TOOL_ID, _("Collidable"), wxXmlResource::Get()->LoadBitmap(wxT("pathfindingobstacleicon16")), wxNullBitmap, wxITEM_CHECK, _("Activates the collision mask for collision detection"), wxT(""), NULL);
     m_toolbar404->Realize();
+    
+    m_toolbar418 = new wxToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_NODIVIDER|wxTB_FLAT);
+    m_toolbar418->SetToolBitmapSize(wxSize(16,16));
+    
+    flexGridSizer416->Add(m_toolbar418, 0, wxALL, 5);
+    
+    m_toolbar418->AddTool(ADD_POINT_TOOL_ID, _("Add a point"), wxXmlResource::Get()->LoadBitmap(wxT("add16")), wxNullBitmap, wxITEM_NORMAL, _("Add a point to the collision mask"), wxT(""), NULL);
+    
+    m_toolbar418->AddTool(EDIT_POINT_TOOL_ID, _("Edit point position..."), wxXmlResource::Get()->LoadBitmap(wxT("edit16")), wxNullBitmap, wxITEM_NORMAL, _("Edit the selected point position..."), wxT(""), NULL);
+    
+    m_toolbar418->AddTool(REMOVE_POINT_TOOL_ID, _("Remove selected point"), wxXmlResource::Get()->LoadBitmap(wxT("remove16")), wxNullBitmap, wxITEM_NORMAL, _("Removes the selected point"), wxT(""), NULL);
+    
+    m_toolbar418->AddTool(RESET_MASK_TOOL_ID, _("Reset to the default collision mask"), wxXmlResource::Get()->LoadBitmap(wxT("undo16")), wxNullBitmap, wxITEM_NORMAL, _("Reset the tile collision mask to the default one"), wxT(""), NULL);
+    m_toolbar418->Realize();
     
     m_tilePreviewPanel = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
     m_tilePreviewPanel->SetScrollRate(5, 5);

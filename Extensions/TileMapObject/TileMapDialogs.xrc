@@ -654,24 +654,93 @@
       <hgap>0</hgap>
       <growablecols>0</growablecols>
       <growablerows>1</growablerows>
-      <object class="sizeritem">
-        <flag>wxALL</flag>
+      <object class="sizeritem" name="flexGridSizer416">
+        <flag>wxALL|wxEXPAND</flag>
         <border>5</border>
-        <object class="wxToolBar" name="m_toolbar404">
-          <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
-          <bitmapsize>16,16</bitmapsize>
-          <object class="tool" name="m_toolbarItem406">
-            <toggle>1</toggle>
-            <label>
-              <![CDATA[Collidable]]>
-            </label>
-            <tooltip>
-              <![CDATA[Activates the collision mask for collision detection]]>
-            </tooltip>
-            <longhelp>
-              <![CDATA[]]>
-            </longhelp>
-            <bitmap>../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</bitmap>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>1</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxToolBar" name="m_toolbar404">
+              <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
+              <bitmapsize>16,16</bitmapsize>
+              <object class="tool" name="m_toolbarItem406">
+                <toggle>1</toggle>
+                <label>
+                  <![CDATA[Collidable]]>
+                </label>
+                <tooltip>
+                  <![CDATA[Activates the collision mask for collision detection]]>
+                </tooltip>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</bitmap>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxToolBar" name="m_toolbar418">
+              <style>wxTB_NODIVIDER|wxTB_FLAT</style>
+              <bitmapsize>16,16</bitmapsize>
+              <object class="tool" name="m_toolbarItem420">
+                <label>
+                  <![CDATA[Add a point]]>
+                </label>
+                <tooltip>
+                  <![CDATA[Add a point to the collision mask]]>
+                </tooltip>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/add16.png</bitmap>
+              </object>
+              <object class="tool" name="m_toolbarItem422">
+                <label>
+                  <![CDATA[Edit point position...]]>
+                </label>
+                <tooltip>
+                  <![CDATA[Edit the selected point position...]]>
+                </tooltip>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
+              </object>
+              <object class="tool" name="m_toolbarItem426">
+                <label>
+                  <![CDATA[Remove selected point]]>
+                </label>
+                <tooltip>
+                  <![CDATA[Removes the selected point]]>
+                </tooltip>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</bitmap>
+              </object>
+              <object class="tool" name="m_toolbarItem432">
+                <label>
+                  <![CDATA[Reset to the default collision mask]]>
+                </label>
+                <tooltip>
+                  <![CDATA[Reset the tile collision mask to the default one]]>
+                </tooltip>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/undo16.png</bitmap>
+              </object>
+            </object>
           </object>
         </object>
       </object>

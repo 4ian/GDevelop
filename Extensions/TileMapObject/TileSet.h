@@ -31,6 +31,18 @@ struct TileHitbox
      * Generates a default hitbox (rectangle of the size of the tile).
      */
     static TileHitbox Rectangle(sf::Vector2f tileSize);
+
+    /**
+     * Serialize the TileHitbox into the given gd::SerializerElement.
+     */
+    void SerializeTo(gd::SerializerElement &element) const;
+
+    /**
+     * Unserialize the TileHitBox from the giver gd::SerializerElement.
+     * \param element the serializer element
+     * \param the tile size to create a default collision rectangle if the collision polygon is not set.
+     */
+    void UnserializeFrom(const gd::SerializerElement &element, sf::Vector2f defaultTileSize);
 };
 
 class TileSet

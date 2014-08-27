@@ -27,8 +27,8 @@ cd ..\..
 
 echo.
 echo --Ensuring GDC++ headers and pch up-to-date for release
-cd IDE/scripts
-call UpdateHeadersAndPCHRelease.bat
+cd GDCpp/scripts
+call CopyHeadersToGD.bat
 cd ..\..
 
 echo.

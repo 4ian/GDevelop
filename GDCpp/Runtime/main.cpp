@@ -52,7 +52,9 @@ int main( int argc, char *p_argv[] )
         fullExecutablePath += GetCurrentWorkingDirectory();
         fullExecutablePath += "/";
     }
+    #ifndef WINDOWS
     fullExecutablePath += p_argv[0];
+    #endif
     std::string executablePath = fullExecutablePath.substr( 0, fullExecutablePath.find_last_of( "/" ) );
     std::string executableFilename = fullExecutablePath.find_last_of( "/" ) < fullExecutablePath.length() ? fullExecutablePath.substr( fullExecutablePath.find_last_of( "/" ), fullExecutablePath.length() ) : "";
     std::string executableNameOnly = executableFilename.substr(0, executableFilename.length()-4);
@@ -76,7 +78,7 @@ int main( int argc, char *p_argv[] )
     gd::ExtensionsLoader::ExtensionsLoadingDone(".");
     //Load resource file
     gd::RessourcesLoader * resLoader = gd::RessourcesLoader::Get();
-    if ( !resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
+    if (!resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executablePath+"/gam.egd" )
            && !resLoader->SetResourceFile( "gam.egd" ) )

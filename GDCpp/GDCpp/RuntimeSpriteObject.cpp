@@ -520,6 +520,8 @@ bool RuntimeSpriteObject::SetAngle(float newAngle)
  */
 float RuntimeSpriteObject::GetAngle() const
 {
+    if ( currentAnimation >= GetAnimationsCount() ) return 0;
+
     if ( !animations[currentAnimation].Get().useMultipleDirections )
         return currentAngle;
     else

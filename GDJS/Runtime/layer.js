@@ -18,12 +18,12 @@
  * @namespace gdjs
  * @constructor
  */
-gdjs.Layer = function(name, runtimeScene)
+gdjs.Layer = function(layerData, runtimeScene)
 {
-    this._name = name;
+    this._name = layerData.name;
     this._cameraRotation = 0;
     this._zoomFactor = 1;
-    this._hidden = false;
+    this._hidden = !layerData.visibility;
     this._pixiRenderer = runtimeScene.getPIXIRenderer();
     this._pixiContainer = new PIXI.DisplayObjectContainer(); //The container of the layer
     this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
@@ -32,6 +32,7 @@ gdjs.Layer = function(name, runtimeScene)
     this._defaultHeight = runtimeScene.getGame().getDefaultHeight();
 
     runtimeScene.getPIXIContainer().addChild(this._pixiContainer);
+    this.show(!this._hidden);
 };
 
 /**

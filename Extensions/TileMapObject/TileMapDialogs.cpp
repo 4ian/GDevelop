@@ -5,6 +5,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "TileMapDialogs.h"
+#include "TileMapDialogsIds.h"
 
 
 // Declare the bitmap loading function

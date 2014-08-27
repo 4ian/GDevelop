@@ -2,13 +2,13 @@
 	"metadata":	{
 		"m_generatedFilesDir":	".",
 		"m_objCounter":	432,
-		"m_includeFiles":	[],
+		"m_includeFiles":	["TileMapDialogsIds.h"],
 		"m_bitmapFunction":	"wxCF6DCInitBitmapResources",
 		"m_bitmapsFile":	"TileMapDialogs_wxsmith_bitmaps.cpp",
 		"m_GenerateCodeTypes":	3,
 		"m_outputFileName":	"TileMapDialogs",
 		"m_firstWindowId":	1000,
-		"m_useEnum":	true,
+		"m_useEnum":	false,
 		"m_templateClasses":	[]
 	},
 	"windows":	[{

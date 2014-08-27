@@ -29,18 +29,10 @@
 #include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
 #include <wx/spinctrl.h>
+#include "TileMapDialogsIds.h"
 
 class TileMapObjectEditorBase : public wxDialog
 {
-public:
-    enum {
-        CHANGE_MAP_SIZE_TOOL_ID = 1001,
-        CONFIGURE_TILESET_TOOL_ID = 1002,
-        EDIT_TILE_TOOL_ID = 1003,
-        HIDE_UPPER_LAYERS_TOOL_ID = 1004,
-        ID_MAINPANEL = 1005,
-        ID_TILESETPANEL = 1006,
-    };
 protected:
     wxAuiManager* m_auimgr178;
     wxPanel* m_tileSetPropertiesPanel;
@@ -130,14 +122,6 @@ public:
 
 class TileEditorBase : public wxPanel
 {
-public:
-    enum {
-        ADD_POINT_TOOL_ID = 1001,
-        COLLIDABLE_TOOL_ID = 1002,
-        EDIT_POINT_TOOL_ID = 1003,
-        REMOVE_POINT_TOOL_ID = 1004,
-        RESET_MASK_TOOL_ID = 1005,
-    };
 protected:
     wxToolBar* m_toolbar404;
     wxToolBar* m_toolbar418;

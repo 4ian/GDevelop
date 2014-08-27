@@ -43,8 +43,48 @@ class wxBitmap;
 class wxWindow;
 #endif
 
-#include "TileMap.h"
-#include "TileSet.h"
+class TileMap;
+class TileSet;
+
+/**
+ * Proxy for the TileMap
+ * Note: needed because the TileMap includes wxBitmap at edittime which is not avaible in the preview compilation.
+ */
+class TileMapProxy
+{
+public:
+    TileMapProxy();
+    TileMapProxy(const TileMap &tilemap);
+    TileMapProxy(const TileMapProxy &other);
+    ~TileMapProxy();
+    TileMapProxy& operator=(const TileMapProxy &other);
+
+    TileMap& Get();
+    const TileMap& Get() const;
+
+private:
+    TileMap *m_tilemap;
+};
+
+/**
+ * Proxy for the TileSet
+ * Note: needed for the same reason as the TileMap
+ */
+class TileSetProxy
+{
+public:
+    TileSetProxy();
+    TileSetProxy(const TileSet &tileset);
+    TileSetProxy(const TileSetProxy &other);
+    ~TileSetProxy();
+    TileSetProxy& operator=(const TileSetProxy &other);
+
+    TileSet& Get();
+    const TileSet& Get() const;
+
+private:
+    TileSet *m_tileset;
+};
 
 /**
  * TileMap Object
@@ -73,8 +113,8 @@ public :
     virtual void SetWidth(float newWidth) {};
     virtual void SetHeight(float newHeight) {};
 
-    TileSet tileSet;
-    TileMap tileMap;
+    TileSetProxy tileSet;
+    TileMapProxy tileMap;
     std::string textureName;
 
 private:
@@ -106,6 +146,8 @@ public :
     virtual void SetWidth(float newWidth) {};
     virtual void SetHeight(float newHeight) {};
 
+    virtual void OnPositionChanged();
+
     #if defined(GD_IDE_ONLY)
     virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
     virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
@@ -114,8 +156,8 @@ public :
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
-    TileSet tileSet;
-    TileMap tileMap;
+    TileSetProxy tileSet;
+    TileMapProxy tileMap;
 
 private:
 
@@ -123,6 +165,9 @@ private:
     std::vector<Polygon2d> hitboxes;
 
     boost::shared_ptr<SFMLTextureWrapper> texture;
+
+    float oldX;
+    float oldY;
 };
 
 void DestroyTileMapObject(gd::Object * object);

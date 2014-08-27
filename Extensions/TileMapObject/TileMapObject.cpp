@@ -49,6 +49,9 @@ freely, subject to the following restrictions:
 #include "TileMapObjectEditor.h"
 #endif
 
+#include "TileMap.h"
+#include "TileSet.h"
+
 using namespace std;
 
 namespace
@@ -134,6 +137,98 @@ namespace
     }
 }
 
+/**
+ * TileMapProxy
+ */
+
+TileMapProxy::TileMapProxy() : m_tilemap(new TileMap())
+{
+
+}
+
+TileMapProxy::TileMapProxy(const TileMap &tilemap) : m_tilemap(new TileMap(tilemap))
+{
+
+}
+
+TileMapProxy::TileMapProxy(const TileMapProxy &other) : m_tilemap(new TileMap(*other.m_tilemap))
+{
+
+}
+
+TileMapProxy::~TileMapProxy()
+{
+    if(m_tilemap)
+        delete m_tilemap;
+}
+
+TileMapProxy& TileMapProxy::operator=(const TileMapProxy &other)
+{
+    if(m_tilemap)
+        delete m_tilemap;
+    m_tilemap = new TileMap(*other.m_tilemap);
+
+    return *this;
+}
+
+TileMap& TileMapProxy::Get()
+{
+    return *m_tilemap;
+}
+
+const TileMap& TileMapProxy::Get() const
+{
+    return *m_tilemap;
+}
+
+/**
+ * TileMapProxy
+ */
+
+TileSetProxy::TileSetProxy() : m_tileset(new TileSet())
+{
+
+}
+
+TileSetProxy::TileSetProxy(const TileSet &tileset) : m_tileset(new TileSet(tileset))
+{
+
+}
+
+TileSetProxy::TileSetProxy(const TileSetProxy &other) : m_tileset(new TileSet(*other.m_tileset))
+{
+
+}
+
+TileSetProxy::~TileSetProxy()
+{
+    if(m_tileset)
+        delete m_tileset;
+}
+
+TileSetProxy& TileSetProxy::operator=(const TileSetProxy &other)
+{
+    if(m_tileset)
+        delete m_tileset;
+    m_tileset = new TileSet(*other.m_tileset);
+
+    return *this;
+}
+
+TileSet& TileSetProxy::Get()
+{
+    return *m_tileset;
+}
+
+const TileSet& TileSetProxy::Get() const
+{
+    return *m_tileset;
+}
+
+/**
+ * TileMapObject
+ */
+
 TileMapObject::TileMapObject(std::string name_) :
     Object(name_),
     tileSet(),
@@ -146,42 +241,42 @@ void TileMapObject::DoUnserializeFrom(gd::Project & project, const gd::Serialize
 {
     if(element.HasChild("tileSet"))
     {
-        tileSet.UnserializeFrom(element.GetChild("tileSet"));
+        tileSet.Get().UnserializeFrom(element.GetChild("tileSet"));
     }
     if(element.HasChild("tileMap"))
     {
-        tileMap.UnserializeFrom(element.GetChild("tileMap"));
+        tileMap.Get().UnserializeFrom(element.GetChild("tileMap"));
     }
 }
 
 float TileMapObject::GetWidth() const
 {
-    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+    if(tileSet.Get().IsDirty() || tileMap.Get().GetColumnsCount() == 0 || tileMap.Get().GetRowsCount() == 0)
         return 200.f;
     else
-        return tileMap.GetColumnsCount() * tileSet.tileSize.x;
+        return tileMap.Get().GetColumnsCount() * tileSet.Get().tileSize.x;
 }
 
 float TileMapObject::GetHeight() const
 {
-    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+    if(tileSet.Get().IsDirty() || tileMap.Get().GetColumnsCount() == 0 || tileMap.Get().GetRowsCount() == 0)
         return 150.f;
     else
-        return tileMap.GetRowsCount() * tileSet.tileSize.y;
+        return tileMap.Get().GetRowsCount() * tileSet.Get().tileSize.y;
 }
 
 #if defined(GD_IDE_ONLY)
 void TileMapObject::DoSerializeTo(gd::SerializerElement & element) const
 {
-    tileSet.SerializeTo(element.AddChild("tileSet"));
-    tileMap.SerializeTo(element.AddChild("tileMap"));
+    tileSet.Get().SerializeTo(element.AddChild("tileSet"));
+    tileMap.Get().SerializeTo(element.AddChild("tileMap"));
 }
 
 void TileMapObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    tileSet.LoadResources(project);
-    tileSet.Generate();
-    vertexArray = GenerateVertexArray(tileSet, tileMap);
+    tileSet.Get().LoadResources(project);
+    tileSet.Get().Generate();
+    vertexArray = GenerateVertexArray(tileSet.Get(), tileMap.Get());
 }
 #endif
 
@@ -189,7 +284,9 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
     RuntimeObject(scene, object),
     tileSet(),
     tileMap(),
-    vertexArray(sf::Quads)
+    vertexArray(sf::Quads),
+    oldX(0),
+    oldY(0)
 {
     const TileMapObject & tileMapObject = static_cast<const TileMapObject&>(object);
 
@@ -197,10 +294,10 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
     tileMap = tileMapObject.tileMap;
 
     //Load the tileset and generate the vertex array
-    tileSet.LoadResources(*(scene.game));
-    tileSet.Generate();
-    vertexArray = GenerateVertexArray(tileSet, tileMap);
-    hitboxes = GenerateHitboxes(tileSet, tileMap);
+    tileSet.Get().LoadResources(*(scene.game));
+    tileSet.Get().Generate();
+    vertexArray = GenerateVertexArray(tileSet.Get(), tileMap.Get());
+    hitboxes = GenerateHitboxes(tileSet.Get(), tileMap.Get());
 }
 
 /**
@@ -216,13 +313,13 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
     transform.translate(GetX(), GetY());
     
     //Unsmooth the texture
-    bool wasSmooth = tileSet.GetTexture().isSmooth();
-    tileSet.GetTexture().setSmooth(false);
+    bool wasSmooth = tileSet.Get().GetTexture().isSmooth();
+    tileSet.Get().GetTexture().setSmooth(false);
 
     //Draw the tilemap
-    window.draw(vertexArray, sf::RenderStates(sf::BlendAlpha, transform, &tileSet.GetTexture(), NULL));
+    window.draw(vertexArray, sf::RenderStates(sf::BlendAlpha, transform, &tileSet.Get().GetTexture(), NULL));
 
-    tileSet.GetTexture().setSmooth(wasSmooth);
+    tileSet.Get().GetTexture().setSmooth(wasSmooth);
 
     return true;
 }
@@ -230,27 +327,41 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
 
 float RuntimeTileMapObject::GetWidth() const
 {
-    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+    if(tileSet.Get().IsDirty() || tileMap.Get().GetColumnsCount() == 0 || tileMap.Get().GetRowsCount() == 0)
         return 200.f;
     else
-        return tileMap.GetColumnsCount() * tileSet.tileSize.x;
+        return tileMap.Get().GetColumnsCount() * tileSet.Get().tileSize.x;
 }
 
 float RuntimeTileMapObject::GetHeight() const
 {
-    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+    if(tileSet.Get().IsDirty() || tileMap.Get().GetColumnsCount() == 0 || tileMap.Get().GetRowsCount() == 0)
         return 150.f;
     else
-        return tileMap.GetRowsCount() * tileSet.tileSize.y;
+        return tileMap.Get().GetRowsCount() * tileSet.Get().tileSize.y;
+}
+
+void RuntimeTileMapObject::OnPositionChanged()
+{
+    std::cout << "Moving by " << GetX() - oldX << " pixels (X)" << std::endl;
+
+    //Moves all hitboxes (use the previous pos to move them)
+    for(std::vector<Polygon2d>::iterator it = hitboxes.begin(); it != hitboxes.end(); it++)
+    {
+        it->Move(GetX() - oldX, GetY() - oldY);
+    }
+
+    oldX = GetX();
+    oldY = GetY();
 }
 
 #if defined(GD_IDE_ONLY)
 sf::Vector2f TileMapObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
-    if(tileSet.IsDirty() || tileMap.GetColumnsCount() == 0 || tileMap.GetRowsCount() == 0)
+    if(tileSet.Get().IsDirty() || tileMap.Get().GetColumnsCount() == 0 || tileMap.Get().GetRowsCount() == 0)
         return sf::Vector2f(200.f, 150.f);
     else
-        return sf::Vector2f(tileMap.GetColumnsCount() * tileSet.tileSize.x, tileMap.GetRowsCount() * tileSet.tileSize.y);
+        return sf::Vector2f(tileMap.Get().GetColumnsCount() * tileSet.Get().tileSize.x, tileMap.Get().GetRowsCount() * tileSet.Get().tileSize.y);
 }
 
 /**
@@ -258,7 +369,7 @@ sf::Vector2f TileMapObject::GetInitialInstanceDefaultSize(gd::InitialInstance & 
  */
 void TileMapObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    if(tileSet.IsDirty())
+    if(tileSet.Get().IsDirty())
         return;
 
     //Construct the transform
@@ -266,18 +377,18 @@ void TileMapObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rend
     transform.translate(instance.GetX(), instance.GetY());
 
     //Unsmooth the texture
-    bool wasSmooth = tileSet.GetTexture().isSmooth();
-    tileSet.GetTexture().setSmooth(false);
+    bool wasSmooth = tileSet.Get().GetTexture().isSmooth();
+    tileSet.Get().GetTexture().setSmooth(false);
 
     //Draw the tilemap
-    renderTarget.draw(vertexArray, sf::RenderStates(sf::BlendAlpha, transform, &tileSet.GetTexture(), NULL));
+    renderTarget.draw(vertexArray, sf::RenderStates(sf::BlendAlpha, transform, &tileSet.Get().GetTexture(), NULL));
 
-    tileSet.GetTexture().setSmooth(wasSmooth);
+    tileSet.Get().GetTexture().setSmooth(wasSmooth);
 }
 
 void TileMapObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    worker.ExposeImage(tileSet.textureName);
+    worker.ExposeImage(tileSet.Get().textureName);
 }
 
 bool TileMapObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const

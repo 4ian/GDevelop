@@ -55,8 +55,8 @@ TileMapObjectEditorBase(parent),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_),
 object(object_),
-tileSet(object.tileSet),
-tileMap(object.tileMap),
+tileSet(object.tileSet.Get()),
+tileMap(object.tileMap.Get()),
 m_tileEditorPanel(new TileEditor(this))
 {
     m_tileSetPanel->SetTileSet(&tileSet);
@@ -136,8 +136,8 @@ void TileMapObjectEditor::OnCancelButtonPressed(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
 {
-    object.tileSet = tileSet;
-    object.tileMap = tileMap;
+    object.tileSet = TileSetProxy(tileSet);
+    object.tileMap = TileMapProxy(tileMap);
 
     EndModal(1);
 }

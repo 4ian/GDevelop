@@ -43,6 +43,7 @@ protected:
     wxStaticText* m_staticText355;
     wxChoice* m_layerChoice;
     TileMapPanel* m_tileMapPanel;
+    wxStaticText* m_staticText448;
     wxStdDialogButtonSizer* m_stdBtnSizer60;
     wxButton* m_button62;
     wxButton* m_button64;

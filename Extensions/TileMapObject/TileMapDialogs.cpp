@@ -105,6 +105,10 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer7->Add(m_tileMapPanel, 0, wxALL|wxEXPAND, 5);
     
+    m_staticText448 = new wxStaticText(m_mainPanel, wxID_ANY, _("Use left mouse click to add the current tile and right click to remove it."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer7->Add(m_staticText448, 0, wxALL, 5);
+    
     m_stdBtnSizer60 = new wxStdDialogButtonSizer();
     
     flexGridSizer200->Add(m_stdBtnSizer60, 0, wxALL|wxEXPAND, 5);

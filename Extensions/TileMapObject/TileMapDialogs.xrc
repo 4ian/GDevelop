@@ -189,6 +189,16 @@
                     <scrollrate>5,5</scrollrate>
                   </object>
                 </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText448">
+                    <label>
+                      <![CDATA[Use left mouse click to add the current tile and right click to remove it.]]>
+                    </label>
+                    <style/>
+                  </object>
+                </object>
               </object>
             </object>
             <object class="sizeritem">

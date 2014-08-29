@@ -2,15 +2,32 @@
 
 #include <algorithm>
 #include <wx/dcbuffer.h>
+#include <wx/event.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
 
 TileEditor::TileEditor(wxWindow* parent) : 
-	TileEditorBase(parent),
-	m_tileset(NULL),
-	m_currentTile(0)
+    TileEditorBase(parent),
+    m_tileset(NULL),
+    m_currentTile(0),
+    m_predefinedShapesMenu(new wxMenu())
 {
-	m_tilePreviewPanel->SetBackgroundStyle(wxBG_STYLE_PAINT);
-	UpdateScrollbars();
+    m_tilePreviewPanel->SetBackgroundStyle(wxBG_STYLE_PAINT);
+    UpdateScrollbars();
+
+    //Create the predefined shape menu
+    m_predefinedShapesMenu->Append(RECTANGLE_SHAPE_TOOL_ID, _("Rectangle Shape"));
+    m_predefinedShapesMenu->AppendSeparator();
+    m_predefinedShapesMenu->Append(TRIANGLE_TL_SHAPE_TOOL_ID, _("Triangle Shape (top-left)"));
+    m_predefinedShapesMenu->Append(TRIANGLE_TR_SHAPE_TOOL_ID, _("Triangle Shape (top-right)"));
+    m_predefinedShapesMenu->Append(TRIANGLE_BR_SHAPE_TOOL_ID, _("Triangle Shape (bottom-right)"));
+    m_predefinedShapesMenu->Append(TRIANGLE_BL_SHAPE_TOOL_ID, _("Triangle Shape (bottom-left)"));
+    m_predefinedShapesMenu->AppendSeparator();
+    m_predefinedShapesMenu->Append(SEMIRECT_T_SHAPE_TOOL_ID, _("Half-rectangle (top)"));
+    m_predefinedShapesMenu->Append(SEMIRECT_R_SHAPE_TOOL_ID, _("Half-rectangle (right)"));
+    m_predefinedShapesMenu->Append(SEMIRECT_B_SHAPE_TOOL_ID, _("Half-rectangle (bottom)"));
+    m_predefinedShapesMenu->Append(SEMIRECT_L_SHAPE_TOOL_ID, _("Half-rectangle (left)"));
+
+    Connect(RECTANGLE_SHAPE_TOOL_ID, SEMIRECT_L_SHAPE_TOOL_ID, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TileEditor::OnPredefinedShapeMenuItemClicked), NULL, this);
 }
 
 TileEditor::~TileEditor()
@@ -19,19 +36,24 @@ TileEditor::~TileEditor()
 
 void TileEditor::SetTileSet(TileSet *tileset)
 {
-	m_tileset = tileset;
-	UpdateScrollbars();
-	m_tilePreviewPanel->Refresh();
+    m_tileset = tileset;
+    UpdateScrollbars();
+    m_tilePreviewPanel->Refresh();
+
+    //Update the tools according to the selected tile
+    TileSelectionEvent event(TILE_SELECTION_CHANGED, -1, m_currentTile);
+    OnTileSetSelectionChanged(event);
 }
 
 void TileEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
 {
-	if(!m_tileset || m_tileset->IsDirty())
-		return;
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
 
-	m_currentTile = event.GetSelectedTile();
-	UpdateScrollbars();
-	m_tilePreviewPanel->Refresh();
+    m_currentTile = event.GetSelectedTile();
+    m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->GetTileHitbox(m_currentTile).collidable);
+    UpdateScrollbars();
+    m_tilePreviewPanel->Refresh();
 }
 
 void TileEditor::OnPreviewErase(wxEraseEvent& event)
@@ -41,7 +63,7 @@ void TileEditor::OnPreviewErase(wxEraseEvent& event)
 
 void TileEditor::UpdateScrollbars()
 {
-	if(!m_tileset || m_tileset->IsDirty()) //If no tileset, stop rendering here
+    if(!m_tileset || m_tileset->IsDirty()) //If no tileset, stop rendering here
         return;
 
     //Compute the virtual size and the default scroll position to have a centered tile.
@@ -53,13 +75,13 @@ void TileEditor::UpdateScrollbars()
     m_tilePreviewPanel->SetVirtualSize(virtualWidth, virtualHeight);
 
     m_tilePreviewPanel->Scroll(virtualWidth/2 - m_tilePreviewPanel->GetClientSize().GetWidth()/2,
-    						   virtualHeight/2 - m_tilePreviewPanel->GetClientSize().GetHeight()/2);
+                               virtualHeight/2 - m_tilePreviewPanel->GetClientSize().GetHeight()/2);
 }
 
 void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 {
-	//Prepare the render
-	wxAutoBufferedPaintDC dc(m_tilePreviewPanel);
+    //Prepare the render
+    wxAutoBufferedPaintDC dc(m_tilePreviewPanel);
     m_tilePreviewPanel->DoPrepareDC(dc);
 
     wxPoint minPos = m_tilePreviewPanel->GetViewStart();
@@ -86,8 +108,62 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
     {
         list.push_back(new wxPoint(m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].x, 
-        						   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
+                                   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
     }
 
     dc.DrawPolygon(&list, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
+}
+
+void TileEditor::OnCollidableToolToggled(wxCommandEvent& event)
+{ 
+    m_tileset->GetTileHitbox(m_currentTile).collidable = event.IsChecked();
+}
+
+void TileEditor::OnPredefinedShapeToolClicked(wxCommandEvent& event)
+{
+    PopupMenu(m_predefinedShapesMenu);
+}
+
+void TileEditor::OnPredefinedShapeMenuItemClicked(wxCommandEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    //Set the predefined shapes as hitbox
+    switch(event.GetId())
+    {
+        case RECTANGLE_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(m_tileset->tileSize);
+            break;
+        case TRIANGLE_TL_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::TopLeft);
+            break;
+        case TRIANGLE_TR_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::TopRight);
+            break;
+        case TRIANGLE_BR_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::BottomRight);
+            break;
+        case TRIANGLE_BL_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::BottomLeft);
+            break;
+        case SEMIRECT_T_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x, m_tileset->tileSize.y/2.f));
+            break;
+        case SEMIRECT_R_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x/2.f, m_tileset->tileSize.y));
+            m_tileset->GetTileHitbox(m_currentTile).hitbox.Move(m_tileset->tileSize.x/2.f, 0);
+            break;
+        case SEMIRECT_B_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x, m_tileset->tileSize.y/2.f));
+            m_tileset->GetTileHitbox(m_currentTile).hitbox.Move(0, m_tileset->tileSize.y/2.f);
+            break;
+        case SEMIRECT_L_SHAPE_TOOL_ID:
+            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x/2.f, m_tileset->tileSize.y));
+            break;
+    }
+
+    //Update the tools according to the properties' changes
+    TileSelectionEvent tileEvent(TILE_SELECTION_CHANGED, -1, m_currentTile);
+    OnTileSetSelectionChanged(tileEvent);
 }

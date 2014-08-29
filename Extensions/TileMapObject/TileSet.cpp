@@ -23,6 +23,26 @@ TileHitbox TileHitbox::Rectangle(sf::Vector2f tileSize)
     return hitbox;
 }
 
+TileHitbox TileHitbox::Triangle(sf::Vector2f tileSize, TriangleOrientation orientation)
+{
+    TileHitbox hitbox;
+    hitbox.collidable = true;
+
+    if(orientation != TileHitbox::BottomRight)
+        hitbox.hitbox.vertices.push_back(sf::Vector2f(0,0));
+
+    if(orientation != TileHitbox::BottomLeft)
+        hitbox.hitbox.vertices.push_back(sf::Vector2f(tileSize.x,0));
+
+    if(orientation != TileHitbox::TopLeft)
+        hitbox.hitbox.vertices.push_back(tileSize);
+
+    if(orientation != TileHitbox::TopRight)
+        hitbox.hitbox.vertices.push_back(sf::Vector2f(0,tileSize.y));
+
+    return hitbox;
+}
+
 void TileHitbox::SerializeTo(gd::SerializerElement &element) const
 {
     element.SetAttribute("collidable", collidable);

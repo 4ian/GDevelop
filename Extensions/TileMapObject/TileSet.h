@@ -24,6 +24,14 @@ struct TileTextureCoords
 
 struct TileHitbox
 {
+    enum TriangleOrientation
+    {
+        TopLeft,
+        TopRight,
+        BottomRight,
+        BottomLeft
+    };
+
     bool collidable;
     Polygon2d hitbox;
 
@@ -31,6 +39,13 @@ struct TileHitbox
      * Generates a default hitbox (rectangle of the size of the tile).
      */
     static TileHitbox Rectangle(sf::Vector2f tileSize);
+
+    /**
+     * Generates a right-angled triangle (which fit in a tile).
+     * \param tileSize the size of the tile
+     * \param orientation specify where the right angle should be
+     */
+    static TileHitbox Triangle(sf::Vector2f tileSize, TriangleOrientation orientation);
 
     /**
      * Serialize the TileHitbox into the given gd::SerializerElement.

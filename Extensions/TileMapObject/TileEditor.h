@@ -1,7 +1,9 @@
 #ifndef TILEEDITOR_H
 #define TILEEDITOR_H
-#include "TileMapDialogs.h"
 
+#include <wx/menu.h>
+
+#include "TileMapDialogs.h"
 #include "TileSet.h"
 
 class TileEditor : public TileEditorBase
@@ -17,10 +19,16 @@ public:
 
 private:
 	TileSet *m_tileset;
-
 	int m_currentTile;
+
+	wxMenu *m_predefinedShapesMenu;
+
 protected:
+    virtual void OnPredefinedShapeToolClicked(wxCommandEvent& event);
+    virtual void OnCollidableToolToggled(wxCommandEvent& event);
     virtual void OnPreviewErase(wxEraseEvent& event);
     virtual void OnPreviewPaint(wxPaintEvent& event);
+
+    void OnPredefinedShapeMenuItemClicked(wxCommandEvent& event);
 };
 #endif // TILEEDITOR_H

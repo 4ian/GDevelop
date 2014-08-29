@@ -123,11 +123,14 @@ public:
 class TileEditorBase : public wxPanel
 {
 protected:
-    wxToolBar* m_toolbar404;
+    wxToolBar* m_mainToolbar;
+    wxPanel* m_justToHideToolbar;
     wxToolBar* m_toolbar418;
     wxScrolledWindow* m_tilePreviewPanel;
 
 protected:
+    virtual void OnCollidableToolToggled(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnPredefinedShapeToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnPreviewPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void OnPreviewErase(wxEraseEvent& event) { event.Skip(); }
 

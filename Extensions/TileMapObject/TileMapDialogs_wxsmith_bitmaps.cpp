@@ -455,8 +455,22 @@ static unsigned char xml_res_file_8[] = {
 221,165,116,240,50,93,39,126,1,157,215,183,111,35,213,143,230,0,0,0,0,73,
 69,78,68,174,66,96,130};
 
-static size_t xml_res_size_9 = 278;
+static size_t xml_res_size_9 = 242;
 static unsigned char xml_res_file_9[] = {
+137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,16,0,0,0,16,8,6,0,0,
+0,31,243,255,97,0,0,0,1,115,82,71,66,0,174,206,28,233,0,0,0,4,103,65,77,
+65,0,0,177,143,11,252,97,5,0,0,0,9,112,72,89,115,0,0,14,195,0,0,14,195,
+1,199,111,168,100,0,0,0,24,116,69,88,116,83,111,102,116,119,97,114,101,
+0,112,97,105,110,116,46,110,101,116,32,52,46,48,46,51,140,230,151,80,0,
+0,0,99,73,68,65,84,56,79,165,204,217,13,128,48,16,3,81,122,129,10,232,145,
+46,232,41,37,5,13,2,196,145,99,109,86,114,148,159,121,195,159,27,215,148,
+143,175,126,196,54,64,56,205,139,7,156,177,5,220,99,25,120,199,18,80,138,
+195,64,45,102,93,160,21,179,38,208,139,89,21,136,196,172,8,68,99,246,1,
+148,152,61,0,53,102,23,224,196,108,7,120,252,165,188,1,223,94,27,87,47,
+146,220,102,0,0,0,0,73,69,78,68,174,66,96,130};
+
+static size_t xml_res_size_10 = 278;
+static unsigned char xml_res_file_10[] = {
 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,16,0,0,0,16,8,6,0,0,
 0,31,243,255,97,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,205,73,
 68,65,84,56,141,99,252,255,255,63,3,37,128,9,155,160,247,198,167,203,200,
@@ -471,8 +485,8 @@ static unsigned char xml_res_file_9[] = {
 39,11,219,184,205,88,246,255,255,127,212,104,36,7,0,0,132,192,138,139,110,
 249,27,234,0,0,0,0,73,69,78,68,174,66,96,130};
 
-static size_t xml_res_size_10 = 1704;
-static unsigned char xml_res_file_10[] = {
+static size_t xml_res_size_11 = 1870;
+static unsigned char xml_res_file_11[] = {
 60,63,120,109,108,32,118,101,114,115,105,111,110,61,34,49,46,48,34,32,101,
 110,99,111,100,105,110,103,61,34,85,84,70,45,56,34,63,62,10,60,114,101,
 115,111,117,114,99,101,32,120,109,108,110,115,61,34,104,116,116,112,58,
@@ -551,13 +565,21 @@ static unsigned char xml_res_file_10[] = {
 102,97,117,108,116,95,114,101,109,111,118,101,49,54,46,112,110,103,60,47,
 111,98,106,101,99,116,62,10,32,32,60,111,98,106,101,99,116,32,99,108,97,
 115,115,61,34,119,120,66,105,116,109,97,112,34,32,110,97,109,101,61,34,
-117,110,100,111,49,54,34,62,84,105,108,101,77,97,112,68,105,97,108,111,
-103,115,95,119,120,115,109,105,116,104,95,98,105,116,109,97,112,115,46,
-99,112,112,36,46,46,95,46,46,95,66,105,110,97,114,105,101,115,95,79,117,
-116,112,117,116,95,82,101,108,101,97,115,101,95,87,105,110,100,111,119,
-115,95,114,101,115,95,105,99,111,110,115,95,100,101,102,97,117,108,116,
-95,117,110,100,111,49,54,46,112,110,103,60,47,111,98,106,101,99,116,62,
-10,60,47,114,101,115,111,117,114,99,101,62,10};
+116,105,108,101,109,97,115,107,116,114,105,97,110,103,108,101,98,114,49,
+54,34,62,84,105,108,101,77,97,112,68,105,97,108,111,103,115,95,119,120,
+115,109,105,116,104,95,98,105,116,109,97,112,115,46,99,112,112,36,46,46,
+95,46,46,95,66,105,110,97,114,105,101,115,95,79,117,116,112,117,116,95,
+82,101,108,101,97,115,101,95,87,105,110,100,111,119,115,95,114,101,115,
+95,116,105,108,101,109,97,115,107,116,114,105,97,110,103,108,101,98,114,
+49,54,46,112,110,103,60,47,111,98,106,101,99,116,62,10,32,32,60,111,98,
+106,101,99,116,32,99,108,97,115,115,61,34,119,120,66,105,116,109,97,112,
+34,32,110,97,109,101,61,34,117,110,100,111,49,54,34,62,84,105,108,101,77,
+97,112,68,105,97,108,111,103,115,95,119,120,115,109,105,116,104,95,98,105,
+116,109,97,112,115,46,99,112,112,36,46,46,95,46,46,95,66,105,110,97,114,
+105,101,115,95,79,117,116,112,117,116,95,82,101,108,101,97,115,101,95,87,
+105,110,100,111,119,115,95,114,101,115,95,105,99,111,110,115,95,100,101,
+102,97,117,108,116,95,117,110,100,111,49,54,46,112,110,103,60,47,111,98,
+106,101,99,116,62,10,60,47,114,101,115,111,117,114,99,101,62,10};
 
 void wxCF6DCInitBitmapResources()
 {
@@ -581,7 +603,8 @@ void wxCF6DCInitBitmapResources()
     XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_options16.png"), xml_res_file_6, xml_res_size_6, wxT("image/png"));
     XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_CppPlatform_Extensions_pathfindingobstacleicon16.png"), xml_res_file_7, xml_res_size_7, wxT("image/png"));
     XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_remove16.png"), xml_res_file_8, xml_res_size_8, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_undo16.png"), xml_res_file_9, xml_res_size_9, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"), xml_res_file_10, xml_res_size_10, wxT("text/xml"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_tilemasktrianglebr16.png"), xml_res_file_9, xml_res_size_9, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_undo16.png"), xml_res_file_10, xml_res_size_10, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"), xml_res_file_11, xml_res_size_11, wxT("text/xml"));
     wxXmlResource::Get()->Load(wxT("memory:XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"));
 }

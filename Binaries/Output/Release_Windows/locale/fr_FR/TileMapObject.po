@@ -1,0 +1,241 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Game Develop\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-08-29 22:43+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Victor Levasseur <victorlevasseur01@orange.fr>\n"
+"Language-Team: Florian \"4ian\" Rival <Florian.rival@gmail.com>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: s;\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-Basepath: ../../../../..\n"
+"X-Poedit-SearchPath-0: Extensions/TileMapObject\n"
+
+#: Extensions/TileMapObject/Extension.cpp:41
+msgid "Tile Map Object"
+msgstr "Object carte de tuiles"
+
+#: Extensions/TileMapObject/Extension.cpp:42
+msgid "Extension allowing to use tile map objects."
+msgstr ""
+"Extension permettant d'utiliser des objets pour dessiner un carte avec des "
+"tuiles."
+
+#: Extensions/TileMapObject/Extension.cpp:47
+msgid "Tile Map"
+msgstr "Carte de tuiles"
+
+#: Extensions/TileMapObject/Extension.cpp:48
+msgid "Displays a tile map"
+msgstr "Affiche une carte de tuiles"
+
+#: Extensions/TileMapObject/TileEditor.cpp:18
+msgid "Rectangle Shape"
+msgstr "Rectangle"
+
+#: Extensions/TileMapObject/TileEditor.cpp:20
+msgid "Triangle Shape (top-left)"
+msgstr "Triangle (en haut à gauche)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:21
+msgid "Triangle Shape (top-right)"
+msgstr "Triangle (en haut à droite)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:22
+msgid "Triangle Shape (bottom-right)"
+msgstr "Triangle (en bas à droite)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:23
+msgid "Triangle Shape (bottom-left)"
+msgstr "Triangle (en bas à gauche)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:25
+msgid "Half-rectangle (top)"
+msgstr "Demi-rectangle (haut)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:26
+msgid "Half-rectangle (right)"
+msgstr "Demi-rectangle (droite)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:27
+msgid "Half-rectangle (bottom)"
+msgstr "Demi-rectangle (bas)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:28
+msgid "Half-rectangle (left)"
+msgstr "Demi-rectangle (gauche)"
+
+#: Extensions/TileMapObject/TileMapConfigurationEditor.cpp:32
+msgid ""
+"The map will be smaller after that change. You can possibly lose data.\n"
+"Are you sure to continue ?"
+msgstr ""
+"La carte sera plus petite après ce changement. Des données seront perdues.\n"
+"Etes-vous sûr(e) de continuer ?"
+
+#: Extensions/TileMapObject/TileMapConfigurationEditor.cpp:33
+msgid "Map size"
+msgstr "Taille de la carte"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:34
+msgid "Tileset"
+msgstr "Jeu de tuiles"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:48
+msgid "Configure the tileset"
+msgstr "Configurer le jeu de tuiles"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:50
+msgid "Edit the selected tile"
+msgstr "Editer la tuile sélectionnée"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:50
+msgid "Opens the tile editor to edit the tile collision mask."
+msgstr "Ouvre l'éditeur de tuiles pour éditer son masque de collision."
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:75
+msgid "Change map size"
+msgstr "Changer la taille de la carte"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:79
+msgid "Current layer:"
+msgstr "Calque actuel:"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:92
+msgid "Hide upper layers"
+msgstr "Cacher les calques supérieurs"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:108
+msgid ""
+"Use left mouse click to add the current tile and right click to remove it."
+msgstr ""
+"Utiliser le clic gauche pour ajouter une tuile et le clic droit pour un "
+"supprimer une."
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:182
+msgid ""
+"The tileset is the texture containing all the tiles which will be used in "
+"your tilemap object."
+msgstr ""
+"Le jeu de tuiles consiste en la texture qui contient toutes les tuiles qui "
+"seront utilisée pour l'objet."
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:189
+msgid ""
+"Note: the tilemap object needs to have all the tiles in a single texture."
+msgstr "Note: l'objet carte de tuiles ne peut utiliser qu'une seule texture."
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:203
+msgid "Tileset texture:"
+msgstr "Texture du jeu de tuiles:"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:229
+msgid "Tile size:"
+msgstr "Taille des tuiles:"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:248
+#: Extensions/TileMapObject/TileMapDialogs.cpp:281
+#: Extensions/TileMapObject/TileMapDialogs.cpp:371
+msgid "x"
+msgstr "x"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:258
+#: Extensions/TileMapObject/TileMapDialogs.cpp:291
+msgid "pixels"
+msgstr "pixels"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:262
+msgid "Tile spacing:"
+msgstr "Espace entre les tuiles:"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:353
+msgid "Map size:"
+msgstr "Taille de la carte:"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:381
+msgid "tiles"
+msgstr "tuiles"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:444
+msgid "Collidable"
+msgstr "Collisions ?"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:444
+msgid "Activates the collision mask for collision detection"
+msgstr "Active le masque de collision"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:446
+msgid "Use a predefined shape"
+msgstr "Utiliser une forme prédéfinie"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:464
+msgid "Add a point"
+msgstr "Ajouter un point"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:464
+msgid "Add a point to the collision mask"
+msgstr "Ajouter un point au masque de collision"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:466
+msgid "Edit point position..."
+msgstr "Editer la position du point..."
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:466
+msgid "Edit the selected point position..."
+msgstr "Edite la position du point sélectionné..."
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:468
+msgid "Remove selected point"
+msgstr "Supprimer le point sélectionné"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:468
+msgid "Removes the selected point"
+msgstr "Supprime le point sélectionné"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:470
+msgid "Reset to the default collision mask"
+msgstr "Rétablir le masque de collision par défaut"
+
+#: Extensions/TileMapObject/TileMapDialogs.cpp:470
+msgid "Reset the tile collision mask to the default one"
+msgstr "Rétablit le masque de collision par défaut de la tuile"
+
+#: Extensions/TileMapObject/TileMapObjectEditor.cpp:76
+msgid "Tile editor"
+msgstr "Editeur de tuile"
+
+#: Extensions/TileMapObject/TileSetConfigurationEditor.cpp:19
+msgid "Images bank's editor"
+msgstr "Editeur de la banque d'images"
+
+#: Extensions/TileMapObject/TileSetConfigurationEditor.cpp:48
+msgid ""
+"Please display the image bank's editor and select an image before clicking "
+"on this button."
+msgstr ""
+"Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de "
+"cliquer sur ce bouton."
+
+#: Extensions/TileMapObject/TileSetPanel.cpp:94
+msgid ""
+"You haven't selected a tileset yet.\n"
+"Click on \"Configure the tileset\" to choose one."
+msgstr ""
+"Vous n'avez pas encore choisi un jeu de tuiles.\n"
+"Cliquer sur \"Configurer le jeu de tuiles\" pour en choisir un."
+
+#: Extensions/TileMapObject/TileMapDialogs.h:61
+msgid "TileMap Object Editor"
+msgstr "Editeur de carte de tuiles"
+
+#: Extensions/TileMapObject/TileMapDialogs.h:97
+msgid "Tileset configuration"
+msgstr "Configuration du jeu de tuiles"
+
+#: Extensions/TileMapObject/TileMapDialogs.h:119
+msgid "Tilemap size configuration"
+msgstr "Configuration de la taille de la carte"

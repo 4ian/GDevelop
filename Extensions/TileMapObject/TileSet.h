@@ -14,6 +14,9 @@
 #include <GDCpp/Polygon.h>
 #include <GDCpp/RuntimeGame.h>
 
+/**
+ * \brief Contains the coordinates of the texture sub-rect
+ */
 struct TileTextureCoords
 {
     sf::Vector2f topLeft;
@@ -24,16 +27,19 @@ struct TileTextureCoords
 
 struct TileHitbox
 {
+    /**
+     * Used to specify the position of the right angle of a right-angled triangle
+     */
     enum TriangleOrientation
     {
-        TopLeft,
-        TopRight,
-        BottomRight,
-        BottomLeft
+        TopLeft, ///< In the top-left hand corner
+        TopRight, ///< In the top-right hand corner
+        BottomRight, ///< In the bottom-right hand corner
+        BottomLeft ///< In the bottom-left hand corner
     };
 
-    bool collidable;
-    Polygon2d hitbox;
+    bool collidable; ///< True to make the tile collidable
+    Polygon2d hitbox; ///< The polygonal hitbox
 
     /**
      * Generates a default hitbox (rectangle of the size of the tile).
@@ -55,11 +61,18 @@ struct TileHitbox
     /**
      * Unserialize the TileHitBox from the giver gd::SerializerElement.
      * \param element the serializer element
-     * \param the tile size to create a default collision rectangle if the collision polygon is not set.
+     * \param defaultTileSize the tile size to create a default collision rectangle if the collision polygon is not set.
      */
     void UnserializeFrom(const gd::SerializerElement &element, sf::Vector2f defaultTileSize);
 };
 
+/**
+ * \brief Contains all the stuff related to the tileset (the texture containing all tiles).
+ *
+ * The TileSet class contains the texture name (path), the tile size and the tile spacing (space between tiles on the texture).
+ * 
+ * Before the first use or after a texture change, you will need to call TileSet::LoadResources to load the texture from the ImageManager.
+ */
 class TileSet
 {
 
@@ -72,36 +85,42 @@ public:
     sf::Vector2f tileSpacing; ///< Space between tile on the tileset texture.
 
     /**
+     * \name Loading and computations
+     */
+    ///\{
+    /**
      * Returns true if the tileset hasn't been loaded and generated from a picture.
+     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName or 
+     * if the TileSet::tileSize or TileSet::tileSpacing have been modified as the object is not in a invalid state.
      */
     bool IsDirty() const {return m_dirty;};
 
     /**
-     * Load the image for the tilemap.
+     * Load the image for the tilemap. Need to be called when using the TileSet for the first or after a texture change.
+     * \note This function overload is used to load the texture before using the TileSet
+     * at edit time or in the TileMapObjectEditor because it also loads the texture as a wxBitmap.
      */
     void LoadResources(gd::Project &game);
+
+    /**
+     * Load the image for the tilemap. Need to be called when using the TileSet for the first or after a texture change.
+     * \note This function overload is used to load the texture before using the TileSet
+     * in the scene preview or in a release game.
+     */
     void LoadResources(RuntimeGame &game);
 
     /**
      * Generate the tile texture coords and temporary bitmaps for the IDE.
+     * Need to be called after a change in TileSet::textureName (in that case after TileSet::LoadResources) or after a change in the TileSet::tileSize or TileSet::tileSpacing.
+     * \sa TileSet::LoadResources
      */
     void Generate();
+    ///\}
 
     /**
-     * Reset the hitbox for all tiles
+     * \name Textures
      */
-    void ResetHitboxes();
-
-    /**
-     * Return the tile ID according to its position.
-     */
-    int GetTileIDFromPosition(sf::Vector2f position);
-
-    /**
-     * Return the tile ID according to its row and column.
-     */
-    int GetTileIDFromCell(int col, int row);
-
+    ///\{
 #ifdef GD_IDE_ONLY
     /**
      * Returns the tileset bitmap
@@ -115,57 +134,94 @@ public:
 #endif
 
     /**
-     * Returns the SFML texture.
+     * \return the SFML texture.
      */
     sf::Texture& GetTexture();
 
     /**
-     * Returns the SFML texture (read-only).
+     * \return the SFML texture (read-only).
      */
     const sf::Texture& GetTexture() const;
 
     /**
-     * Get the tile texture coords (four sf::Vector2f) from its ID
+     * \return the tile texture coords (four sf::Vector2f) from its ID
      */
     TileTextureCoords GetTileTextureCoords(int id) const;
 
     /**
-     * Returns the size of the tileset (in pixels)
+     * \return the size of the tileset (in pixels)
      */
     sf::Vector2u GetSize() const;
+    ///\}
 
     /**
-     * Get the hitbox of a tile.
+     * \name Hitbox
+     */
+    ///\{
+    /**
+     * Reset the hitbox for all tiles. Set a rectangular hitbox for each available tiles.
+     */
+    void ResetHitboxes();
+
+    /**
+     * \return the hitbox of a tile.
      */
     TileHitbox& GetTileHitbox(int id);
-    const TileHitbox& GetTileHitbox(int id) const;
 
     /**
-     * Returns the number of tiles of the tileset.
+     * \return the hitbox of a tile.
+     */
+    const TileHitbox& GetTileHitbox(int id) const;
+    ///\}
+
+    /**
+     * \name Tiles
+     */
+    ///\{
+    /**
+     * Return the tile ID according to its position.
+     */
+    int GetTileIDFromPosition(sf::Vector2f position);
+
+    /**
+     * Return the tile ID according to its row and column.
+     */
+    int GetTileIDFromCell(int col, int row);
+
+    /**
+     * \return the number of tiles of the tileset.
      */
     int GetTilesCount() const {return GetColumnsCount()*GetRowsCount();};
 
     /**
-     * Returns the number of columns of the tileset
+     * \return the number of columns of the tileset
      */
     int GetColumnsCount() const;
 
     /**
-     * Returns the number of rows of the tileset
+     * \return the number of rows of the tileset
      */
     int GetRowsCount() const;
+    ///\}
 
+    /**
+     * \name Serialization
+     */
+    ///\{
     #if defined(GD_IDE_ONLY)
     /**
      * Serialize the tileset into the given element
+     * \param element the element to serialize the TileSet into
      */
     void SerializeTo(gd::SerializerElement &element) const;
     #endif
 
     /**
      * Unserialize the tileset from the given element
+     * \param element the element to unserialize the TileSet from
      */
     void UnserializeFrom(const gd::SerializerElement &element);
+    ///\}
 
 private:
 

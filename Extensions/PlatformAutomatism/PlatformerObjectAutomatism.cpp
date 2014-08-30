@@ -72,7 +72,7 @@ PlatformerObjectAutomatism::PlatformerObjectAutomatism() :
     downKey(false),
     jumpKey(false)
 {
-    SetSlopeMaxAngle(45);
+    SetSlopeMaxAngle(60);
 }
 
 PlatformerObjectAutomatism::~PlatformerObjectAutomatism()

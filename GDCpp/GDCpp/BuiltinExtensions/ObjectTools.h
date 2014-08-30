@@ -19,9 +19,9 @@ struct GD_API ListsTestFuncExtraParameter
 /**
  * Used by MovesToward and ObjectsTurnedToward function to bring a extra parameter to the test function.
  */
-struct MovesTowardExtraParameter : public ListsTestFuncExtraParameter
+struct ToleranceExtraParameter : public ListsTestFuncExtraParameter
 {
-	MovesTowardExtraParameter(float tolerance_) : ListsTestFuncExtraParameter(), tolerance(tolerance_) {};
+	ToleranceExtraParameter(float tolerance_) : ListsTestFuncExtraParameter(), tolerance(tolerance_) {};
 
 	float tolerance;
 };

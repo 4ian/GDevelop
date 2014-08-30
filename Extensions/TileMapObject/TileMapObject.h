@@ -157,6 +157,8 @@ public :
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
+    bool IsCollidingWithTile(int tileLayer, int tileCol, int tileRow, std::map<std::string, std::vector<RuntimeObject*>*> objectsLists, bool isInverted);
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 

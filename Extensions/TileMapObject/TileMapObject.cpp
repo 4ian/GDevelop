@@ -428,6 +428,56 @@ std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes() const
     return hitboxes;
 }
 
+bool RuntimeTileMapObject::IsCollidingWithTile(int tileLayer, int tileCol, int tileRow, std::map<std::string, std::vector<RuntimeObject*>*> objectsLists, bool isInverted)
+{
+    //Prepare the the hitbox
+    if(tileSet.Get().IsDirty())
+        return false;
+
+    Polygon2d tileHitbox = tileSet.Get().GetTileHitbox(tileMap.Get().GetTile(tileLayer, tileCol, tileRow)).hitbox;
+    tileHitbox.Move(GetX() + tileCol * tileSet.Get().tileSize.x,
+                    GetY() + tileRow * tileSet.Get().tileSize.y);
+
+    bool collidesOne = false;
+
+    //Iterate through all objects
+    for(std::map<std::string, std::vector<RuntimeObject*>*>::iterator it = objectsLists.begin(); it != objectsLists.end(); ++it)
+    {
+        int i = 0;
+        while(i < it->second->size())
+        {
+            bool collides = false;
+            RuntimeObject *object = (*(it->second))[i];
+            std::vector<Polygon2d> objectHitboxes = object->GetHitBoxes();
+            for(std::vector<Polygon2d>::iterator hitboxIt = objectHitboxes.begin(); hitboxIt != objectHitboxes.end(); ++hitboxIt)
+            {
+                if(PolygonCollisionTest(tileHitbox, *hitboxIt).collision)
+                {
+                    std::cout << "Collision found !" << std::endl;
+
+                    collides = true;
+                    collidesOne = true;
+                    break;
+                }
+            }
+
+            //if((collides && !isInverted) || (!collides && isInverted))
+            ///TODO: Support the inverse condition
+            if(collides)
+            {
+                i++;         
+            }
+            else
+            {
+                it->second->erase(it->second->begin()+i);
+            }
+        }
+    }
+
+    return collidesOne;
+}
+
+
 void DestroyRuntimeTileMapObject(RuntimeObject * object)
 {
     delete object;

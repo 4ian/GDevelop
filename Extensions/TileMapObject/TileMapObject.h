@@ -129,6 +129,7 @@ private:
 
 class GD_EXTENSION_API RuntimeTileMapObject : public RuntimeObject
 {
+
 public :
 
     RuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);

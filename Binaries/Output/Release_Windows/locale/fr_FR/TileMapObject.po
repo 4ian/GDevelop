@@ -17,7 +17,7 @@ msgstr ""
 
 #: Extensions/TileMapObject/Extension.cpp:41
 msgid "Tile Map Object"
-msgstr "Object carte de tuiles"
+msgstr "Objet carte de tuiles"
 
 #: Extensions/TileMapObject/Extension.cpp:42
 msgid "Extension allowing to use tile map objects."

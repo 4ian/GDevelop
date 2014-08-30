@@ -40,6 +40,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon.h"
+#include "GDCpp/PolygonCollision.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 
@@ -343,8 +344,6 @@ float RuntimeTileMapObject::GetHeight() const
 
 void RuntimeTileMapObject::OnPositionChanged()
 {
-    std::cout << "Moving by " << GetX() - oldX << " pixels (X)" << std::endl;
-
     //Moves all hitboxes (use the previous pos to move them)
     for(std::vector<Polygon2d>::iterator it = hitboxes.begin(); it != hitboxes.end(); it++)
     {

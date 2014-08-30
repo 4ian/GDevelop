@@ -46,7 +46,7 @@ double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObje
 bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1,
                                std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2,
                                bool conditionInverted,
-                               TwoObjectsListsTestFunc functor, float extraParameter )
+                               TwoObjectsListsTestFunc functor, const ListsTestFuncExtraParameter &extraParameter )
 {
     bool isTrue = false;
 
@@ -162,57 +162,63 @@ bool GD_API TwoObjectListsTest(std::map <std::string, std::vector<RuntimeObject*
     return isTrue;
 }
 
-static bool HitBoxesInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float )
+static bool HitBoxesInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, const ListsTestFuncExtraParameter &extraParameter)
 {
     return obj1->IsCollidingWith(obj2);
 }
 
-bool GD_API HitBoxesCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+bool GD_API HitBoxesCollision(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
-    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, &HitBoxesInnerTest, 0);
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, &HitBoxesInnerTest, ListsTestFuncExtraParameter());
 }
 
-static bool TurnedTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float tolerance )
+static bool TurnedTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, const ListsTestFuncExtraParameter &extraParameter)
 {
+    const MovesTowardExtraParameter &moveExtraParam = dynamic_cast<const MovesTowardExtraParameter&>(extraParameter);
+
     double objAngle = atan2(obj2->GetDrawableY()+obj2->GetCenterY() - (obj1->GetDrawableY()+obj1->GetCenterY()),
                               obj2->GetDrawableX()+obj2->GetCenterX() - (obj1->GetDrawableX()+obj1->GetCenterX()));
     objAngle *= 180.0/3.14159;
 
-    return abs(GDpriv::MathematicalTools::angleDifference(obj1->GetAngle(), objAngle)) <= tolerance/2;
+    return abs(GDpriv::MathematicalTools::angleDifference(obj1->GetAngle(), objAngle)) <= moveExtraParam.tolerance/2;
 }
 
 bool GD_API ObjectsTurnedToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
-    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, TurnedTowardInnerTest, tolerance);
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, TurnedTowardInnerTest, MovesTowardExtraParameter(tolerance));
 }
 
-static bool DistanceInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float squaredLength)
+static bool DistanceInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, const ListsTestFuncExtraParameter &extraParameter)
 {
+    const DistanceExtraParameter &distanceExtraParam = dynamic_cast<const DistanceExtraParameter&>(extraParameter);
+
     float X = obj1->GetDrawableX()+obj1->GetCenterX() - (obj2->GetDrawableX()+obj2->GetCenterX());
     float Y = obj1->GetDrawableY()+obj1->GetCenterY() - (obj2->GetDrawableY()+obj2->GetCenterY());
 
-    return (X*X+Y*Y) <= squaredLength;
+    return (X*X+Y*Y) <= distanceExtraParam.squaredLength;
 }
 
 float GD_API DistanceBetweenObjects( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, bool conditionInverted)
 {
     length *= length;
-    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, DistanceInnerTest, length);
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, DistanceInnerTest, DistanceExtraParameter(length));
 }
 
-static bool MovesTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float tolerance)
+static bool MovesTowardInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, const ListsTestFuncExtraParameter &extraParameter)
 {
     if ( obj1->TotalForceLength() == 0 ) return false;
+
+    const MovesTowardExtraParameter &moveExtraParam = dynamic_cast<const MovesTowardExtraParameter&>(extraParameter);
 
     double objAngle = atan2(obj2->GetDrawableY()+obj2->GetCenterY() - (obj1->GetDrawableY()+obj1->GetCenterY()),
                               obj2->GetDrawableX()+obj2->GetCenterX() - (obj1->GetDrawableX()+obj1->GetCenterX()));
     objAngle *= 180.0/3.14159;
 
-    return abs(GDpriv::MathematicalTools::angleDifference(obj1->TotalForceAngle(), objAngle)) <= tolerance/2;
+    return abs(GDpriv::MathematicalTools::angleDifference(obj1->TotalForceAngle(), objAngle)) <= moveExtraParam.tolerance/2;
 }
 
 
 bool GD_API MovesToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
-    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, MovesTowardInnerTest, tolerance);
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, MovesTowardInnerTest, MovesTowardExtraParameter(tolerance));
 }

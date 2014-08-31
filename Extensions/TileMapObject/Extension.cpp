@@ -79,21 +79,21 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsAdvanced()
         .codeExtraInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/TileMapObject.h");
 
-    obj.AddCondition("SingleTileCollision",
+    extension.AddCondition("SingleTileCollision",
                    _("Collision with one tile"),
                    _("Test if an object collides a specific tile."),
-                   _("Test if an object collides a specific tile."),
+                   _("_PARAM4_ is in collision with the tile at _PARAM2_;_PARAM3_ (layer _PARAM1_) of _PARAM0_"),
                    _("Collisions"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")
-        .AddParameter("object", _("Tile Map Object"), "TileMap", false)
+        .AddParameter("objectList", _("Tile Map Object"), "TileMap", false)
         .AddParameter("expression", _("Tile layer (0: Back, 1: Middle, 2: Top)"))
         .AddParameter("expression", _("Tile column"))
         .AddParameter("expression", _("Tile row"))
         .AddParameter("objectList", _("Object"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple()
-        .codeExtraInformation.SetFunctionName("IsCollidingWithTile").SetIncludeFile("TileMapObject/TileMapObject.h");
+        .codeExtraInformation.SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/TileMapObject.h");
 
     /*obj.AddAction("YOffset",
                    _("Image Y Offset"),

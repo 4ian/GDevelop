@@ -157,8 +157,6 @@ public :
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
-    bool IsCollidingWithTile(int tileLayer, int tileCol, int tileRow, std::map<std::string, std::vector<RuntimeObject*>*> objectsLists, bool isInverted);
-
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 
@@ -172,6 +170,13 @@ private:
     float oldX;
     float oldY;
 };
+
+bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
+                         int layer,
+                         int column,
+                         int row,
+                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
+                         bool conditionInverted);
 
 void DestroyTileMapObject(gd::Object * object);
 gd::Object * CreateTileMapObject(std::string name);

@@ -41,6 +41,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon.h"
 #include "GDCpp/PolygonCollision.h"
+#include "GDCpp/BuiltinExtensions/ObjectTools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 
@@ -428,55 +429,57 @@ std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes() const
     return hitboxes;
 }
 
-bool RuntimeTileMapObject::IsCollidingWithTile(int tileLayer, int tileCol, int tileRow, std::map<std::string, std::vector<RuntimeObject*>*> objectsLists, bool isInverted)
+namespace
 {
-    //Prepare the the hitbox
-    if(tileSet.Get().IsDirty())
-        return false;
-
-    Polygon2d tileHitbox = tileSet.Get().GetTileHitbox(tileMap.Get().GetTile(tileLayer, tileCol, tileRow)).hitbox;
-    tileHitbox.Move(GetX() + tileCol * tileSet.Get().tileSize.x,
-                    GetY() + tileRow * tileSet.Get().tileSize.y);
-
-    bool collidesOne = false;
-
-    //Iterate through all objects
-    for(std::map<std::string, std::vector<RuntimeObject*>*>::iterator it = objectsLists.begin(); it != objectsLists.end(); ++it)
+    /**
+     * Extra parameter struct for the TwoObjectListsTest.
+     */
+    struct TileExtraParameter : public ListsTestFuncExtraParameter
     {
-        int i = 0;
-        while(i < it->second->size())
+        TileExtraParameter(int layer_, int column_, int row_) : ListsTestFuncExtraParameter(), layer(layer_), column(column_), row(row_) {};
+
+        int layer;
+        int column;
+        int row;
+    };
+
+    bool TileCollisionInnerTest(RuntimeObject *tileMapObject_, RuntimeObject *object, const ListsTestFuncExtraParameter &extraParameter)
+    {
+        RuntimeTileMapObject *tileMapObject = dynamic_cast<RuntimeTileMapObject*>(tileMapObject_);
+        if(!tileMapObject || tileMapObject->tileSet.Get().IsDirty())
+            return false;
+
+        const TileExtraParameter &tileExtraParam = dynamic_cast<const TileExtraParameter&>(extraParameter);
+
+        //Get the tile hitbox
+        Polygon2d tileHitbox = tileMapObject->tileSet.Get().GetTileHitbox(tileMapObject->tileMap.Get().GetTile(tileExtraParam.layer, tileExtraParam.column, tileExtraParam.row)).hitbox;
+        tileHitbox.Move(tileMapObject->GetX() + tileExtraParam.column * tileMapObject->tileSet.Get().tileSize.x,
+                        tileMapObject->GetY() + tileExtraParam.row * tileMapObject->tileSet.Get().tileSize.y);
+
+        //Get the object hitbox
+        std::vector<Polygon2d> objectHitboxes = object->GetHitBoxes();
+
+        for(std::vector<Polygon2d>::iterator hitboxIt = objectHitboxes.begin(); hitboxIt != objectHitboxes.end(); ++hitboxIt)
         {
-            bool collides = false;
-            RuntimeObject *object = (*(it->second))[i];
-            std::vector<Polygon2d> objectHitboxes = object->GetHitBoxes();
-            for(std::vector<Polygon2d>::iterator hitboxIt = objectHitboxes.begin(); hitboxIt != objectHitboxes.end(); ++hitboxIt)
+            if(PolygonCollisionTest(tileHitbox, *hitboxIt).collision)
             {
-                if(PolygonCollisionTest(tileHitbox, *hitboxIt).collision)
-                {
-                    std::cout << "Collision found !" << std::endl;
-
-                    collides = true;
-                    collidesOne = true;
-                    break;
-                }
-            }
-
-            //if((collides && !isInverted) || (!collides && isInverted))
-            ///TODO: Support the inverse condition
-            if(collides)
-            {
-                i++;         
-            }
-            else
-            {
-                it->second->erase(it->second->begin()+i);
+                return true;
             }
         }
-    }
 
-    return collidesOne;
+        return false;
+    }
 }
 
+bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
+                         int layer,
+                         int column,
+                         int row,
+                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
+                         bool conditionInverted)
+{
+    return TwoObjectListsTest(tileMapList, objectLists, conditionInverted, &TileCollisionInnerTest, TileExtraParameter(layer, column, row));
+}
 
 void DestroyRuntimeTileMapObject(RuntimeObject * object)
 {

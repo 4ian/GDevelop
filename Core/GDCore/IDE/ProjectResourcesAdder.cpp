@@ -17,7 +17,6 @@ namespace gd
 
 bool ProjectResourcesAdder::AddAllMissingImages(gd::Project & project)
 {
-    //Check if there are some resources with absolute filenames
     ImagesUsedInventorizer inventorizer;
     project.ExposeResources(inventorizer);
     std::set<std::string> & allImages = inventorizer.GetAllUsedImages();

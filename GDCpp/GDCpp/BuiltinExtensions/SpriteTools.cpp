@@ -14,7 +14,7 @@
 
 using namespace std;
 
-static bool SpriteCollisionInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, float )
+static bool SpriteCollisionInnerTest(RuntimeObject * obj1, RuntimeObject * obj2, const ListsTestFuncExtraParameter &extraParameter )
 {
     return CheckCollision( static_cast<RuntimeSpriteObject*>(obj1), static_cast<RuntimeSpriteObject*>(obj2));
 }
@@ -24,5 +24,5 @@ static bool SpriteCollisionInnerTest(RuntimeObject * obj1, RuntimeObject * obj2,
  */
 bool GD_API SpriteCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
-    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, SpriteCollisionInnerTest, 0);
+    return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, SpriteCollisionInnerTest, ListsTestFuncExtraParameter());
 }

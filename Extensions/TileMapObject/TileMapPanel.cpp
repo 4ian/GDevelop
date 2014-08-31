@@ -7,7 +7,7 @@
 
 TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) :
     wxScrolledWindow(parent, id, pos, size, style),
-    m_tileToBeInserted(-1),
+    m_tileToBeInserted(0),
     m_hideUpperLayers(false),
     m_tileset(NULL),
     m_tilemap(NULL),
@@ -29,6 +29,7 @@ TileMapPanel::~TileMapPanel()
 void TileMapPanel::SetTileMap(TileMap *tilemap)
 {
     m_tilemap = tilemap;
+    Update();
 }
 
 void TileMapPanel::SetTileSet(TileSet *tileset)
@@ -75,7 +76,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
 
     wxPoint minPos = GetViewStart();
     int width, height;
-    GetVirtualSize(&width, &height);
+    GetClientSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
     dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
@@ -86,12 +87,18 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
 
     dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
 
+    //Determine the first and last columns and rows to draw
+    int firstCol = std::max((int)(minPos.x / m_tileset->tileSize.x - 1), 0);
+    int firstRow = std::max((int)(minPos.y / m_tileset->tileSize.y - 1), 0);
+    int lastCol = std::min((int)(maxPos.x / m_tileset->tileSize.x + 1), m_tilemap->GetColumnsCount());
+    int lastRow = std::min((int)(maxPos.y / m_tileset->tileSize.y + 1), m_tilemap->GetRowsCount());
+
     //Draw the tiles
     for(int layer = 0; m_hideUpperLayers ? layer <= GetCurrentLayer() : layer < 3; layer++)
     {
-        for(int col = 0; col < m_tilemap->GetColumnsCount(); col++)
+        for(int col = firstCol; col < lastCol; col++)
         {
-            for(int row = 0; row < m_tilemap->GetRowsCount(); row++)
+            for(int row = firstRow; row < lastRow; row++)
             {
                 if(m_tilemap->GetTile(layer, col, row) == -1)
                     continue;
@@ -102,12 +109,12 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
     }
 
     //Draw the grid
-    for(int col = 0; col < m_tilemap->GetColumnsCount(); col++)
+    for(int col = firstCol; col < lastCol; col++)
     {
         dc.DrawLine(col * m_tileset->tileSize.x, minPos.y,
                     col * m_tileset->tileSize.x, maxPos.y);
 
-        for(int row = 0; row < m_tilemap->GetRowsCount(); row++)
+        for(int row = firstRow; row < lastRow; row++)
         {
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y,
                         maxPos.x, row * m_tileset->tileSize.y);

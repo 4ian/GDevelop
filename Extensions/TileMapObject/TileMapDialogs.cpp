@@ -139,8 +139,8 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer60->AddButton(m_button64);
     m_stdBtnSizer60->Realize();
     
-    SetMinSize( wxSize(850,550) );
-    SetSizeHints(850,550);
+    SetMinSize( wxSize(950,550) );
+    SetSizeHints(950,550);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
@@ -218,6 +218,7 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->SetFlexibleDirection( wxBOTH );
     flexGridSizer2692->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2692->AddGrowableCol(1);
+    flexGridSizer2692->AddGrowableRow(3);
     
     flexGridSizer2671->Add(flexGridSizer2692, 1, wxALL|wxEXPAND, 5);
     
@@ -234,18 +235,15 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->Add(flexGridSizer295, 1, wxALL|wxEXPAND, 5);
     
     m_textureNameTextCtrl = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_textureNameTextCtrl->SetHint(wxT(""));
+    #endif
     
     flexGridSizer295->Add(m_textureNameTextCtrl, 0, wxALL|wxEXPAND, 5);
     
     m_setTextureButton = new wxBitmapButton(m_mainPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("image16")), wxDefaultPosition, wxSize(-1,-1), wxBU_AUTODRAW);
     
     flexGridSizer295->Add(m_setTextureButton, 0, wxALL, 5);
-    
-    flexGridSizer2692->Add(0, 0, 1, wxALL, 5);
-    
-    m_staticBitmap331 = new wxStaticBitmap(m_mainPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("TileMapExplainPicture")), wxDefaultPosition, wxSize(-1,-1), 0 );
-    
-    flexGridSizer2692->Add(m_staticBitmap331, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     
     m_staticText301 = new wxStaticText(m_mainPanel, wxID_ANY, _("Tile size:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
@@ -313,6 +311,13 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     
     flexGridSizer317->Add(m_staticText329, 0, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     
+    flexGridSizer2692->Add(0, 0, 1, wxALL, 5);
+    
+    m_tileSetPreviewPanel = new TileSetPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxHSCROLL|wxVSCROLL);
+    m_tileSetPreviewPanel->SetScrollRate(5, 5);
+    
+    flexGridSizer2692->Add(m_tileSetPreviewPanel, 0, wxALL|wxEXPAND, 5);
+    
     m_stdBtnSizer2713 = new wxStdDialogButtonSizer();
     
     flexGridSizer2671->Add(m_stdBtnSizer2713, 0, wxALL|wxALIGN_RIGHT, 5);
@@ -324,13 +329,18 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     m_stdBtnSizer2713->AddButton(m_cancelButton);
     m_stdBtnSizer2713->Realize();
     
-    SetSizeHints(750,400);
+    SetSizeHints(750,500);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
     Centre(wxBOTH);
     // Connect events
+    m_textureNameTextCtrl->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnTileSetTextureUpdated), NULL, this);
     m_setTextureButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnSetTextureButtonClicked), NULL, this);
+    m_tileWidthSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_tileHeightSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingWidthSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingHeightSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnOkButtonClicked), NULL, this);
     m_cancelButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnCancelButtonClicked), NULL, this);
     
@@ -338,7 +348,12 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
 
 TileSetConfigurationEditorBase::~TileSetConfigurationEditorBase()
 {
+    m_textureNameTextCtrl->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnTileSetTextureUpdated), NULL, this);
     m_setTextureButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnSetTextureButtonClicked), NULL, this);
+    m_tileWidthSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_tileHeightSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingWidthSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingHeightSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnOkButtonClicked), NULL, this);
     m_cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnCancelButtonClicked), NULL, this);
     

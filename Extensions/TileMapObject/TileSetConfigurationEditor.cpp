@@ -5,10 +5,13 @@
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCpp/Project.h"
 
-TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet &tileSet_, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper) : 
+TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet &tileSet_, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper) : 
 	TileSetConfigurationEditorBase(parent),
 	tileSet(tileSet_),
+    game(game_),
+    previewTileSet(tileSet),
 	resourcesEditorPnl(new ResourcesEditor(this, game, mainFrameWrapper))
 {
     resourcesEditorPnl->Refresh();
@@ -33,12 +36,31 @@ TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet
     m_spacingWidthSpin->SetValue(tileSet.tileSpacing.x);
     m_spacingHeightSpin->SetValue(tileSet.tileSpacing.y);
 
+    //Set the preview tileset to the preview panel
+    m_tileSetPreviewPanel->SetTileSet(&previewTileSet);
+    UpdatePreviewTileSetPanel();
+
     //Realize the resource editor toolbar again
     resourcesEditorPnl->toolbar->Realize();
 }
 
 TileSetConfigurationEditor::~TileSetConfigurationEditor()
 {
+
+}
+
+void TileSetConfigurationEditor::UpdatePreviewTileSetPanel()
+{
+    previewTileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
+    previewTileSet.tileSize.x = m_tileWidthSpin->GetValue();
+    previewTileSet.tileSize.y = m_tileHeightSpin->GetValue();
+    previewTileSet.tileSpacing.x = m_spacingWidthSpin->GetValue();
+    previewTileSet.tileSpacing.y = m_spacingHeightSpin->GetValue();
+
+    previewTileSet.LoadResources(game);
+    previewTileSet.Generate();
+
+    m_tileSetPreviewPanel->Refresh();
 }
 
 void TileSetConfigurationEditor::OnSetTextureButtonClicked(wxCommandEvent& event)
@@ -50,6 +72,7 @@ void TileSetConfigurationEditor::OnSetTextureButtonClicked(wxCommandEvent& event
     }
 
     m_textureNameTextCtrl->SetValue(resourcesEditorPnl->resourcesTree->GetItemText(resourcesEditorPnl->m_itemSelected));
+    OnTileSetTextureUpdated(event); //Update the tileset preview
 }
 
 void TileSetConfigurationEditor::OnCancelButtonClicked(wxCommandEvent& event)
@@ -66,4 +89,14 @@ void TileSetConfigurationEditor::OnOkButtonClicked(wxCommandEvent& event)
 	tileSet.tileSpacing.y = m_spacingHeightSpin->GetValue();
 
 	EndModal(1);
+}
+
+void TileSetConfigurationEditor::OnTileSetTextureUpdated(wxCommandEvent& event)
+{
+    UpdatePreviewTileSetPanel();
+}
+
+void TileSetConfigurationEditor::OnTileSetParameterUpdated(wxSpinEvent& event)
+{
+    UpdatePreviewTileSetPanel();
 }

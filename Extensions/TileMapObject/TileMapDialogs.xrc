@@ -4,7 +4,7 @@
     <title>TileMap Object Editor</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
-    <size>850,550</size>
+    <size>950,550</size>
     <object class="wxAuiManager">
       <flags>285</flags>
       <sashsize>-1</sashsize>
@@ -268,7 +268,7 @@
     <title>Tileset configuration</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
-    <size>750,400</size>
+    <size>750,500</size>
     <object class="wxAuiManager">
       <flags>271</flags>
       <sashsize>-1</sashsize>
@@ -353,7 +353,7 @@
                 <vgap>0</vgap>
                 <hgap>0</hgap>
                 <growablecols>1</growablecols>
-                <growablerows/>
+                <growablerows>3</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL|wxALIGN_CENTER|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
@@ -380,6 +380,9 @@
                       <border>5</border>
                       <object class="wxTextCtrl" name="m_textureNameTextCtrl">
                         <style/>
+                        <hint>
+                          <![CDATA[]]>
+                        </hint>
                       </object>
                     </object>
                     <object class="sizeritem">
@@ -391,18 +394,6 @@
                         <default>0</default>
                       </object>
                     </object>
-                  </object>
-                </object>
-                <object class="spacer" name="Spacer333">
-                  <flag>wxALL</flag>
-                  <border>5</border>
-                  <option>1</option>
-                </object>
-                <object class="sizeritem">
-                  <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-                  <border>5</border>
-                  <object class="wxStaticBitmap" name="m_staticBitmap331">
-                    <bitmap>../../Binaries/Output/Release_Windows/res/TileMapExplainPicture.png</bitmap>
                   </object>
                 </object>
                 <object class="sizeritem">
@@ -529,6 +520,19 @@
                         <style/>
                       </object>
                     </object>
+                  </object>
+                </object>
+                <object class="spacer" name="Spacer458">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <option>1</option>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxScrolledWindow" name="m_tileSetPreviewPanel" subclass="TileSetPanel">
+                    <style>wxHSCROLL|wxVSCROLL</style>
+                    <scrollrate>5,5</scrollrate>
                   </object>
                 </object>
               </object>

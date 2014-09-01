@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	456,
+		"m_objCounter":	460,
 		"m_includeFiles":	["TileMapDialogsIds.h"],
 		"m_bitmapFunction":	"wxCF6DCInitBitmapResources",
 		"m_bitmapsFile":	"TileMapDialogs_wxsmith_bitmaps.cpp",
@@ -22,11 +22,11 @@
 			"m_properties":	[{
 					"type":	"string",
 					"m_label":	"Size:",
-					"m_value":	"850,550"
+					"m_value":	"950,550"
 				}, {
 					"type":	"string",
 					"m_label":	"Minimum Size:",
-					"m_value":	"850,550"
+					"m_value":	"950,550"
 				}, {
 					"type":	"string",
 					"m_label":	"Name:",
@@ -1562,7 +1562,7 @@
 			"m_properties":	[{
 					"type":	"string",
 					"m_label":	"Size:",
-					"m_value":	"750,400"
+					"m_value":	"750,500"
 				}, {
 					"type":	"string",
 					"m_label":	"Minimum Size:",
@@ -2024,7 +2024,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Growable rows:",
-													"m_value":	""
+													"m_value":	"3"
 												}, {
 													"type":	"string",
 													"m_label":	"Horizontal gap:",
@@ -2222,6 +2222,10 @@
 																	"m_value":	""
 																}, {
 																	"type":	"string",
+																	"m_label":	"Text Hint",
+																	"m_value":	""
+																}, {
+																	"type":	"string",
 																	"m_label":	"Max Length:",
 																	"m_value":	"0"
 																}, {
@@ -2233,7 +2237,14 @@
 																	"m_label":	"Auto Complete Files:",
 																	"m_value":	false
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_TEXT_UPDATED",
+																	"m_eventClass":	"wxCommandEvent",
+																	"m_eventHandler":	"wxCommandEventHandler",
+																	"m_functionNameAndSignature":	"OnTileSetTextureUpdated(wxCommandEvent& event)",
+																	"m_description":	"Respond to a wxEVT_COMMAND_TEXT_UPDATED event, generated when the text changes.\nNotice that this event will be sent when the text controls contents changes\n - whether this is due to user input or comes from the program itself\n(for example, if SetValue() is called); see ChangeValue() for a function which does not send this event.",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4404,
@@ -2318,96 +2329,6 @@
 																}],
 															"m_children":	[]
 														}]
-												}, {
-													"m_type":	4454,
-													"proportion":	1,
-													"border":	5,
-													"gbSpan":	"1,1",
-													"gbPosition":	"0,0",
-													"m_styles":	[],
-													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
-													"m_properties":	[{
-															"type":	"string",
-															"m_label":	"Name:",
-															"m_value":	"Spacer333"
-														}, {
-															"type":	"string",
-															"m_label":	"Size:",
-															"m_value":	"0,0"
-														}],
-													"m_events":	[],
-													"m_children":	[]
-												}, {
-													"m_type":	4409,
-													"proportion":	0,
-													"border":	5,
-													"gbSpan":	"1,1",
-													"gbPosition":	"0,0",
-													"m_styles":	[],
-													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
-													"m_properties":	[{
-															"type":	"winid",
-															"m_label":	"ID:",
-															"m_winid":	"wxID_ANY"
-														}, {
-															"type":	"string",
-															"m_label":	"Size:",
-															"m_value":	"-1,-1"
-														}, {
-															"type":	"string",
-															"m_label":	"Minimum Size:",
-															"m_value":	"-1,-1"
-														}, {
-															"type":	"string",
-															"m_label":	"Name:",
-															"m_value":	"m_staticBitmap331"
-														}, {
-															"type":	"multi-string",
-															"m_label":	"Tooltip:",
-															"m_value":	""
-														}, {
-															"type":	"colour",
-															"m_label":	"Bg Colour:",
-															"colour":	"<Default>"
-														}, {
-															"type":	"colour",
-															"m_label":	"Fg Colour:",
-															"colour":	"<Default>"
-														}, {
-															"type":	"font",
-															"m_label":	"Font:",
-															"m_value":	""
-														}, {
-															"type":	"bool",
-															"m_label":	"Hidden",
-															"m_value":	false
-														}, {
-															"type":	"bool",
-															"m_label":	"Disabled",
-															"m_value":	false
-														}, {
-															"type":	"bool",
-															"m_label":	"Focused",
-															"m_value":	false
-														}, {
-															"type":	"string",
-															"m_label":	"Class Name:",
-															"m_value":	""
-														}, {
-															"type":	"string",
-															"m_label":	"Include File:",
-															"m_value":	""
-														}, {
-															"type":	"string",
-															"m_label":	"Style:",
-															"m_value":	""
-														}, {
-															"type":	"bitmapPicker",
-															"m_label":	"Bitmap File:",
-															"m_path":	"../../Binaries/Output/Release_Windows/res/TileMapExplainPicture.png"
-														}],
-													"m_events":	[],
-													"m_children":	[]
 												}, {
 													"m_type":	4405,
 													"proportion":	0,
@@ -2602,7 +2523,14 @@
 																	"m_label":	"Max value:",
 																	"m_value":	"10000"
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_SPINCTRL_UPDATED",
+																	"m_eventClass":	"wxSpinEvent",
+																	"m_eventHandler":	"wxSpinEventHandler",
+																	"m_functionNameAndSignature":	"OnTileSetParameterUpdated(wxSpinEvent& event)",
+																	"m_description":	"Generated whenever the numeric value of the spinctrl is updated",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4405,
@@ -2756,7 +2684,14 @@
 																	"m_label":	"Max value:",
 																	"m_value":	"10000"
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_SPINCTRL_UPDATED",
+																	"m_eventClass":	"wxSpinEvent",
+																	"m_eventHandler":	"wxSpinEventHandler",
+																	"m_functionNameAndSignature":	"OnTileSetParameterUpdated(wxSpinEvent& event)",
+																	"m_description":	"Generated whenever the numeric value of the spinctrl is updated",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4405,
@@ -3028,7 +2963,14 @@
 																	"m_label":	"Max value:",
 																	"m_value":	"10000"
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_SPINCTRL_UPDATED",
+																	"m_eventClass":	"wxSpinEvent",
+																	"m_eventHandler":	"wxSpinEventHandler",
+																	"m_functionNameAndSignature":	"OnTileSetParameterUpdated(wxSpinEvent& event)",
+																	"m_description":	"Generated whenever the numeric value of the spinctrl is updated",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4405,
@@ -3182,7 +3124,14 @@
 																	"m_label":	"Max value:",
 																	"m_value":	"10000"
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_SPINCTRL_UPDATED",
+																	"m_eventClass":	"wxSpinEvent",
+																	"m_eventHandler":	"wxSpinEventHandler",
+																	"m_functionNameAndSignature":	"OnTileSetParameterUpdated(wxSpinEvent& event)",
+																	"m_description":	"Generated whenever the numeric value of the spinctrl is updated",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4405,
@@ -3260,6 +3209,100 @@
 															"m_events":	[],
 															"m_children":	[]
 														}]
+												}, {
+													"m_type":	4454,
+													"proportion":	1,
+													"border":	5,
+													"gbSpan":	"1,1",
+													"gbPosition":	"0,0",
+													"m_styles":	[],
+													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+													"m_properties":	[{
+															"type":	"string",
+															"m_label":	"Name:",
+															"m_value":	"Spacer458"
+														}, {
+															"type":	"string",
+															"m_label":	"Size:",
+															"m_value":	"0,0"
+														}],
+													"m_events":	[],
+													"m_children":	[]
+												}, {
+													"m_type":	4440,
+													"proportion":	0,
+													"border":	5,
+													"gbSpan":	"1,1",
+													"gbPosition":	"0,0",
+													"m_styles":	["wxHSCROLL", "wxVSCROLL"],
+													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+													"m_properties":	[{
+															"type":	"winid",
+															"m_label":	"ID:",
+															"m_winid":	"wxID_ANY"
+														}, {
+															"type":	"string",
+															"m_label":	"Size:",
+															"m_value":	"-1,-1"
+														}, {
+															"type":	"string",
+															"m_label":	"Minimum Size:",
+															"m_value":	"-1,-1"
+														}, {
+															"type":	"string",
+															"m_label":	"Name:",
+															"m_value":	"m_tileSetPreviewPanel"
+														}, {
+															"type":	"multi-string",
+															"m_label":	"Tooltip:",
+															"m_value":	""
+														}, {
+															"type":	"colour",
+															"m_label":	"Bg Colour:",
+															"colour":	"<Default>"
+														}, {
+															"type":	"colour",
+															"m_label":	"Fg Colour:",
+															"colour":	"<Default>"
+														}, {
+															"type":	"font",
+															"m_label":	"Font:",
+															"m_value":	""
+														}, {
+															"type":	"bool",
+															"m_label":	"Hidden",
+															"m_value":	false
+														}, {
+															"type":	"bool",
+															"m_label":	"Disabled",
+															"m_value":	false
+														}, {
+															"type":	"bool",
+															"m_label":	"Focused",
+															"m_value":	false
+														}, {
+															"type":	"string",
+															"m_label":	"Class Name:",
+															"m_value":	"TileSetPanel"
+														}, {
+															"type":	"string",
+															"m_label":	"Include File:",
+															"m_value":	"TileSetPanel.h"
+														}, {
+															"type":	"string",
+															"m_label":	"Style:",
+															"m_value":	""
+														}, {
+															"type":	"string",
+															"m_label":	"Scroll Rate X:",
+															"m_value":	"5"
+														}, {
+															"type":	"string",
+															"m_label":	"Scroll Rate Y:",
+															"m_value":	"5"
+														}],
+													"m_events":	[],
+													"m_children":	[]
 												}]
 										}, {
 											"m_type":	4467,

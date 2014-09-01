@@ -109,9 +109,28 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer7->Add(m_staticText448, 0, wxALL, 5);
     
+    wxFlexGridSizer* flexGridSizer452 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer452->SetFlexibleDirection( wxBOTH );
+    flexGridSizer452->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer452->AddGrowableCol(1);
+    flexGridSizer452->AddGrowableRow(0);
+    
+    flexGridSizer200->Add(flexGridSizer452, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticBitmap456 = new wxStaticBitmap(m_mainPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer452->Add(m_staticBitmap456, 0, wxALL|wxEXPAND, 5);
+    
+    m_hyperLink454 = new wxHyperlinkCtrl(m_mainPanel, wxID_ANY, _("Help about this object"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink454->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink454->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink454->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer452->Add(m_hyperLink454, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
     m_stdBtnSizer60 = new wxStdDialogButtonSizer();
     
-    flexGridSizer200->Add(m_stdBtnSizer60, 0, wxALL|wxEXPAND, 5);
+    flexGridSizer452->Add(m_stdBtnSizer60, 0, wxALL|wxEXPAND, 5);
     
     m_button62 = new wxButton(m_mainPanel, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
     m_stdBtnSizer60->AddButton(m_button62);
@@ -120,8 +139,8 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer60->AddButton(m_button64);
     m_stdBtnSizer60->Realize();
     
-    SetMinSize( wxSize(850,550) );
-    SetSizeHints(850,550);
+    SetMinSize( wxSize(950,550) );
+    SetSizeHints(950,550);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
@@ -132,6 +151,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     this->Connect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Connect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
+    m_hyperLink454->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapObjectEditorBase::OnHelpButtonClicked), NULL, this);
     m_button62->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnOkButtonPressed), NULL, this);
     m_button64->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnCancelButtonPressed), NULL, this);
     
@@ -144,6 +164,7 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     this->Disconnect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Disconnect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
+    m_hyperLink454->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapObjectEditorBase::OnHelpButtonClicked), NULL, this);
     m_button62->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnOkButtonPressed), NULL, this);
     m_button64->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnCancelButtonPressed), NULL, this);
     
@@ -197,6 +218,7 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->SetFlexibleDirection( wxBOTH );
     flexGridSizer2692->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2692->AddGrowableCol(1);
+    flexGridSizer2692->AddGrowableRow(3);
     
     flexGridSizer2671->Add(flexGridSizer2692, 1, wxALL|wxEXPAND, 5);
     
@@ -213,18 +235,15 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->Add(flexGridSizer295, 1, wxALL|wxEXPAND, 5);
     
     m_textureNameTextCtrl = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_textureNameTextCtrl->SetHint(wxT(""));
+    #endif
     
     flexGridSizer295->Add(m_textureNameTextCtrl, 0, wxALL|wxEXPAND, 5);
     
     m_setTextureButton = new wxBitmapButton(m_mainPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("image16")), wxDefaultPosition, wxSize(-1,-1), wxBU_AUTODRAW);
     
     flexGridSizer295->Add(m_setTextureButton, 0, wxALL, 5);
-    
-    flexGridSizer2692->Add(0, 0, 1, wxALL, 5);
-    
-    m_staticBitmap331 = new wxStaticBitmap(m_mainPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("TileMapExplainPicture")), wxDefaultPosition, wxSize(-1,-1), 0 );
-    
-    flexGridSizer2692->Add(m_staticBitmap331, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     
     m_staticText301 = new wxStaticText(m_mainPanel, wxID_ANY, _("Tile size:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
@@ -292,6 +311,13 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     
     flexGridSizer317->Add(m_staticText329, 0, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     
+    flexGridSizer2692->Add(0, 0, 1, wxALL, 5);
+    
+    m_tileSetPreviewPanel = new TileSetPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxHSCROLL|wxVSCROLL);
+    m_tileSetPreviewPanel->SetScrollRate(5, 5);
+    
+    flexGridSizer2692->Add(m_tileSetPreviewPanel, 0, wxALL|wxEXPAND, 5);
+    
     m_stdBtnSizer2713 = new wxStdDialogButtonSizer();
     
     flexGridSizer2671->Add(m_stdBtnSizer2713, 0, wxALL|wxALIGN_RIGHT, 5);
@@ -303,13 +329,18 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     m_stdBtnSizer2713->AddButton(m_cancelButton);
     m_stdBtnSizer2713->Realize();
     
-    SetSizeHints(750,400);
+    SetSizeHints(750,500);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
     Centre(wxBOTH);
     // Connect events
+    m_textureNameTextCtrl->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnTileSetTextureUpdated), NULL, this);
     m_setTextureButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnSetTextureButtonClicked), NULL, this);
+    m_tileWidthSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_tileHeightSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingWidthSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingHeightSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnOkButtonClicked), NULL, this);
     m_cancelButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnCancelButtonClicked), NULL, this);
     
@@ -317,7 +348,12 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
 
 TileSetConfigurationEditorBase::~TileSetConfigurationEditorBase()
 {
+    m_textureNameTextCtrl->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnTileSetTextureUpdated), NULL, this);
     m_setTextureButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnSetTextureButtonClicked), NULL, this);
+    m_tileWidthSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_tileHeightSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingWidthSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_spacingHeightSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnOkButtonClicked), NULL, this);
     m_cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnCancelButtonClicked), NULL, this);
     

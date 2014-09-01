@@ -24,10 +24,11 @@
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include "TileMapPanel.h"
+#include <wx/statbmp.h>
+#include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/bmpbuttn.h>
-#include <wx/statbmp.h>
 #include <wx/spinctrl.h>
 #include "TileMapDialogsIds.h"
 
@@ -44,6 +45,8 @@ protected:
     wxChoice* m_layerChoice;
     TileMapPanel* m_tileMapPanel;
     wxStaticText* m_staticText448;
+    wxStaticBitmap* m_staticBitmap456;
+    wxHyperlinkCtrl* m_hyperLink454;
     wxStdDialogButtonSizer* m_stdBtnSizer60;
     wxButton* m_button62;
     wxButton* m_button64;
@@ -54,11 +57,12 @@ protected:
     virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event) { event.Skip(); }
     virtual void OnOkButtonPressed(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelButtonPressed(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(850,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(950,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~TileMapObjectEditorBase();
 };
 
@@ -73,7 +77,6 @@ protected:
     wxStaticText* m_staticText287;
     wxTextCtrl* m_textureNameTextCtrl;
     wxBitmapButton* m_setTextureButton;
-    wxStaticBitmap* m_staticBitmap331;
     wxStaticText* m_staticText301;
     wxSpinCtrl* m_tileWidthSpin;
     wxStaticText* m_staticText307;
@@ -84,17 +87,20 @@ protected:
     wxStaticText* m_staticText325;
     wxSpinCtrl* m_spacingHeightSpin;
     wxStaticText* m_staticText329;
+    TileSetPanel* m_tileSetPreviewPanel;
     wxStdDialogButtonSizer* m_stdBtnSizer2713;
     wxButton* m_okButton;
     wxButton* m_cancelButton;
 
 protected:
+    virtual void OnTileSetTextureUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void OnSetTextureButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnTileSetParameterUpdated(wxSpinEvent& event) { event.Skip(); }
     virtual void OnOkButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelButtonClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    TileSetConfigurationEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tileset configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,400), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    TileSetConfigurationEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tileset configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,500), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~TileSetConfigurationEditorBase();
 };
 

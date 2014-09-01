@@ -87,6 +87,7 @@ protected:
     wxStaticText* m_staticText325;
     wxSpinCtrl* m_spacingHeightSpin;
     wxStaticText* m_staticText329;
+    wxStaticText* m_staticText462;
     TileSetPanel* m_tileSetPreviewPanel;
     wxStdDialogButtonSizer* m_stdBtnSizer2713;
     wxButton* m_okButton;

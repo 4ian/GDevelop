@@ -45,11 +45,17 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
     //Get the viewport
     wxPoint minPos = GetViewStart();
     int width, height;
-    GetVirtualSize(&width, &height);
+    GetClientSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
     if(m_tileset && !m_tileset->IsDirty())
     {
+        //Determine the first and last columns and rows to draw
+        int firstCol = std::max((int)(minPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) - 1), 0);
+        int firstRow = std::max((int)(minPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) - 1), 0);
+        int lastCol = std::min((int)(maxPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) + 1), m_tileset->GetColumnsCount());
+        int lastRow = std::min((int)(maxPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) + 1), m_tileset->GetRowsCount());
+
         //Draw the background
         dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
         dc.DrawRectangle(minPos.x, minPos.y, width, height);
@@ -60,7 +66,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
 
         //Draw the lines
         dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
-        for(int row = 1; row < m_tileset->GetRowsCount(); row++)
+        for(int row = firstRow; row < lastRow; row++)
         {
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y + (row - 1) * m_tileset->tileSpacing.y,
                         maxPos.x, row * m_tileset->tileSize.y + (row - 1) * m_tileset->tileSpacing.y);
@@ -68,7 +74,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y + (row) * m_tileset->tileSpacing.y - 1,
                         maxPos.x, row * m_tileset->tileSize.y + (row) * m_tileset->tileSpacing.y - 1);
 
-            for(int col = 1; col < m_tileset->GetColumnsCount(); col++)
+            for(int col = firstCol; col < lastCol; col++)
             {
                 dc.DrawLine(col * m_tileset->tileSize.x + (col - 1) * m_tileset->tileSpacing.x, minPos.y,
                             col * m_tileset->tileSize.x + (col - 1) * m_tileset->tileSpacing.x, maxPos.y);

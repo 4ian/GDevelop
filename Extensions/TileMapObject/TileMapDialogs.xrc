@@ -522,10 +522,15 @@
                     </object>
                   </object>
                 </object>
-                <object class="spacer" name="Spacer458">
-                  <flag>wxALL</flag>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
-                  <option>1</option>
+                  <object class="wxStaticText" name="m_staticText462">
+                    <label>
+                      <![CDATA[Preview:]]>
+                    </label>
+                    <style/>
+                  </object>
                 </object>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>

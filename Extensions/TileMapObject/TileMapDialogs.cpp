@@ -311,7 +311,9 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     
     flexGridSizer317->Add(m_staticText329, 0, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     
-    flexGridSizer2692->Add(0, 0, 1, wxALL, 5);
+    m_staticText462 = new wxStaticText(m_mainPanel, wxID_ANY, _("Preview:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer2692->Add(m_staticText462, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     
     m_tileSetPreviewPanel = new TileSetPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxHSCROLL|wxVSCROLL);
     m_tileSetPreviewPanel->SetScrollRate(5, 5);

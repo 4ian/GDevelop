@@ -318,8 +318,8 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
 
     //Construct the transform
     sf::Transform transform;
-    transform.translate(GetX() + centerPos.x - floor(centerPos.x), 
-                        GetY() + centerPos.y - floor(centerPos.y));
+    transform.translate((int)GetX() + centerPos.x - floor(centerPos.x), 
+                        (int)GetY() + centerPos.y - floor(centerPos.y));
     
     //Unsmooth the texture
     bool wasSmooth = tileSet.Get().GetTexture().isSmooth();

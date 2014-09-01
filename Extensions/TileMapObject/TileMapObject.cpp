@@ -25,6 +25,9 @@ freely, subject to the following restrictions:
 
 */
 
+#include <math.h>
+#include <iostream>
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #include <wx/panel.h>
@@ -309,9 +312,14 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
+    //Get the current view
+    sf::View currentView = window.getView();
+    sf::Vector2f centerPos = currentView.getCenter();
+
     //Construct the transform
     sf::Transform transform;
-    transform.translate(GetX(), GetY());
+    transform.translate(GetX() + centerPos.x - floor(centerPos.x), 
+                        GetY() + centerPos.y - floor(centerPos.y));
     
     //Unsmooth the texture
     bool wasSmooth = tileSet.Get().GetTexture().isSmooth();
@@ -371,9 +379,14 @@ void TileMapObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rend
     if(tileSet.Get().IsDirty())
         return;
 
+    //Get the current view
+    sf::View currentView = renderTarget.getView();
+    sf::Vector2f centerPos = currentView.getCenter();
+
     //Construct the transform
     sf::Transform transform;
-    transform.translate(instance.GetX(), instance.GetY());
+    transform.translate(instance.GetX() + centerPos.x - floor(centerPos.x), 
+                        instance.GetY() + centerPos.y - floor(centerPos.y));
 
     //Unsmooth the texture
     bool wasSmooth = tileSet.Get().GetTexture().isSmooth();

@@ -68,8 +68,8 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Height",
                    _("Height"),
-                   _("Test the width of a Tile Map Object."),
-                   _("The width of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Test the height of a Tile Map Object."),
+                   _("The height of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")

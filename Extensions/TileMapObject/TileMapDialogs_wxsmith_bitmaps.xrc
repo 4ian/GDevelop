@@ -3,6 +3,7 @@
   <object class="wxBitmap" name="TileMapExplainPicture">..\..\Binaries\Output\Release_Windows\res\TileMapExplainPicture.png</object>
   <object class="wxBitmap" name="add16">..\..\Binaries\Output\Release_Windows\res\icons_default\add16.png</object>
   <object class="wxBitmap" name="edit16">..\..\Binaries\Output\Release_Windows\res\icons_default\edit16.png</object>
+  <object class="wxBitmap" name="help16">..\..\Binaries\Output\Release_Windows\res\icons_default\help16.png</object>
   <object class="wxBitmap" name="image16">..\..\Binaries\Output\Release_Windows\res\icons_default\image16.png</object>
   <object class="wxBitmap" name="layer16">..\..\Binaries\Output\Release_Windows\res\icons_default\layer16.png</object>
   <object class="wxBitmap" name="maskEdit16">..\..\Binaries\Output\Release_Windows\res\maskEdit16.png</object>

@@ -43,6 +43,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 #include "TileMapObjectEditor.h"
 #include "TileMapObject.h"
@@ -174,6 +175,11 @@ void TileMapObjectEditor::OnChangeMapSizeButtonClicked(wxCommandEvent& event)
     dialog.ShowModal();
 
     m_tileMapPanel->Update();
+}
+
+void TileMapObjectEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
+{
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap"));
 }
 
 #endif

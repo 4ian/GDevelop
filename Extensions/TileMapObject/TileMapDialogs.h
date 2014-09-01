@@ -24,10 +24,11 @@
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include "TileMapPanel.h"
+#include <wx/statbmp.h>
+#include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/bmpbuttn.h>
-#include <wx/statbmp.h>
 #include <wx/spinctrl.h>
 #include "TileMapDialogsIds.h"
 
@@ -44,6 +45,8 @@ protected:
     wxChoice* m_layerChoice;
     TileMapPanel* m_tileMapPanel;
     wxStaticText* m_staticText448;
+    wxStaticBitmap* m_staticBitmap456;
+    wxHyperlinkCtrl* m_hyperLink454;
     wxStdDialogButtonSizer* m_stdBtnSizer60;
     wxButton* m_button62;
     wxButton* m_button64;
@@ -54,6 +57,7 @@ protected:
     virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event) { event.Skip(); }
     virtual void OnOkButtonPressed(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelButtonPressed(wxCommandEvent& event) { event.Skip(); }
 

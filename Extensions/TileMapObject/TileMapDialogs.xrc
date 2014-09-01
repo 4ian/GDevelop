@@ -201,30 +201,60 @@
                 </object>
               </object>
             </object>
-            <object class="sizeritem">
+            <object class="sizeritem" name="flexGridSizer452">
               <flag>wxALL|wxEXPAND</flag>
-              <border>5</border>
-              <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer60">
-                <object class="button">
-                  <object class="wxButton" name="wxID_OK">
-                    <label>
-                      <![CDATA[]]>
-                    </label>
-                    <style/>
-                    <bg/>
-                    <fg/>
-                    <default>0</default>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>3</cols>
+                <rows>0</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>1</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxStaticBitmap" name="m_staticBitmap456">
+                    <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
                   </object>
                 </object>
-                <object class="button">
-                  <object class="wxButton" name="wxID_CANCEL">
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+                  <border>5</border>
+                  <object class="wxHyperlinkCtrl" name="m_hyperLink454">
+                    <style>wxHL_DEFAULT_STYLE</style>
                     <label>
-                      <![CDATA[]]>
+                      <![CDATA[Help about this object]]>
                     </label>
-                    <style/>
-                    <bg/>
-                    <fg/>
-                    <default>0</default>
+                    <url/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer60">
+                    <object class="button">
+                      <object class="wxButton" name="wxID_OK">
+                        <label>
+                          <![CDATA[]]>
+                        </label>
+                        <style/>
+                        <bg/>
+                        <fg/>
+                        <default>0</default>
+                      </object>
+                    </object>
+                    <object class="button">
+                      <object class="wxButton" name="wxID_CANCEL">
+                        <label>
+                          <![CDATA[]]>
+                        </label>
+                        <style/>
+                        <bg/>
+                        <fg/>
+                        <default>0</default>
+                      </object>
+                    </object>
                   </object>
                 </object>
               </object>

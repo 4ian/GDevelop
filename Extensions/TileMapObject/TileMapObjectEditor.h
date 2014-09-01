@@ -50,6 +50,7 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual ~TileMapObjectEditor();
 
     protected:
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event);
     virtual void OnTileEditToolClicked(wxCommandEvent& event);
         virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event);
         virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event);

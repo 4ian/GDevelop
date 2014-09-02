@@ -85,7 +85,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
     if(!m_tilemap || !m_tileset || m_tileset->IsDirty())
         return;
 
-    dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
+    dc.SetPen(wxPen(wxColor(128, 128, 128, 255), 1));
 
     //Determine the first and last columns and rows to draw
     int firstCol = std::max((int)(minPos.x / m_tileset->tileSize.x - 1), 0);
@@ -119,6 +119,23 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y,
                         maxPos.x, row * m_tileset->tileSize.y);
         }
+    }
+
+    //Draw a gray rectangle outside the map
+    dc.SetBrush(wxColor(128, 128, 128, 255));
+    if(maxPos.x > (m_tilemap->GetColumnsCount() * m_tileset->tileSize.x))
+    {
+        dc.DrawRectangle(m_tilemap->GetColumnsCount() * m_tileset->tileSize.x,
+                         minPos.y,
+                         maxPos.x - m_tilemap->GetColumnsCount() * m_tileset->tileSize.x,
+                         maxPos.y - minPos.y);
+    }
+    if(maxPos.y > (m_tilemap->GetRowsCount() * m_tileset->tileSize.y))
+    {
+        dc.DrawRectangle(minPos.x,
+                         m_tilemap->GetRowsCount() * m_tileset->tileSize.y,
+                         maxPos.x - minPos.x,
+                         maxPos.y - m_tilemap->GetRowsCount() * m_tileset->tileSize.y);
     }
 }
 

@@ -52,6 +52,7 @@ protected:
     wxButton* m_button64;
 
 protected:
+    virtual void OnCloseButtonClicked(wxCloseEvent& event) { event.Skip(); }
     virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileEditToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event) { event.Skip(); }

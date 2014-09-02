@@ -50,6 +50,7 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual ~TileMapObjectEditor();
 
     protected:
+    virtual void OnCloseButtonClicked(wxCloseEvent& event);
     virtual void OnHelpButtonClicked(wxHyperlinkEvent& event);
     virtual void OnTileEditToolClicked(wxCommandEvent& event);
         virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event);
@@ -63,6 +64,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
     private:
         void UpdateLayerChoice();
 
+        bool AskCloseConfirmation();
+
         gd::Project & game;
         gd::MainFrameWrapper & mainFrameWrapper;
         TileMapObject & object;
@@ -75,4 +78,3 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
 
 #endif
 #endif
-

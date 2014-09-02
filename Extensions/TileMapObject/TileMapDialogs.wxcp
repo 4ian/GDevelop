@@ -117,7 +117,14 @@
 					"m_label":	"Bitmap File (256x256):",
 					"m_path":	""
 				}],
-			"m_events":	[],
+			"m_events":	[{
+					"m_eventName":	"wxEVT_CLOSE_WINDOW",
+					"m_eventClass":	"wxCloseEvent",
+					"m_eventHandler":	"wxCloseEventHandler",
+					"m_functionNameAndSignature":	"OnCloseButtonClicked(wxCloseEvent& event)",
+					"m_description":	"Process a close event. This event applies to wxFrame and wxDialog classes",
+					"m_noBody":	false
+				}],
 			"m_children":	[{
 					"m_type":	4480,
 					"proportion":	0,

@@ -146,6 +146,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     }
     Centre(wxBOTH);
     // Connect events
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Connect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
     this->Connect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Connect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
@@ -159,6 +160,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
 
 TileMapObjectEditorBase::~TileMapObjectEditorBase()
 {
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Disconnect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
     this->Disconnect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Disconnect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);

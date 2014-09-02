@@ -103,7 +103,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
 
 void TileSetPanel::OnLeftButtonPressed(wxMouseEvent& event)
 {
-    if(!m_tileset)
+    if(!m_tileset || m_tileset->IsDirty())
         return;
 
     wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());

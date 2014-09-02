@@ -65,7 +65,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         dc.DrawBitmap(m_tileset->GetWxBitmap(), 0, 0, false);
 
         //Draw the lines
-        dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
+        dc.SetPen(wxPen(wxColor(128, 128, 128, 255), 1));
         for(int row = firstRow; row < lastRow; row++)
         {
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y + (row - 1) * m_tileset->tileSpacing.y,
@@ -97,7 +97,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         //Draw a white background with a text
         dc.SetBrush(*wxWHITE_BRUSH);
         dc.DrawRectangle(minPos.x, minPos.y, width, height);
-        dc.DrawText(_("You haven't selected a tileset yet.\nClick on \"Configure the tileset\" to choose one."), minPos.x + 16, minPos.y + 16);
+        dc.DrawText(_("You haven't selected a tileset yet."), minPos.x + 16, minPos.y + 16);
     }
 }
 

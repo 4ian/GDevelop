@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	462,
+		"m_objCounter":	466,
 		"m_includeFiles":	["TileMapDialogsIds.h"],
 		"m_bitmapFunction":	"wxCF6DCInitBitmapResources",
 		"m_bitmapsFile":	"TileMapDialogs_wxsmith_bitmaps.cpp",
@@ -313,11 +313,11 @@
 									"m_children":	[{
 											"m_type":	4461,
 											"proportion":	0,
-											"border":	5,
+											"border":	0,
 											"gbSpan":	"1,1",
 											"gbPosition":	"0,0",
 											"m_styles":	["wxTB_HORZ_TEXT", "wxTB_NODIVIDER", "wxTB_FLAT"],
-											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
 													"type":	"winid",
 													"m_label":	"ID:",
@@ -669,11 +669,11 @@
 									"m_children":	[{
 											"m_type":	4461,
 											"proportion":	0,
-											"border":	5,
+											"border":	0,
 											"gbSpan":	"1,1",
 											"gbPosition":	"0,0",
 											"m_styles":	["wxTB_HORZ_TEXT", "wxTB_NODIVIDER", "wxTB_FLAT"],
-											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
 													"type":	"winid",
 													"m_label":	"ID:",
@@ -4421,7 +4421,7 @@
 								}, {
 									"type":	"string",
 									"m_label":	"Growable columns:",
-									"m_value":	"1"
+									"m_value":	"0"
 								}, {
 									"type":	"string",
 									"m_label":	"Growable rows:",
@@ -4439,7 +4439,7 @@
 							"m_children":	[{
 									"m_type":	4461,
 									"proportion":	0,
-									"border":	5,
+									"border":	0,
 									"gbSpan":	"1,1",
 									"gbPosition":	"0,0",
 									"m_styles":	["wxTB_HORZ_TEXT", "wxTB_NODIVIDER", "wxTB_FLAT"],

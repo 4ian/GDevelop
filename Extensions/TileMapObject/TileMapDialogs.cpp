@@ -237,9 +237,6 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->Add(flexGridSizer295, 1, wxALL|wxEXPAND, 5);
     
     m_textureNameTextCtrl = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
-    #if wxVERSION_NUMBER >= 3000
-    m_textureNameTextCtrl->SetHint(wxT(""));
-    #endif
     
     flexGridSizer295->Add(m_textureNameTextCtrl, 0, wxALL|wxEXPAND, 5);
     
@@ -322,9 +319,28 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     
     flexGridSizer2692->Add(m_tileSetPreviewPanel, 0, wxALL|wxEXPAND, 5);
     
+    wxFlexGridSizer* flexGridSizer468 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer468->SetFlexibleDirection( wxBOTH );
+    flexGridSizer468->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer468->AddGrowableCol(2);
+    flexGridSizer468->AddGrowableRow(0);
+    
+    flexGridSizer2671->Add(flexGridSizer468, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticBitmap470 = new wxStaticBitmap(m_mainPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer468->Add(m_staticBitmap470, 0, wxALL, 5);
+    
+    m_hyperLink472 = new wxHyperlinkCtrl(m_mainPanel, wxID_ANY, _("Help on this dialog"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink472->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink472->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink472->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer468->Add(m_hyperLink472, 0, wxALL, 5);
+    
     m_stdBtnSizer2713 = new wxStdDialogButtonSizer();
     
-    flexGridSizer2671->Add(m_stdBtnSizer2713, 0, wxALL|wxALIGN_RIGHT, 5);
+    flexGridSizer468->Add(m_stdBtnSizer2713, 0, wxALL|wxALIGN_RIGHT, 5);
     
     m_okButton = new wxButton(m_mainPanel, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
     m_stdBtnSizer2713->AddButton(m_okButton);
@@ -345,6 +361,7 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     m_tileHeightSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_spacingWidthSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_spacingHeightSpin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_hyperLink472->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileSetConfigurationEditorBase::OnHelpButtonClicked), NULL, this);
     m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnOkButtonClicked), NULL, this);
     m_cancelButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnCancelButtonClicked), NULL, this);
     
@@ -358,6 +375,7 @@ TileSetConfigurationEditorBase::~TileSetConfigurationEditorBase()
     m_tileHeightSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_spacingWidthSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
     m_spacingHeightSpin->Disconnect(wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler(TileSetConfigurationEditorBase::OnTileSetParameterUpdated), NULL, this);
+    m_hyperLink472->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileSetConfigurationEditorBase::OnHelpButtonClicked), NULL, this);
     m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnOkButtonClicked), NULL, this);
     m_cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnCancelButtonClicked), NULL, this);
     
@@ -422,9 +440,28 @@ TileMapConfigurationEditorBase::TileMapConfigurationEditorBase(wxWindow* parent,
     
     flexGridSizer380->Add(m_staticText388, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
+    wxFlexGridSizer* flexGridSizer474 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer474->SetFlexibleDirection( wxBOTH );
+    flexGridSizer474->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer474->AddGrowableCol(2);
+    flexGridSizer474->AddGrowableRow(0);
+    
+    flexGridSizer367->Add(flexGridSizer474, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticBitmap476 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer474->Add(m_staticBitmap476, 0, wxALL, 5);
+    
+    m_hyperLink478 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help on this dialog"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink478->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink478->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink478->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer474->Add(m_hyperLink478, 0, wxALL, 5);
+    
     m_stdBtnSizer371 = new wxStdDialogButtonSizer();
     
-    flexGridSizer367->Add(m_stdBtnSizer371, 0, wxALL|wxEXPAND, 5);
+    flexGridSizer474->Add(m_stdBtnSizer371, 0, wxALL|wxEXPAND, 5);
     
     m_okButton = new wxButton(this, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
     m_stdBtnSizer371->AddButton(m_okButton);
@@ -439,6 +476,7 @@ TileMapConfigurationEditorBase::TileMapConfigurationEditorBase(wxWindow* parent,
     }
     Centre(wxBOTH);
     // Connect events
+    m_hyperLink478->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapConfigurationEditorBase::OnHelpButtonClicked), NULL, this);
     m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnOkPressed), NULL, this);
     m_cancelButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnCancelPressed), NULL, this);
     
@@ -446,6 +484,7 @@ TileMapConfigurationEditorBase::TileMapConfigurationEditorBase(wxWindow* parent,
 
 TileMapConfigurationEditorBase::~TileMapConfigurationEditorBase()
 {
+    m_hyperLink478->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapConfigurationEditorBase::OnHelpButtonClicked), NULL, this);
     m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnOkPressed), NULL, this);
     m_cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnCancelPressed), NULL, this);
     

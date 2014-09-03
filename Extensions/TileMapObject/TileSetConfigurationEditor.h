@@ -49,6 +49,7 @@ private:
 	void UpdatePreviewTileSetPanel();
 
 protected:
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event);
     virtual void OnTileSetParameterUpdated(wxSpinEvent& event);
     virtual void OnTileSetTextureUpdated(wxCommandEvent& event);
     virtual void OnCancelButtonClicked(wxCommandEvent& event);

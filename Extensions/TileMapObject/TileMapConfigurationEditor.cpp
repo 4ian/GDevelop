@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #include "TileMapConfigurationEditor.h"
 
 #include <wx/msgdlg.h> 
+#include "GDCore/Tools/HelpFileAccess.h"
 
 TileMapConfigurationEditor::TileMapConfigurationEditor(wxWindow* parent, TileMap &tileMap_) : 
 	TileMapConfigurationEditorBase(parent),
@@ -66,4 +67,9 @@ void TileMapConfigurationEditor::OnOkPressed(wxCommandEvent& event)
 
 	tileMap.SetSize(newMapWidth, newMapHeight);
 	EndModal(1);
+}
+
+void TileMapConfigurationEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
+{
+	gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilemapconfig"));
 }

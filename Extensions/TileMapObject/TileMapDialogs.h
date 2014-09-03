@@ -90,6 +90,8 @@ protected:
     wxStaticText* m_staticText329;
     wxStaticText* m_staticText462;
     TileSetPanel* m_tileSetPreviewPanel;
+    wxStaticBitmap* m_staticBitmap470;
+    wxHyperlinkCtrl* m_hyperLink472;
     wxStdDialogButtonSizer* m_stdBtnSizer2713;
     wxButton* m_okButton;
     wxButton* m_cancelButton;
@@ -98,6 +100,7 @@ protected:
     virtual void OnTileSetTextureUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void OnSetTextureButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileSetParameterUpdated(wxSpinEvent& event) { event.Skip(); }
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event) { event.Skip(); }
     virtual void OnOkButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelButtonClicked(wxCommandEvent& event) { event.Skip(); }
 
@@ -115,11 +118,14 @@ protected:
     wxStaticText* m_staticText384;
     wxSpinCtrl* m_mapHeightSpin;
     wxStaticText* m_staticText388;
+    wxStaticBitmap* m_staticBitmap476;
+    wxHyperlinkCtrl* m_hyperLink478;
     wxStdDialogButtonSizer* m_stdBtnSizer371;
     wxButton* m_okButton;
     wxButton* m_cancelButton;
 
 protected:
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event) { event.Skip(); }
     virtual void OnOkPressed(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelPressed(wxCommandEvent& event) { event.Skip(); }
 

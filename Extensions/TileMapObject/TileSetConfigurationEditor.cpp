@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCpp/Project.h"
 
 TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet &tileSet_, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper) : 
@@ -125,4 +126,9 @@ void TileSetConfigurationEditor::OnTileSetTextureUpdated(wxCommandEvent& event)
 void TileSetConfigurationEditor::OnTileSetParameterUpdated(wxSpinEvent& event)
 {
     UpdatePreviewTileSetPanel();
+}
+
+void TileSetConfigurationEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
+{
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"));
 }

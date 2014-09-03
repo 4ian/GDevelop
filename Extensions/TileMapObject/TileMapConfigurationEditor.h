@@ -39,6 +39,7 @@ public:
 private:
 	TileMap &tileMap;
 protected:
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event);
     virtual void OnCancelPressed(wxCommandEvent& event);
     virtual void OnOkPressed(wxCommandEvent& event);
 };

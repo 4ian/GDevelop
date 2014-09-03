@@ -1,8 +1,7 @@
 /**
 
-Game Develop - Tiled Sprite Extension
-Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
-Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
+Game Develop - Tile Map Extension
+Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -50,6 +49,7 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual ~TileMapObjectEditor();
 
     protected:
+    virtual void OnCloseButtonClicked(wxCloseEvent& event);
     virtual void OnHelpButtonClicked(wxHyperlinkEvent& event);
     virtual void OnTileEditToolClicked(wxCommandEvent& event);
         virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event);
@@ -63,6 +63,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
     private:
         void UpdateLayerChoice();
 
+        bool AskCloseConfirmation();
+
         gd::Project & game;
         gd::MainFrameWrapper & mainFrameWrapper;
         TileMapObject & object;
@@ -75,4 +77,3 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
 
 #endif
 #endif
-

@@ -43,7 +43,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_tileSetToolBar = new wxToolBar(m_tileSetPropertiesPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
     m_tileSetToolBar->SetToolBitmapSize(wxSize(16,16));
     
-    flexGridSizer5->Add(m_tileSetToolBar, 0, wxALL, 5);
+    flexGridSizer5->Add(m_tileSetToolBar, 0, wxALL|wxEXPAND, 0);
     
     m_tileSetToolBar->AddTool(CONFIGURE_TILESET_TOOL_ID, _("Configure the tileset"), wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     
@@ -70,7 +70,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_mainPanelToolbar = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
     m_mainPanelToolbar->SetToolBitmapSize(wxSize(16,16));
     
-    flexGridSizer200->Add(m_mainPanelToolbar, 0, wxALL, 5);
+    flexGridSizer200->Add(m_mainPanelToolbar, 0, wxALL|wxEXPAND, 0);
     
     m_mainPanelToolbar->AddTool(CHANGE_MAP_SIZE_TOOL_ID, _("Change map size"), wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     
@@ -146,6 +146,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     }
     Centre(wxBOTH);
     // Connect events
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Connect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
     this->Connect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Connect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
@@ -159,6 +160,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
 
 TileMapObjectEditorBase::~TileMapObjectEditorBase()
 {
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Disconnect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
     this->Disconnect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Disconnect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
@@ -311,7 +313,9 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     
     flexGridSizer317->Add(m_staticText329, 0, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     
-    flexGridSizer2692->Add(0, 0, 1, wxALL, 5);
+    m_staticText462 = new wxStaticText(m_mainPanel, wxID_ANY, _("Preview:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer2692->Add(m_staticText462, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     
     m_tileSetPreviewPanel = new TileSetPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxHSCROLL|wxVSCROLL);
     m_tileSetPreviewPanel->SetScrollRate(5, 5);
@@ -467,7 +471,7 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     wxFlexGridSizer* flexGridSizer416 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer416->SetFlexibleDirection( wxBOTH );
     flexGridSizer416->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer416->AddGrowableCol(1);
+    flexGridSizer416->AddGrowableCol(0);
     flexGridSizer416->AddGrowableRow(0);
     
     flexGridSizer398->Add(flexGridSizer416, 1, wxALL|wxEXPAND, 0);
@@ -475,7 +479,7 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     m_mainToolbar = new wxToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
     m_mainToolbar->SetToolBitmapSize(wxSize(16,16));
     
-    flexGridSizer416->Add(m_mainToolbar, 0, wxALL|wxEXPAND, 5);
+    flexGridSizer416->Add(m_mainToolbar, 0, wxALL|wxEXPAND, 0);
     
     m_mainToolbar->AddTool(COLLIDABLE_TOOL_ID, _("Collidable"), wxXmlResource::Get()->LoadBitmap(wxT("pathfindingobstacleicon16")), wxNullBitmap, wxITEM_CHECK, _("Activates the collision mask for collision detection"), wxT(""), NULL);
     

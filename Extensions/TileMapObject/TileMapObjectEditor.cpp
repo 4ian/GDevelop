@@ -1,8 +1,7 @@
 /**
 
-Game Develop - Tiled Sprite Extension
-Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
-Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
+Game Develop - Tile Map Extension
+Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -34,6 +33,7 @@ freely, subject to the following restrictions:
 #include <wx/textdlg.h> 
 #include <wx/settings.h>
 #include <wx/config.h>
+#include <wx/msgdlg.h> 
 
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
@@ -130,9 +130,15 @@ void TileMapObjectEditor::UpdateLayerChoice()
     m_layerChoice->SetSelection(m_tileMapPanel->GetCurrentLayer());
 }
 
+bool TileMapObjectEditor::AskCloseConfirmation()
+{
+    return wxMessageBox(_("Do you want to cancel all the changes made ?"), _("Confirm"), wxYES_NO|wxICON_QUESTION|wxNO_DEFAULT, this) == wxYES;
+}
+
 void TileMapObjectEditor::OnCancelButtonPressed(wxCommandEvent& event)
 {
-    EndModal(0);
+    if(AskCloseConfirmation())
+        EndModal(0);
 }
 
 void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
@@ -180,6 +186,12 @@ void TileMapObjectEditor::OnChangeMapSizeButtonClicked(wxCommandEvent& event)
 void TileMapObjectEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
 {
     gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap"));
+}
+
+void TileMapObjectEditor::OnCloseButtonClicked(wxCloseEvent& event)
+{
+    if(AskCloseConfirmation())
+        EndModal(0);
 }
 
 #endif

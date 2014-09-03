@@ -1,3 +1,29 @@
+/**
+
+Game Develop - Tile Map Extension
+Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+    2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
+
+    3. This notice may not be removed or altered from any source
+    distribution.
+
+*/
+
 #include "TileSetPanel.h"
 
 #include <iostream>
@@ -45,11 +71,17 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
     //Get the viewport
     wxPoint minPos = GetViewStart();
     int width, height;
-    GetVirtualSize(&width, &height);
+    GetClientSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
     if(m_tileset && !m_tileset->IsDirty())
     {
+        //Determine the first and last columns and rows to draw
+        int firstCol = std::max((int)(minPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) - 1), 0);
+        int firstRow = std::max((int)(minPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) - 1), 0);
+        int lastCol = std::min((int)(maxPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) + 1), m_tileset->GetColumnsCount());
+        int lastRow = std::min((int)(maxPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) + 1), m_tileset->GetRowsCount());
+
         //Draw the background
         dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
         dc.DrawRectangle(minPos.x, minPos.y, width, height);
@@ -59,8 +91,8 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         dc.DrawBitmap(m_tileset->GetWxBitmap(), 0, 0, false);
 
         //Draw the lines
-        dc.SetPen(wxPen(wxColor(128, 128, 128, 128), 1));
-        for(int row = 1; row < m_tileset->GetRowsCount(); row++)
+        dc.SetPen(wxPen(wxColor(128, 128, 128, 255), 1));
+        for(int row = firstRow; row < lastRow; row++)
         {
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y + (row - 1) * m_tileset->tileSpacing.y,
                         maxPos.x, row * m_tileset->tileSize.y + (row - 1) * m_tileset->tileSpacing.y);
@@ -68,7 +100,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
             dc.DrawLine(minPos.x, row * m_tileset->tileSize.y + (row) * m_tileset->tileSpacing.y - 1,
                         maxPos.x, row * m_tileset->tileSize.y + (row) * m_tileset->tileSpacing.y - 1);
 
-            for(int col = 1; col < m_tileset->GetColumnsCount(); col++)
+            for(int col = firstCol; col < lastCol; col++)
             {
                 dc.DrawLine(col * m_tileset->tileSize.x + (col - 1) * m_tileset->tileSpacing.x, minPos.y,
                             col * m_tileset->tileSize.x + (col - 1) * m_tileset->tileSpacing.x, maxPos.y);
@@ -91,13 +123,13 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         //Draw a white background with a text
         dc.SetBrush(*wxWHITE_BRUSH);
         dc.DrawRectangle(minPos.x, minPos.y, width, height);
-        dc.DrawText(_("You haven't selected a tileset yet.\nClick on \"Configure the tileset\" to choose one."), minPos.x + 16, minPos.y + 16);
+        dc.DrawText(_("You haven't selected a tileset yet."), minPos.x + 16, minPos.y + 16);
     }
 }
 
 void TileSetPanel::OnLeftButtonPressed(wxMouseEvent& event)
 {
-    if(!m_tileset)
+    if(!m_tileset || m_tileset->IsDirty())
         return;
 
     wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());

@@ -52,6 +52,7 @@ protected:
     wxButton* m_button64;
 
 protected:
+    virtual void OnCloseButtonClicked(wxCloseEvent& event) { event.Skip(); }
     virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileEditToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event) { event.Skip(); }
@@ -87,6 +88,7 @@ protected:
     wxStaticText* m_staticText325;
     wxSpinCtrl* m_spacingHeightSpin;
     wxStaticText* m_staticText329;
+    wxStaticText* m_staticText462;
     TileSetPanel* m_tileSetPreviewPanel;
     wxStdDialogButtonSizer* m_stdBtnSizer2713;
     wxButton* m_okButton;

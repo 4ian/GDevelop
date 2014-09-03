@@ -48,8 +48,7 @@
             <growablecols>0</growablecols>
             <growablerows>1</growablerows>
             <object class="sizeritem">
-              <flag>wxALL</flag>
-              <border>5</border>
+              <flag>wxALL|wxEXPAND</flag>
               <object class="wxToolBar" name="m_tileSetToolBar">
                 <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
                 <bitmapsize>16,16</bitmapsize>
@@ -119,8 +118,7 @@
             <growablecols>0</growablecols>
             <growablerows>1</growablerows>
             <object class="sizeritem">
-              <flag>wxALL</flag>
-              <border>5</border>
+              <flag>wxALL|wxEXPAND</flag>
               <object class="wxToolBar" name="m_mainPanelToolbar">
                 <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
                 <bitmapsize>16,16</bitmapsize>
@@ -522,10 +520,15 @@
                     </object>
                   </object>
                 </object>
-                <object class="spacer" name="Spacer458">
-                  <flag>wxALL</flag>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
-                  <option>1</option>
+                  <object class="wxStaticText" name="m_staticText462">
+                    <label>
+                      <![CDATA[Preview:]]>
+                    </label>
+                    <style/>
+                  </object>
                 </object>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
@@ -706,11 +709,10 @@
           <rows>1</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
-          <growablecols>1</growablecols>
+          <growablecols>0</growablecols>
           <growablerows>0</growablerows>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
             <object class="wxToolBar" name="m_mainToolbar">
               <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
               <bitmapsize>16,16</bitmapsize>

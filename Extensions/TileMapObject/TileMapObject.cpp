@@ -1,8 +1,7 @@
 /**
 
-Game Develop - Tiled Sprite Extension
-Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
-Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
+Game Develop - Tile Map Extension
+Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,6 +23,9 @@ freely, subject to the following restrictions:
     distribution.
 
 */
+
+#include <math.h>
+#include <iostream>
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
@@ -310,9 +312,14 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
+    //Get the current view
+    sf::View currentView = window.getView();
+    sf::Vector2f centerPos = currentView.getCenter();
+
     //Construct the transform
     sf::Transform transform;
-    transform.translate(GetX(), GetY());
+    transform.translate((int)GetX() + centerPos.x - floor(centerPos.x), 
+                        (int)GetY() + centerPos.y - floor(centerPos.y));
     
     //Unsmooth the texture
     bool wasSmooth = tileSet.Get().GetTexture().isSmooth();
@@ -372,9 +379,14 @@ void TileMapObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rend
     if(tileSet.Get().IsDirty())
         return;
 
+    //Get the current view
+    sf::View currentView = renderTarget.getView();
+    sf::Vector2f centerPos = currentView.getCenter();
+
     //Construct the transform
     sf::Transform transform;
-    transform.translate(instance.GetX(), instance.GetY());
+    transform.translate(instance.GetX() + centerPos.x - floor(centerPos.x), 
+                        instance.GetY() + centerPos.y - floor(centerPos.y));
 
     //Unsmooth the texture
     bool wasSmooth = tileSet.Get().GetTexture().isSmooth();

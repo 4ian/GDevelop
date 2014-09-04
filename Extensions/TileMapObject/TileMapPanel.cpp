@@ -37,13 +37,17 @@ TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     m_hideUpperLayers(false),
     m_tileset(NULL),
     m_tilemap(NULL),
-    m_mapCurrentLayer(0)
+    m_mapCurrentLayer(0),
+    m_insertionMode(PencilMode),
+    m_isDrawingRectangle(false)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 
     Connect(wxEVT_PAINT, wxPaintEventHandler(TileMapPanel::OnPaint), NULL, this);
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
     Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
+    Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
+    Connect(wxEVT_RIGHT_UP, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
     Connect(wxEVT_MOTION, wxMouseEventHandler(TileMapPanel::OnMouseEvent), NULL, this);
 }
 
@@ -90,6 +94,12 @@ void TileMapPanel::Update()
     Refresh();
 }
 
+void TileMapPanel::SetInsertionMode(InsertionMode newInsertionMode)
+{
+    m_insertionMode = newInsertionMode;
+    Update();
+}
+
 void TileMapPanel::OnTileSetSelectionChanged(TileSelectionEvent &event)
 {
     m_tileToBeInserted = event.GetSelectedTile();
@@ -133,6 +143,25 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
             }
         }
     }
+
+    //Draw the rectangle (when the mode is RectangleMode)
+    if(m_insertionMode == RectangleMode && m_isDrawingRectangle)
+    {
+        dc.SetBrush(wxBrush(wxColour(128, 128, 255, 128)));
+        dc.SetPen(wxPen(wxColor(128, 128, 255, 255), 1));
+
+        wxPoint topLeftPos(GetPositionOfTile(std::min(m_beginCol, m_endCol), 
+                                             std::min(m_beginRow, m_endRow)));
+
+        wxPoint bottomRightPos(GetPositionOfTile(std::max(m_beginCol + 1, m_endCol + 1), 
+                                                 std::max(m_beginRow + 1, m_endRow + 1)));
+
+        wxSize rectSize(bottomRightPos.x - topLeftPos.x, bottomRightPos.y - topLeftPos.y);
+
+        dc.DrawRectangle(topLeftPos, rectSize);
+    }
+
+    dc.SetPen(wxPen(wxColor(128, 128, 128, 255), 1));
 
     //Draw the grid
     for(int col = firstCol; col < lastCol; col++)
@@ -178,17 +207,72 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
     if(currentColumn >= m_tilemap->GetColumnsCount() || currentRow >= m_tilemap->GetRowsCount())
         return; //Stop if the position is out of range
 
-    if(event.LeftIsDown()) //Left mouse button pressed
+    if(m_insertionMode == PencilMode)
     {
-        //Add a tile to the current position
-        m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted);
-        Refresh();
+        if(event.GetEventType() == wxEVT_LEFT_DOWN || event.GetEventType() == wxEVT_RIGHT_DOWN || event.GetEventType() == wxEVT_MOTION)
+        {
+            if(event.LeftIsDown()) //Left mouse button pressed
+            {
+                //Add a tile to the current position
+                m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted);
+                Refresh();
+            }
+            else if(event.RightIsDown())
+            {
+                //Remove the tile
+                m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, -1);
+                Refresh();
+            }
+        }
     }
-    else if(event.RightIsDown())
+    else if(m_insertionMode == RectangleMode)
     {
-        //Remove the tile
-        m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, -1);
-        Refresh();
+        if(event.GetEventType() == wxEVT_LEFT_DOWN || event.GetEventType() == wxEVT_RIGHT_DOWN)
+        {
+            m_isDrawingRectangle = true;
+            m_beginCol = m_endCol = currentColumn;
+            m_beginRow = m_endRow = currentRow;
+
+            Update();
+        }
+        else if(event.GetEventType() == wxEVT_MOTION)
+        {
+            m_endCol = currentColumn;
+            m_endRow = currentRow;
+            Update();
+        }
+        else if(event.GetEventType() == wxEVT_LEFT_UP)
+        {
+            m_endCol = currentColumn;
+            m_endRow = currentRow;
+            m_isDrawingRectangle = false;
+
+            for(int col = std::min(m_beginCol, m_endCol); col <= std::max(m_beginCol, m_endCol); col++)
+            {
+                for(int row = std::min(m_beginRow, m_endRow); row <= std::max(m_beginRow, m_endRow); row++)
+                {
+                    m_tilemap->SetTile(m_mapCurrentLayer, col, row, m_tileToBeInserted);
+                }
+            }
+
+            Update();
+        }
+        else if(event.GetEventType() == wxEVT_RIGHT_UP)
+        {
+            m_endCol = currentColumn;
+            m_endRow = currentRow;
+            m_isDrawingRectangle = false;
+
+            for(int col = std::min(m_beginCol, m_endCol); col <= std::max(m_beginCol, m_endCol); col++)
+            {
+                for(int row = std::min(m_beginRow, m_endRow); row <= std::max(m_beginRow, m_endRow); row++)
+                {
+                    m_tilemap->SetTile(m_mapCurrentLayer, col, row, -1);
+                }
+            }
+
+            Update();
+        }
     }
 }
 

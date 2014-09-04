@@ -117,54 +117,125 @@
             <hgap>0</hgap>
             <growablecols>0</growablecols>
             <growablerows>1</growablerows>
-            <object class="sizeritem">
+            <object class="sizeritem" name="flexGridSizer490">
               <flag>wxALL|wxEXPAND</flag>
-              <object class="wxToolBar" name="m_mainPanelToolbar">
-                <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
-                <bitmapsize>16,16</bitmapsize>
-                <object class="tool" name="m_changeMapSizeTool">
-                  <label>
-                    <![CDATA[Change map size]]>
-                  </label>
-                  <longhelp>
-                    <![CDATA[]]>
-                  </longhelp>
-                  <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>0</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>1</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND|wxALIGN_TOP</flag>
+                  <object class="wxToolBar" name="m_toolbar492">
+                    <style>wxTB_NODIVIDER|wxTB_FLAT</style>
+                    <bitmapsize>16,16</bitmapsize>
+                    <object class="tool" name="m_toolbarItem494">
+                      <radio>1</radio>
+                      <label>
+                        <![CDATA[Pencil mode]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Pencil mode\nAdd tiles only where the mouse goes.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem500">
+                      <radio>1</radio>
+                      <label>
+                        <![CDATA[Rectangle mode]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Rectangle mode\nAdd tile in a rectangle from the position where the mouse was pressed to the position the mouse was released.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                    <object class="tool" name="m_toolbarItem502">
+                      <label>
+                        <![CDATA[Fill layer]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Fill the whole layer with the selected tile.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/fill16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem504">
+                      <label>
+                        <![CDATA[Erase all the layer]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Delete all the tiles from the current layer.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                  </object>
                 </object>
-                <object class="separator"/>
-                <object class="wxStaticText" name="m_staticText355">
-                  <label>
-                    <![CDATA[Current layer:]]>
-                  </label>
-                  <style/>
-                </object>
-                <object class="wxChoice" name="m_layerChoice">
-                  <style/>
-                  <content>
-                    <item>
-                      <![CDATA[Back]]>
-                    </item>
-                    <item>
-                      <![CDATA[Middle]]>
-                    </item>
-                    <item>
-                      <![CDATA[Top]]>
-                    </item>
-                  </content>
-                  <selection>
-                    <![CDATA[0]]>
-                  </selection>
-                </object>
-                <object class="separator"/>
-                <object class="tool" name="m_hideUpperLayerCheck">
-                  <toggle>1</toggle>
-                  <label>
-                    <![CDATA[Hide upper layers]]>
-                  </label>
-                  <longhelp>
-                    <![CDATA[]]>
-                  </longhelp>
-                  <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/layer16.png</bitmap>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxToolBar" name="m_mainPanelToolbar">
+                    <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
+                    <bitmapsize>16,16</bitmapsize>
+                    <object class="tool" name="m_changeMapSizeTool">
+                      <label>
+                        <![CDATA[Change map size]]>
+                      </label>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                    <object class="wxStaticText" name="m_staticText355">
+                      <label>
+                        <![CDATA[Current layer:]]>
+                      </label>
+                      <style/>
+                    </object>
+                    <object class="wxChoice" name="m_layerChoice">
+                      <style/>
+                      <content>
+                        <item>
+                          <![CDATA[Back]]>
+                        </item>
+                        <item>
+                          <![CDATA[Middle]]>
+                        </item>
+                        <item>
+                          <![CDATA[Top]]>
+                        </item>
+                      </content>
+                      <selection>
+                        <![CDATA[0]]>
+                      </selection>
+                    </object>
+                    <object class="separator"/>
+                    <object class="tool" name="m_hideUpperLayerCheck">
+                      <toggle>1</toggle>
+                      <label>
+                        <![CDATA[Hide upper layers]]>
+                      </label>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/layer16.png</bitmap>
+                    </object>
+                  </object>
                 </object>
               </object>
             </object>

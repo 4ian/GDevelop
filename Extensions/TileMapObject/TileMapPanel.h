@@ -39,15 +39,13 @@ freely, subject to the following restrictions:
  
 class TileMapPanel : public wxScrolledWindow
 {
-    //Tile to be inserted
-    int m_tileToBeInserted;
-    bool m_hideUpperLayers;
-
-    TileSet *m_tileset;
-    TileMap *m_tilemap;
-    int m_mapCurrentLayer;
-
 public:
+    enum InsertionMode
+    {
+        PencilMode,
+        RectangleMode
+    };
+
     TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=wxHSCROLL|wxVSCROLL);
     ~TileMapPanel();
 
@@ -79,6 +77,11 @@ public:
      */
     void Update();
 
+    /**
+     * Change the insertion mode
+     */
+    void SetInsertionMode(InsertionMode newInsertionMode);
+
     void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
 protected:
@@ -88,6 +91,24 @@ protected:
 private:
     wxPoint GetPositionOfTile(int column, int row);
     void GetTileAt(wxPoint position, int &tileCol, int &tileRow);
+
+    //Tile to be inserted
+    int m_tileToBeInserted;
+    bool m_hideUpperLayers;
+
+    TileSet *m_tileset;
+    TileMap *m_tilemap;
+    int m_mapCurrentLayer;
+
+    InsertionMode m_insertionMode;
+
+    //Some parameters for the Rectangle Mode
+    bool m_isDrawingRectangle;
+    int m_beginCol;
+    int m_beginRow;
+    int m_endCol;
+    int m_endRow;
+    
 };
 
 #endif

@@ -29,13 +29,18 @@ freely, subject to the following restrictions:
 
 enum 
 {
-    //TileMapObjectEditor IDs
+    //TileMapObjectEditor IDs 
     CHANGE_MAP_SIZE_TOOL_ID = 		1001,
     CONFIGURE_TILESET_TOOL_ID = 	1002,
     EDIT_TILE_TOOL_ID = 			1003,
     HIDE_UPPER_LAYERS_TOOL_ID = 	1004,
     ID_MAINPANEL = 					1005,
     ID_TILESETPANEL = 				1006,
+    MODE_SINGLE_TILE_TOOL_ID =      1007,
+    MODE_RECTANGLE_TILE_TOOL_ID =   1008,
+    FILL_WITH_TILE_TOOL_ID =        1009,
+    ERASE_ALL_TILES_TOOL_ID =       1010,
+
 
     //TileEditor IDs
     ADD_POINT_TOOL_ID = 			1101,

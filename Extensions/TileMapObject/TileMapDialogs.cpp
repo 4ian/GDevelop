@@ -67,10 +67,36 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer200->AddGrowableRow(1);
     m_mainPanel->SetSizer(flexGridSizer200);
     
+    wxFlexGridSizer* flexGridSizer490 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer490->SetFlexibleDirection( wxBOTH );
+    flexGridSizer490->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer490->AddGrowableCol(1);
+    flexGridSizer490->AddGrowableRow(0);
+    
+    flexGridSizer200->Add(flexGridSizer490, 1, wxALL|wxEXPAND, 0);
+    
+    m_toolbar492 = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_NODIVIDER|wxTB_FLAT);
+    m_toolbar492->SetToolBitmapSize(wxSize(16,16));
+    
+    flexGridSizer490->Add(m_toolbar492, 0, wxALL|wxEXPAND|wxALIGN_TOP, 0);
+    
+    m_toolbar492->AddTool(MODE_SINGLE_TILE_TOOL_ID, _("Pencil mode"), wxXmlResource::Get()->LoadBitmap(wxT("edit16")), wxNullBitmap, wxITEM_RADIO, _("Pencil mode\nAdd tiles only where the mouse goes."), wxT(""), NULL);
+    
+    m_toolbar492->AddTool(MODE_RECTANGLE_TILE_TOOL_ID, _("Rectangle mode"), wxXmlResource::Get()->LoadBitmap(wxT("rectangle")), wxNullBitmap, wxITEM_RADIO, _("Rectangle mode\nAdd tile in a rectangle from the position where the mouse was pressed to the position the mouse was released."), wxT(""), NULL);
+    
+    m_toolbar492->AddSeparator();
+    
+    m_toolbar492->AddTool(FILL_WITH_TILE_TOOL_ID, _("Fill layer"), wxXmlResource::Get()->LoadBitmap(wxT("fill16")), wxNullBitmap, wxITEM_NORMAL, _("Fill the whole layer with the selected tile."), wxT(""), NULL);
+    
+    m_toolbar492->AddTool(ERASE_ALL_TILES_TOOL_ID, _("Erase all the layer"), wxXmlResource::Get()->LoadBitmap(wxT("delete16")), wxNullBitmap, wxITEM_NORMAL, _("Delete all the tiles from the current layer."), wxT(""), NULL);
+    
+    m_toolbar492->AddSeparator();
+    m_toolbar492->Realize();
+    
     m_mainPanelToolbar = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT);
     m_mainPanelToolbar->SetToolBitmapSize(wxSize(16,16));
     
-    flexGridSizer200->Add(m_mainPanelToolbar, 0, wxALL|wxEXPAND, 0);
+    flexGridSizer490->Add(m_mainPanelToolbar, 0, wxALL|wxEXPAND, 0);
     
     m_mainPanelToolbar->AddTool(CHANGE_MAP_SIZE_TOOL_ID, _("Change map size"), wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
     
@@ -149,6 +175,8 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Connect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
     this->Connect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
+    this->Connect(MODE_SINGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
+    this->Connect(MODE_RECTANGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Connect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Connect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
@@ -163,6 +191,8 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Disconnect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
     this->Disconnect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
+    this->Disconnect(MODE_SINGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
+    this->Disconnect(MODE_RECTANGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Disconnect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Disconnect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);

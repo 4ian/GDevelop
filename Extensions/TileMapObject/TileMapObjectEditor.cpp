@@ -194,4 +194,16 @@ void TileMapObjectEditor::OnCloseButtonClicked(wxCloseEvent& event)
         EndModal(0);
 }
 
+void TileMapObjectEditor::OnTileInsertionModeChanged(wxCommandEvent& event)
+{
+    if(event.GetId() == MODE_SINGLE_TILE_TOOL_ID)
+    {
+        m_tileMapPanel->SetInsertionMode(TileMapPanel::PencilMode);
+    }
+    else if(event.GetId() == MODE_RECTANGLE_TILE_TOOL_ID)
+    {
+        m_tileMapPanel->SetInsertionMode(TileMapPanel::RectangleMode);
+    }
+}
+
 #endif

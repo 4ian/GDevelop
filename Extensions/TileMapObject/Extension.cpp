@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "TileMapObject.h"
+#include "RuntimeTileMapObject.h"
 #include <iostream>
 #include <boost/version.hpp>
 
@@ -50,7 +51,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
                &DestroyTileMapObject);
 
     #if defined(GD_IDE_ONLY)
-    obj.SetIncludeFile("TileMapObject/TileMapObject.h");
+    obj.SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddCondition("Width",
                    _("Width"),
@@ -63,7 +64,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TileMapObject/TileMapObject.h");
+        .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddCondition("Height",
                    _("Height"),
@@ -76,7 +77,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/TileMapObject.h");
+        .codeExtraInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     extension.AddCondition("SingleTileCollision",
                    _("Collision with one tile"),
@@ -92,15 +93,15 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("objectList", _("Object"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple()
-        .codeExtraInformation.SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/TileMapObject.h");
+        .codeExtraInformation.SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddExpression("TileWidth", _("Tile width"), _("Tile width"), _("Tiles"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("GetTileWidth").SetIncludeFile("TileMapObject/TileMapObject.h");
+        .codeExtraInformation.SetFunctionName("GetTileWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddExpression("TileHeight", _("Tile height"), _("Tile height"), _("Tiles"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/TileMapObject.h");
+        .codeExtraInformation.SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     /*obj.AddAction("YOffset",
                    _("Image Y Offset"),

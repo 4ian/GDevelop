@@ -124,6 +124,9 @@ include_directories(.)
 set(source_files
 	Extension.cpp
 	TileMapObject.cpp
+	RuntimeTileMapObject.cpp
+	TileMapTools.cpp
+	TileMapProxies.cpp
 	TileMap.cpp
 	TileSet.cpp
 	)
@@ -135,7 +138,6 @@ set(gdide_source_files
 	TileEditor.cpp
 	TileSetPanel.cpp
 	TileMapPanel.cpp
-	TileMap.cpp
 	TileMapDialogs.cpp
 	TileMapDialogs.xrc
 	TileMapDialogs_wxsmith_bitmaps.cpp)

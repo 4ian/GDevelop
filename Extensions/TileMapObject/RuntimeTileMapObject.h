@@ -24,8 +24,11 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef TILEMAPOBJECT_H
-#define TILEMAPOBJECT_H
+#ifndef RUNTIMETILEMAPOBJECT_H
+#define RUNTIMETILEMAPOBJECT_H
+
+#include <string>
+
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include <GDCpp/Polygon.h>
@@ -45,48 +48,61 @@ class wxBitmap;
 class wxWindow;
 #endif
 
-/**
- * TileMap Object
- */
-class GD_EXTENSION_API TileMapObject : public gd::Object
+class GD_EXTENSION_API RuntimeTileMapObject : public RuntimeObject
 {
+
 public :
 
-    TileMapObject(std::string name_);
-    virtual ~TileMapObject() {};
-    virtual gd::Object * Clone() const { return new TileMapObject(*this);}
+    RuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeTileMapObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeTileMapObject(*this);}
 
-    #if defined(GD_IDE_ONLY)
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-
-    virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
-    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
-    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
-    #endif
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
     virtual float GetWidth() const;
     virtual float GetHeight() const;
 
+    virtual float GetAngle() const {return 0;};
+    virtual bool SetAngle(float ang) {return false;};
+
     virtual void SetWidth(float newWidth) {};
     virtual void SetHeight(float newHeight) {};
 
+    virtual void OnPositionChanged();
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
+
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
+
+    float GetTileWidth() const;
+    float GetTileHeight() const;
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
-    std::string textureName;
 
 private:
 
-    virtual void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
-    #if defined(GD_IDE_ONLY)
-    virtual void DoSerializeTo(gd::SerializerElement & element) const;
-    #endif
-
     sf::VertexArray vertexArray;
+    std::vector<Polygon2d> hitboxes;
+
+    boost::shared_ptr<SFMLTextureWrapper> texture;
+
+    float oldX;
+    float oldY;
 };
 
-void DestroyTileMapObject(gd::Object * object);
-gd::Object * CreateTileMapObject(std::string name);
+bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
+                         int layer,
+                         int column,
+                         int row,
+                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
+                         bool conditionInverted);
 
-#endif // TILEDSPRITEOBJECT_H
+void DestroyRuntimeTileMapObject(RuntimeObject * object);
+RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);
+
+#endif

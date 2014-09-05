@@ -926,7 +926,14 @@
 																	"m_label":	"Construct the Dropdown Menu:",
 																	"m_value":	true
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+																	"m_eventClass":	"wxCommandEvent",
+																	"m_eventHandler":	"wxCommandEventHandler",
+																	"m_functionNameAndSignature":	"OnFillLayerToolClicked(wxCommandEvent& event)",
+																	"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4462,
@@ -974,7 +981,14 @@
 																	"m_label":	"Construct the Dropdown Menu:",
 																	"m_value":	true
 																}],
-															"m_events":	[],
+															"m_events":	[{
+																	"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+																	"m_eventClass":	"wxCommandEvent",
+																	"m_eventHandler":	"wxCommandEventHandler",
+																	"m_functionNameAndSignature":	"OnClearLayerToolClicked(wxCommandEvent& event)",
+																	"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+																	"m_noBody":	false
+																}],
 															"m_children":	[]
 														}, {
 															"m_type":	4504,

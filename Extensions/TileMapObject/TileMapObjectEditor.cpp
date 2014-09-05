@@ -206,4 +206,16 @@ void TileMapObjectEditor::OnTileInsertionModeChanged(wxCommandEvent& event)
     }
 }
 
+void TileMapObjectEditor::OnClearLayerToolClicked(wxCommandEvent& event)
+{
+    if(wxMessageBox(_("Are you sure to clear the whole layer ?"), _("Confirm"), wxYES_NO|wxICON_QUESTION|wxNO_DEFAULT, this) == wxYES)
+        m_tileMapPanel->FillLayer(m_tileMapPanel->GetCurrentLayer(), -1);
+}
+
+void TileMapObjectEditor::OnFillLayerToolClicked(wxCommandEvent& event)
+{
+    if(wxMessageBox(_("Are you sure to fill the whole layer with that tile ?"), _("Confirm"), wxYES_NO|wxICON_QUESTION|wxNO_DEFAULT, this) == wxYES)
+        m_tileMapPanel->FillLayer(m_tileMapPanel->GetCurrentLayer(), m_tileSetPanel->GetSelectedTile());
+}
+
 #endif

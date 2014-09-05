@@ -57,6 +57,8 @@ protected:
     virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileEditToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileInsertionModeChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnFillLayerToolClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnClearLayerToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnChangeMapSizeButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }

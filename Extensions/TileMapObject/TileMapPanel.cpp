@@ -84,6 +84,22 @@ void TileMapPanel::SetCurrentLayer(int currentLayer)
     Refresh();
 }
 
+void TileMapPanel::FillLayer(int layer, int tile)
+{
+    if(!m_tilemap)
+        return;
+
+    for(int col = 0; col < m_tilemap->GetColumnsCount(); col++)
+    {
+        for(int row = 0; row < m_tilemap->GetRowsCount(); row++)
+        {
+            m_tilemap->SetTile(layer, col, row, tile);
+        }
+    }
+
+    Refresh();
+}
+
 void TileMapPanel::Update()
 {
     if(!m_tilemap || !m_tileset)

@@ -55,6 +55,13 @@ void TileSetPanel::SetTileSet(TileSet *tileset)
     Update();
 }
 
+int TileSetPanel::GetSelectedTile() const
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return -1;
+    
+    return m_tileset->GetTileIDFromCell(m_selectedCol, m_selectedRow);
+}
 
 void TileSetPanel::Update()
 {

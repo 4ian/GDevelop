@@ -177,6 +177,8 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     this->Connect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Connect(MODE_SINGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Connect(MODE_RECTANGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
+    this->Connect(FILL_WITH_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnFillLayerToolClicked), NULL, this);
+    this->Connect(ERASE_ALL_TILES_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnClearLayerToolClicked), NULL, this);
     this->Connect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Connect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
@@ -193,6 +195,8 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     this->Disconnect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Disconnect(MODE_SINGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Disconnect(MODE_RECTANGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
+    this->Disconnect(FILL_WITH_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnFillLayerToolClicked), NULL, this);
+    this->Disconnect(ERASE_ALL_TILES_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnClearLayerToolClicked), NULL, this);
     this->Disconnect(CHANGE_MAP_SIZE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnChangeMapSizeButtonClicked), NULL, this);
     m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Disconnect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);

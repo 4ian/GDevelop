@@ -67,6 +67,8 @@ public:
 
     void SetTileSet(TileSet *tileset);
 
+    int GetSelectedTile() const;
+
     void Update(); //Refresh.
 
 protected:

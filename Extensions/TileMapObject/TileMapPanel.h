@@ -73,6 +73,11 @@ public:
     void SetCurrentLayer(int currentLayer);
 
     /**
+     * Fill a layer with the given tile
+     */
+    void FillLayer(int layer, int tile);
+
+    /**
      * Refresh and recreate tile cache.
      */
     void Update();

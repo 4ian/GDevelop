@@ -156,6 +156,15 @@ float RuntimeTileMapObject::GetTileHeight() const
     return tileSet.Get().tileSize.y;
 }
 
+float RuntimeTileMapObject::GetMapWidth() const
+{
+    return static_cast<float>(tileMap.Get().GetColumnsCount());
+}
+
+float RuntimeTileMapObject::GetMapHeight() const
+{
+    return static_cast<float>(tileMap.Get().GetRowsCount());
+}
 
 namespace
 {

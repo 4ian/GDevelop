@@ -103,6 +103,14 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "TileMap", false)
         .codeExtraInformation.SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
+    obj.AddExpression("MapWidth", _("Map width"), _("Map width"), _("Map"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .codeExtraInformation.SetFunctionName("GetMapWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+    obj.AddExpression("MapHeight", _("Map height"), _("Map height"), _("Map"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .codeExtraInformation.SetFunctionName("GetMapHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
     /*obj.AddAction("YOffset",
                    _("Image Y Offset"),
                    _("Modify the offset used on the Y axis when displaying the image."),

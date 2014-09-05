@@ -81,6 +81,9 @@ public :
     float GetTileWidth() const;
     float GetTileHeight() const;
 
+    float GetMapWidth() const;
+    float GetMapHeight() const;
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 

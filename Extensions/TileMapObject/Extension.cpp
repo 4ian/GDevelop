@@ -103,40 +103,13 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "TileMap", false)
         .codeExtraInformation.SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
-    obj.AddExpression("MapWidth", _("Map width"), _("Map width"), _("Map"), "res/TileMapIcon16.png")
+    obj.AddExpression("MapWidth", _("Map width (tiles)"), _("Map width"), _("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
         .codeExtraInformation.SetFunctionName("GetMapWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
-    obj.AddExpression("MapHeight", _("Map height"), _("Map height"), _("Map"), "res/TileMapIcon16.png")
+    obj.AddExpression("MapHeight", _("Map height (tiles)"), _("Map height"), _("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
         .codeExtraInformation.SetFunctionName("GetMapHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
-
-    /*obj.AddAction("YOffset",
-                   _("Image Y Offset"),
-                   _("Modify the offset used on the Y axis when displaying the image."),
-                   _("Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"),
-                   _("Image offset"),
-                   "res/conditions/scaleWidth24.png",
-                   "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
-        .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetYOffset").SetManipulatedType("number").SetAssociatedGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
-
-    obj.AddCondition("YOffset",
-                   _("Image Y Offset"),
-                   _("Test the offset used on the Y axis when displaying the image."),
-                   _("The Y offset of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Image offset"),
-                   "res/conditions/scaleWidth24.png",
-                   "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
-        .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");*/
     #endif
 }
 

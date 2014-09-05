@@ -94,6 +94,14 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsSimple()
         .codeExtraInformation.SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/TileMapObject.h");
 
+    obj.AddExpression("TileWidth", _("Tile width"), _("Tile width"), _("Tiles"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .codeExtraInformation.SetFunctionName("GetTileWidth").SetIncludeFile("TileMapObject/TileMapObject.h");
+
+    obj.AddExpression("TileHeight", _("Tile height"), _("Tile height"), _("Tiles"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .codeExtraInformation.SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/TileMapObject.h");
+
     /*obj.AddAction("YOffset",
                    _("Image Y Offset"),
                    _("Modify the offset used on the Y axis when displaying the image."),

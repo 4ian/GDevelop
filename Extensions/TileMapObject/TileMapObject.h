@@ -156,6 +156,9 @@ public :
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
+    float GetTileWidth() const;
+    float GetTileHeight() const;
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 

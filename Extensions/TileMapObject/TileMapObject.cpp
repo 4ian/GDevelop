@@ -441,6 +441,16 @@ std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes() const
     return hitboxes;
 }
 
+float RuntimeTileMapObject::GetTileWidth() const
+{
+    return tileSet.Get().tileSize.x;
+}
+
+float RuntimeTileMapObject::GetTileHeight() const
+{
+    return tileSet.Get().tileSize.y;
+}
+
 namespace
 {
     /**

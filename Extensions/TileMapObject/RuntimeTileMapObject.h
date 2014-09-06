@@ -84,6 +84,12 @@ public :
     float GetMapWidth() const;
     float GetMapHeight() const;
 
+    float GetTile(int layer, int column, int row);
+    void SetTile(int layer, int column, int row, int tileId);
+
+    float GetColumnAt(float x);
+    float GetRowAt(float y);
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 
@@ -91,6 +97,8 @@ private:
 
     sf::VertexArray vertexArray;
     std::vector<Polygon2d> hitboxes;
+
+    bool needGeneration;
 
     boost::shared_ptr<SFMLTextureWrapper> texture;
 

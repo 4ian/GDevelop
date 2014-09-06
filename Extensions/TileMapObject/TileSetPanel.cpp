@@ -122,7 +122,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         {
             dc.SetPen(wxPen(wxColor(0, 0, 255, 255), 4));
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
-            dc.DrawText(wxString::FromDouble(m_tileset->GetTileIDFromCell(m_selectedCol, m_selectedRow)), GetPositionOfTile(m_selectedCol, m_selectedRow) + wxPoint(2, 2));
+            dc.DrawText("#" + wxString::FromDouble(m_tileset->GetTileIDFromCell(m_selectedCol, m_selectedRow)), GetPositionOfTile(m_selectedCol, m_selectedRow) + wxPoint(2, 2));
             dc.DrawRectangle(GetPositionOfTile(m_selectedCol, m_selectedRow), wxSize(m_tileset->tileSize.x, m_tileset->tileSize.y));
         }
     }
@@ -143,7 +143,12 @@ void TileSetPanel::OnLeftButtonPressed(wxMouseEvent& event)
     wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());
 
     //Select the tile
-    GetTileAt(mousePos, m_selectedCol, m_selectedRow);
+    int selectedCol, selectedRow;
+    GetTileAt(mousePos, selectedCol, selectedRow);
+    if(selectedCol >= m_tileset->GetColumnsCount() || selectedRow >= m_tileset->GetRowsCount())
+        return;
+    m_selectedCol = selectedCol;
+    m_selectedRow = selectedRow;
 
     //Send the event
     TileSelectionEvent newEvent(TILE_SELECTION_CHANGED, GetId(), m_tileset->GetTileIDFromCell(m_selectedCol, m_selectedRow));

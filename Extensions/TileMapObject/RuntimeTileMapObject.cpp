@@ -52,7 +52,8 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
     tileMap(),
     vertexArray(sf::Quads),
     oldX(0),
-    oldY(0)
+    oldY(0),
+    needGeneration(false)
 {
     const TileMapObject & tileMapObject = static_cast<const TileMapObject&>(object);
 
@@ -71,6 +72,14 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
  */
 bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
 {
+    if(needGeneration)
+    {
+        //Re-generate the vertex array and the hitboxes
+        vertexArray = TileMapExtension::GenerateVertexArray(tileSet.Get(), tileMap.Get());
+        hitboxes = TileMapExtension::GenerateHitboxes(tileSet.Get(), tileMap.Get());
+        needGeneration = false;
+    }
+
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
@@ -164,6 +173,33 @@ float RuntimeTileMapObject::GetMapWidth() const
 float RuntimeTileMapObject::GetMapHeight() const
 {
     return static_cast<float>(tileMap.Get().GetRowsCount());
+}
+
+float RuntimeTileMapObject::GetTile(int layer, int column, int row)
+{
+    if(layer < 0 || layer > 2 || column < 0 || column >= tileMap.Get().GetColumnsCount() || row < 0 || row >= tileMap.Get().GetRowsCount())
+        return -1.f;
+
+    return static_cast<float>(tileMap.Get().GetTile(layer, column, row));
+}
+
+void RuntimeTileMapObject::SetTile(int layer, int column, int row, int tileId)
+{
+    if(layer < 0 || layer > 2 || column < 0 || column >= tileMap.Get().GetColumnsCount() || row < 0 || row >= tileMap.Get().GetRowsCount())
+        return;
+
+    needGeneration = true; //The tilemap object will be re-generated before the next rendering
+    tileMap.Get().SetTile(layer, column, row, tileId);
+}
+
+float RuntimeTileMapObject::GetColumnAt(float x)
+{
+    return static_cast<float>(floor((x - GetX())/tileSet.Get().tileSize.x));
+}
+
+float RuntimeTileMapObject::GetRowAt(float y)
+{
+    return static_cast<float>(floor((y - GetY())/tileSet.Get().tileSize.y));
 }
 
 namespace

@@ -95,6 +95,8 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsSimple()
         .codeExtraInformation.SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
+
+
     obj.AddExpression("TileWidth", _("Tile width"), _("Tile width"), _("Tiles"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
         .codeExtraInformation.SetFunctionName("GetTileWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
@@ -110,6 +112,41 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
     obj.AddExpression("MapHeight", _("Map height (tiles)"), _("Map height"), _("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
         .codeExtraInformation.SetFunctionName("GetMapHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+
+
+    obj.AddExpression("GetTile", _("Get the Tile (id)"), _("Get the Tile (id)"), _("Map"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .AddParameter("expression", _("Layer"), "", false)
+        .AddParameter("expression", _("Column"), "", false)
+        .AddParameter("expression", _("Row"), "", false)
+        .codeExtraInformation.SetFunctionName("GetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+    obj.AddAction("SetTile",
+                   _("Change a tile"),
+                   _("Change a tile at a specific cell."),
+                   _("Set tile #_PARAM4_ at the cell _PARAM2_;_PARAM3_ (layer: _PARAM1_) in _PARAM0_"),
+                   _("Tiles"),
+                   "CppPlatform/Extensions/TileMapIcon24.png",
+                   "res/TileMapIcon16.png")
+        .AddParameter("objectList", _("Tile Map Object"), "TileMap", false)
+        .AddParameter("expression", _("Tile layer (0: Back, 1: Middle, 2: Top)"))
+        .AddParameter("expression", _("Tile column"))
+        .AddParameter("expression", _("Tile row"))
+        .AddParameter("expression", _("New tile Id"))
+        .MarkAsSimple()
+        .codeExtraInformation.SetFunctionName("SetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+    obj.AddExpression("GetColumnAt", _("Get tile column from X coordinates"), _("Get tile column from Y coordinates"), _("Map"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .AddParameter("expression", _("X"), "", false)
+        .codeExtraInformation.SetFunctionName("GetColumnAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+    obj.AddExpression("GetRowAt", _("Get tile row from Y coordinates"), _("Get tile row from Y coordinates"), _("Map"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .AddParameter("expression", _("Y"), "", false)
+        .codeExtraInformation.SetFunctionName("GetRowAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
     #endif
 }
 

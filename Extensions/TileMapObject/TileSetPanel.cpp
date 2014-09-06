@@ -122,6 +122,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         {
             dc.SetPen(wxPen(wxColor(0, 0, 255, 255), 4));
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
+            dc.DrawText(wxString::FromDouble(m_tileset->GetTileIDFromCell(m_selectedCol, m_selectedRow)), GetPositionOfTile(m_selectedCol, m_selectedRow) + wxPoint(2, 2));
             dc.DrawRectangle(GetPositionOfTile(m_selectedCol, m_selectedRow), wxSize(m_tileset->tileSize.x, m_tileset->tileSize.y));
         }
     }

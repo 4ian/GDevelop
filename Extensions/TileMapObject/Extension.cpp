@@ -133,7 +133,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("expression", _("Tile layer (0: Back, 1: Middle, 2: Top)"))
         .AddParameter("expression", _("Tile column"))
         .AddParameter("expression", _("Tile row"))
-        .AddParameter("expression", _("New tile Id"))
+        .AddParameter("expression", _("New tile Id (-1 to delete the tile)"))
         .MarkAsSimple()
         .codeExtraInformation.SetFunctionName("SetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 

@@ -77,6 +77,10 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
         //Re-generate the vertex array and the hitboxes
         vertexArray = TileMapExtension::GenerateVertexArray(tileSet.Get(), tileMap.Get());
         hitboxes = TileMapExtension::GenerateHitboxes(tileSet.Get(), tileMap.Get());
+        for(std::vector<Polygon2d>::iterator it = hitboxes.begin(); it != hitboxes.end(); it++)
+        {
+            it->Move(GetX(), GetY());
+        }
         needGeneration = false;
     }
 

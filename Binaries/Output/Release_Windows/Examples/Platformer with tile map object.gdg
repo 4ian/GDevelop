@@ -7,7 +7,7 @@
         <windowWidth>800</windowWidth>
         <windowHeight>600</windowHeight>
         <latestCompilationDirectory></latestCompilationDirectory>
-        <maxFPS>60</maxFPS>
+        <maxFPS>-1</maxFPS>
         <minFPS>10</minFPS>
         <verticalSync>false</verticalSync>
         <extensions>
@@ -703,6 +703,33 @@
                                 <parameter></parameter>
                                 <parameter></parameter>
                                 <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="SourisBouton" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Left</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="TileMapObject::SetTile" />
+                            <parameters>
+                                <parameter>Platforms</parameter>
+                                <parameter>2</parameter>
+                                <parameter>Platforms.GetColumnAt(MouseX())</parameter>
+                                <parameter>Platforms.GetRowAt(MouseY())</parameter>
+                                <parameter>0</parameter>
                             </parameters>
                             <subActions />
                         </action>

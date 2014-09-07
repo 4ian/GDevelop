@@ -214,6 +214,7 @@ std::string RuntimeTileMapObject::SaveAsString() const
 void RuntimeTileMapObject::LoadFromString(const std::string &str)
 {
     tileMap.Get().UnserializeFromString(str);
+    needGeneration = true;
 }
 
 namespace

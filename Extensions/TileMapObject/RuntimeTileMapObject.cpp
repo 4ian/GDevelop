@@ -217,6 +217,14 @@ void RuntimeTileMapObject::LoadFromString(const std::string &str)
     needGeneration = true;
 }
 
+void RuntimeTileMapObject::ChangeTexture(const std::string &textureName, RuntimeScene &scene)
+{
+    tileSet.Get().textureName = textureName;
+    tileSet.Get().LoadResources(*(scene.game));
+    tileSet.Get().Generate();
+    needGeneration = true;
+}
+
 namespace
 {
     /**

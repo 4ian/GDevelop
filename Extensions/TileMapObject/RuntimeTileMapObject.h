@@ -93,6 +93,8 @@ public :
     std::string SaveAsString() const;
     void LoadFromString(const std::string &str);
 
+    void ChangeTexture(const std::string &textureName, RuntimeScene &scene);
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 

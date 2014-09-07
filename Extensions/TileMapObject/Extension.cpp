@@ -167,6 +167,21 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsSimple()
         .codeExtraInformation.SetFunctionName("LoadFromString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
+
+
+    obj.AddAction("ChangeTexture",
+                   _("Change the tileset texture"),
+                   _("Change the tileset texture."),
+                   _("Change the tileset texture of _PARAM0_ to _PARAM1_"),
+                   _("Tileset"),
+                   "CppPlatform/Extensions/TileMapIcon24.png",
+                   "res/TileMapIcon16.png")
+        .AddParameter("objectList", _("Tile Map Object"), "TileMap", false)
+        .AddParameter("string", _("The new texture name"))
+        .AddCodeOnlyParameter("currentScene", "")
+        .MarkAsSimple()
+        .codeExtraInformation.SetFunctionName("ChangeTexture").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
     #endif
 }
 

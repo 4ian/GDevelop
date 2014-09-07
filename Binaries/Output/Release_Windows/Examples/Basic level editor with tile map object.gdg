@@ -41,6 +41,7 @@
     <resources>
         <resources>
             <resource alwaysLoaded="false" file="tiles_spritesheet.png" kind="image" name="tiles_spritesheet.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="../../../../n.png" kind="image" name="n.png" smoothed="true" userAdded="true" />
         </resources>
         <resourceFolders />
     </resources>

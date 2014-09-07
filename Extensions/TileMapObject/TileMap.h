@@ -90,8 +90,28 @@ public:
      */
     void UnserializeFrom(const gd::SerializerElement &element);
 
+    /**
+     * Returns a std::string representing the whole tilemap content
+     */
+    std::string SerializeToString() const;
+
+    /**
+     * Loads the tilemap from a std::string.
+     */
+    void UnserializeFromString(const std::string &str);
+
 private:
 	void UpdateMapSize();
+
+    /**
+     * Returns a std::string representing the content of the layer
+     */
+    std::string SerializeLayer(int layer) const;
+
+    /**
+     * Load a layer from its std::string representation
+     */
+    void UnserializeLayer(int layer, const std::string &str);
 
 	std::vector<TileMapLayer> m_layers;
 	int m_width;

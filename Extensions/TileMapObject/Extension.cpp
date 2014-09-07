@@ -137,7 +137,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsSimple()
         .codeExtraInformation.SetFunctionName("SetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
-    obj.AddExpression("GetColumnAt", _("Get tile column from X coordinates"), _("Get tile column from Y coordinates"), _("Map"), "res/TileMapIcon16.png")
+    obj.AddExpression("GetColumnAt", _("Get tile column from X coordinates"), _("Get tile column from X coordinates"), _("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
         .AddParameter("expression", _("X"), "", false)
         .codeExtraInformation.SetFunctionName("GetColumnAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");

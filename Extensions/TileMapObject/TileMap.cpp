@@ -89,26 +89,7 @@ void TileMap::SerializeTo(gd::SerializerElement &element) const
 
     //Save the tiles
     gd::SerializerElement &tilesElement = element.AddChild("tiles");
-    for(int layer = 0; layer < 3; layer++)
-    {
-        gd::SerializerElement &layerElement = tilesElement.AddChild("layer" + gd::ToString(layer));
-        std::string tileString; // Will contain a string representing the tiles 
-                                // (each column is separated by '|' and the rows by ',')
-        for(int col = 0; col < m_width; col++)
-        {
-            for(int row = 0; row < m_height; row++)
-            {
-                tileString += gd::ToString(GetTile(layer, col, row));
-                if(row != (m_height - 1))
-                    tileString += ",";
-            }
-
-            if(col != (m_width - 1))
-                tileString += "|";
-        }
-
-        layerElement.SetValue(tileString);
-    }
+    tilesElement.SetValue(SerializeToString());
 }
 #endif
 
@@ -121,23 +102,67 @@ void TileMap::UnserializeFrom(const gd::SerializerElement &element)
     if(element.HasChild("tiles"))
     {
         gd::SerializerElement &tilesElement = element.GetChild("tiles");
-        for(int layer = 0; layer < 3; layer++)
+        UnserializeFromString(tilesElement.GetValue().GetString());
+    }
+}
+
+std::string TileMap::SerializeToString() const
+{
+    std::string tilesStr;
+    for(int layer = 0; layer < 3; layer++)
+    {
+        tilesStr += SerializeLayer(layer);
+        if(layer != 2)
+            tilesStr += "#";
+    }
+
+    return tilesStr;
+}
+
+void TileMap::UnserializeFromString(const std::string &str)
+{
+    std::vector<std::string> tileMapVec = gd::SplitString<std::string>(str, '#');
+    for(int layer = 0; layer < std::min((int)tileMapVec.size(), 3); layer++)
+    {
+        UnserializeLayer(layer, tileMapVec[layer]);
+    }
+}
+
+std::string TileMap::SerializeLayer(int layer) const
+{
+    std::string tileString; // Will contain a string representing the tiles 
+                            // (each column is separated by '|' and the rows by ',')
+    for(int col = 0; col < m_width; col++)
+    {
+        for(int row = 0; row < m_height; row++)
         {
-            if(tilesElement.HasChild("layer" + gd::ToString(layer)))
-            {
-                gd::SerializerElement &layerElement = tilesElement.GetChild("layer" + gd::ToString(layer));
-                std::string columnsStr = layerElement.GetValue().GetString();
-                std::vector<std::string> columnsVec = gd::SplitString<std::string>(columnsStr, '|');
-                for(int col = 0; col < columnsVec.size(); col++)
-                {
-                    std::string rowsStr = columnsVec[col];
-                    std::vector<std::string> rowsVec = gd::SplitString<std::string>(rowsStr, ',');
-                    for(int row = 0; row < rowsVec.size(); row++)
-                    {
-                        SetTile(layer, col, row, gd::ToInt(rowsVec[row]));
-                    }
-                }
-            }
+            tileString += gd::ToString(GetTile(layer, col, row));
+            if(row != (m_height - 1))
+                tileString += ",";
+        }
+
+        if(col != (m_width - 1))
+            tileString += "|";
+    }
+
+    return tileString;
+}
+
+void TileMap::UnserializeLayer(int layer, const std::string &str)
+{
+    std::vector<std::string> columnsVec = gd::SplitString<std::string>(str, '|');
+    for(int col = 0; col < columnsVec.size(); col++)
+    {
+        std::string rowsStr = columnsVec[col];
+        std::vector<std::string> rowsVec = gd::SplitString<std::string>(rowsStr, ',');
+
+        //Change the tilemap size if needed
+        if(m_width < columnsVec.size() || m_height < rowsVec.size())
+            SetSize(std::max((int)columnsVec.size(), m_width), std::max((int)rowsVec.size(), m_height));
+
+        for(int row = 0; row < rowsVec.size(); row++)
+        {
+            SetTile(layer, col, row, gd::ToInt(rowsVec[row]));
         }
     }
 }

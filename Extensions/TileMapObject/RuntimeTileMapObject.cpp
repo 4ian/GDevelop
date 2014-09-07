@@ -206,6 +206,16 @@ float RuntimeTileMapObject::GetRowAt(float y)
     return static_cast<float>(floor((y - GetY())/tileSet.Get().tileSize.y));
 }
 
+std::string RuntimeTileMapObject::SaveAsString() const
+{
+    return tileMap.Get().SerializeToString();
+}
+
+void RuntimeTileMapObject::LoadFromString(const std::string &str)
+{
+    tileMap.Get().UnserializeFromString(str);
+}
+
 namespace
 {
     /**

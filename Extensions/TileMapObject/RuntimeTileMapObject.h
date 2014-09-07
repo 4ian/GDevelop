@@ -90,6 +90,9 @@ public :
     float GetColumnAt(float x);
     float GetRowAt(float y);
 
+    std::string SaveAsString() const;
+    void LoadFromString(const std::string &str);
+
     TileSetProxy tileSet;
     TileMapProxy tileMap;
 

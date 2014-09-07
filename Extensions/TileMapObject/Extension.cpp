@@ -137,6 +137,8 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .MarkAsSimple()
         .codeExtraInformation.SetFunctionName("SetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
+
+
     obj.AddExpression("GetColumnAt", _("Get tile column from X coordinates"), _("Get tile column from X coordinates"), _("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", _("Object"), "TileMap", false)
         .AddParameter("expression", _("X"), "", false)
@@ -146,6 +148,24 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "TileMap", false)
         .AddParameter("expression", _("Y"), "", false)
         .codeExtraInformation.SetFunctionName("GetRowAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+
+
+    obj.AddStrExpression("SaveTiles", _("Save the tile map"), _("Save the tile map content in a string"), _("Saving"), "res/TileMapIcon16.png")
+        .AddParameter("object", _("Object"), "TileMap", false)
+        .codeExtraInformation.SetFunctionName("SaveAsString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
+    obj.AddAction("LoadTiles",
+                   _("Load the tiles from a string"),
+                   _("Load the tiles from a string."),
+                   _("Load the tiles of _PARAM0_ from _PARAM1_"),
+                   _("Loading"),
+                   "CppPlatform/Extensions/TileMapIcon24.png",
+                   "res/TileMapIcon16.png")
+        .AddParameter("objectList", _("Tile Map Object"), "TileMap", false)
+        .AddParameter("string", _("The string representing the tiles"))
+        .MarkAsSimple()
+        .codeExtraInformation.SetFunctionName("LoadFromString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     #endif
 }

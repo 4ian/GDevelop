@@ -143,7 +143,6 @@ class TileEditorBase : public wxPanel
 {
 protected:
     wxToolBar* m_mainToolbar;
-    wxPanel* m_justToHideToolbar;
     wxToolBar* m_toolbar418;
     wxScrolledWindow* m_tilePreviewPanel;
 

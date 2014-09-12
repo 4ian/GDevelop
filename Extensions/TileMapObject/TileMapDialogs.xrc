@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+  <object class="wxDialog" name="TileMapObjectEditorBase">
+    <title>TileMap Object Editor</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
+    <size>950,550</size>
+    <object class="wxAuiManager">
+      <flags>285</flags>
+      <sashsize>-1</sashsize>
+      <pane-border-size>-1</pane-border-size>
+      <sash-colour/>
+      <caption-colour/>
+      <caption-colour-gradient/>
+      <inactive-caption-colour/>
+      <inactive-caption-colour-gradient/>
+      <caption-text-colour/>
+      <inactive-caption-text-colour/>
+      <gradient-type>wxAUI_GRADIENT_NONE</gradient-type>
+      <object class="wxAuiPaneInfo">
+        <name>
+          <![CDATA[TILESETPANEL]]>
+        </name>
+        <caption>
+          <![CDATA[Tileset]]>
+        </caption>
+        <caption-visible>1</caption-visible>
+        <resizable>1</resizable>
+        <direction>wxAUI_DOCK_LEFT</direction>
+        <layer>0</layer>
+        <row>0</row>
+        <position>0</position>
+        <bestsize>400,550</bestsize>
+        <maxsize>-1,-1</maxsize>
+        <minsize>400,550</minsize>
+        <closebtn>0</closebtn>
+        <minbtn>0</minbtn>
+        <maxbtn>0</maxbtn>
+        <pinbtn>0</pinbtn>
+        <toolbar-pane>0</toolbar-pane>
+        <object class="wxPanel" name="m_tileSetPropertiesPanel">
+          <style>wxTAB_TRAVERSAL</style>
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>6</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>1</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <object class="wxToolBar" name="m_tileSetToolBar">
+                <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
+                <bitmapsize>16,16</bitmapsize>
+                <object class="tool" name="m_configureTileSetTool">
+                  <label>
+                    <![CDATA[Configure the tileset]]>
+                  </label>
+                  <longhelp>
+                    <![CDATA[]]>
+                  </longhelp>
+                  <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
+                </object>
+                <object class="tool" name="m_editTileTool">
+                  <toggle>1</toggle>
+                  <label>
+                    <![CDATA[Edit the selected tile]]>
+                  </label>
+                  <tooltip>
+                    <![CDATA[Opens the tile editor to edit the tile collision mask.]]>
+                  </tooltip>
+                  <longhelp>
+                    <![CDATA[]]>
+                  </longhelp>
+                  <bitmap>../../Binaries/Output/Release_Windows/res/maskEdit16.png</bitmap>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+              <object class="wxScrolledWindow" name="m_tileSetPanel" subclass="TileSetPanel">
+                <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
+                <scrollrate>5,5</scrollrate>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="wxAuiPaneInfo">
+        <name>
+          <![CDATA[MAINPANEL]]>
+        </name>
+        <caption>
+          <![CDATA[]]>
+        </caption>
+        <caption-visible>0</caption-visible>
+        <resizable>0</resizable>
+        <direction>wxAUI_DOCK_CENTER</direction>
+        <layer>0</layer>
+        <row>0</row>
+        <position>0</position>
+        <bestsize>600,800</bestsize>
+        <maxsize>-1,-1</maxsize>
+        <minsize>600,800</minsize>
+        <closebtn>0</closebtn>
+        <minbtn>0</minbtn>
+        <maxbtn>0</maxbtn>
+        <pinbtn>0</pinbtn>
+        <toolbar-pane>0</toolbar-pane>
+        <object class="wxPanel" name="m_mainPanel">
+          <style>wxTAB_TRAVERSAL</style>
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>3</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>1</growablerows>
+            <object class="sizeritem" name="flexGridSizer490">
+              <flag>wxALL|wxEXPAND</flag>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>0</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>1</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND|wxALIGN_TOP</flag>
+                  <object class="wxToolBar" name="m_toolbar492">
+                    <style>wxTB_NODIVIDER|wxTB_FLAT</style>
+                    <bitmapsize>16,16</bitmapsize>
+                    <object class="tool" name="m_toolbarItem494">
+                      <radio>1</radio>
+                      <label>
+                        <![CDATA[Pencil mode]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Pencil mode\nAdd tiles only where the mouse goes.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem500">
+                      <radio>1</radio>
+                      <label>
+                        <![CDATA[Rectangle mode]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Rectangle mode\nAdd tile in a rectangle from the position where the mouse was pressed to the position the mouse was released.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                    <object class="tool" name="m_toolbarItem502">
+                      <label>
+                        <![CDATA[Fill layer]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Fill the whole layer with the selected tile.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/fill16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem504">
+                      <label>
+                        <![CDATA[Erase all the layer]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Delete all the tiles from the current layer.]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxToolBar" name="m_mainPanelToolbar">
+                    <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
+                    <bitmapsize>16,16</bitmapsize>
+                    <object class="tool" name="m_changeMapSizeTool">
+                      <label>
+                        <![CDATA[Change map size]]>
+                      </label>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                    <object class="wxStaticText" name="m_staticText355">
+                      <label>
+                        <![CDATA[Current layer:]]>
+                      </label>
+                      <style/>
+                    </object>
+                    <object class="wxChoice" name="m_layerChoice">
+                      <style/>
+                      <content>
+                        <item>
+                          <![CDATA[Back]]>
+                        </item>
+                        <item>
+                          <![CDATA[Middle]]>
+                        </item>
+                        <item>
+                          <![CDATA[Top]]>
+                        </item>
+                      </content>
+                      <selection>
+                        <![CDATA[0]]>
+                      </selection>
+                    </object>
+                    <object class="separator"/>
+                    <object class="tool" name="m_hideUpperLayerCheck">
+                      <toggle>1</toggle>
+                      <label>
+                        <![CDATA[Hide upper layers]]>
+                      </label>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/layer16.png</bitmap>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer7">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>4</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxScrolledWindow" name="m_tileMapPanel" subclass="TileMapPanel">
+                    <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
+                    <scrollrate>5,5</scrollrate>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText448">
+                    <label>
+                      <![CDATA[Use left mouse click to add the current tile and right click to remove it.]]>
+                    </label>
+                    <style/>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer452">
+              <flag>wxALL|wxEXPAND</flag>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>3</cols>
+                <rows>0</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>1</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxStaticBitmap" name="m_staticBitmap456">
+                    <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+                  <border>5</border>
+                  <object class="wxHyperlinkCtrl" name="m_hyperLink454">
+                    <style>wxHL_DEFAULT_STYLE</style>
+                    <label>
+                      <![CDATA[Help about this object]]>
+                    </label>
+                    <url/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer60">
+                    <object class="button">
+                      <object class="wxButton" name="wxID_OK">
+                        <label>
+                          <![CDATA[]]>
+                        </label>
+                        <style/>
+                        <bg/>
+                        <fg/>
+                        <default>0</default>
+                      </object>
+                    </object>
+                    <object class="button">
+                      <object class="wxButton" name="wxID_CANCEL">
+                        <label>
+                          <![CDATA[]]>
+                        </label>
+                        <style/>
+                        <bg/>
+                        <fg/>
+                        <default>0</default>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="TileSetConfigurationEditorBase">
+    <title>Tileset configuration</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+    <size>750,500</size>
+    <object class="wxAuiManager">
+      <flags>271</flags>
+      <sashsize>-1</sashsize>
+      <pane-border-size>-1</pane-border-size>
+      <sash-colour/>
+      <caption-colour/>
+      <caption-colour-gradient/>
+      <inactive-caption-colour/>
+      <inactive-caption-colour-gradient/>
+      <caption-text-colour/>
+      <inactive-caption-text-colour/>
+      <gradient-type>wxAUI_GRADIENT_NONE</gradient-type>
+      <object class="wxAuiPaneInfo">
+        <name>
+          <![CDATA[MAINPANEL]]>
+        </name>
+        <caption>
+          <![CDATA[]]>
+        </caption>
+        <caption-visible>0</caption-visible>
+        <resizable>0</resizable>
+        <direction>wxAUI_DOCK_CENTER</direction>
+        <layer>0</layer>
+        <row>0</row>
+        <position>0</position>
+        <bestsize>100,100</bestsize>
+        <maxsize>100,100</maxsize>
+        <minsize>100,100</minsize>
+        <closebtn>0</closebtn>
+        <minbtn>0</minbtn>
+        <maxbtn>0</maxbtn>
+        <pinbtn>0</pinbtn>
+        <toolbar-pane>0</toolbar-pane>
+        <object class="wxPanel" name="m_mainPanel">
+          <style>wxTAB_TRAVERSAL</style>
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>0</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>2</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>5</border>
+              <object class="wxStaticText" name="m_staticText335">
+                <label>
+                  <![CDATA[The tileset is the texture containing all the tiles which will be used in your tilemap object.]]>
+                </label>
+                <style/>
+                <font>
+                  <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <underlined>0</underlined>
+                </font>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>5</border>
+              <object class="wxStaticText" name="m_staticText337">
+                <label>
+                  <![CDATA[Note: the tilemap object needs to have all the tiles in a single texture.]]>
+                </label>
+                <style/>
+                <font>
+                  <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                  <style>italic</style>
+                  <weight>normal</weight>
+                  <underlined>0</underlined>
+                </font>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer2692">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>0</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>1</growablecols>
+                <growablerows>3</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_CENTER|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText287">
+                    <label>
+                      <![CDATA[Tileset texture:]]>
+                    </label>
+                    <style/>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer295">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>0</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0</growablecols>
+                    <growablerows>0</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>5</border>
+                      <object class="wxTextCtrl" name="m_textureNameTextCtrl">
+                        <style/>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxBitmapButton" name="m_setTextureButton">
+                        <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/image16.png</bitmap>
+                        <style>wxBU_AUTODRAW</style>
+                        <default>0</default>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText301">
+                    <label>
+                      <![CDATA[Tile size:]]>
+                    </label>
+                    <style/>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer303">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>4</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0,2</growablecols>
+                    <growablerows>0</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>5</border>
+                      <object class="wxSpinCtrl" name="m_tileWidthSpin">
+                        <style>wxSP_ARROW_KEYS</style>
+                        <value>24</value>
+                        <min>1</min>
+                        <max>10000</max>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText307">
+                        <label>
+                          <![CDATA[x]]>
+                        </label>
+                        <style/>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>5</border>
+                      <object class="wxSpinCtrl" name="m_tileHeightSpin">
+                        <style>wxSP_ARROW_KEYS</style>
+                        <value>24</value>
+                        <min>1</min>
+                        <max>10000</max>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText311">
+                        <label>
+                          <![CDATA[pixels]]>
+                        </label>
+                        <style/>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText313">
+                    <label>
+                      <![CDATA[Tile spacing:]]>
+                    </label>
+                    <style/>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer317">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>4</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0,2</growablecols>
+                    <growablerows>0</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>5</border>
+                      <object class="wxSpinCtrl" name="m_spacingWidthSpin">
+                        <style>wxSP_ARROW_KEYS</style>
+                        <value>0</value>
+                        <min>0</min>
+                        <max>10000</max>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText325">
+                        <label>
+                          <![CDATA[x]]>
+                        </label>
+                        <style/>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>5</border>
+                      <object class="wxSpinCtrl" name="m_spacingHeightSpin">
+                        <style>wxSP_ARROW_KEYS</style>
+                        <value>0</value>
+                        <min>0</min>
+                        <max>10000</max>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText329">
+                        <label>
+                          <![CDATA[pixels]]>
+                        </label>
+                        <style/>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText462">
+                    <label>
+                      <![CDATA[Preview:]]>
+                    </label>
+                    <style/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxScrolledWindow" name="m_tileSetPreviewPanel" subclass="TileSetPanel">
+                    <style>wxHSCROLL|wxVSCROLL</style>
+                    <scrollrate>5,5</scrollrate>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer468">
+              <flag>wxALL|wxEXPAND</flag>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>3</cols>
+                <rows>1</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>2</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxStaticBitmap" name="m_staticBitmap470">
+                    <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxHyperlinkCtrl" name="m_hyperLink472">
+                    <style>wxHL_DEFAULT_STYLE</style>
+                    <label>
+                      <![CDATA[Help on this dialog]]>
+                    </label>
+                    <url/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT</flag>
+                  <border>5</border>
+                  <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer2713">
+                    <object class="button">
+                      <object class="wxButton" name="wxID_OK">
+                        <label>
+                          <![CDATA[]]>
+                        </label>
+                        <style/>
+                        <bg/>
+                        <fg/>
+                        <default>0</default>
+                      </object>
+                    </object>
+                    <object class="button">
+                      <object class="wxButton" name="wxID_CANCEL">
+                        <label>
+                          <![CDATA[]]>
+                        </label>
+                        <style/>
+                        <bg/>
+                        <fg/>
+                        <default>0</default>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="TileMapConfigurationEditorBase">
+    <title>Tilemap size configuration</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE</style>
+    <size>500,300</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>0</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem" name="flexGridSizer369">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>0</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>1</growablecols>
+          <growablerows/>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="m_staticText378">
+              <label>
+                <![CDATA[Map size:]]>
+              </label>
+              <style/>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer380">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <option>1</option>
+            <object class="wxFlexGridSizer">
+              <cols>4</cols>
+              <rows>1</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0,2</growablecols>
+              <growablerows/>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxSpinCtrl" name="m_mapWidthSpin">
+                  <style>wxSP_ARROW_KEYS</style>
+                  <value>10</value>
+                  <min>1</min>
+                  <max>100000</max>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_staticText384">
+                  <label>
+                    <![CDATA[x]]>
+                  </label>
+                  <style/>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxSpinCtrl" name="m_mapHeightSpin">
+                  <style>wxSP_ARROW_KEYS</style>
+                  <value>5</value>
+                  <min>1</min>
+                  <max>100000</max>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_staticText388">
+                  <label>
+                    <![CDATA[tiles]]>
+                  </label>
+                  <style/>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer474">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>3</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>2</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxStaticBitmap" name="m_staticBitmap476">
+              <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxHyperlinkCtrl" name="m_hyperLink478">
+              <style>wxHL_DEFAULT_STYLE</style>
+              <label>
+                <![CDATA[Help on this dialog]]>
+              </label>
+              <url/>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer371">
+              <object class="button">
+                <object class="wxButton" name="wxID_OK">
+                  <label>
+                    <![CDATA[]]>
+                  </label>
+                  <style/>
+                  <bg/>
+                  <fg/>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="button">
+                <object class="wxButton" name="wxID_CANCEL">
+                  <label>
+                    <![CDATA[]]>
+                  </label>
+                  <style/>
+                  <bg/>
+                  <fg/>
+                  <default>0</default>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="TileEditorBase">
+    <size>500,300</size>
+    <style>wxTAB_TRAVERSAL</style>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem" name="flexGridSizer416">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <object class="wxToolBar" name="m_mainToolbar">
+              <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
+              <bitmapsize>16,16</bitmapsize>
+              <object class="tool" name="m_toolbarItem406">
+                <toggle>1</toggle>
+                <label>
+                  <![CDATA[Collidable]]>
+                </label>
+                <tooltip>
+                  <![CDATA[Activates the collision mask for collision detection]]>
+                </tooltip>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</bitmap>
+              </object>
+              <object class="tool" name="m_toolbarItem444">
+                <label>
+                  <![CDATA[Use a predefined shape]]>
+                </label>
+                <longhelp>
+                  <![CDATA[]]>
+                </longhelp>
+                <bitmap>../../Binaries/Output/Release_Windows/res/tilemasktrianglebr16.png</bitmap>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxPanel" name="m_justToHideToolbar">
+              <style>wxTAB_TRAVERSAL</style>
+              <hidden>1</hidden>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>0</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols/>
+                <growablerows/>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxToolBar" name="m_toolbar418">
+                    <style>wxTB_NODIVIDER|wxTB_FLAT</style>
+                    <bitmapsize>16,16</bitmapsize>
+                    <object class="tool" name="m_toolbarItem420">
+                      <label>
+                        <![CDATA[Add a point]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Add a point to the collision mask]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/add16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem422">
+                      <label>
+                        <![CDATA[Edit point position...]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Edit the selected point position...]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem426">
+                      <label>
+                        <![CDATA[Remove selected point]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Removes the selected point]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem432">
+                      <label>
+                        <![CDATA[Reset to the default collision mask]]>
+                      </label>
+                      <tooltip>
+                        <![CDATA[Reset the tile collision mask to the default one]]>
+                      </tooltip>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/undo16.png</bitmap>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <minsize>100,100</minsize>
+        <object class="wxScrolledWindow" name="m_tilePreviewPanel">
+          <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
+          <scrollrate>5,5</scrollrate>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

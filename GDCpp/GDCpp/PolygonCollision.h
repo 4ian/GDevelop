@@ -31,7 +31,7 @@ struct CollisionResult
  *
  * \ingroup GameEngine
  */
-CollisionResult PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
+CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
 
 #endif // POLYGONCOLLISION_H
 

@@ -588,8 +588,14 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     // Connect events
     this->Connect(COLLIDABLE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnCollidableToolToggled), NULL, this);
     this->Connect(PREDEFINED_SHAPE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnPredefinedShapeToolClicked), NULL, this);
+    this->Connect(ADD_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnAddPointToolClicked), NULL, this);
+    this->Connect(EDIT_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnEditPointToolClicked), NULL, this);
+    this->Connect(REMOVE_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnRemovePointToolClicked), NULL, this);
     m_tilePreviewPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(TileEditorBase::OnPreviewPaint), NULL, this);
     m_tilePreviewPanel->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TileEditorBase::OnPreviewErase), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileEditorBase::OnPreviewLeftDown), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TileEditorBase::OnPreviewLeftUp), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_MOTION, wxMouseEventHandler(TileEditorBase::OnPreviewMotion), NULL, this);
     
 }
 
@@ -597,7 +603,13 @@ TileEditorBase::~TileEditorBase()
 {
     this->Disconnect(COLLIDABLE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnCollidableToolToggled), NULL, this);
     this->Disconnect(PREDEFINED_SHAPE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnPredefinedShapeToolClicked), NULL, this);
+    this->Disconnect(ADD_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnAddPointToolClicked), NULL, this);
+    this->Disconnect(EDIT_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnEditPointToolClicked), NULL, this);
+    this->Disconnect(REMOVE_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnRemovePointToolClicked), NULL, this);
     m_tilePreviewPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(TileEditorBase::OnPreviewPaint), NULL, this);
     m_tilePreviewPanel->Disconnect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TileEditorBase::OnPreviewErase), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileEditorBase::OnPreviewLeftDown), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(TileEditorBase::OnPreviewLeftUp), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_MOTION, wxMouseEventHandler(TileEditorBase::OnPreviewMotion), NULL, this);
     
 }

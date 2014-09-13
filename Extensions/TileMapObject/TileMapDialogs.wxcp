@@ -5455,7 +5455,14 @@
 													"m_label":	"Construct the Dropdown Menu:",
 													"m_value":	true
 												}],
-											"m_events":	[],
+											"m_events":	[{
+													"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+													"m_eventClass":	"wxCommandEvent",
+													"m_eventHandler":	"wxCommandEventHandler",
+													"m_functionNameAndSignature":	"OnAddPointToolClicked(wxCommandEvent& event)",
+													"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+													"m_noBody":	false
+												}],
 											"m_children":	[]
 										}, {
 											"m_type":	4462,
@@ -5503,7 +5510,14 @@
 													"m_label":	"Construct the Dropdown Menu:",
 													"m_value":	true
 												}],
-											"m_events":	[],
+											"m_events":	[{
+													"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+													"m_eventClass":	"wxCommandEvent",
+													"m_eventHandler":	"wxCommandEventHandler",
+													"m_functionNameAndSignature":	"OnEditPointToolClicked(wxCommandEvent& event)",
+													"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+													"m_noBody":	false
+												}],
 											"m_children":	[]
 										}, {
 											"m_type":	4462,
@@ -5551,7 +5565,14 @@
 													"m_label":	"Construct the Dropdown Menu:",
 													"m_value":	true
 												}],
-											"m_events":	[],
+											"m_events":	[{
+													"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+													"m_eventClass":	"wxCommandEvent",
+													"m_eventHandler":	"wxCommandEventHandler",
+													"m_functionNameAndSignature":	"OnRemovePointToolClicked(wxCommandEvent& event)",
+													"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+													"m_noBody":	false
+												}],
 											"m_children":	[]
 										}]
 								}]
@@ -5641,6 +5662,27 @@
 									"m_eventHandler":	"wxEraseEventHandler",
 									"m_functionNameAndSignature":	"OnPreviewErase(wxEraseEvent& event)",
 									"m_description":	"Process a wxEVT_ERASE_BACKGROUND event.",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_LEFT_DOWN",
+									"m_eventClass":	"wxMouseEvent",
+									"m_eventHandler":	"wxMouseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewLeftDown(wxMouseEvent& event)",
+									"m_description":	"Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_LEFT_UP",
+									"m_eventClass":	"wxMouseEvent",
+									"m_eventHandler":	"wxMouseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewLeftUp(wxMouseEvent& event)",
+									"m_description":	"Process a wxEVT_LEFT_UP event.",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_MOTION",
+									"m_eventClass":	"wxMouseEvent",
+									"m_eventHandler":	"wxMouseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewMotion(wxMouseEvent& event)",
+									"m_description":	"Process a wxEVT_MOTION event",
 									"m_noBody":	false
 								}],
 							"m_children":	[]

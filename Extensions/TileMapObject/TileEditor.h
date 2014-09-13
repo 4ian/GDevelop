@@ -49,7 +49,20 @@ private:
 
 	wxMenu *m_predefinedShapesMenu;
 
+    float m_xOffset;
+    float m_yOffset;
+
+    int m_currentDraggingPoint;
+
+    wxPoint GetRealPosition(wxPoint absolutePos);
+
 protected:
+    virtual void OnPreviewLeftDown(wxMouseEvent& event);
+    virtual void OnPreviewLeftUp(wxMouseEvent& event);
+    virtual void OnPreviewMotion(wxMouseEvent& event);
+    virtual void OnAddPointToolClicked(wxCommandEvent& event);
+    virtual void OnEditPointToolClicked(wxCommandEvent& event);
+    virtual void OnRemovePointToolClicked(wxCommandEvent& event);
     virtual void OnPredefinedShapeToolClicked(wxCommandEvent& event);
     virtual void OnCollidableToolToggled(wxCommandEvent& event);
     virtual void OnPreviewErase(wxEraseEvent& event);

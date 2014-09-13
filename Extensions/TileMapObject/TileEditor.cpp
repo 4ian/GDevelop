@@ -35,7 +35,10 @@ TileEditor::TileEditor(wxWindow* parent) :
     TileEditorBase(parent),
     m_tileset(NULL),
     m_currentTile(0),
-    m_predefinedShapesMenu(new wxMenu())
+    m_predefinedShapesMenu(new wxMenu()),
+    m_xOffset(0.f),
+    m_yOffset(0.f),
+    m_currentDraggingPoint(-1)
 {
     m_tilePreviewPanel->SetBackgroundStyle(wxBG_STYLE_PAINT);
     UpdateScrollbars();
@@ -104,6 +107,14 @@ void TileEditor::UpdateScrollbars()
                                virtualHeight/2 - m_tilePreviewPanel->GetClientSize().GetHeight()/2);
 }
 
+wxPoint TileEditor::GetRealPosition(wxPoint absolutePos)
+{
+    wxPoint realPoint(m_tilePreviewPanel->CalcUnscrolledPosition(absolutePos).x - m_xOffset,
+                      m_tilePreviewPanel->CalcUnscrolledPosition(absolutePos).y - m_yOffset);
+
+    return realPoint;
+}
+
 void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 {
     //Prepare the render
@@ -112,7 +123,7 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 
     wxPoint minPos = m_tilePreviewPanel->GetViewStart();
     int width, height;
-    m_tilePreviewPanel->GetVirtualSize(&width, &height);
+    m_tilePreviewPanel->GetClientSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
     //Draw the background
@@ -122,14 +133,17 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     if(!m_tileset || m_tileset->IsDirty()) //If no tileset, stop rendering here
         return;
 
-    //Draw the tile
+    //Draw the tile and compute the drawing offset
     wxBitmap tileBitmap = m_tileset->GetTileBitmap(m_currentTile);
-    dc.DrawBitmap(tileBitmap, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
+    m_xOffset = width/2 - tileBitmap.GetWidth()/2;
+    m_yOffset = height/2 - tileBitmap.GetHeight()/2;
+    dc.DrawBitmap(tileBitmap, m_xOffset, m_yOffset);
 
     //Draw the hitbox
     dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
     dc.SetPen(wxPen(wxColour(100,100,100)));
 
+    //List all points
     wxPointList list;
     for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
     {
@@ -137,7 +151,24 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
                                    m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
     }
 
-    dc.DrawPolygon(&list, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
+    //Draw the polygon
+    dc.DrawPolygon(&list, m_xOffset, m_yOffset);
+
+    //Draw all points
+    for(unsigned int i = 0; i < list.size(); i++)
+    {
+        dc.DrawBitmap(gd::CommonBitmapManager::Get()->point, 
+                      m_xOffset + list[i]->x - gd::CommonBitmapManager::Get()->point.GetWidth()/2,
+                      m_yOffset + list[i]->y - gd::CommonBitmapManager::Get()->point.GetHeight()/2);
+    }
+
+    //Show a warning if the polygon isn't convex
+    if(!m_tileset->GetTileHitbox(m_currentTile).hitbox.IsConvex())
+    {
+        dc.DrawBitmap(wxBitmap("res/warning.png", wxBITMAP_TYPE_PNG), 5, 5);
+        dc.SetPen(wxPen(wxColour(0,0,0)));
+        dc.DrawText(_("This polygon must be convex, it's not the case."), 25, 5);
+    }
 }
 
 void TileEditor::OnCollidableToolToggled(wxCommandEvent& event)
@@ -192,4 +223,48 @@ void TileEditor::OnPredefinedShapeMenuItemClicked(wxCommandEvent& event)
     //Update the tools according to the properties' changes
     TileSelectionEvent tileEvent(TILE_SELECTION_CHANGED, -1, m_currentTile);
     OnTileSetSelectionChanged(tileEvent);
+}
+
+void TileEditor::OnAddPointToolClicked(wxCommandEvent& event)
+{
+
+}
+
+void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
+{
+
+}
+
+void TileEditor::OnRemovePointToolClicked(wxCommandEvent& event)
+{
+
+}
+
+void TileEditor::OnPreviewLeftDown(wxMouseEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    //Test if the mouse is hovering a point
+    for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
+    {
+        list.push_back(new wxPoint(m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].x, 
+                                   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
+    }
+}
+
+void TileEditor::OnPreviewLeftUp(wxMouseEvent& event)
+{
+    m_currentDraggingPoint = -1; //Stop the point dragging
+}
+
+void TileEditor::OnPreviewMotion(wxMouseEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    if(m_currentDraggingPoint != -1) // Currently dragging a point
+    {
+        
+    }
 }

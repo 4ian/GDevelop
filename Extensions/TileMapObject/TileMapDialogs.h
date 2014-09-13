@@ -149,8 +149,14 @@ protected:
 protected:
     virtual void OnCollidableToolToggled(wxCommandEvent& event) { event.Skip(); }
     virtual void OnPredefinedShapeToolClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnAddPointToolClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnEditPointToolClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnRemovePointToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnPreviewPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void OnPreviewErase(wxEraseEvent& event) { event.Skip(); }
+    virtual void OnPreviewLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void OnPreviewLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void OnPreviewMotion(wxMouseEvent& event) { event.Skip(); }
 
 public:
     TileEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);

@@ -32,7 +32,7 @@ freely, subject to the following restrictions:
 
 wxDEFINE_EVENT(TILE_SELECTION_CHANGED, TileSelectionEvent);
 
-TileSetPanel::TileSetPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) : 
+TileSetPanel::TileSetPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) :
     wxScrolledWindow(parent, id, pos, size, style),
     m_tileset(NULL),
     m_selectedCol(0),
@@ -59,7 +59,7 @@ int TileSetPanel::GetSelectedTile() const
 {
     if(!m_tileset || m_tileset->IsDirty())
         return -1;
-    
+
     return m_tileset->GetTileIDFromCell(m_selectedCol, m_selectedRow);
 }
 
@@ -137,7 +137,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
 
 void TileSetPanel::OnLeftButtonPressed(wxMouseEvent& event)
 {
-    if(!m_tileset || m_tileset->IsDirty())
+    if (!m_tileset || m_tileset->IsDirty())
         return;
 
     wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());
@@ -145,7 +145,7 @@ void TileSetPanel::OnLeftButtonPressed(wxMouseEvent& event)
     //Select the tile
     int selectedCol, selectedRow;
     GetTileAt(mousePos, selectedCol, selectedRow);
-    if(selectedCol >= m_tileset->GetColumnsCount() || selectedRow >= m_tileset->GetRowsCount())
+    if (selectedCol >= m_tileset->GetColumnsCount() || selectedRow >= m_tileset->GetRowsCount())
         return;
     m_selectedCol = selectedCol;
     m_selectedRow = selectedRow;
@@ -165,7 +165,7 @@ wxPoint TileSetPanel::GetPositionOfTile(int column, int row)
 
 void TileSetPanel::GetTileAt(wxPoint position, int &tileCol, int &tileRow)
 {
-    if(m_tileset->tileSize.x == 0 || m_tileset->tileSize.y == 0)
+    if (m_tileset->tileSize.x == 0 || m_tileset->tileSize.y == 0)
     {
         tileCol = 0;
         tileRow = 0;

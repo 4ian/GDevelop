@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "TileMapPanel.h"
 
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
 #include <wx/dcbuffer.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
 
@@ -89,9 +89,9 @@ void TileMapPanel::FillLayer(int layer, int tile)
     if(!m_tilemap)
         return;
 
-    for(int col = 0; col < m_tilemap->GetColumnsCount(); col++)
+    for (int col = 0; col < m_tilemap->GetColumnsCount(); col++)
     {
-        for(int row = 0; row < m_tilemap->GetRowsCount(); row++)
+        for (int row = 0; row < m_tilemap->GetRowsCount(); row++)
         {
             m_tilemap->SetTile(layer, col, row, tile);
         }
@@ -102,11 +102,11 @@ void TileMapPanel::FillLayer(int layer, int tile)
 
 void TileMapPanel::Update()
 {
-    if(!m_tilemap || !m_tileset)
+    if (!m_tilemap || !m_tileset)
         return;
     SetScrollRate(1, 1);
     SetVirtualSize(m_tilemap->GetColumnsCount() * m_tileset->tileSize.x, m_tilemap->GetRowsCount() * m_tileset->tileSize.y);
-    
+
     Refresh();
 }
 
@@ -154,7 +154,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
             {
                 if(m_tilemap->GetTile(layer, col, row) == -1)
                     continue;
-    
+
                 dc.DrawBitmap(m_tileset->GetTileBitmap(m_tilemap->GetTile(layer, col, row)), GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y);
             }
         }
@@ -166,10 +166,10 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
         dc.SetBrush(wxBrush(wxColour(128, 128, 255, 128)));
         dc.SetPen(wxPen(wxColor(128, 128, 255, 255), 1));
 
-        wxPoint topLeftPos(GetPositionOfTile(std::min(m_beginCol, m_endCol), 
+        wxPoint topLeftPos(GetPositionOfTile(std::min(m_beginCol, m_endCol),
                                              std::min(m_beginRow, m_endRow)));
 
-        wxPoint bottomRightPos(GetPositionOfTile(std::max(m_beginCol + 1, m_endCol + 1), 
+        wxPoint bottomRightPos(GetPositionOfTile(std::max(m_beginCol + 1, m_endCol + 1),
                                                  std::max(m_beginRow + 1, m_endRow + 1)));
 
         wxSize rectSize(bottomRightPos.x - topLeftPos.x, bottomRightPos.y - topLeftPos.y);

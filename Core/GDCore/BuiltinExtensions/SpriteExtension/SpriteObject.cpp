@@ -7,6 +7,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
+#include <algorithm>
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Animation.h"
@@ -282,6 +283,12 @@ bool SpriteObject::RemoveAnimation(unsigned int nb)
 
     animations.erase( animations.begin() + nb );
     return true;
+}
+
+void SpriteObject::SwapAnimations(unsigned int firstIndex, unsigned int secondIndex)
+{
+    if ( firstIndex < animations.size() && secondIndex < animations.size() && firstIndex != secondIndex)
+        std::swap(animations[firstIndex], animations[secondIndex]);
 }
 
 /**

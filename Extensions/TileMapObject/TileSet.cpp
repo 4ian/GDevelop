@@ -26,11 +26,11 @@ freely, subject to the following restrictions:
 
 #include "TileSet.h"
 
-#include <algorithm> 
+#include <algorithm>
 #include <iostream>
 #ifdef GD_IDE_ONLY
 #include <wx/file.h>
-#include <wx/filefn.h> 
+#include <wx/filefn.h>
 #include <wx/filename.h>
 #endif
 #include <GDCore/CommonTools.h>
@@ -91,8 +91,8 @@ void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vecto
 
     hitbox.vertices.clear();
 
-    std::string defaultPolygonStr = "0;0|" 
-                                    + gd::ToString(defaultTileSize.x) + ";0|" 
+    std::string defaultPolygonStr = "0;0|"
+                                    + gd::ToString(defaultTileSize.x) + ";0|"
                                     + gd::ToString(defaultTileSize.x) + ";" + gd::ToString(defaultTileSize.y) + "|"
                                     + "0;" + gd::ToString(defaultTileSize.y);
     std::string polygonStr = element.GetStringAttribute("polygon", defaultPolygonStr);
@@ -157,14 +157,14 @@ void TileSet::Generate()
 {
     m_dirty = true;
 
-    if(!m_tilesetTexture)
+    if (!m_tilesetTexture)
         return;
 
     std::cout << "Generating texture coords..." << std::endl;
 
     //Calculates the number of rows and columns in the tileset
     int columns(0), rows(0);
-    if(tileSize.x == 0 || tileSize.y == 0)
+    if (tileSize.x == 0 || tileSize.y == 0)
         return;
     columns = (m_tilesetTexture->texture.getSize().x + tileSpacing.x) / (tileSize.x + tileSpacing.x);
     rows = (m_tilesetTexture->texture.getSize().y + tileSpacing.y) / (tileSize.y + tileSpacing.y);
@@ -203,7 +203,7 @@ void TileSet::Generate()
     }
 
     //Puts the default hitbox for new tiles (if there are more tiles than before)
-    if(GetTilesCount() > m_hitboxes.size())
+    if (GetTilesCount() > m_hitboxes.size())
         m_hitboxes.insert(m_hitboxes.end(), (GetTilesCount()-m_hitboxes.size()), TileHitbox::Rectangle(tileSize));
 
     std::cout << "OK" << std::endl;
@@ -213,7 +213,7 @@ void TileSet::Generate()
 void TileSet::ResetHitboxes()
 {
     m_hitboxes.clear();
-    if(m_dirty)
+    if (m_dirty)
         return;
 
     m_hitboxes.assign(GetTilesCount(), TileHitbox::Rectangle(tileSize));
@@ -325,7 +325,7 @@ void TileSet::UnserializeFrom(const gd::SerializerElement &element)
     tileSpacing.x = element.GetIntAttribute("tileSpacingX", 0);
     tileSpacing.y = element.GetIntAttribute("tileSpacingY", 0);
 
-    if(element.HasChild("hitboxes"))
+    if (element.HasChild("hitboxes"))
     {
         gd::SerializerElement &tilesElem = element.GetChild("hitboxes");
         tilesElem.ConsiderAsArrayOf("tileHitbox");

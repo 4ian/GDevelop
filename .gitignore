@@ -35,6 +35,7 @@
 *.a
 *.so
 *.bc
+*.debhelper.log
 /Binaries/Output/Release_Linux/**
 !/Binaries/Output/Release_Linux/Start Game Develop.sh
 !/Binaries/Output/Release_Linux/CppPlatform/

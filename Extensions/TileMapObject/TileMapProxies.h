@@ -31,8 +31,9 @@ class TileMap;
 class TileSet;
 
 /**
- * Proxy for the TileMap
- * Note: needed because the TileMap includes wxBitmap at edittime which is not avaible in the preview compilation.
+ * \brief Lightweight proxy class for the TileMap
+ * \note Needed because TileMap includes wx/bitmap.h which is not avaible when
+ * compiling for runtime.
  */
 class TileMapProxy
 {
@@ -51,8 +52,9 @@ private:
 };
 
 /**
- * Proxy for the TileSet
- * Note: needed for the same reason as the TileMap
+ * \brief Lightweight proxy class for the TileSet
+ * \note Needed because TileSet includes wx/bitmap.h which is not avaible when
+ * compiling for runtime.
  */
 class TileSetProxy
 {

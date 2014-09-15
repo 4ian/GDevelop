@@ -47,9 +47,12 @@ License
 -------
 
 * The IDE (in the IDE folder) is licensed with GPL v3.
-* The Core library, the native and HTML5 platforms (respectively Core, GDCpp and GDJS folders) are LGPL v3.
+* The Core library, the native and HTML5 platforms (respectively *Core*, *GDCpp* and *GDJS* folders) are LGPL v3.
 * Extensions (in the Extensions folder) are using zlib/libpng license.
 * The name, Game Develop, and its logo are the exclusive property of Florian Rival.
+
+Games exported with Game Develop are based on the native and/or HTML5 platforms (see *Core*, *GDCpp* and *GDJS* folders): these platforms are distributed under the LPGL v3 license, so that you can **distribute, sell or do anything** with the games you created with Game Develop. In particular, you are not forced to make your game open source.
+
 
 [CMake]:http://www.cmake.org/
 [Ninja]:http://martine.github.io/ninja/

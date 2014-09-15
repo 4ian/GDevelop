@@ -56,7 +56,7 @@ float distance(float minA, float maxA, float minB, float maxB)
 
 }
 
-CollisionResult PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
+CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
 {
     p1.ComputeEdges();
     p2.ComputeEdges();

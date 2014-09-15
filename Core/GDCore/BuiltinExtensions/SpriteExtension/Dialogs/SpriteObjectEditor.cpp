@@ -154,6 +154,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     selectedPolygonPoint(0),
     xSelectionOffset(0),
     ySelectionOffset(0),
+    polygonEditionHelper(),
     previewElapsedTime(0),
     previewCurrentSprite(0),
     mainFrameWrapper(mainFrameWrapper_)
@@ -702,7 +703,7 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
             {
                 std::vector<Polygon2d> mask = sprite.GetCollisionMask();
 
-                for (unsigned int i = 0;i<mask.size();++i)
+                /*for (unsigned int i = 0;i<mask.size();++i)
                 {
                     wxPointList list;
                     for (unsigned int j = 0;j<mask[i].vertices.size();++j)
@@ -719,7 +720,8 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
                         dc.SetPen(wxPen(wxColour(j == selectedPolygonPoint ? 180 : 100,100,100)));
                         dc.DrawRectangle(spritePosX+mask[i].vertices[j].x-3, spritePosY+mask[i].vertices[j].y-3, 5, 5);
                     }
-                }
+                }*/
+                polygonEditionHelper.OnPaint(mask, dc, wxPoint(spritePosX, spritePosY));
             }
             else //When no custom mask is set, the mask is a bounding box.
             {
@@ -1224,6 +1226,7 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
     }
     if ( editingPoint ) RefreshPoints();
 
+    polygonEditionHelper.OnMouseLeftUp(event);
     movingPolygon = false;
     movingPolygonPoint = false;
 
@@ -1353,6 +1356,7 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
     if ( editingMask )
     {
         std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+        polygonEditionHelper.OnMouseLeftDown(mask, event, wxPoint(spritePosX, spritePosY));
         for (unsigned int i = 0;i<mask.size();++i)
         {
             for (unsigned int j = 0;j<mask[i].vertices.size();++j)
@@ -1362,12 +1366,6 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
                                  spritePosX+mask[i].vertices[j].x+2 >=  event.GetX() &&
                                  spritePosY+mask[i].vertices[j].y+2 >=  event.GetY() )
                  {
-                    movingPolygonPoint = true;
-                    selectedPolygon = i;
-                    selectedPolygonPoint = j;
-                    xSelectionOffset = spritePosX+mask[i].vertices[j].x-event.GetX();
-                    ySelectionOffset = spritePosY+mask[i].vertices[j].y-event.GetY();
-
                     //Also select the point in the tree
                     wxTreeListItem polygonItem = maskTree->GetFirstChild(maskTree->GetRootItem());
                     unsigned int polyId = 0;
@@ -1399,20 +1397,12 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    if ( editingMask && movingPolygonPoint )
+    if ( editingMask && polygonEditionHelper.IsMovingPoint())
     {
         std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-        if ( selectedPolygon < mask.size())
-        {
-            if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
-            {
-                mask[selectedPolygon].vertices[selectedPolygonPoint].x =
-                    std::max((float)0.0, std::min(spriteWidth, event.GetX()-spritePosX+xSelectionOffset));
-                mask[selectedPolygon].vertices[selectedPolygonPoint].y =
-                    std::max((float)0.0, std::min(spriteHeight, event.GetY()-spritePosY+ySelectionOffset));
-            }
-        }
-        sprites[0]->SetCollisionMaskAutomatic(false);
+        polygonEditionHelper.OnMouseMove(mask, event, wxPoint(spritePosX, spritePosY), spriteWidth, spriteHeight);
+
+    	sprites[0]->SetCollisionMaskAutomatic(false);
         sprites[0]->SetCustomCollisionMask(mask);
 
         //Apply changes to other sprites if necessary
@@ -1421,7 +1411,7 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
             sprites[i]->SetCollisionMaskAutomatic(false);
             sprites[i]->SetCustomCollisionMask(mask);
         }
-
+        
         imagePanel->Refresh();
         imagePanel->Update();
         RefreshCollisionMasks();

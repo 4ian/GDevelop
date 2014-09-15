@@ -4,6 +4,7 @@ compiler:
   - clang
 
 install:
+  - sudo apt-get update
 #Download and compile dependencies
   - cd ExtLibs
   - sudo apt-get install p7zip-full

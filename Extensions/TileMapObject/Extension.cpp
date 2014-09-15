@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 */
 /**
  * Contributors to the extension:
- * Florian Rival ( Minor changes, added offsets, HTML5 port )
+ * Florian Rival (Minor changes)
  */
 
 #include "GDCpp/ExtensionBase.h"

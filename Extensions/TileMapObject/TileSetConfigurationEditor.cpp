@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCpp/Project.h"
 
-TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet &tileSet_, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper) : 
+TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet &tileSet_, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper) :
     TileSetConfigurationEditorBase(parent),
     tileSet(tileSet_),
     game(game_),
@@ -44,16 +44,16 @@ TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet
     resourcesEditorPnl->Refresh();
 
     m_auimgr->AddPane( resourcesEditorPnl, wxAuiPaneInfo().Name( "ResourcesEditor" )
-                                                          .Left()
-                                                          .CloseButton(false)
-                                                          .Caption(_( "Images bank's editor" ))
-                                                          .MaximizeButton( true )
-                                                          .MinimizeButton( false )
-                                                          .CaptionVisible(true)
-                                                          .MinSize(50, 50)
-                                                          .BestSize(230,100)
-                                                          .Show(true) 
-                      );
+      .Left()
+      .CloseButton(false)
+      .Caption(_( "Images bank's editor" ))
+      .MaximizeButton( true )
+      .MinimizeButton( false )
+      .CaptionVisible(true)
+      .MinSize(50, 50)
+      .BestSize(230,100)
+      .Show(true)
+    );
 
     m_auimgr->Update();
 

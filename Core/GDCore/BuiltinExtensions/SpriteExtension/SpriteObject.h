@@ -105,6 +105,11 @@ public :
     bool HasNoAnimations() const { return animations.empty(); }
 
     /**
+     * \brief Swap the position of two sprites
+     */
+    void SwapAnimations(unsigned int firstIndex, unsigned int secondIndex);
+
+    /**
      * \brief Return a read-only reference to the vector containing all the animation of the object.
      */
     const std::vector < Animation > & GetAllAnimations() const { return animations; }

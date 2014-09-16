@@ -28,7 +28,7 @@ public:
 
     void OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoint offset);
     void OnMouseLeftDown(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset);
-    void OnMouseMove(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset, float maxX = FLT_MAX, float maxY = FLT_MAX);
+    void OnMouseMove(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset, float minX = -FLT_MAX, float minY = -FLT_MAX, float maxX = FLT_MAX, float maxY = FLT_MAX);
     void OnMouseLeftUp(wxMouseEvent &event);
 
     bool IsMovingPoint() const {return movingPolygonPoint;};

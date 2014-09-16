@@ -1378,38 +1378,6 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
 
             if ( verticeItem.IsOk()) maskTree->Select(verticeItem);
         }
-        /*for (unsigned int i = 0;i<mask.size();++i)
-        {
-            for (unsigned int j = 0;j<mask[i].vertices.size();++j)
-            {
-                if ( spritePosX+mask[i].vertices[j].x-2 <= event.GetX() &&
-                                 spritePosY+mask[i].vertices[j].y-2 <=  event.GetY() &&
-                                 spritePosX+mask[i].vertices[j].x+2 >=  event.GetX() &&
-                                 spritePosY+mask[i].vertices[j].y+2 >=  event.GetY() )
-                 {
-                    //Also select the point in the tree
-                    wxTreeListItem polygonItem = maskTree->GetFirstChild(maskTree->GetRootItem());
-                    unsigned int polyId = 0;
-                    while ( polygonItem.IsOk() && polyId != i )
-                    {
-                        polygonItem = maskTree->GetNextSibling(polygonItem);
-                        polyId++;
-                    }
-                    if ( polygonItem.IsOk() )
-                    {
-                        wxTreeListItem verticeItem = maskTree->GetFirstChild(polygonItem);
-                        unsigned int verticeId = 0;
-                        while ( verticeItem.IsOk() && verticeId != j )
-                        {
-                            verticeItem = maskTree->GetNextSibling(verticeItem);
-                            verticeId++;
-                        }
-
-                        if ( verticeItem.IsOk()) maskTree->Select(verticeItem);
-                    }
-                 }
-            }
-        }*/
     }
 }
 
@@ -1421,7 +1389,7 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
     if ( editingMask && polygonEditionHelper.IsMovingPoint())
     {
         std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-        polygonEditionHelper.OnMouseMove(mask, event, wxPoint(spritePosX, spritePosY), spriteWidth, spriteHeight);
+        polygonEditionHelper.OnMouseMove(mask, event, wxPoint(spritePosX, spritePosY), 0.f, 0.f, spriteWidth, spriteHeight);
 
     	sprites[0]->SetCollisionMaskAutomatic(false);
         sprites[0]->SetCustomCollisionMask(mask);

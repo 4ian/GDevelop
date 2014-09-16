@@ -58,8 +58,8 @@ void PolygonEditionHelper::OnMouseLeftDown(std::vector<Polygon2d> &mask, wxMouse
     {
         for (unsigned int j = 0;j<mask[i].vertices.size();++j)
         {
-            if ( offset.x+mask[i].vertices[j].x-2 <= event.GetX() &&
-                             offset.y+mask[i].vertices[j].y-2 <=  event.GetY() &&
+            if ( offset.x+mask[i].vertices[j].x-3 <= event.GetX() &&
+                             offset.y+mask[i].vertices[j].y-3 <=  event.GetY() &&
                              offset.x+mask[i].vertices[j].x+2 >=  event.GetX() &&
                              offset.y+mask[i].vertices[j].y+2 >=  event.GetY() )
              {
@@ -73,7 +73,7 @@ void PolygonEditionHelper::OnMouseLeftDown(std::vector<Polygon2d> &mask, wxMouse
     }
 }
 
-void PolygonEditionHelper::OnMouseMove(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset, float maxX, float maxY)
+void PolygonEditionHelper::OnMouseMove(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset, float minX, float minY, float maxX, float maxY)
 {
     if(!movingPolygonPoint)
         return;
@@ -83,9 +83,9 @@ void PolygonEditionHelper::OnMouseMove(std::vector<Polygon2d> &mask, wxMouseEven
         if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
         {
             mask[selectedPolygon].vertices[selectedPolygonPoint].x =
-                std::max((float)0.0, std::min(maxX, event.GetX()-(float)offset.x+xSelectionOffset));
+                std::max(minX, std::min(maxX, event.GetX()-(float)offset.x+xSelectionOffset));
             mask[selectedPolygon].vertices[selectedPolygonPoint].y =
-                std::max((float)0.0, std::min(maxY, event.GetY()-(float)offset.y+ySelectionOffset));
+                std::max(minY, std::min(maxY, event.GetY()-(float)offset.y+ySelectionOffset));
         }
     }
 }

@@ -5,6 +5,8 @@
  * This project is released under the GNU Lesser General Public License.
  */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include "GDCore/IDE/Dialogs/PolygonEditionHelper.h"
 
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -94,3 +96,5 @@ void PolygonEditionHelper::OnMouseLeftUp(wxMouseEvent &event)
 }
 
 }
+
+#endif

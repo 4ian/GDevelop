@@ -32,6 +32,11 @@ public:
     void OnMouseLeftUp(wxMouseEvent &event);
 
     bool IsMovingPoint() const {return movingPolygonPoint;};
+    int GetSelectedPolygon() const {return selectedPolygon;};
+    int GetSelectedPoint() const {return selectedPolygonPoint;};
+
+    void SetSelectedPolygon(int polygon) {selectedPolygon = polygon;};
+    void SetSelectedPoint(int point) {selectedPolygonPoint = point;};
 
 private:
     PolygonEditionHelper(const PolygonEditionHelper&) {};

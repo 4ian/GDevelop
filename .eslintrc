@@ -1,0 +1,22 @@
+{
+    "globals": {
+        "angular": false,
+        "require": false,
+        "console": false,
+        "gd" : true,
+        "module" : true,
+        "process": false,
+        "describe": false,
+        "it": false,
+        "after": false,
+        "gdjs": true
+    },
+    "rules": {
+        "quotes": 0,
+        "global-strict": 0,
+        "no-console": 0,
+        "curly": 0,
+        "no-redeclare": 0,
+        "no-underscore-dangle": 0
+    }
+}

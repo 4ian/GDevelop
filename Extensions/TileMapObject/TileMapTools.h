@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 
 class TileSet;
 class TileMap;

@@ -12,7 +12,7 @@
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/PolygonCollision.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCore/CommonTools.h"
 #include <SFML/System.hpp>
 #include <iostream>

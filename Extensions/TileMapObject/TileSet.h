@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/RuntimeGame.h"
 
 /**

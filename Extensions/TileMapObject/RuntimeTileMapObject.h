@@ -31,7 +31,7 @@ freely, subject to the following restrictions:
 
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include <boost/shared_ptr.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 

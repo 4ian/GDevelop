@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"

@@ -4,7 +4,7 @@
  * This project is released under the GNU Lesser General Public License.
  */
 #include "GDCpp/PolygonCollision.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include <cmath>
 #include <cfloat>
 

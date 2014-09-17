@@ -35,7 +35,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Position.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/PolygonCollision.h"
 #include "GDCpp/BuiltinExtensions/ObjectTools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
@@ -93,9 +93,9 @@ bool RuntimeTileMapObject::Draw( sf::RenderTarget& window )
 
     //Construct the transform
     sf::Transform transform;
-    transform.translate((int)GetX() + centerPos.x - floor(centerPos.x), 
+    transform.translate((int)GetX() + centerPos.x - floor(centerPos.x),
                         (int)GetY() + centerPos.y - floor(centerPos.y));
-    
+
     //Unsmooth the texture
     bool wasSmooth = tileSet.Get().GetTexture().isSmooth();
     tileSet.Get().GetTexture().setSmooth(false);

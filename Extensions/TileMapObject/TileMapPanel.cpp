@@ -155,7 +155,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
                 if(m_tilemap->GetTile(layer, col, row) == -1)
                     continue;
 
-                dc.DrawBitmap(m_tileset->GetTileBitmap(m_tilemap->GetTile(layer, col, row)), GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y);
+                dc.DrawBitmap(m_tileset->GetTileBitmap(m_tilemap->GetTile(layer, col, row)), GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y, true);
             }
         }
     }

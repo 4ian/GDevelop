@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/ImageManager.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Position.h"

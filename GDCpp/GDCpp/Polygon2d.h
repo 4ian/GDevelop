@@ -4,4 +4,4 @@
  * This project is released under the GNU Lesser General Public License.
  */
 
-#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon.h"
+#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.h"

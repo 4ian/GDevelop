@@ -73,16 +73,16 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     var that = this;
     var i = 0;
     gdjs.iterateOverArray(objectData.automatisms, function(autoData) {
-        var ctor = gdjs.getAutomatismConstructor(autoData.type);
+        var Ctor = gdjs.getAutomatismConstructor(autoData.type);
 
         //Try to reuse already existing automatisms.
         if ( i < that._automatisms.length ) {
-            if ( that._automatisms[i] instanceof ctor )
-                ctor.call(that._automatisms[i], runtimeScene, autoData, that);
+            if ( that._automatisms[i] instanceof Ctor )
+                Ctor.call(that._automatisms[i], runtimeScene, autoData, that);
             else
-                that._automatisms[i] = new ctor(runtimeScene, autoData, that);
+                that._automatisms[i] = new Ctor(runtimeScene, autoData, that);
         }
-        else that._automatisms.push(new ctor(runtimeScene, autoData, that));
+        else that._automatisms.push(new Ctor(runtimeScene, autoData, that));
 
         that._automatismsTable.put(autoData.name, that._automatisms[i]);
 
@@ -257,8 +257,8 @@ gdjs.RuntimeObject.prototype.getDrawableY = function() {
 
 
 gdjs.RuntimeObject.prototype.rotateTowardPosition = function(x, y, speed, scene) {
-    this.rotateTowardAngle(Math.atan2(y - (this.getDrawableY()+this.getCenterY()),
-        x - (this.getDrawableX()+this.getCenterX()))*180/Math.PI, speed, scene);
+    this.rotateTowardAngle(Math.atan2(y - (this.getDrawableY() + this.getCenterY()),
+        x - (this.getDrawableX() + this.getCenterX()))*180/Math.PI, speed, scene);
 };
 
 gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeScene) {
@@ -270,7 +270,7 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
     var angularDiff = gdjs.evtTools.common.angleDifference(this.getAngle(), angle);
     var diffWasPositive = angularDiff >= 0;
 
-    var newAngle = this.getAngle()+(diffWasPositive ? -1.0 : 1.0)*speed*runtimeScene.getElapsedTime()/1000;
+    var newAngle = this.getAngle() + (diffWasPositive ? -1.0 : 1.0) * speed * runtimeScene.getElapsedTime()/1000;
     if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 ^ diffWasPositive)
         newAngle = angle;
     this.setAngle(newAngle);
@@ -334,7 +334,7 @@ gdjs.RuntimeObject.prototype.getAngle = function() {
  */
 gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     this.layer = layer;
-}
+};
 
 /**
  * Get the layer of the object.
@@ -344,7 +344,7 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
  */
 gdjs.RuntimeObject.prototype.getLayer = function() {
     return this.layer;
-}
+};
 
 /**
  * Return true if the object is on the specified layer
@@ -355,7 +355,7 @@ gdjs.RuntimeObject.prototype.getLayer = function() {
  */
 gdjs.RuntimeObject.prototype.isOnLayer = function(layer) {
     return this.layer === layer;
-}
+};
 
 /**
  * Get the container of the object variables
@@ -459,7 +459,7 @@ gdjs.RuntimeObject.prototype.hide = function(enable) {
  * @method isVisible
  * @return {Boolean} true if the object is not hidden.
  */
-gdjs.RuntimeObject.prototype.isVisible = function(enable) {
+gdjs.RuntimeObject.prototype.isVisible = function() {
     return !this.hidden;
 };
 
@@ -468,7 +468,7 @@ gdjs.RuntimeObject.prototype.isVisible = function(enable) {
  * @method isHidden
  * @return {Boolean} true if the object is hidden.
  */
-gdjs.RuntimeObject.prototype.isHidden = function(enable) {
+gdjs.RuntimeObject.prototype.isHidden = function() {
     return this.hidden;
 };
 
@@ -495,7 +495,7 @@ gdjs.RuntimeObject.prototype.getHeight = function() {
  * @method getCenterX
  */
 gdjs.RuntimeObject.prototype.getCenterX = function() {
-    return this.getWidth()/2;
+    return this.getWidth() / 2;
 };
 
 /**
@@ -503,7 +503,7 @@ gdjs.RuntimeObject.prototype.getCenterX = function() {
  * @method getCenterY
  */
 gdjs.RuntimeObject.prototype.getCenterY = function() {
-    return this.getHeight()/2;
+    return this.getHeight() / 2;
 };
 
 //Forces :
@@ -584,8 +584,8 @@ gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, clearin
 gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, clearing) {
     if ( obj == null ) return;
 
-    this.addForceTowardPosition(obj.getDrawableX()+obj.getCenterX(),
-                                obj.getDrawableY()+obj.getCenterY(),
+    this.addForceTowardPosition(obj.getDrawableX() + obj.getCenterX(),
+                                obj.getDrawableY() + obj.getCenterY(),
                                 len, clearing);
 };
 
@@ -963,13 +963,6 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
             }
         }
     }
-
-    /*
-    for(var i = 0, len = objects.length;i<len;++i) {
-        if ( objects[i].id != this.id ) {
-            this.addForceTowardObject(objects[i], -len, false);
-        }
-    }*/
 };
 
 /**

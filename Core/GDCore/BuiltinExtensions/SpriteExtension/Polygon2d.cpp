@@ -3,10 +3,10 @@
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
+#include "Polygon2d.h"
 #include <cmath>
 #include <iostream>
 #include <SFML/System/Vector2.hpp>
-#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon.h"
 
 void Polygon2d::Rotate(float angle)
 {

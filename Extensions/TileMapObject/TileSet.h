@@ -34,11 +34,11 @@ freely, subject to the following restrictions:
 #include <string>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
-#include <GDCore/PlatformDefinition/ImageManager.h>
-#include <GDCore/PlatformDefinition/Project.h>
-#include <GDCore/Serialization/SerializerElement.h>
-#include <GDCpp/Polygon.h>
-#include <GDCpp/RuntimeGame.h>
+#include "GDCore/PlatformDefinition/ImageManager.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Serialization/SerializerElement.h"
+#include "GDCpp/Polygon2d.h"
+#include "GDCpp/RuntimeGame.h"
 
 /**
  * \brief Contains the coordinates of the texture sub-rect
@@ -96,7 +96,7 @@ struct TileHitbox
  * \brief Contains all the stuff related to the tileset (the texture containing all tiles).
  *
  * The TileSet class contains the texture name (path), the tile size and the tile spacing (space between tiles on the texture).
- * 
+ *
  * Before the first use or after a texture change, you will need to call TileSet::LoadResources to load the texture from the ImageManager.
  */
 class TileSet
@@ -116,7 +116,7 @@ public:
     ///\{
     /**
      * Returns true if the tileset hasn't been loaded and generated from a picture.
-     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName or 
+     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName or
      * if the TileSet::tileSize or TileSet::tileSpacing have been modified as the object is not in a invalid state.
      */
     bool IsDirty() const {return m_dirty;};
@@ -255,7 +255,7 @@ private:
     std::vector<TileTextureCoords> m_coords; ///< The tileset coords
 
     std::vector<TileHitbox> m_hitboxes;
-    
+
     #ifdef GD_IDE_ONLY
     wxBitmap m_tilesetBitmap; ///< The tileset texture
     std::vector<wxBitmap> m_bitmaps;

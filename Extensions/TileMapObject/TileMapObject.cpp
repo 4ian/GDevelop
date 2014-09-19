@@ -41,7 +41,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Position.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/PolygonCollision.h"
 #include "GDCpp/BuiltinExtensions/ObjectTools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
@@ -135,7 +135,7 @@ void TileMapObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rend
 
     //Construct the transform
     sf::Transform transform;
-    transform.translate(instance.GetX() + centerPos.x - floor(centerPos.x), 
+    transform.translate(instance.GetX() + centerPos.x - floor(centerPos.x),
                         instance.GetY() + centerPos.y - floor(centerPos.y));
 
     //Unsmooth the texture

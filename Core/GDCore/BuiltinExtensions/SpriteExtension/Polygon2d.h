@@ -23,7 +23,7 @@ public:
     virtual ~Polygon2d() {};
 
     std::vector<sf::Vector2f> vertices; ///< The vertices composing the polygon
-    mutable std::vector<sf::Vector2f> edges; ///< Can be computed from vertices using ComputeEdges()
+    mutable std::vector<sf::Vector2f> edges; ///< Edges. Can be computed from vertices using ComputeEdges()
 
     /**
      * Moves each vertices from the given amount.
@@ -69,4 +69,3 @@ public:
 };
 
 #endif // GDCORE_POLYGON_H
-

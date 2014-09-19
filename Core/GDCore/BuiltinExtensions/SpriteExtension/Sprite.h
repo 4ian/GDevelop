@@ -10,7 +10,7 @@
 #include <boost/shared_ptr.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include "GDCore/BuiltinExtensions/SpriteExtension/Point.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon.h"
+#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.h"
 class SFMLTextureWrapper;
 #undef LoadImage //prevent windows.h to be polluting everything
 

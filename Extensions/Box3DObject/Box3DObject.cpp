@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Position.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 #if defined(GD_IDE_ONLY)

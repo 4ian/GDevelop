@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/Position.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 

@@ -1,6 +1,6 @@
 #include "ObjectTools.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Polygon.h"
+#include "GDCpp/Polygon2d.h"
 #include "GDCpp/PolygonCollision.h"
 #include "MathematicalTools.h"
 #include <cmath>

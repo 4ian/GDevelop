@@ -93,9 +93,8 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
         dc.DrawRectangle(minPos.x, minPos.y, width, height);
 
-
         //Draw the bitmap
-        dc.DrawBitmap(m_tileset->GetWxBitmap(), 0, 0, false);
+        dc.DrawBitmap(m_tileset->GetWxBitmap(), 0, 0, true);
 
         //Draw the lines
         dc.SetPen(wxPen(wxColor(128, 128, 128, 255), 1));

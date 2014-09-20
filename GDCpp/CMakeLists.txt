@@ -50,7 +50,7 @@ include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
-ELSEIF (NOT EMSCRIPTEN)
+ELSEIF (NOT NO_GUI)
 	find_package(wxWidgets COMPONENTS core base ribbon webview stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
 	find_package(PkgConfig REQUIRED)
@@ -63,8 +63,10 @@ ENDIF(WIN32)
 ###
 set(GDCpp_extra_definitions "${GDCpp_extra_definitions} GD_IDE_ONLY=1;")
 IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
-	add_definitions( -DGD_NO_WX_GUI )
 	add_definitions( -DEMSCRIPTEN )
+ENDIF()
+IF (NO_GUI)
+	add_definitions( -DGD_NO_WX_GUI )
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	add_definitions( -DDEBUG )
@@ -97,7 +99,9 @@ ELSE()
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK3_CFLAGS_OTHER})
+	IF (NOT NO_GUI)
+		add_definitions(${GTK3_CFLAGS_OTHER})
+	ENDIF()
 ENDIF(WIN32)
 
 
@@ -194,3 +198,17 @@ ELSE()
 			WORKING_DIRECTORY ${GD_base_dir}/GDCpp/scripts)
 	ENDIF()
 ENDIF()
+
+#Tests
+###
+if(BUILD_TESTS)
+	file(
+	    GLOB_RECURSE
+	    test_source_files
+	    tests/*
+	)
+	add_executable(GDCpp_tests ${test_source_files})
+	target_link_libraries(GDCpp_tests GDCpp_Runtime)
+	target_link_libraries(GDCpp_tests ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
+	target_link_libraries(GDCpp_tests GLU GL)
+endif()

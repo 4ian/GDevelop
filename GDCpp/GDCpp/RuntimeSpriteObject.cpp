@@ -8,6 +8,7 @@
 #include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include "RuntimeSpriteObject.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Animation.h"

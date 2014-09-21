@@ -29,6 +29,8 @@ namespace gd { class Resource; }
 namespace gd { class Project; }
 class Sprite;
 
+#include "GDCore/IDE/Dialogs/PolygonEditionHelper.h"
+
 namespace gd {
 
 /**
@@ -270,6 +272,8 @@ private:
     unsigned int selectedPolygonPoint;
     float xSelectionOffset;
     float ySelectionOffset;
+
+    gd::PolygonEditionHelper polygonEditionHelper;
 
     float previewElapsedTime;
     int previewCurrentSprite;

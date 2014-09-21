@@ -154,6 +154,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     selectedPolygonPoint(0),
     xSelectionOffset(0),
     ySelectionOffset(0),
+    polygonEditionHelper(),
     previewElapsedTime(0),
     previewCurrentSprite(0),
     mainFrameWrapper(mainFrameWrapper_)
@@ -702,7 +703,7 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
             {
                 std::vector<Polygon2d> mask = sprite.GetCollisionMask();
 
-                for (unsigned int i = 0;i<mask.size();++i)
+                /*for (unsigned int i = 0;i<mask.size();++i)
                 {
                     wxPointList list;
                     for (unsigned int j = 0;j<mask[i].vertices.size();++j)
@@ -719,7 +720,8 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
                         dc.SetPen(wxPen(wxColour(j == selectedPolygonPoint ? 180 : 100,100,100)));
                         dc.DrawRectangle(spritePosX+mask[i].vertices[j].x-3, spritePosY+mask[i].vertices[j].y-3, 5, 5);
                     }
-                }
+                }*/
+                polygonEditionHelper.OnPaint(mask, dc, wxPoint(spritePosX, spritePosY));
             }
             else //When no custom mask is set, the mask is a bounding box.
             {
@@ -1224,6 +1226,7 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
     }
     if ( editingPoint ) RefreshPoints();
 
+    polygonEditionHelper.OnMouseLeftUp(event);
     movingPolygon = false;
     movingPolygonPoint = false;
 
@@ -1353,43 +1356,27 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
     if ( editingMask )
     {
         std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-        for (unsigned int i = 0;i<mask.size();++i)
+        polygonEditionHelper.OnMouseLeftDown(mask, event, wxPoint(spritePosX, spritePosY));
+
+        //Select the item in the treeview
+        wxTreeListItem polygonItem = maskTree->GetFirstChild(maskTree->GetRootItem());
+        unsigned int polyId = 0;
+        while ( polygonItem.IsOk() && polyId != polygonEditionHelper.GetSelectedPolygon() )
         {
-            for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+            polygonItem = maskTree->GetNextSibling(polygonItem);
+            polyId++;
+        }
+        if ( polygonItem.IsOk() )
+        {
+            wxTreeListItem verticeItem = maskTree->GetFirstChild(polygonItem);
+            unsigned int verticeId = 0;
+            while ( verticeItem.IsOk() && verticeId != polygonEditionHelper.GetSelectedPoint() )
             {
-                if ( spritePosX+mask[i].vertices[j].x-2 <= event.GetX() &&
-                                 spritePosY+mask[i].vertices[j].y-2 <=  event.GetY() &&
-                                 spritePosX+mask[i].vertices[j].x+2 >=  event.GetX() &&
-                                 spritePosY+mask[i].vertices[j].y+2 >=  event.GetY() )
-                 {
-                    movingPolygonPoint = true;
-                    selectedPolygon = i;
-                    selectedPolygonPoint = j;
-                    xSelectionOffset = spritePosX+mask[i].vertices[j].x-event.GetX();
-                    ySelectionOffset = spritePosY+mask[i].vertices[j].y-event.GetY();
-
-                    //Also select the point in the tree
-                    wxTreeListItem polygonItem = maskTree->GetFirstChild(maskTree->GetRootItem());
-                    unsigned int polyId = 0;
-                    while ( polygonItem.IsOk() && polyId != i )
-                    {
-                        polygonItem = maskTree->GetNextSibling(polygonItem);
-                        polyId++;
-                    }
-                    if ( polygonItem.IsOk() )
-                    {
-                        wxTreeListItem verticeItem = maskTree->GetFirstChild(polygonItem);
-                        unsigned int verticeId = 0;
-                        while ( verticeItem.IsOk() && verticeId != j )
-                        {
-                            verticeItem = maskTree->GetNextSibling(verticeItem);
-                            verticeId++;
-                        }
-
-                        if ( verticeItem.IsOk()) maskTree->Select(verticeItem);
-                    }
-                 }
+                verticeItem = maskTree->GetNextSibling(verticeItem);
+                verticeId++;
             }
+
+            if ( verticeItem.IsOk()) maskTree->Select(verticeItem);
         }
     }
 }
@@ -1399,20 +1386,12 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    if ( editingMask && movingPolygonPoint )
+    if ( editingMask && polygonEditionHelper.IsMovingPoint())
     {
         std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-        if ( selectedPolygon < mask.size())
-        {
-            if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
-            {
-                mask[selectedPolygon].vertices[selectedPolygonPoint].x =
-                    std::max((float)0.0, std::min(spriteWidth, event.GetX()-spritePosX+xSelectionOffset));
-                mask[selectedPolygon].vertices[selectedPolygonPoint].y =
-                    std::max((float)0.0, std::min(spriteHeight, event.GetY()-spritePosY+ySelectionOffset));
-            }
-        }
-        sprites[0]->SetCollisionMaskAutomatic(false);
+        polygonEditionHelper.OnMouseMove(mask, event, wxPoint(spritePosX, spritePosY), 0.f, 0.f, spriteWidth, spriteHeight);
+
+    	sprites[0]->SetCollisionMaskAutomatic(false);
         sprites[0]->SetCustomCollisionMask(mask);
 
         //Apply changes to other sprites if necessary
@@ -1421,7 +1400,7 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
             sprites[i]->SetCollisionMaskAutomatic(false);
             sprites[i]->SetCustomCollisionMask(mask);
         }
-
+        
         imagePanel->Refresh();
         imagePanel->Update();
         RefreshCollisionMasks();
@@ -1464,26 +1443,31 @@ void SpriteObjectEditor::OnAddVerticeClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-    if ( selectedPolygon < mask.size() )
+    if ( polygonEditionHelper.GetSelectedPolygon() < mask.size() )
     {
-        if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
+        if ( polygonEditionHelper.GetSelectedPoint() < mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() )
         {
-            if ( selectedPolygonPoint < 1 ) selectedPolygonPoint = 1;
-            if ( selectedPolygonPoint >= mask[selectedPolygon].vertices.size() ) selectedPolygonPoint = mask[selectedPolygon].vertices.size()-1;
-            if ( mask[selectedPolygon].vertices.size() < 2 ) return;
+            if ( polygonEditionHelper.GetSelectedPoint() < 1 ) 
+            	polygonEditionHelper.SetSelectedPoint(1);
+            if ( polygonEditionHelper.GetSelectedPoint() >= mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() ) 
+            	polygonEditionHelper.SetSelectedPoint(mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size()-1);
+            if ( mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() < 2 ) 
+            	return;
 
-            sf::Vector2f newPoint = (mask[selectedPolygon].vertices[selectedPolygonPoint]+mask[selectedPolygon].vertices[selectedPolygonPoint-1]);
+            sf::Vector2f newPoint = (mask[polygonEditionHelper.GetSelectedPolygon()].vertices[polygonEditionHelper.GetSelectedPoint()]
+            	+ mask[polygonEditionHelper.GetSelectedPolygon()].vertices[polygonEditionHelper.GetSelectedPoint()-1]);
             newPoint.x /= 2.0f;
             newPoint.y /= 2.0f;
-            mask[selectedPolygon].vertices.insert(mask[selectedPolygon].vertices.begin()+selectedPolygonPoint, newPoint);
+            mask[polygonEditionHelper.GetSelectedPolygon()].vertices.insert(mask[polygonEditionHelper.GetSelectedPolygon()].vertices.begin()+polygonEditionHelper.GetSelectedPoint(), newPoint);
         }
         else
         {
-            size_t verticeCount = mask[selectedPolygon].vertices.size();
-            sf::Vector2f newPoint = mask[selectedPolygon].vertices[verticeCount-1]+mask[selectedPolygon].vertices[verticeCount-2];
+            size_t verticeCount = mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size();
+            sf::Vector2f newPoint = mask[polygonEditionHelper.GetSelectedPolygon()].vertices[verticeCount-1]
+            	+ mask[polygonEditionHelper.GetSelectedPolygon()].vertices[verticeCount-2];
             newPoint.x /= 2.0f;
             newPoint.y /= 2.0f;
-            mask[selectedPolygon].vertices.insert(mask[selectedPolygon].vertices.begin()+verticeCount-1, newPoint);
+            mask[polygonEditionHelper.GetSelectedPolygon()].vertices.insert(mask[polygonEditionHelper.GetSelectedPolygon()].vertices.begin()+verticeCount-1, newPoint);
         }
     }
 
@@ -1503,16 +1487,16 @@ void SpriteObjectEditor::OnmaskTreeSelectionChanged(wxTreeListEvent& event)
     {
         //A polygon is selected
         wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
-        selectedPolygon = data ? ToInt(ToString(data->GetData())) : std::string::npos;
-        selectedPolygonPoint = std::string::npos;
+        polygonEditionHelper.SetSelectedPolygon(data ? ToInt(ToString(data->GetData())) : std::string::npos);
+        polygonEditionHelper.SetSelectedPoint(std::string::npos);
     }
     else
     {
         //A point is selected
         wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
-        selectedPolygonPoint = data ? ToInt(ToString(data->GetData())) : std::string::npos;
+        polygonEditionHelper.SetSelectedPoint(data ? ToInt(ToString(data->GetData())) : std::string::npos);
         wxStringClientData * parentData = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(maskTree->GetItemParent(selectedItem)));
-        selectedPolygon = parentData ? ToInt(ToString(parentData->GetData())) : std::string::npos;
+        polygonEditionHelper.SetSelectedPolygon(parentData ? ToInt(ToString(parentData->GetData())) : std::string::npos);
     }
 
     imagePanel->Refresh();
@@ -1525,25 +1509,25 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-    if ( selectedPolygon < mask.size() )
+    if ( polygonEditionHelper.GetSelectedPolygon() < mask.size() )
     {
-        if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
+        if ( polygonEditionHelper.GetSelectedPoint() < mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() )
         {
             //Make sure not to delete a vertice if the polygon has 3 vertices
-            if ( mask[selectedPolygon].vertices.size() <= 3 )
+            if ( mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() <= 3 )
             {
                 if (wxMessageBox(_("A polygon can not have less than 3 vertices.\nDo you want to delete the entire polygon\?"), _("Delete the polygon\?"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
                 {
-                    mask.erase(mask.begin()+selectedPolygon);
+                    mask.erase(mask.begin()+polygonEditionHelper.GetSelectedPolygon());
                 }
                 else
                     return;
             }
 
-            mask[selectedPolygon].vertices.erase(mask[selectedPolygon].vertices.begin()+selectedPolygonPoint);
+            mask[polygonEditionHelper.GetSelectedPolygon()].vertices.erase(mask[polygonEditionHelper.GetSelectedPolygon()].vertices.begin()+polygonEditionHelper.GetSelectedPoint());
         }
         else
-            mask.erase(mask.begin()+selectedPolygon);
+            mask.erase(mask.begin()+polygonEditionHelper.GetSelectedPolygon());
     }
 
     for (unsigned int i = 0;i<sprites.size();++i)

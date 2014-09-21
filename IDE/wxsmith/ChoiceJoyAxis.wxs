@@ -23,7 +23,8 @@
 						<item>AxisR</item>
 						<item>AxisU</item>
 						<item>AxisV</item>
-						<item>AxisPOV</item>
+						<item>AxisPovX</item>
+						<item>AxisPovY</item>
 					</content>
 					<default>-1</default>
 					<handler function="OnaxisRadioSelect" entry="EVT_RADIOBOX" />

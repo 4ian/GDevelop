@@ -38,7 +38,7 @@ TileEditor::TileEditor(wxWindow* parent) :
     m_predefinedShapesMenu(new wxMenu()),
     m_xOffset(0.f),
     m_yOffset(0.f),
-    m_currentDraggingPoint(-1)
+    m_polygonHelper()
 {
     m_tilePreviewPanel->SetBackgroundStyle(wxBG_STYLE_PAINT);
     UpdateScrollbars();
@@ -140,27 +140,8 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     dc.DrawBitmap(tileBitmap, m_xOffset, m_yOffset);
 
     //Draw the hitbox
-    dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-    dc.SetPen(wxPen(wxColour(100,100,100)));
-
-    //List all points
-    wxPointList list;
-    for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
-    {
-        list.push_back(new wxPoint(m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].x, 
-                                   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
-    }
-
-    //Draw the polygon
-    dc.DrawPolygon(&list, m_xOffset, m_yOffset);
-
-    //Draw all points
-    for(unsigned int i = 0; i < list.size(); i++)
-    {
-        dc.DrawBitmap(gd::CommonBitmapManager::Get()->point, 
-                      m_xOffset + list[i]->x - gd::CommonBitmapManager::Get()->point.GetWidth()/2,
-                      m_yOffset + list[i]->y - gd::CommonBitmapManager::Get()->point.GetHeight()/2);
-    }
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    m_polygonHelper.OnPaint(polygonList, dc, wxPoint(m_xOffset, m_yOffset));
 
     //Show a warning if the polygon isn't convex
     if(!m_tileset->GetTileHitbox(m_currentTile).hitbox.IsConvex())
@@ -245,17 +226,24 @@ void TileEditor::OnPreviewLeftDown(wxMouseEvent& event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
-    //Test if the mouse is hovering a point
-    for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
-    {
-        list.push_back(new wxPoint(m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].x, 
-                                   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
-    }
+    event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
+    event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
+
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    m_polygonHelper.OnMouseLeftDown(polygonList, event, wxPoint(m_xOffset, m_yOffset));
+    m_tileset->GetTileHitbox(m_currentTile).hitbox = polygonList[0];
+
+    m_tilePreviewPanel->Refresh();
 }
 
 void TileEditor::OnPreviewLeftUp(wxMouseEvent& event)
 {
-    m_currentDraggingPoint = -1; //Stop the point dragging
+    event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
+    event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
+
+    m_polygonHelper.OnMouseLeftUp(event);
+
+    m_tilePreviewPanel->Refresh();
 }
 
 void TileEditor::OnPreviewMotion(wxMouseEvent& event)
@@ -263,8 +251,12 @@ void TileEditor::OnPreviewMotion(wxMouseEvent& event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
-    if(m_currentDraggingPoint != -1) // Currently dragging a point
-    {
-        
-    }
+    event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
+    event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
+
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    m_polygonHelper.OnMouseMove(polygonList, event, wxPoint(m_xOffset, m_yOffset), 0.f, 0.f, m_tileset->tileSize.x, m_tileset->tileSize.y);
+    m_tileset->GetTileHitbox(m_currentTile).hitbox = polygonList[0];
+
+    m_tilePreviewPanel->Refresh();
 }

@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #define TILEEDITOR_H
 
 #include <wx/menu.h>
+#include "GDCore/IDE/Dialogs/PolygonEditionHelper.h"
 
 #include "TileMapDialogs.h"
 #include "TileSet.h"
@@ -52,7 +53,7 @@ private:
     float m_xOffset;
     float m_yOffset;
 
-    int m_currentDraggingPoint;
+    gd::PolygonEditionHelper m_polygonHelper;
 
     wxPoint GetRealPosition(wxPoint absolutePos);
 

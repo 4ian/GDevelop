@@ -424,7 +424,11 @@ PathfindingAutomatism::PathfindingAutomatism() :
 
 void PathfindingAutomatism::MoveTo(RuntimeScene & scene, float x, float y)
 {
-    if ( !sceneManager ) return;
+    if ( parentScene != &scene ) //Parent scene has changed
+    {
+        parentScene = &scene;
+        sceneManager = parentScene ? &ScenePathfindingObstaclesManager::managers[&scene] : NULL;
+    }
 
     path.clear();
 

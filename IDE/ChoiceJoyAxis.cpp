@@ -52,7 +52,7 @@ scene(scene_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Choose directly Joystick axis :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	wxString __wxRadioBoxChoices_1[7] =
+	wxString __wxRadioBoxChoices_1[8] =
 	{
 		_("AxisX"),
 		_("AxisY"),
@@ -60,9 +60,10 @@ scene(scene_)
 		_("AxisR"),
 		_("AxisU"),
 		_("AxisV"),
-		_("AxisPOV")
+		_("AxisPovX"),
+		_("AxisPovY")
 	};
-	axisRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Axis"), wxDefaultPosition, wxDefaultSize, 7, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+	axisRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Axis"), wxDefaultPosition, wxDefaultSize, 8, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	FlexGridSizer1->Add(axisRadio, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -100,7 +101,8 @@ scene(scene_)
 	else if ( joyaxis == "\"AxisR\"" ) axisRadio->SetSelection(3);
 	else if ( joyaxis == "\"AxisU\"" ) axisRadio->SetSelection(4);
 	else if ( joyaxis == "\"AxisV\"" ) axisRadio->SetSelection(5);
-	else if ( joyaxis == "\"AxisPOV\"" ) axisRadio->SetSelection(6);
+	else if ( joyaxis == "\"AxisPOV\"" || joyaxis == "\"AxisPovX\"" ) axisRadio->SetSelection(6);
+	else if ( joyaxis == "\"AxisPovY\"" ) axisRadio->SetSelection(7);
 	else joyaxis = "\"AxisX\"";
 }
 
@@ -126,7 +128,8 @@ void ChoiceJoyAxis::OnaxisRadioSelect(wxCommandEvent& event)
 	else if ( axisRadio->GetSelection() == 3 ) joyaxis = "\"AxisR\"";
 	else if ( axisRadio->GetSelection() == 4 ) joyaxis = "\"AxisU\"";
 	else if ( axisRadio->GetSelection() == 5 ) joyaxis = "\"AxisV\"";
-	else if ( axisRadio->GetSelection() == 6 ) joyaxis = "\"AxisPOV\"";
+	else if ( axisRadio->GetSelection() == 6 ) joyaxis = "\"AxisPovX\"";
+	else if ( axisRadio->GetSelection() == 7 ) joyaxis = "\"AxisPovY\"";
 }
 
 void ChoiceJoyAxis::OnokBtClick(wxCommandEvent& event)

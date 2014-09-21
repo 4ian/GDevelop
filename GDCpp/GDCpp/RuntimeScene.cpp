@@ -144,13 +144,9 @@ boost::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
 
 void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 {
-    if ( newWindow == NULL )
-    {
-        cout << "Try to change renderWindow to a NULL window." << endl;
-        return;
-    }
-
     renderWindow = newWindow;
+
+    if (!renderWindow) return;
     renderWindow->setTitle(GetWindowDefaultTitle());
 
     glEnable(GL_DEPTH_TEST);
@@ -168,6 +164,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 #ifndef RELEASE
 void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, int x, int & y)
 {
+    if (!renderWindow) return;
     FontManager * fontManager = FontManager::Get();
 
     y += 15;
@@ -270,6 +267,7 @@ int RuntimeScene::RenderAndStep()
 void RuntimeScene::ManageRenderTargetEvents()
 {
     renderTargetEvents.clear();
+    if (!renderWindow) return;
 
     sf::Event event;
     while ( renderWindow->pollEvent( event ) )
@@ -318,6 +316,8 @@ void RuntimeScene::RenderWithoutStep()
 
 void RuntimeScene::Render()
 {
+    if (!renderWindow) return;
+
     renderWindow->clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
@@ -427,6 +427,8 @@ void RuntimeScene::DisplayText(Text & text)
 }
 bool RuntimeScene::DisplayLegacyTexts(string layer)
 {
+    if (!renderWindow) return false;
+
     for ( unsigned int i = 0;i < textes.size();i++ )
     {
         if ( textes[i].layer == layer )

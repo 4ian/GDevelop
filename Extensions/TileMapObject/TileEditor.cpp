@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include <algorithm>
 #include <wx/dcbuffer.h>
 #include <wx/event.h>
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 
 TileEditor::TileEditor(wxWindow* parent) : 
@@ -235,7 +236,21 @@ void TileEditor::OnAddPointToolClicked(wxCommandEvent& event)
 
 void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
 {
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
 
+    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    int selectedPoint = m_polygonHelper.GetSelectedPoint();
+    if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
+        return;
+
+    std::string x_str = gd::ToString(wxGetTextFromUser(_("Enter the X position of the point ( regarding the tile )."), _("X position"),gd::ToString(mask.vertices[selectedPoint].x)));
+    std::string y_str = gd::ToString(wxGetTextFromUser(_("Enter the Y position of the point ( regarding the tile )."), _("Y position"),gd::ToString(mask.vertices[selectedPoint].y)));
+
+    mask.vertices[selectedPoint].x = gd::ToInt(x_str);
+    mask.vertices[selectedPoint].y = gd::ToInt(y_str);
+
+    m_tilePreviewPanel->Refresh();
 }
 
 void TileEditor::OnRemovePointToolClicked(wxCommandEvent& event)

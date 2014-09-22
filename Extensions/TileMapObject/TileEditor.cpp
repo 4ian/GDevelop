@@ -208,7 +208,29 @@ void TileEditor::OnPredefinedShapeMenuItemClicked(wxCommandEvent& event)
 
 void TileEditor::OnAddPointToolClicked(wxCommandEvent& event)
 {
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
 
+    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+
+    int selectedPoint = m_polygonHelper.GetSelectedPoint();
+    if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
+    {
+        if(mask.vertices.size() <= 2)
+            return;
+        else
+            selectedPoint = mask.vertices.size() - 1;
+    }
+
+    int nextToSelectedPoint = ( (selectedPoint == (mask.vertices.size() - 1) ) ? 0 : selectedPoint + 1 );
+
+    sf::Vector2f newPoint = mask.vertices[selectedPoint] + mask.vertices[nextToSelectedPoint];
+    newPoint.x /= 2.f;
+    newPoint.y /= 2.f;
+
+    mask.vertices.insert(mask.vertices.begin() + selectedPoint + 1, newPoint);
+
+    m_tilePreviewPanel->Refresh();
 }
 
 void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
@@ -218,7 +240,20 @@ void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
 
 void TileEditor::OnRemovePointToolClicked(wxCommandEvent& event)
 {
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
 
+    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    if(mask.vertices.size() <= 3)
+        return;
+
+    int selectedPoint = m_polygonHelper.GetSelectedPoint();
+    if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
+        return;
+
+    mask.vertices.erase(mask.vertices.begin() + selectedPoint);
+
+    m_tilePreviewPanel->Refresh();
 }
 
 void TileEditor::OnPreviewLeftDown(wxMouseEvent& event)

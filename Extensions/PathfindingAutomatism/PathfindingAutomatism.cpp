@@ -401,6 +401,8 @@ const float SearchContext::sqrt2 = 1.414213562;
 }
 
 PathfindingAutomatism::PathfindingAutomatism() :
+    parentScene(NULL),
+    sceneManager(NULL),
     pathFound(false),
     allowDiagonals(true),
     acceleration(400),
@@ -422,7 +424,11 @@ PathfindingAutomatism::PathfindingAutomatism() :
 
 void PathfindingAutomatism::MoveTo(RuntimeScene & scene, float x, float y)
 {
-    if ( !sceneManager ) return;
+    if ( parentScene != &scene ) //Parent scene has changed
+    {
+        parentScene = &scene;
+        sceneManager = parentScene ? &ScenePathfindingObstaclesManager::managers[&scene] : NULL;
+    }
 
     path.clear();
 

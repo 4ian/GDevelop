@@ -6,6 +6,7 @@
 /ExtLibs/boost
 /ExtLibs/SFML
 /ExtLibs/wxwidgets
+/ExtLibs/wxWidgets
 /ExtLibs/*.7z
 /scripts/Repository keys
 /scripts/logs/*.txt
@@ -15,12 +16,20 @@
 /Binaries/.build-test
 /Binaries/.embuild
 /Binaries/.embuild-debug
+/Binaries/build
+/Binaries/build-debug
+/Binaries/build-dev
+/Binaries/build-tests
+/Binaries/embuild
+/Binaries/embuild-debug
 /Binaries/Releases/*.exe
 /Binaries/Releases/**/*.7z
 /Binaries/Releases/**/*.tar.bz2
 /Binaries/Releases/**/*.tar.lzma
 /Binaries/Releases/**/*.zip
 /Binaries/Releases/**/*.deb
+Binaries/Packaging/debian-package/opt/
+Binaries/Packaging/debian-package/debian
 /WebIDE
 *.depend
 *.layout
@@ -36,6 +45,7 @@
 *.so
 *.bc
 *.debhelper.log
+/Binaries/Output/Debug_Linux/**
 /Binaries/Output/Release_Linux/**
 !/Binaries/Output/Release_Linux/Start Game Develop.sh
 !/Binaries/Output/Release_Linux/CppPlatform/

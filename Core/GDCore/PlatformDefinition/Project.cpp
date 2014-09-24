@@ -512,7 +512,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     if ( GDMajorVersion <= 1 )
     {
         gd::LogError(_("The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."));
-        //return; //TODO
+        return;
     }
     //End of Compatibility code
     #endif
@@ -551,6 +551,14 @@ void Project::UnserializeFrom(const SerializerElement & element)
     for(unsigned int i = 0;i<platformsElement.GetChildrenCount();++i)
     {
         std::string name = platformsElement.GetChild(i).GetStringAttribute("name");
+        //Compatibility code
+        if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, 0, 3, 4, 73, 0) )
+        {
+            if (name == "Game Develop C++ platform") name = "GDevelop C++ platform";
+            if (name == "Game Develop JS platform") name = "GDevelop JS platform";
+        }
+        //End of Compatibility code
+
         gd::Platform * platform = gd::PlatformManager::Get()->GetPlatform(name);
 
         if ( platform ) {
@@ -563,12 +571,14 @@ void Project::UnserializeFrom(const SerializerElement & element)
         }
     }
 
+    //Compatibility code
     if ( platformsElement.GetChildrenCount() == 0 )
     {
         //Compatibility with GD2.x
         platforms.push_back(gd::PlatformManager::Get()->GetPlatform("GDevelop C++ platform"));
         currentPlatform = platforms.back();
     }
+    //End of Compatibility code
 
     if (currentPlatform == NULL && !platforms.empty())
         currentPlatform = platforms.back();
@@ -576,7 +586,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( GDMajorVersion < 3 )
+    if ( VersionWrapper::IsOlder(GDMajorVersion, 0, 0, 0, 3, 0, 0, 0) )
     {
         updateText += _("Sprite scaling has changed since GD 2: The resizing is made so that the origin point of the object won't move whatever the scale of the object.\n");
         updateText += _("You may have to slightly change the position of some objects if you have changed their size.\n\n");
@@ -588,7 +598,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion <= 1 && build <= 10822) )
+    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, build, 2,2,1,10822) )
     {
         if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "BuiltinExternalLayouts") == GetUsedExtensions().end() )
             GetUsedExtensions().push_back("BuiltinExternalLayouts");
@@ -597,7 +607,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( GDMajorVersion < 3 || (GDMajorVersion == 3 && GDMinorVersion < 3) )
+    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, build, 3,3,3,0) )
     {
         if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarAutomatism") != GetUsedExtensions().end() )
         {

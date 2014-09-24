@@ -1,6 +1,6 @@
 /** \file
  *  GDevelop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_VERSIONWRAPPER_H
@@ -20,54 +20,68 @@ class GD_CORE_API VersionWrapper
 public:
 
     /**
-     * Get GDevelop Core Major version number
+     * \brief Get GDevelop Core Major version number
      */
     static int Major();
 
     /**
-     * Get GDevelop Core Minor version number
+     * \brief Get GDevelop Core Minor version number
      */
     static int Minor();
 
     /**
-     * Get GDevelop Core Build version number
+     * \brief Get GDevelop Core Build version number
      */
     static int Build();
 
     /**
-     * Get GDevelop Core Revision version number
+     * \brief Get GDevelop Core Revision version number
      */
     static int Revision();
 
     /**
-     * Get a full string containing version.
+     * \brief Get a full string containing version.
      */
     static std::string FullString();
 
     /**
-     * Get GDCore status ( Alpha/Beta/Release Candidate/Release )
+     * \brief Get GDCore status ( Alpha/Beta/Release Candidate/Release )
      */
     static std::string Status();
 
     /**
-     * Return true if GDCpp is compiled with edittime support.
+     * \brief Return true if GDCpp is compiled with edittime support.
      */
     static bool CompiledForEdittime();
 
     /**
-     * Get Year of the release
+     * \brief Get Year of the release
      */
     static std::string Year();
 
     /**
-     * Get Month of the release
+     * \brief Get Month of the release
      */
     static std::string Month();
 
     /**
-     * Get Day of the release
+     * \brief Get Day of the release
      */
     static std::string Date();
+
+    /**
+     * \brief Return true if the first version is older
+     * than the second version.
+     */
+    static bool IsOlder(int major, int minor, int build, int revision,
+        int major2, int minor2, int build2, int revision2);
+
+    /**
+     * \brief Return true if the first version is older or equal
+     * to the second version.
+     */
+    static bool IsOlderOrEqual(int major, int minor, int build, int revision,
+        int major2, int minor2, int build2, int revision2);
 };
 
 }

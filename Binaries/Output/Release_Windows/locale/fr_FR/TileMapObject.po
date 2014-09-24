@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Game Develop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-07 17:53+0100\n"
+"POT-Creation-Date: 2014-09-23 22:25+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Victor Levasseur <victorlevasseur01@orange.fr>\n"
 "Language-Team: Florian \"4ian\" Rival <Florian.rival@gmail.com>\n"
@@ -268,41 +268,61 @@ msgstr "Jeu de tuiles"
 msgid "The new texture name"
 msgstr "Nom de la nouvelle texture"
 
-#: Extensions/TileMapObject/TileEditor.cpp:44
+#: Extensions/TileMapObject/TileEditor.cpp:48
 msgid "Rectangle Shape"
 msgstr "Rectangle"
 
-#: Extensions/TileMapObject/TileEditor.cpp:46
+#: Extensions/TileMapObject/TileEditor.cpp:50
 msgid "Triangle Shape (top-left)"
 msgstr "Triangle (en haut à gauche)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:47
+#: Extensions/TileMapObject/TileEditor.cpp:51
 msgid "Triangle Shape (top-right)"
 msgstr "Triangle (en haut à droite)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:48
+#: Extensions/TileMapObject/TileEditor.cpp:52
 msgid "Triangle Shape (bottom-right)"
 msgstr "Triangle (en bas à droite)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:49
+#: Extensions/TileMapObject/TileEditor.cpp:53
 msgid "Triangle Shape (bottom-left)"
 msgstr "Triangle (en bas à gauche)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:51
+#: Extensions/TileMapObject/TileEditor.cpp:55
 msgid "Half-rectangle (top)"
 msgstr "Demi-rectangle (haut)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:52
+#: Extensions/TileMapObject/TileEditor.cpp:56
 msgid "Half-rectangle (right)"
 msgstr "Demi-rectangle (droite)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:53
+#: Extensions/TileMapObject/TileEditor.cpp:57
 msgid "Half-rectangle (bottom)"
 msgstr "Demi-rectangle (bas)"
 
-#: Extensions/TileMapObject/TileEditor.cpp:54
+#: Extensions/TileMapObject/TileEditor.cpp:58
 msgid "Half-rectangle (left)"
 msgstr "Demi-rectangle (gauche)"
+
+#: Extensions/TileMapObject/TileEditor.cpp:152
+msgid "This polygon must be convex, it's not the case."
+msgstr "Le polygon de collision doit être convexe, ce n'est pas le cas."
+
+#: Extensions/TileMapObject/TileEditor.cpp:247
+msgid "Enter the X position of the point ( regarding the tile )."
+msgstr "Entrer la position X du point (par rapport à la tuile)."
+
+#: Extensions/TileMapObject/TileEditor.cpp:247
+msgid "X position"
+msgstr "Position X"
+
+#: Extensions/TileMapObject/TileEditor.cpp:248
+msgid "Enter the Y position of the point ( regarding the tile )."
+msgstr "Entrer la position Y du point (par rapport à la tuile)."
+
+#: Extensions/TileMapObject/TileEditor.cpp:248
+msgid "Y position"
+msgstr "Position Y"
 
 #: Extensions/TileMapObject/TileMapConfigurationEditor.cpp:59
 msgid ""
@@ -462,40 +482,32 @@ msgid "Activates the collision mask for collision detection"
 msgstr "Active le masque de collision"
 
 #: Extensions/TileMapObject/TileMapDialogs.cpp:559
-msgid "Use a predefined shape"
-msgstr "Utiliser une forme prédéfinie"
+msgid "Predefined shape"
+msgstr "Forme prédéfinie"
 
-#: Extensions/TileMapObject/TileMapDialogs.cpp:577
+#: Extensions/TileMapObject/TileMapDialogs.cpp:569
 msgid "Add a point"
 msgstr "Ajouter un point"
 
-#: Extensions/TileMapObject/TileMapDialogs.cpp:577
+#: Extensions/TileMapObject/TileMapDialogs.cpp:569
 msgid "Add a point to the collision mask"
 msgstr "Ajouter un point au masque de collision"
 
-#: Extensions/TileMapObject/TileMapDialogs.cpp:579
+#: Extensions/TileMapObject/TileMapDialogs.cpp:571
 msgid "Edit point position..."
 msgstr "Editer la position du point..."
 
-#: Extensions/TileMapObject/TileMapDialogs.cpp:579
+#: Extensions/TileMapObject/TileMapDialogs.cpp:571
 msgid "Edit the selected point position..."
 msgstr "Edite la position du point sélectionné..."
 
-#: Extensions/TileMapObject/TileMapDialogs.cpp:581
+#: Extensions/TileMapObject/TileMapDialogs.cpp:573
 msgid "Remove selected point"
 msgstr "Supprimer le point sélectionné"
 
-#: Extensions/TileMapObject/TileMapDialogs.cpp:581
+#: Extensions/TileMapObject/TileMapDialogs.cpp:573
 msgid "Removes the selected point"
 msgstr "Supprime le point sélectionné"
-
-#: Extensions/TileMapObject/TileMapDialogs.cpp:583
-msgid "Reset to the default collision mask"
-msgstr "Rétablir le masque de collision par défaut"
-
-#: Extensions/TileMapObject/TileMapDialogs.cpp:583
-msgid "Reset the tile collision mask to the default one"
-msgstr "Rétablit le masque de collision par défaut de la tuile"
 
 #: Extensions/TileMapObject/TileMapObjectEditor.cpp:77
 msgid "Tile editor"
@@ -520,11 +532,11 @@ msgstr ""
 "built_tilemap"
 
 #: Extensions/TileMapObject/TileMapObjectEditor.cpp:211
-msgid "Are you sure to clear the whole layer ?"
+msgid "Are you sure you want to clear the whole layer ?"
 msgstr "Etes-vous sûr(e) de vouloir vider le calque ?"
 
 #: Extensions/TileMapObject/TileMapObjectEditor.cpp:217
-msgid "Are you sure to fill the whole layer with that tile ?"
+msgid "Are you sure you want to fill the whole layer with that tile ?"
 msgstr "Etes vous sûr(e) de vouloir remplir le calque avec cette tuile ?"
 
 #: Extensions/TileMapObject/TileSetConfigurationEditor.cpp:49
@@ -547,7 +559,7 @@ msgstr ""
 "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/"
 "built_tilemap/tilesetconfig"
 
-#: Extensions/TileMapObject/TileSetPanel.cpp:134
+#: Extensions/TileMapObject/TileSetPanel.cpp:133
 msgid "You haven't selected a tileset yet."
 msgstr "Vous n'avez pas sélectionné de jeu de tuiles."
 
@@ -562,6 +574,12 @@ msgstr "Configuration du jeu de tuiles"
 #: Extensions/TileMapObject/TileMapDialogs.h:137
 msgid "Tilemap size configuration"
 msgstr "Configuration de la taille de la carte"
+
+#~ msgid "Reset to the default collision mask"
+#~ msgstr "Rétablir le masque de collision par défaut"
+
+#~ msgid "Reset the tile collision mask to the default one"
+#~ msgstr "Rétablit le masque de collision par défaut de la tuile"
 
 #~ msgid ""
 #~ "You haven't selected a tileset yet.\n"

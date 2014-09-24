@@ -470,24 +470,8 @@ static unsigned char xml_res_file_12[] = {
 148,152,61,0,53,102,23,224,196,108,7,120,252,165,188,1,223,94,27,87,47,
 146,220,102,0,0,0,0,73,69,78,68,174,66,96,130};
 
-static size_t xml_res_size_13 = 278;
+static size_t xml_res_size_13 = 2151;
 static unsigned char xml_res_file_13[] = {
-137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,16,0,0,0,16,8,6,0,0,
-0,31,243,255,97,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,205,73,
-68,65,84,56,141,99,252,255,255,63,3,37,128,9,155,160,247,198,167,203,200,
-54,192,123,227,211,101,76,140,12,145,100,25,224,184,250,46,73,154,25,24,
-24,24,24,97,97,96,184,224,226,178,207,127,255,71,74,241,11,48,240,179,177,
-98,85,252,249,222,179,251,7,10,76,149,48,92,0,211,204,192,192,192,240,236,
-227,7,134,143,191,126,99,53,128,87,73,74,209,97,194,233,123,56,189,0,3,
-164,24,194,196,192,192,192,112,62,65,63,138,151,153,113,57,57,134,48,34,
-167,3,100,175,220,73,54,96,68,215,104,235,49,19,37,209,28,222,145,206,136,
-226,5,108,46,33,4,48,194,128,84,67,176,6,226,249,4,253,40,172,170,255,51,
-96,24,140,213,0,92,224,240,206,244,40,116,67,72,50,0,171,33,255,255,255,
-39,11,219,184,205,88,246,255,255,127,212,104,36,7,0,0,132,192,138,139,110,
-249,27,234,0,0,0,0,73,69,78,68,174,66,96,130};
-
-static size_t xml_res_size_14 = 2303;
-static unsigned char xml_res_file_14[] = {
 60,63,120,109,108,32,118,101,114,115,105,111,110,61,34,49,46,48,34,32,101,
 110,99,111,100,105,110,103,61,34,85,84,70,45,56,34,63,62,10,60,114,101,
 115,111,117,114,99,101,32,120,109,108,110,115,61,34,104,116,116,112,58,
@@ -594,15 +578,8 @@ static unsigned char xml_res_file_14[] = {
 66,105,110,97,114,105,101,115,95,79,117,116,112,117,116,95,82,101,108,101,
 97,115,101,95,87,105,110,100,111,119,115,95,114,101,115,95,116,105,108,
 101,109,97,115,107,116,114,105,97,110,103,108,101,98,114,49,54,46,112,110,
-103,60,47,111,98,106,101,99,116,62,10,32,32,60,111,98,106,101,99,116,32,
-99,108,97,115,115,61,34,119,120,66,105,116,109,97,112,34,32,110,97,109,
-101,61,34,117,110,100,111,49,54,34,62,84,105,108,101,77,97,112,68,105,97,
-108,111,103,115,95,119,120,115,109,105,116,104,95,98,105,116,109,97,112,
-115,46,99,112,112,36,46,46,95,46,46,95,66,105,110,97,114,105,101,115,95,
-79,117,116,112,117,116,95,82,101,108,101,97,115,101,95,87,105,110,100,111,
-119,115,95,114,101,115,95,105,99,111,110,115,95,100,101,102,97,117,108,
-116,95,117,110,100,111,49,54,46,112,110,103,60,47,111,98,106,101,99,116,
-62,10,60,47,114,101,115,111,117,114,99,101,62,10};
+103,60,47,111,98,106,101,99,116,62,10,60,47,114,101,115,111,117,114,99,
+101,62,10};
 
 void wxCF6DCInitBitmapResources()
 {
@@ -630,7 +607,6 @@ void wxCF6DCInitBitmapResources()
     XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_conditions_rectangle.png"), xml_res_file_10, xml_res_size_10, wxT("image/png"));
     XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_remove16.png"), xml_res_file_11, xml_res_size_11, wxT("image/png"));
     XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_tilemasktrianglebr16.png"), xml_res_file_12, xml_res_size_12, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_undo16.png"), xml_res_file_13, xml_res_size_13, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"), xml_res_file_14, xml_res_size_14, wxT("text/xml"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"), xml_res_file_13, xml_res_size_13, wxT("text/xml"));
     wxXmlResource::Get()->Load(wxT("memory:XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"));
 }

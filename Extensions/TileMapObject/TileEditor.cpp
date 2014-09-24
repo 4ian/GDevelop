@@ -29,13 +29,17 @@ freely, subject to the following restrictions:
 #include <algorithm>
 #include <wx/dcbuffer.h>
 #include <wx/event.h>
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 
 TileEditor::TileEditor(wxWindow* parent) : 
     TileEditorBase(parent),
     m_tileset(NULL),
     m_currentTile(0),
-    m_predefinedShapesMenu(new wxMenu())
+    m_predefinedShapesMenu(new wxMenu()),
+    m_xOffset(0.f),
+    m_yOffset(0.f),
+    m_polygonHelper()
 {
     m_tilePreviewPanel->SetBackgroundStyle(wxBG_STYLE_PAINT);
     UpdateScrollbars();
@@ -104,6 +108,14 @@ void TileEditor::UpdateScrollbars()
                                virtualHeight/2 - m_tilePreviewPanel->GetClientSize().GetHeight()/2);
 }
 
+wxPoint TileEditor::GetRealPosition(wxPoint absolutePos)
+{
+    wxPoint realPoint(m_tilePreviewPanel->CalcUnscrolledPosition(absolutePos).x - m_xOffset,
+                      m_tilePreviewPanel->CalcUnscrolledPosition(absolutePos).y - m_yOffset);
+
+    return realPoint;
+}
+
 void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 {
     //Prepare the render
@@ -112,7 +124,7 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 
     wxPoint minPos = m_tilePreviewPanel->GetViewStart();
     int width, height;
-    m_tilePreviewPanel->GetVirtualSize(&width, &height);
+    m_tilePreviewPanel->GetClientSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
     //Draw the background
@@ -122,22 +134,23 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     if(!m_tileset || m_tileset->IsDirty()) //If no tileset, stop rendering here
         return;
 
-    //Draw the tile
+    //Draw the tile and compute the drawing offset
     wxBitmap tileBitmap = m_tileset->GetTileBitmap(m_currentTile);
-    dc.DrawBitmap(tileBitmap, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
+    m_xOffset = width/2 - tileBitmap.GetWidth()/2;
+    m_yOffset = height/2 - tileBitmap.GetHeight()/2;
+    dc.DrawBitmap(tileBitmap, m_xOffset, m_yOffset);
 
     //Draw the hitbox
-    dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-    dc.SetPen(wxPen(wxColour(100,100,100)));
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    m_polygonHelper.OnPaint(polygonList, dc, wxPoint(m_xOffset, m_yOffset));
 
-    wxPointList list;
-    for (unsigned int i = 0; i < m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices.size();++i)
+    //Show a warning if the polygon isn't convex
+    if(!m_tileset->GetTileHitbox(m_currentTile).hitbox.IsConvex())
     {
-        list.push_back(new wxPoint(m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].x, 
-                                   m_tileset->GetTileHitbox(m_currentTile).hitbox.vertices[i].y));
+        dc.DrawBitmap(wxBitmap("res/warning.png", wxBITMAP_TYPE_PNG), 5, 5);
+        dc.SetPen(wxPen(wxColour(0,0,0)));
+        dc.DrawText(_("This polygon must be convex, it's not the case."), 25, 5);
     }
-
-    dc.DrawPolygon(&list, width/2 - tileBitmap.GetWidth()/2, height/2 - tileBitmap.GetHeight()/2);
 }
 
 void TileEditor::OnCollidableToolToggled(wxCommandEvent& event)
@@ -192,4 +205,108 @@ void TileEditor::OnPredefinedShapeMenuItemClicked(wxCommandEvent& event)
     //Update the tools according to the properties' changes
     TileSelectionEvent tileEvent(TILE_SELECTION_CHANGED, -1, m_currentTile);
     OnTileSetSelectionChanged(tileEvent);
+}
+
+void TileEditor::OnAddPointToolClicked(wxCommandEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+
+    int selectedPoint = m_polygonHelper.GetSelectedPoint();
+    if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
+    {
+        if(mask.vertices.size() <= 2)
+            return;
+        else
+            selectedPoint = mask.vertices.size() - 1;
+    }
+
+    int nextToSelectedPoint = ( (selectedPoint == (mask.vertices.size() - 1) ) ? 0 : selectedPoint + 1 );
+
+    sf::Vector2f newPoint = mask.vertices[selectedPoint] + mask.vertices[nextToSelectedPoint];
+    newPoint.x /= 2.f;
+    newPoint.y /= 2.f;
+
+    mask.vertices.insert(mask.vertices.begin() + selectedPoint + 1, newPoint);
+
+    m_tilePreviewPanel->Refresh();
+}
+
+void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    int selectedPoint = m_polygonHelper.GetSelectedPoint();
+    if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
+        return;
+
+    std::string x_str = gd::ToString(wxGetTextFromUser(_("Enter the X position of the point ( regarding the tile )."), _("X position"),gd::ToString(mask.vertices[selectedPoint].x)));
+    std::string y_str = gd::ToString(wxGetTextFromUser(_("Enter the Y position of the point ( regarding the tile )."), _("Y position"),gd::ToString(mask.vertices[selectedPoint].y)));
+
+    mask.vertices[selectedPoint].x = gd::ToInt(x_str);
+    mask.vertices[selectedPoint].y = gd::ToInt(y_str);
+
+    m_tilePreviewPanel->Refresh();
+}
+
+void TileEditor::OnRemovePointToolClicked(wxCommandEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    if(mask.vertices.size() <= 3)
+        return;
+
+    int selectedPoint = m_polygonHelper.GetSelectedPoint();
+    if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
+        return;
+
+    mask.vertices.erase(mask.vertices.begin() + selectedPoint);
+
+    m_tilePreviewPanel->Refresh();
+}
+
+void TileEditor::OnPreviewLeftDown(wxMouseEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
+    event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
+
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    m_polygonHelper.OnMouseLeftDown(polygonList, event, wxPoint(m_xOffset, m_yOffset));
+    m_tileset->GetTileHitbox(m_currentTile).hitbox = polygonList[0];
+
+    m_tilePreviewPanel->Refresh();
+}
+
+void TileEditor::OnPreviewLeftUp(wxMouseEvent& event)
+{
+    event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
+    event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
+
+    m_polygonHelper.OnMouseLeftUp(event);
+
+    m_tilePreviewPanel->Refresh();
+}
+
+void TileEditor::OnPreviewMotion(wxMouseEvent& event)
+{
+    if(!m_tileset || m_tileset->IsDirty())
+        return;
+
+    event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
+    event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
+
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    m_polygonHelper.OnMouseMove(polygonList, event, wxPoint(m_xOffset, m_yOffset), 0.f, 0.f, m_tileset->tileSize.x, m_tileset->tileSize.y);
+    m_tileset->GetTileHitbox(m_currentTile).hitbox = polygonList[0];
+
+    m_tilePreviewPanel->Refresh();
 }

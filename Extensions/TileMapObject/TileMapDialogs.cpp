@@ -544,7 +544,7 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     wxFlexGridSizer* flexGridSizer416 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer416->SetFlexibleDirection( wxBOTH );
     flexGridSizer416->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer416->AddGrowableCol(0);
+    flexGridSizer416->AddGrowableCol(1);
     flexGridSizer416->AddGrowableRow(0);
     
     flexGridSizer398->Add(flexGridSizer416, 1, wxALL|wxEXPAND, 0);
@@ -556,31 +556,21 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     
     m_mainToolbar->AddTool(COLLIDABLE_TOOL_ID, _("Collidable"), wxXmlResource::Get()->LoadBitmap(wxT("pathfindingobstacleicon16")), wxNullBitmap, wxITEM_CHECK, _("Activates the collision mask for collision detection"), wxT(""), NULL);
     
-    m_mainToolbar->AddTool(PREDEFINED_SHAPE_TOOL_ID, _("Use a predefined shape"), wxXmlResource::Get()->LoadBitmap(wxT("tilemasktrianglebr16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    m_mainToolbar->AddTool(PREDEFINED_SHAPE_TOOL_ID, _("Predefined shape"), wxXmlResource::Get()->LoadBitmap(wxT("tilemasktrianglebr16")), wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    
+    m_mainToolbar->AddSeparator();
     m_mainToolbar->Realize();
     
-    m_justToHideToolbar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
-    m_justToHideToolbar->Hide();
-    
-    flexGridSizer416->Add(m_justToHideToolbar, 0, wxALL, 5);
-    
-    wxFlexGridSizer* flexGridSizer436 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer436->SetFlexibleDirection( wxBOTH );
-    flexGridSizer436->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    m_justToHideToolbar->SetSizer(flexGridSizer436);
-    
-    m_toolbar418 = new wxToolBar(m_justToHideToolbar, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_NODIVIDER|wxTB_FLAT);
+    m_toolbar418 = new wxToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_NODIVIDER|wxTB_FLAT);
     m_toolbar418->SetToolBitmapSize(wxSize(16,16));
     
-    flexGridSizer436->Add(m_toolbar418, 0, wxALL, 5);
+    flexGridSizer416->Add(m_toolbar418, 0, wxALL, 0);
     
     m_toolbar418->AddTool(ADD_POINT_TOOL_ID, _("Add a point"), wxXmlResource::Get()->LoadBitmap(wxT("add16")), wxNullBitmap, wxITEM_NORMAL, _("Add a point to the collision mask"), wxT(""), NULL);
     
     m_toolbar418->AddTool(EDIT_POINT_TOOL_ID, _("Edit point position..."), wxXmlResource::Get()->LoadBitmap(wxT("edit16")), wxNullBitmap, wxITEM_NORMAL, _("Edit the selected point position..."), wxT(""), NULL);
     
     m_toolbar418->AddTool(REMOVE_POINT_TOOL_ID, _("Remove selected point"), wxXmlResource::Get()->LoadBitmap(wxT("remove16")), wxNullBitmap, wxITEM_NORMAL, _("Removes the selected point"), wxT(""), NULL);
-    
-    m_toolbar418->AddTool(RESET_MASK_TOOL_ID, _("Reset to the default collision mask"), wxXmlResource::Get()->LoadBitmap(wxT("undo16")), wxNullBitmap, wxITEM_NORMAL, _("Reset the tile collision mask to the default one"), wxT(""), NULL);
     m_toolbar418->Realize();
     
     m_tilePreviewPanel = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
@@ -598,8 +588,14 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     // Connect events
     this->Connect(COLLIDABLE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnCollidableToolToggled), NULL, this);
     this->Connect(PREDEFINED_SHAPE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnPredefinedShapeToolClicked), NULL, this);
+    this->Connect(ADD_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnAddPointToolClicked), NULL, this);
+    this->Connect(EDIT_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnEditPointToolClicked), NULL, this);
+    this->Connect(REMOVE_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnRemovePointToolClicked), NULL, this);
     m_tilePreviewPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(TileEditorBase::OnPreviewPaint), NULL, this);
     m_tilePreviewPanel->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TileEditorBase::OnPreviewErase), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileEditorBase::OnPreviewLeftDown), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TileEditorBase::OnPreviewLeftUp), NULL, this);
+    m_tilePreviewPanel->Connect(wxEVT_MOTION, wxMouseEventHandler(TileEditorBase::OnPreviewMotion), NULL, this);
     
 }
 
@@ -607,7 +603,13 @@ TileEditorBase::~TileEditorBase()
 {
     this->Disconnect(COLLIDABLE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnCollidableToolToggled), NULL, this);
     this->Disconnect(PREDEFINED_SHAPE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnPredefinedShapeToolClicked), NULL, this);
+    this->Disconnect(ADD_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnAddPointToolClicked), NULL, this);
+    this->Disconnect(EDIT_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnEditPointToolClicked), NULL, this);
+    this->Disconnect(REMOVE_POINT_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnRemovePointToolClicked), NULL, this);
     m_tilePreviewPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(TileEditorBase::OnPreviewPaint), NULL, this);
     m_tilePreviewPanel->Disconnect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TileEditorBase::OnPreviewErase), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileEditorBase::OnPreviewLeftDown), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(TileEditorBase::OnPreviewLeftUp), NULL, this);
+    m_tilePreviewPanel->Disconnect(wxEVT_MOTION, wxMouseEventHandler(TileEditorBase::OnPreviewMotion), NULL, this);
     
 }

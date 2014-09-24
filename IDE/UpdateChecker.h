@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -10,7 +10,7 @@
 
 /**
  * \brief Class to download and retrieve information
- * about Game Develop updates
+ * about GDevelop updates
  */
 class UpdateChecker
 {

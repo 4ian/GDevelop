@@ -33,7 +33,7 @@ ProjectUpdateDialog::ProjectUpdateDialog(wxWindow* parent, wxString updateText)
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("If you save your project using this version of Game Develop, you won\'t be able to use it with\na previous version of Game Develop due to these changes :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("If you save your project using this version of GDevelop, you won\'t be able to use it with\na previous version of GDevelop due to these changes :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	updateTextEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(432,174), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer2->Add(updateTextEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

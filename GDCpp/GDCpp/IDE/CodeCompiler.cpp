@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -296,7 +296,7 @@ void CodeCompiler::StartTheNextTask()
     currentTaskProcess->Redirect();
     if ( wxExecute(currentTask.compilerCall.GetFullCall(), wxEXEC_ASYNC, currentTaskProcess) == 0 )
     {
-        gd::LogError(_("Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every needed file are present."));
+        gd::LogError(_("Unable to launch the internal compiler: Try to reinstall GDevelop to make sure that every needed file are present."));
         delete currentTaskProcess;
         currentTaskProcess = NULL;
     }

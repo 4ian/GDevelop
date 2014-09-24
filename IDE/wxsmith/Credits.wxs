@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Credits">
-		<title>About Game Develop</title>
+		<title>About GDevelop</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -33,7 +33,7 @@
 												<growablecols>0</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-														<label>Game Develop</label>
+														<label>GDevelop</label>
 														<font>
 															<weight>bold</weight>
 														</font>
@@ -118,7 +118,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-														<label>You like Game Develop?</label>
+														<label>You like GDevelop?</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -151,7 +151,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-												<value>Game Develop is an open source software:&#x0A;&#x0A;  * The IDE is distributed under the GPL v3 license.&#x0A;  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.&#x0A;  * Extensions are distributed under the zlib/libpng license.&#x0A;  * The name, Game Develop, and its logo are the exclusive property of Florian Rival.&#x0A;&#x0A;About games created with Game Develop&#x0A;&#x0A;Games exported with Game Develop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with Game Develop. In particular, you are not forced to make your game open source.</value>
+												<value>GDevelop is an open source software:&#x0A;&#x0A;  * The IDE is distributed under the GPL v3 license.&#x0A;  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.&#x0A;  * Extensions are distributed under the zlib/libpng license.&#x0A;  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.&#x0A;&#x0A;About games created with GDevelop&#x0A;&#x0A;Games exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source.</value>
 												<size>272,51</size>
 												<style>wxTE_MULTILINE|wxTE_READONLY</style>
 											</object>

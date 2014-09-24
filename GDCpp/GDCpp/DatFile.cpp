@@ -28,7 +28,7 @@ bool DatFile::Create (std::vector<std::string> files, std::string directory, std
     //We start by filling it with 0
     memset (&m_header, 0, sizeof(m_header));
     //Then we copy the ID
-    memcpy (m_header.uniqueID, "EXEGD", 5); //EXEcutable Game Develop
+    memcpy (m_header.uniqueID, "EXEGD", 5); //EXEcutable GDevelop
     //Then the version
     memcpy (m_header.version, "0.1", 3);
     //Then the number of files to include

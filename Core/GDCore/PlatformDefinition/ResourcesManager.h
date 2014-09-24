@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -134,7 +134,7 @@ public:
 private:
     std::string kind;
     std::string name;
-    bool userAdded; ///< True if the resource was added by the user, and not automatically by Game Develop.
+    bool userAdded; ///< True if the resource was added by the user, and not automatically by GDevelop.
 
     static std::string badStr;
 };

@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -105,7 +105,7 @@ SplashScreen::SplashScreen( wxBitmap &label, long timeout, wxWindow *parent, wxW
     SetThemeEnabled( false ); // seems to be useful by description
     SetBackgroundStyle( wxBG_STYLE_CUSTOM ); // the trick for GTK+ (notice it's after Show())
 
-    SetTitle("Game Develop");
+    SetTitle("GDevelop");
 
     wxIconBundle icons;
     icons.AddIcon("res/icon16.png");

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Preferences">
-		<title>Game Develop settings</title>
+		<title>GDevelop settings</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX</style>
@@ -29,7 +29,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-										<label>This window allows you to customize Game Develop. &#x0A;Each user of the computer has his own options.</label>
+										<label>This window allows you to customize GDevelop. &#x0A;Each user of the computer has his own options.</label>
 										<style>wxALIGN_LEFT</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -78,8 +78,8 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxCheckBox" name="ID_CHECKBOX10" variable="sendInfoCheck" member="yes">
-														<label>Send anonymous statistics about Game Develop ( version, language used )</label>
-														<tooltip>When checked, Game Develop will send some anonymous information to our server so as to get some statistics about the software</tooltip>
+														<label>Send anonymous statistics about GDevelop ( version, language used )</label>
+														<tooltip>When checked, GDevelop will send some anonymous information to our server so as to get some statistics about the software</tooltip>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -480,7 +480,7 @@
 												<cols>6</cols>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON16" variable="Button2" member="yes">
-														<label>Game Develop Metro</label>
+														<label>GDevelop Metro</label>
 														<handler function="OnGDMetroStyleClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -498,7 +498,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON6" variable="gdStyleBt" member="yes">
-														<label>Game Develop Office</label>
+														<label>GDevelop Office</label>
 														<handler function="OnOfficeGDStyleBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1099,7 +1099,7 @@
 												<growablecols>0</growablecols>
 												<object class="sizeritem">
 													<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="internalCodeEditorCheck" member="yes">
-														<label>Edit sources using internal Game Develop code editor</label>
+														<label>Edit sources using internal GDevelop code editor</label>
 														<selected>1</selected>
 														<style>wxRB_GROUP</style>
 													</object>

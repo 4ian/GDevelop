@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -325,9 +325,9 @@ void AuiTabArt::DrawBackground(wxDC& dc,
 {
     // draw background
 
-    //Game Develop use a less visible gradient
+    //GDevelop use a less visible gradient
     wxColor top_color       = noBgGradient ? *wxWHITE : gdAuiStepColour(m_base_colour, 120);
-    //Game Develop use a white background
+    //GDevelop use a white background
     wxColor bottom_color   = *wxWHITE;
     wxRect r;
 
@@ -338,7 +338,7 @@ void AuiTabArt::DrawBackground(wxDC& dc,
    else //for wxAUI_NB_TOP
        r = wxRect(rect.x, rect.y, rect.width+2, rect.height-3);
 
-    //Game Develop invert gradient for bottom
+    //GDevelop invert gradient for bottom
    if (m_flags &wxAUI_NB_BOTTOM)
     dc.GradientFillLinear(r, top_color, bottom_color, wxNORTH);
    else //for wxAUI_NB_TOP
@@ -347,14 +347,14 @@ void AuiTabArt::DrawBackground(wxDC& dc,
 
    // draw base lines
 
-    //Game Develop use a white background
+    //GDevelop use a white background
    dc.SetPen(*wxWHITE_PEN);
    int y = rect.GetHeight();
    int w = rect.GetWidth();
 
    if (m_flags &wxAUI_NB_BOTTOM)
    {
-       //Game Develop use a white background
+       //GDevelop use a white background
        dc.SetBrush(*wxWHITE_BRUSH);
        dc.DrawRectangle(-1, 0, w+2, 4);
    }
@@ -362,7 +362,7 @@ void AuiTabArt::DrawBackground(wxDC& dc,
    //  else if (m_flags &wxAUI_NB_RIGHT) {}
    else //for wxAUI_NB_TOP
    {
-       //Game Develop use a white background
+       //GDevelop use a white background
        dc.SetBrush(*wxWHITE_BRUSH);
        dc.DrawRectangle(-1, y-4, w+2, 4);
    }
@@ -717,7 +717,7 @@ void AuiTabArt::DrawTab(wxDC& dc,
         else //for wxAUI_NB_TOP
             dc.SetPen(m_base_colour_pen);
 
-        //Game Develop use white pen so as to conform to white background
+        //GDevelop use white pen so as to conform to white background
         dc.SetPen(*wxWHITE_PEN);
 
         dc.DrawLine(border_points[0].x+1,

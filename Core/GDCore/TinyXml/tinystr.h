@@ -36,7 +36,7 @@ distribution.
 
 /**
  * Changes by Florian Rival :
- * Added GD_CORE_API to integrate TinyXml to Game Develop Library.
+ * Added GD_CORE_API to integrate TinyXml to GDevelop Library.
  */
 
 #ifndef TIXML_USE_STL

@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -40,7 +40,7 @@ public:
 };
 
 /**
- * \brief The window showing information about Game Develop, technologies and contributors.
+ * \brief The window showing information about GDevelop, technologies and contributors.
  */
 class Credits: public wxDialog
 {

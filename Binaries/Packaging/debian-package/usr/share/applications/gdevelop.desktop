@@ -1,13 +1,13 @@
 [Desktop Entry]
-Version=3.4.72
+Version=3.4.74
 Encoding=UTF-8
-Name=Game Develop
+Name=GDevelop
 GenericName=IDE
 Comment=HTML5 and native game development software
-Exec=sh -c "game-develop %F"
-Icon=/opt/game-develop/res/icon128linux.png
+Exec=sh -c "gdevelop %F"
+Icon=/opt/gdevelop/res/icon128linux.png
 Terminal=false
 Type=Application
 Categories=Application;Development;
-Name=Game Develop
+Name=GDevelop
 

@@ -1,5 +1,5 @@
 /** \file
- *  Game Develop
+ *  GDevelop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
@@ -57,9 +57,9 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 	}
 	else if ( scope == PROJECT_VARIABLE ) {
 		output = "runtimeScene.getGame().getVariables()";
-		variables = &codeGenerator.GetProject().GetVariables();	
+		variables = &codeGenerator.GetProject().GetVariables();
 	}
-	else { 
+	else {
 	    std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(object, context);
 
 	    output = "gdjs.VariablesContainer.badVariablesContainer";
@@ -92,7 +92,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 			return;
 		}
 	}
-	
+
 	output += ".get(\""+variableName+"\")";
 }
 
@@ -107,7 +107,7 @@ void VariableCodeGenerationCallbacks::OnChildSubscript(std::string stringExpress
     gd::CallbacksForGeneratingExpressionCode callbacks(argumentCode, codeGenerator, context);
 
     gd::ExpressionParser parser(stringExpression);
-    if ( !parser.ParseStringExpression(codeGenerator.GetPlatform(), 
+    if ( !parser.ParseStringExpression(codeGenerator.GetPlatform(),
     	codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) )
     {
         cout << "Error in text expression" << parser.firstErrorStr << endl;

@@ -47,7 +47,7 @@ ExtensionBugReportDlg::ExtensionBugReportDlg(wxWindow* parent, wxString extensio
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/bigextensionbug.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
 	FlexGridSizer2->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("An extension seems to be incompatible and make Game Develop crashing."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("An extension seems to be incompatible and make GDevelop crashing."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	wxFont StaticText1Font(11,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText1->SetFont(StaticText1Font);
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -59,14 +59,14 @@ ExtensionBugReportDlg::ExtensionBugReportDlg(wxWindow* parent, wxString extensio
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	errorTxt = new wxStaticText(this, ID_STATICTEXT5, _("Game Develop crashed while loading this file:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	errorTxt = new wxStaticText(this, ID_STATICTEXT5, _("GDevelop crashed while loading this file:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer6->Add(errorTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	fileTxt = new wxStaticText(this, ID_STATICTEXT2, _("Unknown file"), wxDefaultPosition, wxSize(159,13), 0, _T("ID_STATICTEXT2"));
 	wxFont fileTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	fileTxt->SetFont(fileTxtFont);
 	FlexGridSizer6->Add(fileTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("To launch Game Develop without errors,\ndelete the file from the extension and relaunch Game Develop."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("To launch GDevelop without errors,\ndelete the file from the extension and relaunch GDevelop."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText3->SetFont(StaticText3Font);
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -76,14 +76,14 @@ ExtensionBugReportDlg::ExtensionBugReportDlg(wxWindow* parent, wxString extensio
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 4, 0, 0);
-	closeGDBt = new wxButton(this, ID_BUTTON1, _("Close Game Develop"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	closeGDBt = new wxButton(this, ID_BUTTON1, _("Close GDevelop"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	closeGDBt->SetDefault();
 	FlexGridSizer4->Add(closeGDBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	moreBt = new wxButton(this, ID_BUTTON4, _("Options"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer4->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	loadWithoutExtensionsBt = new wxButton(this, ID_BUTTON3, _("loadWithoutExtensionsBt"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer4->Add(loadWithoutExtensionsBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	loadGDBt = new wxButton(this, ID_BUTTON2, _("Launch Game Develop anyway"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	loadGDBt = new wxButton(this, ID_BUTTON2, _("Launch GDevelop anyway"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer4->Add(loadGDBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -95,7 +95,7 @@ ExtensionBugReportDlg::ExtensionBugReportDlg(wxWindow* parent, wxString extensio
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ExtensionBugReportDlg::OnloadWithoutExtensionsBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ExtensionBugReportDlg::OnloadGDBtClick);
 	//*)
-    loadWithoutExtensionsBt->SetLabel(_("Launch Game Develop without any extension"));
+    loadWithoutExtensionsBt->SetLabel(_("Launch GDevelop without any extension"));
     moreBt->SetLabel(_("More options"));
 
     loadGDBt->Show(false);

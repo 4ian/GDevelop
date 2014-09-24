@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Game Develop C++ Platform" />
+		<Option title="GDevelop C++ Platform" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>

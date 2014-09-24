@@ -83,7 +83,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-									<label>A problem when copying a known file:&#x0A;  -Check that your file (image, sound ...) exists.&#x0A;  -Check you have read/write permission. &#x0A;&#x0A;A problem when copying a file unknown:&#x0A;  -Check that the file in question exists. &#x0A;    If not, try reinstalling Game Develop&#x0A;  -Check you have read/write permission.&#x0A;&#x0A;A problem when creating a file:&#x0A;  -Make sure you have read/write&#x0A;   permission.</label>
+									<label>A problem when copying a known file:&#x0A;  -Check that your file (image, sound ...) exists.&#x0A;  -Check you have read/write permission. &#x0A;&#x0A;A problem when copying a file unknown:&#x0A;  -Check that the file in question exists. &#x0A;    If not, try reinstalling GDevelop&#x0A;  -Check you have read/write permission.&#x0A;&#x0A;A problem when creating a file:&#x0A;  -Make sure you have read/write&#x0A;   permission.</label>
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>

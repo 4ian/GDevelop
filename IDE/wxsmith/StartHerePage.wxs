@@ -476,7 +476,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL16" variable="HyperlinkCtrl5" member="yes">
-							<label>If you like Game Develop, you can make a donation to the author.</label>
+							<label>If you like GDevelop, you can make a donation to the author.</label>
 							<url>http://www.compilgames.net/donate.php</url>
 							<style>wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 						</object>

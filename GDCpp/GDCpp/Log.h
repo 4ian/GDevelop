@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -11,7 +11,7 @@
 #include <vector>
 
 /**
- * Display Game Develop version and some informations to std::cout.
+ * Display GDevelop version and some informations to std::cout.
  */
 void GD_API GDLogBanner();
 

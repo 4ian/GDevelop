@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -12,7 +12,7 @@ namespace gd
 {
 
 /**
- * \brief Internal class providing Game Develop specific skin for wxwidget's wxAuiNotebook class.
+ * \brief Internal class providing GDevelop specific skin for wxwidget's wxAuiNotebook class.
  *
  * If you use wxAuiNotebook, please use this art provider by using SkinHelper::ApplyCurrentSkin.<br>
  * ( You do not have to use this class directly. )

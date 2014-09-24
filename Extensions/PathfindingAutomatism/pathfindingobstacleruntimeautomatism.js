@@ -1,5 +1,5 @@
 /**
-Game Develop - Pathfinding Automatism Extension
+GDevelop - Pathfinding Automatism Extension
 Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 

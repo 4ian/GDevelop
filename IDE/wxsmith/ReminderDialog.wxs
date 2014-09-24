@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ReminderDialog">
-		<title>Support Game Develop</title>
+		<title>Support GDevelop</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<handler function="OnClose" entry="EVT_CLOSE" />
@@ -10,7 +10,7 @@
 			<growablerows>2</growablerows>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-					<label>Thank you for using Game Develop!</label>
+					<label>Thank you for using GDevelop!</label>
 					<font>
 						<size>13</size>
 					</font>
@@ -25,7 +25,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-							<label>We&apos;d love to get your feedback about Game Develop! You can write us something&#x0A;about the software:</label>
+							<label>We&apos;d love to get your feedback about GDevelop! You can write us something&#x0A;about the software:</label>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -110,7 +110,7 @@
 									<growablerows>2</growablerows>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-											<label>Game Develop is an open source software:&#x0A;You can use it freely, but its development costs a&#x0A;lot of time, as well as money.&#x0A;&#x0A;If Game Develop proves to be useful to you, you&#x0A;can support its authors by donating or contributing&#x0A;to the project:</label>
+											<label>GDevelop is an open source software:&#x0A;You can use it freely, but its development costs a&#x0A;lot of time, as well as money.&#x0A;&#x0A;If GDevelop proves to be useful to you, you&#x0A;can support its authors by donating or contributing&#x0A;to the project:</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -118,7 +118,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="HyperlinkCtrl2" member="yes">
-											<label>Donate or contribute to Game Develop</label>
+											<label>Donate or contribute to GDevelop</label>
 											<handler function="OnHyperlinkCtrl1Click" entry="EVT_HYPERLINK" />
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

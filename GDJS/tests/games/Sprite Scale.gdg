@@ -25,8 +25,8 @@
             <Extension name="BuiltinMathematicalTools" />
             <Extension name="BuiltinExternalLayouts" />
         </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
+        <Platforms current="GDevelop C++ platform">
+            <Platform name="GDevelop C++ platform" />
         </Platforms>
         <WindowW value="800" />
         <WindowH value="600" />

@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Panel Sprite Extension
+GDevelop - Panel Sprite Extension
 Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
 
 This software is provided 'as-is', without any express or implied

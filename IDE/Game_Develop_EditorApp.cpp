@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -103,16 +103,16 @@ bool Game_Develop_EditorApp::OnInit()
     //Parse command line:
     wxCmdLineEntryDesc cmdLineDesc[] = {
         {wxCMD_LINE_PARAM, NULL, NULL, ("Files to open"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL},
-        {wxCMD_LINE_SWITCH, "h", "help", ("Display help about launching Game Develop using command line") },
-        {wxCMD_LINE_SWITCH, "v", "version", ("Display Game Develop version and quit"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+        {wxCMD_LINE_SWITCH, "h", "help", ("Display help about launching GDevelop using command line") },
+        {wxCMD_LINE_SWITCH, "v", "version", ("Display GDevelop version and quit"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
         {wxCMD_LINE_OPTION, NULL, ("lang"), ("Force loading a specific language ( Example : /lang=en_GB )"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
-        {wxCMD_LINE_SWITCH, NULL, ("allowMultipleInstances"), ("Allow to launch Game Develop even if it is already opened") },
-        {wxCMD_LINE_SWITCH, NULL, ("noCrashCheck"), ("Don't check if Game Develop crashed during last use.") },
+        {wxCMD_LINE_SWITCH, NULL, ("allowMultipleInstances"), ("Allow to launch GDevelop even if it is already opened") },
+        {wxCMD_LINE_SWITCH, NULL, ("noCrashCheck"), ("Don't check if GDevelop crashed during last use.") },
         {wxCMD_LINE_NONE}
     };
 
     wxCmdLineParser parser (cmdLineDesc, argc, argv);
-    parser.AddUsageText("For more information about using Game Develop, please refer to the online help.");
+    parser.AddUsageText("For more information about using GDevelop, please refer to the online help.");
     if ( parser.Parse(false) > 0 )
         ;
     else if ( parser.Found( wxT("version") ) )
@@ -126,9 +126,9 @@ bool Game_Develop_EditorApp::OnInit()
         return false;
     }
 
-    cout << "Game Develop initialization started:" << endl;
+    cout << "GDevelop initialization started:" << endl;
     SetAppName("GDIDE");
-    SetAppDisplayName("Game Develop IDE");
+    SetAppDisplayName("GDevelop IDE");
 
     std::vector<std::string> filesToOpen;
     for (unsigned int i = 0;i<parser.GetParamCount();++i)
@@ -138,14 +138,14 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Load configuration
     #if defined(LINUX)
-    wxString ConfigPath = wxFileName::GetHomeDir() + "/.config/Game Develop/";
+    wxString ConfigPath = wxFileName::GetHomeDir() + "/.config/GDevelop/";
     #else
-    wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
+    wxString ConfigPath = wxFileName::GetHomeDir() + "/.GDevelop/";
     #endif
     if ( !wxDirExists( ConfigPath ) )
         wxMkdir( ConfigPath );
 
-    wxFileConfig *config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
+    wxFileConfig *config = new wxFileConfig( _T( "GDevelop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
     wxConfigBase::Set( config );
     cout << "* Config file set." << endl;
 
@@ -205,7 +205,7 @@ bool Game_Develop_EditorApp::OnInit()
 
             STClient * client = new STClient;
             wxString hostName = "localhost"; //Mandatory to provide the host ( for TCP/IP based implementations ).
-            wxConnectionBase * connection = client->MakeConnection(hostName, "GDIDE", "Game Develop IDE");
+            wxConnectionBase * connection = client->MakeConnection(hostName, "GDIDE", "GDevelop IDE");
 
             if ( connection )
             {
@@ -218,7 +218,7 @@ bool Game_Develop_EditorApp::OnInit()
             else
             {
                 if ( !filesToOpen.empty() )
-                    wxMessageBox(_("It seems that Game Develop is busy and can't open the requested file.\nPlease close any open dialogs and retry."),
+                    wxMessageBox(_("It seems that GDevelop is busy and can't open the requested file.\nPlease close any open dialogs and retry."),
                         _("Sorry! :/"), wxICON_INFORMATION|wxOK);
             }
 
@@ -302,8 +302,8 @@ bool Game_Develop_EditorApp::OnInit()
     errorDetectFile.Close();
 
     //Les log
-    cout << "* Displaying Game Develop version information :" << endl;
-    cout << "Game Develop " << gd::VersionWrapper::FullString() << ", built "
+    cout << "* Displaying GDevelop version information :" << endl;
+    cout << "GDevelop " << gd::VersionWrapper::FullString() << ", built "
          << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << endl;
 
     cout << "* Creating a useless SFML texture" << endl;
@@ -370,7 +370,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;
     LogFileManager::Get()->InitalizeFromConfig();
-    LogFileManager::Get()->WriteToLogFile("Game Develop initialization ended"),
+    LogFileManager::Get()->WriteToLogFile("GDevelop initialization ended"),
 
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
@@ -381,7 +381,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     cout << "* Initialization ended." << endl;
 
-    //gd::LogWarning(_("This is a beta version of Game Develop 3.\n\nSome features may be missing and bugs present: Report any feedback on www.forum.compilgames.net.\nThanks!"));
+    //gd::LogWarning(_("This is a beta version of GDevelop 3.\n\nSome features may be missing and bugs present: Report any feedback on www.forum.compilgames.net.\nThanks!"));
 
     //Checking for updates
     {
@@ -440,7 +440,7 @@ bool Game_Develop_EditorApp::OnInit()
 
 int Game_Develop_EditorApp::OnExit()
 {
-    cout << "\nGame Develop shutdown started:" << endl;
+    cout << "\nGDevelop shutdown started:" << endl;
     cout << "* Closing the configuration and destroying singletons";
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
     cout << ".";
@@ -471,10 +471,10 @@ int Game_Develop_EditorApp::OnExit()
 #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
 void Game_Develop_EditorApp::OnUnhandledException()
 {
-    wxSafeShowMessage( "Fatal error", "A fatal error occurred (01).\nGame Develop has to be shutdown." );
+    wxSafeShowMessage( "Fatal error", "A fatal error occurred (01).\nGDevelop has to be shutdown." );
 
     wxFile dataErrorFile("errordata.txt", wxFile::write);
-    dataErrorFile.Write("Game Develop - Error log.\n");
+    dataErrorFile.Write("GDevelop - Error log.\n");
     dataErrorFile.Write("\n");
     dataErrorFile.Write("GD Error code : (01) Fatal error\n");
 
@@ -494,10 +494,10 @@ void Game_Develop_EditorApp::OnUnhandledException()
 bool Game_Develop_EditorApp::OnExceptionInMainLoop()
 {
     #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
-    wxSafeShowMessage( "Fatal error", "A fatal error occurred: (02) Segmentation Fault.\nGame Develop has to be shutdown." );
+    wxSafeShowMessage( "Fatal error", "A fatal error occurred: (02) Segmentation Fault.\nGDevelop has to be shutdown." );
 
     wxFile dataErrorFile("errordata.txt", wxFile::write);
-    dataErrorFile.Write("Game Develop - Error log.\n");
+    dataErrorFile.Write("GDevelop - Error log.\n");
     dataErrorFile.Write("\n");
     dataErrorFile.Write("GD Error code : (02) Segmentation Fault\n");
 

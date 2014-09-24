@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Panel Sprite Extension
+GDevelop - Panel Sprite Extension
 Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
 
 This software is provided 'as-is', without any express or implied
@@ -353,7 +353,7 @@ RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::O
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyPanelSpriteObject(gd::Object * object)
@@ -363,7 +363,7 @@ void DestroyPanelSpriteObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreatePanelSpriteObject(std::string name)
 {

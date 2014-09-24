@@ -1,12 +1,12 @@
 /**
- * \mainpage Game Develop Core
+ * \mainpage GDevelop Core
  * \image html gdlogo.png
  * \section welcome Welcome
  *
- * The **Game Develop Core** library contains the main concepts, classes and tools that are used by the *platforms* and the *Game Develop IDE*.<br>
- * This ensures that the IDE, or any tool based on Game Develop Core, is able to work with projects based on any arbitrary platform.
+ * The **GDevelop Core** library contains the main concepts, classes and tools that are used by the *platforms* and the *GDevelop IDE*.<br>
+ * This ensures that the IDE, or any tool based on GDevelop Core, is able to work with projects based on any arbitrary platform.
  *
- * Two official platforms are available for Game Develop:
+ * Two official platforms are available for GDevelop:
  *  - The *C++ Platform* (GDCpp) to create native games.
  *  - The *JS Platform* (GDJS) to create HTML5 games.
  *
@@ -21,14 +21,14 @@
  *
  * \section aboutdoc About this documentation
  *
- * If you never used Game Develop Core before, take a look at \subpage overview.
+ * If you never used GDevelop Core before, take a look at \subpage overview.
  *
- * As everything that is developed around Game Develop is based on this library, you should take a look at it quite often: platforms, extensions
+ * As everything that is developed around GDevelop is based on this library, you should take a look at it quite often: platforms, extensions
  * and the IDE are intensively using the classes and tools offered by GDCore.
  * When developing an extension for the C++ or JS platform, read these documentations:
  *
- *  - [Open Game Develop C++ Platform documentation](../GDCpp Documentation/index.html)
- *  - [Open Game Develop JS Platform documentation](../GDJS Documentation/index.html)
+ *  - [Open GDevelop C++ Platform documentation](../GDCpp Documentation/index.html)
+ *  - [Open GDevelop JS Platform documentation](../GDJS Documentation/index.html)
  *
  */
 
@@ -37,7 +37,7 @@
  *
  * <b>Windows</b>
  *
- * Follow these three step to be able to compile %Game Develop and the extensions:
+ * Follow these three step to be able to compile %GDevelop and the extensions:
  * -# \subpage installWinLibs
  * -# \subpage installWinCompiler
  * -# \ref installAndUseCMake
@@ -47,18 +47,18 @@
  * -# \subpage installLinux
  * -# \subpage installAndUseCMake
  *
- * See the recommended tools and conventions for working on Game Develop on this page:
+ * See the recommended tools and conventions for working on GDevelop on this page:
  * \subpage recommendedToolsAndConventions
  */
 
 /**
  *  \page installWinLibs (Windows) Download and install SFML, wxWidgets and Boost
  *
- * %Game Develop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of %Game Develop and
- * the extensions, %Game Develop require the extensions to use the same version of the libraries.
+ * %GDevelop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of %GDevelop and
+ * the extensions, %GDevelop require the extensions to use the same version of the libraries.
  * \section download Download
 
- * You can download the specific versions of the libraries used by the current version of %Game Develop using these links:<br>
+ * You can download the specific versions of the libraries used by the current version of %GDevelop using these links:<br>
  * - http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
  * - http://www.compilgames.net/code/GameDevelopSDK/wxwidgets.7z
  * - http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z
@@ -66,7 +66,7 @@
  * They are already built for windows, and for an use with the TDM-GCC compiler.
  *
  * \section uncompress Uncompress
- * By default, %Game Develop projects search the libraries in the ExtLibs
+ * By default, %GDevelop projects search the libraries in the ExtLibs
  * (located at the root of the SDK) directory ( ExtLibs/SFML, ExtLibs/wxWidgets... ).<br>
  * Uncompress the libraries in this directory.
  */
@@ -74,13 +74,13 @@
 /**
  *  \page installWinCompiler (Windows) Install TDM-GCC compiler
  *
- * %Game Develop is compiled with TDM-GCC under Windows.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %Game Develop and
- * the compiler used by the extensions, %Game Develop require the extensions and the platforms to use the same version of TDM-GCC.<br>
+ * %GDevelop is compiled with TDM-GCC under Windows.<br>
+ * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %GDevelop and
+ * the compiler used by the extensions, %GDevelop require the extensions and the platforms to use the same version of TDM-GCC.<br>
  *
  * \section installWinCompiler_download Download
  *
- * The current version of the compiler used by %Game Develop can be found and downloaded on the website : http://www.compilgames.net
+ * The current version of the compiler used by %GDevelop can be found and downloaded on the website : http://www.compilgames.net
  *
  * \section installWinCompiler_install Installation
  *
@@ -162,24 +162,24 @@
 /**
  *  \page installLinux (Linux) Install development files
  *
- * \section downloadGD Download and extract Game Develop for Linux
+ * \section downloadGD Download and extract GDevelop for Linux
  *
- * If you didn't already downloaded Game Develop for Linux, do it now from [the official website](http://www.compilgames.net/).
+ * If you didn't already downloaded GDevelop for Linux, do it now from [the official website](http://www.compilgames.net/).
  *
  * Then extract all the files inside the <b>GameDevelop</b> folder inside the *Binaries/Output/Release_Linux/ * folder
  * of the SDK. ( You should have files like libGDCore.so now present in Binaries/Output/Release_Linux )
  *
  * \section download Download, (build) and install libraries
  *
- * %Game Develop is compiled with gcc under Linux.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %Game Develop and
- * the compiler used by the extensions, %Game Develop require the extensions and the platforms to use the same version of gcc.<br>
+ * %GDevelop is compiled with gcc under Linux.<br>
+ * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %GDevelop and
+ * the compiler used by the extensions, %GDevelop require the extensions and the platforms to use the same version of gcc.<br>
  *
  * \subsection sfml SFML
  *
- * %Game Develop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
+ * %GDevelop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
  *
- * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which Game Develop is distributed officially:
+ * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which GDevelop is distributed officially:
  *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs.
  *  - If you compile GD for another version of Ubuntu or a different distro, extract the archive inside the folder ExtLibs, and *recompile* SFML using CMake into
  *  a folder called **build-linux**. It's easy, just follow [this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php). Again, be sure
@@ -188,11 +188,11 @@
  *
  * \subsection boost Boost
 
- * Boost version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
+ * Boost version used by %GDevelop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
  * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
  * \subsection wxWidgets wxWidgets
 
- * wxWidgets version used by %Game Develop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2 <br>
+ * wxWidgets version used by %GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2 <br>
  * First extract the archive inside the folder ExtLibs.
  *
  * Be sure to have GTK+ 3.0 and WebKitGTK development files installed:
@@ -209,13 +209,13 @@
  * \endcode
  *
  * \subsection installcmake Install CMake
- * You'll need CMake to build Game Develop: See more on \subpage installAndUseCMake.
+ * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
  */
 
 /**
  * \page buildSFML (Linux) Manually build SFML
  *
- * If you're compiling Game Develop for another distro that is the not the distro for which Game Develop is officially distributed
+ * If you're compiling GDevelop for another distro that is the not the distro for which GDevelop is officially distributed
  * (i.e: The latest Ubuntu), you have to recompile SFML.
  *
  * \section downloadSFML Download SFML
@@ -252,7 +252,7 @@ sudo apt-get install libfreetype6-dev
  * make
  * \endcode
  *
- * Remember that it is mandatory to have this **build-linux** folder as Game Develop will use the libraries created into this folder.
+ * Remember that it is mandatory to have this **build-linux** folder as GDevelop will use the libraries created into this folder.
  * Pay attention to it if you use the GUI version of CMake.
  *
  * If you have errors when launching cmake, make sure you have installed all dependencies.²
@@ -263,7 +263,7 @@ sudo apt-get install libfreetype6-dev
  *
  * \section texteditor Text editor
  *
- * Game Develop is compiled thanks to CMake which can generate *Makefiles* or a project file for most popular IDE available.<br>
+ * GDevelop is compiled thanks to CMake which can generate *Makefiles* or a project file for most popular IDE available.<br>
  *
  * [Sublime Text](http://www.sublimetext.com/) is a very nice text editor for programmers:
  * *"You'll love the slick user interface, extraordinary features and amazing performance."*. <br>
@@ -309,7 +309,7 @@ sudo apt-get install libfreetype6-dev
  * \subsection pullrequest Submitting code thanks to Pull Request.
  *
  * Using *Pull request*, you can easily submit your changes so that they are integrated into the official
- * Game Develop repository (http://github.com/4ian/gd).
+ * GDevelop repository (http://github.com/4ian/gd).
  *
  * See this article on *GitHub help* about pull requests: https://help.github.com/articles/using-pull-requests.<br>
  * Pull requests are extremely easy to use and the best way to contribute to GD!
@@ -351,7 +351,7 @@ sudo apt-get install libfreetype6-dev
  *
  * \section platformstructure Structure of a platform
  *
- * A platform for Game Develop Core is a class inheriting from gd::Platform.<br>
+ * A platform for GDevelop Core is a class inheriting from gd::Platform.<br>
  * They contains the extensions of the platform (see below) and offer various methods, like gd::Platform::GetProjectExporter which
  * is called by the IDE to export a gd::Project to a stand-alone game.
  *
@@ -374,7 +374,7 @@ sudo apt-get install libfreetype6-dev
  * }
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * The platform dynamic library file is often located inside <i>Game Develop directory</i>/*xxx*Platform (*xxx* being replaced by the platform acronym).
+ * The platform dynamic library file is often located inside <i>GDevelop directory</i>/*xxx*Platform (*xxx* being replaced by the platform acronym).
  *
  * In this folder, the platform can store basically anything it needs. For example, both GDJS and GDCpp are storing a folder called *Runtime* containing
  * the game engine.
@@ -382,7 +382,7 @@ sudo apt-get install libfreetype6-dev
  *
  * \section extensionsstructure Structure of an extension
  *
- * **Extensions** are seen by Game Develop Core as classes inheriting from gd::PlatformExtension.<br>
+ * **Extensions** are seen by GDevelop Core as classes inheriting from gd::PlatformExtension.<br>
  * They are stored inside the platform they belong to, and they are also loaded from a dynamic library file thanks to gd::ExtensionsLoader. The main
  * job of an extension is to <b>declare</b> everything it provides: objects, actions and conditions, automatisms, expressions.<br>
  * This is done directly using the standard method provided by gd::PlatformExtension, notably:
@@ -429,11 +429,11 @@ sudo apt-get install libfreetype6-dev
  * <br>
  * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake).
  *
- * \section writeANewExtension_installExtension Use the extension with Game Develop
+ * \section writeANewExtension_installExtension Use the extension with GDevelop
  *
- * To make your extension usable with %Game Develop, you have to:
- * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *Game Develop folder*.
- * -# For the C++ platform, copy **all needed include file** (.h files) inside a folder with the name of your extension located into <i>(Game Develop folder)/CppPlatform/Extensions/include</i>.<br>
+ * To make your extension usable with %GDevelop, you have to:
+ * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *GDevelop folder*.
+ * -# For the C++ platform, copy **all needed include file** (.h files) inside a folder with the name of your extension located into <i>(GDevelop folder)/CppPlatform/Extensions/include</i>.<br>
  *  You can use a *small script* (batch file on Windows) to copy all the needed includes files in a single click.<br>
  * -# For the JS platform, there is a script in *GDJS/scripts* called **CopyRuntimeToGD**. Launch it to automatically copy the .js files of your extension into *Binaries/Output/Release_{OS}/JsPlatform/...*.
  * -# <b>Translations catalog files</b> (.po/.mo files) must be put into xxxPlatform/Extensions/locale/<b>language</b>/myExtension.mo (Example : CppPlatform/Extensions/locale/fr_FR/myExtension.mo)
@@ -585,7 +585,7 @@ Automatisms are declared like objects:
  * Call AddAction/AddCondition/AddExpression on the <i>aut</i> object.
 
  * \section excludingNonRuntimeDeclaration (C++ platform) Excluding elements declaration from runtime
- * When your extension is compiled for the C++ platform Runtime, Game Develop does not known anything about action/condition or even events classes.<br>
+ * When your extension is compiled for the C++ platform Runtime, GDevelop does not known anything about action/condition or even events classes.<br>
  * You have then to exclude all actions/conditions/expressions/events declaration from extension at runtime (only Extension/Object/Automatisms declarations have to be kept).
 
  * Use the *<code>GD_IDE_ONLY</code> define* to achieve this goal, as demonstrated in this skeleton of a complete extension declaration:
@@ -654,13 +654,13 @@ public:
     virtual ~Extension() {};
 };
 
-// Used by Game Develop to create the extension class
+// Used by GDevelop to create the extension class
 // -- Do not need to be modified. --
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
 
-// Used by Game Develop to destroy the extension class
+// Used by GDevelop to destroy the extension class
 // -- Do not need to be modified. --
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;

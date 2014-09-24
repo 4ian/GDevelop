@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -10,7 +10,7 @@
 class ConsoleFrame;
 
 /**
- * \brief Manage Game Develop IDE console.
+ * \brief Manage GDevelop IDE console.
  *
  * Class managing the GD console, allowing to display it by a simple function call.
  * Best when created at program start and killed when program exits.

@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -1320,7 +1320,7 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
 
     if ( pointName == "Centre" ) //Center point can be automatically positioned.
     {
-        if (wxMessageBox(_("The point \"Centre\" can be automatically placed by Game Develop at the center.\nDo you really want to modify the point\?\nClick on yes to modify it, click on no so as let Game Develop place it."),
+        if (wxMessageBox(_("The point \"Centre\" can be automatically placed by GDevelop at the center.\nDo you really want to modify the point\?\nClick on yes to modify it, click on no so as let GDevelop place it."),
                        _("Position of the point \"Centre\""), wxYES_NO ) == wxNO)
         {
             for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetCentreAutomatic(true);
@@ -1400,7 +1400,7 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
             sprites[i]->SetCollisionMaskAutomatic(false);
             sprites[i]->SetCustomCollisionMask(mask);
         }
-        
+
         imagePanel->Refresh();
         imagePanel->Update();
         RefreshCollisionMasks();
@@ -1447,11 +1447,11 @@ void SpriteObjectEditor::OnAddVerticeClick(wxCommandEvent& event)
     {
         if ( polygonEditionHelper.GetSelectedPoint() < mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() )
         {
-            if ( polygonEditionHelper.GetSelectedPoint() < 1 ) 
+            if ( polygonEditionHelper.GetSelectedPoint() < 1 )
             	polygonEditionHelper.SetSelectedPoint(1);
-            if ( polygonEditionHelper.GetSelectedPoint() >= mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() ) 
+            if ( polygonEditionHelper.GetSelectedPoint() >= mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() )
             	polygonEditionHelper.SetSelectedPoint(mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size()-1);
-            if ( mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() < 2 ) 
+            if ( mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() < 2 )
             	return;
 
             sf::Vector2f newPoint = (mask[polygonEditionHelper.GetSelectedPolygon()].vertices[polygonEditionHelper.GetSelectedPoint()]

@@ -1,10 +1,10 @@
-/** \file This file contains some common tools which can be used in source file and in C++ Code events of Game Develop projects.
+/** \file This file contains some common tools which can be used in source file and in C++ Code events of GDevelop projects.
 *
-* This file is automatically included by Game Develop. See GDCpp/EventsPrecompiledHeader.h for a full list of automatically
+* This file is automatically included by GDevelop. See GDCpp/EventsPrecompiledHeader.h for a full list of automatically
 * included files.
  */
 //Extensions writers: Please do not use these functions: There are meant to be used
-//for ease the writing of C++ code inside Game Develop!
+//for ease the writing of C++ code inside GDevelop!
 
 #include <vector>
 #include "GDCpp/RuntimeObject.h"

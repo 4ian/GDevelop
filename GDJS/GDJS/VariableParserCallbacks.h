@@ -1,5 +1,5 @@
 /** \file
- *  Game Develop
+ *  GDevelop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
@@ -17,7 +17,7 @@ namespace gdjs {
  *
  * Usage example:
  \code
- 
+
  \endcode
  */
 class VariableCodeGenerationCallbacks : public gd::VariableParserCallbacks
@@ -37,7 +37,7 @@ public:
      * \param context The current code generation context.
      * \param scope The scope of the variable being accessed: LAYOUT_VARIABLE, PROJECT_VARIABLE.
      */
-    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_, 
+    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_,
         gd::EventsCodeGenerationContext & context_, const VariableScope & scope_);
     /**
 
@@ -47,7 +47,7 @@ public:
      * \param context The current code generation context.
      * \param object The name of the object
      */
-    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_, 
+    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_,
         gd::EventsCodeGenerationContext & context_, const std::string & object);
 
     /**

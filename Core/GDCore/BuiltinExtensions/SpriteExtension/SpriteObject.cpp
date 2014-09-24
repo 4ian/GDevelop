@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -293,7 +293,7 @@ void SpriteObject::SwapAnimations(unsigned int firstIndex, unsigned int secondIn
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroySpriteObject(gd::Object * object)
@@ -303,7 +303,7 @@ void DestroySpriteObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateSpriteObject(std::string name)
 {

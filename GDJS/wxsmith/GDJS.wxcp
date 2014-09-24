@@ -1570,7 +1570,7 @@
 														}, {
 															"type":	"multi-string",
 															"m_label":	"Label:",
-															"m_value":	"GameDevShare.com is a free online gaming platform for\\ngames created with Game Develop."
+															"m_value":	"GameDevShare.com is a free online gaming platform for\\ngames created with GDevelop."
 														}, {
 															"type":	"string",
 															"m_label":	"Wrap:",
@@ -1714,7 +1714,7 @@
 																		}, {
 																			"type":	"multi-string",
 																			"m_label":	"Label:",
-																			"m_value":	"Just click on the \"Export\" button and Game Develop will\\npackage your game in a single zip file. Then you'll be\\nasked for some information (Name of your game, your\\nemail address) and the game will be uploaded on the website."
+																			"m_value":	"Just click on the \"Export\" button and GDevelop will\\npackage your game in a single zip file. Then you'll be\\nasked for some information (Name of your game, your\\nemail address) and the game will be uploaded on the website."
 																		}, {
 																			"type":	"string",
 																			"m_label":	"Wrap:",
@@ -3213,7 +3213,7 @@
 																		}, {
 																			"type":	"multi-string",
 																			"m_label":	"Label:",
-																			"m_value":	"Just click on the \"Export\" button and Game Develop will\\npackage your game.\\nYou'll then be able to import the project into Intel XDK,\\nwhich will allows you to compile the game into an\\niOS and Android application."
+																			"m_value":	"Just click on the \"Export\" button and GDevelop will\\npackage your game.\\nYou'll then be able to import the project into Intel XDK,\\nwhich will allows you to compile the game into an\\niOS and Android application."
 																		}, {
 																			"type":	"string",
 																			"m_label":	"Wrap:",
@@ -3737,7 +3737,7 @@
 																		}, {
 																			"type":	"multi-string",
 																			"m_label":	"Label:",
-																			"m_value":	"Just click on the \"Export\" button and Game Develop will\\npackage your game in a single zip file.\\nYou'll then be able to upload this file on the cloud compiler\\nat cloud.ludei.com, which will allows you to compile\\nthe game into an iOS/Android app."
+																			"m_value":	"Just click on the \"Export\" button and GDevelop will\\npackage your game in a single zip file.\\nYou'll then be able to upload this file on the cloud compiler\\nat cloud.ludei.com, which will allows you to compile\\nthe game into an iOS/Android app."
 																		}, {
 																			"type":	"string",
 																			"m_label":	"Wrap:",

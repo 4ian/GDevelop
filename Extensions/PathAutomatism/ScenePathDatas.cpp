@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Path Automatism Extension
+GDevelop - Path Automatism Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied

@@ -1,5 +1,5 @@
 /**
-Game Develop - Physics Automatism Extension
+GDevelop - Physics Automatism Extension
 Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 

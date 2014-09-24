@@ -50,7 +50,7 @@
     </Info>
     <Resources>
         <Resources>
-            <Resource kind="image" name="automatism64.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\Game Develop 2\res\automatism64.png" />
+            <Resource kind="image" name="automatism64.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\GDevelop 2\res\automatism64.png" />
             <Resource kind="image" name="SMB_TOAD_0_0.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="D:\Jeux créés avec GD\Super Mario Battle 2\images\toad_new\TOAD_0_0.png" />
             <Resource kind="image" name="SMB_TOAD_0_1.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="D:\Jeux créés avec GD\Super Mario Battle 2\images\toad_new\TOAD_0_1.png" />
             <Resource kind="image" name="SMB_TOAD_0_2.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="D:\Jeux créés avec GD\Super Mario Battle 2\images\toad_new\TOAD_0_2.png" />

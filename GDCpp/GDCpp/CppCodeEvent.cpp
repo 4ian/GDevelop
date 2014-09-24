@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -61,7 +61,7 @@ void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & project) c
 
     if (sourceFile == boost::shared_ptr<gd::SourceFile>() )
     {
-        gd::LogError(_("Unable to create a virtual source file for a C++ Code event.\nPlease report this error to Game Develop developer."));
+        gd::LogError(_("Unable to create a virtual source file for a C++ Code event.\nPlease report this error to GDevelop developer."));
         return;
     }
 

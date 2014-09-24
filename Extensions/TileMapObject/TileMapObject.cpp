@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -173,7 +173,7 @@ void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFr
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyTileMapObject(gd::Object * object)
@@ -183,7 +183,7 @@ void DestroyTileMapObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateTileMapObject(std::string name)
 {

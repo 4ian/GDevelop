@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Platform Automatism Extension
+GDevelop - Platform Automatism Extension
 Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -39,7 +39,7 @@ public:
     /**
      * \brief Map containing, for each RuntimeScene, its associated ScenePlatformObjectsManager.
      */
-    static std::map<RuntimeScene*, ScenePlatformObjectsManager> managers; 
+    static std::map<RuntimeScene*, ScenePlatformObjectsManager> managers;
 
 	ScenePlatformObjectsManager() {};
 	virtual ~ScenePlatformObjectsManager();

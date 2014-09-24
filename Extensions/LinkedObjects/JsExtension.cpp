@@ -1,6 +1,6 @@
 /**
 
-Game Develop - LinkedObjects Extension
+GDevelop - LinkedObjects Extension
 Copyright (c) 2008-2013  Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -48,7 +48,7 @@ public:
                               "Florian Rival",
                               "zlib/libpng License (Open Source)");
 
-        CloneExtension("Game Develop C++ platform", "LinkedObjects");
+        CloneExtension("GDevelop C++ platform", "LinkedObjects");
 
         GetAllActions()["LinkedObjects::LinkObjects"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.linkObjects");
@@ -67,7 +67,7 @@ public:
 };
 
 /**
- * Used by Game Develop to create the extension class
+ * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
@@ -75,7 +75,7 @@ extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
 }
 
 /**
- * Used by Game Develop to destroy the extension class
+ * Used by GDevelop to destroy the extension class
  * -- Do not need to be modified. --
  */
 extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {

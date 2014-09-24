@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -497,21 +497,21 @@ void Project::UnserializeFrom(const SerializerElement & element)
     int revision = gdVersionElement.GetIntAttribute("revision", 0, "Revision");
 
     if ( GDMajorVersion > gd::VersionWrapper::Major() )
-        gd::LogWarning( _( "The version of Game Develop used to create this game seems to be a new version.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+        gd::LogWarning( _( "The version of GDevelop used to create this game seems to be a new version.\nGDevelop may fail to open the game, or data may be missing.\nYou should check if a new version of GDevelop is available." ) );
     else
     {
         if ( (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion >  gd::VersionWrapper::Minor()) ||
              (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build >  gd::VersionWrapper::Build()) ||
              (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build == gd::VersionWrapper::Build() && revision > gd::VersionWrapper::Revision()) )
         {
-            gd::LogWarning( _( "The version of Game Develop used to create this game seems to be greater.\nGame Develop may fail to open the game, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
+            gd::LogWarning( _( "The version of GDevelop used to create this game seems to be greater.\nGDevelop may fail to open the game, or data may be missing.\nYou should check if a new version of GDevelop is available." ) );
         }
     }
 
     //Compatibility code
     if ( GDMajorVersion <= 1 )
     {
-        gd::LogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
+        gd::LogError(_("The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."));
         //return; //TODO
     }
     //End of Compatibility code
@@ -566,7 +566,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     if ( platformsElement.GetChildrenCount() == 0 )
     {
         //Compatibility with GD2.x
-        platforms.push_back(gd::PlatformManager::Get()->GetPlatform("Game Develop C++ platform"));
+        platforms.push_back(gd::PlatformManager::Get()->GetPlatform("GDevelop C++ platform"));
         currentPlatform = platforms.back();
     }
 

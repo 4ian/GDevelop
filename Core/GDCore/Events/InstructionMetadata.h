@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -150,7 +150,7 @@ public:
 
     /**
      * \brief Add a parameter to the instruction ( condition or action ) information class.
-     * \param type One of the type handled by Game Develop.
+     * \param type One of the type handled by GDevelop.
      * This will also determine the type of the argument used when calling the function in the generated code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param description Description for parameter
      * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
@@ -160,7 +160,7 @@ public:
 
     /**
      * \brief Add a parameter not displayed in editor.
-     * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
+     * \param type One of the type handled by GDevelop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
      */
     InstructionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);

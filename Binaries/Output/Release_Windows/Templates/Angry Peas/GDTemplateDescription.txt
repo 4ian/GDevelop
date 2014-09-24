@@ -1,3 +1,3 @@
-Game Develop JS platform
+GDevelop JS platform
 Angry Peas
 Demonstrate how to use physics to create a "Angry Birds" like game.

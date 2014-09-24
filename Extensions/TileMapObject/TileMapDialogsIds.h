@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -27,9 +27,9 @@ freely, subject to the following restrictions:
 #ifndef TILEMAPDIALOGSIDS_H
 #define TILEMAPDIALOGSIDS_H
 
-enum 
+enum
 {
-    //TileMapObjectEditor IDs 
+    //TileMapObjectEditor IDs
     CHANGE_MAP_SIZE_TOOL_ID = 		1001,
     CONFIGURE_TILESET_TOOL_ID = 	1002,
     EDIT_TILE_TOOL_ID = 			1003,
@@ -51,7 +51,7 @@ enum
     PREDEFINED_SHAPE_TOOL_ID =      1106,
 
     //Predefined shapes popup menu IDs
-    //Note: TL means top-left, BR bottom-right 
+    //Note: TL means top-left, BR bottom-right
     //and so on...
     RECTANGLE_SHAPE_TOOL_ID =       1201,
     TRIANGLE_TL_SHAPE_TOOL_ID =     1202,

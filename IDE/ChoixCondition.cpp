@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -929,7 +929,7 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        gd::LogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
+        gd::LogWarning(_("The action has to many parameters. This can be a bug of GDevelop.\nRead Help to know how report a bug."));
         return;
     }
 

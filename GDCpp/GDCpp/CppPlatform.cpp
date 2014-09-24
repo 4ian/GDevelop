@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -197,14 +197,14 @@ void CppPlatform::DestroySingleton()
 
 #if !defined(EMSCRIPTEN)
 /**
- * Used by Game Develop to create the platform class
+ * Used by GDevelop to create the platform class
  */
 extern "C" gd::Platform * GD_API CreateGDPlatform() {
     return &CppPlatform::Get();
 }
 
 /**
- * Used by Game Develop to destroy the platform class
+ * Used by GDevelop to destroy the platform class
  */
 extern "C" void GD_API DestroyGDPlatform() {
     CppPlatform::DestroySingleton();

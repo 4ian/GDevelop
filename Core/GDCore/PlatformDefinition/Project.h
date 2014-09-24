@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -407,12 +407,12 @@ public:
     void SetDirty(bool enable = true) { dirty = enable; }
 
     /**
-     * Get the major version of Game Develop used to save the project.
+     * Get the major version of GDevelop used to save the project.
      */
     unsigned int GetLastSaveGDMajorVersion() { return GDMajorVersion; };
 
     /**
-     * Get the minor version of Game Develop used to save the project.
+     * Get the minor version of GDevelop used to save the project.
      */
     unsigned int GetLastSaveGDMinorVersion() { return GDMinorVersion; };
     #endif

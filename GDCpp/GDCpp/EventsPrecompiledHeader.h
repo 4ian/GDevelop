@@ -1,5 +1,5 @@
 //This file contains some common includes and is automatically used for each source file compiled
-//within Game Develop
+//within GDevelop
 #include <vector>
 #include <map>
 #include <string>

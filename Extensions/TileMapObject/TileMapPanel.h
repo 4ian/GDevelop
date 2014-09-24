@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 #include "TileSetPanel.h"
 #include "TileMap.h"
 #include "TileSet.h"
- 
+
 class TileMapPanel : public wxScrolledWindow
 {
 public:
@@ -113,7 +113,7 @@ private:
     int m_beginRow;
     int m_endCol;
     int m_endRow;
-    
+
 };
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Game Develop JS Platform
+ * GDevelop JS Platform
  * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -110,7 +110,7 @@ gdjs.evtTools.camera.centerCameraWithinLimits = function(runtimeScene, object, l
     var newX = object.getDrawableX()+object.getCenterX()+xOffset;
     if ( newX < left +layer.getCameraWidth(cameraId)/2 ) newX = left+layer.getCameraWidth(cameraId)/2;
     if ( newX > right-layer.getCameraWidth(cameraId)/2 ) newX = right-layer.getCameraWidth(cameraId)/2;
-    
+
     var newY = object.getDrawableY()+object.getCenterY()+yOffset;
     if ( newY < top   +layer.getCameraHeight(cameraId)/2 ) newY = top+layer.getCameraHeight(cameraId)/2;
     if ( newY > bottom-layer.getCameraHeight(cameraId)/2 ) newY = bottom-layer.getCameraHeight(cameraId)/2;

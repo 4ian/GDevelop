@@ -49,11 +49,11 @@
     </Info>
     <Resources>
         <Resources>
-            <Resource kind="image" name="2DSmallWoodBox.jpg" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\Game Develop 2\Examples\2DSmallWoodBox.jpg" />
-            <Resource kind="image" name="2DWoodBox.jpg" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\Game Develop 2\Examples\2DWoodBox.jpg" />
-            <Resource kind="image" name="Background.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\Game Develop 2\Examples\Background.png" />
+            <Resource kind="image" name="2DSmallWoodBox.jpg" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\GDevelop 2\Examples\2DSmallWoodBox.jpg" />
+            <Resource kind="image" name="2DWoodBox.jpg" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\GDevelop 2\Examples\2DWoodBox.jpg" />
+            <Resource kind="image" name="Background.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\GDevelop 2\Examples\Background.png" />
             <Resource kind="image" name="grass.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="D:\Développement\GD2\GDLSDK\Extensions\PhysicsAutomatism\test\grass.png" />
-            <Resource kind="image" name="Bille.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\Game Develop 2\Examples\Bille.png" />
+            <Resource kind="image" name="Bille.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="C:\Program Files (x86)\Compil Games\GDevelop 2\Examples\Bille.png" />
         </Resources>
         <ResourceFolders />
     </Resources>

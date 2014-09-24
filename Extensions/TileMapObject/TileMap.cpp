@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -28,8 +28,8 @@ freely, subject to the following restrictions:
 
 #include <GDCore/CommonTools.h>
 
-TileMap::TileMap() : 
-	m_layers(3, TileMapLayer()), 
+TileMap::TileMap() :
+	m_layers(3, TileMapLayer()),
 	m_width(10),
 	m_height(5)
 {
@@ -130,7 +130,7 @@ void TileMap::UnserializeFromString(const std::string &str)
 
 std::string TileMap::SerializeLayer(int layer) const
 {
-    std::string tileString; // Will contain a string representing the tiles 
+    std::string tileString; // Will contain a string representing the tiles
                             // (each column is separated by '|' and the rows by ',')
     for(int col = 0; col < m_width; col++)
     {

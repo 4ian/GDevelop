@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tiled Sprite Extension
+GDevelop - Tiled Sprite Extension
 Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
 Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 

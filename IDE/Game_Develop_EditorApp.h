@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -54,7 +54,7 @@ class STServer : public wxServer
 public:
     wxConnectionBase * OnAcceptConnection(const wxString & topic)
     {
-        if ( topic != "Game Develop IDE" ) return NULL;
+        if ( topic != "GDevelop IDE" ) return NULL;
 
         //Check that there are no modal dialogs active
         wxWindowList::Node * node = wxTopLevelWindows.GetFirst();

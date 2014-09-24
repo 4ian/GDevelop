@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2014 Florian Rival (Florian.Rival@gmail.com).
  * Copyright 2014 Victor Levasseur (victorlevasseur52@gmail.com).
  * This project is released under the GNU Lesser General Public License.
@@ -22,7 +22,7 @@ namespace gd
 
 /**
  * \brief PolygonEditionHelper provides features to make the polygon edition easier.
- * Can be easily integrated into a wxPanel of a wxScrolledWindow. 
+ * Can be easily integrated into a wxPanel of a wxScrolledWindow.
  * \ingroup IDEDialogs
  */
 class GD_CORE_API PolygonEditionHelper

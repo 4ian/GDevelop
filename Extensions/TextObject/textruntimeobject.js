@@ -1,5 +1,5 @@
 /*
- *  Game Develop JS Platform
+ *  GDevelop JS Platform
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 

@@ -1,5 +1,5 @@
 /*
- * Game Develop JS Platform
+ * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -18,7 +18,7 @@ namespace gdjs
 {
 
 /**
- * \brief Game Develop Javascript Platform
+ * \brief GDevelop Javascript Platform
  *
  * Platform designed to be used to create 2D games based on Javascript.<br>
  * <br>
@@ -29,7 +29,7 @@ class GD_API JsPlatform : public gd::Platform
 {
 public:
 
-    virtual std::string GetName() const { return "Game Develop JS platform"; }
+    virtual std::string GetName() const { return "GDevelop JS platform"; }
     virtual std::string GetFullName() const { return gd::ToString(_("Web platform")); }
     virtual std::string GetSubtitle() const { return gd::ToString(_("HTML5 and javascript based games for web browsers.")); }
     virtual std::string GetDescription() const { return gd::ToString(_("Allows to create 2D games which can be played in a web browser.")); }

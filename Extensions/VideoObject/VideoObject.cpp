@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Video Object Extension
+GDevelop - Video Object Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -401,7 +401,7 @@ RuntimeObject * CreateRuntimeVideoObject(RuntimeScene & scene, const gd::Object 
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyVideoObject(gd::Object * object)
@@ -411,7 +411,7 @@ void DestroyVideoObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateVideoObject(std::string name)
 {

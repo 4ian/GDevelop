@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxFrame" name="MainFrame">
-		<title>Game Develop</title>
+		<title>GDevelop</title>
 		<centered>1</centered>
 		<icon>res/icon16.png</icon>
 		<size>850,700</size>
@@ -149,7 +149,7 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem8" member="yes">
 				<label>Quit</label>
-				<help>Quit Game Develop</help>
+				<help>Quit GDevelop</help>
 				<handler function="OnQuit" entry="EVT_MENU" />
 			</object>
 		</object>

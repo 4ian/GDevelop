@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -23,7 +23,7 @@ namespace gd
 {
 
 /**
- * \brief Class that is used by games to load resources from an Game Develop Executable ( DatFile ) or from an external file.
+ * \brief Class that is used by games to load resources from an GDevelop Executable ( DatFile ) or from an external file.
  *
  * \ingroup ResourcesManagement
  */

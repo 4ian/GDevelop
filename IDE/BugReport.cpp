@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -87,17 +87,17 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel2, ID_STATICBITMAP3, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_INFORMATION")),wxART_OTHER), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer9->Add(StaticBitmap3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("It seems that Game Develop has closed abruptly after an\nerror. Game Develop should never freeze or crash whatever \nthe user make. You can help us correct the problem by filling\nthe error report."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("It seems that GDevelop has closed abruptly after an\nerror. GDevelop should never freeze or crash whatever \nthe user make. You can help us correct the problem by filling\nthe error report."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer9->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3->Add(FlexGridSizer9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Known bugs for this version of Game Develop"));
+    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Known bugs for this version of GDevelop"));
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer11->AddGrowableCol(1);
     FlexGridSizer11->AddGrowableRow(0);
     StaticBitmap4 = new wxStaticBitmap(Panel2, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/internet32.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
     FlexGridSizer11->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
-    StaticText8 = new wxStaticText(Panel2, ID_STATICTEXT8, _("You can visit a page on our website which can\ncontain known bugs for this version of Game Develop:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    StaticText8 = new wxStaticText(Panel2, ID_STATICTEXT8, _("You can visit a page on our website which can\ncontain known bugs for this version of GDevelop:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     FlexGridSizer12->Add(StaticText8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     bugListBt = new wxHyperlinkCtrl(Panel2, ID_HYPERLINKCTRL1, _("View the known bugs for this version"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
     FlexGridSizer12->Add(bugListBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -148,7 +148,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     openedFilesEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     FlexGridSizer10->Add(openedFilesEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("Game Develop may have made automatic backups of these projects. When you\'ll\nclose this window, the backups will be opened. If these backup are not corrupted,\nyou can save them over the original project files."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("GDevelop may have made automatic backups of these projects. When you\'ll\nclose this window, the backups will be opened. If these backup are not corrupted,\nyou can save them over the original project files."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer5->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
     CloseNoOpenBt = new wxButton(Panel4, ID_BUTTON3, _("Close but don\'t open the autosave(s)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
@@ -204,7 +204,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
     if (UserReportEdit->GetValue().Trim().IsEmpty() || UserReportEdit->GetValue().length() < 7)
         return;
 
-    //On recherche le rapport d'erreur de Game Develop
+    //On recherche le rapport d'erreur de GDevelop
     string rapport;
     if ( wxFileExists( "errordata.txt" ) )
     {
@@ -219,7 +219,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
         }
     }
     if ( rapport == "" )
-        rapport = "Pas de rapport d'erreur de Game Develop";
+        rapport = "Pas de rapport d'erreur de GDevelop";
 
     wxString report;
     report += "GD Error report:\n\n";

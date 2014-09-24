@@ -1,6 +1,6 @@
 /**
 
-Game Develop - DestroyOutside Automatism Extension
+GDevelop - DestroyOutside Automatism Extension
 Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied

@@ -1,5 +1,5 @@
 /*
- * Game Develop JS Platform
+ * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -72,7 +72,7 @@ public:
         if ( !exporter.ExportLayoutForPreview(project, layout, exportDir) )
         {
             gd::LogError(_("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
-                       +_("\n\nPlease report this error on the Game Develop website, or contact the extension developer if it seems related to a third party extension."));
+                       +_("\n\nPlease report this error on the GDevelop website, or contact the extension developer if it seems related to a third party extension."));
         }
 
         //Without "http://", the function fails ( on Windows at least ).
@@ -196,14 +196,14 @@ void JsPlatform::DestroySingleton()
 
 #if !defined(EMSCRIPTEN)
 /**
- * Used by Game Develop to create the platform class
+ * Used by GDevelop to create the platform class
  */
 extern "C" gd::Platform * GD_API CreateGDPlatform() {
     return &JsPlatform::Get();
 }
 
 /**
- * Used by Game Develop to destroy the platform class
+ * Used by GDevelop to destroy the platform class
  */
 extern "C" void GD_API DestroyGDPlatform() {
     JsPlatform::DestroySingleton();

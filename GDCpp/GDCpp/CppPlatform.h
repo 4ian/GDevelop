@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -20,7 +20,7 @@ typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
 typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
 /**
- * \brief Game Develop C++ Platform
+ * \brief GDevelop C++ Platform
  *
  * Platform designed to be used to create 2D games based on SFML and OpenGL libraries for rendering,
  * events being translated to C++ and then compiled using GCC.
@@ -29,7 +29,7 @@ class GD_API CppPlatform : public gd::Platform
 {
 public:
 
-    virtual std::string GetName() const { return "Game Develop C++ platform"; }
+    virtual std::string GetName() const { return "GDevelop C++ platform"; }
     #if defined(GD_IDE_ONLY)
     virtual std::string GetFullName() const { return ToString(_("Native platform")); }
     virtual std::string GetSubtitle() const { return ToString(_("C++ and OpenGL based games for Windows or Linux.")); }

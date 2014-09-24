@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Box 3D Extension
+GDevelop - Box 3D Extension
 Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -440,7 +440,7 @@ RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object 
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyBox3DObject(gd::Object * object)
@@ -450,7 +450,7 @@ void DestroyBox3DObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateBox3DObject(std::string name)
 {

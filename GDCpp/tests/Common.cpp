@@ -1,10 +1,10 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
 /**
- * @file Tests covering common features of Game Develop C++ Platform.
+ * @file Tests covering common features of GDevelop C++ Platform.
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"

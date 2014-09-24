@@ -22,20 +22,20 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\bugreport.cpp:90
 msgid ""
-"It seems that Game Develop has closed abruptly after an\n"
-"error. Game Develop should never freeze or crash whatever \n"
+"It seems that GDevelop has closed abruptly after an\n"
+"error. GDevelop should never freeze or crash whatever \n"
 "the user make. You can help us correct the problem by filling\n"
 "the error report."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\bugreport.cpp:93
-msgid "Known bugs for this version of Game Develop"
+msgid "Known bugs for this version of GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\bugreport.cpp:100
 msgid ""
 "You can visit a page on our website which can\n"
-"contain known bugs for this version of Game Develop:"
+"contain known bugs for this version of GDevelop:"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\bugreport.cpp:102
@@ -79,7 +79,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\bugreport.cpp:151
 msgid ""
-"Game Develop may have made automatic backups of these projects. When you'll\n"
+"GDevelop may have made automatic backups of these projects. When you'll\n"
 "close this window, the backups will be opened. If these backup are not corrupted,\n"
 "you can save them over the original project files."
 msgstr ""
@@ -723,7 +723,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\ide\choixaction.cpp:951
 #: d:\florian\programmation\gamedevelop3\ide\choixcondition.cpp:932
 msgid ""
-"The action has to many parameters. This can be a bug of Game Develop.\n"
+"The action has to many parameters. This can be a bug of GDevelop.\n"
 "Read Help to know how report a bug."
 msgstr ""
 
@@ -1105,7 +1105,7 @@ msgid "Editor Preferences"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\consoleframe.cpp:32
-msgid "Game Develop Console"
+msgid "GDevelop Console"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\consoleframe.cpp:45
@@ -1199,12 +1199,12 @@ msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/ma
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:79
-msgid "About Game Develop"
+msgid "About GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:92
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:143
-msgid "Game Develop"
+msgid "GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:97
@@ -1232,7 +1232,7 @@ msgid "http://www.compilgames.net"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:117
-msgid "You like Game Develop?"
+msgid "You like GDevelop?"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:119
@@ -1245,16 +1245,16 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:129
 msgid ""
-"Game Develop is an open source software:\n"
+"GDevelop is an open source software:\n"
 "\n"
 "  * The IDE is distributed under the GPL v3 license.\n"
 "  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.\n"
 "  * Extensions are distributed under the zlib/libpng license.\n"
-"  * The name, Game Develop, and its logo are the exclusive property of Florian Rival.\n"
+"  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.\n"
 "\n"
-"About games created with Game Develop\n"
+"About games created with GDevelop\n"
 "\n"
-"Games exported with Game Develop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with Game Develop. In particular, you are not forced to make your game open source."
+"Games exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:147
@@ -1290,7 +1290,7 @@ msgid "Contributors: (No special order)"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:223
-msgid "François Dumortier : Game Develop logo design and website conception."
+msgid "François Dumortier : GDevelop logo design and website conception."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:226
@@ -1350,7 +1350,7 @@ msgid "Some images of examples came from images pack by Ari Feldman"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:258
-msgid "Thanks to all the community and users of Game Develop"
+msgid "Thanks to all the community and users of GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\credits.cpp:330
@@ -1824,11 +1824,11 @@ msgid "Extension not compatible"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:50
-msgid "An extension seems to be incompatible and make Game Develop crashing."
+msgid "An extension seems to be incompatible and make GDevelop crashing."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:62
-msgid "Game Develop crashed while loading this file:"
+msgid "GDevelop crashed while loading this file:"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:64
@@ -1837,8 +1837,8 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:69
 msgid ""
-"To launch Game Develop without errors,\n"
-"delete the file from the extension and relaunch Game Develop."
+"To launch GDevelop without errors,\n"
+"delete the file from the extension and relaunch GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:73
@@ -1846,7 +1846,7 @@ msgid "Report the problem to the extension's developer if possible."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:79
-msgid "Close Game Develop"
+msgid "Close GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:84
@@ -1854,11 +1854,11 @@ msgid "loadWithoutExtensionsBt"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:86
-msgid "Launch Game Develop anyway"
+msgid "Launch GDevelop anyway"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:98
-msgid "Launch Game Develop without any extension"
+msgid "Launch GDevelop without any extension"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\extensionbugreportdlg.cpp:99
@@ -1897,7 +1897,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\game_develop_editorapp.cpp:221
 msgid ""
-"It seems that Game Develop is busy and can't open the requested file.\n"
+"It seems that GDevelop is busy and can't open the requested file.\n"
 "Please close any open dialogs and retry."
 msgstr ""
 
@@ -1974,7 +1974,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\importimage.cpp:153
 msgid ""
-"Game Develop decompose spritesheets of characters\n"
+"GDevelop decompose spritesheets of characters\n"
 "with 4 directions with 4 images."
 msgstr ""
 
@@ -2862,7 +2862,7 @@ msgid "Quit"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:221
-msgid "Quit Game Develop"
+msgid "Quit GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe.cpp:227
@@ -3056,7 +3056,7 @@ msgstr ""
 msgid ""
 "Unable to find the platform associated with the template.\n"
 "\n"
-"Please report this error to Game Develop developer."
+"Please report this error to GDevelop developer."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\mainframe_files.cpp:113
@@ -3161,7 +3161,7 @@ msgid "Check for updates again"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\maj.cpp:136
-msgid "A new version of Game Develop is available !"
+msgid "A new version of GDevelop is available !"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\maj.cpp:156
@@ -3171,12 +3171,12 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\ide\maj.cpp:182
 msgid ""
 "No download link is available.\n"
-"Go on our web site so as to download the last version of Game Develop."
+"Go on our web site so as to download the last version of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\maj.cpp:216
 msgid ""
-"Game Develop will be closed at the end of the download so as to install the new version. Don't forget to save your work.\n"
+"GDevelop will be closed at the end of the download so as to install the new version. Don't forget to save your work.\n"
 "Download and install the new version ?"
 msgstr ""
 
@@ -3210,7 +3210,7 @@ msgid ""
 "-Your internet connection\n"
 "-Your firewall-If you can manually access  our site.\n"
 "\n"
-"You can disable Check for updates in the preferences of Game Develop."
+"You can disable Check for updates in the preferences of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\maj.cpp:263
@@ -3223,7 +3223,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\mp3ogg.cpp:63
 msgid ""
-"Game Develop can not read the MP3 format ( owing to license\n"
+"GDevelop can not read the MP3 format ( owing to license\n"
 "and algorithms patented by Fraunhofer-Gesellschaft ), you can\n"
 "convert a MP3 file to the free OGG Vobris format or WAV."
 msgstr ""
@@ -3267,7 +3267,7 @@ msgstr ""
 msgid ""
 "This utility uses lame.exe ( free MP3 Encoder )\n"
 "and OGGENC.EXE (free OGG Vorbis Encoder ).\n"
-"These latter are included in the Game Develop directory."
+"These latter are included in the GDevelop directory."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\mp3ogg.cpp:105
@@ -3275,8 +3275,8 @@ msgid ""
 "This utility uses lame.exe ( free MP3 Encoder )\n"
 "and OGGENC.EXE (free OGG Vorbis Encoder ).\n"
 "These latter were not detected in\n"
-"Game Develop directory. Download them or use the installer\n"
-"of Game Develop."
+"GDevelop directory. Download them or use the installer\n"
+"of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\mp3ogg.cpp:131
@@ -3293,12 +3293,12 @@ msgid "The encoding is finished. The WAV file is located in the same directory a
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:203
-msgid "Game Develop settings"
+msgid "GDevelop settings"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:214
 msgid ""
-"This window allows you to customize Game Develop. \n"
+"This window allows you to customize GDevelop. \n"
 "Each user of the computer has his own options."
 msgstr ""
 
@@ -3307,11 +3307,11 @@ msgid "Startup"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:232
-msgid "Send anonymous statistics about Game Develop ( version, language used )"
+msgid "Send anonymous statistics about GDevelop ( version, language used )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:234
-msgid "When checked, Game Develop will send some anonymous information to our server so as to get some statistics about the software"
+msgid "When checked, GDevelop will send some anonymous information to our server so as to get some statistics about the software"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:238
@@ -3439,7 +3439,7 @@ msgid "Predefined appearance "
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:363
-msgid "Game Develop Metro"
+msgid "GDevelop Metro"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:365
@@ -3447,7 +3447,7 @@ msgid "Metro White"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:367
-msgid "Game Develop Office"
+msgid "GDevelop Office"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:369
@@ -3627,7 +3627,7 @@ msgid "Edit sources"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:536
-msgid "Edit sources using internal Game Develop code editor"
+msgid "Edit sources using internal GDevelop code editor"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:541
@@ -3698,7 +3698,7 @@ msgid ": Italic"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:1040
-msgid "Game Develop must be relaunched to apply changes."
+msgid "GDevelop must be relaunched to apply changes."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\preferences.cpp:1503
@@ -3944,7 +3944,7 @@ msgid "Open a tool to convert various images format"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:401
-msgid "Open the online help for Game Develop"
+msgid "Open the online help for GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\projectmanager.cpp:437
@@ -4335,7 +4335,7 @@ msgid "NewsLink2"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:221
-msgid "If you like Game Develop, you can make a donation to the author."
+msgid "If you like GDevelop, you can make a donation to the author."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\startherepage.cpp:248
@@ -4365,7 +4365,7 @@ msgid ""
 "Error while downloading the update file.\n"
 "Please check your internet connection and your firewall.\n"
 "\n"
-"You can disable Check for updates in the preferences of Game Develop."
+"You can disable Check for updates in the preferences of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\updatechecker.cpp:61
@@ -4373,7 +4373,7 @@ msgid ""
 "Unable to connect to the server so as to check for updates.\n"
 "Please check your internet connection, your firewall and if you can go on GD website.\n"
 "\n"
-"You can disable Check for updates in the preferences of Game Develop."
+"You can disable Check for updates in the preferences of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\updatechecker.cpp:68
@@ -4381,7 +4381,7 @@ msgid ""
 "Error while loading the update file.\n"
 "Please check your internet connection and your firewall.\n"
 "\n"
-"You can disable Check for updates in the preferences of Game Develop."
+"You can disable Check for updates in the preferences of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\externallayouteditor.cpp:77
@@ -4397,7 +4397,7 @@ msgid "No layout"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\helpviewerdlg.cpp:41
-msgid "Game Develop - Online help"
+msgid "GDevelop - Online help"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\helpviewerdlg.cpp:53
@@ -4456,7 +4456,7 @@ msgid "Create the new project"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\newprojectdialog.cpp:125
-msgid "Game Develop projects"
+msgid "GDevelop projects"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\newprojectdialog.cpp:130
@@ -4655,16 +4655,16 @@ msgid "Activate the use of C++ source files"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:53
-msgid "Support Game Develop"
+msgid "Support GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:56
-msgid "Thank you for using Game Develop!"
+msgid "Thank you for using GDevelop!"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:62
 msgid ""
-"We'd love to get your feedback about Game Develop! You can write us something\n"
+"We'd love to get your feedback about GDevelop! You can write us something\n"
 "about the software:"
 msgstr ""
 
@@ -4690,17 +4690,17 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:89
 msgid ""
-"Game Develop is an open source software:\n"
+"GDevelop is an open source software:\n"
 "You can use it freely, but its development costs a\n"
 "lot of time, as well as money.\n"
 "\n"
-"If Game Develop proves to be useful to you, you\n"
+"If GDevelop proves to be useful to you, you\n"
 "can support its authors by donating or contributing\n"
 "to the project:"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:91
-msgid "Donate or contribute to Game Develop"
+msgid "Donate or contribute to GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\ide\dialogs\reminderdialog.cpp:96
@@ -7293,7 +7293,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\cppcodeevent.cpp:64
 msgid ""
 "Unable to create a virtual source file for a C++ Code event.\n"
-"Please report this error to Game Develop developer."
+"Please report this error to GDevelop developer."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\cppcodeevent.cpp:130
@@ -7565,7 +7565,7 @@ msgid "Infinite loop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\codecompiler.cpp:299
-msgid "Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every needed file are present."
+msgid "Unable to launch the internal compiler: Try to reinstall GDevelop to make sure that every needed file are present."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\codecompiler.cpp:562
@@ -7743,7 +7743,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\fullprojectcompiler.cpp:605
 msgid ""
-"Game Develop is unable to find a temporary compilation directory.\n"
+"GDevelop is unable to find a temporary compilation directory.\n"
 "If compilation fail, go in the options and choose a temporary direction where you have read and write permissions."
 msgstr ""
 
@@ -7801,7 +7801,7 @@ msgid ""
 "\n"
 "A problem when copying a file unknown:\n"
 "  -Check that the file in question exists. \n"
-"    If not, try reinstalling Game Develop\n"
+"    If not, try reinstalling GDevelop\n"
 "  -Check you have read/write permission.\n"
 "\n"
 "A problem when creating a file:\n"
@@ -7830,7 +7830,7 @@ msgid "Changes made to events will be taken into account when you switch to Edit
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:223
-msgid "Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n"
+msgid "Compilation of events failed, and scene cannot be previewed. Please report this problem to GDevelop's developer, joining this file:\n"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdcpp\gdcpp\ide\dialogs\cpplayoutpreviewer.cpp:353
@@ -8365,7 +8365,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\jscodeevent.cpp:59
 msgid ""
 "Unable to create a virtual source file for a JsCode event.\n"
-"Please report this error to Game Develop developer."
+"Please report this error to GDevelop developer."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\jscodeevent.cpp:120
@@ -8386,7 +8386,7 @@ msgstr ""
 msgid ""
 "\n"
 "\n"
-"Please report this error on the Game Develop website, or contact the extension developer if it seems related to a third party extension."
+"Please report this error on the GDevelop website, or contact the extension developer if it seems related to a third party extension."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\jsplatform.cpp:82
@@ -8657,12 +8657,12 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:156
 msgid ""
 "GameDevShare.com is a free online gaming platform for\n"
-"games created with Game Develop."
+"games created with GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:171
 msgid ""
-"Just click on the \"Export\" button and Game Develop will\n"
+"Just click on the \"Export\" button and GDevelop will\n"
 "package your game in a single zip file. Then you'll be\n"
 "asked for some information (Name of your game, your\n"
 "email address) and the game will be uploaded on the website."
@@ -8700,7 +8700,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:294
 msgid ""
-"Just click on the \"Export\" button and Game Develop will\n"
+"Just click on the \"Export\" button and GDevelop will\n"
 "package your game.\n"
 "You'll then be able to import the project into Intel XDK,\n"
 "which will allows you to compile the game into an\n"
@@ -8720,7 +8720,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\gdjs\gdjs\dialogs\gdjsdialogs.cpp:337
 msgid ""
-"Just click on the \"Export\" button and Game Develop will\n"
+"Just click on the \"Export\" button and GDevelop will\n"
 "package your game in a single zip file.\n"
 "You'll then be able to upload this file on the cloud compiler\n"
 "at cloud.ludei.com, which will allows you to compile\n"
@@ -16829,7 +16829,7 @@ msgid "Ogg Theora Video|*.ogg;*.ogv|All files|*.*"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobjecteditor.cpp:174
-msgid "ffmpeg2theora.exe executable was not found in Extensions directory of Game Develop."
+msgid "ffmpeg2theora.exe executable was not found in Extensions directory of GDevelop."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\extensions\videoobject\videoobjecteditor.cpp:178
@@ -18189,7 +18189,7 @@ msgid "Make objects moving"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:717
-msgid "Moves the objects according to the forces they have. Game Develop call this action at the end of the events by default."
+msgid "Moves the objects according to the forces they have. GDevelop call this action at the end of the events by default."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\baseobjectextension.cpp:726
@@ -20860,9 +20860,9 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\dialogs\spriteobjecteditor.cpp:1320
 msgid ""
-"The point \"Centre\" can be automatically placed by Game Develop at the center.\n"
+"The point \"Centre\" can be automatically placed by GDevelop at the center.\n"
 "Do you really want to modify the point?\n"
-"Click on yes to modify it, click on no so as let Game Develop place it."
+"Click on yes to modify it, click on no so as let GDevelop place it."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\builtinextensions\spriteextension\dialogs\spriteobjecteditor.cpp:1321
@@ -22106,7 +22106,7 @@ msgid "Rename an automatism"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\projectextensionsdialog.cpp:95
-msgid "Use extension modules for Game Develop"
+msgid "Use extension modules for GDevelop"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\projectextensionsdialog.cpp:103
@@ -22187,8 +22187,8 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\projectupdatedialog.cpp:36
 msgid ""
-"If you save your project using this version of Game Develop, you won't be able to use it with\n"
-"a previous version of Game Develop due to these changes :"
+"If you save your project using this version of GDevelop, you won't be able to use it with\n"
+"a previous version of GDevelop due to these changes :"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\ide\dialogs\projectupdatedialog.cpp:40
@@ -22556,20 +22556,20 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:500
 msgid ""
-"The version of Game Develop used to create this game seems to be a new version.\n"
-"Game Develop may fail to open the game, or data may be missing.\n"
-"You should check if a new version of Game Develop is available."
+"The version of GDevelop used to create this game seems to be a new version.\n"
+"GDevelop may fail to open the game, or data may be missing.\n"
+"You should check if a new version of GDevelop is available."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:507
 msgid ""
-"The version of Game Develop used to create this game seems to be greater.\n"
-"Game Develop may fail to open the game, or data may be missing.\n"
-"You should check if a new version of Game Develop is available."
+"The version of GDevelop used to create this game seems to be greater.\n"
+"GDevelop may fail to open the game, or data may be missing.\n"
+"You should check if a new version of GDevelop is available."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:514
-msgid "The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."
+msgid "The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop3\core\gdcore\platformdefinition\project.cpp:581

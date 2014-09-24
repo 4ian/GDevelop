@@ -18,14 +18,14 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName",      "Florian Rival"
-            VALUE "FileDescription",  "Game Develop Integrated Development Environment"
+            VALUE "FileDescription",  "GDevelop Integrated Development Environment"
             VALUE "FileVersion",      GDCore_RC_FILEVERSION_STRING
-            VALUE "InternalName",     "Game Develop IDE"
+            VALUE "InternalName",     "GDevelop IDE"
             VALUE "LegalCopyright",   "2008-2014 Florian Rival"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "GDIDE.exe"
-            VALUE "ProductName",      "Game Develop"
+            VALUE "ProductName",      "GDevelop"
             VALUE "ProductVersion",   GDCore_RC_FILEVERSION_STRING
         END
     END

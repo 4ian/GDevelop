@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -391,7 +391,7 @@ const sf::Sprite & RuntimeSpriteObject::GetCurrentSFMLSprite() const
 }
 
 /**
- * Get the ( Game Develop ) sprite
+ * Get the ( GDevelop ) sprite
  */
 const gd::Sprite & RuntimeSpriteObject::GetCurrentSprite() const
 {

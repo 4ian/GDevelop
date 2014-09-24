@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -48,7 +48,7 @@ public:
 
     /**
      * \brief Add a path where catalog are searched.
-     * \param path The path, relative to the Game Develop directory.
+     * \param path The path, relative to the GDevelop directory.
      */
     void AddPath(std::string path);
 

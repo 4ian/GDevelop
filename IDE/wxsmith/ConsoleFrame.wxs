@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxFrame" name="ConsoleFrame">
-		<title>Game Develop Console</title>
+		<title>GDevelop Console</title>
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
 		<handler function="OnClose" entry="EVT_CLOSE" />

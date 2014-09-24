@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -81,7 +81,7 @@ void MainFrame::CreateNewProject()
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
             if ( newProject->GetLayoutsCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
         }
-        else gd::LogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
+        else gd::LogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to GDevelop developer."));
     }
     else if ( dialog.UserWantToBrowseExamples() )
     {
@@ -110,7 +110,7 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     wxString oldWorkingDir = wxGetCwd();
-    wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "\"Game Develop\" Project(*.gdg)|*.gdg|\"Game Develop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
+    wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "\"GDevelop\" Project(*.gdg)|*.gdg|\"GDevelop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
@@ -132,7 +132,7 @@ void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
     #endif
 
     wxString oldWorkingDir = wxGetCwd();
-    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"Game Develop\" Project (*.gdg)|*.gdg" );
+    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"GDevelop\" Project (*.gdg)|*.gdg" );
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
@@ -267,7 +267,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-            wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+            wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
             fileDialog.ShowModal();
 
             std::string path = gd::ToString(fileDialog.GetPath());
@@ -327,7 +327,7 @@ void MainFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Display dialog box
-    wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
     fileDialog.ShowModal();
 
     std::string file = gd::ToString(fileDialog.GetPath());
@@ -348,7 +348,7 @@ void MainFrame::SaveAs()
         {
             wxRichMessageDialog dlg(this, _("Project has been saved in a new folder.\nDo you want to also copy its resources into this new folder?"), _("Saving in a new directory"), wxYES_NO|wxICON_INFORMATION );
             dlg.ShowCheckBox(_("Do not show again"));
-            //dlg.ShowDetailedText(_("Since the last versions of Game Develop, resources filenames are relative\nto the project folder, allowing to copy or move a project simply by moving the directory\nof the project, provided that resources are also in this directory."));
+            //dlg.ShowDetailedText(_("Since the last versions of GDevelop, resources filenames are relative\nto the project folder, allowing to copy or move a project simply by moving the directory\nof the project, provided that resources are also in this directory."));
 
             if ( dlg.ShowModal() == wxID_YES )
             {

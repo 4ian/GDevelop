@@ -1,5 +1,5 @@
 /** \file
- *  Game Develop
+ *  GDevelop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
@@ -11,7 +11,7 @@ namespace gd
 {
 
 /**
- * \brief Used to get information about Game Develop Core version.
+ * \brief Used to get information about GDevelop Core version.
  *
  * \ingroup Tools
  */
@@ -20,22 +20,22 @@ class GD_CORE_API VersionWrapper
 public:
 
     /**
-     * Get Game Develop Core Major version number
+     * Get GDevelop Core Major version number
      */
     static int Major();
 
     /**
-     * Get Game Develop Core Minor version number
+     * Get GDevelop Core Minor version number
      */
     static int Minor();
 
     /**
-     * Get Game Develop Core Build version number
+     * Get GDevelop Core Build version number
      */
     static int Build();
 
     /**
-     * Get Game Develop Core Revision version number
+     * Get GDevelop Core Revision version number
      */
     static int Revision();
 

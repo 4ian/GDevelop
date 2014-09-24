@@ -1,9 +1,9 @@
-Game Develop Javascript Platform
+GDevelop Javascript Platform
 ================================
 
-Game Develop Javascript Platform ( GDJS ) is a platform for developing
-HTML5/Javascript based games with Game Develop 3 ( Free game development software
-available on http://www.compilgames.net ).
+GDevelop Javascript Platform (GDJS) is a platform for developing
+HTML5/Javascript based games with GDevelop 3 (Free game development software
+available on http://www.compilgames.net).
 
 Getting started
 ---------------
@@ -24,5 +24,5 @@ or any pull request so as to add a nice feature, do not hesitate to get in touch
 License
 -------
 
-Game Develop JS Platform is distributed under the GNU LGPL license: See license.txt for
+GDevelop JS Platform is distributed under the GNU LGPL license: See license.txt for
 more information.

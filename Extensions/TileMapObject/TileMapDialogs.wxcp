@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	508,
+		"m_objCounter":	512,
 		"m_includeFiles":	["TileMapDialogsIds.h"],
 		"m_bitmapFunction":	"wxCF6DCInitBitmapResources",
 		"m_bitmapsFile":	"TileMapDialogs_wxsmith_bitmaps.cpp",
@@ -5179,7 +5179,7 @@
 								}, {
 									"type":	"string",
 									"m_label":	"Growable columns:",
-									"m_value":	"0"
+									"m_value":	"1"
 								}, {
 									"type":	"string",
 									"m_label":	"Growable rows:",
@@ -5310,7 +5310,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Label:",
-													"m_value":	"Use a predefined shape"
+													"m_value":	"Predefined shape"
 												}, {
 													"type":	"multi-string",
 													"m_label":	"Tooltip:",
@@ -5346,14 +5346,34 @@
 													"m_noBody":	false
 												}],
 											"m_children":	[]
+										}, {
+											"m_type":	4504,
+											"proportion":	0,
+											"border":	5,
+											"gbSpan":	"1,1",
+											"gbPosition":	"0,0",
+											"m_styles":	[],
+											"m_sizerFlags":	[],
+											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Name:",
+													"m_value":	"m_tbSeparator512"
+												}, {
+													"type":	"choice",
+													"m_label":	"Kind:",
+													"m_selection":	0,
+													"m_options":	["separator"]
+												}],
+											"m_events":	[],
+											"m_children":	[]
 										}]
 								}, {
-									"m_type":	4408,
+									"m_type":	4461,
 									"proportion":	0,
-									"border":	5,
+									"border":	0,
 									"gbSpan":	"1,1",
 									"gbPosition":	"0,0",
-									"m_styles":	["wxTAB_TRAVERSAL"],
+									"m_styles":	["wxTB_NODIVIDER", "wxTB_FLAT"],
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 									"m_properties":	[{
 											"type":	"winid",
@@ -5365,332 +5385,195 @@
 											"m_value":	"-1,-1"
 										}, {
 											"type":	"string",
-											"m_label":	"Minimum Size:",
-											"m_value":	"-1,-1"
+											"m_label":	"Name:",
+											"m_value":	"m_toolbar418"
 										}, {
 											"type":	"string",
-											"m_label":	"Name:",
-											"m_value":	"m_justToHideToolbar"
-										}, {
-											"type":	"multi-string",
 											"m_label":	"Tooltip:",
 											"m_value":	""
 										}, {
-											"type":	"colour",
-											"m_label":	"Bg Colour:",
-											"colour":	"<Default>"
-										}, {
-											"type":	"colour",
-											"m_label":	"Fg Colour:",
-											"colour":	"<Default>"
-										}, {
-											"type":	"font",
-											"m_label":	"Font:",
-											"m_value":	""
-										}, {
-											"type":	"bool",
-											"m_label":	"Hidden",
-											"m_value":	true
-										}, {
-											"type":	"bool",
-											"m_label":	"Disabled",
-											"m_value":	false
-										}, {
-											"type":	"bool",
-											"m_label":	"Focused",
-											"m_value":	false
+											"type":	"string",
+											"m_label":	"Bitmap Size:",
+											"m_value":	"16,16"
 										}, {
 											"type":	"string",
-											"m_label":	"Class Name:",
-											"m_value":	""
+											"m_label":	"Margins:",
+											"m_value":	"-1,-1"
 										}, {
 											"type":	"string",
-											"m_label":	"Include File:",
-											"m_value":	""
+											"m_label":	"Padding:",
+											"m_value":	"1"
 										}, {
 											"type":	"string",
-											"m_label":	"Style:",
-											"m_value":	""
+											"m_label":	"Separator Size:",
+											"m_value":	"5"
 										}],
 									"m_events":	[],
 									"m_children":	[{
-											"m_type":	4403,
-											"proportion":	1,
+											"m_type":	4462,
+											"proportion":	0,
 											"border":	5,
 											"gbSpan":	"1,1",
 											"gbPosition":	"0,0",
 											"m_styles":	[],
-											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+											"m_sizerFlags":	[],
 											"m_properties":	[{
+													"type":	"winid",
+													"m_label":	"ID:",
+													"m_winid":	"ADD_POINT_TOOL_ID"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
-													"m_value":	"flexGridSizer436"
+													"m_value":	"m_toolbarItem420"
 												}, {
 													"type":	"string",
-													"m_label":	"Style:",
+													"m_label":	"Label:",
+													"m_value":	"Add a point"
+												}, {
+													"type":	"multi-string",
+													"m_label":	"Tooltip:",
+													"m_value":	"Add a point to the collision mask"
+												}, {
+													"type":	"string",
+													"m_label":	"Help String:",
 													"m_value":	""
 												}, {
-													"type":	"string",
-													"m_label":	"# Columns:",
-													"m_value":	"2"
+													"type":	"bitmapPicker",
+													"m_label":	"Bitmap File:",
+													"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/add16.png"
 												}, {
-													"type":	"string",
-													"m_label":	"# Rows:",
-													"m_value":	"0"
+													"type":	"filePicker",
+													"m_label":	"Disabled-Bitmap File",
+													"m_path":	""
 												}, {
-													"type":	"string",
-													"m_label":	"Growable columns:",
-													"m_value":	""
+													"type":	"choice",
+													"m_label":	"Kind:",
+													"m_selection":	0,
+													"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
 												}, {
-													"type":	"string",
-													"m_label":	"Growable rows:",
-													"m_value":	""
-												}, {
-													"type":	"string",
-													"m_label":	"Horizontal gap:",
-													"m_value":	"0"
-												}, {
-													"type":	"string",
-													"m_label":	"Vertical gap:",
-													"m_value":	"0"
+													"type":	"bool",
+													"m_label":	"Construct the Dropdown Menu:",
+													"m_value":	true
 												}],
-											"m_events":	[],
-											"m_children":	[{
-													"m_type":	4461,
-													"proportion":	0,
-													"border":	5,
-													"gbSpan":	"1,1",
-													"gbPosition":	"0,0",
-													"m_styles":	["wxTB_NODIVIDER", "wxTB_FLAT"],
-													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
-													"m_properties":	[{
-															"type":	"winid",
-															"m_label":	"ID:",
-															"m_winid":	"wxID_ANY"
-														}, {
-															"type":	"string",
-															"m_label":	"Size:",
-															"m_value":	"-1,-1"
-														}, {
-															"type":	"string",
-															"m_label":	"Name:",
-															"m_value":	"m_toolbar418"
-														}, {
-															"type":	"string",
-															"m_label":	"Tooltip:",
-															"m_value":	""
-														}, {
-															"type":	"string",
-															"m_label":	"Bitmap Size:",
-															"m_value":	"16,16"
-														}, {
-															"type":	"string",
-															"m_label":	"Margins:",
-															"m_value":	"-1,-1"
-														}, {
-															"type":	"string",
-															"m_label":	"Padding:",
-															"m_value":	"1"
-														}, {
-															"type":	"string",
-															"m_label":	"Separator Size:",
-															"m_value":	"5"
-														}],
-													"m_events":	[],
-													"m_children":	[{
-															"m_type":	4462,
-															"proportion":	0,
-															"border":	5,
-															"gbSpan":	"1,1",
-															"gbPosition":	"0,0",
-															"m_styles":	[],
-															"m_sizerFlags":	[],
-															"m_properties":	[{
-																	"type":	"winid",
-																	"m_label":	"ID:",
-																	"m_winid":	"ADD_POINT_TOOL_ID"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Name:",
-																	"m_value":	"m_toolbarItem420"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Label:",
-																	"m_value":	"Add a point"
-																}, {
-																	"type":	"multi-string",
-																	"m_label":	"Tooltip:",
-																	"m_value":	"Add a point to the collision mask"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Help String:",
-																	"m_value":	""
-																}, {
-																	"type":	"bitmapPicker",
-																	"m_label":	"Bitmap File:",
-																	"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/add16.png"
-																}, {
-																	"type":	"filePicker",
-																	"m_label":	"Disabled-Bitmap File",
-																	"m_path":	""
-																}, {
-																	"type":	"choice",
-																	"m_label":	"Kind:",
-																	"m_selection":	0,
-																	"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
-																}, {
-																	"type":	"bool",
-																	"m_label":	"Construct the Dropdown Menu:",
-																	"m_value":	true
-																}],
-															"m_events":	[],
-															"m_children":	[]
-														}, {
-															"m_type":	4462,
-															"proportion":	0,
-															"border":	5,
-															"gbSpan":	"1,1",
-															"gbPosition":	"0,0",
-															"m_styles":	[],
-															"m_sizerFlags":	[],
-															"m_properties":	[{
-																	"type":	"winid",
-																	"m_label":	"ID:",
-																	"m_winid":	"EDIT_POINT_TOOL_ID"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Name:",
-																	"m_value":	"m_toolbarItem422"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Label:",
-																	"m_value":	"Edit point position..."
-																}, {
-																	"type":	"multi-string",
-																	"m_label":	"Tooltip:",
-																	"m_value":	"Edit the selected point position..."
-																}, {
-																	"type":	"string",
-																	"m_label":	"Help String:",
-																	"m_value":	""
-																}, {
-																	"type":	"bitmapPicker",
-																	"m_label":	"Bitmap File:",
-																	"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/edit16.png"
-																}, {
-																	"type":	"filePicker",
-																	"m_label":	"Disabled-Bitmap File",
-																	"m_path":	""
-																}, {
-																	"type":	"choice",
-																	"m_label":	"Kind:",
-																	"m_selection":	0,
-																	"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
-																}, {
-																	"type":	"bool",
-																	"m_label":	"Construct the Dropdown Menu:",
-																	"m_value":	true
-																}],
-															"m_events":	[],
-															"m_children":	[]
-														}, {
-															"m_type":	4462,
-															"proportion":	0,
-															"border":	5,
-															"gbSpan":	"1,1",
-															"gbPosition":	"0,0",
-															"m_styles":	[],
-															"m_sizerFlags":	[],
-															"m_properties":	[{
-																	"type":	"winid",
-																	"m_label":	"ID:",
-																	"m_winid":	"REMOVE_POINT_TOOL_ID"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Name:",
-																	"m_value":	"m_toolbarItem426"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Label:",
-																	"m_value":	"Remove selected point"
-																}, {
-																	"type":	"multi-string",
-																	"m_label":	"Tooltip:",
-																	"m_value":	"Removes the selected point"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Help String:",
-																	"m_value":	""
-																}, {
-																	"type":	"bitmapPicker",
-																	"m_label":	"Bitmap File:",
-																	"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/remove16.png"
-																}, {
-																	"type":	"filePicker",
-																	"m_label":	"Disabled-Bitmap File",
-																	"m_path":	""
-																}, {
-																	"type":	"choice",
-																	"m_label":	"Kind:",
-																	"m_selection":	0,
-																	"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
-																}, {
-																	"type":	"bool",
-																	"m_label":	"Construct the Dropdown Menu:",
-																	"m_value":	true
-																}],
-															"m_events":	[],
-															"m_children":	[]
-														}, {
-															"m_type":	4462,
-															"proportion":	0,
-															"border":	5,
-															"gbSpan":	"1,1",
-															"gbPosition":	"0,0",
-															"m_styles":	[],
-															"m_sizerFlags":	[],
-															"m_properties":	[{
-																	"type":	"winid",
-																	"m_label":	"ID:",
-																	"m_winid":	"RESET_MASK_TOOL_ID"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Name:",
-																	"m_value":	"m_toolbarItem432"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Label:",
-																	"m_value":	"Reset to the default collision mask"
-																}, {
-																	"type":	"multi-string",
-																	"m_label":	"Tooltip:",
-																	"m_value":	"Reset the tile collision mask to the default one"
-																}, {
-																	"type":	"string",
-																	"m_label":	"Help String:",
-																	"m_value":	""
-																}, {
-																	"type":	"bitmapPicker",
-																	"m_label":	"Bitmap File:",
-																	"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/undo16.png"
-																}, {
-																	"type":	"filePicker",
-																	"m_label":	"Disabled-Bitmap File",
-																	"m_path":	""
-																}, {
-																	"type":	"choice",
-																	"m_label":	"Kind:",
-																	"m_selection":	0,
-																	"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
-																}, {
-																	"type":	"bool",
-																	"m_label":	"Construct the Dropdown Menu:",
-																	"m_value":	true
-																}],
-															"m_events":	[],
-															"m_children":	[]
-														}]
-												}]
+											"m_events":	[{
+													"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+													"m_eventClass":	"wxCommandEvent",
+													"m_eventHandler":	"wxCommandEventHandler",
+													"m_functionNameAndSignature":	"OnAddPointToolClicked(wxCommandEvent& event)",
+													"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+													"m_noBody":	false
+												}],
+											"m_children":	[]
+										}, {
+											"m_type":	4462,
+											"proportion":	0,
+											"border":	5,
+											"gbSpan":	"1,1",
+											"gbPosition":	"0,0",
+											"m_styles":	[],
+											"m_sizerFlags":	[],
+											"m_properties":	[{
+													"type":	"winid",
+													"m_label":	"ID:",
+													"m_winid":	"EDIT_POINT_TOOL_ID"
+												}, {
+													"type":	"string",
+													"m_label":	"Name:",
+													"m_value":	"m_toolbarItem422"
+												}, {
+													"type":	"string",
+													"m_label":	"Label:",
+													"m_value":	"Edit point position..."
+												}, {
+													"type":	"multi-string",
+													"m_label":	"Tooltip:",
+													"m_value":	"Edit the selected point position..."
+												}, {
+													"type":	"string",
+													"m_label":	"Help String:",
+													"m_value":	""
+												}, {
+													"type":	"bitmapPicker",
+													"m_label":	"Bitmap File:",
+													"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/edit16.png"
+												}, {
+													"type":	"filePicker",
+													"m_label":	"Disabled-Bitmap File",
+													"m_path":	""
+												}, {
+													"type":	"choice",
+													"m_label":	"Kind:",
+													"m_selection":	0,
+													"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+												}, {
+													"type":	"bool",
+													"m_label":	"Construct the Dropdown Menu:",
+													"m_value":	true
+												}],
+											"m_events":	[{
+													"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+													"m_eventClass":	"wxCommandEvent",
+													"m_eventHandler":	"wxCommandEventHandler",
+													"m_functionNameAndSignature":	"OnEditPointToolClicked(wxCommandEvent& event)",
+													"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+													"m_noBody":	false
+												}],
+											"m_children":	[]
+										}, {
+											"m_type":	4462,
+											"proportion":	0,
+											"border":	5,
+											"gbSpan":	"1,1",
+											"gbPosition":	"0,0",
+											"m_styles":	[],
+											"m_sizerFlags":	[],
+											"m_properties":	[{
+													"type":	"winid",
+													"m_label":	"ID:",
+													"m_winid":	"REMOVE_POINT_TOOL_ID"
+												}, {
+													"type":	"string",
+													"m_label":	"Name:",
+													"m_value":	"m_toolbarItem426"
+												}, {
+													"type":	"string",
+													"m_label":	"Label:",
+													"m_value":	"Remove selected point"
+												}, {
+													"type":	"multi-string",
+													"m_label":	"Tooltip:",
+													"m_value":	"Removes the selected point"
+												}, {
+													"type":	"string",
+													"m_label":	"Help String:",
+													"m_value":	""
+												}, {
+													"type":	"bitmapPicker",
+													"m_label":	"Bitmap File:",
+													"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/remove16.png"
+												}, {
+													"type":	"filePicker",
+													"m_label":	"Disabled-Bitmap File",
+													"m_path":	""
+												}, {
+													"type":	"choice",
+													"m_label":	"Kind:",
+													"m_selection":	0,
+													"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+												}, {
+													"type":	"bool",
+													"m_label":	"Construct the Dropdown Menu:",
+													"m_value":	true
+												}],
+											"m_events":	[{
+													"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+													"m_eventClass":	"wxCommandEvent",
+													"m_eventHandler":	"wxCommandEventHandler",
+													"m_functionNameAndSignature":	"OnRemovePointToolClicked(wxCommandEvent& event)",
+													"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+													"m_noBody":	false
+												}],
+											"m_children":	[]
 										}]
 								}]
 						}, {
@@ -5779,6 +5662,27 @@
 									"m_eventHandler":	"wxEraseEventHandler",
 									"m_functionNameAndSignature":	"OnPreviewErase(wxEraseEvent& event)",
 									"m_description":	"Process a wxEVT_ERASE_BACKGROUND event.",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_LEFT_DOWN",
+									"m_eventClass":	"wxMouseEvent",
+									"m_eventHandler":	"wxMouseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewLeftDown(wxMouseEvent& event)",
+									"m_description":	"Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_LEFT_UP",
+									"m_eventClass":	"wxMouseEvent",
+									"m_eventHandler":	"wxMouseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewLeftUp(wxMouseEvent& event)",
+									"m_description":	"Process a wxEVT_LEFT_UP event.",
+									"m_noBody":	false
+								}, {
+									"m_eventName":	"wxEVT_MOTION",
+									"m_eventClass":	"wxMouseEvent",
+									"m_eventHandler":	"wxMouseEventHandler",
+									"m_functionNameAndSignature":	"OnPreviewMotion(wxMouseEvent& event)",
+									"m_description":	"Process a wxEVT_MOTION event",
 									"m_noBody":	false
 								}],
 							"m_children":	[]

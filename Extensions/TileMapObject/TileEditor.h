@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #define TILEEDITOR_H
 
 #include <wx/menu.h>
+#include "GDCore/IDE/Dialogs/PolygonEditionHelper.h"
 
 #include "TileMapDialogs.h"
 #include "TileSet.h"
@@ -49,7 +50,20 @@ private:
 
 	wxMenu *m_predefinedShapesMenu;
 
+    float m_xOffset;
+    float m_yOffset;
+
+    gd::PolygonEditionHelper m_polygonHelper;
+
+    wxPoint GetRealPosition(wxPoint absolutePos);
+
 protected:
+    virtual void OnPreviewLeftDown(wxMouseEvent& event);
+    virtual void OnPreviewLeftUp(wxMouseEvent& event);
+    virtual void OnPreviewMotion(wxMouseEvent& event);
+    virtual void OnAddPointToolClicked(wxCommandEvent& event);
+    virtual void OnEditPointToolClicked(wxCommandEvent& event);
+    virtual void OnRemovePointToolClicked(wxCommandEvent& event);
     virtual void OnPredefinedShapeToolClicked(wxCommandEvent& event);
     virtual void OnCollidableToolToggled(wxCommandEvent& event);
     virtual void OnPreviewErase(wxEraseEvent& event);

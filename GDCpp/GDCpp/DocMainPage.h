@@ -4,7 +4,7 @@
  * \section welcome Welcome
  * This is the help file for the GDevelop C++ Platform, which contains a reference of all the features provided
  * by the C++ Platform and explains how to create extensions for this platform.<br>
- * Creating extensions need some knowledge in C++ language. %GDevelop use mainly SFML, Boost and wxWidgets libraries.
+ * Creating extensions need some knowledge in C++ language. GDevelop use mainly SFML, Boost and wxWidgets libraries.
  *
  * ### GDevelop Core documentation
  * Some classes and features are provided by the *GDevelop Core library*: When you're working with a class in the <code>gd</code>
@@ -68,7 +68,7 @@
  *
  * \section aboutBoostShared_ptr About Boost shared pointers
  *
- * %GDevelop use shared pointers ( boost::shared_ptr ), for scenes or objects for example. <br>
+ * GDevelop use shared pointers ( boost::shared_ptr ), for scenes or objects for example. <br>
  * Shared pointers are used like raw pointers ( *myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object... ).
  * They doesn't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
  * Thus, scenes for instance don't have to manually delete the objects they own in their destructors.

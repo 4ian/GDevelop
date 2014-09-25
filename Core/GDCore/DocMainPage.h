@@ -14,14 +14,14 @@
  * First, please refer to these pages to install the required tools and to get help about setting up a basic extension:<br>
  *
  * -# \subpage setupDevEnv
- * -# \subpage overview
- * -# \subpage writeANewExtension
+ * -# \ref overview
+ * -# \ref writeANewExtension
  *
  * You can also read \subpage recommendedToolsAndConventions.
  *
  * \section aboutdoc About this documentation
  *
- * If you never used GDevelop Core before, take a look at \subpage overview.
+ * If you never used GDevelop Core before, take a look at \ref overview.
  *
  * As everything that is developed around GDevelop is based on this library, you should take a look at it quite often: platforms, extensions
  * and the IDE are intensively using the classes and tools offered by GDCore.
@@ -37,7 +37,7 @@
  *
  * <b>Windows</b>
  *
- * Follow these three step to be able to compile %GDevelop and the extensions:
+ * Follow these three step to be able to compile GDevelop and the extensions:
  * -# \subpage installWinLibs
  * -# \subpage installWinCompiler
  * -# \ref installAndUseCMake
@@ -54,11 +54,11 @@
 /**
  *  \page installWinLibs (Windows) Download and install SFML, wxWidgets and Boost
  *
- * %GDevelop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of %GDevelop and
- * the extensions, %GDevelop require the extensions to use the same version of the libraries.
+ * GDevelop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of GDevelop and
+ * the extensions, GDevelop require the extensions to use the same version of the libraries.
  * \section download Download
 
- * You can download the specific versions of the libraries used by the current version of %GDevelop using these links:<br>
+ * You can download the specific versions of the libraries used by the current version of GDevelop using these links:<br>
  * - http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
  * - http://www.compilgames.net/code/GameDevelopSDK/wxwidgets.7z
  * - http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z
@@ -66,7 +66,7 @@
  * They are already built for windows, and for an use with the TDM-GCC compiler.
  *
  * \section uncompress Uncompress
- * By default, %GDevelop projects search the libraries in the ExtLibs
+ * By default, GDevelop projects search the libraries in the ExtLibs
  * (located at the root of the SDK) directory ( ExtLibs/SFML, ExtLibs/wxWidgets... ).<br>
  * Uncompress the libraries in this directory.
  */
@@ -74,13 +74,13 @@
 /**
  *  \page installWinCompiler (Windows) Install TDM-GCC compiler
  *
- * %GDevelop is compiled with TDM-GCC under Windows.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %GDevelop and
- * the compiler used by the extensions, %GDevelop require the extensions and the platforms to use the same version of TDM-GCC.<br>
+ * GDevelop is compiled with TDM-GCC under Windows.<br>
+ * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by GDevelop and
+ * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of TDM-GCC.<br>
  *
  * \section installWinCompiler_download Download
  *
- * The current version of the compiler used by %GDevelop can be found and downloaded on the website : http://www.compilgames.net
+ * The current version of the compiler used by GDevelop can be found and downloaded on the website : http://www.compilgames.net
  *
  * \section installWinCompiler_install Installation
  *
@@ -171,13 +171,13 @@
  *
  * \section download Download, (build) and install libraries
  *
- * %GDevelop is compiled with gcc under Linux.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %GDevelop and
- * the compiler used by the extensions, %GDevelop require the extensions and the platforms to use the same version of gcc.<br>
+ * GDevelop is compiled with gcc under Linux.<br>
+ * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by GDevelop and
+ * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of gcc.<br>
  *
  * \subsection sfml SFML
  *
- * %GDevelop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
+ * GDevelop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
  *
  * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which GDevelop is distributed officially:
  *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs.
@@ -188,11 +188,11 @@
  *
  * \subsection boost Boost
 
- * Boost version used by %GDevelop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
+ * Boost version used by GDevelop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
  * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
  * \subsection wxWidgets wxWidgets
 
- * wxWidgets version used by %GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2 <br>
+ * wxWidgets version used by GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2 <br>
  * First extract the archive inside the folder ExtLibs.
  *
  * Be sure to have GTK+ 3.0 and WebKitGTK development files installed:
@@ -374,7 +374,7 @@ sudo apt-get install libfreetype6-dev
  * }
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * The platform dynamic library file is often located inside <i>GDevelop directory</i>/*xxx*Platform (*xxx* being replaced by the platform acronym).
+ * The platform dynamic library file is often located inside <i>GDevelop directory</i>/xxxPlatform (*xxx* being replaced by the platform acronym).
  *
  * In this folder, the platform can store basically anything it needs. For example, both GDJS and GDCpp are storing a folder called *Runtime* containing
  * the game engine.
@@ -431,7 +431,7 @@ sudo apt-get install libfreetype6-dev
  *
  * \section writeANewExtension_installExtension Use the extension with GDevelop
  *
- * To make your extension usable with %GDevelop, you have to:
+ * To make your extension usable with GDevelop, you have to:
  * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *GDevelop folder*.
  * -# For the C++ platform, copy **all needed include file** (.h files) inside a folder with the name of your extension located into <i>(GDevelop folder)/CppPlatform/Extensions/include</i>.<br>
  *  You can use a *small script* (batch file on Windows) to copy all the needed includes files in a single click.<br>

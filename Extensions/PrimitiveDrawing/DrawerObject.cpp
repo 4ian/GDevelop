@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Primitive Drawing Extension
+GDevelop - Primitive Drawing Extension
 Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -375,7 +375,7 @@ RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyDrawerObject(gd::Object * object)
@@ -385,7 +385,7 @@ void DestroyDrawerObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateDrawerObject(std::string name)
 {

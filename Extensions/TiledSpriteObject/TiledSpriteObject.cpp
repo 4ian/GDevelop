@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tiled Sprite Extension
+GDevelop - Tiled Sprite Extension
 Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
 Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 
@@ -228,7 +228,7 @@ RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::O
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyTiledSpriteObject(gd::Object * object)
@@ -238,7 +238,7 @@ void DestroyTiledSpriteObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateTiledSpriteObject(std::string name)
 {

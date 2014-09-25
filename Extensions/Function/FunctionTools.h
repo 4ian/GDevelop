@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Function Extension
+GDevelop - Function Extension
 Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied

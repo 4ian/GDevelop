@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -22,7 +22,7 @@ namespace gd
 
 /**
  * \brief Singleton class which can be used by the IDE and the editors to access to a (fake) clipboard.
- * 
+ *
  * All objects stored in this clipboard are stored by copy. Getter returns a copy of the stored objects,
  * and can only be called if "Has" method returns true (otherwise, behavior is undefined).
  */
@@ -35,8 +35,8 @@ public:
     static Clipboard * Get();
 
     /**
-     * @brief Destroy the unique clipboard instance. 
-     * 
+     * @brief Destroy the unique clipboard instance.
+     *
      * No need to call this method except at the end of the application.
      */
     static void DestroySingleton();

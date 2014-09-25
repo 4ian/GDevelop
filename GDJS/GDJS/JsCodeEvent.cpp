@@ -1,5 +1,5 @@
 /** \file
- *  Game Develop
+ *  GDevelop
  *  2008-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 
@@ -56,7 +56,7 @@ void JsCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & project, st
 
     if (sourceFile == boost::shared_ptr<gd::SourceFile>() )
     {
-        gd::LogError(_("Unable to create a virtual source file for a JsCode event.\nPlease report this error to Game Develop developer."));
+        gd::LogError(_("Unable to create a virtual source file for a JsCode event.\nPlease report this error to GDevelop developer."));
         return;
     }
 

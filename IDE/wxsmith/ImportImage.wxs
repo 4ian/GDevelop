@@ -132,7 +132,7 @@
 										<growablerows>4</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText9" member="yes">
-												<label>Game Develop decompose spritesheets of characters&#x0A;with 4 directions with 4 images.</label>
+												<label>GDevelop decompose spritesheets of characters&#x0A;with 4 directions with 4 images.</label>
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>

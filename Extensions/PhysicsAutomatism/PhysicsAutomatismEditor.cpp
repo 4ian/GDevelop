@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Physics Automatism Extension
+GDevelop - Physics Automatism Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -253,7 +253,7 @@ scene(scene_)
 	linearDampingEdit->SetValue(ToString(automatism.linearDamping));
 	angularDampingEdit->SetValue(ToString(automatism.angularDamping));
 
-	if ( game_.GetCurrentPlatform().GetName() == "Game Develop JS platform" )
+	if ( game_.GetCurrentPlatform().GetName() == "GDevelop JS platform" )
     {
         polygonCheck->Hide();
         polygonBt->Hide();

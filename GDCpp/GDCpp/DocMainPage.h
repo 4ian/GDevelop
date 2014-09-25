@@ -1,13 +1,13 @@
 /**
- * \mainpage Game Develop C++ Platform
+ * \mainpage GDevelop C++ Platform
  * \image html gdlogo.png
  * \section welcome Welcome
- * This is the help file for the Game Develop C++ Platform, which contains a reference of all the features provided
+ * This is the help file for the GDevelop C++ Platform, which contains a reference of all the features provided
  * by the C++ Platform and explains how to create extensions for this platform.<br>
- * Creating extensions need some knowledge in C++ language. %Game Develop use mainly SFML, Boost and wxWidgets libraries.
+ * Creating extensions need some knowledge in C++ language. GDevelop use mainly SFML, Boost and wxWidgets libraries.
  *
- * ### Game Develop Core documentation
- * Some classes and features are provided by the *Game Develop Core library*: When you're working with a class in the <code>gd</code>
+ * ### GDevelop Core documentation
+ * Some classes and features are provided by the *GDevelop Core library*: When you're working with a class in the <code>gd</code>
  * namespace, read the [GDCore documentation here](../GDCore Documentation/index.html).
  *
  * \section gettingstarted Getting started
@@ -30,7 +30,7 @@
  *
  * \section storageAndIdeClasses Some important classes used by the IDE or for storage
  *
- * The C++ platform also make uses of some classes provide by Game Develop Core: These classes are in the namespace <i>gd</i>.<br>
+ * The C++ platform also make uses of some classes provide by GDevelop Core: These classes are in the namespace <i>gd</i>.<br>
  * <br>
  * It is important to make the distinction between the classes used by the IDE or for storage only and the classes used by the game engine.<br>
  * When a game is being played, it is first loaded using the classes listed below. Then, in a second part, the game engine classes are initialized, most
@@ -45,7 +45,7 @@
  *
  * \subsection scene gd::Layout
  *
- * A scene is called a <i>layout</i> in Game Develop Core. It is used only for storage or by the IDE: It contains the objects and the initial instances
+ * A scene is called a <i>layout</i> in GDevelop Core. It is used only for storage or by the IDE: It contains the objects and the initial instances
  * of a scene. gd::Layout classes representing the scenes of a game are stored inside a gd::Project.<br>
  * RuntimeScene are <b>not</b> stored inside a gd::Project. RuntimeScene is a <i>runtime</i> class used only by the game engine.
  *
@@ -64,11 +64,11 @@
  * Each event type is represented by a class, which define how the event is rendered ( BaseEvent::Render ), how the code is generated ( BaseEvent::GenerateEventCode ), and various properties ( BaseEvent::CanHaveSubEvents for example )...<br>
  * As the other classes list in this section, this class is only at <i>edittime</i> used by the IDE.
  *
- * The classes described in this section are not documented here: Please refer to the documentation of <b>Game Develop Core</b> if you need help using them.
+ * The classes described in this section are not documented here: Please refer to the documentation of <b>GDevelop Core</b> if you need help using them.
  *
  * \section aboutBoostShared_ptr About Boost shared pointers
  *
- * %Game Develop use shared pointers ( boost::shared_ptr ), for scenes or objects for example. <br>
+ * GDevelop use shared pointers ( boost::shared_ptr ), for scenes or objects for example. <br>
  * Shared pointers are used like raw pointers ( *myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object... ).
  * They doesn't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
  * Thus, scenes for instance don't have to manually delete the objects they own in their destructors.
@@ -98,7 +98,7 @@
  */
 
 /**
- * \defgroup BuiltinExtensions Standard Game Develop extensions
+ * \defgroup BuiltinExtensions Standard GDevelop extensions
  */
 
 /**

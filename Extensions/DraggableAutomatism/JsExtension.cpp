@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Draggable Automatism Extension
+GDevelop - Draggable Automatism Extension
 Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -66,7 +66,7 @@ extern "C" gd::PlatformExtension * CreateGDJSDraggableAutomatismExtension() {
 }
 #else
 /**
- * Used by Game Develop to create the extension class
+ * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
@@ -74,7 +74,7 @@ extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
 }
 
 /**
- * Used by Game Develop to destroy the extension class
+ * Used by GDevelop to destroy the extension class
  * -- Do not need to be modified. --
  */
 extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {

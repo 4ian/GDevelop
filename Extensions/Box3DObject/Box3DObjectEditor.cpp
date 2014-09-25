@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Box 3D Extension
+GDevelop - Box 3D Extension
 Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied

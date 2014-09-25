@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -26,10 +26,10 @@ freely, subject to the following restrictions:
 
 #include "TileMapConfigurationEditor.h"
 
-#include <wx/msgdlg.h> 
+#include <wx/msgdlg.h>
 #include "GDCore/Tools/HelpFileAccess.h"
 
-TileMapConfigurationEditor::TileMapConfigurationEditor(wxWindow* parent, TileMap &tileMap_) : 
+TileMapConfigurationEditor::TileMapConfigurationEditor(wxWindow* parent, TileMap &tileMap_) :
 	TileMapConfigurationEditorBase(parent),
 	tileMap(tileMap_)
 {
@@ -54,7 +54,7 @@ void TileMapConfigurationEditor::OnOkPressed(wxCommandEvent& event)
 
 	if(newMapWidth < tileMap.GetColumnsCount() || newMapHeight < tileMap.GetRowsCount())
 	{
-		//The tilemap will be smaller (less columns, less rows or both), 
+		//The tilemap will be smaller (less columns, less rows or both),
 		//warn the user about the possible loss of data
 		if(wxMessageBox(_("The map will be smaller after that change. You can possibly lose data.\nAre you sure to continue ?"),
 						_("Map size"),

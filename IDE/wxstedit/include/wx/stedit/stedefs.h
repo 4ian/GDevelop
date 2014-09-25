@@ -9,7 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Updated by Florian Rival to use the library directly in Game Develop
+ * Updated by Florian Rival to use the library directly in GDevelop
  * ( Commented out some defines -- see below )
  */
 
@@ -56,7 +56,7 @@
 // These are our DLL macros (see the contrib libs like wxPlot)
 //-----------------------------------------------------------------------------
 /**
- * Updated by Florian Rival to use the library directly in Game Develop
+ * Updated by Florian Rival to use the library directly in GDevelop
  */
 /*
 #ifdef WXMAKINGDLL_STEDIT

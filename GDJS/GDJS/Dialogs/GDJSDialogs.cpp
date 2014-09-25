@@ -153,7 +153,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
 
     flexGridSizer63->Add(m_staticBitmap57, 0, wxALL, 0);
 
-    m_staticText65 = new wxStaticText(m_panel63, wxID_ANY, _("GameDevShare.com is a free online gaming platform for\ngames created with Game Develop."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_CENTRE);
+    m_staticText65 = new wxStaticText(m_panel63, wxID_ANY, _("GameDevShare.com is a free online gaming platform for\ngames created with GDevelop."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_CENTRE);
 
     flexGridSizer55->Add(m_staticText65, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_TOP, 10);
 
@@ -168,7 +168,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
 
     staticBoxSizer110->Add(flexGridSizer116, 1, wxALL|wxEXPAND, 0);
 
-    m_staticText67 = new wxStaticText(m_panel63, wxID_ANY, _("Just click on the \"Export\" button and Game Develop will\npackage your game in a single zip file. Then you'll be\nasked for some information (Name of your game, your\nemail address) and the game will be uploaded on the website."), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText67 = new wxStaticText(m_panel63, wxID_ANY, _("Just click on the \"Export\" button and GDevelop will\npackage your game in a single zip file. Then you'll be\nasked for some information (Name of your game, your\nemail address) and the game will be uploaded on the website."), wxDefaultPosition, wxSize(-1,-1), 0);
 
     flexGridSizer116->Add(m_staticText67, 0, wxALL|wxEXPAND|wxALIGN_CENTER, 5);
 
@@ -291,7 +291,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
 
     staticBoxSizer1126->Add(flexGridSizer1147, 1, wxALL|wxEXPAND, 0);
 
-    m_staticText6768 = new wxStaticText(m_panel118, wxID_ANY, _("Just click on the \"Export\" button and Game Develop will\npackage your game.\nYou'll then be able to import the project into Intel XDK,\nwhich will allows you to compile the game into an\niOS and Android application."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_LEFT);
+    m_staticText6768 = new wxStaticText(m_panel118, wxID_ANY, _("Just click on the \"Export\" button and GDevelop will\npackage your game.\nYou'll then be able to import the project into Intel XDK,\nwhich will allows you to compile the game into an\niOS and Android application."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_LEFT);
 
     flexGridSizer1147->Add(m_staticText6768, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, 5);
 
@@ -334,7 +334,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
 
     staticBoxSizer112->Add(flexGridSizer114, 1, wxALL|wxEXPAND, 0);
 
-    m_staticText676 = new wxStaticText(m_panel71, wxID_ANY, _("Just click on the \"Export\" button and Game Develop will\npackage your game in a single zip file.\nYou'll then be able to upload this file on the cloud compiler\nat cloud.ludei.com, which will allows you to compile\nthe game into an iOS/Android app."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_LEFT);
+    m_staticText676 = new wxStaticText(m_panel71, wxID_ANY, _("Just click on the \"Export\" button and GDevelop will\npackage your game in a single zip file.\nYou'll then be able to upload this file on the cloud compiler\nat cloud.ludei.com, which will allows you to compile\nthe game into an iOS/Android app."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_LEFT);
 
     flexGridSizer114->Add(m_staticText676, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, 5);
 

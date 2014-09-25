@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -1360,7 +1360,7 @@ void LayoutEditorCanvas::OnRedoBtClick( wxCommandEvent & event )
 }
 
 /**
- * Toggle Game Develop full screen mode.
+ * Toggle GDevelop full screen mode.
  */
 void LayoutEditorCanvas::OnFullScreenBtClick(wxCommandEvent & event)
 {

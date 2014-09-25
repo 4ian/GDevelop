@@ -1,5 +1,5 @@
 /*
- * Game Develop JS Platform
+ * GDevelop JS Platform
  * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -36,7 +36,7 @@ gdjs.evtTools.storage.loadJSONFileFromStorage = function(filename) {
 };
 
 /**
- * Unload from memory a JSON object, which is then stored in the local storage 
+ * Unload from memory a JSON object, which is then stored in the local storage
  * object provided by the browser.
  * The JSON object is named GDJS_filename in the localStorage object.
  *
@@ -66,13 +66,13 @@ gdjs.evtTools.storage.clearJSONFile = function(filename) {
 		notPermanentlyLoaded = true;
 		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
 	}
-    
+
     var JSONobject = gdjs.evtTools.storage.loadedFiles.get(filename);
     for ( var p in JSONobject ) {
         if ( JSONobject.hasOwnProperty(p) )
             delete JSONobject[p];
     }
-    
+
 	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 	return true;
 };
@@ -92,7 +92,7 @@ gdjs.evtTools.storage.elementExistsInJSONFile = function(filename, element) {
 			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
-		
+
 		currentElem = currentElem[elemArray[i]];
 	}
 
@@ -115,7 +115,7 @@ gdjs.evtTools.storage.deleteElementFromJSONFile = function(filename, element) {
 			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
-		
+
 		if ( i == elemArray.length-1)
 			delete currentElem[elemArray[i]];
 		else
@@ -138,7 +138,7 @@ gdjs.evtTools.storage.writeNumberInJSONFile = function(filename, element, val) {
 	for (var i =0;i<elemArray.length;++i) {
 
 		if ( !currentElem[elemArray[i]] ) currentElem[elemArray[i]] = {};
-		
+
 		if ( i == elemArray.length-1)
 			currentElem[elemArray[i]].value = val;
 		else
@@ -161,7 +161,7 @@ gdjs.evtTools.storage.writeStringInJSONFile = function(filename, element, str) {
 	for (var i =0;i<elemArray.length;++i) {
 
 		if ( !currentElem[elemArray[i]] ) currentElem[elemArray[i]] = {};
-		
+
 		if ( i == elemArray.length-1)
 			currentElem[elemArray[i]].str = str;
 		else
@@ -187,7 +187,7 @@ gdjs.evtTools.storage.readNumberFromJSONFile = function(filename, element, runti
 			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
-		
+
 		if ( i == elemArray.length-1 && currentElem[elemArray[i]].value)
 			variable.setNumber(currentElem[elemArray[i]].value);
 		else
@@ -213,7 +213,7 @@ gdjs.evtTools.storage.readStringFromJSONFile = function(filename, element, runti
 			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
-		
+
 		if ( i == elemArray.length-1 && currentElem[elemArray[i]].str)
 			variable.setString(currentElem[elemArray[i]].str);
 		else

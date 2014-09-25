@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -73,7 +73,7 @@ CompilationErrorDialog::CompilationErrorDialog(wxWindow* parent, string report)
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A problem when copying a known file:\n  -Check that your file (image, sound ...) exists.\n  -Check you have read/write permission. \n\nA problem when copying a file unknown:\n  -Check that the file in question exists. \n    If not, try reinstalling Game Develop\n  -Check you have read/write permission.\n\nA problem when creating a file:\n  -Make sure you have read/write\n   permission."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A problem when copying a known file:\n  -Check that your file (image, sound ...) exists.\n  -Check you have read/write permission. \n\nA problem when copying a file unknown:\n  -Check that the file in question exists. \n    If not, try reinstalling GDevelop\n  -Check you have read/write permission.\n\nA problem when creating a file:\n  -Make sure you have read/write\n   permission."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

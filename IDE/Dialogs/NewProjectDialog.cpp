@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -122,7 +122,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     //Get the base folder for the new projects
     wxConfigBase::Get()->Read("/Dossier/NewProjectDefaultFolder", &newProjectBaseFolder);
     if ( newProjectBaseFolder.empty() ) newProjectBaseFolder = wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+
-                                                               _("Game Develop projects")+wxFileName::GetPathSeparator();
+                                                               _("GDevelop projects")+wxFileName::GetPathSeparator();
     newProjectBaseFolder = wxFileName::FileName(newProjectBaseFolder).GetPath(); //Normalize.
 
     //Create a filename for the project
@@ -319,7 +319,7 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
 
 void NewProjectDialog::OnbrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choose a file for the project" ), newProjectBaseFolder, _("Project.gdg"), "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog dialog( this, _( "Choose a file for the project" ), newProjectBaseFolder, _("Project.gdg"), "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
 
     if ( dialog.ShowModal() != wxID_CANCEL )
     {

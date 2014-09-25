@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -60,7 +60,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/mp3ogg.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop can not read the MP3 format ( owing to license\nand algorithms patented by Fraunhofer-Gesellschaft ), you can\nconvert a MP3 file to the free OGG Vobris format or WAV."), wxDefaultPosition, wxSize(336,54), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("GDevelop can not read the MP3 format ( owing to license\nand algorithms patented by Fraunhofer-Gesellschaft ), you can\nconvert a MP3 file to the free OGG Vobris format or WAV."), wxDefaultPosition, wxSize(336,54), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -82,7 +82,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	StaticBoxSizer2->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Note"));
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("This utility uses lame.exe ( free MP3 Encoder )\nand OGGENC.EXE (free OGG Vorbis Encoder ).\nThese latter are included in the Game Develop directory."), wxDefaultPosition, wxSize(331,61), 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("This utility uses lame.exe ( free MP3 Encoder )\nand OGGENC.EXE (free OGG Vorbis Encoder ).\nThese latter are included in the GDevelop directory."), wxDefaultPosition, wxSize(331,61), 0, _T("ID_STATICTEXT2"));
 	StaticBoxSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -102,7 +102,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 
 	if ( !wxFileExists("oggenc.exe") || !wxFileExists("lame.exe") )
 	{
-	    StaticText2->SetLabel(_("This utility uses lame.exe ( free MP3 Encoder )\nand OGGENC.EXE (free OGG Vorbis Encoder ).\nThese latter were not detected in\nGame Develop directory. Download them or use the installer\nof Game Develop."));
+	    StaticText2->SetLabel(_("This utility uses lame.exe ( free MP3 Encoder )\nand OGGENC.EXE (free OGG Vorbis Encoder ).\nThese latter were not detected in\nGDevelop directory. Download them or use the installer\nof GDevelop."));
 	    StaticText2->Layout();
 	    Layout();
 	}

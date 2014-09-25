@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2014 Florian Rival (Florian.Rival@gmail.com).
  * Copyright 2014 Victor Levasseur (victorlevasseur52@gmail.com).
  * This project is released under the GNU Lesser General Public License.
@@ -14,9 +14,9 @@
 namespace gd
 {
 
-PolygonEditionHelper::PolygonEditionHelper() : 
-    movingPolygonPoint(false), 
-    selectedPolygon(0), 
+PolygonEditionHelper::PolygonEditionHelper() :
+    movingPolygonPoint(false),
+    selectedPolygon(0),
     selectedPolygonPoint(0),
     xSelectionOffset(0),
     ySelectionOffset(0)
@@ -39,7 +39,7 @@ void PolygonEditionHelper::OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoi
 
         dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
         dc.SetPen(wxPen(wxColour(100,100,100)));
-        if ( i == selectedPolygon ) 
+        if ( i == selectedPolygon )
             dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
 
         dc.DrawPolygon(&list, offset.x, offset.y);

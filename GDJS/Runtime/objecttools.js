@@ -1,5 +1,5 @@
 /*
- * Game Develop JS Platform
+ * GDevelop JS Platform
  * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -17,7 +17,7 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
  * Do a test on two tables of objects so as to pick only the pair of objects for which the test is true.
  * If inverted == true, only the objects of the first table are filtered.
  *
- * Note that the func method is not called stricly for each pair: When considering a pair of objects, if 
+ * Note that the func method is not called stricly for each pair: When considering a pair of objects, if
  * these objects have already been marked as picked, the func method won't be called again.
  *
  * Cost (Worst case, func being always false):
@@ -79,7 +79,7 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
                     }
                 }
             }
-            
+
             if ( !atLeastOneObject && inverted ) {
                 //For example, the object is not overlapping any other object.
                 isTrue = true;
@@ -87,12 +87,12 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
             }
         }
     }
-    
+
     //Trim not picked objects from arrays.
     for(var i = 0, leni = objects1Values.length;i<leni;++i) {
         var arr = objects1Values[i];
         var finalSize = 0;
-        
+
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
             var obj = arr[k];
             if ( arr[k].pick ) {
@@ -118,7 +118,7 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
             arr.length = finalSize;
         }
     }
-    
+
     return isTrue;
 }
 
@@ -127,13 +127,13 @@ gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLis
     //if ( inverted ) ( See below why it is commented )
     return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.collisionTest,
                                                  objectsLists1, objectsLists2, inverted);
-                                                 
+
     //Using HSHG ( code below ) is *less* efficient in games like SoldierJS
     //but more efficient when no collision is really involved ( For example, testing a collision
     //with lots of objects which are very far ).
     //For now, use of HSHG is deactivated ( TwoListsTest is always called above ) : The bottleneck
     //must come from the fact this.HSHG performs collision test on all instances, and not on the
-    //picked one. ( getPotentialCollidingObjects method is using all the objects of the scene. ) 
+    //picked one. ( getPotentialCollidingObjects method is using all the objects of the scene. )
 
     /*var objects1 = [];
     var objects2 = [];

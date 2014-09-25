@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Timed Event Extension
+GDevelop - Timed Event Extension
 Copyright (c) 2011-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied

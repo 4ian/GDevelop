@@ -1,7 +1,7 @@
-Official extensions for Game Develop
+Official extensions for GDevelop
 ====================================
 
-These are the official extensions directly bundled with Game Develop.
+These are the official extensions directly bundled with GDevelop.
 
 
 Getting started
@@ -9,7 +9,7 @@ Getting started
 
 First, take a look at the *Readme.md* at the root of the repository and the [developer documentation](http://4ian.github.io/GD-Documentation/).
 Extensions always contains an Extension.cpp and/or a JsExtension.cpp file that are used
-to expose the extension to Game Develop IDE.
+to expose the extension to GDevelop IDE.
 
 After being compiled, extensions binaries are put in Binaries/Output/Release_*{OS}*/CppPlatform/Extensions
 (or Binaries/Output/Release_*{OS}*/JsPlatform/Extensions), where *{OS}* can be Windows, Linux

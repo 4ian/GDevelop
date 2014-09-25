@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -53,7 +53,7 @@ wxDECLARE_EVENT(TILE_SELECTION_CHANGED, TileSelectionEvent);
 
 typedef void (wxEvtHandler::*TileSelectionEventFunction)(TileSelectionEvent&);
 #define TileSelectionEventHandler(func) wxEVENT_HANDLER_CAST(TileSelectionEventFunction, func)
- 
+
 class TileSetPanel : public wxScrolledWindow
 {
     TileSet *m_tileset;;

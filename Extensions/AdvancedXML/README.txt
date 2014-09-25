@@ -1,4 +1,4 @@
-Advanced XML is a free implementation of TinyXML for Game Develop.
+Advanced XML is a free implementation of TinyXML for GDevelop.
 
 Source code organisation
 ========================

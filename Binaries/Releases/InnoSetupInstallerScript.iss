@@ -1,14 +1,14 @@
-; Inno Setup installation script for Game Develop.
+; Inno Setup installation script for GDevelop.
 
 [Setup]
-AppName=Game Develop
+AppName=GDevelop
 AppVersion=3.4
 AppPublisher=Florian Rival
 AppPublisherURL=http://www.compilgames.net
 AppSupportURL=http://www.forum.compilgames.net
 AppUpdatesURL=http://www.compilgames.net
-DefaultDirName={pf}/Game Develop
-DefaultGroupName=Game Develop
+DefaultDirName={pf}/GDevelop
+DefaultGroupName=GDevelop
 AllowNoIcons=yes
 LicenseFile=..\Output\Release_Windows\License-fr.rtf
 InfoBeforeFile=..\Output\Release_Windows\Informations-fr.rtf
@@ -22,9 +22,9 @@ WizardImageFile=Setup bitmap\wizbmp.bmp
 WizardSmallImageFile=Setup bitmap/smallicon.bmp
 AppCopyright=2008-2014 Florian Rival
 VersionInfoCompany=Florian Rival
-VersionInfoDescription=Game Develop setup
+VersionInfoDescription=GDevelop setup
 VersionInfoCopyright=2008-2014 Florian Rival
-VersionInfoProductName=Game Develop
+VersionInfoProductName=GDevelop
 VersionInfoProductVersion=3.4
 
 [Languages]
@@ -38,7 +38,7 @@ Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:Ad
 Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
 
 [Components]
-Name: "main"; Description: "Game Develop"; Types: full compact custom; Flags: fixed
+Name: "main"; Description: "GDevelop"; Types: full compact custom; Flags: fixed
 Name: "example"; Description: "Exemples"; Types: full custom; Languages: french
 Name: "example"; Description: "Examples"; Types: full custom; Languages: english russian
 Name: "example"; Description: "Ejemplos"; Types: full custom; Languages: spanish
@@ -58,30 +58,30 @@ Source: ..\Output\Release_Windows\Examples\*; DestDir: {app}\Examples; Flags: ig
 Source: ..\Output\Release_Windows\Ressources\*; DestDir: {app}\Ressources; Flags: ignoreversion createallsubdirs recursesubdirs; Components: res
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: ..\Output\Release_Windows\icon.ico; DestDir: {app}; Flags: ignoreversion
-Source: ..\Output\Release_Windows\SelectLanguage-en.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: english; Components: main
-Source: ..\Output\Release_Windows\SelectLanguage-fr.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: french ; Components: main
-Source: ..\Output\Release_Windows\SelectLanguage-es.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: spanish ; Components: main
-Source: ..\Output\Release_Windows\SelectLanguage-ru.cfg; DestDir: {userdocs}\..\.Game Develop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: russian ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-en.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: english; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-fr.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: french ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-es.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: spanish ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-ru.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: russian ; Components: main
 
 [Icons]
-Name: {group}\Game Develop; Filename: {app}\GDIDE.exe; WorkingDir: {app}
+Name: {group}\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}
 Name: {group}\Aide; Filename: http://www.wiki.compilgames.net ;Languages: french;
 Name: {group}\Help; Filename: http://www.wiki.compilgames.net; Languages: english;
 Name: {group}\Tutoriel; Filename: http://www.wiki.compilgames.net/doku.php/game_develop/tutoriels; Languages: french;
 Name: {group}\Tutorial; Filename: http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials; Languages: english;
-Name: {group}\{cm:ProgramOnTheWeb,Game Develop}; Filename: http://www.compilgames.net
-Name: {group}\{cm:UninstallProgram,Game Develop}; Filename: {uninstallexe}
-Name: {commondesktop}\Game Develop; Filename: {app}\GDIDE.exe; WorkingDir: {app}; Tasks: desktopicon
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Game Develop; Filename: {app}\GDIDE.exe; WorkingDir: {app}; Tasks: quicklaunchicon
+Name: {group}\{cm:ProgramOnTheWeb,GDevelop}; Filename: http://www.compilgames.net
+Name: {group}\{cm:UninstallProgram,GDevelop}; Filename: {uninstallexe}
+Name: {commondesktop}\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}; Tasks: desktopicon
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}; Tasks: quicklaunchicon
 
 [Run]
-Filename: {app}\GDIDE.exe; Description: {cm:LaunchProgram,Game Develop}; Flags: nowait postinstall skipifsilent
+Filename: {app}\GDIDE.exe; Description: {cm:LaunchProgram,GDevelop}; Flags: nowait postinstall skipifsilent
 
 [Registry]
-Root: HKCR; SubKey: .gdg; ValueType: string; ValueData: Game Develop Game; Flags: uninsdeletekey
-Root: HKCR; SubKey: Game Develop Game; ValueType: string; ValueData: Game created with Game Develop; Flags: uninsdeletekey
-Root: HKCR; SubKey: Game Develop Game\Shell\Open\Command; ValueType: string; ValueData: """{app}/GDIDE.exe"" ""%1"""; Flags: uninsdeletevalue
-Root: HKCR; Subkey: Game Develop Game\DefaultIcon; ValueType: string; ValueData: {app}\icon.ico,-1; Flags: uninsdeletevalue
+Root: HKCR; SubKey: .gdg; ValueType: string; ValueData: GDevelop Game; Flags: uninsdeletekey
+Root: HKCR; SubKey: GDevelop Game; ValueType: string; ValueData: Game created with GDevelop; Flags: uninsdeletekey
+Root: HKCR; SubKey: GDevelop Game\Shell\Open\Command; ValueType: string; ValueData: """{app}/GDIDE.exe"" ""%1"""; Flags: uninsdeletevalue
+Root: HKCR; Subkey: GDevelop Game\DefaultIcon; ValueType: string; ValueData: {app}\icon.ico,-1; Flags: uninsdeletevalue
 
 
 [InstallDelete]

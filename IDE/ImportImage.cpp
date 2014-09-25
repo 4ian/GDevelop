@@ -150,7 +150,7 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer9 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);
 	FlexGridSizer9->AddGrowableRow(4);
-	StaticText9 = new wxStaticText(Panel3, ID_STATICTEXT10, _("Game Develop decompose spritesheets of characters\nwith 4 directions with 4 images."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+	StaticText9 = new wxStaticText(Panel3, ID_STATICTEXT10, _("GDevelop decompose spritesheets of characters\nwith 4 directions with 4 images."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
 	FlexGridSizer9->Add(StaticText9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer10->AddGrowableCol(1);

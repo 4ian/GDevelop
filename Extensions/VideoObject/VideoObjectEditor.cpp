@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Video Object Extension
+GDevelop - Video Object Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -171,7 +171,7 @@ void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
 {
     if ( !wxFileExists(wxGetCwd()+"/Extensions/ffmpeg2theora.exe"))
     {
-        gd::LogError(_("ffmpeg2theora.exe executable was not found in Extensions directory of Game Develop."));
+        gd::LogError(_("ffmpeg2theora.exe executable was not found in Extensions directory of GDevelop."));
         return;
     }
 

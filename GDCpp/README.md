@@ -1,7 +1,7 @@
-Game Develop C++ Platform
+GDevelop C++ Platform
 =========================
 
-Game Develop C++ Platform (GDcpp) is a platform for developing native games with Game Develop.
+GDevelop C++ Platform (GDcpp) is a platform for developing native games with GDevelop.
 
 Getting started
 ---------------
@@ -27,5 +27,5 @@ or any pull request so as to add a nice feature, do not hesitate to get in touch
 License
 -------
 
-Game Develop C++ Platform is distributed under the GNU LGPL license: See license.txt for
+GDevelop C++ Platform is distributed under the GNU LGPL license: See license.txt for
 more information.

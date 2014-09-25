@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -218,7 +218,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer6->AddGrowableRow(0);
 	StaticBitmap8 = new wxStaticBitmap(this, ID_STATICBITMAP8, wxBitmap(wxImage(_T("res/donateicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP8"));
 	FlexGridSizer6->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl5 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL16, _("If you like Game Develop, you can make a donation to the author."), _("http://www.compilgames.net/donate.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
+	HyperlinkCtrl5 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL16, _("If you like GDevelop, you can make a donation to the author."), _("http://www.compilgames.net/donate.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
 	FlexGridSizer6->Add(HyperlinkCtrl5, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -239,15 +239,9 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL11,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent7BtClick);
 	//*)
 
-	#if defined(DEACTIVATED_DURING_INDIEGOGO_CAMPAIGN)
     wxString donateLink = _("http://www.compilgames.net/donate.php");
     if ( !donateLink.StartsWith("http://www.compilgames.net/") ) donateLink = "http://www.compilgames.net/donate.php";
     donateLink += "?utm_source=GD&utm_medium=StartPageLink&utm_campaign=paywhatyouwant";
-    #else
-    wxString donateLink = "https://www.indiegogo.com/projects/game-develop/x/6586688";
-    wxString lang = _("en");
-    donateLink += "?utm_source=software&utm_medium=StartPageLink_"+lang+"&utm_campaign=software";
-    #endif
 
 	HyperlinkCtrl5->SetURL(donateLink);
 
@@ -394,7 +388,7 @@ void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
     wxString examplesDir = wxGetCwd()+"/Examples/";
     #endif
 
-    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"GDevelop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));

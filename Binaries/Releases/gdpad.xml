@@ -67,7 +67,7 @@
     <NewsFeed_Description_250></NewsFeed_Description_250>
   </NewsFeed>
   <Program_Info>
-    <Program_Name>Game Develop</Program_Name>
+    <Program_Name>GDevelop</Program_Name>
     <Program_Version>3</Program_Version>
     <Program_Release_Month>07</Program_Release_Month>
     <Program_Release_Day>11</Program_Release_Day>
@@ -125,20 +125,20 @@
     </Download_URLs>
   </Web_Info>
   <Permissions>
-    <Distribution_Permissions>Game Develop can be freely distributed over the internet in an unchanged form.</Distribution_Permissions>
-    <EULA>·	Game Develop
+    <Distribution_Permissions>GDevelop can be freely distributed over the internet in an unchanged form.</Distribution_Permissions>
+    <EULA>·	GDevelop
 
-Game Develop is a freeware, meaning it is totally free.
+GDevelop is a freeware, meaning it is totally free.
 
 -You can use the software, for personal or commercial use.
 -The software is provided 'as-is', without any express or implied warranty.
 -You can distribute the software to anybody provided you don't require money for it, you don't claim to be the author and you distribute the entire software with its installer.
 -You must not try to decompile the software.
 
-·	Games created with Game Develop
+·	Games created with GDevelop
 
--The author of Game Develop is not liable for games made with the software.
--If you create a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.
+-The author of GDevelop is not liable for games made with the software.
+-If you create a game with GDevelop, an acknowledgment in the game documentation would be appreciated but is not required.
 
 ·	If you have any questions
 
@@ -150,18 +150,18 @@ Go on our website :  http://www.compilgames.net</EULA>
       <Keywords>Development, creation, game, making, maker, programming, IDE, 2D, HTML5, 3D, develop, physics, build, create, C++</Keywords>
       <Char_Desc_45>Free game development software</Char_Desc_45>
       <Char_Desc_80>Free game creation software, allowing to create any kind of 2D games.</Char_Desc_80>
-      <Char_Desc_250>Game Develop is a free game creation software, allowing to make games for the web ( HTML5 ) or for Windows and Linux. No programming or coding skill is required! It is easy to use and powerful enough for advanced users.</Char_Desc_250>
-      <Char_Desc_450>Game Develop is a free game creation software, allowing to make games for the web ( HTML5 ) or for Windows and Linux. No programming or coding skill is required! It is easy to use and powerful enough for advanced users.  All the game logic is made thanks to a powerful and intuitive events system. Many features are available: Physics, dynamic lights, particle systems, networking...</Char_Desc_450>
-      <Char_Desc_2000>Game Develop is a free game creation software, allowing to make games for the web ( HTML5 ) or for Windows and Linux. No programming or coding skill is required! It is easy to use and powerful enough for advanced users. 
+      <Char_Desc_250>GDevelop is a free game creation software, allowing to make games for the web ( HTML5 ) or for Windows and Linux. No programming or coding skill is required! It is easy to use and powerful enough for advanced users.</Char_Desc_250>
+      <Char_Desc_450>GDevelop is a free game creation software, allowing to make games for the web ( HTML5 ) or for Windows and Linux. No programming or coding skill is required! It is easy to use and powerful enough for advanced users.  All the game logic is made thanks to a powerful and intuitive events system. Many features are available: Physics, dynamic lights, particle systems, networking...</Char_Desc_450>
+      <Char_Desc_2000>GDevelop is a free game creation software, allowing to make games for the web ( HTML5 ) or for Windows and Linux. No programming or coding skill is required! It is easy to use and powerful enough for advanced users.
 
-The creation under Game Develop is entirely visual : Creation of objects, image insertion, objects positioning...
+The creation under GDevelop is entirely visual : Creation of objects, image insertion, objects positioning...
 The user interface allows you to preview your game and test it inside the editor, by simply clicking on a single button.
 
 All the game logic is created using events, allowing to launch actions if some conditions are filled. An entire game can be created without using a single line of code as events are both easy to use and flexible, thanks to sub-events and custom events types like loop events or functions-like events.
-Moreover, events are compiled by Game Develop to machine code, just like ordinary programming language used in commercial games: Game Develop is the only game development software which combine the simplicity of creation with the power of professional programming languages.
+Moreover, events are compiled by GDevelop to machine code, just like ordinary programming language used in commercial games: GDevelop is the only game development software which combine the simplicity of creation with the power of professional programming languages.
 
-Game Develop provides you with many features for your project : Dynamic lights and particle systems are available trought dedicated objects, actions and conditions to create multiplayer games are available, 3D objects can be used to render buildings, realistic physics behaviour can be added to objects thanks to the Physics automatism.
-Many of these features are provided thanks to official open source extensions, and external developers can also develop extensions to enhance Game Develop capabilities.</Char_Desc_2000>
+GDevelop provides you with many features for your project : Dynamic lights and particle systems are available trought dedicated objects, actions and conditions to create multiplayer games are available, 3D objects can be used to render buildings, realistic physics behaviour can be added to objects thanks to the Physics automatism.
+Many of these features are provided thanks to official open source extensions, and external developers can also develop extensions to enhance GDevelop capabilities.</Char_Desc_2000>
     </English>
   </Program_Descriptions>
 </XML_DIZ_INFO>

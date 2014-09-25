@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Physics Automatism Extension
+GDevelop - Physics Automatism Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -47,7 +47,7 @@ public:
                               _("Automatism allowing to move objects as if they were subject to the laws of physics."),
                               "Florian Rival",
                               "zlib/libpng License (Open Source)");
-        CloneExtension("Game Develop C++ platform", "PhysicsAutomatism");
+        CloneExtension("GDevelop C++ platform", "PhysicsAutomatism");
 
         GetAutomatismMetadata("PhysicsAutomatism::PhysicsAutomatism")
             .SetIncludeFile("PhysicsAutomatism/box2djs/box2d.js")
@@ -169,7 +169,7 @@ public:
 };
 
 /**
- * Used by Game Develop to create the extension class
+ * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
@@ -177,7 +177,7 @@ extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
 }
 
 /**
- * Used by Game Develop to destroy the extension class
+ * Used by GDevelop to destroy the extension class
  * -- Do not need to be modified. --
  */
 extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {

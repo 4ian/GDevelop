@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -714,7 +714,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddAction("MoveObjects",
                    _("Make objects moving"),
-                   _("Moves the objects according to the forces they have. Game Develop call this action at the end of the events by default."),
+                   _("Moves the objects according to the forces they have. GDevelop call this action at the end of the events by default."),
                    _("Make objects moving"),
                    _("Movement"),
                    "res/actions/doMove24.png",

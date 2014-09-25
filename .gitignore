@@ -47,7 +47,7 @@ Binaries/Packaging/debian-package/debian
 *.debhelper.log
 /Binaries/Output/Debug_Linux/**
 /Binaries/Output/Release_Linux/**
-!/Binaries/Output/Release_Linux/Start Game Develop.sh
+!/Binaries/Output/Release_Linux/Start GDevelop.sh
 !/Binaries/Output/Release_Linux/CppPlatform/
 /Binaries/**/MinGW32
 /Binaries/**/CppPlatform/Runtime

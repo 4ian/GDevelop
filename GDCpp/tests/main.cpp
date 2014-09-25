@@ -1,10 +1,10 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
 /**
- * @file Main file for Game Develop C++ Platform tests
+ * @file Main file for GDevelop C++ Platform tests
  *
  * Please write any new test in a separate file.
  */

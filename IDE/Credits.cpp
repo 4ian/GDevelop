@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -76,7 +76,7 @@ Credits::Credits(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer11;
 	wxGridSizer* GridSizer2;
 
-	Create(parent, wxID_ANY, _("About Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("About GDevelop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/GD-logo.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer1->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -89,7 +89,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer10->AddGrowableRow(0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("GDevelop"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	StaticText1->SetMinSize(wxSize(-1,-1));
 	wxFont StaticText1Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText1->SetFont(StaticText1Font);
@@ -114,7 +114,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer5->AddGrowableRow(0);
 	StaticBitmap8 = new wxStaticBitmap(Panel1, ID_STATICBITMAP8, wxBitmap(wxImage(_T("res/donateicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP8"));
 	FlexGridSizer5->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("You like Game Develop\?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("You like GDevelop\?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl5 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL16, _("You can make a donation to the author."), _("http://www.compilgames.net/donate.php\?utm&source=GDutm&medium=CreditsLinkutm&campaign=paywhatyouwant"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
 	FlexGridSizer5->Add(HyperlinkCtrl5, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
@@ -126,7 +126,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("Game Develop is an open source software:\n\n  * The IDE is distributed under the GPL v3 license.\n  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.\n  * Extensions are distributed under the zlib/libpng license.\n  * The name, Game Develop, and its logo are the exclusive property of Florian Rival.\n\nAbout games created with Game Develop\n\nGames exported with Game Develop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with Game Develop. In particular, you are not forced to make your game open source."), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("GDevelop is an open source software:\n\n  * The IDE is distributed under the GPL v3 license.\n  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.\n  * Extensions are distributed under the zlib/libpng license.\n  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.\n\nAbout games created with GDevelop\n\nGames exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source."), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer11->Add(TextCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer11);
 	FlexGridSizer11->Fit(Panel2);
@@ -213,14 +213,14 @@ Credits::Credits(wxWindow* parent)
 	//Be sure that my name has not been translated ;)
 	florianRival->SetLabel("Florian \"4ian\" Rival");
 
-    //Format Game Develop version
+    //Format GDevelop version
     string nbversion = gd::VersionWrapper::FullString();
     string status = gd::VersionWrapper::Status();
-    string version ="Game Develop "+nbversion+" "+status+"";
+    string version ="GDevelop "+nbversion+" "+status+"";
 	StaticText1->SetLabel(version);
 	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: (No special order)")+"</h5>\n"
                       +"<br>"
-                      +_("François Dumortier : Game Develop logo design and website conception.")+"<br>"
+                      +_("François Dumortier : GDevelop logo design and website conception.")+"<br>"
                       +"( <a href=\"http://www.fdumortier.com\">http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
                       +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension.")+"<br>"
@@ -255,7 +255,7 @@ Credits::Credits(wxWindow* parent)
                       +_("Some images of examples came from images pack by Ari Feldman")+"<br>"
                       +"( <a href=\"http://www.widgetworx.com/widgetworx/portfolio/spritelib.html\">http://www.widgetworx.com/widgetworx/portfolio/spritelib.html</a> )"+"<br>"
                       +"<br>"
-                      +"\n<center><h5>"+_("Thanks to all the community and users of Game Develop")+"</h5><br></center>\n</body>\n</html>");
+                      +"\n<center><h5>"+_("Thanks to all the community and users of GDevelop")+"</h5><br></center>\n</body>\n</html>");
 
 	FlexGridSizer3->Layout();
 }

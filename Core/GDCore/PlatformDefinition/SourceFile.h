@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -49,12 +49,12 @@ public:
     void UnserializeFrom(const SerializerElement & element);
 
     /**
-     * \brief Set if the file is hidden from the user point of view and is only managed by Game Develop
+     * \brief Set if the file is hidden from the user point of view and is only managed by GDevelop
      */
     void SetGDManaged(bool gdManaged_) { gdManaged = gdManaged_; };
 
     /**
-     * \brief Return true if the file is hidden from the user point of view and is only managed by Game Develop
+     * \brief Return true if the file is hidden from the user point of view and is only managed by GDevelop
      */
     bool IsGDManaged() const { return gdManaged; };
 
@@ -87,7 +87,7 @@ private:
 
     std::string filename; ///< Filename
     time_t lastBuildTimeStamp; ///< Time of the last build
-    bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by Game Develop.
+    bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by GDevelop.
     std::string language; ///< String identifying the language of this source file (typically C++ or Javascript).
     boost::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.
 };

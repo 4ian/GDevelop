@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -602,7 +602,7 @@ std::string FullProjectCompiler::GetTempDir()
             tempDir = wxFileName::GetHomeDir();
 
         if ( !wxFileName::IsDirWritable(tempDir) )
-            wxMessageBox(_("Game Develop is unable to find a temporary compilation directory.\nIf compilation fail, go in the options and choose a temporary direction where you have read and write permissions."), _("Compilation may fail!"), wxICON_EXCLAMATION);
+            wxMessageBox(_("GDevelop is unable to find a temporary compilation directory.\nIf compilation fail, go in the options and choose a temporary direction where you have read and write permissions."), _("Compilation may fail!"), wxICON_EXCLAMATION);
     }
 
     return tempDir + "/GDDeploymentTemporaries";

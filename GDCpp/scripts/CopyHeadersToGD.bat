@@ -6,7 +6,7 @@ IF NOT DEFINED destDir set destDir="..\..\Binaries\Output\Release_Windows\CppPla
 
 echo Copying GDC++ and extensions header files (*.h) to %destDir%...
 
-::Game Develop C++ Platform and Core headers
+::GDevelop C++ Platform and Core headers
 xcopy ..\*.h "%destDir%\include\GDCpp\*.h" /S /Y /Q /D /E
 xcopy ..\..\Core\*.h "%destDir%\include\Core\*.h" /S /Y /Q /D /E
 

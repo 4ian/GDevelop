@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -133,7 +133,7 @@ parent(parent_)
 
 	if ( wasAutomaticallyOpened )
     {
-        StaticText1->SetLabel(_("A new version of Game Develop is available !"));
+        StaticText1->SetLabel(_("A new version of GDevelop is available !"));
         VerifMAJBt->Show(false);
     }
 
@@ -179,7 +179,7 @@ void MAJ::OnLienBtClick(wxCommandEvent& event)
 {
     if ( linkCtrl->GetLabel() == _("No link"))
     {
-        gd::LogMessage(_("No download link is available.\nGo on our web site so as to download the last version of Game Develop."));
+        gd::LogMessage(_("No download link is available.\nGo on our web site so as to download the last version of GDevelop."));
         return;
     }
 
@@ -213,10 +213,10 @@ void MAJ::OnFermerBtClick(wxCommandEvent& event)
 void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
 {
     //Warn the user his work can be lost
-    if ( wxMessageBox(_("Game Develop will be closed at the end of the download so as to install the new version. Don't forget to save your work.\nDownload and install the new version \?"), _("Installation of the new version"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
+    if ( wxMessageBox(_("GDevelop will be closed at the end of the download so as to install the new version. Don't forget to save your work.\nDownload and install the new version \?"), _("Installation of the new version"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
         return;
 
-    wxString tempDir = wxFileName::GetHomeDir()+"/.Game Develop";
+    wxString tempDir = wxFileName::GetHomeDir()+"/.GDevelop";
 
     //Open connection to file
     wxHTTP http;
@@ -249,7 +249,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     }
     else
     {
-        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
+        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
         return;
     }
 

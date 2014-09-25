@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Tile Map Extension
+GDevelop - Tile Map Extension
 Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -33,13 +33,13 @@ freely, subject to the following restrictions:
 
 /**
  * \brief Represents a TileMap layer.
- * This class represents a tilemap layer. It contains all tiles of the layer stored by column and row. 
+ * This class represents a tilemap layer. It contains all tiles of the layer stored by column and row.
  * Tiles are represented by two number corresponding to the position of the tile in the TileSet.
  * \sa TileMap
  */
 struct TileMapLayer
 {
-    std::vector< std::vector< int > > tiles; ///< Contains all tiles, the column is the first index and the row is the second. 
+    std::vector< std::vector< int > > tiles; ///< Contains all tiles, the column is the first index and the row is the second.
     										 ///  the pair contains the tile position into the TileSet.
 };
 

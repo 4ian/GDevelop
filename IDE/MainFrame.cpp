@@ -1,5 +1,5 @@
 /*
- * Game Develop IDE
+ * GDevelop IDE
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
@@ -140,7 +140,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     wxMenuItem* MenuItem41;
     wxFlexGridSizer* FlexGridSizer1;
 
-    Create(parent, wxID_ANY, _("Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("GDevelop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
     	wxIcon FrameIcon;
@@ -218,7 +218,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem22->SetBitmap(gd::SkinHelper::GetIcon("help", 16));
     fileMenu.Append(MenuItem22);
     fileMenu.AppendSeparator();
-    MenuItem8 = new wxMenuItem((&fileMenu), ID_MENUITEM14, _("Quit"), _("Quit Game Develop"), wxITEM_NORMAL);
+    MenuItem8 = new wxMenuItem((&fileMenu), ID_MENUITEM14, _("Quit"), _("Quit GDevelop"), wxITEM_NORMAL);
     fileMenu.Append(MenuItem8);
     menuRecentFiles->Delete(toBeDeletedMenuItem);
     MenuItem16 = new wxMenuItem((&helpMenu), ID_MENUITEM20, _("Help"), wxEmptyString, wxITEM_NORMAL);
@@ -517,13 +517,13 @@ void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
     projectCurrentlyEdited = i;
     if ( i >= games.size())
     {
-        wxString GD = "Game Develop";
+        wxString GD = "GDevelop";
         SetTitle( GD );
         projectPropertiesPnl->SetProject(NULL); //Update editors displaying current project properties
     }
     else
     {
-        wxString GD = "Game Develop";
+        wxString GD = "GDevelop";
         SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->GetProjectFile() );
         projectPropertiesPnl->SetProject(games[i].get()); //Update editors displaying current project properties
     }
@@ -603,7 +603,7 @@ void MainFrame::UpdateOpenedProjectsLogFile()
 }
 
 /**
- * Want to close Game Develop
+ * Want to close GDevelop
  */
 void MainFrame::OnClose( wxCloseEvent& event )
 {
@@ -631,7 +631,7 @@ void MainFrame::OnClose( wxCloseEvent& event )
     consoleManager->DestroySingleton();
 
     //Log the shutdown
-    LogFileManager::Get()->WriteToLogFile("Game Develop shutting down");
+    LogFileManager::Get()->WriteToLogFile("GDevelop shutting down");
     Destroy();
 }
 

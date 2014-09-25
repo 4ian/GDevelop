@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -257,13 +257,13 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         error += "Not the same SFML version.\n";
 
     else if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
-        error += "Not the same Boost version.\n(Extension is using "+ToString(extensionPtr->compilationInfo.boostVersion)+", Game Develop is using "+ToString(BOOST_VERSION)+")\n";
+        error += "Not the same Boost version.\n(Extension is using "+ToString(extensionPtr->compilationInfo.boostVersion)+", GDevelop is using "+ToString(BOOST_VERSION)+")\n";
 
     else if ( extensionPtr->compilationInfo.gdCoreVersion != GDCore_RC_FILEVERSION_STRING)
-        error += "Not the same Game Develop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", Game Develop is using "+GDCore_RC_FILEVERSION_STRING+")\n";
+        error += "Not the same GDevelop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", GDevelop is using "+GDCore_RC_FILEVERSION_STRING+")\n";
 
     else if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
-        error += "Not the same architecture.\n(Extension sizeof(int*) is "+ToString(extensionPtr->compilationInfo.sizeOfpInt)+", Game Develop sizeof(int*) is "+ToString(sizeof(int*))+")\n";
+        error += "Not the same architecture.\n(Extension sizeof(int*) is "+ToString(extensionPtr->compilationInfo.sizeOfpInt)+", GDevelop sizeof(int*) is "+ToString(sizeof(int*))+")\n";
 
     if ( !error.empty() )
     {

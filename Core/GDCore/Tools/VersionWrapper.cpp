@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -53,6 +53,22 @@ bool VersionWrapper::CompiledForEdittime()
 #else
     return false;
 #endif
+}
+
+bool VersionWrapper::IsOlder(int major, int minor, int build, int revision,
+    int major2, int minor2, int build2, int revision2)
+{
+    return (major < major2) ||
+        (major == major2 && minor < minor2) ||
+        (major == major2 && minor == minor2 && build < build2) ||
+        (major == major2 && minor == minor2 && build == build2 && revision < revision2);
+}
+
+bool VersionWrapper::IsOlderOrEqual(int major, int minor, int build, int revision,
+    int major2, int minor2, int build2, int revision2)
+{
+    return (major == major2 && minor == minor2 && build == build2 && revision == revision2) ||
+        IsOlder(major, minor, build, revision, major2, minor2, build2, revision2);
 }
 
 

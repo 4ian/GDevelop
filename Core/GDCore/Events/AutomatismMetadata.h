@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -25,7 +25,7 @@ namespace gd
  * \brief Contains user-friendly information about an automatism type
  *
  * Implementations may derive from this class so as to provide more complete metadata if needed.
- * ( For example, Game Develop C++ Platform is shared pointers to objects that will be cloned so as to create the automatisms... )
+ * ( For example, GDevelop C++ Platform is shared pointers to objects that will be cloned so as to create the automatisms... )
  *
  * \ingroup Events
  */

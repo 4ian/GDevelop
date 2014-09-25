@@ -1,5 +1,5 @@
 /**
-Game Develop - Platform Automatism Extension
+GDevelop - Platform Automatism Extension
 Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
  */
 

@@ -1,5 +1,5 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -22,7 +22,7 @@ int parseLine(char* line){
     return i;
 }
 
-size_t SystemStats::GetUsedVirtualMemory() 
+size_t SystemStats::GetUsedVirtualMemory()
 {
 #if defined(LINUX)
     FILE* file = fopen("/proc/self/status", "r");
@@ -48,5 +48,5 @@ size_t SystemStats::GetUsedVirtualMemory()
     return 0;
 #endif
 }
-   
+
 }

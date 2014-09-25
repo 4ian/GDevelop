@@ -1,4 +1,4 @@
-#This is the CMake file used to build Game Develop.
+#This is the CMake file used to build GDevelop.
 #For more information, see the Readme.md file.
 
 cmake_minimum_required(VERSION 2.6)
@@ -17,9 +17,9 @@ macro(gd_set_option var default type docstring)
     endif()
     set(${var} ${${var}} CACHE ${type} ${docstring} FORCE)
 endmacro()
-gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build Game Develop Core library, FALSE to use the already compiled binaries")
-gd_set_option(BUILD_GDCPP TRUE BOOL "TRUE to build Game Develop C++ Platform")
-gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build Game Develop JS Platform")
+gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build GDevelop Core library, FALSE to use the already compiled binaries")
+gd_set_option(BUILD_GDCPP TRUE BOOL "TRUE to build GDevelop C++ Platform")
+gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build GDevelop JS Platform")
 gd_set_option(BUILD_IDE TRUE BOOL "TRUE to build the IDE")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
 gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")

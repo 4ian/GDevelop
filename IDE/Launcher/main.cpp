@@ -41,7 +41,7 @@ std::string GetDynamicLibLastError()
 
 int main(int argc, char ** argv)
 {
-    std::cout << "Game Develop IDE Launcher" << std::endl;
+    std::cout << "GDevelop IDE Launcher" << std::endl;
     std::cout << "Creating a dummy SFML object..." << std::endl;
     sf::Texture texture;
 
@@ -52,7 +52,7 @@ int main(int argc, char ** argv)
         std::string error =  "Unable to open GDIDE.dll!\n";
         error += "Full error message:\n";
         error += GetDynamicLibLastError();
-        error += "\n\nMake sure that Game Develop is correctly installed and that GDIDE.dll is not missing.";
+        error += "\n\nMake sure that GDevelop is correctly installed and that GDIDE.dll is not missing.";
 
         return AbortWithMessage(error);
     }
@@ -64,12 +64,12 @@ int main(int argc, char ** argv)
         std::string error =  "Unable to find the IDE entry point!\n";
         error += "Full error message:\n";
         error += GetDynamicLibLastError();
-        error += "\n\nPlease report this error on the Game Develop forum.";
+        error += "\n\nPlease report this error on the GDevelop forum.";
 
         return AbortWithMessage(error);
     }
 
-    std::cout << "Starting Game Develop..." << std::endl;
+    std::cout << "Starting GDevelop..." << std::endl;
     int code = entryPoint(argc, argv);
     std::cout << "Closing GDIDE.dll..";
     FreeLibrary(lib);

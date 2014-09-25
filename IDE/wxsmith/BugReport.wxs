@@ -30,7 +30,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-												<label>It seems that Game Develop has closed abruptly after an&#x0A;error. Game Develop should never freeze or crash whatever &#x0A;the user make. You can help us correct the problem by filling&#x0A;the error report.</label>
+												<label>It seems that GDevelop has closed abruptly after an&#x0A;error. GDevelop should never freeze or crash whatever &#x0A;the user make. You can help us correct the problem by filling&#x0A;the error report.</label>
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -43,7 +43,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-										<label>Known bugs for this version of Game Develop</label>
+										<label>Known bugs for this version of GDevelop</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
 												<cols>3</cols>
@@ -63,7 +63,7 @@
 														<cols>1</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
-																<label>You can visit a page on our website which can&#x0A;contain known bugs for this version of Game Develop:</label>
+																<label>You can visit a page on our website which can&#x0A;contain known bugs for this version of GDevelop:</label>
 															</object>
 															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -220,7 +220,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-										<label>Game Develop may have made automatic backups of these projects. When you&apos;ll&#x0A;close this window, the backups will be opened. If these backup are not corrupted,&#x0A;you can save them over the original project files.</label>
+										<label>GDevelop may have made automatic backups of these projects. When you&apos;ll&#x0A;close this window, the backups will be opened. If these backup are not corrupted,&#x0A;you can save them over the original project files.</label>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>

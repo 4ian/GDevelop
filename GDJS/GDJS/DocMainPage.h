@@ -1,8 +1,8 @@
 /**
- * \mainpage %Game Develop JS Platform
+ * \mainpage GDevelop JS Platform
  * \image html gdlogo.png
  * \section welcome Welcome
- * This is the help file for the Game Develop JS Platform, which contains a reference of all the features provided
+ * This is the help file for the GDevelop JS Platform, which contains a reference of all the features provided
  * by the JS Platform and explains how to create <b>extensions</b> for this platform.<br>
  * Writing extensions requires to know Javascript and you need to write a bit of C++ code: Do not worry, everything is explained
  * here.
@@ -11,7 +11,7 @@
  * Note that the documentation of the Javascript game engine of this platform is available [here](../GDJS Runtime Documentation/index.html).
  *
  * \section gettingstarted Getting started
- * Please refer to the getting started guide in the [GDCore documentation](..\GDCore Documentation\index.html).<br>
+ * Please refer to the getting started guide in the [GDCore documentation](../GDCore Documentation/index.html).<br>
  * You can then read the \subpage OverviewOfGDJS.
  */
 

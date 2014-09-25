@@ -200,7 +200,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer26;
     wxFlexGridSizer* FlexGridSizer30;
 
-    Create(parent, wxID_ANY, _("Game Develop settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("GDevelop settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
     FlexGridSizer1->AddGrowableRow(0);
@@ -211,7 +211,7 @@ changesNeedRestart(false)
     FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/preferencelogo.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer12->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("This window allows you to customize Game Develop. \nEach user of the computer has his own options."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT, _T("ID_STATICTEXT7"));
+    StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("This window allows you to customize GDevelop. \nEach user of the computer has his own options."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT, _T("ID_STATICTEXT7"));
     FlexGridSizer12->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1->SetSizer(FlexGridSizer12);
     FlexGridSizer12->Fit(Panel1);
@@ -229,9 +229,9 @@ changesNeedRestart(false)
     MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Check for updates"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
     FlexGridSizer39->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    sendInfoCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Send anonymous statistics about Game Develop ( version, language used )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
+    sendInfoCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Send anonymous statistics about GDevelop ( version, language used )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
     sendInfoCheck->SetValue(false);
-    sendInfoCheck->SetToolTip(_("When checked, Game Develop will send some anonymous information to our server so as to get some statistics about the software"));
+    sendInfoCheck->SetToolTip(_("When checked, GDevelop will send some anonymous information to our server so as to get some statistics about the software"));
     FlexGridSizer39->Add(sendInfoCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer1->Add(FlexGridSizer39, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -360,11 +360,11 @@ changesNeedRestart(false)
     FlexGridSizer16->AddGrowableCol(0);
     StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Predefined appearance "));
     FlexGridSizer2 = new wxFlexGridSizer(0, 6, 0, 0);
-    Button2 = new wxButton(Panel4, ID_BUTTON16, _("Game Develop Metro"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON16"));
+    Button2 = new wxButton(Panel4, ID_BUTTON16, _("GDevelop Metro"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON16"));
     FlexGridSizer2->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button1 = new wxButton(Panel4, ID_BUTTON8, _("Metro White"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     FlexGridSizer2->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    gdStyleBt = new wxButton(Panel4, ID_BUTTON6, _("Game Develop Office"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    gdStyleBt = new wxButton(Panel4, ID_BUTTON6, _("GDevelop Office"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     FlexGridSizer2->Add(gdStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     officeStyleBt = new wxButton(Panel4, ID_BUTTON7, _("Office Blue"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
     FlexGridSizer2->Add(officeStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -533,7 +533,7 @@ changesNeedRestart(false)
     StaticBoxSizer13 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Edit sources"));
     FlexGridSizer25 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer25->AddGrowableCol(0);
-    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Edit sources using internal Game Develop code editor"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Edit sources using internal GDevelop code editor"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
     internalCodeEditorCheck->SetValue(true);
     FlexGridSizer25->Add(internalCodeEditorCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer26 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -1037,7 +1037,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        gd::LogMessage(_("Game Develop must be relaunched to apply changes."));
+        gd::LogMessage(_("GDevelop must be relaunched to apply changes."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());

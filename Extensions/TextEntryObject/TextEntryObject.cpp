@@ -1,6 +1,6 @@
 /**
 
-Game Develop - TextEntry Object Extension
+GDevelop - TextEntry Object Extension
 Copyright (c) 2011-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -138,7 +138,7 @@ RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Obj
 
 /**
  * Function destroying an extension Object.
- * Game Develop does not delete directly extension object
+ * GDevelop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
 void DestroyTextEntryObject(gd::Object * object)
@@ -148,7 +148,7 @@ void DestroyTextEntryObject(gd::Object * object)
 
 /**
  * Function creating an extension Object.
- * Game Develop can not directly create an extension object
+ * GDevelop can not directly create an extension object
  */
 gd::Object * CreateTextEntryObject(std::string name)
 {

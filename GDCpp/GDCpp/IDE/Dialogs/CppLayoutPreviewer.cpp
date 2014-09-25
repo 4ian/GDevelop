@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -220,7 +220,7 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     if ( !previewScene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(editor.GetLayout().GetCompiledEventsFile(),
                                                                         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(editor.GetLayout().GetName())) )
     {
-        gd::LogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")
+        gd::LogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to GDevelop's developer, joining this file:\n")
                    +CodeCompiler::Get()->GetOutputDirectory()+"LatestCompilationOutput.txt");
         editor.GoToEditingState();
 

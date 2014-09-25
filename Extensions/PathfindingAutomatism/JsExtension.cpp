@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Pathfinding Automatism Extension
+GDevelop - Pathfinding Automatism Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -48,7 +48,7 @@ public:
                               _("Compute paths for objects avoiding obstacles."),
                               "Florian Rival",
                               "zlib/libpng License (Open Source)");
-        CloneExtension("Game Develop C++ platform", "PathfindingAutomatism");
+        CloneExtension("GDevelop C++ platform", "PathfindingAutomatism");
 
         GetAutomatismMetadata("PathfindingAutomatism::PathfindingAutomatism")
             .SetIncludeFile("PathfindingAutomatism/pathfindingruntimeautomatism.js")
@@ -129,7 +129,7 @@ public:
 };
 
 /**
- * Used by Game Develop to create the extension class
+ * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
@@ -137,7 +137,7 @@ extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
 }
 
 /**
- * Used by Game Develop to destroy the extension class
+ * Used by GDevelop to destroy the extension class
  * -- Do not need to be modified. --
  */
 extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {

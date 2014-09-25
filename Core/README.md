@@ -1,7 +1,7 @@
-Game Develop Core
+GDevelop Core
 =================
 
-This is the core library used to build platforms, extensions, tools for Game Develop. The IDE is also based on classes and tools offered by this library.
+This is the core library used to build platforms, extensions, tools for GDevelop. The IDE is also based on classes and tools offered by this library.
 
 Getting started
 ---------------
@@ -17,5 +17,5 @@ or any pull request so as to add a nice feature, do not hesitate to get in touch
 License
 -------
 
-Game Develop Core is distributed under the GNU LGPL license: See license.txt for
+GDevelop Core is distributed under the GNU LGPL license: See license.txt for
 more information.

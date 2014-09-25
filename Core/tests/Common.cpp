@@ -1,14 +1,15 @@
 /*
- * Game Develop Core
+ * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
 /**
- * @file Tests covering common features of Game Develop Core.
+ * @file Tests covering common features of GDevelop Core.
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/SystemStats.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Variable.h"
@@ -145,4 +146,14 @@ TEST_CASE( "EventsList", "[common][events]" ) {
 	    REQUIRE(1500 >= endMemory-startMemory);
 	}
 
+}
+
+TEST_CASE( "VersionWrapper", "[common]" ) {
+    REQUIRE( gd::VersionWrapper::IsOlder(1,9,9,9,2,0,0,0) == true );
+    REQUIRE( gd::VersionWrapper::IsOlder(2,0,0,0,1,9,9,9) == false );
+    REQUIRE( gd::VersionWrapper::IsOlder(2,1,9,9,2,1,9,9) == false );
+    REQUIRE( gd::VersionWrapper::IsOlder(2,1,9,9,2,2,0,0) == true );
+    REQUIRE( gd::VersionWrapper::IsOlder(2,1,0,9,2,2,0,9) == true );
+    REQUIRE( gd::VersionWrapper::IsOlder(2,1,0,9,2,1,1,0) == true );
+    REQUIRE( gd::VersionWrapper::IsOlderOrEqual(2,1,9,9,2,1,9,9) == true );
 }

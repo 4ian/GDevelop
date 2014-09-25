@@ -1,7 +1,7 @@
 {
   "name": "GDJS-tests",
   "version": "0.0.0",
-  "description": "Tests for the HTML5 engine of Game Develop",
+  "description": "Tests for the HTML5 engine of GDevelop",
   "main": "index.js",
   "scripts": {
     "test": "karma start --browsers Firefox --single-run"

@@ -1,5 +1,5 @@
 /*
- * Game Develop C++ Platform
+ * GDevelop C++ Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public License.
  */
@@ -27,7 +27,7 @@ void GD_API GDLogBanner()
     else if(sizeof(int*) == 8)
         sys += "64-bits";
 
-    std::cout << "Game Develop - " << gd::VersionWrapper::FullString() << " " << gd::VersionWrapper::Status() << std::endl;
+    std::cout << "GDevelop - " << gd::VersionWrapper::FullString() << " " << gd::VersionWrapper::Status() << std::endl;
     std::cout << "Built " << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << std::endl;
     std::cout << sys << std::endl;
     std::cout << std::endl;

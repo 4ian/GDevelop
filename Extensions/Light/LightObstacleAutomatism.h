@@ -3,7 +3,7 @@
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
-Game Develop - Light Extension
+GDevelop - Light Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 arising from the use of this software.
 

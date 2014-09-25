@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particle System Extension
+GDevelop - Particle System Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -93,7 +93,7 @@ Extension::Extension()
 };
 
 /**
- * Used by Game Develop to create the extension class
+ * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
@@ -101,7 +101,7 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 }
 
 /**
- * Used by Game Develop to destroy the extension class
+ * Used by GDevelop to destroy the extension class
  * -- Do not need to be modified. --
  */
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {

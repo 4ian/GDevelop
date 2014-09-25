@@ -27,9 +27,9 @@
             <Extension name="CommonDialogs" />
             <Extension name="TextObject" />
         </Extensions>
-        <Platforms current="Game Develop JS platform">
-            <Platform name="Game Develop JS platform" />
-            <Platform name="Game Develop C++ platform" />
+        <Platforms current="GDevelop JS platform">
+            <Platform name="GDevelop JS platform" />
+            <Platform name="GDevelop C++ platform" />
         </Platforms>
         <WindowW value="800" />
         <WindowH value="600" />

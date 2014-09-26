@@ -361,8 +361,9 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
             if ( !parentAuiManager->GetPane("PROFILER").IsOk() )
                 parentAuiManager->AddPane( profiler.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
             else
-                parentAuiManager->GetPane("PROFILER").Window(debugger.get());
+                parentAuiManager->GetPane("PROFILER").Window(profiler.get());
         }
+        parentAuiManager->Update();
     }
 }
 

@@ -12,7 +12,6 @@
 #include <wx/string.h>
 //*)
 
-const long RenderDialog::ID_CUSTOM1 = wxNewId();
 //(*IdInit(RenderDialog)
 const long RenderDialog::ID_CUSTOM1 = wxNewId();
 //*)

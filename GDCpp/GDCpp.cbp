@@ -635,6 +635,7 @@
 			<Add directory="../ExtLibs/boost" />
 			<Add directory="../ExtLibs/SFML/include" />
 		</Compiler>
+		<Unit filename="GDCore/IDE/Dialogs/DndResourcesEditor.h" />
 		<Unit filename="GDCpp/Animation.cpp" />
 		<Unit filename="GDCpp/Animation.h" />
 		<Unit filename="GDCpp/Arial.hpp" />
@@ -782,7 +783,6 @@
 		<Unit filename="GDCpp/IDE/Dialogs/wxSFMLCanvas.cpp" />
 		<Unit filename="GDCpp/IDE/Dialogs/wxSFMLCanvas.hpp" />
 		<Unit filename="GDCpp/IDE/DndResourcesEditor.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/DndResourcesEditor.h" />
 		<Unit filename="GDCpp/IDE/ExecutableIconChanger.cpp" />
 		<Unit filename="GDCpp/IDE/ExecutableIconChanger.h" />
 		<Unit filename="GDCpp/IDE/Exporter.cpp" />
@@ -833,6 +833,7 @@
 		<Unit filename="GDCpp/RuntimeObject.h" />
 		<Unit filename="GDCpp/RuntimeScene.cpp" />
 		<Unit filename="GDCpp/RuntimeScene.h" />
+		<Unit filename="GDCpp/RuntimeSpriteObject.h" />
 		<Unit filename="GDCpp/Scene.cpp" />
 		<Unit filename="GDCpp/Scene.h" />
 		<Unit filename="GDCpp/SceneNameMangler.cpp" />
@@ -847,7 +848,6 @@
 		<Unit filename="GDCpp/Sprite.cpp" />
 		<Unit filename="GDCpp/Sprite.h" />
 		<Unit filename="GDCpp/SpriteObject.cpp" />
-		<Unit filename="GDCpp/RuntimeSpriteObject.h" />
 		<Unit filename="GDCpp/Text.cpp" />
 		<Unit filename="GDCpp/Text.h" />
 		<Unit filename="GDCpp/Tools/AES.cpp" />
@@ -874,7 +874,6 @@
 		<Unit filename="GDCpp/tinyxml/tinyxmlerror.cpp" />
 		<Unit filename="GDCpp/tinyxml/tinyxmlparser.cpp" />
 		<Unit filename="wxsmith/CompilationErrorDialog.wxs" />
-		<Unit filename="wxsmith/DebuggerGUI.wxs" />
 		<Unit filename="wxsmith/ProfileDlg.wxs" />
 		<Unit filename="wxsmith/ProjectExportDialog.wxs" />
 		<Unit filename="wxsmith/RenderDialog.wxs" />
@@ -885,7 +884,7 @@
 			<lib_finder disable_auto="1" />
 			<AutoVersioning>
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="" />
+				<Settings autoincrement="0" date_declarations="1" use_define="0" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>
@@ -897,7 +896,6 @@
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCpp/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDCpp/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDCpp\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDCpp\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDCpp\IDE\Dialogs\ProfileDlg.cpp" hdr="GDCpp\IDE\Dialogs\ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
-					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="GDCpp\IDE\Dialogs\DebuggerGUI.cpp" hdr="GDCpp\IDE\Dialogs\DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="GDCpp\IDE\Dialogs\RenderDialog.cpp" hdr="GDCpp\IDE\Dialogs\RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ProjectExportDialog.wxs" src="GDCpp\IDE\Dialogs\ProjectExportDialog.cpp" hdr="GDCpp\IDE\Dialogs\ProjectExportDialog.h" fwddecl="0" i18n="1" name="ProjectExportDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/CompilationErrorDialog.wxs" src="GDCpp\IDE\Dialogs\CompilationErrorDialog.cpp" hdr="GDCpp\IDE\Dialogs\CompilationErrorDialog.h" fwddecl="0" i18n="1" name="CompilationErrorDialog" language="CPP" />

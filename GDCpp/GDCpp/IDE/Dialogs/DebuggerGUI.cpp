@@ -96,10 +96,10 @@ DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_)
             sizer->Fit(extPanel);
             sizer->SetSizeHints(extPanel);
 
-            extList->InsertColumn(0, "Property");
-            extList->InsertColumn(1, "Value");
+            extList->InsertColumn(0, _("Property"));
+            extList->InsertColumn(1, _("Value"));
             extList->SetColumnWidth(0, 175);
-            extList->SetColumnWidth(1, -1);
+            extList->SetColumnWidth(1, 100);
 
             m_notebook->AddPage(extPanel, extension->GetFullName(), false);
             extensionsListCtrls.push_back(extList);

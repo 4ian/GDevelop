@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 //(*InternalHeaders(ProjectExportDialog)
 #include <wx/bitmap.h>
-#include "GDCore/Tools/Localization.h"
+#include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
 //*)

@@ -8,12 +8,13 @@
 #include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
 
 //(*InternalHeaders(RenderDialog)
-#include "GDCore/Tools/Localization.h"
+#include <wx/intl.h>
 #include <wx/string.h>
 //*)
 
 const long RenderDialog::ID_CUSTOM1 = wxNewId();
 //(*IdInit(RenderDialog)
+const long RenderDialog::ID_CUSTOM1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(RenderDialog,wxDialog)

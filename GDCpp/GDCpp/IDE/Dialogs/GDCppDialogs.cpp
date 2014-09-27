@@ -28,7 +28,7 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     m_auimgr->SetFlags( wxAUI_MGR_LIVE_RESIZE|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_ALLOW_ACTIVE_PANE|wxAUI_MGR_ALLOW_FLOATING);
     m_auimgr->GetArtProvider()->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
     
-    m_toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_DEFAULT_STYLE|wxAUI_TB_OVERFLOW);
+    m_toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE);
     m_toolbar->SetToolBitmapSize(wxSize(16,16));
     
     m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).Fixed().CaptionVisible(true).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false).ToolbarPane());
@@ -69,6 +69,7 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     
     m_generalList = new wxListCtrl(m_panel31, ID_GENERAL_LIST_CTRL, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
     flexGridSizer35->Add(m_generalList, 0, wxALL|wxEXPAND, 0);
+    m_generalList->SetMinSize(wxSize(200,100));
     
     m_panel33 = new wxPanel(m_notebook, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
     int m_panel33ImgIndex;
@@ -84,7 +85,7 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     
     m_objectsTree = new wxTreeCtrl(m_panel33, ID_OBJECTS_TREE_CTRL);
     flexGridSizer39->Add(m_objectsTree, 0, wxALL|wxEXPAND, 0);
-    m_objectsTree->SetMinSize(wxSize(150,-1));
+    m_objectsTree->SetMinSize(wxSize(150,100));
     
     wxFlexGridSizer* flexGridSizer41 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer41->SetFlexibleDirection( wxBOTH );
@@ -100,15 +101,15 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer43->AddGrowableCol(1);
     flexGridSizer43->AddGrowableRow(0);
     
-    flexGridSizer41->Add(flexGridSizer43, 1, wxALL|wxEXPAND, 5);
+    flexGridSizer41->Add(flexGridSizer43, 1, wxALL|wxEXPAND, 0);
     
     m_staticText45 = new wxStaticText(m_panel33, wxID_ANY, _("Object :"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer43->Add(m_staticText45, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
-    m_objectName = new wxStaticText(m_panel33, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_objectName = new wxStaticText(m_panel33, wxID_ANY, _("aaa"), wxDefaultPosition, wxSize(-1,-1), 0);
     
-    flexGridSizer43->Add(m_objectName, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5);
+    flexGridSizer43->Add(m_objectName, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
     m_deleteBt = new wxBitmapButton(m_panel33, ID_DELETE_BT, wxXmlResource::Get()->LoadBitmap(wxT("deleteicon")), wxDefaultPosition, wxSize(-1,-1), wxBU_AUTODRAW);
     m_deleteBt->SetToolTip(_("Delete the selected object"));
@@ -117,6 +118,7 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     
     m_objectList = new wxListCtrl(m_panel33, ID_OBJECT_LIST, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
     flexGridSizer41->Add(m_objectList, 0, wxALL|wxEXPAND, 0);
+    m_objectList->SetMinSize(wxSize(150,100));
     
     SetSizeHints(500,300);
     if ( GetSizer() ) {

@@ -4,6 +4,9 @@
  * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#ifdef CreateDialog
+#undef CreateDialog
+#endif
 #include <iostream>
 #include <wx/dcclient.h>
 #include "GDCore/Tools/Log.h"

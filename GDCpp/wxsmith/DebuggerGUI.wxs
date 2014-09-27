@@ -19,20 +19,10 @@
 								<object class="AuiManagerItem">
 									<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
 										<object class="AuiToolBarItem">
-											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
-												<bitmap>res/starticon.png</bitmap>
-												<shorthelp>Play the scene</shorthelp>
-												<longhelp>Play the scene</longhelp>
-												<handler function="OnPlayBtClick" entry="EVT_TOOL" />
-											</object>
-											<label>Play the scene</label>
-										</object>
-										<object class="AuiToolBarItem">
 											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
 												<bitmap>res/pauseicon.png</bitmap>
 												<shorthelp>Pause the scene</shorthelp>
 												<longhelp>Pause the scene being played</longhelp>
-												<handler function="OnPauseBtClick" entry="EVT_TOOL" />
 											</object>
 											<label>Pause the scene</label>
 										</object>
@@ -41,7 +31,6 @@
 												<bitmap>res/stepicon.png</bitmap>
 												<shorthelp>Render only one frame of the scene</shorthelp>
 												<longhelp>Render only one frame of the scene</longhelp>
-												<handler function="OnStepBtClick" entry="EVT_TOOL" />
 											</object>
 											<label>Step</label>
 										</object>
@@ -54,7 +43,6 @@
 												<bitmap>res/addobjetdbg.png</bitmap>
 												<shorthelp>Create a new object</shorthelp>
 												<longhelp>Create a new object</longhelp>
-												<handler function="OnAddObjBtClick" entry="EVT_TOOL" />
 											</object>
 											<label>Item label</label>
 										</object>
@@ -63,7 +51,6 @@
 												<bitmap>res/addvaricon.png</bitmap>
 												<shorthelp>Add a scene variable</shorthelp>
 												<longhelp>Add a scene variable</longhelp>
-												<handler function="OnAddVarSceneBtClick" entry="EVT_TOOL" />
 											</object>
 											<label>Add a scene variable</label>
 										</object>
@@ -72,9 +59,16 @@
 												<bitmap>res/addvargicon.png</bitmap>
 												<shorthelp>Create a new global variable</shorthelp>
 												<longhelp>Create a new global variable</longhelp>
-												<handler function="OnAddVarGlobalBtClick" entry="EVT_TOOL" />
 											</object>
 											<label>Add a new global variable</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
+												<bitmap>res/starticon.png</bitmap>
+												<shorthelp>Play the scene</shorthelp>
+												<longhelp>Play the scene</longhelp>
+											</object>
+											<label>Play the scene</label>
 										</object>
 									</object>
 									<name>PaneName</name>
@@ -113,7 +107,6 @@
 									<object class="wxListCtrl" name="ID_LISTCTRL2" variable="generalList" member="yes">
 										<size>249,203</size>
 										<style>wxLC_REPORT</style>
-										<handler function="OngeneralListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -141,7 +134,6 @@
 											<item2></item2>
 										</items_text>
 										<size>138,203</size>
-										<handler function="OnobjectsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>2</border>
@@ -177,7 +169,6 @@
 													<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="deleteBt" member="yes">
 														<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 														<tooltip>Delete this object</tooltip>
-														<handler function="OndeleteBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>2</border>
@@ -191,7 +182,6 @@
 											<object class="wxListCtrl" name="ID_LISTCTRL1" variable="objectList" member="yes">
 												<size>249,203</size>
 												<style>wxLC_REPORT|wxLC_EDIT_LABELS</style>
-												<handler function="OnobjectListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 											</object>
 											<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>2</border>

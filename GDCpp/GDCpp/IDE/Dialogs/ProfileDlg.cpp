@@ -8,7 +8,7 @@
 #include "ProfileDlg.h"
 
 //(*InternalHeaders(ProfileDlg)
-#include "GDCore/Tools/Localization.h"
+#include <wx/intl.h>
 #include <wx/string.h>
 //*)
 #undef CreateDialog //Thanks windows.h

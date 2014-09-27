@@ -6,7 +6,10 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef RENDERDIALOG_H
 #define RENDERDIALOG_H
-
+#ifdef ___WXMSW___
+#include <wx/msw/winundef.h>
+#endif
+#undef CreateDialog
 //(*Headers(RenderDialog)
 #include "wxSFMLCanvas.hpp"
 #include <wx/dialog.h>

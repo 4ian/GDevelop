@@ -1,17 +1,6 @@
-/*
- * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
- */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "DebuggerGUI.h"
 
-//(*InternalHeaders(DebuggerGUI)
-#include <wx/bitmap.h>
-#include "GDCore/Tools/Localization.h"
-#include <wx/image.h>
-#include <wx/string.h>
-//*)
 #include <wx/toolbar.h>
 #include <wx/image.h>
 #include <boost/weak_ptr.hpp>
@@ -30,168 +19,63 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include <SFML/Graphics.hpp>
-#include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Localization.h" 
 
-using namespace std;
-
-//(*IdInit(DebuggerGUI)
-const long DebuggerGUI::ID_AUITOOLBARITEM1 = wxNewId();
-const long DebuggerGUI::ID_AUITOOLBARITEM2 = wxNewId();
-const long DebuggerGUI::ID_AUITOOLBARITEM3 = wxNewId();
-const long DebuggerGUI::ID_AUITOOLBARITEM5 = wxNewId();
-const long DebuggerGUI::ID_AUITOOLBARITEM6 = wxNewId();
-const long DebuggerGUI::ID_AUITOOLBARITEM4 = wxNewId();
-const long DebuggerGUI::ID_AUITOOLBAR1 = wxNewId();
-const long DebuggerGUI::ID_PANEL3 = wxNewId();
-const long DebuggerGUI::ID_LISTCTRL2 = wxNewId();
-const long DebuggerGUI::ID_PANEL1 = wxNewId();
-const long DebuggerGUI::ID_TREECTRL1 = wxNewId();
-const long DebuggerGUI::ID_STATICTEXT1 = wxNewId();
-const long DebuggerGUI::ID_STATICTEXT2 = wxNewId();
-const long DebuggerGUI::ID_BITMAPBUTTON1 = wxNewId();
-const long DebuggerGUI::ID_LISTCTRL1 = wxNewId();
-const long DebuggerGUI::ID_PANEL2 = wxNewId();
-const long DebuggerGUI::ID_NOTEBOOK1 = wxNewId();
-//*)
-const long DebuggerGUI::ID_PLAYBT = wxNewId();
-const long DebuggerGUI::ID_PAUSEBT = wxNewId();
-const long DebuggerGUI::ID_STEPBT = wxNewId();
-const long DebuggerGUI::ID_CONSOLEBT = wxNewId();
-const long DebuggerGUI::ID_VARSCENEBT = wxNewId();
-const long DebuggerGUI::ID_VARGLOBALBT = wxNewId();
-const long DebuggerGUI::ID_ADDOBJBT = wxNewId();
 const long DebuggerGUI::ID_EXTLIST = wxNewId();
 
-
-BEGIN_EVENT_TABLE(DebuggerGUI,wxPanel)
-	//(*EventTable(DebuggerGUI)
-	//*)
-END_EVENT_TABLE()
-
-DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene & scene_) :
-scene(scene_),
-mustRecreateTree(true),
-doMAJ(false),
-objectChanged(true)
+DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_)
+    : DebuggerGUIBase(parent),
+      BaseDebugger(),
+      scene(scene_),
+      mustRecreateTree(true),
+      doMAJ(false),
+      objectChanged(true)
 {
-	//(*Initialize(DebuggerGUI)
-	wxFlexGridSizer* FlexGridSizer4;
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer5;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer6;
-	wxFlexGridSizer* FlexGridSizer1;
+    //Connect events
+    Connect(ID_PLAY_TOOL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnPlayBtClick);
+    Connect(ID_PAUSE_TOOL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnPauseBtClick);
+    Connect(ID_STEP_TOOL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnStepBtClick);
+    Connect(ID_ADD_OBJECT_TOOL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddObjBtClick);
+    Connect(ID_ADD_VAR_TOOL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarSceneBtClick);
+    Connect(ID_ADD_VARG_TOOL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarGlobalBtClick);
+    Connect(ID_GENERAL_LIST_CTRL,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OngeneralListItemActivated);
+    Connect(ID_OBJECTS_TREE_CTRL,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&DebuggerGUI::OnobjectsTreeSelectionChanged);
+    Connect(ID_DELETE_BT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OndeleteBtClick);
+    Connect(ID_OBJECT_LIST,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnobjectListItemActivated);
 
-	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
-	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(1);
-	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer6->AddGrowableCol(0);
-	FlexGridSizer6->AddGrowableRow(0);
-	toolbarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
-	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_AUITOOLBARITEM1, _("Play the scene"), wxBitmap(wxImage(_T("res/starticon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Play the scene"), _("Play the scene"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Pause the scene"), wxBitmap(wxImage(_T("res/pauseicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Pause the scene"), _("Pause the scene being played"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM3, _("Step"), wxBitmap(wxImage(_T("res/stepicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Render only one frame of the scene"), _("Render only one frame of the scene"), NULL);
-	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM5, _("Item label"), wxBitmap(wxImage(_T("res/addobjetdbg.png"))), wxNullBitmap, wxITEM_NORMAL, _("Create a new object"), _("Create a new object"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM6, _("Add a scene variable"), wxBitmap(wxImage(_T("res/addvaricon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add a scene variable"), _("Add a scene variable"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Add a new global variable"), wxBitmap(wxImage(_T("res/addvargicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Create a new global variable"), _("Create a new global variable"), NULL);
-	toolbar->Realize();
-	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
-	AuiManager1->Update();
-	FlexGridSizer6->Add(toolbarPanel, 1, wxBOTTOM|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
-	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer3->AddGrowableCol(0);
-	FlexGridSizer3->AddGrowableRow(0);
-	generalList = new wxListCtrl(Panel1, ID_LISTCTRL2, wxDefaultPosition, wxSize(249,203), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL2"));
-	FlexGridSizer3->Add(generalList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Panel1->SetSizer(FlexGridSizer3);
-	FlexGridSizer3->Fit(Panel1);
-	FlexGridSizer3->SetSizeHints(Panel1);
-	Panel2 = new wxPanel(Notebook1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
-	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer2->AddGrowableCol(1);
-	FlexGridSizer2->AddGrowableRow(0);
-	objectsTree = new wxTreeCtrl(Panel2, ID_TREECTRL1, wxDefaultPosition, wxSize(138,203), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-	FlexGridSizer2->Add(objectsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer4->AddGrowableCol(0);
-	FlexGridSizer4->AddGrowableRow(1);
-	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer5->AddGrowableCol(2);
-	FlexGridSizer5->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(Panel2, ID_STATICTEXT1, _("Object :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	objectName = new wxStaticText(Panel2, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer5->Add(objectName, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	deleteBt = new wxBitmapButton(Panel2, ID_BITMAPBUTTON1, gd::SkinHelper::GetIcon("delete", 16), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
-	deleteBt->SetToolTip(_("Delete this object"));
-	FlexGridSizer5->Add(deleteBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 2);
-	FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	objectList = new wxListCtrl(Panel2, ID_LISTCTRL1, wxDefaultPosition, wxSize(249,203), wxLC_REPORT|wxLC_EDIT_LABELS, wxDefaultValidator, _T("ID_LISTCTRL1"));
-	FlexGridSizer4->Add(objectList, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Panel2->SetSizer(FlexGridSizer2);
-	FlexGridSizer2->Fit(Panel2);
-	FlexGridSizer2->SetSizeHints(Panel2);
-	Notebook1->AddPage(Panel1, _("General"), false);
-	Notebook1->AddPage(Panel2, _("Objects"), false);
-	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	SetSizer(FlexGridSizer1);
-	FlexGridSizer1->Fit(this);
-	FlexGridSizer1->SetSizeHints(this);
-
-	Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnPlayBtClick);
-	Connect(ID_AUITOOLBARITEM2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnPauseBtClick);
-	Connect(ID_AUITOOLBARITEM3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnStepBtClick);
-	Connect(ID_AUITOOLBARITEM5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddObjBtClick);
-	Connect(ID_AUITOOLBARITEM6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarSceneBtClick);
-	Connect(ID_AUITOOLBARITEM4,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarGlobalBtClick);
-	toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&DebuggerGUI::OntoolbarPanelResize,0,this);
-	Connect(ID_LISTCTRL2,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OngeneralListItemActivated);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&DebuggerGUI::OnobjectsTreeSelectionChanged);
-	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OndeleteBtClick);
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnobjectListItemActivated);
-	Connect(wxEVT_SIZE,(wxObjectEventFunction)&DebuggerGUI::OnResize);
-	//*)
-
-	Connect(ID_EXTLIST,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnExtensionListItemActivated);
-
-    gd::SkinHelper::ApplyCurrentSkin(*toolbar);
-    toolbar->Realize();
+    gd::SkinHelper::ApplyCurrentSkin(*m_toolbar);
+    m_toolbar->Realize();
 
     font = *wxNORMAL_FONT;
     font.SetWeight(wxFONTWEIGHT_BOLD);
 
-    generalList->InsertColumn(0, "Propriété");
-    generalList->InsertColumn(1, "Valeur");
-    generalList->SetColumnWidth(0, 225);
-    generalList->SetColumnWidth(1, 165);
+    //Apply some styles
+    m_generalList->SetWindowStyleFlag(wxLC_REPORT);
+    m_objectList->SetWindowStyleFlag(wxLC_REPORT|wxLC_EDIT_LABELS);
 
-    generalList->InsertItem(0, _("Frame per seconds ( FPS )"));
-    generalList->InsertItem(1, _("Time elapsed since the last image"));
-    generalList->InsertItem(2, _("Number of objects"));
-    generalList->InsertItem(3, _("Resources count"));
-    generalList->InsertItem(4, _("Window's size"));
-    generalList->InsertItem(5, _("Position of the mouse over the window"));
-    generalList->InsertItem(6, _("Time elapsed since the beginning of the scene"));
-    generalList->InsertItem(7, "");
-    generalList->InsertItem(8, _("Scene variables"));
-    generalList->SetItemFont(8, font);
-    generalBaseItemCount = generalList->GetItemCount();
+    m_generalList->InsertColumn(0, _("Property"));
+    m_generalList->InsertColumn(1, _("Value"));
+    m_generalList->SetColumnWidth(0, 225);
+    m_generalList->SetColumnWidth(1, 165);
 
-    objectList->InsertColumn(0, "Propriété");
-    objectList->InsertColumn(1, "Valeur");
-    objectList->SetColumnWidth(0, 175);
-    objectList->SetColumnWidth(1, 100);
+    m_generalList->InsertItem(0, _("Frame per seconds ( FPS )"));
+    m_generalList->InsertItem(1, _("Time elapsed since the last image"));
+    m_generalList->InsertItem(2, _("Number of objects"));
+    m_generalList->InsertItem(3, _("Resources count"));
+    m_generalList->InsertItem(4, _("Window's size"));
+    m_generalList->InsertItem(5, _("Position of the mouse over the window"));
+    m_generalList->InsertItem(6, _("Time elapsed since the beginning of the scene"));
+    m_generalList->InsertItem(7, "");
+    m_generalList->InsertItem(8, _("Scene variables"));
+    m_generalList->SetItemFont(8, font);
+    generalBaseItemCount = m_generalList->GetItemCount();
 
-    objectsTree->AddRoot(_("Objects"));
+    m_objectList->InsertColumn(0, _("Property"));
+    m_objectList->InsertColumn(1, _("Value"));
+    m_objectList->SetColumnWidth(0, 175);
+    m_objectList->SetColumnWidth(1, 100);
+
+    m_objectsTree->AddRoot(_("Objects"));
 
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
@@ -202,7 +86,7 @@ objectChanged(true)
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
         {
             alreadyCreatedPanels.insert(extension->GetName());
-            wxPanel * extPanel = new wxPanel(Notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, extension->GetName());
+            wxPanel * extPanel = new wxPanel(m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, extension->GetName());
             wxFlexGridSizer * sizer = new wxFlexGridSizer(0, 3, 0, 0);
             sizer->AddGrowableCol(0);
             sizer->AddGrowableRow(0);
@@ -212,12 +96,12 @@ objectChanged(true)
             sizer->Fit(extPanel);
             sizer->SetSizeHints(extPanel);
 
-            extList->InsertColumn(0, "Propriété");
-            extList->InsertColumn(1, "Valeur");
+            extList->InsertColumn(0, "Property");
+            extList->InsertColumn(1, "Value");
             extList->SetColumnWidth(0, 175);
             extList->SetColumnWidth(1, -1);
 
-            Notebook1->AddPage(extPanel, extension->GetFullName(), false);
+            m_notebook->AddPage(extPanel, extension->GetFullName(), false);
             extensionsListCtrls.push_back(extList);
         }
     }
@@ -225,22 +109,10 @@ objectChanged(true)
 
 DebuggerGUI::~DebuggerGUI()
 {
-	//(*Destroy(DebuggerGUI)
-	//*)
-
-	AuiManager1->UnInit();
-}
-
-
-////////////////////////////////////////////////////////////
-/// Mise à jour de la taille de la toolbar
-////////////////////////////////////////////////////////////
-void DebuggerGUI::OntoolbarPanelResize(wxSizeEvent& event)
-{
 }
 
 ////////////////////////////////////////////////////////////
-/// Contrôle du déroulement de la scène
+/// ContrÃ´le du dÃ©roulement de la scÃ¨ne
 ////////////////////////////////////////////////////////////
 void DebuggerGUI::OnPlayBtClick(wxCommandEvent& event)
 {
@@ -263,44 +135,39 @@ void DebuggerGUI::Pause()
 {
     doMAJ = false;
     mustRecreateTree = true;
-    toolbar->Enable(false);
-    deleteBt->Enable(false);
+    m_toolbar->Enable(false);
+    m_deleteBt->Enable(false);
 }
 
 void DebuggerGUI::Play()
 {
     doMAJ = true;
     mustRecreateTree = true;
-    toolbar->Enable(true);
-    deleteBt->Enable(true);
+    m_toolbar->Enable(true);
+    m_deleteBt->Enable(true);
 }
 
-
-/**
- * Refreshing the debugger.
- * Automatically called by the RuntimeScene
- */
 void DebuggerGUI::UpdateGUI()
 {
     if ( !doMAJ || !IsShown())
         return;
 
     //General tab
-    generalList->SetItem(0, 1, ToString(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
-    generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
-    generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
-    //TODO //generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
-    generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
-    generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
-    generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
+    m_generalList->SetItem(0, 1, ToString(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
+    m_generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
+    m_generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
+    //TODO //m_generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
+    m_generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
+    m_generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
+    m_generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables
-    while(static_cast<unsigned int>(generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
-        generalList->DeleteItem(generalBaseItemCount);
+    while(static_cast<unsigned int>(m_generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
+        m_generalList->DeleteItem(generalBaseItemCount);
 
     //Rajout si au contraire il n'y en a pas assez
-    while(static_cast<unsigned int>(generalList->GetItemCount()) < generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
-        generalList->InsertItem(generalBaseItemCount, "");
+    while(static_cast<unsigned int>(m_generalList->GetItemCount()) < generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
+        m_generalList->InsertItem(generalBaseItemCount, "");
 
     //Update scene variables
     unsigned int i = 0;
@@ -308,19 +175,19 @@ void DebuggerGUI::UpdateGUI()
     for (std::map < std::string, gd::Variable* >::const_iterator it = sceneVariables.begin();
         it!=sceneVariables.end();++it, ++i)
     {
-        generalList->SetItem(generalBaseItemCount+i, 0, it->first);
-        generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
-        generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
+        m_generalList->SetItem(generalBaseItemCount+i, 0, it->first);
+        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
+        m_generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
     //White space
-    generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count(), 0, "");
-    generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count(), 1, "");
+    m_generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count(), 0, "");
+    m_generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count(), 1, "");
 
     //Global variable title
-    generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count()+1, 0, _("Globals variables"));
-    generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count()+1, 1, "");
-    generalList->SetItemFont(generalBaseItemCount+scene.GetVariables().Count()+1, font);
+    m_generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count()+1, 0, _("Globals variables"));
+    m_generalList->SetItem(generalBaseItemCount+scene.GetVariables().Count()+1, 1, "");
+    m_generalList->SetItemFont(generalBaseItemCount+scene.GetVariables().Count()+1, font);
     generalBaseAndVariablesItemCount = generalBaseItemCount+scene.GetVariables().Count()+2;
 
     //Update global variables
@@ -329,9 +196,9 @@ void DebuggerGUI::UpdateGUI()
     for (std::map < std::string, gd::Variable* >::const_iterator it = gameVariables.begin();
         it!=gameVariables.end();++it, ++i)
     {
-        generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, it->first);
-        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
-        generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, it->first);
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
+        m_generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
     //Extensions tab
@@ -362,11 +229,11 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    //Arbre des objets : Création des objets
+    //Arbre des objets : CrÃ©ation des objets
     if ( mustRecreateTree )
     {
-        objectsTree->DeleteAllItems();
-        objectsTree->AddRoot(_("objects"));
+        m_objectsTree->DeleteAllItems();
+        m_objectsTree->AddRoot(_("objects"));
         objectsInTree.clear();
         initialObjects.clear();
         mustRecreateTree = false;
@@ -374,17 +241,17 @@ void DebuggerGUI::UpdateGUI()
         //Scene's objects
         for(unsigned int i = 0;i<scene.GetObjects().size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.GetObjects()[i]->GetName());
+            wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.GetObjects()[i]->GetName());
             initialObjects[scene.GetObjects()[i]->GetName()] = objectItem;
         }
         //Globals objects
         for(unsigned int i = 0;i<scene.game->GetObjects().size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.game->GetObjects()[i]->GetName());
+            wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.game->GetObjects()[i]->GetName());
             initialObjects[scene.game->GetObjects()[i]->GetName()] = objectItem;
         }
 
-        objectsTree->ExpandAll();
+        m_objectsTree->ExpandAll();
     }
 
     //Ajout des objets
@@ -399,30 +266,30 @@ void DebuggerGUI::UpdateGUI()
             char str[24];
             snprintf(str, 24, "%p", allObjects[i].get());
 
-            wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], str);
-            objectsInTree[weakPtrToObject] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
+            wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], str);
+            objectsInTree[weakPtrToObject] = std::pair<std::string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
         }
         else
         {
-            //Si l'objet qui est dans l'arbre n'est pas le même, on le supprime et le reajoute au bon endroit
+            //Si l'objet qui est dans l'arbre n'est pas le mÃªme, on le supprime et le reajoute au bon endroit
             if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() && initialObjects.find(allObjects[i]->GetName()) != initialObjects.end() )
             {
-                objectsTree->Delete(objectsInTree[weakPtrToObject].second);
-                wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], ToString(i));
-                objectsInTree[weakPtrToObject] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
+                m_objectsTree->Delete(objectsInTree[weakPtrToObject].second);
+                wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], ToString(i));
+                objectsInTree[weakPtrToObject] = std::pair<std::string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
             }
         }
     }
 
-    //Suppression des élements en trop
-    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
-    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
+    //Suppression des Ã©lements en trop
+    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
+    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
     while(objectsInTreeIter != objectsInTreeEnd)
     {
         if ( (*objectsInTreeIter).first.expired() )
         {
-            objectsTree->Delete((*objectsInTreeIter).second.second); //Delete from the tree
+            m_objectsTree->Delete((*objectsInTreeIter).second.second); //Delete from the tree
             objectsInTree.erase(objectsInTreeIter++); //Post increment is important. It increment the iterator and then return the *original* iterator.
             //( Erasing an value does not invalidate any iterator except the deleted one )
         }
@@ -431,14 +298,14 @@ void DebuggerGUI::UpdateGUI()
     }
 
     //Obtain the shared_ptr to the selected object
-    if ( !objectsTree->GetSelection().IsOk() )
+    if ( !m_objectsTree->GetSelection().IsOk() )
         return;
 
     RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
-    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
-        if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
+        if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
             object = i->first.lock();
             continue;
@@ -448,20 +315,20 @@ void DebuggerGUI::UpdateGUI()
     if ( object == boost::shared_ptr<RuntimeObject>() )
         return;
 
-    objectName->SetLabel(object->GetName());
+    m_objectName->SetLabel(object->GetName());
 
     //Object selected has changed, recreate the enitre table.
     if ( objectChanged )
         RecreateListForObject(object);
 
-    string value, uselessName;
+    std::string value, uselessName;
     unsigned int currentLine = 1; //We start a the second line, after "General"
 
     //Properties of base object
     for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, uselessName, value);
-        objectList->SetItem(currentLine, 1, value);
+        m_objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
     }
@@ -472,7 +339,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
     {
         object->GetPropertyForDebugger(i, uselessName, value);
-        objectList->SetItem(currentLine, 1, value);
+        m_objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
     }
@@ -483,69 +350,22 @@ void DebuggerGUI::UpdateGUI()
     const std::map < std::string, gd::Variable* > & objectVariables = object->GetVariables().DumpAllVariables();
 
     //Suppression des lignes en trop pour les variables
-    while(objectList->GetItemCount() > baseItemCount+objectVariables.size())
-        objectList->DeleteItem(baseItemCount+objectVariables.size());
+    while(m_objectList->GetItemCount() > baseItemCount+objectVariables.size())
+        m_objectList->DeleteItem(baseItemCount+objectVariables.size());
 
     //Rajout si au contraire il n'y en a pas assez
-    while(objectList->GetItemCount() < baseItemCount+objectVariables.size())
+    while(m_objectList->GetItemCount() < baseItemCount+objectVariables.size())
     {
-        objectList->InsertItem(baseItemCount, "");
+        m_objectList->InsertItem(baseItemCount, "");
     }
 
-    //Mise à jour des variables
+    //Mise Ã  jour des variables
     for (std::map < std::string, gd::Variable* >::const_iterator it = objectVariables.begin();
         it!=objectVariables.end();++it, ++i)
     {
-        objectList->SetItem(baseItemCount+i, 0, it->first);
-        objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
+        m_objectList->SetItem(baseItemCount+i, 0, it->first);
+        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
     }
-}
-
-/**
- * Create the list of properties for an object
- */
-void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
-{
-    objectList->DeleteAllItems();
-    unsigned int currentLine = 0;
-    string name, uselessValue;
-
-    objectList->InsertItem(0, _("General"));
-    objectList->SetItemFont(0, font);
-    currentLine++;
-
-    //Create base properties.
-    for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
-    {
-        object->RuntimeObject::GetPropertyForDebugger(i, name, uselessValue);
-        objectList->InsertItem(currentLine, name);
-
-        currentLine++;
-    }
-
-    objectList->InsertItem(objectList->GetItemCount(), "");
-    objectList->InsertItem(objectList->GetItemCount(), _("Specific"));
-    objectList->SetItemFont(objectList->GetItemCount()-1, font);
-    currentLine += 2;
-
-    //Create object specific properties.
-    for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
-    {
-        object->GetPropertyForDebugger(i, name, uselessValue);
-        objectList->InsertItem(currentLine, name);
-
-        currentLine++;
-    }
-
-    objectList->InsertItem(objectList->GetItemCount(), "");
-    objectList->InsertItem(objectList->GetItemCount(), _("Variables"));
-    objectList->SetItemFont(objectList->GetItemCount()-1, font);
-
-    //On retient combien il y a d'item de base pour savoir où commencer
-    //pour ajouter les variables.
-    baseItemCount = objectList->GetItemCount();
-
-    objectChanged = false;
 }
 
 void DebuggerGUI::OnobjectsTreeSelectionChanged(wxTreeEvent& event)
@@ -558,15 +378,15 @@ void DebuggerGUI::OnobjectsTreeSelectionChanged(wxTreeEvent& event)
  */
 void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 {
-    if ( !objectsTree->GetSelection().IsOk() )
+    if ( !m_objectsTree->GetSelection().IsOk() )
         return;
 
     //Obtain the shared_ptr to the object
     RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
-    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
-        if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
+        if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
             object = i->first.lock();
             continue;
@@ -581,9 +401,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     {
         int propNb = event.GetIndex()-1;
 
-        string uselessName, oldValue;
+        std::string uselessName, oldValue;
         object->RuntimeObject::GetPropertyForDebugger(propNb, uselessName, oldValue);
-        string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
+        std::string newValue = std::string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
         if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
@@ -596,9 +416,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     {
         int propNb = event.GetIndex()-1-2-object->RuntimeObject::GetNumberOfProperties();
 
-        string uselessName, oldValue;
+        std::string uselessName, oldValue;
         object->GetPropertyForDebugger(propNb, uselessName, oldValue);
-        string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
+        std::string newValue = std::string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
@@ -607,9 +427,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     }
     else //Or a variable
     {
-        std::string name = ToString(objectList->GetItemText(event.GetIndex()));
+        std::string name = ToString(m_objectList->GetItemText(event.GetIndex()));
 
-        string newValue = ToString(wxGetTextFromUser(_("Enter the new value"), _("Editing a variable"), object->GetVariables().Get(name).GetString()));
+        std::string newValue = ToString(wxGetTextFromUser(_("Enter the new value"), _("Editing a variable"), object->GetVariables().Get(name).GetString()));
         object->GetVariables().Get(name).SetString(newValue);
     }
 
@@ -622,16 +442,16 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
 {
     if ( event.GetIndex() < (generalBaseItemCount + scene.GetVariables().Count()))
     {
-        std::string name = ToString(generalList->GetItemText(event.GetIndex()));
+        std::string name = ToString(m_generalList->GetItemText(event.GetIndex()));
 
-        string newValue = ToString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), scene.GetVariables().Get(name).GetString()));
+        std::string newValue = ToString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), scene.GetVariables().Get(name).GetString()));
         scene.GetVariables().Get(name).SetString(newValue);
     }
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + scene.game->GetVariables().Count()) )
     {
-        std::string name = ToString(generalList->GetItemText(event.GetIndex()));
+        std::string name = ToString(m_generalList->GetItemText(event.GetIndex()));
 
-        string newValue = ToString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), scene.game->GetVariables().Get(name).GetString()));
+        std::string newValue = ToString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), scene.game->GetVariables().Get(name).GetString()));
         scene.game->GetVariables().Get(name).SetString(newValue);
     }
 }
@@ -644,23 +464,23 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
     wxListCtrl * list = dynamic_cast<wxListCtrl*>(event.GetEventObject());
     if ( !list )
     {
-        cout << "Received an event for a bad Extension wxListCtrl in debugger." << endl;
+        std::cout << "Received an event for a bad Extension wxListCtrl in debugger." << std::endl;
         return;
     }
 
-    boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(string(list->GetName().mb_str()));
+    boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(std::string(list->GetName().mb_str()));
     boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
     if ( extension == boost::shared_ptr<ExtensionBase>() )
     {
-        cout << "Unknown extension in debugger ( " << list->GetName() << " )" << endl;
+        std::cout << "Unknown extension in debugger ( " << list->GetName() << " )" << std::endl;
         return;
     }
 
     int propNb = event.GetIndex();
-    string uselessName, oldValue;
+    std::string uselessName, oldValue;
     extension->GetPropertyForDebugger(scene, propNb, uselessName, oldValue);
-    string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
+    std::string newValue = std::string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
@@ -668,20 +488,75 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
     }
 }
 
+void DebuggerGUI::UpdateListCtrlColumnsWidth()
+{
+    m_generalList->SetColumnWidth(1, m_generalList->GetSize().GetWidth()-m_generalList->GetColumnWidth(0)-15);
+    m_objectList->SetColumnWidth(1, m_objectList->GetSize().GetWidth()-m_objectList->GetColumnWidth(0)-15);
+    for (unsigned int i = 0;i<extensionsListCtrls.size();++i)
+        extensionsListCtrls[i]->SetColumnWidth(1, extensionsListCtrls[i]->GetSize().GetWidth()-extensionsListCtrls[i]->GetColumnWidth(0)-15);
+}
+
+/**
+ * Create the list of properties for an object
+ */
+void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
+{
+    m_objectList->DeleteAllItems();
+    unsigned int currentLine = 0;
+    std::string name, uselessValue;
+
+    m_objectList->InsertItem(0, _("General"));
+    m_objectList->SetItemFont(0, font);
+    currentLine++;
+
+    //Create base properties.
+    for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
+    {
+        object->RuntimeObject::GetPropertyForDebugger(i, name, uselessValue);
+        m_objectList->InsertItem(currentLine, name);
+
+        currentLine++;
+    }
+
+    m_objectList->InsertItem(m_objectList->GetItemCount(), "");
+    m_objectList->InsertItem(m_objectList->GetItemCount(), _("Specific"));
+    m_objectList->SetItemFont(m_objectList->GetItemCount()-1, font);
+    currentLine += 2;
+
+    //Create object specific properties.
+    for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
+    {
+        object->GetPropertyForDebugger(i, name, uselessValue);
+        m_objectList->InsertItem(currentLine, name);
+
+        currentLine++;
+    }
+
+    m_objectList->InsertItem(m_objectList->GetItemCount(), "");
+    m_objectList->InsertItem(m_objectList->GetItemCount(), _("Variables"));
+    m_objectList->SetItemFont(m_objectList->GetItemCount()-1, font);
+
+    //On retient combien il y a d'item de base pour savoir oÃ¹ commencer
+    //pour ajouter les variables.
+    baseItemCount = m_objectList->GetItemCount();
+
+    objectChanged = false;
+}
+
 /**
  * Delete the selected object
  */
 void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
 {
-    if ( !objectsTree->GetSelection().IsOk() )
+    if ( !m_objectsTree->GetSelection().IsOk() )
         return;
 
     //Obtain the shared_ptr to the object
     RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
-    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
-        if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
+        if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
             object = i->first.lock();
             continue;
@@ -696,7 +571,7 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
  */
 void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 {
-    string variableName = string(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable")).mb_str());
+    std::string variableName = std::string(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable")).mb_str());
 
     if ( variableName == "" ) return;
     if ( scene.GetVariables().Has(variableName) )
@@ -705,7 +580,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
         return;
     }
 
-    string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")));
+    std::string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")));
 
     scene.GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -715,7 +590,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
  */
 void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 {
-    string variableName = ToString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")));
+    std::string variableName = ToString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")));
 
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().Has(variableName) )
@@ -724,7 +599,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
         return;
     }
 
-    string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")));
+    std::string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")));
 
     scene.game->GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -734,7 +609,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     gd::ChooseObjectDialog dialog( this, *scene.game, scene, false );
     if ( dialog.ShowModal() != 1 ) return;
 
-    string objectWanted = dialog.GetChosenObject();
+    std::string objectWanted = dialog.GetChosenObject();
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
@@ -752,8 +627,8 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
         return;
     }
 
-    int x = ToInt(string(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object")).mb_str()));
-    int y = ToInt(string(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object")).mb_str()));
+    int x = ToInt(std::string(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object")).mb_str()));
+    int y = ToInt(std::string(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object")).mb_str()));
     newObject->SetX( x );
     newObject->SetY( y );
 
@@ -764,20 +639,6 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     scene.objectsInstances.AddObject(newObject);
 
     return;
-}
-
-void DebuggerGUI::OnResize(wxSizeEvent& event)
-{
-    Notebook1->SetSize(GetSize().GetWidth()-5, GetSize().GetHeight()-toolbarPanel->GetSize().GetHeight()-10);
-    UpdateListCtrlColumnsWidth();
-}
-
-void DebuggerGUI::UpdateListCtrlColumnsWidth()
-{
-    generalList->SetColumnWidth(1, generalList->GetSize().GetWidth()-generalList->GetColumnWidth(0)-15);
-    objectList->SetColumnWidth(1, objectList->GetSize().GetWidth()-objectList->GetColumnWidth(0)-15);
-    for (unsigned int i = 0;i<extensionsListCtrls.size();++i)
-        extensionsListCtrls[i]->SetColumnWidth(1, extensionsListCtrls[i]->GetSize().GetWidth()-extensionsListCtrls[i]->GetColumnWidth(0)-15);
 }
 
 #endif

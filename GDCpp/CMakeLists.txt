@@ -112,11 +112,17 @@ include_directories(.)
 file(GLOB_RECURSE source_files GDCpp/*)
 file(GLOB_RECURSE ide_source_files GDCpp/*)
 file(GLOB_RECURSE exe_source_files Runtime/*)
-# Remove some file for runtime target
+# Remove some file for runtime/nogui target
 list (REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.h")
 list (REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.cpp")
 list (REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs_dialogs_bitmaps.h")
 list (REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs_dialogs_bitmaps.cpp")
+IF (NO_GUI)
+list (REMOVE_ITEM ide_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.h")
+list (REMOVE_ITEM ide_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.cpp")
+list (REMOVE_ITEM ide_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs_dialogs_bitmaps.h")
+list (REMOVE_ITEM ide_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs_dialogs_bitmaps.cpp")
+ENDIF(NO_GUI)
 
 add_library(GDCpp SHARED ${ide_source_files})
 set_target_properties(GDCpp PROPERTIES COMPILE_DEFINITIONS "${GDCpp_extra_definitions}")

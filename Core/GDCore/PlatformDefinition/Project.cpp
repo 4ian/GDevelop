@@ -546,6 +546,14 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     currentPlatform = NULL;
     std::string currentPlatformName = propElement.GetChild("currentPlatform").GetValue().GetString();
+    //Compatibility code
+    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, 0, 3, 4, 73, 0) )
+    {
+        if (currentPlatformName == "Game Develop C++ platform") currentPlatformName = "GDevelop C++ platform";
+        if (currentPlatformName == "Game Develop JS platform") currentPlatformName = "GDevelop JS platform";
+    }
+    //End of Compatibility code
+
     const SerializerElement & platformsElement = propElement.GetChild("platforms", 0, "Platforms");
     platformsElement.ConsiderAsArrayOf("platform", "Platform");
     for(unsigned int i = 0;i<platformsElement.GetChildrenCount();++i)

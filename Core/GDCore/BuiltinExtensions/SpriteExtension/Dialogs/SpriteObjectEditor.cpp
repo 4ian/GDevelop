@@ -1483,6 +1483,8 @@ void SpriteObjectEditor::OnAddVerticeClick(wxCommandEvent& event)
 void SpriteObjectEditor::OnmaskTreeSelectionChanged(wxTreeListEvent& event)
 {
     wxTreeListItem selectedItem = maskTree->GetSelection();
+    if(polygonEditionHelper.IsMovingPoint())
+    	return;
     if ( maskTree->GetItemParent(selectedItem) == maskTree->GetRootItem() )
     {
         //A polygon is selected

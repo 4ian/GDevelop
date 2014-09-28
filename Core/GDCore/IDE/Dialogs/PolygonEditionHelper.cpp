@@ -54,6 +54,9 @@ void PolygonEditionHelper::OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoi
 
 void PolygonEditionHelper::OnMouseLeftDown(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset)
 {
+    if(movingPolygonPoint)
+        return;
+
     for (unsigned int i = 0;i<mask.size();++i)
     {
         for (unsigned int j = 0;j<mask[i].vertices.size();++j)

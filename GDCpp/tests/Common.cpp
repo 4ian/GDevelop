@@ -25,10 +25,12 @@ TEST_CASE( "RuntimeScene", "[common]" ) {
 	SECTION("Loading from a layout") {
 		gd::Project project;
 		gd::Layout layout;
+                layout.SetName("My layout");
 
 		RuntimeGame game;
 		RuntimeScene scene(NULL, &game);
 
 		scene.LoadFromScene(layout);
+                REQUIRE(scene.GetName() == "My layout");
 	}
 }

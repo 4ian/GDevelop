@@ -108,10 +108,26 @@ ENDIF(WIN32)
 #The targets
 ###
 include_directories(.)
-file(GLOB_RECURSE source_files GDCpp/*)
+
+file(GLOB source_gdcpp GDCpp/*)
+file(GLOB_RECURSE source_gdcpp_builtin GDCpp/BuiltinExtensions/*)
+file(GLOB_RECURSE source_gdcpp_events GDCpp/Events/*)
+file(GLOB source_gdcpp_ide GDCpp/IDE/*)
+file(GLOB_RECURSE source_gdcpp_ide_dialogs GDCpp/IDE/Dialogs/*)
+file(GLOB_RECURSE source_gdcpp_platfdef GDCpp/PlatformDefinition/*)
+file(GLOB_RECURSE source_gdcpp_serialization GDCpp/Serialization/*)
+file(GLOB_RECURSE source_gdcpp_tinyxml GDCpp/tinyxml/*)
+file(GLOB_RECURSE source_gdcpp_tools GDCpp/Tools/*)
+
+set(source_files ${source_gdcpp} ${source_gdcpp_builtin} ${source_gdcpp_events} ${source_gdcpp_ide} ${source_gdcpp_platfdef} ${source_gdcpp_serialization} ${source_gdcpp_tinyxml} ${source_gdcpp_tools})
+set(ide_source_files ${source_gdcpp} ${source_gdcpp_builtin} ${source_gdcpp_events} ${source_gdcpp_ide} ${source_gdcpp_platfdef} ${source_gdcpp_serialization} ${source_gdcpp_tinyxml} ${source_gdcpp_tools})
+IF (NOT NO_GUI)
+list(APPEND ide_source_files ${source_gdcpp_ide_dialogs})
+ENDIF()
+
 file(GLOB_RECURSE exe_source_files Runtime/*)
 
-add_library(GDCpp SHARED ${source_files})
+add_library(GDCpp SHARED ${ide_source_files})
 set_target_properties(GDCpp PROPERTIES COMPILE_DEFINITIONS "${GDCpp_extra_definitions}")
 set_target_properties(GDCpp PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
 set_target_properties(GDCpp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")

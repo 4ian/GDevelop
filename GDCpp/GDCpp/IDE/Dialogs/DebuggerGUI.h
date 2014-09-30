@@ -1,89 +1,29 @@
-/*
- * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
- */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef DEBUGGERGUI_H
 #define DEBUGGERGUI_H
+#include "GDCppDialogs.h"
+/*#ifdef ___WXMSW___
+#include <wx/msw/winundef.h>
+#endif*/
 
-//(*Headers(DebuggerGUI)
-#include <wx/listctrl.h>
-#include <wx/treectrl.h>
-#include <wx/notebook.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/aui/aui.h>
-#include <wx/panel.h>
-#include <wx/bmpbuttn.h>
-//*)
 #include <wx/toolbar.h>
 
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/IDE/BaseDebugger.h"
 
-#ifdef ___WXMSW___
-#include <wx/msw/winundef.h>
-#endif
-
-class GD_API DebuggerGUI: public wxPanel, public BaseDebugger
+class GD_API DebuggerGUI : public DebuggerGUIBase, public BaseDebugger
 {
 public:
-
-    DebuggerGUI(wxWindow* parent, RuntimeScene & scene_);
+    DebuggerGUI(wxWindow* parent, RuntimeScene &scene_);
     virtual ~DebuggerGUI();
 
-    //(*Declarations(DebuggerGUI)
-    wxAuiManager* AuiManager1;
-    wxPanel* toolbarPanel;
-    wxAuiToolBar* toolbar;
-    wxListCtrl* generalList;
-    wxNotebook* Notebook1;
-    wxTreeCtrl* objectsTree;
-    wxBitmapButton* deleteBt;
-    wxPanel* Panel1;
-    wxStaticText* StaticText1;
-    wxStaticText* objectName;
-    wxListCtrl* objectList;
-    wxPanel* Panel2;
-    //*)
-
     void Pause();
-    void Play();
-protected:
+    void Play(); 
 
-    //(*Identifiers(DebuggerGUI)
-    static const long ID_AUITOOLBARITEM1;
-    static const long ID_AUITOOLBARITEM2;
-    static const long ID_AUITOOLBARITEM3;
-    static const long ID_AUITOOLBARITEM5;
-    static const long ID_AUITOOLBARITEM6;
-    static const long ID_AUITOOLBARITEM4;
-    static const long ID_AUITOOLBAR1;
-    static const long ID_PANEL3;
-    static const long ID_LISTCTRL2;
-    static const long ID_PANEL1;
-    static const long ID_TREECTRL1;
-    static const long ID_STATICTEXT1;
-    static const long ID_STATICTEXT2;
-    static const long ID_BITMAPBUTTON1;
-    static const long ID_LISTCTRL1;
-    static const long ID_PANEL2;
-    static const long ID_NOTEBOOK1;
-    //*)
-    static const long ID_PLAYBT;
-    static const long ID_PAUSEBT;
-    static const long ID_STEPBT;
-    static const long ID_CONSOLEBT;
-    static const long ID_VARSCENEBT;
-    static const long ID_VARGLOBALBT;
-    static const long ID_ADDOBJBT;
+protected:
     static const long ID_EXTLIST;
 
-private:
-
-    //(*Handlers(DebuggerGUI)
     void OntoolbarPanelResize(wxSizeEvent& event);
     void OnobjectsTreeSelectionChanged(wxTreeEvent& event);
     void OnobjectsTreeItemActivated(wxTreeEvent& event);
@@ -98,7 +38,8 @@ private:
     void OnAddObjBtClick(wxCommandEvent& event);
     void OnAddVarGlobalBtClick(wxCommandEvent& event);
     void OnAddVarSceneBtClick(wxCommandEvent& event);
-    //*)
+
+private:
     void UpdateGUI();
     void OnExtensionListItemActivated(wxListEvent& event);
     void UpdateListCtrlColumnsWidth();
@@ -120,9 +61,7 @@ private:
     bool objectChanged;
 
     wxFont font;
-
-    DECLARE_EVENT_TABLE()
 };
 
-#endif
+#endif // DEBUGGERGUI_H
 #endif

@@ -25,126 +25,105 @@ TEST_CASE( "Common tools", "[common]" ) {
 }
 
 TEST_CASE( "Project", "[common]" ) {
-	SECTION("Basics") {
-		gd::Project project;
-		project.SetName("myname");
-	    REQUIRE( project.GetName() == "myname" );
-	}
+    SECTION("Basics") {
+        gd::Project project;
+        project.SetName("myname");
+        REQUIRE( project.GetName() == "myname" );
+    }
 }
 
 TEST_CASE( "Variable", "[common]" ) {
-	SECTION("Basics") {
-		gd::Variable variable;
-		variable.SetValue(50);
-	    REQUIRE( variable.GetValue() == 50 );
-	    REQUIRE( variable == 50 );
-	    REQUIRE( variable.IsNumber() == true );
-	    REQUIRE( variable.IsStructure() == false );
+    SECTION("Basics") {
+        gd::Variable variable;
+        variable.SetValue(50);
+        REQUIRE( variable.GetValue() == 50 );
+        REQUIRE( variable == 50 );
+        REQUIRE( variable.IsNumber() == true );
+        REQUIRE( variable.IsStructure() == false );
 
-		variable.SetString("MyString");
-	    REQUIRE( variable.GetString() == "MyString" );
-	    REQUIRE( variable == "MyString" );
-	    REQUIRE( variable.IsNumber() == false );
-	    REQUIRE( variable.IsStructure() == false );
-	}
-	SECTION("Conversions") {
-		gd::Variable variable;
-		variable.SetValue(50);
-	    REQUIRE( variable.GetString() == "50" ); //Used as a string...
-	    REQUIRE( variable.IsNumber() == false ); //...so consider as a string
+        variable.SetString("MyString");
+        REQUIRE( variable.GetString() == "MyString" );
+        REQUIRE( variable == "MyString" );
+        REQUIRE( variable.IsNumber() == false );
+        REQUIRE( variable.IsStructure() == false );
+    }
+    SECTION("Conversions") {
+        gd::Variable variable;
+        variable.SetValue(50);
+        REQUIRE( variable.GetString() == "50" ); //Used as a string...
+        REQUIRE( variable.IsNumber() == false ); //...so consider as a string
 
-		variable.SetString("MyString");
-	    REQUIRE( variable.GetValue() == 0 ); //Used as a number...
-	    REQUIRE( variable.IsNumber() == true ); //...so consider as a number
-	}
-	SECTION("Use with int and string like semantics") {
-		gd::Variable variable;
-		variable = 50;
-	    REQUIRE( variable.GetValue() == 50 );
-	    REQUIRE( variable.IsNumber() == true );
+        variable.SetString("MyString");
+        REQUIRE( variable.GetValue() == 0 ); //Used as a number...
+        REQUIRE( variable.IsNumber() == true ); //...so consider as a number
+    }
+    SECTION("Use with int and string like semantics") {
+        gd::Variable variable;
+        variable = 50;
+        REQUIRE( variable.GetValue() == 50 );
+        REQUIRE( variable.IsNumber() == true );
 
-		variable = "MyString";
-	    REQUIRE( variable.GetString() == "MyString" );
-	    REQUIRE( variable.IsNumber() == false );
+        variable = "MyString";
+        REQUIRE( variable.GetString() == "MyString" );
+        REQUIRE( variable.IsNumber() == false );
 
-	    variable = std::string("MyRealStdString");
-	    REQUIRE( variable.GetString() == "MyRealStdString" );
-	    REQUIRE( variable.IsNumber() == false );
-	}
-}
-
-TEST_CASE( "Resources", "[common][resources]" ) {
-	SECTION("Basics") {
-        gd::ImageResource image;
-        image.SetName("MyResourceName");
-
-        REQUIRE(image.GetName() == "MyResourceName");
-	}
-	SECTION("Filename handling") {
-        gd::ImageResource image;
-        image.SetFile("MyResourceFile");
-        REQUIRE(image.GetFile() == "MyResourceFile");
-        image.SetFile("My/relative/ResourceFile");
-        REQUIRE(image.GetFile() == "My/relative/ResourceFile");
-        image.SetFile("..\\My\\windows\\style\\relative\\ResourceFile");
-        REQUIRE(image.GetFile() == "../My/windows/style/relative/ResourceFile");
-        image.SetFile("Lots\\\\Of\\\\\\..\\Backslashs");
-        REQUIRE(image.GetFile() == "Lots//Of///../Backslashs");
-	}
+        variable = std::string("MyRealStdString");
+        REQUIRE( variable.GetString() == "MyRealStdString" );
+        REQUIRE( variable.IsNumber() == false );
+    }
 }
 
 TEST_CASE( "EventsList", "[common][events]" ) {
+    SECTION("Basics") {
+        gd::EventsList list;
+        gd::EmptyEvent event1;
+        boost::shared_ptr<gd::BaseEvent> event2(new gd::EmptyEvent);
+        list.InsertEvent(event1);
+        list.InsertEvent(event2);
+        REQUIRE( &list.GetEvent(0) != &event1 ); //First event inserted by copy
+        REQUIRE( &list.GetEvent(1) == event2.get() ); //Second event not copied
+    }
 
-	SECTION("Basics") {
-		gd::EventsList list;
-		gd::EmptyEvent event1;
-		boost::shared_ptr<gd::BaseEvent> event2(new gd::EmptyEvent);
-		list.InsertEvent(event1);
-		list.InsertEvent(event2);
-	    REQUIRE( &list.GetEvent(0) != &event1 ); //First event inserted by copy
-	    REQUIRE( &list.GetEvent(1) == event2.get() ); //Second event not copied
-	}
+    SECTION("Subevents") {
+        gd::EventsList list;
+        gd::StandardEvent stdEvent;
+        list.InsertEvent(stdEvent, 0);
 
-	SECTION("Subevents") {
-		gd::EventsList list;
-		gd::StandardEvent stdEvent;
-		list.InsertEvent(stdEvent, 0);
+        //Create a lots of nested events
+        gd::BaseEvent * lastEvent = &list.GetEvent(0);
+        gd::BaseEvent * oneOfTheSubEvent = NULL;
+        for(unsigned int i=0;i<100;++i) {
+            gd::StandardEvent subEvent;
+            lastEvent = &lastEvent->GetSubEvents().InsertEvent(subEvent);
+            if ( i == 60 ) oneOfTheSubEvent = lastEvent;
+        }
 
-		//Create a lots of nested events
-		gd::BaseEvent * lastEvent = &list.GetEvent(0);
-		gd::BaseEvent * oneOfTheSubEvent = NULL;
-	    for(unsigned int i=0;i<100;++i) {
-			gd::StandardEvent subEvent;
-	    	lastEvent = &lastEvent->GetSubEvents().InsertEvent(subEvent);
-	    	if ( i == 60 ) oneOfTheSubEvent = lastEvent;
-	    }
+        //Check if Contains method can find the specified sub event.
+        REQUIRE(list.Contains(*oneOfTheSubEvent) == true);
+        REQUIRE(list.Contains(*oneOfTheSubEvent, false) == false);
+    }
 
-	    //Check if Contains method can find the specified sub event.
-	    REQUIRE(list.Contains(*oneOfTheSubEvent) == true);
-	    REQUIRE(list.Contains(*oneOfTheSubEvent, false) == false);
-	}
+    SECTION("Memory consumption") {
+        size_t startMemory = gd::SystemStats::GetUsedVirtualMemory();
 
-	SECTION("Memory consumption") {
-	    size_t startMemory = gd::SystemStats::GetUsedVirtualMemory();
+        gd::EventsList list;
+        gd::StandardEvent stdEvent;
+        list.InsertEvent(stdEvent, 0);
 
-		gd::EventsList list;
-		gd::StandardEvent stdEvent;
-		list.InsertEvent(stdEvent, 0);
+        //Create a lots of nested events
+        gd::BaseEvent * lastEvent = &list.GetEvent(0);
+        for(unsigned int i=0;i<2000;++i) {
+            gd::StandardEvent subEvent;
+            lastEvent = &lastEvent->GetSubEvents().InsertEvent(subEvent);
+        }
 
-		//Create a lots of nested events
-		gd::BaseEvent * lastEvent = &list.GetEvent(0);
-	    for(unsigned int i=0;i<2000;++i) {
-			gd::StandardEvent subEvent;
-	    	lastEvent = &lastEvent->GetSubEvents().InsertEvent(subEvent);
-	    }
+        //Copy the result
+        gd::EventsList copiedList = list;
 
-	    //Copy the result
-	    gd::EventsList copiedList = list;
-
-	    size_t endMemory = gd::SystemStats::GetUsedVirtualMemory();
-	    INFO("Memory used: " << endMemory-startMemory << "KB");
-	    REQUIRE(1500 >= endMemory-startMemory);
-	}
+        size_t endMemory = gd::SystemStats::GetUsedVirtualMemory();
+        INFO("Memory used: " << endMemory-startMemory << "KB");
+        REQUIRE(1500 >= endMemory-startMemory);
+    }
 
 }
 

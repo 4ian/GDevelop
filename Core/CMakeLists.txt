@@ -104,14 +104,10 @@ ENDIF(WIN32)
 #The target
 ###
 include_directories(.)
-file(GLOB source_files_1 GDCore/* GDCore/IDE/*)
-file(GLOB_RECURSE source_files_2 GDCore/BuiltinExtensions/* GDCore/Events/* GDCore/PlatformDefinition/* GDCore/Serialization/* GDCore/TinyXml/* GDCore/Tools/*)
-file(GLOB_RECURSE source_files_gui GDCore/IDE/Dialogs/* GDCore/IDE/wxTools/*)
+file(GLOB_RECURSE source_files GDCore/*)
 
-IF(NOT NO_GUI)
-	set(source_files ${source_files_1} ${source_files_2} ${source_files_gui})
-ELSE()
-	set(source_files ${source_files_1} ${source_files_2})
+IF(NO_GUI)
+	list(REMOVE_ITEM source_files GDCore/IDE/Dialogs/GDCoreDialogs.cpp GDCore/IDE/Dialogs/GDCoreDialogs.h GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp)
 ENDIF()
 
 add_library(GDCore SHARED ${source_files})

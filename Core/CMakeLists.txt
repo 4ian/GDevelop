@@ -104,11 +104,12 @@ ENDIF(WIN32)
 #The target
 ###
 include_directories(.)
-file(
-        GLOB_RECURSE
-        source_files
-        GDCore/*
-)
+file(GLOB_RECURSE source_files GDCore/*)
+
+IF(NO_GUI)
+	list(REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp")
+ENDIF()
+
 add_library(GDCore SHARED ${source_files})
 IF(EMSCRIPTEN)
 	set_target_properties(GDCore PROPERTIES SUFFIX ".bc")

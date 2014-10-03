@@ -107,7 +107,7 @@ include_directories(.)
 file(GLOB_RECURSE source_files GDCore/*)
 
 IF(NO_GUI)
-	list(REMOVE_ITEM source_files GDCore/IDE/Dialogs/GDCoreDialogs.cpp GDCore/IDE/Dialogs/GDCoreDialogs.h GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp)
+	list(REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp")
 ENDIF()
 
 add_library(GDCore SHARED ${source_files})

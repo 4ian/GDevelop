@@ -804,12 +804,13 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
-        if ( !games[i]->GetProjectFile().empty() )
-        {
-            wxString filename = wxFileName(games[i]->GetProjectFile()).GetPath()+"/"+wxFileName(games[i]->GetProjectFile()).GetName()+".gdg.autosave";
+        wxFileName filename(games[i]->GetProjectFile());
+        if (games[i]->GetProjectFile().empty()) continue;
+        if (!filename.IsFileWritable()) continue;
 
-            if ( !games[i]->SaveToFile(string(filename.mb_str())) ) {gd::LogStatus( "L'enregistrement automatique a échoué." );}
-        }
+        wxString autosaveFilename = filename.GetPath() + "/" + filename.GetName()+".gdg.autosave";
+        if ( !games[i]->SaveToFile(gd::ToString(autosaveFilename)) )
+            gd::LogStatus( _("Autosave failed!") );
     }
 }
 

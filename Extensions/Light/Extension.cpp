@@ -245,7 +245,7 @@ public:
                       _("LightObstacle"),
                       _("Mark the objects as obstacles for Light objects."),
                       "",
-                      "CppPlatform/Extensions/lightObstacleicon32.png",
+                      "CppPlatform/Extensions/lightObstacleIcon32.png",
                       "LightObstacleAutomatism",
                       boost::shared_ptr<gd::Automatism>(new LightObstacleAutomatism),
                       boost::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas));

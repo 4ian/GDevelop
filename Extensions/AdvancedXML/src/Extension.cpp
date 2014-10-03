@@ -61,7 +61,7 @@ public:
             .AddParameter("string", _("Reference (allow to access later to the element)"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::CreateNewDocument").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::CreateNewDocument").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("LoadFile",
                        _("Load an XML file"),
@@ -75,7 +75,7 @@ public:
             .AddParameter("string", _("Reference (allow to access later to the element)"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::LoadXmlFile").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::LoadXmlFile").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("SaveFile",
                        _("Save an XML file"),
@@ -89,7 +89,7 @@ public:
             .AddParameter("string", _("Reference to the XML document"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::SaveXmlFile").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::SaveXmlFile").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("BrowseTo",
                        _("Load an element into a reference"),
@@ -104,7 +104,7 @@ public:
             .AddParameter("string", _("Path ( tags can be browsed by separating them using /. Use * to go to the first child element without knowing the tag name )"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::BrowseTo").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::BrowseTo").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("NextSibling",
                        _("Go to next element"),
@@ -119,7 +119,7 @@ public:
             .AddParameter("string", _("Tag name filter "), "", true)
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::NextSibling").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::NextSibling").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddCondition("IsRefValid",
                        _("The reference is valid"),
@@ -132,7 +132,7 @@ public:
             .AddParameter("string", _("Reference to the element to be tested"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::IsRefValid").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::IsRefValid").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -149,7 +149,7 @@ public:
             .AddParameter("expression", _("Type"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::GetRefType").SetManipulatedType("number").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::GetRefType").SetManipulatedType("number").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -162,7 +162,7 @@ public:
             .AddParameter("string", _("Element reference"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::GetRefType").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::GetRefType").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -179,7 +179,7 @@ public:
             .AddParameter("string", _("Text of the element\nIf the element is a tag, it will be the tag name,if the element is a text or a comment, it will be the content."))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::CreateNewElement").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::CreateNewElement").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("DeleteAnElement",
                        _("Delete an element"),
@@ -192,7 +192,7 @@ public:
             .AddParameter("string", _("Reference to the element to be deleted"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::DeleteAnElement").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::DeleteAnElement").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("InsertElementIntoAnother",
                        _("Add an element inside another"),
@@ -207,7 +207,7 @@ public:
             .AddParameter("string", _("The element will be added before this element (if not defined, the element will be added at the end)"), "", true)
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::InsertElementIntoAnother").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::InsertElementIntoAnother").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("SetTagName",
                        _("Change the tag name"),
@@ -222,7 +222,7 @@ public:
             .AddParameter("string", _("Tag name"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::SetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetText").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::SetText").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetText").SetManipulatedType("string");
 
         AddStrExpression("GetTagName",
                        _("Tag name"),
@@ -233,7 +233,7 @@ public:
             .AddParameter("string", _("Element reference"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -250,7 +250,7 @@ public:
             .AddParameter("string", _("Contents"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::SetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetText").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::SetText").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetText").SetManipulatedType("string");
 
         AddStrExpression("GetContent",
                        _("Contents"),
@@ -261,7 +261,7 @@ public:
             .AddParameter("string", _("Element reference"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -275,7 +275,7 @@ public:
             .AddParameter("string", _("Name of the attribute"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::GetAttributeNumber").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::GetAttributeNumber").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -293,7 +293,7 @@ public:
             .AddParameter("expression", _("Value"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::SetAttributeNumber").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetAttributeNumber").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::SetAttributeNumber").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetAttributeNumber").SetManipulatedType("number");
 
         AddStrExpression("GetAttributeString",
                        _("Text of an attribute of an element"),
@@ -305,7 +305,7 @@ public:
             .AddParameter("string", _("Name of the attribute"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::GetAttributeString").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::GetAttributeString").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
 
 
@@ -323,7 +323,7 @@ public:
             .AddParameter("string", _("Value"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::SetAttributeString").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetAttributeString").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::SetAttributeString").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetAttributeString").SetManipulatedType("string");
 
         AddAction("RemoveAttribute",
                        _("Delete an attribute"),
@@ -337,7 +337,7 @@ public:
             .AddParameter("string", _("Name of the attribute"))
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("AdvancedXML::RemoveAttribute").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
+            .codeExtraInformation.SetFunctionName("AdvancedXML::RemoveAttribute").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         #endif
 

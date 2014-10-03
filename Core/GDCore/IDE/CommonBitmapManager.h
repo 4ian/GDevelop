@@ -49,7 +49,6 @@ public:
     wxBitmap scene;
     wxBitmap layerBt;
     wxBitmap joyaxisBt;
-    wxBitmap backthumbsBg;
     wxBitmap varBt;
     wxBitmap noProtection;
     wxBitmap folder40;

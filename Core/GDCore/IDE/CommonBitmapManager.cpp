@@ -44,7 +44,6 @@ CommonBitmapManager::CommonBitmapManager()
     scene = gd::SkinHelper::GetIcon("scene", 16);
     layerBt = gd::SkinHelper::GetIcon("layer", 16);
     joyaxisBt.LoadFile("res/joystick16.png", wxBITMAP_TYPE_ANY);
-    backthumbsBg.LoadFile("res/backthumbs.png", wxBITMAP_TYPE_ANY);
     varBt.LoadFile("res/var.png", wxBITMAP_TYPE_ANY);
     unknown24.LoadFile("res/unknown24.png", wxBITMAP_TYPE_ANY);
     unknownAction24.LoadFile("res/unknownAction24.png", wxBITMAP_TYPE_ANY);

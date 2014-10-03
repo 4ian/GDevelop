@@ -1,20 +1,14 @@
 /*
  * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2014 Victor Levasseur (victorlevasseur52@gmail.com).
  * This project is released under the GNU Lesser General Public License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#ifndef EDITORLAYERS_H
-#define EDITORLAYERS_H
+#ifndef LAYERSEDITORPANEL_H
+#define LAYERSEDITORPANEL_H
+#include "GDCoreDialogs.h"
 
-//(*Headers(LayersEditorPanel)
-#include <wx/listctrl.h>
-#include <wx/sizer.h>
-#include <wx/menu.h>
-#include <wx/aui/aui.h>
-#include <wx/panel.h>
-#include <wx/imaglist.h>
-//*)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class Project; }
@@ -30,11 +24,10 @@ namespace gd
  *
  * \ingroup IDEdialogs
  */
-class GD_CORE_API LayersEditorPanel: public wxPanel, public gd::LayoutEditorCanvasAssociatedEditor
+class GD_CORE_API LayersEditorPanel : public LayersEditorPanelBase, public gd::LayoutEditorCanvasAssociatedEditor
 {
 public:
-
-    LayersEditorPanel(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::MainFrameWrapper & mainFrameWrapper_);
+    LayersEditorPanel(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper);
     virtual ~LayersEditorPanel();
 
     /**
@@ -45,91 +38,63 @@ public:
     /**
      * The editor can be linked to a layout editor canvas to update it according to the changes made in the editor.
      */
-    void SetAssociatedLayoutEditorCanvas(gd::LayoutEditorCanvas * layoutCanvas_) { layoutCanvas = layoutCanvas_; Refresh(); };
+    void SetAssociatedLayoutEditorCanvas(gd::LayoutEditorCanvas * layoutCanvas) { m_layoutCanvas = layoutCanvas; Refresh(); };
 
     /**
      * Return the associated layout editor canvas.
      * \see LayersEditorPanel::SetAssociatedLayoutEditorCanvas
      */
-    gd::LayoutEditorCanvas * GetAssociatedLayoutEditorCanvas() { return layoutCanvas; };
+    gd::LayoutEditorCanvas * GetAssociatedLayoutEditorCanvas() { return m_layoutCanvas; };
 
     /**
      * Enable or disable the editor.
      */
-    virtual bool Enable(bool enable=true) { return wxWindow::Enable(enable); };
+    virtual bool Enable(bool enable = true) { return wxWindow::Enable(enable); };
 
 protected:
+    virtual void OnAddLayerClicked(wxCommandEvent& event);
+    virtual void OnDeleteLayerClicked(wxCommandEvent& event);
+    virtual void OnEditLayerClicked(wxCommandEvent& event);
+    virtual void OnHelpClicked(wxCommandEvent& event);
+    virtual void OnLayerDownClicked(wxCommandEvent& event);
+    virtual void OnLayerUpClicked(wxCommandEvent& event);
+    virtual void OnRefreshClicked(wxCommandEvent& event);
+    void OnEditSelected1(wxCommandEvent& event);
+    void OnlayersListItemRClick(wxListEvent& event);
+    void OnlayersListItemSelect(wxListEvent& event);
+    void OnlayersListItemActivated(wxListEvent& event);
+    void OnlayersListItemSelect1(wxListEvent& event);
+    void OnlayersListItemFocused(wxListEvent& event);
 
-    //(*Identifiers(LayersEditorPanel)
-    static const long ID_AUITOOLBARITEM1;
-    static const long ID_AUITOOLBARITEM4;
-    static const long ID_AUITOOLBARITEM5;
-    static const long ID_AUITOOLBARITEM3;
-    static const long ID_AUITOOLBARITEM2;
-    static const long ID_AUITOOLBARITEM6;
-    static const long ID_AUITOOLBARITEM7;
-    static const long ID_AUITOOLBAR1;
-    static const long ID_PANEL3;
-    static const long ID_LISTCTRL1;
     static const long idMenuEdit;
     static const long idMenuAdd;
     static const long idMenuDel;
     static const long idMenuUp;
     static const long idMenuDown;
-    //*)
-    static const long ID_BITMAPBUTTON1;
-    static const long ID_BITMAPBUTTON6;
-    static const long ID_BITMAPBUTTON3;
 
 private:
-
-    //(*Handlers(LayersEditorPanel)
-    void OntoolBarPanelResize(wxSizeEvent& event);
-    void OnAddSelected(wxCommandEvent& event);
-    void OnDelSelected(wxCommandEvent& event);
-    void OnUpSelected(wxCommandEvent& event);
-    void OnDownSelected(wxCommandEvent& event);
-    void OnlayersListItemRClick(wxListEvent& event);
-    void OnlayersListItemSelect(wxListEvent& event);
-    void OnlayersListItemActivated(wxListEvent& event);
-    void OnEditSelected1(wxCommandEvent& event);
-    void OnlayersListItemSelect1(wxListEvent& event);
-    void OnlayersListItemFocused(wxListEvent& event);
-    void OnRefreshClick(wxCommandEvent& event);
-    void OnHelpClick(wxCommandEvent& event);
-    //*)
     void UpdateSelectedLayerIcon();
-    void OnRefresh(wxCommandEvent& event);
-    void OnMoreOptions(wxCommandEvent& event);
     void EditSelectedLayer();
-    void OnHelp(wxCommandEvent& event);
     gd::Layer * GetSelectedLayer();
 
-    //(*Declarations(LayersEditorPanel)
-    wxAuiManager* AuiManager1;
-    wxAuiToolBar* toolbar;
-    wxMenuItem* MenuItem2;
-    wxMenuItem* MenuItem1;
-    wxListCtrl* layersList;
+    wxImageList * m_imageList;
+
     wxMenu contextMenu;
-    wxPanel* toolBarPanel;
-    wxImageList* imageList;
-    //*)
+        wxMenuItem* MenuItem1;
+        wxMenuItem* MenuItem2;
+        wxMenuItem* MenuItem3;
+        wxMenuItem* MenuItem4;
+        wxMenuItem* MenuItem5;
 
-    gd::Project & project;
-    gd::Layout & layout;
-    gd::LayoutEditorCanvas * layoutCanvas;
-    gd::MainFrameWrapper & mainFrameWrapper;
+    gd::Project & m_project;
+    gd::Layout & m_layout;
+    gd::LayoutEditorCanvas * m_layoutCanvas;
+    gd::MainFrameWrapper & m_mainFrameWrapper;
 
-    std::string layerSelected;
-
-    void CreateToolbar();
-
-    DECLARE_EVENT_TABLE()
+    std::string m_layerSelected;
 };
-
 
 }
 
-#endif
+#endif // LAYERSEDITORPANEL_H
 #endif

@@ -1,17 +1,5 @@
-/*
- * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
- */
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LayersEditorPanel.h"
 
-//(*InternalHeaders(LayersEditorPanel)
-#include <wx/bitmap.h>
-#include "GDCore/Tools/Localization.h"
-#include <wx/image.h>
-#include <wx/string.h>
-//*)
 #include <wx/config.h>
 #include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
@@ -27,314 +15,109 @@
 namespace gd
 {
 
-//(*IdInit(LayersEditorPanel)
-const long LayersEditorPanel::ID_AUITOOLBARITEM1 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBARITEM4 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBARITEM5 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBARITEM3 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBARITEM2 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBARITEM6 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBARITEM7 = wxNewId();
-const long LayersEditorPanel::ID_AUITOOLBAR1 = wxNewId();
-const long LayersEditorPanel::ID_PANEL3 = wxNewId();
-const long LayersEditorPanel::ID_LISTCTRL1 = wxNewId();
 const long LayersEditorPanel::idMenuEdit = wxNewId();
 const long LayersEditorPanel::idMenuAdd = wxNewId();
 const long LayersEditorPanel::idMenuDel = wxNewId();
 const long LayersEditorPanel::idMenuUp = wxNewId();
 const long LayersEditorPanel::idMenuDown = wxNewId();
-//*)
-const long LayersEditorPanel::ID_BITMAPBUTTON1 = wxNewId();
-const long LayersEditorPanel::ID_BITMAPBUTTON6 = wxNewId();
-const long LayersEditorPanel::ID_BITMAPBUTTON3 = wxNewId();
 
-BEGIN_EVENT_TABLE(LayersEditorPanel,wxPanel)
-	//(*EventTable(LayersEditorPanel)
-	//*)
-END_EVENT_TABLE()
-
-LayersEditorPanel::LayersEditorPanel(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::MainFrameWrapper & mainFrameWrapper_) :
-project(project_),
-layout(layout_),
-layoutCanvas(NULL),
-mainFrameWrapper(mainFrameWrapper_)
+LayersEditorPanel::LayersEditorPanel(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper) : 
+LayersEditorPanelBase(parent), 
+gd::LayoutEditorCanvasAssociatedEditor(),
+m_imageList(new wxImageList(16, 16, 1)),
+m_project(project),
+m_layout(layout),
+m_layoutCanvas(NULL),
+m_mainFrameWrapper(mainFrameWrapper)
 {
+    //Connect the wxListCtrl to events
+    Connect(LayersEditorPanelBase::LAYERS_LIST_ID,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemSelect1);
+    Connect(LayersEditorPanelBase::LAYERS_LIST_ID,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemActivated);
+    Connect(LayersEditorPanelBase::LAYERS_LIST_ID,wxEVT_COMMAND_LIST_ITEM_FOCUSED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemFocused);
+    Connect(LayersEditorPanelBase::LAYERS_LIST_ID,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemRClick);
 
-	//(*Initialize(LayersEditorPanel)
-	wxMenuItem* MenuItem5;
-	wxMenuItem* MenuItem4;
-	wxMenuItem* MenuItem3;
-	wxFlexGridSizer* FlexGridSizer1;
+    //Create the context menu
+    MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Edit the layer properties"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
+    contextMenu.Append(MenuItem1);
+    contextMenu.AppendSeparator();
+    MenuItem2 = new wxMenuItem((&contextMenu), idMenuAdd, _("Add a layer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
+    contextMenu.Append(MenuItem2);
+    MenuItem3 = new wxMenuItem((&contextMenu), idMenuDel, _("Delete the layer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
+    contextMenu.Append(MenuItem3);
+    contextMenu.AppendSeparator();
+    MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("Move over"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
+    contextMenu.Append(MenuItem4);
+    MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Move below"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
+    contextMenu.Append(MenuItem5);
 
-	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
-	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(1);
-	toolBarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(120,25), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	AuiManager1 = new wxAuiManager(toolBarPanel, wxAUI_MGR_DEFAULT);
-	toolbar = new wxAuiToolBar(toolBarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add a layer"), gd::SkinHelper::GetIcon("add", 16), wxNullBitmap, wxITEM_NORMAL, _("Add a layer"), _("Add a new layer"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Delete the selected layer"), gd::SkinHelper::GetIcon("delete", 16), wxNullBitmap, wxITEM_NORMAL, _("Delete the selected layer"), _("Delete the selected layer"), NULL);
-	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM5, _("Edit the properties of the layer"), gd::SkinHelper::GetIcon("properties", 16), wxNullBitmap, wxITEM_NORMAL, _("Edit the properties of the layer"), _("Edit the properties of the layer"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM3, _("Move the layer over"), gd::SkinHelper::GetIcon("up", 16), wxNullBitmap, wxITEM_NORMAL, _("Move the layer over"), _("Move the layer over"), NULL);
-	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Move the layer below"), gd::SkinHelper::GetIcon("down", 16), wxNullBitmap, wxITEM_NORMAL, _("Move the layer below"), _("Move the layer below"), NULL);
-	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM6, _("Refresh the list"), wxBitmap(wxImage(_T("res/refreshicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Refresh the list"), _("Refresh the list"), NULL);
-	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM7, _("Help"), gd::SkinHelper::GetIcon("help", 16), wxNullBitmap, wxITEM_NORMAL, _("Display help about the layers editor"), _("Display help about the layers editor"), NULL);
-	toolbar->Realize();
-	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
-	AuiManager1->Update();
-	FlexGridSizer1->Add(toolBarPanel, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
-	layersList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(191,198), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL1"));
-	FlexGridSizer1->Add(layersList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	SetSizer(FlexGridSizer1);
-	MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Edit the layer properties"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
-	contextMenu.Append(MenuItem1);
-	contextMenu.AppendSeparator();
-	MenuItem2 = new wxMenuItem((&contextMenu), idMenuAdd, _("Add a layer"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
-	contextMenu.Append(MenuItem2);
-	MenuItem3 = new wxMenuItem((&contextMenu), idMenuDel, _("Delete the layer"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
-	contextMenu.Append(MenuItem3);
-	contextMenu.AppendSeparator();
-	MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("Move over"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
-	contextMenu.Append(MenuItem4);
-	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Move below"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
-	contextMenu.Append(MenuItem5);
-	imageList = new wxImageList(16, 16, 1);
-	FlexGridSizer1->Fit(this);
-	FlexGridSizer1->SetSizeHints(this);
+    //Connect menu's events
+    Connect(idMenuEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnEditSelected1);
+    Connect(idMenuAdd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnAddLayerClicked);
+    Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnDeleteLayerClicked);
+    Connect(idMenuUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnLayerUpClicked);
+    Connect(idMenuDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnLayerDownClicked);
 
-	Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnAddSelected);
-	Connect(ID_AUITOOLBARITEM4,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnDelSelected);
-	Connect(ID_AUITOOLBARITEM5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnEditSelected1);
-	Connect(ID_AUITOOLBARITEM3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnUpSelected);
-	Connect(ID_AUITOOLBARITEM2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnDownSelected);
-	Connect(ID_AUITOOLBARITEM6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnRefreshClick);
-	Connect(ID_AUITOOLBARITEM7,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&LayersEditorPanel::OnHelpClick);
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemSelect1);
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemActivated);
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_FOCUSED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemFocused);
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemRClick);
-	Connect(idMenuEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnEditSelected1);
-	Connect(idMenuAdd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnAddSelected);
-	Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnDelSelected);
-	Connect(idMenuUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnUpSelected);
-	Connect(idMenuDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnDownSelected);
-	//*)
+    //Add images to the image list
+    m_imageList->Add(wxBitmap("res/rightArrowGrey.png", wxBITMAP_TYPE_ANY));
+    m_imageList->Add(wxBitmap("res/1rightarrow.png", wxBITMAP_TYPE_ANY));
+    m_imageList->Add(wxBitmap("res/eye.png", wxBITMAP_TYPE_ANY));
+    m_imageList->Add(wxBitmap("res/eyeGrey.png", wxBITMAP_TYPE_ANY));
+    m_layersList->AssignImageList(m_imageList, wxIMAGE_LIST_SMALL);
 
-    imageList->Add(wxBitmap("res/rightArrowGrey.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/1rightarrow.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/eye.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/eyeGrey.png", wxBITMAP_TYPE_ANY));
-    layersList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
+    m_layersList->InsertColumn(1, _("Layer"));
+    m_layersList->InsertColumn(2, _("Visible"));
 
-	layersList->InsertColumn(1, _("Layer"));
-	layersList->InsertColumn(2, _("Visible"));
-
-    gd::SkinHelper::ApplyCurrentSkin(*toolbar);
+    gd::SkinHelper::ApplyCurrentSkin(*m_toolbar);
+    m_toolbar->Realize(); //Force m_toolbar update to get a good size
 
     Refresh();
 }
 
 LayersEditorPanel::~LayersEditorPanel()
 {
-	//(*Destroy(LayersEditorPanel)
-	//*)
-	AuiManager1->UnInit();
-}
-
-void LayersEditorPanel::OnRefresh(wxCommandEvent& event)
-{
-    Refresh();
-}
-
-void LayersEditorPanel::OnMoreOptions(wxCommandEvent& event)
-{
-    PopupMenu(&contextMenu);
-}
-
-void LayersEditorPanel::OnHelpClick(wxCommandEvent& event)
-{
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+    
 }
 
 void LayersEditorPanel::Refresh()
 {
-    layersList->DeleteAllItems();
+    m_layersList->DeleteAllItems();
 
-    for (unsigned int i =0;i<layout.GetLayersCount();++i)
+    for (unsigned int i = 0; i < m_layout.GetLayersCount(); ++i)
     {
-        std::string name = layout.GetLayer(i).GetName();
+        std::string name = m_layout.GetLayer(i).GetName();
         if ( name == "" ) name = _("Base layer");
-    	layersList->InsertItem(0, name);
+        m_layersList->InsertItem(0, name);
 
-    	if ( layout.GetLayer(i).GetVisibility() )
-            layersList->SetItemColumnImage(0, 1, 2);
+        if ( m_layout.GetLayer(i).GetVisibility() )
+            m_layersList->SetItemColumnImage(0, 1, 2);
         else
-            layersList->SetItemColumnImage(0, 1, 3);
+            m_layersList->SetItemColumnImage(0, 1, 3);
 
-        layersList->SetItemImage(0,-1,0);
+        m_layersList->SetItemImage(0,-1,0);
     }
-    layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
-    layersList->SetColumnWidth( 1, wxLIST_AUTOSIZE );
+    m_layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
+    m_layersList->SetColumnWidth( 1, wxLIST_AUTOSIZE );
 
     UpdateSelectedLayerIcon();
 }
-void LayersEditorPanel::OnRefreshClick(wxCommandEvent& event)
-{
-    Refresh();
-}
-
 
 void LayersEditorPanel::UpdateSelectedLayerIcon()
 {
-    if ( !layoutCanvas ) return;
+    if ( !m_layoutCanvas ) 
+        return;
 
-    for (unsigned int i =0;i<layout.GetLayersCount();++i)
+    for (unsigned int i = 0; i<m_layout.GetLayersCount(); ++i)
     {
-    	if ( layout.GetLayer(i).GetName() == layoutCanvas->GetCurrentLayer() )
-            layersList->SetItemImage(layout.GetLayersCount()-i-1,1,1);
+        if ( m_layout.GetLayer(i).GetName() == m_layoutCanvas->GetCurrentLayer() )
+            m_layersList->SetItemImage(m_layout.GetLayersCount()-i-1,1,1);
         else
-            layersList->SetItemImage(layout.GetLayersCount()-i-1,-1,-1);
+            m_layersList->SetItemImage(m_layout.GetLayersCount()-i-1,-1,-1);
     }
-}
-
-void LayersEditorPanel::OnAddSelected(wxCommandEvent& event)
-{
-    wxString name = _("New layer");
-
-    bool alreadyExist = false;
-    int nb = 0;
-    for (unsigned int i = 0;i<layout.GetLayersCount();++i)
-    {
-    	if ( layout.GetLayer(i).GetName() == name )
-            alreadyExist = true;
-    }
-    while ( alreadyExist )
-    {
-        ++nb;
-        name = _("New layer ") + ToString(nb);
-
-        alreadyExist = false;
-        for (unsigned int i = 0;i<layout.GetLayersCount();++i)
-        {
-            if ( layout.GetLayer(i).GetName() == name )
-                alreadyExist = true;
-        }
-    }
-
-    layout.InsertNewLayer(ToString(name), layout.GetLayersCount()-1);
-    layout.GetLayer(ToString(name)).SetCameraCount(1);
-
-    Refresh();
-}
-
-/** Delete a layer
- */
-void LayersEditorPanel::OnDelSelected(wxCommandEvent& event)
-{
-    //Get selected layer
-    Layer * selectedLayer = GetSelectedLayer();
-    if ( !selectedLayer || selectedLayer->GetName().empty() ) return;
-
-    std::string name = selectedLayer->GetName();
-
-    for (unsigned int i = 0;i<layout.GetLayersCount();++i)
-    {
-    	if ( &layout.GetLayer(i) == selectedLayer )
-    	{
-    	    //Ask the user what he wants to do with the existing instances.
-    	    if ( layout.GetInitialInstances().SomeInstancesAreOnLayer(name) )
-    	    {
-    	        std::vector<std::string> availableLayers;
-    	        for (unsigned int j = 0;j<layout.GetLayersCount();++j)
-    	        {
-    	            if (i!=j) availableLayers.push_back(layout.GetLayer(j).GetName());
-    	        }
-
-                ObjectsOnBadLayerDialog dialog(this, availableLayers);
-                int choice = dialog.ShowModal();
-
-                if ( choice == 0 ) return; //Cancel
-                else if ( choice == 1 )
-                    layout.GetInitialInstances().RemoveAllInstancesOnLayer(name);
-                else if ( choice == 2 )
-                    layout.GetInitialInstances().MoveInstancesToLayer(name, dialog.moveOnLayerNamed);
-    	    }
-
-            //Delete the layer and select base layer
-    	    layout.RemoveLayer(name);
-            if ( layoutCanvas )
-            {
-                layoutCanvas->SetCurrentLayer("");
-            }
-            Refresh();
-    	    return;
-    	}
-    }
-    gd::LogWarning(_("Can't find the layer to delete !"));
-}
-
-void LayersEditorPanel::OnUpSelected(wxCommandEvent& event)
-{
-    //Get selected layer
-    Layer * selectedLayer = GetSelectedLayer();
-    if ( !selectedLayer ) return;
-
-    for (unsigned int i = 0;i<layout.GetLayersCount();++i)
-    {
-    	if ( &layout.GetLayer(i) == selectedLayer )
-    	{
-    	    if ( i <= layout.GetLayersCount()-1-1 )
-    	    {
-                //Move the layer
-    	        layout.SwapLayers(i,i+1);
-                Refresh();
-
-                //Focus it again
-                layersList->SetItemState(layout.GetLayersCount()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    	    }
-    	    return;
-    	}
-    }
-    gd::LogWarning(_("Can't find the layer to move  !"));
-}
-
-void LayersEditorPanel::OnDownSelected(wxCommandEvent& event)
-{
-    //Get selected layer
-    Layer * selectedLayer = GetSelectedLayer();
-    if ( !selectedLayer ) return;
-
-    for (unsigned int i = 0;i<layout.GetLayersCount();++i)
-    {
-    	if ( &layout.GetLayer(i) == selectedLayer )
-    	{
-    	    if ( i >= 1 )
-    	    {
-    	        //Move the layer
-    	        layout.SwapLayers(i,i-1);
-                Refresh();
-
-                //Focus it again
-                layersList->SetItemState(layout.GetLayersCount()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    	    }
-    	    return;
-    	}
-    }
-    gd::LogWarning(_("Can't find the layer to move  !"));
-}
-
-void LayersEditorPanel::OnlayersListItemRClick(wxListEvent& event)
-{
-    PopupMenu(&contextMenu);
 }
 
 Layer* LayersEditorPanel::GetSelectedLayer()
@@ -343,18 +126,37 @@ Layer* LayersEditorPanel::GetSelectedLayer()
 
     for (;;)
     {
-        itemIndex = layersList->GetNextItem(itemIndex,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
+        itemIndex = m_layersList->GetNextItem(itemIndex,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
         if (itemIndex == -1) break;
 
         // Got the selected item index
-        unsigned int layerId = layout.GetLayersCount()-itemIndex-1;
-        if ( layerId < layout.GetLayersCount() )
+        unsigned int layerId = m_layout.GetLayersCount()-itemIndex-1;
+        if ( layerId < m_layout.GetLayersCount() )
         {
-            return &layout.GetLayer(layerId);
+            return &m_layout.GetLayer(layerId);
         }
     }
 
     return NULL;
+}
+
+void LayersEditorPanel::EditSelectedLayer()
+{
+    //Get selected layer
+    gd::Layer * layer = GetSelectedLayer();
+    if ( !layer ) return;
+
+    std::string oldName = layer->GetName();
+    layer->EditLayer();
+
+    //Be sure to update instances if the layer name has changed.
+    if ( layer->GetName() != oldName )
+    {
+        m_layout.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
+        if ( m_layoutCanvas && m_layoutCanvas->GetCurrentLayer() == oldName ) m_layoutCanvas->SetCurrentLayer(layer->GetName());
+    }
+
+    Refresh();
 }
 
 /** Item double clicked: Toggle visibility or edit the layer
@@ -366,18 +168,18 @@ void LayersEditorPanel::OnlayersListItemActivated(wxListEvent& event)
     if ( !selectedLayer ) return;
 
     //Get selected column
-    wxPoint click_point=::wxGetMousePosition();
-    wxPoint list_point=layersList->GetScreenPosition();
+    wxPoint click_point = ::wxGetMousePosition();
+    wxPoint list_point = m_layersList->GetScreenPosition();
 
     // delta x
-    int dx=click_point.x - list_point.x;
+    int dx = click_point.x - list_point.x;
 
     // work out the column
-    int ex=0; // cumulative sum of column widths
+    int ex = 0; // cumulative sum of column widths
     int column = -1;
-    for (column=0; column<layersList->GetColumnCount(); column++) {
-            ex+=layersList->GetColumnWidth(column);
-            if (ex > dx) break;
+    for (column = 0; column < m_layersList->GetColumnCount(); column++) {
+        ex += m_layersList->GetColumnWidth(column);
+        if (ex > dx) break;
     }
 
     if ( column == 1 )
@@ -393,24 +195,6 @@ void LayersEditorPanel::OnlayersListItemActivated(wxListEvent& event)
     }
 }
 
-void LayersEditorPanel::EditSelectedLayer()
-{
-    //Get selected layer
-    gd::Layer * layer = GetSelectedLayer();
-    if ( !layer ) return;
-
-    std::string oldName = layer->GetName();
-    layer->EditLayer();
-
-    //Be sure to update instances if the layer name has changed.
-    if ( layer->GetName() != oldName )
-    {
-        layout.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
-        if ( layoutCanvas && layoutCanvas->GetCurrentLayer() == oldName ) layoutCanvas->SetCurrentLayer(layer->GetName());
-    }
-
-    Refresh();
-}
 void LayersEditorPanel::OnEditSelected1(wxCommandEvent& event)
 {
     EditSelectedLayer();
@@ -424,7 +208,7 @@ void LayersEditorPanel::OnlayersListItemSelect1(wxListEvent& event)
     Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    if ( layoutCanvas ) layoutCanvas->SetCurrentLayer(layer->GetName());
+    if ( m_layoutCanvas ) m_layoutCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
 }
 
@@ -436,10 +220,152 @@ void LayersEditorPanel::OnlayersListItemFocused(wxListEvent& event)
     Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    if ( layoutCanvas ) layoutCanvas->SetCurrentLayer(layer->GetName());
+    if ( m_layoutCanvas ) m_layoutCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
 }
 
+void LayersEditorPanel::OnlayersListItemRClick(wxListEvent& event)
+{
+    PopupMenu(&contextMenu);
+}
+
+void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
+{
+    wxString name = _("New layer");
+
+    bool alreadyExist = false;
+    int nb = 0;
+    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    {
+        if ( m_layout.GetLayer(i).GetName() == name )
+            alreadyExist = true;
+    }
+    while ( alreadyExist )
+    {
+        ++nb;
+        name = _("New layer ") + ToString(nb);
+
+        alreadyExist = false;
+        for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+        {
+            if ( m_layout.GetLayer(i).GetName() == name )
+                alreadyExist = true;
+        }
+    }
+
+    m_layout.InsertNewLayer(ToString(name), m_layout.GetLayersCount()-1);
+    m_layout.GetLayer(ToString(name)).SetCameraCount(1);
+
+    Refresh();
+}
+
+void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
+{
+    //Get selected layer
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer || selectedLayer->GetName().empty() ) return;
+
+    std::string name = selectedLayer->GetName();
+
+    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    {
+        if ( &m_layout.GetLayer(i) == selectedLayer )
+        {
+            //Ask the user what he wants to do with the existing instances.
+            if ( m_layout.GetInitialInstances().SomeInstancesAreOnLayer(name) )
+            {
+                std::vector<std::string> availableLayers;
+                for (unsigned int j = 0;j<m_layout.GetLayersCount();++j)
+                {
+                    if (i!=j) availableLayers.push_back(m_layout.GetLayer(j).GetName());
+                }
+
+                ObjectsOnBadLayerDialog dialog(this, availableLayers);
+                int choice = dialog.ShowModal();
+
+                if ( choice == 0 ) return; //Cancel
+                else if ( choice == 1 )
+                    m_layout.GetInitialInstances().RemoveAllInstancesOnLayer(name);
+                else if ( choice == 2 )
+                    m_layout.GetInitialInstances().MoveInstancesToLayer(name, dialog.moveOnLayerNamed);
+            }
+
+            //Delete the layer and select base layer
+            m_layout.RemoveLayer(name);
+            if ( m_layoutCanvas )
+            {
+                m_layoutCanvas->SetCurrentLayer("");
+            }
+            Refresh();
+            return;
+        }
+    }
+    gd::LogWarning(_("Can't find the layer to delete !"));
+}
+
+void LayersEditorPanel::OnEditLayerClicked(wxCommandEvent& event)
+{
+    EditSelectedLayer();
+}
+
+void LayersEditorPanel::OnHelpClicked(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+}
+
+void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)
+{
+    //Get selected layer
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer ) return;
+
+    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    {
+        if ( &m_layout.GetLayer(i) == selectedLayer )
+        {
+            if ( i >= 1 )
+            {
+                //Move the layer
+                m_layout.SwapLayers(i,i-1);
+                Refresh();
+
+                //Focus it again
+                m_layersList->SetItemState(m_layout.GetLayersCount()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+            }
+            return;
+        }
+    }
+    gd::LogWarning(_("Can't find the layer to move  !"));
+}
+
+void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
+{
+    //Get selected layer
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer ) return;
+
+    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    {
+        if ( &m_layout.GetLayer(i) == selectedLayer )
+        {
+            if ( i <= m_layout.GetLayersCount()-1-1 )
+            {
+                //Move the layer
+                m_layout.SwapLayers(i,i+1);
+                Refresh();
+
+                //Focus it again
+                m_layersList->SetItemState(m_layout.GetLayersCount()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+            }
+            return;
+        }
+    }
+    gd::LogWarning(_("Can't find the layer to move  !"));
+}
+
+void LayersEditorPanel::OnRefreshClicked(wxCommandEvent& event)
+{
+    Refresh();
+}
 
 }
-#endif

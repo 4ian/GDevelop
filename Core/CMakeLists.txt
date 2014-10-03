@@ -104,11 +104,16 @@ ENDIF(WIN32)
 #The target
 ###
 include_directories(.)
-file(
-        GLOB_RECURSE
-        source_files
-        GDCore/*
-)
+file(GLOB source_files_1 GDCore/* GDCore/IDE/*)
+file(GLOB_RECURSE source_files_2 GDCore/BuiltinExtensions/* GDCore/Events/* GDCore/PlatformDefinition/* GDCore/Serialization/* GDCore/TinyXml/* GDCore/Tools/*)
+file(GLOB_RECURSE source_files_gui GDCore/IDE/Dialogs/* GDCore/IDE/wxTools/*)
+
+IF(NOT NO_GUI)
+	set(source_files ${source_files_1} ${source_files_2} ${source_files_gui})
+ELSE()
+	set(source_files ${source_files_1} ${source_files_2})
+ENDIF()
+
 add_library(GDCore SHARED ${source_files})
 IF(EMSCRIPTEN)
 	set_target_properties(GDCore PROPERTIES SUFFIX ".bc")

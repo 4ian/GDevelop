@@ -29,10 +29,10 @@ LayersEditorPanelBase::LayersEditorPanelBase(wxWindow* parent, wxWindowID id, co
     m_auimgr->GetArtProvider()->SetMetric( wxAUI_DOCKART_PANE_BORDER_SIZE, 1);
     m_auimgr->GetArtProvider()->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
     
-    m_toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_DEFAULT_STYLE);
+    m_toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE);
     m_toolbar->SetToolBitmapSize(wxSize(16,16));
     
-    m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).Fixed().CaptionVisible(true).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false).ToolbarPane());
+    m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Caption(_("Layers editor")).Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).Fixed().CaptionVisible(true).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false).ToolbarPane());
     
     m_toolbar->AddTool(ADD_LAYER_TOOL, _("Add a layer"), wxXmlResource::Get()->LoadBitmap(wxT("add16")), wxNullBitmap, wxITEM_NORMAL, _("Add a new layer"), wxT(""), NULL);
     
@@ -57,7 +57,7 @@ LayersEditorPanelBase::LayersEditorPanelBase(wxWindow* parent, wxWindowID id, co
     
     m_panel7 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
     
-    m_auimgr->AddPane(m_panel7, wxAuiPaneInfo().Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgr->AddPane(m_panel7, wxAuiPaneInfo().Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     m_auimgr->Update();
     
     wxFlexGridSizer* flexGridSizer13 = new wxFlexGridSizer(1, 1, 0, 0);

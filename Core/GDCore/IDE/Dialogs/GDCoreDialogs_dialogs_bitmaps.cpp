@@ -283,13 +283,13 @@ void wxC629BInitBitmapResources()
         else wxFileSystem::AddHandler(new wxMemoryFSHandlerBase);
     }
 
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_add16.png"), xml_res_file_0, xml_res_size_0, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_delete16.png"), xml_res_file_1, xml_res_size_1, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_down16.png"), xml_res_file_2, xml_res_size_2, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_help16.png"), xml_res_file_3, xml_res_size_3, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_properties16.png"), xml_res_file_4, xml_res_size_4, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_refreshicon.png"), xml_res_file_5, xml_res_size_5, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_up16.png"), xml_res_file_6, xml_res_size_6, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$E__Developpement_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"), xml_res_file_7, xml_res_size_7, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$E__Developpement_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_add16.png"), xml_res_file_0, xml_res_size_0, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_delete16.png"), xml_res_file_1, xml_res_size_1, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_down16.png"), xml_res_file_2, xml_res_size_2, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_help16.png"), xml_res_file_3, xml_res_size_3, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_properties16.png"), xml_res_file_4, xml_res_size_4, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_refreshicon.png"), xml_res_file_5, xml_res_size_5, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_up16.png"), xml_res_file_6, xml_res_size_6, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$_home_victor_Developpement_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"), xml_res_file_7, xml_res_size_7, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$_home_victor_Developpement_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"));
 }

@@ -129,7 +129,7 @@
 						}, {
 							"type":	"integer",
 							"m_label":	"Pane Border Size",
-							"m_value":	-1
+							"m_value":	0
 						}, {
 							"type":	"colour",
 							"m_label":	"Sash Colour",
@@ -187,12 +187,12 @@
 								"m_minSize":	"-1,-1",
 								"m_maxSize":	"-1,-1",
 								"m_resizable":	false,
-								"m_captionVisible":	true,
+								"m_captionVisible":	false,
 								"m_closeButton":	false,
 								"m_minButton":	false,
 								"m_maxButton":	false,
 								"m_pinButton":	false,
-								"m_toolbarPane":	true
+								"m_toolbarPane":	false
 							},
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{

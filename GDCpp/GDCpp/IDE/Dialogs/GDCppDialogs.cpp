@@ -26,12 +26,13 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     m_auimgr = new wxAuiManager;
     m_auimgr->SetManagedWindow( this );
     m_auimgr->SetFlags( wxAUI_MGR_LIVE_RESIZE|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_ALLOW_ACTIVE_PANE|wxAUI_MGR_ALLOW_FLOATING);
+    m_auimgr->GetArtProvider()->SetMetric( wxAUI_DOCKART_PANE_BORDER_SIZE, 0);
     m_auimgr->GetArtProvider()->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
     
     m_toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE);
     m_toolbar->SetToolBitmapSize(wxSize(16,16));
     
-    m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).Fixed().CaptionVisible(true).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false).ToolbarPane());
+    m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
     m_toolbar->AddTool(ID_PLAY_TOOL, _("Play the scene"), wxXmlResource::Get()->LoadBitmap(wxT("starticon")), wxNullBitmap, wxITEM_NORMAL, _("Play the current scene"), wxT(""), NULL);
     

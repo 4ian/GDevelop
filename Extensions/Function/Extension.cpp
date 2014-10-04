@@ -66,7 +66,7 @@ public:
             {
                 virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
                 {
-                    codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
+                    codeGenerator.AddGlobalDeclaration("std::vector<std::string> * " + codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters;\n");
                     std::string functionName = instruction.GetParameter(0).GetPlainString();
                     const gd::Project & project = codeGenerator.GetProject();
                     const gd::Layout & scene = codeGenerator.GetLayout();
@@ -105,11 +105,11 @@ public:
 
                         code += "functionParameters.push_back("+parameterCode+");\n";
                     }
-                    code += "std::vector<std::string> * oldFunctionParameters = currentFunctionParameters;\n";
-                    code += "currentFunctionParameters = &functionParameters;\n";
+                    code += "std::vector<std::string> * oldFunctionParameters = " + codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters;\n";
+                    code += codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters = &functionParameters;\n";
 
                     code += FunctionEvent::MangleFunctionName(*functionEvent)+"(runtimeContext, "+objectsAsArgumentCode+");\n";
-                    code += "currentFunctionParameters = oldFunctionParameters;\n";
+                    code += codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters = oldFunctionParameters;\n";
 
                     return code;
                 };
@@ -146,7 +146,7 @@ public:
                     FunctionEvent & event = dynamic_cast<FunctionEvent&>(event_);
 
                     //Declaring the pointer to the function parameters
-                    codeGenerator.AddGlobalDeclaration(event.globalDeclaration);
+                    codeGenerator.AddGlobalDeclaration("std::vector<std::string> * " + codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters;\n");
 
                     //Declaring function prototype.
                     codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(event)+"(RuntimeContext *, std::map <std::string, std::vector<RuntimeObject*> *>);\n");
@@ -215,7 +215,7 @@ public:
             {
                 virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
                 {
-                    codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
+                    codeGenerator.AddGlobalDeclaration("std::vector<std::string> * " + codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters;\n");
                     codeGenerator.AddIncludeFile("Function/FunctionTools.h");
                     const gd::Project & game = codeGenerator.GetProject();
                     const gd::Layout & scene = codeGenerator.GetLayout();
@@ -228,7 +228,7 @@ public:
 
                     std::string code;
 
-                    code += "GDpriv::FunctionTools::GetSafelyStringFromVector(currentFunctionParameters, "+expression+")";
+                    code += "GDpriv::FunctionTools::GetSafelyStringFromVector(" + codeGenerator.GetLayout().GetMangledName() + "_currentFunctionParameters, "+expression+")";
 
                     return code;
                 };

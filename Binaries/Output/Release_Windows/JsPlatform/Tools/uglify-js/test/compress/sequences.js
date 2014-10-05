@@ -91,9 +91,11 @@ make_sequences_4: {
 lift_sequences_1: {
     options = { sequences: true };
     input: {
+        var foo, x, y, bar;
         foo = !(x(), y(), bar());
     }
     expect: {
+        var foo, x, y, bar;
         x(), y(), foo = !bar();
     }
 }
@@ -101,10 +103,12 @@ lift_sequences_1: {
 lift_sequences_2: {
     options = { sequences: true, evaluate: true };
     input: {
+        var foo, bar;
         foo.x = (foo = {}, 10);
         bar = (bar = {}, 10);
     }
     expect: {
+        var foo, bar;
         foo.x = (foo = {}, 10),
         bar = {}, bar = 10;
     }
@@ -113,9 +117,11 @@ lift_sequences_2: {
 lift_sequences_3: {
     options = { sequences: true, conditionals: true };
     input: {
+        var x, foo, bar, baz;
         x = (foo(), bar(), baz()) ? 10 : 20;
     }
     expect: {
+        var x, foo, bar, baz;
         foo(), bar(), x = baz() ? 10 : 20;
     }
 }
@@ -123,9 +129,11 @@ lift_sequences_3: {
 lift_sequences_4: {
     options = { side_effects: true };
     input: {
+        var x, foo, bar, baz;
         x = (foo, bar, baz);
     }
     expect: {
+        var x, foo, bar, baz;
         x = baz;
     }
 }

@@ -775,6 +775,14 @@ merge(Compressor.prototype, {
             if (d && d.constant && d.init) return ev(d.init, compressor);
             throw def;
         });
+        def(AST_Dot, function(compressor){
+            if (compressor.option("unsafe") && this.property == "length") {
+                var str = ev(this.expression, compressor);
+                if (typeof str == "string")
+                    return str.length;
+            }
+            throw def;
+        });
     })(function(node, func){
         node.DEFMETHOD("_eval", func);
     });
@@ -889,7 +897,9 @@ merge(Compressor.prototype, {
                 || this.operator == "--"
                 || this.expression.has_side_effects(compressor);
         });
-        def(AST_SymbolRef, function(compressor){ return false });
+        def(AST_SymbolRef, function(compressor){
+            return this.global() && this.undeclared();
+        });
         def(AST_Object, function(compressor){
             for (var i = this.properties.length; --i >= 0;)
                 if (this.properties[i].has_side_effects(compressor))
@@ -1737,6 +1747,7 @@ merge(Compressor.prototype, {
                             } catch(ex) {
                                 if (ex !== ast) throw ex;
                             };
+                            if (!fun) return self;
                             var args = fun.argnames.map(function(arg, i){
                                 return make_node(AST_String, self.args[i], {
                                     value: arg.print_to_string()
@@ -2312,6 +2323,17 @@ merge(Compressor.prototype, {
                 alternative: alternative
             });
         }
+        // x=y?1:1 --> x=1
+        if (consequent instanceof AST_Constant
+            && alternative instanceof AST_Constant
+            && consequent.equivalent_to(alternative)) {
+            if (self.condition.has_side_effects(compressor)) {
+                return AST_Seq.from_array([self.condition, make_node_from_constant(compressor, consequent.value, self)]);
+            } else {
+                return make_node_from_constant(compressor, consequent.value, self);
+
+            }
+        }
         return self;
     });
 
@@ -2349,7 +2371,7 @@ merge(Compressor.prototype, {
                 return make_node(AST_Dot, self, {
                     expression : self.expression,
                     property   : prop
-                });
+                }).optimize(compressor);
             }
             var v = parseFloat(prop);
             if (!isNaN(v) && v.toString() == prop) {
@@ -2359,6 +2381,19 @@ merge(Compressor.prototype, {
             }
         }
         return self;
+    });
+
+    OPT(AST_Dot, function(self, compressor){
+        var prop = self.property;
+        if (RESERVED_WORDS(prop) && !compressor.option("screw_ie8")) {
+            return make_node(AST_Sub, self, {
+                expression : self.expression,
+                property   : make_node(AST_String, self, {
+                    value: prop
+                })
+            }).optimize(compressor);
+        }
+        return self.evaluate(compressor)[0];
     });
 
     function literals_in_boolean_context(self, compressor) {

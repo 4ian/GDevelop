@@ -26,7 +26,7 @@ dot_properties: {
         a.foo = "bar";
         a["if"] = "if";
         a["*"] = "asterisk";
-        a.\u0EB3 = "unicode";
+        a["\u0EB3"] = "unicode";
         a[""] = "whitespace";
         a["1_1"] = "foo";
     }
@@ -48,7 +48,27 @@ dot_properties_es5: {
         a.foo = "bar";
         a.if = "if";
         a["*"] = "asterisk";
-        a.\u0EB3 = "unicode";
+        a["\u0EB3"] = "unicode";
         a[""] = "whitespace";
+    }
+}
+
+evaluate_length: {
+    options = {
+        properties: true,
+        unsafe: true,
+        evaluate: true
+    };
+    input: {
+        a = "foo".length;
+        a = ("foo" + "bar")["len" + "gth"];
+        a = b.length;
+        a = ("foo" + b).length;
+    }
+    expect: {
+        a = 3;
+        a = 6;
+        a = b.length;
+        a = ("foo" + b).length;
     }
 }

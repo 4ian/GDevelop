@@ -17,6 +17,12 @@ if (failures) {
     process.exit(1);
 }
 
+var run_ast_conversion_tests = require("./mozilla-ast");
+
+run_ast_conversion_tests({
+    iterations: 1000
+});
+
 /* -----[ utils ]----- */
 
 function tmpl() {

@@ -295,10 +295,10 @@ var AST_Toplevel = DEFNODE("Toplevel", "globals", {
         var parameters = [];
 
         arg_parameter_pairs.forEach(function(pair) {
-            var split = pair.split(":");
+            var splitAt = pair.lastIndexOf(":");
 
-            args.push(split[0]);
-            parameters.push(split[1]);
+            args.push(pair.substr(0, splitAt));
+            parameters.push(pair.substr(splitAt + 1));
         });
 
         var wrapped_tl = "(function(" + parameters.join(",") + "){ '$ORIG'; })(" + args.join(",") + ")";

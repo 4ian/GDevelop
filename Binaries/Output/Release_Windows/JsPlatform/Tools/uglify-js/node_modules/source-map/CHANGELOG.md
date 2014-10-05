@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.34
+
+* Make `SourceNode` work with windows style ("\r\n") newlines. Issue #103.
+
+* Fix bug involving source contents and the
+  `SourceMapGenerator.prototype.applySourceMap`. Issue #100.
+
 ## 0.1.33
 
 * Fix some edge cases surrounding path joining and URL resolution.
@@ -44,7 +51,7 @@
 ## 0.1.29
 
 * Allow duplicate entries in the `names` and `sources` arrays of source maps
-  (usually from TypeScript) we are parsing. Fixes github isse 72.
+  (usually from TypeScript) we are parsing. Fixes github issue 72.
 
 ## 0.1.28
 

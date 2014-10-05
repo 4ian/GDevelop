@@ -309,16 +309,22 @@ define(function (require, exports, module) {
       original: { line: 2, column: 2 },
       source: '../coffee/foo.coffee'
     });
+    bundleMap.setSourceContent('../coffee/foo.coffee', 'foo coffee');
     bundleMap.addMapping({
       generated: { line: 13, column: 13 },
       original: { line: 12, column: 12 },
       source: '/bar.coffee'
     });
+    bundleMap.setSourceContent('/bar.coffee', 'bar coffee');
     bundleMap.addMapping({
       generated: { line: 23, column: 23 },
       original: { line: 22, column: 22 },
       source: 'http://www.example.com/baz.coffee'
     });
+    bundleMap.setSourceContent(
+      'http://www.example.com/baz.coffee',
+      'baz coffee'
+    );
     bundleMap = new SourceMapConsumer(bundleMap.toJSON());
 
     var minifiedMap = new SourceMapGenerator({
@@ -352,16 +358,19 @@ define(function (require, exports, module) {
         original: { line: 2, column: 2 },
         source: sources[0]
       });
+      map.setSourceContent(sources[0], 'foo coffee');
       map.addMapping({
         generated: { line: 11, column: 11 },
         original: { line: 12, column: 12 },
         source: sources[1]
       });
+      map.setSourceContent(sources[1], 'bar coffee');
       map.addMapping({
         generated: { line: 21, column: 21 },
         original: { line: 22, column: 22 },
         source: sources[2]
       });
+      map.setSourceContent(sources[2], 'baz coffee');
       return map.toJSON();
     }
 

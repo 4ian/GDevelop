@@ -434,7 +434,13 @@ function OutputStream(options) {
     /* -----[ PARENTHESES ]----- */
 
     function PARENS(nodetype, func) {
-        nodetype.DEFMETHOD("needs_parens", func);
+        if (Array.isArray(nodetype)) {
+            nodetype.forEach(function(nodetype){
+                PARENS(nodetype, func);
+            });
+        } else {
+            nodetype.DEFMETHOD("needs_parens", func);
+        }
     };
 
     PARENS(AST_Node, function(){
@@ -453,7 +459,7 @@ function OutputStream(options) {
         return first_in_statement(output);
     });
 
-    PARENS(AST_Unary, function(output){
+    PARENS([ AST_Unary, AST_Undefined ], function(output){
         var p = output.parent();
         return p instanceof AST_PropAccess && p.expression === this;
     });
@@ -549,7 +555,7 @@ function OutputStream(options) {
             return true;
     });
 
-    function assign_and_conditional_paren_rules(output) {
+    PARENS([ AST_Assign, AST_Conditional ], function (output){
         var p = output.parent();
         // !(a = false) → true
         if (p instanceof AST_Unary)
@@ -566,10 +572,7 @@ function OutputStream(options) {
         // (a = foo)["prop"] —or— (a = foo).prop
         if (p instanceof AST_PropAccess && p.expression === this)
             return true;
-    };
-
-    PARENS(AST_Assign, assign_and_conditional_paren_rules);
-    PARENS(AST_Conditional, assign_and_conditional_paren_rules);
+    });
 
     /* -----[ PRINTERS ]----- */
 
@@ -656,7 +659,7 @@ function OutputStream(options) {
         output.print("for");
         output.space();
         output.with_parens(function(){
-            if (self.init) {
+            if (self.init && !(self.init instanceof AST_EmptyStatement)) {
                 if (self.init instanceof AST_Definitions) {
                     self.init.print(output);
                 } else {
@@ -996,8 +999,12 @@ function OutputStream(options) {
     DEFPRINT(AST_UnaryPrefix, function(self, output){
         var op = self.operator;
         output.print(op);
-        if (/^[a-z]/i.test(op))
+        if (/^[a-z]/i.test(op)
+            || (/[+-]$/.test(op)
+                && self.expression instanceof AST_UnaryPrefix
+                && /^[+-]/.test(self.expression.operator))) {
             output.space();
+        }
         self.expression.print(output);
     });
     DEFPRINT(AST_UnaryPostfix, function(self, output){

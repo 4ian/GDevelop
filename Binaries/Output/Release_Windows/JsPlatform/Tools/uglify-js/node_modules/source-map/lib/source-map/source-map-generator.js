@@ -229,6 +229,9 @@ define(function (require, exports, module) {
       aSourceMapConsumer.sources.forEach(function (sourceFile) {
         var content = aSourceMapConsumer.sourceContentFor(sourceFile);
         if (content) {
+          if (aSourceMapPath) {
+            sourceFile = util.join(aSourceMapPath, sourceFile);
+          }
           if (sourceRoot) {
             sourceFile = util.relative(sourceRoot, sourceFile);
           }

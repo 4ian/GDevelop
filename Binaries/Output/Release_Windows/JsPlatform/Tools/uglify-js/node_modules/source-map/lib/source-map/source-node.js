@@ -12,6 +12,13 @@ define(function (require, exports, module) {
   var SourceMapGenerator = require('./source-map-generator').SourceMapGenerator;
   var util = require('./util');
 
+  // Matches a Windows-style `\r\n` newline or a `\n` newline used by all other
+  // operating systems these days (capturing the result).
+  var REGEX_NEWLINE = /(\r?\n)/g;
+
+  // Matches a Windows-style newline, or any character.
+  var REGEX_CHARACTER = /\r\n|[\s\S]/g;
+
   /**
    * SourceNodes provide a way to abstract over interpolating/concatenating
    * snippets of generated JavaScript source code while maintaining the line and
@@ -46,9 +53,17 @@ define(function (require, exports, module) {
       // and the SourceMap
       var node = new SourceNode();
 
-      // The generated code
-      // Processed fragments are removed from this array.
-      var remainingLines = aGeneratedCode.split('\n');
+      // All even indices of this array are one line of the generated code,
+      // while all odd indices are the newlines between two adjacent lines
+      // (since `REGEX_NEWLINE` captures its match).
+      // Processed fragments are removed from this array, by calling `shiftNextLine`.
+      var remainingLines = aGeneratedCode.split(REGEX_NEWLINE);
+      var shiftNextLine = function() {
+        var lineContents = remainingLines.shift();
+        // The last line of a file might not have a newline.
+        var newLine = remainingLines.shift() || "";
+        return lineContents + newLine;
+      };
 
       // We need to remember the position of "remainingLines"
       var lastGeneratedLine = 1, lastGeneratedColumn = 0;
@@ -65,7 +80,7 @@ define(function (require, exports, module) {
           if (lastGeneratedLine < mapping.generatedLine) {
             var code = "";
             // Associate first line with "lastMapping"
-            addMappingWithCode(lastMapping, remainingLines.shift() + "\n");
+            addMappingWithCode(lastMapping, shiftNextLine());
             lastGeneratedLine++;
             lastGeneratedColumn = 0;
             // The remaining code is added without mapping
@@ -89,7 +104,7 @@ define(function (require, exports, module) {
         // to the SourceNode without any mapping.
         // Each line is added as separate string.
         while (lastGeneratedLine < mapping.generatedLine) {
-          node.add(remainingLines.shift() + "\n");
+          node.add(shiftNextLine());
           lastGeneratedLine++;
         }
         if (lastGeneratedColumn < mapping.generatedColumn) {
@@ -104,12 +119,10 @@ define(function (require, exports, module) {
       if (remainingLines.length > 0) {
         if (lastMapping) {
           // Associate the remaining code in the current line with "lastMapping"
-          var lastLine = remainingLines.shift();
-          if (remainingLines.length > 0) lastLine += "\n";
-          addMappingWithCode(lastMapping, lastLine);
+          addMappingWithCode(lastMapping, shiftNextLine());
         }
         // and add the remaining lines without any mapping
-        node.add(remainingLines.join("\n"));
+        node.add(remainingLines.join(""));
       }
 
       // Copy sourcesContent into SourceNode
@@ -348,8 +361,8 @@ define(function (require, exports, module) {
         lastOriginalSource = null;
         sourceMappingActive = false;
       }
-      chunk.split('').forEach(function (ch, idx, array) {
-        if (ch === '\n') {
+      chunk.match(REGEX_CHARACTER).forEach(function (ch, idx, array) {
+        if (REGEX_NEWLINE.test(ch)) {
           generated.line++;
           generated.column = 0;
           // Mappings end at eol
@@ -371,7 +384,7 @@ define(function (require, exports, module) {
             });
           }
         } else {
-          generated.column++;
+          generated.column += ch.length;
         }
       });
     });

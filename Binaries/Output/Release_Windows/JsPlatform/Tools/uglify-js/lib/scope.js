@@ -532,6 +532,7 @@ AST_Toplevel.DEFMETHOD("scope_warnings", function(options){
         }
         if (options.unreferenced
             && (node instanceof AST_SymbolDeclaration || node instanceof AST_Label)
+            && !(node instanceof AST_SymbolCatch)
             && node.unreferenced()) {
             AST_Node.warn("{type} {name} is declared but not referenced [{file}:{line},{col}]", {
                 type: node instanceof AST_Label ? "Label" : "Symbol",

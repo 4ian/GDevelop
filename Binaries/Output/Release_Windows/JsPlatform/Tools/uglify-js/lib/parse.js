@@ -168,14 +168,7 @@ function is_identifier_char(ch) {
 };
 
 function is_identifier_string(str){
-    var i = str.length;
-    if (i == 0) return false;
-    if (!is_identifier_start(str.charCodeAt(0))) return false;
-    while (--i >= 0) {
-        if (!is_identifier_char(str.charAt(i)))
-            return false;
-    }
-    return true;
+    return /^[a-z_$][a-z0-9_$]*$/i.test(str);
 };
 
 function parse_js_number(num) {

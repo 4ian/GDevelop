@@ -115,7 +115,7 @@ exports.minify = function(files, options) {
         if (options.sourceMapIncludeSources) {
             for (var file in sourcesContent) {
                 if (sourcesContent.hasOwnProperty(file)) {
-                    options.source_map.get().setSourceContent(file, sourcesContent[file]);
+                    output.source_map.get().setSourceContent(file, sourcesContent[file]);
                 }
             }
         }
@@ -126,6 +126,11 @@ exports.minify = function(files, options) {
     }
     var stream = UglifyJS.OutputStream(output);
     toplevel.print(stream);
+
+    if(options.outSourceMap){
+        stream += "\n//# sourceMappingURL=" + options.outSourceMap;
+    }
+
     return {
         code : stream + "",
         map  : output.source_map + ""

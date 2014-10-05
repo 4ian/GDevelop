@@ -1034,13 +1034,11 @@ void Project::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEve
 
 Project::Project(const Project & other)
 {
-    std::cout << "Init" << this << "from " << &other << std::endl;
     Init(other);
 }
 
 Project& Project::operator=(const Project & other)
 {
-    std::cout << "Init" << this << "from " << &other << std::endl;
     if ( this != &other )
         Init(other);
 

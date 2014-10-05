@@ -693,16 +693,17 @@ std::string Exporter::GetNodeExecutablePath()
         guessPaths.push_back(gd::ToString(userPath));
     else
     {
-        #if defined(WINDOWS)
-
         //Try some common paths.
+        #if defined(WINDOWS)
         guessPaths.push_back("C:/Program Files/nodejs/node.exe");
         guessPaths.push_back("C:/Program Files (x86)/nodejs/node.exe");
-
         #elif defined(LINUX)
         guessPaths.push_back("/usr/bin/env/node");
         guessPaths.push_back("/usr/bin/node");
         guessPaths.push_back("/usr/local/bin/node");
+        guessPaths.push_back("/usr/bin/env/nodejs");
+        guessPaths.push_back("/usr/bin/nodejs");
+        guessPaths.push_back("/usr/local/bin/nodejs");
         #else
             #warning Please complete this so as to return a path to the Node executable.
         #endif

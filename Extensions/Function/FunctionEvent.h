@@ -99,17 +99,16 @@ public:
     virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     /**
-     * Tool function to generate an unique C++ name for a function.
+     * \brief Tool function to generate an unique C++ name for a function used
+     * inside a layout.
      */
-    static std::string MangleFunctionName(const FunctionEvent & functionEvent) { return "GDFunction"+gd::SceneNameMangler::GetMangledSceneName(functionEvent.GetName())+ToString(&functionEvent); };
+    static std::string MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent);
 
     /**
-     * Tool function to search for a function event in an event list.
+     * \brief Tool function to search for a function event in an event list.
      * \return NULL if the function was not found.
      */
-    static const FunctionEvent* SearchForFunctionInEvents(const gd::EventsList & events, const std::string & functionName);
-
-    static const std::string globalDeclaration;
+    static const FunctionEvent* SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName);
 
 private:
     void Init(const FunctionEvent & event);

@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #include "FunctionEvent.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/CommonTools.h"
+#include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
@@ -51,9 +52,6 @@ name("MyFunction"),
 nameSelected(false)
 {
 }
-
-//Functions need some additionals "tools"
-const std::string FunctionEvent::globalDeclaration = "std::vector<std::string> * currentFunctionParameters;\n";
 
 vector < vector<gd::Instruction>* > FunctionEvent::GetAllConditionsVectors()
 {
@@ -202,26 +200,48 @@ FunctionEvent& FunctionEvent::operator=(const FunctionEvent & event)
     return *this;
 }
 
-const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::EventsList & events, const std::string & functionName)
+const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        try {
-            const FunctionEvent & functionEvent = dynamic_cast<const FunctionEvent&>(events[i]);
-
-            if ( functionEvent.GetName() == functionName )
-                return &functionEvent;
-        } catch(...) {}
-
-        if ( events[i].CanHaveSubEvents() )
+        const FunctionEvent * functionEvent = dynamic_cast<const FunctionEvent*>(&events[i]);
+        const gd::LinkEvent * linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);
+        if (functionEvent)
         {
-            const FunctionEvent * result = SearchForFunctionInEvents(events[i].GetSubEvents(), functionName);
+            if ( functionEvent->GetName() == functionName )
+                return functionEvent;
+        }
+        else if (linkEvent && linkEvent->GetLinkedEvents(project))
+        {
+            const FunctionEvent* result = SearchForFunctionInEvents(project,
+                *linkEvent->GetLinkedEvents(project), functionName);
+            if (result) return result;
+        }
+        else if ( events[i].CanHaveSubEvents() )
+        {
+            const FunctionEvent * result = SearchForFunctionInEvents(project,
+                events[i].GetSubEvents(), functionName);
             if (result) return result;
         }
     }
 
     return NULL;
 }
+
+std::string FunctionEvent::MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent)
+{
+    //To generate a "unique" name for the function, the name is mangled and suffixed with the
+    //pointer to the (original) event of the function.
+    const gd::BaseEvent * ptr = &functionEvent;
+    boost::shared_ptr<gd::BaseEvent> originalEvent = functionEvent.originalEvent.lock();
+    if (originalEvent != boost::shared_ptr<gd::BaseEvent>()) {
+        ptr = originalEvent.get();
+    }
+
+    return "GDFunction"+layout.GetMangledName()
+        +gd::SceneNameMangler::GetMangledSceneName(functionEvent.GetName())
+        +ToString(ptr);
+};
 
 #endif
 

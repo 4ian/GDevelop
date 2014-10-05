@@ -63,6 +63,14 @@ public:
     virtual bool MustBePreprocessed() { return true;}
 
     /**
+     * \brief Get a pointer to the list of events that are targeted by the link.
+     *
+     * @param project The project containing the link.
+     * @return NULL if nothing is found or a pointer to the list of events being linked.
+     */
+    const EventsList * GetLinkedEvents(const gd::Project & project) const;
+
+    /**
      * \brief Replace the link in the events list by the linked events.
      * When implementing a platform with a link event, you should call this function when preprocessing the events
      * ( See gd::EventMetadata::codeGeneration ).

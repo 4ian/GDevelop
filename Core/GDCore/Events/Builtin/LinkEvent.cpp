@@ -27,18 +27,25 @@ using namespace std;
 namespace gd
 {
 
-void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList)
+const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
 {
-    //Finding what to link to.
-    const EventsList * eventsToInclude = NULL;
-    gd::ExternalEvents * linkedExternalEvents = NULL;
+    const EventsList * events = NULL;
+    const gd::ExternalEvents * linkedExternalEvents = NULL;
     if ( project.HasExternalEventsNamed(GetTarget()) )
     {
         linkedExternalEvents = &project.GetExternalEvents(GetTarget());
-        eventsToInclude = &project.GetExternalEvents(GetTarget()).GetEvents();
+        events = &project.GetExternalEvents(GetTarget()).GetEvents();
     }
-    else if ( project.HasLayoutNamed(GetTarget()) ) eventsToInclude = &project.GetLayout(GetTarget()).GetEvents();
+    else if ( project.HasLayoutNamed(GetTarget()) )
+        events = &project.GetLayout(GetTarget()).GetEvents();
 
+    return events;
+}
+
+void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList)
+{
+    //Finding what to link to.
+    const EventsList * eventsToInclude = GetLinkedEvents(project);
     if ( eventsToInclude != NULL )
     {
         unsigned int firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();

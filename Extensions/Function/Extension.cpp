@@ -66,18 +66,18 @@ public:
             {
                 virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
                 {
-                    codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
                     std::string functionName = instruction.GetParameter(0).GetPlainString();
                     const gd::Project & project = codeGenerator.GetProject();
-                    const gd::Layout & scene = codeGenerator.GetLayout();
+                    const gd::Layout & layout = codeGenerator.GetLayout();
 
-                    const FunctionEvent * functionEvent = FunctionEvent::SearchForFunctionInEvents(scene.GetEvents(), functionName);
+                    const FunctionEvent * functionEvent = FunctionEvent::SearchForFunctionInEvents(project, layout.GetEvents(), functionName);
                     if ( !functionEvent )
                     {
                         std::cout << "Function \""+functionName+"\" not found!" << std::endl;
                         return "//Function \""+functionName+"\" not found.\n";
                     }
 
+                    codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(layout, *functionEvent)+"(RuntimeContext *, std::map <std::string, std::vector<RuntimeObject*> *>, std::vector<std::string> &);\n");
                     std::string code;
 
                     //Generate code for objects passed as arguments
@@ -100,17 +100,13 @@ public:
                         std::string parameterCode;
                         gd::CallbacksForGeneratingExpressionCode callbacks(parameterCode, codeGenerator, context);
                         gd::ExpressionParser parser(instruction.GetParameter(i).GetPlainString());
-                        parser.ParseStringExpression(CppPlatform::Get(), project, scene, callbacks);
+                        parser.ParseStringExpression(CppPlatform::Get(), project, layout, callbacks);
                         if (parameterCode.empty()) parameterCode = "\"\"";
 
                         code += "functionParameters.push_back("+parameterCode+");\n";
                     }
-                    code += "std::vector<std::string> * oldFunctionParameters = currentFunctionParameters;\n";
-                    code += "currentFunctionParameters = &functionParameters;\n";
 
-                    code += FunctionEvent::MangleFunctionName(*functionEvent)+"(runtimeContext, "+objectsAsArgumentCode+");\n";
-                    code += "currentFunctionParameters = oldFunctionParameters;\n";
-
+                    code += FunctionEvent::MangleFunctionName(layout, *functionEvent)+"(runtimeContext, "+objectsAsArgumentCode+", functionParameters);\n";
                     return code;
                 };
             };
@@ -144,16 +140,14 @@ public:
                                              gd::EventsCodeGenerationContext & /* The function has nothing to do with the current context */)
                 {
                     FunctionEvent & event = dynamic_cast<FunctionEvent&>(event_);
-
-                    //Declaring the pointer to the function parameters
-                    codeGenerator.AddGlobalDeclaration(event.globalDeclaration);
+                    const gd::Layout & layout = codeGenerator.GetLayout();
 
                     //Declaring function prototype.
-                    codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(event)+"(RuntimeContext *, std::map <std::string, std::vector<RuntimeObject*> *>);\n");
+                    codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(layout, event)+"(RuntimeContext *, std::map <std::string, std::vector<RuntimeObject*> *>, std::vector<std::string> &);\n");
 
                     //Generating function code:
                     std::string functionCode;
-                    functionCode += "\nvoid "+FunctionEvent::MangleFunctionName(event)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<RuntimeObject*> *> objectsListsMap)\n{\n";
+                    functionCode += "\nvoid "+FunctionEvent::MangleFunctionName(layout, event)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<RuntimeObject*> *> objectsListsMap, std::vector<std::string> & currentFunctionParameters)\n{\n";
 
                     gd::EventsCodeGenerationContext callerContext;
                     {
@@ -215,10 +209,14 @@ public:
             {
                 virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
                 {
-                    codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
                     codeGenerator.AddIncludeFile("Function/FunctionTools.h");
                     const gd::Project & game = codeGenerator.GetProject();
                     const gd::Layout & scene = codeGenerator.GetLayout();
+
+                    //Ensure currentFunctionParameters vector is always existing.
+                    std::string mainFakeParameters = "std::vector<std::string> currentFunctionParameters;\n";
+                    if (codeGenerator.GetCustomCodeInMain().find(mainFakeParameters) == std::string::npos)
+                        codeGenerator.AddCustomCodeInMain(mainFakeParameters);
 
                     //Generate code for evaluating index
                     std::string expression;
@@ -241,7 +239,7 @@ public:
                            _("Return the text contained in a parameter of the currently launched function"),
                            _("Function"),
                            "res/function.png")
-                .AddParameter("expression", _("Number of the parameter ( Parameters start at 0 ! )"))
+                .AddParameter("expression", _("Index of the parameter (Parameters start at 0!)"))
                 .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>(codeGenerator));
         }
         #endif

@@ -1267,9 +1267,9 @@ void ProjectManager::OnOpenProjectFolderSelected(wxCommandEvent& event)
     #if defined(WINDOWS)
     wxExecute("explorer.exe \""+dir+"\"");
     #elif defined(LINUX)
-    system(std::string("xdg-open \""+dir).c_str());
+    system(std::string("xdg-open \""+dir+"\"").c_str());
     #elif defined(MAC)
-    system(std::string("open \""+dir).c_str());
+    system(std::string("open \""+dir+"\"").c_str());
     #endif
 }
 

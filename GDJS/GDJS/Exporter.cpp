@@ -658,13 +658,20 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"),
                           _("Compilation finished"), wxYES_NO) == wxYES )
         {
+            int returnCode = 0;
             #if defined(WINDOWS)
             wxExecute("explorer.exe \""+exportDir+"\"");
             #elif defined(LINUX)
-            system(std::string("xdg-open \""+exportDir).c_str());
+            returnCode = system(std::string("xdg-open \""+exportDir+"\"").c_str());
             #elif defined(MAC)
-            system(std::string("open \""+exportDir).c_str());
+            returnCode = system(std::string("open \""+exportDir+"\"").c_str());
             #endif
+
+            if (returnCode != 0) {
+                wxString error = _("Oops, it seems that the folder couldn't be displayed. Open your file explorer and go to:\n\n");
+                error += exportDir;
+                wxLogWarning(error);
+            }
         }
     }
     #endif

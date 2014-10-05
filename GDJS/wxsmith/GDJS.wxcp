@@ -1,7 +1,7 @@
 {
 	"metadata":	{
-		"m_generatedFilesDir":	"..\\GDJS\\Dialogs",
-		"m_objCounter":	150,
+		"m_generatedFilesDir":	"../GDJS/Dialogs/",
+		"m_objCounter":	156,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxCB65InitBitmapResources",
 		"m_bitmapsFile":	"GDJSDialogsBitmaps.cpp",
@@ -92,11 +92,11 @@
 					"m_options":	["", "wxBOTH", "wxVERTICAL", "wxHORIZONTAL"]
 				}, {
 					"type":	"string",
-					"m_label":	"File:",
+					"m_label":	"Inherited Class",
 					"m_value":	"UploadOnlineDialog"
 				}, {
 					"type":	"string",
-					"m_label":	"Inherited Class",
+					"m_label":	"File:",
 					"m_value":	"UploadOnlineDialog"
 				}, {
 					"type":	"string",
@@ -906,7 +906,8 @@
 											"m_eventClass":	"wxCommandEvent",
 											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"OnCloseBtClicked(wxCommandEvent& event)",
-											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked."
+											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+											"m_noBody":	false
 										}],
 									"m_children":	[]
 								}]
@@ -987,11 +988,11 @@
 					"m_options":	["", "wxBOTH", "wxVERTICAL", "wxHORIZONTAL"]
 				}, {
 					"type":	"string",
-					"m_label":	"File:",
+					"m_label":	"Inherited Class",
 					"m_value":	"ProjectExportDialog"
 				}, {
 					"type":	"string",
-					"m_label":	"Inherited Class",
+					"m_label":	"File:",
 					"m_value":	"ProjectExportDialog"
 				}, {
 					"type":	"string",
@@ -2062,7 +2063,7 @@
 																				}, {
 																					"type":	"string",
 																					"m_label":	"Size:",
-																					"m_value":	"201,23"
+																					"m_value":	"-1,-1"
 																				}, {
 																					"type":	"string",
 																					"m_label":	"Minimum Size:",
@@ -2145,7 +2146,7 @@
 																				}, {
 																					"type":	"string",
 																					"m_label":	"Size:",
-																					"m_value":	"30,23"
+																					"m_value":	"30,-1"
 																				}, {
 																					"type":	"string",
 																					"m_label":	"Minimum Size:",
@@ -2216,7 +2217,8 @@
 																					"m_eventClass":	"wxCommandEvent",
 																					"m_eventHandler":	"wxCommandEventHandler",
 																					"m_functionNameAndSignature":	"OnBrowseBtClick(wxCommandEvent& event)",
-																					"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked."
+																					"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																					"m_noBody":	false
 																				}],
 																			"m_children":	[]
 																		}]
@@ -2240,80 +2242,210 @@
 																	"m_events":	[],
 																	"m_children":	[]
 																}, {
-																	"m_type":	4415,
+																	"m_type":	4403,
 																	"proportion":	1,
 																	"border":	5,
-																	"gbSpan":	"",
-																	"gbPosition":	"",
+																	"gbSpan":	"1,1",
+																	"gbPosition":	"0,0",
 																	"m_styles":	[],
-																	"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_LEFT", "wxALIGN_CENTER_VERTICAL"],
+																	"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 																	"m_properties":	[{
-																			"type":	"winid",
-																			"m_label":	"ID:",
-																			"m_winid":	"wxID_ANY"
-																		}, {
-																			"type":	"string",
-																			"m_label":	"Size:",
-																			"m_value":	"-1,-1"
-																		}, {
-																			"type":	"string",
-																			"m_label":	"Minimum Size:",
-																			"m_value":	"-1,-1"
-																		}, {
 																			"type":	"string",
 																			"m_label":	"Name:",
-																			"m_value":	"minifyCheck"
-																		}, {
-																			"type":	"multi-string",
-																			"m_label":	"Tooltip:",
-																			"m_value":	""
-																		}, {
-																			"type":	"colour",
-																			"m_label":	"Bg Colour:",
-																			"colour":	"<Default>"
-																		}, {
-																			"type":	"colour",
-																			"m_label":	"Fg Colour:",
-																			"colour":	"<Default>"
-																		}, {
-																			"type":	"font",
-																			"m_label":	"Font:",
-																			"m_value":	""
-																		}, {
-																			"type":	"bool",
-																			"m_label":	"Hidden",
-																			"m_value":	false
-																		}, {
-																			"type":	"bool",
-																			"m_label":	"Disabled",
-																			"m_value":	false
-																		}, {
-																			"type":	"bool",
-																			"m_label":	"Focused",
-																			"m_value":	false
-																		}, {
-																			"type":	"string",
-																			"m_label":	"Class Name:",
-																			"m_value":	""
-																		}, {
-																			"type":	"string",
-																			"m_label":	"Include File:",
-																			"m_value":	""
+																			"m_value":	"flexGridSizer152"
 																		}, {
 																			"type":	"string",
 																			"m_label":	"Style:",
 																			"m_value":	""
 																		}, {
 																			"type":	"string",
-																			"m_label":	"Label:",
-																			"m_value":	"Minify and optimize"
+																			"m_label":	"# Columns:",
+																			"m_value":	"2"
 																		}, {
-																			"type":	"bool",
-																			"m_label":	"Value:",
-																			"m_value":	true
+																			"type":	"string",
+																			"m_label":	"# Rows:",
+																			"m_value":	"0"
+																		}, {
+																			"type":	"string",
+																			"m_label":	"Growable columns:",
+																			"m_value":	""
+																		}, {
+																			"type":	"string",
+																			"m_label":	"Growable rows:",
+																			"m_value":	""
+																		}, {
+																			"type":	"string",
+																			"m_label":	"Horizontal gap:",
+																			"m_value":	"0"
+																		}, {
+																			"type":	"string",
+																			"m_label":	"Vertical gap:",
+																			"m_value":	"0"
 																		}],
 																	"m_events":	[],
-																	"m_children":	[]
+																	"m_children":	[{
+																			"m_type":	4415,
+																			"proportion":	1,
+																			"border":	5,
+																			"gbSpan":	"",
+																			"gbPosition":	"",
+																			"m_styles":	[],
+																			"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_LEFT", "wxALIGN_CENTER_VERTICAL"],
+																			"m_properties":	[{
+																					"type":	"winid",
+																					"m_label":	"ID:",
+																					"m_winid":	"wxID_ANY"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Size:",
+																					"m_value":	"-1,-1"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Minimum Size:",
+																					"m_value":	"-1,-1"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Name:",
+																					"m_value":	"minifyCheck"
+																				}, {
+																					"type":	"multi-string",
+																					"m_label":	"Tooltip:",
+																					"m_value":	""
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Bg Colour:",
+																					"colour":	"<Default>"
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Fg Colour:",
+																					"colour":	"<Default>"
+																				}, {
+																					"type":	"font",
+																					"m_label":	"Font:",
+																					"m_value":	""
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Hidden",
+																					"m_value":	false
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Disabled",
+																					"m_value":	false
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Focused",
+																					"m_value":	false
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Class Name:",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Include File:",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Style:",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Label:",
+																					"m_value":	"Minify and optimize"
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Value:",
+																					"m_value":	true
+																				}],
+																			"m_events":	[],
+																			"m_children":	[]
+																		}, {
+																			"m_type":	4438,
+																			"proportion":	0,
+																			"border":	5,
+																			"gbSpan":	"1,1",
+																			"gbPosition":	"0,0",
+																			"m_styles":	["wxHL_DEFAULT_STYLE"],
+																			"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																			"m_properties":	[{
+																					"type":	"winid",
+																					"m_label":	"ID:",
+																					"m_winid":	"wxID_ANY"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Size:",
+																					"m_value":	"-1,-1"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Minimum Size:",
+																					"m_value":	"-1,-1"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Name:",
+																					"m_value":	"nodejsLink"
+																				}, {
+																					"type":	"multi-string",
+																					"m_label":	"Tooltip:",
+																					"m_value":	""
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Bg Colour:",
+																					"colour":	"<Default>"
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Fg Colour:",
+																					"colour":	"<Default>"
+																				}, {
+																					"type":	"font",
+																					"m_label":	"Font:",
+																					"m_value":	""
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Hidden",
+																					"m_value":	false
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Disabled",
+																					"m_value":	false
+																				}, {
+																					"type":	"bool",
+																					"m_label":	"Focused",
+																					"m_value":	false
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Class Name:",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Include File:",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Style:",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
+																					"m_label":	"Label:",
+																					"m_value":	"(Node.js is required)"
+																				}, {
+																					"type":	"string",
+																					"m_label":	"URL:",
+																					"m_value":	"http://nodejs.org/"
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Normal Colour:",
+																					"colour":	"#0000FF"
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Visited Colour:",
+																					"colour":	"#FF0000"
+																				}, {
+																					"type":	"colour",
+																					"m_label":	"Hover Colour:",
+																					"colour":	"#0000FF"
+																				}],
+																			"m_events":	[],
+																			"m_children":	[]
+																		}]
 																}]
 														}]
 												}, {
@@ -4079,7 +4211,8 @@
 											"m_eventClass":	"wxCommandEvent",
 											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"OnCloseBtClicked(wxCommandEvent& event)",
-											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked."
+											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+											"m_noBody":	false
 										}],
 									"m_children":	[]
 								}, {
@@ -4168,7 +4301,8 @@
 											"m_eventClass":	"wxCommandEvent",
 											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"OnExportBtClicked(wxCommandEvent& event)",
-											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked."
+											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+											"m_noBody":	false
 										}],
 									"m_children":	[]
 								}]
@@ -4249,11 +4383,11 @@
 					"m_options":	["", "wxBOTH", "wxVERTICAL", "wxHORIZONTAL"]
 				}, {
 					"type":	"string",
-					"m_label":	"File:",
+					"m_label":	"Inherited Class",
 					"m_value":	"CocoonJSUploadDialog"
 				}, {
 					"type":	"string",
-					"m_label":	"Inherited Class",
+					"m_label":	"File:",
 					"m_value":	"CocoonJSUploadDialog"
 				}, {
 					"type":	"string",
@@ -5028,7 +5162,8 @@
 									"m_eventClass":	"wxCommandEvent",
 									"m_eventHandler":	"wxCommandEventHandler",
 									"m_functionNameAndSignature":	"OnCloseBtClicked(wxCommandEvent& event)",
-									"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked."
+									"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+									"m_noBody":	false
 								}],
 							"m_children":	[]
 						}]
@@ -5108,11 +5243,11 @@
 					"m_options":	["", "wxBOTH", "wxVERTICAL", "wxHORIZONTAL"]
 				}, {
 					"type":	"string",
-					"m_label":	"File:",
+					"m_label":	"Inherited Class",
 					"m_value":	"IntelXDKPackageDialog"
 				}, {
 					"type":	"string",
-					"m_label":	"Inherited Class",
+					"m_label":	"File:",
 					"m_value":	"IntelXDKPackageDialog"
 				}, {
 					"type":	"string",
@@ -6130,7 +6265,8 @@
 											"m_eventClass":	"wxCommandEvent",
 											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"OnCloseClicked(wxCommandEvent& event)",
-											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked."
+											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+											"m_noBody":	false
 										}],
 									"m_children":	[]
 								}]

@@ -38,6 +38,7 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     exportChoice->SetSelection(latestPage);
 
     hasNode = !Exporter::GetNodeExecutablePath().empty();
+    nodejsLink->Show(!hasNode);
     if ( !hasNode )
     {
         minifyCheck->Disable();
@@ -91,7 +92,7 @@ void ProjectExportDialog::OnExportBtClicked(wxCommandEvent& event)
 
 void ProjectExportDialog::OnBrowseBtClick(wxCommandEvent& event)
 {
-    wxDirDialog dialog(this, _("Choose a folder, empty if possible, where create your game."));
+    wxDirDialog dialog(this, _("Choose a folder, empty if possible, where the game should be exported."));
     if ( dialog.ShowModal() == wxID_OK )
         exportFolderEdit->SetValue(dialog.GetPath());
 }

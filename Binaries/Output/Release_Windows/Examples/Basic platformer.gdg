@@ -62,7 +62,7 @@
             <Resource kind="image" name="Left.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Left.png" />
             <Resource kind="image" name="Right.png" alwaysLoaded="false" smoothed="true" userAdded="false" file="Right.png" />
             <Resource kind="image" name="ladder_mid.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="ladder_mid.png" />
-            <Resource kind="image" name="grass.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="grass.png" />
+            <Resource kind="image" name="Grass.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Grass.png" />
         </Resources>
         <ResourceFolders />
     </Resources>
@@ -159,7 +159,7 @@
                         <Animation typeNormal="false">
                             <Direction boucle="false" tempsEntre="1.000000">
                                 <Sprites>
-                                    <Sprite image="grass.png">
+                                    <Sprite image="Grass.png">
                                         <Points />
                                         <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
                                         <PointCentre nom="centre" X="35.000000" Y="35.000000" automatic="true" />

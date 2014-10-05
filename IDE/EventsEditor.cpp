@@ -155,7 +155,7 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	eventsPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	eventsPanel = new wxControl(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_PANEL1"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	liveEditingPanel = new wxPanel(eventsPanel, ID_PANEL2, wxPoint(100,100), wxDefaultSize, wxSIMPLE_BORDER, _T("ID_PANEL2"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -297,6 +297,13 @@ void EventsEditor::Init(wxWindow* parent)
     addInstrIcon->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseEnter), NULL, this);
     addInstrBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseLeave), NULL, this);
     addInstrIcon->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseLeave), NULL, this);
+
+    //Ensure that the eventsPanel is a wxControl: if declared as a wxPanel, it
+    //won't be able to catch keyboard input.
+    if (dynamic_cast<wxPanel*>(eventsPanel))
+    {
+    	std::cout << "ERROR: eventsPanel was declared as a wxPanel instead of wxControl! Keyboards shortcut won't work with wxGTK.";
+    }
 
 	//Load configuration
 	wxConfigBase * config = wxConfigBase::Get();
@@ -751,7 +758,7 @@ void EventsEditor::OneventsPanelLeftUp(wxMouseEvent& event)
 
 void EventsEditor::OneventsPanelLeftDown(wxMouseEvent& event)
 {
-    eventsPanel->SetFocusIgnoringChildren();
+    eventsPanel->SetFocus();
 
     //Want to resize conditions column ?
     if ( event.GetX() >= conditionColumnWidth-2 && event.GetX() <= conditionColumnWidth+2  )
@@ -945,7 +952,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
 {
     if (!liveEditingPanel->IsShown())
-        eventsPanel->SetFocusIgnoringChildren();
+        eventsPanel->SetFocus();
 
     //Column resizing
     if ( (event.GetX() >= conditionColumnWidth-2 && event.GetX() <= conditionColumnWidth+2) || isResizingColumns)
@@ -1180,7 +1187,7 @@ void EventsEditor::EndLiveEditing()
         return;
     }
 
-    eventsPanel->SetFocusIgnoringChildren();
+    eventsPanel->SetFocus();
     *liveEditedParameter.parameter = gd::Expression(ToString(liveEdit->GetValue()));
     liveEditedParameter.event->eventHeightNeedUpdate = true;
     liveEditingPanel->Show(false);

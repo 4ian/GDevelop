@@ -144,7 +144,7 @@ public:
     wxPanel* listContextPanel;
     wxMenuItem* MenuItem6;
     wxMenu eventTypesMenu;
-    wxPanel* eventsPanel;
+    wxControl* eventsPanel;
     wxStaticText* addInstrBt;
     wxMenuItem* eventCopyMenu;
     wxMenu multipleContextMenu;

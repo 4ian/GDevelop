@@ -9,7 +9,7 @@
 			<growablecols>0</growablecols>
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
-				<object class="wxPanel" name="ID_PANEL1" variable="eventsPanel" member="yes">
+				<object class="wxControl" name="ID_PANEL1" variable="eventsPanel" member="yes">
 					<bg>#FFFFFF</bg>
 					<handler function="OneventsPanelPaint" entry="EVT_PAINT" />
 					<handler function="OneventsPanelEraseBackground" entry="EVT_ERASE_BACKGROUND" />

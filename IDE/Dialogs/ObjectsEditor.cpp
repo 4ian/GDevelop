@@ -603,7 +603,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                             objectsGroups.end(),
                             std::bind2nd(gd::GroupHasTheSameName(), event.GetLabel())) != objectsGroups.end())
         {
-            gd::LogWarning( _( "Unable to rename the groupe : another group has already this name." ) );
+            gd::LogWarning( _( "Unable to rename the group: another group has already this name." ) );
 
             event.Veto();
             return;
@@ -824,6 +824,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, layout, objects.GetObject(name));
 
     objectsList->EditLabel(itemAdded);
+    renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
 
     gd::LogStatus( _( "The object was correctly added" ) );
 }

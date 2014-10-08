@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <project firstLayout="">
-    <gdVersion build="73" major="3" minor="4" revision="0" />
+    <gdVersion build="74" major="3" minor="5" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Platformer with Tile Map Object</name>
         <author></author>
         <windowWidth>800</windowWidth>
         <windowHeight>600</windowHeight>
         <latestCompilationDirectory></latestCompilationDirectory>
-        <maxFPS>-1</maxFPS>
+        <maxFPS>60</maxFPS>
         <minFPS>10</minFPS>
         <verticalSync>false</verticalSync>
         <extensions>
@@ -34,9 +34,9 @@
             <extension name="PlatformAutomatism" />
         </extensions>
         <platforms>
-            <platform name="Game Develop C++ platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
-        <currentPlatform>Game Develop C++ platform</currentPlatform>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
     <resources>
         <resources>

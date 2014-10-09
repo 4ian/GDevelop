@@ -536,7 +536,7 @@ void PlatformerObjectAutomatism::UnserializeFrom(const gd::SerializerElement & e
     maxSpeed = element.GetDoubleAttribute("maxSpeed");
     jumpSpeed = element.GetDoubleAttribute("jumpSpeed");
     ignoreDefaultControls = element.GetBoolAttribute("ignoreDefaultControls");
-    slopeMaxAngle = element.GetDoubleAttribute("slopeMaxAngle");
+    SetSlopeMaxAngle(element.GetDoubleAttribute("slopeMaxAngle"));
 }
 
 #if defined(GD_IDE_ONLY)

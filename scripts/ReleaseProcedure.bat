@@ -44,9 +44,9 @@ IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 
 echo.
 echo --Creating archive...
-if exist Binaries\Releases\gd3xxxx.7z (del Binaries\Releases\gd3xxxx.7z)
+if exist Binaries\Releases\gd3xxxx.zip (del Binaries\Releases\gd3xxxx.zip)
 cd Binaries\Output\Release_Windows\
-IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "C:\Program Files (x86)\7-Zip\7z.exe" a ..\..\Releases\gd3xxxx.7z * > ..\..\..\scripts\logs\7zArchiveLog.txt
+IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "C:\Program Files (x86)\7-Zip\7z.exe" a ..\..\Releases\gd3xxxx.zip * > ..\..\..\scripts\logs\zipArchiveLog.txt
 IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 cd ..\..\..
 

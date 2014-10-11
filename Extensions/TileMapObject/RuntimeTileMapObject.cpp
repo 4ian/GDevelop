@@ -248,7 +248,11 @@ namespace
         const TileExtraParameter &tileExtraParam = dynamic_cast<const TileExtraParameter&>(extraParameter);
 
         //Get the tile hitbox
-        Polygon2d tileHitbox = tileMapObject->tileSet.Get().GetTileHitbox(tileMapObject->tileMap.Get().GetTile(tileExtraParam.layer, tileExtraParam.column, tileExtraParam.row)).hitbox;
+        int tileId = tileMapObject->tileMap.Get().GetTile(tileExtraParam.layer, tileExtraParam.column, tileExtraParam.row);
+        if(tileId < 0 || tileId >= tileMapObject->tileSet.Get().GetTilesCount())
+            return false;
+
+        Polygon2d tileHitbox = tileMapObject->tileSet.Get().GetTileHitbox(tileId).hitbox;
         tileHitbox.Move(tileMapObject->GetX() + tileExtraParam.column * tileMapObject->tileSet.Get().tileSize.x,
                         tileMapObject->GetY() + tileExtraParam.row * tileMapObject->tileSet.Get().tileSize.y);
 

@@ -17,7 +17,7 @@ namespace gd
 
 bool ProjectResourcesAdder::AddAllMissingImages(gd::Project & project)
 {
-    ImagesUsedInventorizer inventorizer;
+    gd::ImagesUsedInventorizer inventorizer;
     project.ExposeResources(inventorizer);
     std::set<std::string> & allImages = inventorizer.GetAllUsedImages();
 
@@ -32,6 +32,38 @@ bool ProjectResourcesAdder::AddAllMissingImages(gd::Project & project)
     }
 
     return true;
+}
+
+std::vector<std::string> ProjectResourcesAdder::GetAllUselessResources(gd::Project & project)
+{
+    std::vector<std::string> unusedResources;
+
+    //Search for used images
+    gd::ImagesUsedInventorizer inventorizer;
+    project.ExposeResources(inventorizer);
+    std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
+
+    //Search all images resources not used
+    std::vector<std::string> resources = project.GetResourcesManager().GetAllResourcesList();
+    for (unsigned int i = 0;i < resources.size();i++)
+    {
+        if (project.GetResourcesManager().GetResource(resources[i]).GetKind() != "image")
+            continue;
+
+        if (usedImages.find(resources[i]) == usedImages.end())
+            unusedResources.push_back(resources[i]);
+    }
+
+    return unusedResources;
+}
+
+void ProjectResourcesAdder::RemoveAllUselessResources(gd::Project & project)
+{
+    std::vector<std::string> unusedResources = GetAllUselessResources(project);
+
+    for(unsigned int i = 0;i < unusedResources.size();++i) {
+        project.GetResourcesManager().RemoveResource(unusedResources[i]);
+    }
 }
 
 }

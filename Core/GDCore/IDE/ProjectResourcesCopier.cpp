@@ -66,7 +66,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
-    std::cout << "Resource:" << it->first << std::endl;
         if ( !it->first.empty() )
         {
             #if !defined(GD_NO_WX_GUI)
@@ -92,7 +91,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
                 {
                     gd::LogWarning( gd::ToString(_( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile+_("\".")));
                 }
-                std::cout << "Copied " << it->first << " to " << destinationFile << std::endl;
             }
         }
 

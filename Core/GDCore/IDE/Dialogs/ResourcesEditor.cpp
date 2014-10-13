@@ -40,6 +40,7 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
+#include "GDCore/IDE/ProjectResourcesAdder.h"
 #include "GDCore/IDE/ImagesUsedInventorizer.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -520,33 +521,6 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
         {
             std::string imageName = data->GetSecondString();
 
-            //Warn the user if the resource is still in use
-            //TODO : Activate this when multiple selection is implemented.
-            /*{
-                //Search in scenes resources
-                ImagesUsedInventorizer inventorizer;
-                for ( unsigned int i = 0;i < project.GetLayoutsCount();i++ )
-                {
-                    for (unsigned int j = 0;j<project.GetLayout(i).GetObjects().size();++j)
-                        project.GetLayout(i).GetObjects()[j]->ExposeResources(inventorizer);
-
-                    LaunchResourceWorkerOnEvents(project, project.GetLayout(i).GetEvents(), inventorizer);
-                }
-                //Search in global objects resources
-                for (unsigned int j = 0;j<project.GetObjects().size();++j)
-                    project.GetObjects()[j]->ExposeResources(inventorizer);
-                //Search in external events
-                for ( unsigned int i = 0;i < project.GetExternalEventsCount();i++ )
-                    LaunchResourceWorkerOnEvents(project, project.GetExternalEvents(i).GetEvents(), inventorizer);
-
-                std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
-                if ( usedImages.find(imageName) != usedImages.end() )
-                {
-                    if ( wxMessageBox(_("Certains élements du projet utilisent cette ressource.\nÊtes vous sûr de vouloir la supprimer ?"), _("Ressource utilisée"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
-                        return;
-                }
-            }*/
-
             project.GetResourcesManager().RemoveResource(imageName);
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, imageName);
@@ -969,39 +943,19 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
-    //TODO: Factor me using gd::Project::ExposeResources
+    std::cout << "hello" << std::endl;
+    std::vector<std::string> unusedImages =
+        gd::ProjectResourcesAdder::GetAllUselessResources(project);
+        std::cout << unusedImages.size()<< std::endl;
 
-    //Search in scenes resources
-    ImagesUsedInventorizer inventorizer;
-    for ( unsigned int i = 0;i < project.GetLayoutsCount();i++ )
-    {
-        for (unsigned int j = 0;j<project.GetLayout(i).GetObjectsCount();++j)
-        	project.GetLayout(i).GetObject(j).ExposeResources(inventorizer);
-
-        LaunchResourceWorkerOnEvents(project, project.GetLayout(i).GetEvents(), inventorizer);
-    }
-    //Search in global objects resources
-    for (unsigned int j = 0;j<project.GetObjectsCount();++j)
-        project.GetObject(j).ExposeResources(inventorizer);
-    //Search in external events
-    for ( unsigned int i = 0;i < project.GetExternalEventsCount();i++ )
-        LaunchResourceWorkerOnEvents(project, project.GetExternalEvents(i).GetEvents(), inventorizer);
-
-    //Construct a wxArrayString with unused images
+    //Construct corresponding wxArrayString with unused images
     wxArrayString imagesNotUsed;
     wxArrayInt initialSelection;
-    std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
-    std::vector<std::string> resources = project.GetResourcesManager().GetAllResourcesList();
-    for ( unsigned int i = 0;i < resources.size() ;i++ )
+    for ( unsigned int i = 0;i < unusedImages.size() ;i++ )
     {
-        if ( project.GetResourcesManager().GetResource(resources[i]).GetKind() != "image" )
-            continue;
-
-        if ( usedImages.find(resources[i]) == usedImages.end() )
-        {
-            imagesNotUsed.push_back(resources[i]);
-            initialSelection.push_back(imagesNotUsed.size()-1);
-        }
+        std::cout << unusedImages[i]<< std::endl;
+        imagesNotUsed.push_back(unusedImages[i]);
+        initialSelection.push_back(imagesNotUsed.size()-1);
     }
 
     //Request the user to choose which images to remove.

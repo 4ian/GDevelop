@@ -13,6 +13,7 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
+#include "GDCore/IDE/ProjectResourcesAdder.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/Serialization/Serializer.h"
 
@@ -56,7 +57,7 @@ TEST_CASE( "Resources", "[common][resources]" ) {
         REQUIRE(worker.files.size() == 3);
         REQUIRE(std::find(worker.files.begin(), worker.files.end(), "path/to/file2.png") != worker.files.end());
 
-        SECTION("Object using resource") {
+        SECTION("Object using a resource") {
             gd::SpriteObject obj("myObject");
 
             gd::Animation anim;
@@ -73,6 +74,19 @@ TEST_CASE( "Resources", "[common][resources]" ) {
             REQUIRE(worker.files.size() == 3);
             REQUIRE(worker.images.size() == 1);
             REQUIRE(worker.images[0] == "res1");
+
+            SECTION("ProjectResourcesAdder") {
+                std::vector<std::string> uselessResources =
+                    gd::ProjectResourcesAdder::GetAllUselessResources(project);
+
+                REQUIRE(uselessResources.size() == 2);
+
+                gd::ProjectResourcesAdder::RemoveAllUselessResources(project);
+                std::vector<std::string> remainingResources =
+                    project.GetResourcesManager().GetAllResourcesList();
+                REQUIRE(remainingResources.size() == 1);
+                REQUIRE(remainingResources[0] == "res1");
+            }
         }
     }
 }

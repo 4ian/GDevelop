@@ -24,7 +24,7 @@ namespace gd
  * sometimes update them.
  *
  * \see ResourcesMergingHelper
- * \see ImagesUsedInventorizer
+ * \see gd::ImagesUsedInventorizer
  *
  * \see gd::LaunchResourceWorkerOnEvents
  *

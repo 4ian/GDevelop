@@ -127,13 +127,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
         .MarkAsAdvanced();
 
     extension.AddAction("LaunchFile",
-                   _("Launch a file"),
-                   _("This action launch the specified file."),
-                   _("Launch the file _PARAM0_"),
+                   _("Open an URL or a file"),
+                   _("This action launch the specified file or URL, in a browser (or in a new tab if the game is using the Web platform and is launched inside a browser)."),
+                   _("Open URL (or file) _PARAM0_"),
                    _("Files"),
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
-        .AddParameter("file", _("Filename"), "",false)
+        .AddParameter("string", _("URL (or filename)"), "",false)
         .MarkAsAdvanced();
 
     extension.AddAction("ExecuteCmd",

@@ -41,6 +41,8 @@ FileExtension::FileExtension()
         .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.deleteElementFromJSONFile");
     GetAllActions()["DeleteFichier"].SetGroup(_("Storage"))
         .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.clearJSONFile");
+    GetAllActions()["LaunchFile"]
+        .codeExtraInformation.SetFunctionName("gdjs.evtTools.window.openURL");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
     /*
@@ -53,16 +55,6 @@ FileExtension::FileExtension()
                    "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
         .codeExtraInformation.SetFunctionName("FileExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
-
-    AddAction("LaunchFile",
-                   _("Launch a file"),
-                   _("This action launch the specified file."),
-                   _("Launch the file _PARAM0_"),
-                   _("Files"),
-                   "res/actions/launchFile24.png",
-                   "res/actions/launchFile.png")
-        .AddParameter("file", _("Filename"), "",false)
-        .codeExtraInformation.SetFunctionName("LaunchFile").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
     AddAction("ExecuteCmd",
                    _("Execute a command"),

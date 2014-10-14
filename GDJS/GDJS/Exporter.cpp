@@ -540,6 +540,12 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         fs.MkDir(exportDir+"/Extensions");
         std::vector<std::string> includesFiles;
 
+        if (exportForCocoonJS)
+        {
+            fs.MkDir(exportDir+"/libs/CocoonJS");
+            includesFiles.push_back("libs/CocoonJS/cocoon.min.js");
+        }
+
         gd::Project exportedProject = project;
 
         //Export the resources ( before generating events as some resources filenames may be updated )

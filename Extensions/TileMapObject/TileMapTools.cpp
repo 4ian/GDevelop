@@ -49,23 +49,39 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
         {
             for(int row = 0; row < tileMap.GetRowsCount(); row++)
             {
-                vertexs += 4;
+                TileTextureCoords coords;
+                if(tileMap.GetTile(layer, col, row) != -1)
+                {
+                    coords = tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row));
+                }
+                else 
+                {
+                    coords = tileSet.GetTileTextureCoords(0);
+                }
 
-                TileTextureCoords coords = tileMap.GetTile(layer, col, row) != -1 ? tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row)) : TileTextureCoords();
+                vertexs += 4;
                 {
                     sf::Vertex vertex(sf::Vector2f(col * tileWidth, row * tileHeight), coords.topLeft);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
                 {
                     sf::Vertex vertex(sf::Vector2f(col * tileWidth, (row + 1) * tileHeight), coords.bottomLeft);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
                 {
                     sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, (row + 1) * tileHeight), coords.bottomRight);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
                 {
                     sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, row * tileHeight), coords.topRight);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
             }
@@ -119,11 +135,22 @@ void UpdateVertexArray(sf::VertexArray &vertexArray, int layer, int col, int row
     const int vertexPos = 4 * (layer * tileMap.GetColumnsCount() * tileMap.GetRowsCount() + col * tileMap.GetRowsCount() + row);
     std::cout << " at " << vertexPos << std::endl;
 
-    TileTextureCoords newCoords = tileMap.GetTile(layer, col, row) != -1 ? tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row)) : TileTextureCoords();
+    TileTextureCoords newCoords = tileMap.GetTile(layer, col, row) != -1 ? tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row)) : tileSet.GetTileTextureCoords(0);
     vertexArray[vertexPos].texCoords = newCoords.topLeft;
     vertexArray[vertexPos + 1].texCoords = newCoords.bottomLeft;
     vertexArray[vertexPos + 2].texCoords = newCoords.bottomRight;
     vertexArray[vertexPos + 3].texCoords = newCoords.topRight;
+    for(int i = 0; i < 4; i++)
+    {
+        if(tileMap.GetTile(layer, col, row) == -1)
+        {
+            vertexArray[vertexPos + i].color.a = 0;
+        }
+        else
+        {
+            vertexArray[vertexPos + i].color.a = 255;
+        }
+    }
 
     std::cout << " [Done]" << std::endl;
 }

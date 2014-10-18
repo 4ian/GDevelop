@@ -2575,6 +2575,10 @@
 																	"m_value":	""
 																}, {
 																	"type":	"string",
+																	"m_label":	"Text Hint",
+																	"m_value":	""
+																}, {
+																	"type":	"string",
 																	"m_label":	"Max Length:",
 																	"m_value":	"0"
 																}, {

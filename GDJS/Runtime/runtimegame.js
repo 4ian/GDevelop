@@ -645,7 +645,7 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
 
     var game = this;
     if ( assets.length !== 0 ) {
-        var assetLoader = new PIXI.AssetLoader(assets);
+        var assetLoader = new PIXI.AssetLoader(assets, true);
         assetLoader.onComplete = onAssetsLoaded;
         assetLoader.onProgress = onAssetsLoadingProgress;
         assetLoader.load();

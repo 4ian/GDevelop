@@ -5,7 +5,7 @@
 sudo apt-get install cmake
 
 #7zip
-sudo apt-get install p7zip
+sudo apt-get install p7zip-full
 
 #SFML
 sudo apt-get install libopenal-dev
@@ -17,7 +17,7 @@ sudo apt-get install libsndfile1-dev
 sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 
-wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z 
+wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
 7za x SFML.7z
 
 cd SFML

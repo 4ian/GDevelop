@@ -594,19 +594,19 @@ void wxCF6DCInitBitmapResources()
         else wxFileSystem::AddHandler(new wxMemoryFSHandlerBase);
     }
 
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_add16.png"), xml_res_file_0, xml_res_size_0, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_delete16.png"), xml_res_file_1, xml_res_size_1, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_edit16.png"), xml_res_file_2, xml_res_size_2, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_fill16.png"), xml_res_file_3, xml_res_size_3, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_help16.png"), xml_res_file_4, xml_res_size_4, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_image16.png"), xml_res_file_5, xml_res_size_5, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_layer16.png"), xml_res_file_6, xml_res_size_6, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_maskEdit16.png"), xml_res_file_7, xml_res_size_7, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_options16.png"), xml_res_file_8, xml_res_size_8, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_CppPlatform_Extensions_pathfindingobstacleicon16.png"), xml_res_file_9, xml_res_size_9, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_conditions_rectangle.png"), xml_res_file_10, xml_res_size_10, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_remove16.png"), xml_res_file_11, xml_res_size_11, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_tilemasktrianglebr16.png"), xml_res_file_12, xml_res_size_12, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"), xml_res_file_13, xml_res_size_13, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$E__Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_add16.png"), xml_res_file_0, xml_res_size_0, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_delete16.png"), xml_res_file_1, xml_res_size_1, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_edit16.png"), xml_res_file_2, xml_res_size_2, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_fill16.png"), xml_res_file_3, xml_res_size_3, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_help16.png"), xml_res_file_4, xml_res_size_4, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_image16.png"), xml_res_file_5, xml_res_size_5, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_layer16.png"), xml_res_file_6, xml_res_size_6, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_maskEdit16.png"), xml_res_file_7, xml_res_size_7, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_options16.png"), xml_res_file_8, xml_res_size_8, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_CppPlatform_Extensions_pathfindingobstacleicon16.png"), xml_res_file_9, xml_res_size_9, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_conditions_rectangle.png"), xml_res_file_10, xml_res_size_10, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_icons_default_remove16.png"), xml_res_file_11, xml_res_size_11, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$.._.._Binaries_Output_Release_Windows_res_tilemasktrianglebr16.png"), xml_res_file_12, xml_res_size_12, wxT("image/x-apple-ios-png"));
+    XRC_ADD_FILE(wxT("XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$_home_victor_Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"), xml_res_file_13, xml_res_size_13, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/TileMapDialogs_wxsmith_bitmaps.cpp$_home_victor_Developpement_GD_Extensions_TileMapObject_TileMapDialogs_wxsmith_bitmaps.xrc"));
 }

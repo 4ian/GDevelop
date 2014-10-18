@@ -449,6 +449,9 @@
                       <border>5</border>
                       <object class="wxTextCtrl" name="m_textureNameTextCtrl">
                         <style/>
+                        <hint>
+                          <![CDATA[]]>
+                        </hint>
                       </object>
                     </object>
                     <object class="sizeritem">
@@ -824,7 +827,7 @@
     <style>wxTAB_TRAVERSAL</style>
     <object class="wxFlexGridSizer">
       <cols>1</cols>
-      <rows>2</rows>
+      <rows>3</rows>
       <vgap>0</vgap>
       <hgap>0</hgap>
       <growablecols>0</growablecols>
@@ -921,6 +924,22 @@
         <object class="wxScrolledWindow" name="m_tilePreviewPanel">
           <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
           <scrollrate>5,5</scrollrate>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL</flag>
+        <border>5</border>
+        <object class="wxStaticText" name="m_tileIdLabel">
+          <label>
+            <![CDATA[]]>
+          </label>
+          <style/>
+          <font>
+            <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+            <style>italic</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+          </font>
         </object>
       </object>
     </object>

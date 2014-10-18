@@ -145,6 +145,7 @@ protected:
     wxToolBar* m_mainToolbar;
     wxToolBar* m_toolbar418;
     wxScrolledWindow* m_tilePreviewPanel;
+    wxStaticText* m_tileIdLabel;
 
 protected:
     virtual void OnCollidableToolToggled(wxCommandEvent& event) { event.Skip(); }

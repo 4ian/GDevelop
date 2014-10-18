@@ -271,6 +271,9 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->Add(flexGridSizer295, 1, wxALL|wxEXPAND, 5);
     
     m_textureNameTextCtrl = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_textureNameTextCtrl->SetHint(wxT(""));
+    #endif
     
     flexGridSizer295->Add(m_textureNameTextCtrl, 0, wxALL|wxEXPAND, 5);
     
@@ -534,7 +537,7 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer398 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer398 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer398->SetFlexibleDirection( wxBOTH );
     flexGridSizer398->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer398->AddGrowableCol(0);
@@ -578,6 +581,13 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     
     flexGridSizer398->Add(m_tilePreviewPanel, 0, wxALL|wxEXPAND, 5);
     m_tilePreviewPanel->SetMinSize(wxSize(100,100));
+    
+    m_tileIdLabel = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    wxFont m_tileIdLabelFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_tileIdLabelFont.SetStyle(wxFONTSTYLE_ITALIC);
+    m_tileIdLabel->SetFont(m_tileIdLabelFont);
+    
+    flexGridSizer398->Add(m_tileIdLabel, 0, wxALL, 5);
     
     SetMinSize( wxSize(200,200) );
     SetSizeHints(500,300);

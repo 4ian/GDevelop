@@ -84,6 +84,8 @@ void TileEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
     m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->GetTileHitbox(m_currentTile).collidable);
     UpdateScrollbars();
     m_tilePreviewPanel->Refresh();
+
+    m_tileIdLabel->SetLabel(_("Tile ID: ") + wxString::FromDouble(m_currentTile));
 }
 
 void TileEditor::OnPreviewErase(wxEraseEvent& event)

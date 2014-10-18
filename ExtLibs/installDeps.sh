@@ -45,7 +45,7 @@ mv boost_1_55_0 boost
 sudo apt-get install libgtk-3-dev
 sudo apt-get install libwebkitgtk-3.0-dev
 
-wget https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2
+wget https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2
 tar jxf wxWidgets-3.0.1.tar.bz2
 
 cd wxWidgets-3.0.1

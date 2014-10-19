@@ -58,6 +58,15 @@ float distance(float minA, float maxA, float minB, float maxB)
 
 CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
 {
+    if(p1.vertices.size() < 3 || p2.vertices.size() < 3)
+    {
+        CollisionResult result;
+        result.collision = false;
+        result.move_axis.x = 0.0f;
+        result.move_axis.y = 0.0f;
+        return result;
+    }
+
     p1.ComputeEdges();
     p2.ComputeEdges();
 

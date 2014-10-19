@@ -45,6 +45,8 @@ freely, subject to the following restrictions:
  */
 struct TileTextureCoords
 {
+    TileTextureCoords() : topLeft(0,0), topRight(0,0), bottomRight(0,0), bottomLeft(0,0) {};
+
     sf::Vector2f topLeft;
     sf::Vector2f topRight;
     sf::Vector2f bottomRight;

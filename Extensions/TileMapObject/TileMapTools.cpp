@@ -49,26 +49,39 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
         {
             for(int row = 0; row < tileMap.GetRowsCount(); row++)
             {
-                if(tileMap.GetTile(layer, col, row) == -1)
-                    continue;
+                TileTextureCoords coords;
+                if(tileMap.GetTile(layer, col, row) != -1)
+                {
+                    coords = tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row));
+                }
+                else 
+                {
+                    coords = tileSet.GetTileTextureCoords(0);
+                }
 
                 vertexs += 4;
-
-                TileTextureCoords coords = tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row));
                 {
                     sf::Vertex vertex(sf::Vector2f(col * tileWidth, row * tileHeight), coords.topLeft);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
                 {
                     sf::Vertex vertex(sf::Vector2f(col * tileWidth, (row + 1) * tileHeight), coords.bottomLeft);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
                 {
                     sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, (row + 1) * tileHeight), coords.bottomRight);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
                 {
                     sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, row * tileHeight), coords.topRight);
+                    if(tileMap.GetTile(layer, col, row) == -1)
+                        vertex.color.a = 0;
                     vertexArray.append(vertex);
                 }
             }
@@ -83,13 +96,11 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
 std::vector<Polygon2d> GenerateHitboxes(TileSet &tileSet, TileMap &tileMap)
 {
     std::vector<Polygon2d> hitboxes;
-    int tileWidth = tileSet.tileSize.x;
-    int tileHeight = tileSet.tileSize.y;
+    const int tileWidth = tileSet.tileSize.x;
+    const int tileHeight = tileSet.tileSize.y;
 
     if(tileSet.IsDirty())
         return hitboxes;
-
-    std::cout << "Generating Hitboxes" << std::endl;
 
     for(int layer = 0; layer < 3; layer++)
     {
@@ -97,19 +108,73 @@ std::vector<Polygon2d> GenerateHitboxes(TileSet &tileSet, TileMap &tileMap)
         {
             for(int row = 0; row < tileMap.GetRowsCount(); row++)
             {
-                if(tileMap.GetTile(layer, col, row) == -1 || !tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).collidable)
-                    continue;
+                //Note : a hitbox is also added for empty/non-collidable tiles to ease the hitbox update when changing a tile
+                Polygon2d newPolygon;
 
-                std::vector<Polygon2d>::iterator newHitboxIt = hitboxes.insert(hitboxes.begin(), tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).hitbox);
-                std::cout << "Collision mask at " << col * tileWidth << ";" << row * tileHeight << std::endl;
-                newHitboxIt->Move(col * tileWidth, row * tileHeight);
+                if(tileMap.GetTile(layer, col, row) != -1 && tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).collidable)
+                {
+                    newPolygon = tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).hitbox;
+                }
+
+                newPolygon.Move(col * tileWidth, row * tileHeight);
+                hitboxes.push_back(newPolygon);
             }
         }
     }
 
-    std::cout << "Hitbox:OK" << std::endl;
-
     return hitboxes;
+}
+
+void UpdateVertexArray(sf::VertexArray &vertexArray, int layer, int col, int row, TileSet &tileSet, TileMap &tileMap)
+{
+    std::cout << "Updating Vertex Array" << std::endl;
+
+    if(tileSet.IsDirty())
+        return;
+
+    const int vertexPos = 4 * (layer * tileMap.GetColumnsCount() * tileMap.GetRowsCount() + col * tileMap.GetRowsCount() + row);
+    std::cout << " at " << vertexPos << std::endl;
+
+    TileTextureCoords newCoords = tileMap.GetTile(layer, col, row) != -1 ? tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row)) : tileSet.GetTileTextureCoords(0);
+    vertexArray[vertexPos].texCoords = newCoords.topLeft;
+    vertexArray[vertexPos + 1].texCoords = newCoords.bottomLeft;
+    vertexArray[vertexPos + 2].texCoords = newCoords.bottomRight;
+    vertexArray[vertexPos + 3].texCoords = newCoords.topRight;
+    for(int i = 0; i < 4; i++)
+    {
+        if(tileMap.GetTile(layer, col, row) == -1)
+        {
+            vertexArray[vertexPos + i].color.a = 0;
+        }
+        else
+        {
+            vertexArray[vertexPos + i].color.a = 255;
+        }
+    }
+
+    std::cout << " [Done]" << std::endl;
+}
+
+void UpdateHitboxes(std::vector<Polygon2d> &polygons, sf::Vector2f position, int layer, int col, int row, TileSet &tileSet, TileMap &tileMap)
+{
+    if(tileSet.IsDirty())
+        return;
+
+    const int vertexPos = layer * tileMap.GetColumnsCount() * tileMap.GetRowsCount() + col * tileMap.GetRowsCount() + row;
+
+    const int tileWidth = tileSet.tileSize.x;
+    const int tileHeight = tileSet.tileSize.y;
+
+    if(tileMap.GetTile(layer, col, row) != -1 && tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).collidable)
+    {
+        polygons[vertexPos] = tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).hitbox;
+    }
+    else
+    {
+        polygons[vertexPos] = Polygon2d();
+    }
+
+    polygons[vertexPos].Move(position.x + col * tileWidth, position.y + row * tileHeight);
 }
 
 }

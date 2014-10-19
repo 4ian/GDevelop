@@ -38,6 +38,9 @@ namespace TileMapExtension
 {
 	sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap);
 	std::vector<Polygon2d> GenerateHitboxes(TileSet &tileSet, TileMap &tileMap);
+
+    void UpdateVertexArray(sf::VertexArray &vertexArray, int layer, int col, int row, TileSet &tileSet, TileMap &tileMap);
+    void UpdateHitboxes(std::vector<Polygon2d> &polygons, sf::Vector2f position, int layer, int col, int row, TileSet &tileSet, TileMap &tileMap);
 }
 
 #endif

@@ -4,7 +4,7 @@
     <title>TileMap Object Editor</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
-    <size>950,550</size>
+    <size>1100,550</size>
     <object class="wxAuiManager">
       <flags>285</flags>
       <sashsize>-1</sashsize>
@@ -121,11 +121,11 @@
               <flag>wxALL|wxEXPAND</flag>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>2</cols>
+                <cols>3</cols>
                 <rows>0</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols>1</growablecols>
+                <growablecols>2</growablecols>
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND|wxALIGN_TOP</flag>
@@ -224,16 +224,25 @@
                         <![CDATA[0]]>
                       </selection>
                     </object>
-                    <object class="separator"/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxToolBar" name="m_toolbar516">
+                    <style>wxTB_FLAT</style>
+                    <bitmapsize>16,16</bitmapsize>
                     <object class="tool" name="m_hideUpperLayerCheck">
                       <toggle>1</toggle>
                       <label>
                         <![CDATA[Hide upper layers]]>
                       </label>
+                      <tooltip>
+                        <![CDATA[Hide upper layers]]>
+                      </tooltip>
                       <longhelp>
-                        <![CDATA[]]>
+                        <![CDATA[Hide upper layers]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/layer16.png</bitmap>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/eye.png</bitmap>
                     </object>
                   </object>
                 </object>
@@ -449,6 +458,9 @@
                       <border>5</border>
                       <object class="wxTextCtrl" name="m_textureNameTextCtrl">
                         <style/>
+                        <hint>
+                          <![CDATA[]]>
+                        </hint>
                       </object>
                     </object>
                     <object class="sizeritem">
@@ -820,11 +832,11 @@
     </object>
   </object>
   <object class="wxPanel" name="TileEditorBase">
-    <size>500,300</size>
+    <size>400,300</size>
     <style>wxTAB_TRAVERSAL</style>
     <object class="wxFlexGridSizer">
       <cols>1</cols>
-      <rows>2</rows>
+      <rows>3</rows>
       <vgap>0</vgap>
       <hgap>0</hgap>
       <growablecols>0</growablecols>
@@ -921,6 +933,22 @@
         <object class="wxScrolledWindow" name="m_tilePreviewPanel">
           <style>wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL</style>
           <scrollrate>5,5</scrollrate>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL</flag>
+        <border>5</border>
+        <object class="wxStaticText" name="m_tileIdLabel">
+          <label>
+            <![CDATA[]]>
+          </label>
+          <style/>
+          <font>
+            <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+            <style>italic</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+          </font>
         </object>
       </object>
     </object>

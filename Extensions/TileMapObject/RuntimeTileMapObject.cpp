@@ -192,8 +192,10 @@ void RuntimeTileMapObject::SetTile(int layer, int column, int row, int tileId)
     if(layer < 0 || layer > 2 || column < 0 || column >= tileMap.Get().GetColumnsCount() || row < 0 || row >= tileMap.Get().GetRowsCount())
         return;
 
-    needGeneration = true; //The tilemap object will be re-generated before the next rendering
+    //Just update a single tile in the tile map
     tileMap.Get().SetTile(layer, column, row, tileId);
+    TileMapExtension::UpdateVertexArray(vertexArray, layer, column, row, tileSet.Get(), tileMap.Get());
+    TileMapExtension::UpdateHitboxes(hitboxes, sf::Vector2f(GetX(), GetY()), layer, column, row, tileSet.Get(), tileMap.Get());
 }
 
 float RuntimeTileMapObject::GetColumnAt(float x)

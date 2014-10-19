@@ -84,6 +84,8 @@ void TileEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
     m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->GetTileHitbox(m_currentTile).collidable);
     UpdateScrollbars();
     m_tilePreviewPanel->Refresh();
+
+    m_tileIdLabel->SetLabel(_("Tile ID: ") + wxString::FromDouble(m_currentTile));
 }
 
 void TileEditor::OnPreviewErase(wxEraseEvent& event)
@@ -138,7 +140,7 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     wxBitmap tileBitmap = m_tileset->GetTileBitmap(m_currentTile);
     m_xOffset = width/2 - tileBitmap.GetWidth()/2;
     m_yOffset = height/2 - tileBitmap.GetHeight()/2;
-    dc.DrawBitmap(tileBitmap, m_xOffset, m_yOffset);
+    dc.DrawBitmap(tileBitmap, m_xOffset, m_yOffset, true);
 
     //Draw the hitbox
     std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);

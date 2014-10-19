@@ -3,10 +3,10 @@
   <object class="wxBitmap" name="add16">../../Binaries/Output/Release_Windows/res/icons_default/add16.png</object>
   <object class="wxBitmap" name="delete16">../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</object>
   <object class="wxBitmap" name="edit16">../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</object>
+  <object class="wxBitmap" name="eye">../../Binaries/Output/Release_Windows/res/eye.png</object>
   <object class="wxBitmap" name="fill16">../../Binaries/Output/Release_Windows/res/fill16.png</object>
   <object class="wxBitmap" name="help16">../../Binaries/Output/Release_Windows/res/icons_default/help16.png</object>
   <object class="wxBitmap" name="image16">../../Binaries/Output/Release_Windows/res/icons_default/image16.png</object>
-  <object class="wxBitmap" name="layer16">../../Binaries/Output/Release_Windows/res/icons_default/layer16.png</object>
   <object class="wxBitmap" name="maskEdit16">../../Binaries/Output/Release_Windows/res/maskEdit16.png</object>
   <object class="wxBitmap" name="options16">../../Binaries/Output/Release_Windows/res/icons_default/options16.png</object>
   <object class="wxBitmap" name="pathfindingobstacleicon16">../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</object>

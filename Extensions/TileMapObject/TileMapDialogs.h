@@ -44,6 +44,7 @@ protected:
     wxToolBar* m_mainPanelToolbar;
     wxStaticText* m_staticText355;
     wxChoice* m_layerChoice;
+    wxToolBar* m_toolbar516;
     TileMapPanel* m_tileMapPanel;
     wxStaticText* m_staticText448;
     wxStaticBitmap* m_staticBitmap456;
@@ -67,7 +68,7 @@ protected:
     virtual void OnCancelButtonPressed(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(950,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1100,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~TileMapObjectEditorBase();
 };
 
@@ -160,7 +161,7 @@ protected:
     virtual void OnPreviewMotion(wxMouseEvent& event) { event.Skip(); }
 
 public:
-    TileEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    TileEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL);
     virtual ~TileEditorBase();
 };
 

@@ -158,8 +158,6 @@ private:
     std::string extensionNamespace;
 };
 
-typedef ExpressionMetadata StrExpressionMetadata;
-
 }
 
 #endif

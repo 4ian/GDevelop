@@ -90,7 +90,7 @@ gd::ExpressionMetadata & ObjectMetadata::AddExpression(const std::string & name,
 #endif
 }
 
-gd::StrExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string & name,
+gd::ExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string & name,
                                        const std::string & fullname,
                                        const std::string & description,
                                        const std::string & group,
@@ -98,7 +98,7 @@ gd::StrExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string &
 {
 #if defined(GD_IDE_ONLY)
     //Be careful, objects expression do not have namespace ( not necessary as objects inherits from only one derived object )
-    strExpressionsInfos[name] = StrExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
+    strExpressionsInfos[name] = ExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
     return strExpressionsInfos[name];
 #endif
 }

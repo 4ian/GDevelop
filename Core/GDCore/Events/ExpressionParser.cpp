@@ -324,6 +324,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
 bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
 {
+    callbacks.SetReturnType("expression");
     string expression = expressionPlainString;
 
     size_t parsePosition = 0;
@@ -536,6 +537,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
 
 bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
 {
+    callbacks.SetReturnType("string");
     string expression = expressionPlainString;
 
     size_t parsePosition = 0;
@@ -583,10 +585,10 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
             }
 
             //Adding constant text instruction
-
+            //(Function without name is considered as a constant text)
             vector < gd::Expression > parameters;
             parameters.push_back(finalText);
-            gd::StrExpressionMetadata noParametersInfo; //TODO : A bit of hack here.
+            gd::ExpressionMetadata noParametersInfo;
 
             callbacks.OnStaticFunction("", parameters, noParametersInfo);
 
@@ -666,7 +668,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
             if ( nameIsFunction && MetadataProvider::HasStrExpression(platform, functionName) )
             {
                 functionFound = true;
-                const gd::StrExpressionMetadata & expressionInfo = MetadataProvider::GetStrExpressionMetadata(platform, functionName);
+                const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetStrExpressionMetadata(platform, functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -691,7 +693,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
             else if ( !nameIsFunction && MetadataProvider::HasObjectStrExpression(platform, gd::GetTypeOfObject(project, layout, objectName), functionName) )
             {
                 functionFound = true;
-                const gd::StrExpressionMetadata & expressionInfo = MetadataProvider::GetObjectStrExpressionMetadata(platform, gd::GetTypeOfObject(project, layout, nameBefore), functionName);
+                const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetObjectStrExpressionMetadata(platform, gd::GetTypeOfObject(project, layout, nameBefore), functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -732,7 +734,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
                         parameters.push_back(gd::Expression(autoName));
                         functionFound = true;
 
-                        const gd::StrExpressionMetadata & expressionInfo = MetadataProvider::GetAutomatismStrExpressionMetadata(platform,
+                        const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetAutomatismStrExpressionMetadata(platform,
                                                                                                                                 gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
 
                         //Verify that object has automatism.

@@ -20,7 +20,7 @@ gd::AutomatismMetadata MetadataProvider::badAutomatismInfo;
 gd::ObjectMetadata MetadataProvider::badObjectInfo;
 gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
 gd::ExpressionMetadata MetadataProvider::badExpressionMetadata;
-gd::StrExpressionMetadata MetadataProvider::badStrExpressionMetadata;
+gd::ExpressionMetadata MetadataProvider::badStrExpressionMetadata;
 
 
 /**
@@ -180,7 +180,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetExpressionMetadata(const gd:
     return badExpressionMetadata;
 }
 
-const gd::StrExpressionMetadata & MetadataProvider::GetObjectStrExpressionMetadata(const gd::Platform & platform, string objectType, string exprType)
+const gd::ExpressionMetadata & MetadataProvider::GetObjectStrExpressionMetadata(const gd::Platform & platform, string objectType, string exprType)
 {
     std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
@@ -188,16 +188,16 @@ const gd::StrExpressionMetadata & MetadataProvider::GetObjectStrExpressionMetada
         const vector < string > & objects = extensions[i]->GetExtensionObjectsTypes();
         if ( find(objects.begin(), objects.end(), objectType) != objects.end())
         {
-            const std::map<string, gd::StrExpressionMetadata> & allObjectStrExpressions = extensions[i]->GetAllStrExpressionsForObject(objectType);
+            const std::map<string, gd::ExpressionMetadata> & allObjectStrExpressions = extensions[i]->GetAllStrExpressionsForObject(objectType);
             if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
                 return allObjectStrExpressions.find(exprType)->second;
         }
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<string, gd::StrExpressionMetadata> & allObjectStrExpressions = extensions[i]->GetAllStrExpressionsForObject("");
+        const std::map<string, gd::ExpressionMetadata> & allObjectStrExpressions = extensions[i]->GetAllStrExpressionsForObject("");
         if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
             return allObjectStrExpressions.find(exprType)->second;
     }
@@ -205,7 +205,7 @@ const gd::StrExpressionMetadata & MetadataProvider::GetObjectStrExpressionMetada
     return badStrExpressionMetadata;
 }
 
-const gd::StrExpressionMetadata & MetadataProvider::GetAutomatismStrExpressionMetadata(const gd::Platform & platform, string autoType, string exprType)
+const gd::ExpressionMetadata & MetadataProvider::GetAutomatismStrExpressionMetadata(const gd::Platform & platform, string autoType, string exprType)
 {
     std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
@@ -213,16 +213,16 @@ const gd::StrExpressionMetadata & MetadataProvider::GetAutomatismStrExpressionMe
         const vector < string > & autos = extensions[i]->GetAutomatismsTypes();
         if ( find(autos.begin(), autos.end(), autoType) != autos.end())
         {
-            const std::map<string, gd::StrExpressionMetadata> & allAutomatismStrExpressions = extensions[i]->GetAllStrExpressionsForAutomatism(autoType);
+            const std::map<string, gd::ExpressionMetadata> & allAutomatismStrExpressions = extensions[i]->GetAllStrExpressionsForAutomatism(autoType);
             if ( allAutomatismStrExpressions.find(exprType) != allAutomatismStrExpressions.end() )
                 return allAutomatismStrExpressions.find(exprType)->second;
         }
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<string, gd::StrExpressionMetadata> & allAutomatismStrExpressions = extensions[i]->GetAllStrExpressionsForAutomatism("");
+        const std::map<string, gd::ExpressionMetadata> & allAutomatismStrExpressions = extensions[i]->GetAllStrExpressionsForAutomatism("");
         if ( allAutomatismStrExpressions.find(exprType) != allAutomatismStrExpressions.end() )
             return allAutomatismStrExpressions.find(exprType)->second;
     }
@@ -230,12 +230,12 @@ const gd::StrExpressionMetadata & MetadataProvider::GetAutomatismStrExpressionMe
     return badStrExpressionMetadata;
 }
 
-const gd::StrExpressionMetadata & MetadataProvider::GetStrExpressionMetadata(const gd::Platform & platform, string exprType)
+const gd::ExpressionMetadata & MetadataProvider::GetStrExpressionMetadata(const gd::Platform & platform, string exprType)
 {
     std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<string, gd::StrExpressionMetadata> & allExpr = extensions[i]->GetAllStrExpressions();
+        const std::map<string, gd::ExpressionMetadata> & allExpr = extensions[i]->GetAllStrExpressions();
         if ( allExpr.find(exprType) != allExpr.end() )
             return allExpr.find(exprType)->second;
     }
@@ -267,7 +267,7 @@ bool MetadataProvider::HasObjectAction(const gd::Platform & platform, std::strin
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & actions = extensions[i]->GetAllActionsForObject("");
@@ -288,7 +288,7 @@ bool MetadataProvider::HasAutomatismAction(const gd::Platform & platform, std::s
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & actions = extensions[i]->GetAllActionsForAutomatism("");
@@ -323,7 +323,7 @@ bool MetadataProvider::HasObjectCondition(const gd::Platform & platform, std::st
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & conditions = extensions[i]->GetAllConditionsForObject("");
@@ -344,7 +344,7 @@ bool MetadataProvider::HasAutomatismCondition(const gd::Platform & platform, std
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & conditions = extensions[i]->GetAllConditionsForAutomatism("");
@@ -378,7 +378,7 @@ bool MetadataProvider::HasObjectExpression(const gd::Platform & platform, std::s
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllExpressionsForObject("");
@@ -399,7 +399,7 @@ bool MetadataProvider::HasAutomatismExpression(const gd::Platform & platform, st
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllExpressionsForAutomatism("");
@@ -416,7 +416,7 @@ bool MetadataProvider::HasStrExpression(const gd::Platform & platform, std::stri
     std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<std::string, gd::StrExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressions();
+        const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressions();
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -429,15 +429,15 @@ bool MetadataProvider::HasObjectStrExpression(const gd::Platform & platform, std
     std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<std::string, gd::StrExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForObject(objectType);
+        const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForObject(objectType);
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<std::string, gd::StrExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForObject("");
+        const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForObject("");
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -450,15 +450,15 @@ bool MetadataProvider::HasAutomatismStrExpression(const gd::Platform & platform,
     std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<std::string, gd::StrExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForAutomatism(automatismType);
+        const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForAutomatism(automatismType);
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
 
-    //Then check bases
+    //Then check in functions of "Base object".
     for (unsigned int i =0;i<extensions.size();++i)
     {
-        const std::map<std::string, gd::StrExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForAutomatism("");
+        const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForAutomatism("");
         if ( expressions.find(name) != expressions.end() )
             return true;
     }

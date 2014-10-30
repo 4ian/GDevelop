@@ -15,7 +15,6 @@ namespace gd { class Project; }
 namespace gd { class Platform; }
 namespace gd { class ParameterMetadata; }
 namespace gd { class ExpressionMetadata; }
-namespace gd { class StrExpressionMetadata; }
 
 namespace gd
 {
@@ -81,29 +80,42 @@ private:
  */
 class GD_CORE_API ParserCallbacks
 {
-    public:
+    friend class ExpressionParser;
+public:
 
-    ParserCallbacks() {};
+    ParserCallbacks() : returnType("expression") {};
     virtual ~ParserCallbacks() {};
+
+    /**
+     * \brief Get the type of the expression for which callbacks are used:
+     * "expression" or "string".
+     */
+    const std::string & GetReturnType() { return returnType; }
 
     virtual void OnConstantToken(std::string text) = 0;
     virtual void OnNumber(std::string text) = 0;
     virtual void OnOperator(std::string text) = 0;
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
     virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
     virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
     virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
     virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
 
     std::string firstErrorStr;
     size_t firstErrorPos;
+private:
+    /**
+     * \brief Set the return type of the expression: Done by ExpressionParser according to
+     * which Parse* method is called.
+     * \see gd::ExpressionParser
+     */
+    void SetReturnType(std::string type) { returnType = type; }
+
+    std::string returnType; //The type of the expression ("expression" (default), "string"...)
 };
 
 }

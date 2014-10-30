@@ -15,7 +15,6 @@
 namespace gd { class Object; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
-namespace gd { class StrExpressionMetadata; }
 class wxBitmap;
 
 typedef void (*DestroyFunPtr)(gd::Object*);
@@ -78,7 +77,7 @@ public:
      * \brief Declare a new string expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::StrExpressionMetadata & AddStrExpression(const std::string & name_,
+    gd::ExpressionMetadata & AddStrExpression(const std::string & name_,
                                            const std::string & fullname_,
                                            const std::string & description_,
                                            const std::string & group_,
@@ -127,7 +126,7 @@ public:
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;
     std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > strExpressionsInfos;
 
     std::vector<std::string> includeFiles;
     std::string className;

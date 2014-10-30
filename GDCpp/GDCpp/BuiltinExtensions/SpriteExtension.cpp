@@ -24,7 +24,7 @@ SpriteExtension::SpriteExtension()
     std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("Sprite");
     std::map<std::string, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("Sprite");
     std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("Sprite");
-    std::map<std::string, gd::StrExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("Sprite");
+    std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("Sprite");
 
     objectActions["Opacity"].codeExtraInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["ChangeAnimation"].codeExtraInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");

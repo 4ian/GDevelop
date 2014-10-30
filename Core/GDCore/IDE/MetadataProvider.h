@@ -11,7 +11,6 @@ namespace gd { class AutomatismMetadata; }
 namespace gd { class ObjectMetadata; }
 namespace gd { class ExpressionMetadata; }
 namespace gd { class ExpressionMetadata; }
-namespace gd { class StrExpressionMetadata; }
 namespace gd { class Platform; }
 
 namespace gd
@@ -70,19 +69,19 @@ public:
      * Get information about a string expression from its type
      * Works for static expressions.
      */
-    static const gd::StrExpressionMetadata & GetStrExpressionMetadata(const gd::Platform & platform, std::string exprType);
+    static const gd::ExpressionMetadata & GetStrExpressionMetadata(const gd::Platform & platform, std::string exprType);
 
     /**
      * Get information about a string expression from its type
      * Works for object expressions.
      */
-    static const gd::StrExpressionMetadata & GetObjectStrExpressionMetadata(const gd::Platform & platform, std::string objectType, std::string exprType);
+    static const gd::ExpressionMetadata & GetObjectStrExpressionMetadata(const gd::Platform & platform, std::string objectType, std::string exprType);
 
     /**
      * Get information about a string expression from its type
      * Works for automatism expressions.
      */
-    static const gd::StrExpressionMetadata & GetAutomatismStrExpressionMetadata(const gd::Platform & platform, std::string autoType, std::string exprType);
+    static const gd::ExpressionMetadata & GetAutomatismStrExpressionMetadata(const gd::Platform & platform, std::string autoType, std::string exprType);
 
     /**
      * Verifying if a ( static ) condition exists
@@ -164,7 +163,7 @@ private:
     static ObjectMetadata badObjectInfo;
     static gd::InstructionMetadata badInstructionMetadata;
     static gd::ExpressionMetadata badExpressionMetadata;
-    static gd::StrExpressionMetadata badStrExpressionMetadata;
+    static gd::ExpressionMetadata badStrExpressionMetadata;
     int useless; //Useless member to avoid emscripten "must have a positive integer typeid pointer" runtime error.
 };
 

@@ -78,7 +78,7 @@ public:
     /**
      * Declare a new string expression as being part of the extension.
      */
-    gd::StrExpressionMetadata & AddStrExpression(const std::string & name_,
+    gd::ExpressionMetadata & AddStrExpression(const std::string & name_,
                                            const std::string & fullname_,
                                            const std::string & description_,
                                            const std::string & group_,
@@ -119,7 +119,7 @@ public:
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;
     std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > strExpressionsInfos;
 
     std::vector<std::string> includeFiles;
     std::string className;

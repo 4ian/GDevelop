@@ -25,6 +25,7 @@
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/AdvancedEntryDialog.h"
+#include "GDCore/IDE/wxTools/TreeItemExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -185,8 +186,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                                             ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),0) ;
 
             //Add each object expression
-            std::map<string, gd::StrExpressionMetadata > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, gd::StrExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
                 if ( it->second.IsShown() )
                 {
@@ -207,7 +208,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    TreeItemStrExpressionInfoData * associatedData = new TreeItemStrExpressionInfoData(it->first, it->second);
+                    gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
                     ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
@@ -220,8 +221,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                                             ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
 
             //Add each automatism expression
-            std::map<string, gd::StrExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<string, gd::StrExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
+            std::map<string, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
             {
                 if ( it->second.IsShown() )
                 {
@@ -242,7 +243,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    TreeItemStrExpressionInfoData * associatedData = new TreeItemStrExpressionInfoData(it->first, it->second);
+                    gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
                     ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
@@ -251,8 +252,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
         //Add each expression
         extensionItem = ValList->GetRootItem();
 
-        std::map<string, gd::StrExpressionMetadata > allExpr = extensions[i]->GetAllStrExpressions();
-        for(std::map<string, gd::StrExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
+        std::map<string, gd::ExpressionMetadata > allExpr = extensions[i]->GetAllStrExpressions();
+        for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
         {
             if ( it->second.IsShown() )
             {
@@ -273,7 +274,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                     IDimage = imageListVal->GetImageCount()-1;
                 }
 
-                TreeItemStrExpressionInfoData * associatedData = new TreeItemStrExpressionInfoData(it->first, it->second);
+                gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
                 ValList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
         }
@@ -313,8 +314,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
         for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
 	        keywords += " "+it->first;
 
-	    const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
-        for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	    const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
 	        keywords += " "+it->first;
 
         //Add keywords of objects expressions
@@ -325,8 +326,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
             for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 
@@ -338,8 +339,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
             for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 	}
@@ -535,28 +536,28 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
 {
     if ( !itemObj.IsOk() ) return;
 
-    TreeItemStrExpressionInfoData * infos = dynamic_cast<TreeItemStrExpressionInfoData*>(ObjList->GetItemData(itemObj));
+    gd::TreeItemExpressionMetadata * infos = dynamic_cast<gd::TreeItemExpressionMetadata*>(ObjList->GetItemData(itemObj));
     if ( infos != NULL )
     {
-        if ( infos->GetStrExpressionMetadata().parameters.empty() ) return; //Not even a parameter for the object ?
+        if ( infos->GetExpressionMetadata().parameters.empty() ) return; //Not even a parameter for the object ?
 
         bool cancelled = false;
-        std::string object = ShowParameterDialog(infos->GetStrExpressionMetadata().parameters[0], cancelled);
+        std::string object = ShowParameterDialog(infos->GetExpressionMetadata().parameters[0], cancelled);
         if ( cancelled ) return;
 
         std::string parametersStr, automatismStr;
-        for (unsigned int i = 1;i<infos->GetStrExpressionMetadata().parameters.size();++i)
+        for (unsigned int i = 1;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
-            if ( i == 1 && infos->GetStrExpressionMetadata().parameters[i].type == "automatism")
+            if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "automatism")
             {
-                gd::ChooseAutomatismDialog dialog(this, project, layout, object, infos->GetStrExpressionMetadata().parameters[i].supplementaryInformation);
+                gd::ChooseAutomatismDialog dialog(this, project, layout, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
                 if ( dialog.ShowModal() == 1 )
                     automatismStr = dialog.GetChosenAutomatism()+"::";
             }
             else
             {
                 if ( !parametersStr.empty() ) parametersStr += ",";
-                parametersStr += ShowParameterDialog(infos->GetStrExpressionMetadata().parameters[i], cancelled, object);
+                parametersStr += ShowParameterDialog(infos->GetExpressionMetadata().parameters[i], cancelled, object);
                 if ( cancelled ) return;
             }
         }
@@ -583,16 +584,16 @@ void EditStrExpressionDialog::OnAddFunctionBtClick(wxCommandEvent& event)
 {
     if ( !itemVal.IsOk() ) return;
 
-    TreeItemStrExpressionInfoData * infos = dynamic_cast<TreeItemStrExpressionInfoData*>(ValList->GetItemData(itemVal));
+    gd::TreeItemExpressionMetadata * infos = dynamic_cast<gd::TreeItemExpressionMetadata*>(ValList->GetItemData(itemVal));
     if ( infos != NULL )
     {
         bool cancelled = false;
 
         std::string parametersStr;
-        for (unsigned int i = 0;i<infos->GetStrExpressionMetadata().parameters.size();++i)
+        for (unsigned int i = 0;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
             if ( !parametersStr.empty() ) parametersStr += ",";
-            parametersStr += ShowParameterDialog(infos->GetStrExpressionMetadata().parameters[i], cancelled);
+            parametersStr += ShowParameterDialog(infos->GetExpressionMetadata().parameters[i], cancelled);
             if ( cancelled ) return;
         }
 

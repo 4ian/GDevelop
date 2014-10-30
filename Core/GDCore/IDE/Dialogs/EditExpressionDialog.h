@@ -226,26 +226,6 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
-/**
-* \brief Internal class used by gd::EditExpressionDialog.
- * This class can be used by wxTreeCtrl, to attach
- * information ( an gd::ExpressionMetadata and the name of the expression ) to an item
- *
- * \see gd::EditExpressionDialog
- */
-class GD_CORE_API TreeItemExpressionInfoData : public wxTreeItemData
-{
-public:
-    TreeItemExpressionInfoData(const std::string & name_, const gd::ExpressionMetadata & info_) : name(name_), info(info_) { };
-    virtual ~TreeItemExpressionInfoData() {};
-
-    const std::string & GetName() const { return name; }
-    const gd::ExpressionMetadata & GetExpressionMetadata() const { return info; }
-
-private:
-    std::string name;
-    gd::ExpressionMetadata info;
-};
 }
 #endif
 #endif

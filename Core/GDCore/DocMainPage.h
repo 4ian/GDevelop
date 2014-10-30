@@ -192,7 +192,7 @@
  * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
  * \subsection wxWidgets wxWidgets
 
- * wxWidgets version used by GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2 <br>
+ * wxWidgets version used by GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2 <br>
  * First extract the archive inside the folder ExtLibs.
  *
  * Be sure to have GTK+ 3.0 and WebKitGTK development files installed:

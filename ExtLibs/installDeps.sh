@@ -5,7 +5,7 @@
 sudo apt-get install cmake
 
 #7zip
-sudo apt-get install p7zip
+sudo apt-get install p7zip-full
 
 #SFML
 sudo apt-get install libopenal-dev
@@ -17,7 +17,7 @@ sudo apt-get install libsndfile1-dev
 sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 
-wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z 
+wget http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
 7za x SFML.7z
 
 cd SFML
@@ -45,7 +45,7 @@ mv boost_1_55_0 boost
 sudo apt-get install libgtk-3-dev
 sudo apt-get install libwebkitgtk-3.0-dev
 
-wget https://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2
+wget https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2
 tar jxf wxWidgets-3.0.1.tar.bz2
 
 cd wxWidgets-3.0.1

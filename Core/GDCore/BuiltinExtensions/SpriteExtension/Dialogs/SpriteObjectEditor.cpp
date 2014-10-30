@@ -148,12 +148,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     spritePosY(0),
     editingMask(false),
     editingPoint(false),
-    movingPolygon(false),
-    selectedPolygon(0),
-    movingPolygonPoint(false),
-    selectedPolygonPoint(0),
-    xSelectionOffset(0),
-    ySelectionOffset(0),
+    deletingMaskTreeItems(false),
     polygonEditionHelper(),
     previewElapsedTime(0),
     previewCurrentSprite(0),
@@ -702,25 +697,6 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
             if ( !sprite.IsCollisionMaskAutomatic() )
             {
                 std::vector<Polygon2d> mask = sprite.GetCollisionMask();
-
-                /*for (unsigned int i = 0;i<mask.size();++i)
-                {
-                    wxPointList list;
-                    for (unsigned int j = 0;j<mask[i].vertices.size();++j)
-                        list.push_back(new wxPoint(mask[i].vertices[j].x, mask[i].vertices[j].y));
-
-                    dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-                    dc.SetPen(wxPen(wxColour(100,100,100)));
-                    if ( i == selectedPolygon ) dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-
-                    dc.DrawPolygon(&list, spritePosX, spritePosY);
-                    for (unsigned int j = 0;j<mask[i].vertices.size();++j)
-                    {
-                        dc.SetBrush(wxBrush(wxColour(128,128,228), wxBRUSHSTYLE_SOLID));
-                        dc.SetPen(wxPen(wxColour(j == selectedPolygonPoint ? 180 : 100,100,100)));
-                        dc.DrawRectangle(spritePosX+mask[i].vertices[j].x-3, spritePosY+mask[i].vertices[j].y-3, 5, 5);
-                    }
-                }*/
                 polygonEditionHelper.OnPaint(mask, dc, wxPoint(spritePosX, spritePosY));
             }
             else //When no custom mask is set, the mask is a bounding box.
@@ -804,7 +780,9 @@ void SpriteObjectEditor::RefreshPoints()
 
 void SpriteObjectEditor::RefreshCollisionMasks()
 {
+	deletingMaskTreeItems = false; //See OnmaskTreeSelectionChanged
     maskTree->DeleteAllItems();
+    deletingMaskTreeItems = true;
 
     if ( selectedAnimation < object.GetAnimationsCount() &&
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() &&
@@ -1227,8 +1205,6 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
     if ( editingPoint ) RefreshPoints();
 
     polygonEditionHelper.OnMouseLeftUp(event);
-    movingPolygon = false;
-    movingPolygonPoint = false;
 
     imagePanel->Refresh();
     imagePanel->Update();
@@ -1482,9 +1458,17 @@ void SpriteObjectEditor::OnAddVerticeClick(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnmaskTreeSelectionChanged(wxTreeListEvent& event)
 {
+	//The event is called event when we are deleting items (with DeleteAllItems)
+	//on GTK, so do nothing in this case, otherwise we get crashs with GetItemData.
+	if (!deletingMaskTreeItems)
+		return;
+
     wxTreeListItem selectedItem = maskTree->GetSelection();
+    if (!selectedItem.IsOk() || selectedItem == maskTree->GetRootItem())
+    	return; //Be careful, nothing could be selected (e.g: when clearing the tree).
     if(polygonEditionHelper.IsMovingPoint()) //Do not select a point when we are currently moving another point
     	return;
+
     if ( maskTree->GetItemParent(selectedItem) == maskTree->GetRootItem() )
     {
         //A polygon is selected
@@ -1564,6 +1548,8 @@ void SpriteObjectEditor::OnPositionMaskSelected(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    unsigned int selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
+    unsigned int selectedPolygonPoint = polygonEditionHelper.GetSelectedPoint();
     if ( selectedPolygon < mask.size() && selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
     {
         mask[selectedPolygon].vertices[selectedPolygonPoint].x = ToFloat(ToString(wxGetTextFromUser(_("Enter the X position of the vertice"), _("Positioning"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].x))));
@@ -1586,6 +1572,7 @@ void SpriteObjectEditor::OnMovePolygonSelected(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    unsigned int selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
     if ( selectedPolygon < mask.size() )
     {
         float xOffset = ToFloat(ToString(wxGetTextFromUser(_("Enter the displacement offset on X axis."), _("Displacement"), "0")));
@@ -1609,6 +1596,7 @@ void SpriteObjectEditor::OnRotatePolygonSelected(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    unsigned int selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
     if ( selectedPolygon < mask.size() )
     {
         float angle = ToFloat(ToString(wxGetTextFromUser(_("Enter the angle of the rotation, in degrees"), _("Rotation of the polygon"), "0")))*3.14159/180;

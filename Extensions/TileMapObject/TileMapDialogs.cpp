@@ -67,10 +67,10 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     flexGridSizer200->AddGrowableRow(1);
     m_mainPanel->SetSizer(flexGridSizer200);
     
-    wxFlexGridSizer* flexGridSizer490 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer490 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer490->SetFlexibleDirection( wxBOTH );
     flexGridSizer490->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer490->AddGrowableCol(1);
+    flexGridSizer490->AddGrowableCol(2);
     flexGridSizer490->AddGrowableRow(0);
     
     flexGridSizer200->Add(flexGridSizer490, 1, wxALL|wxEXPAND, 0);
@@ -112,11 +112,15 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_layerChoice = new wxChoice(m_mainPanelToolbar, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), m_layerChoiceArr, 0);
     m_layerChoice->SetSelection(0);
     m_mainPanelToolbar->AddControl(m_layerChoice);
-    
-    m_mainPanelToolbar->AddSeparator();
-    
-    m_mainPanelToolbar->AddTool(HIDE_UPPER_LAYERS_TOOL_ID, _("Hide upper layers"), wxXmlResource::Get()->LoadBitmap(wxT("layer16")), wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
     m_mainPanelToolbar->Realize();
+    
+    m_toolbar516 = new wxToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTB_FLAT);
+    m_toolbar516->SetToolBitmapSize(wxSize(16,16));
+    
+    flexGridSizer490->Add(m_toolbar516, 0, wxALL|wxEXPAND, 0);
+    
+    m_toolbar516->AddTool(HIDE_UPPER_LAYERS_TOOL_ID, _("Hide upper layers"), wxXmlResource::Get()->LoadBitmap(wxT("eye")), wxNullBitmap, wxITEM_CHECK, _("Hide upper layers"), _("Hide upper layers"), NULL);
+    m_toolbar516->Realize();
     
     wxFlexGridSizer* flexGridSizer7 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer7->SetFlexibleDirection( wxBOTH );
@@ -165,8 +169,8 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer60->AddButton(m_button64);
     m_stdBtnSizer60->Realize();
     
-    SetMinSize( wxSize(950,550) );
-    SetSizeHints(950,550);
+    SetMinSize( wxSize(1100,550) );
+    SetSizeHints(1100,550);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
@@ -271,6 +275,9 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     flexGridSizer2692->Add(flexGridSizer295, 1, wxALL|wxEXPAND, 5);
     
     m_textureNameTextCtrl = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_textureNameTextCtrl->SetHint(wxT(""));
+    #endif
     
     flexGridSizer295->Add(m_textureNameTextCtrl, 0, wxALL|wxEXPAND, 5);
     
@@ -534,7 +541,7 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer398 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer398 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer398->SetFlexibleDirection( wxBOTH );
     flexGridSizer398->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer398->AddGrowableCol(0);
@@ -579,8 +586,15 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     flexGridSizer398->Add(m_tilePreviewPanel, 0, wxALL|wxEXPAND, 5);
     m_tilePreviewPanel->SetMinSize(wxSize(100,100));
     
+    m_tileIdLabel = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    wxFont m_tileIdLabelFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_tileIdLabelFont.SetStyle(wxFONTSTYLE_ITALIC);
+    m_tileIdLabel->SetFont(m_tileIdLabelFont);
+    
+    flexGridSizer398->Add(m_tileIdLabel, 0, wxALL, 5);
+    
     SetMinSize( wxSize(200,200) );
-    SetSizeHints(500,300);
+    SetSizeHints(400,300);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }

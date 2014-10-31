@@ -33,27 +33,50 @@ freely, subject to the following restrictions:
 #include "TileSet.h"
 #include "TileMap.h"
 
+#include <iostream>
+
 /**
- * Command to change a tile in a tilemap.
+ * Command to change a tile (or a whole rectangle) in a tilemap.
  * (It can also remove a tile using newTileId = -1)
  */
 class ChangeTileCommand : public wxCommand
 {
 public:
     ChangeTileCommand(TileMap &tileMap, int layer, int col, int row, int newTileId) : 
-        wxCommand(true), m_tileMap(tileMap), m_layer(layer), m_row(row), m_col(col), m_newTileId(newTileId), m_oldTileId(-1) {};
+        wxCommand(true), m_tileMap(tileMap), m_layer(layer), m_row(row), m_col(col), m_endCol(col), m_endRow(row), m_newTileId(newTileId) 
+    {
+        m_oldTileId.resize(1);
+    };
+
+    ChangeTileCommand(TileMap &tileMap, int layer, int col, int row, int endCol, int endRow, int newTileId) : 
+        wxCommand(true), m_tileMap(tileMap), m_layer(layer), m_row(row), m_col(col), m_endCol(endCol), m_endRow(endRow), m_newTileId(newTileId)
+    {
+        m_oldTileId.resize((m_endCol - m_col + 1) * (m_endRow - m_row + 1));
+    };
 
     virtual bool Do()
     {
-        m_oldTileId = m_tileMap.GetTile(m_layer, m_col, m_row);
-        m_tileMap.SetTile(m_layer, m_col, m_row, m_newTileId);
+        for(int col = m_col; col <= m_endCol; col++)
+        {
+            for(int row = m_row; row <= m_endRow; row++)
+            {
+                m_oldTileId[(m_endRow - m_row + 1) * (col - m_col) + row - m_row] = m_tileMap.GetTile(m_layer, col, row);
+                m_tileMap.SetTile(m_layer, col, row, m_newTileId);
+            }
+        }
 
         return true;
     }
 
     virtual bool Undo()
     {
-        m_tileMap.SetTile(m_layer, m_col, m_row, m_oldTileId);
+        for(int col = m_col; col <= m_endCol; col++)
+        {
+            for(int row = m_row; row <= m_endRow; row++)
+            {
+                m_tileMap.SetTile(m_layer, col, row, m_oldTileId[(m_endRow - m_row + 1) * (col - m_col) + row - m_row]);
+            }
+        }
 
         return true;
     }
@@ -63,9 +86,11 @@ private:
     int m_layer;
     int m_col;
     int m_row;
+    int m_endCol;
+    int m_endRow;
     int m_newTileId;
 
-    int m_oldTileId;
+    std::vector<int> m_oldTileId;
 };
 
 #endif

@@ -268,13 +268,11 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
             m_endRow = currentRow;
             m_isDrawingRectangle = false;
 
-            for(int col = std::min(m_beginCol, m_endCol); col <= std::max(m_beginCol, m_endCol); col++)
-            {
-                for(int row = std::min(m_beginRow, m_endRow); row <= std::max(m_beginRow, m_endRow); row++)
-                {
-                    m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, col, row, m_tileToBeInserted));
-                }
-            }
+            m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, std::min(m_beginCol, m_endCol), 
+                                                                                           std::min(m_beginRow, m_endRow), 
+                                                                                           std::max(m_beginCol, m_endCol), 
+                                                                                           std::max(m_beginRow, m_endRow), 
+                                                                                           m_tileToBeInserted));
 
             Update();
         }
@@ -284,13 +282,11 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
             m_endRow = currentRow;
             m_isDrawingRectangle = false;
 
-            for(int col = std::min(m_beginCol, m_endCol); col <= std::max(m_beginCol, m_endCol); col++)
-            {
-                for(int row = std::min(m_beginRow, m_endRow); row <= std::max(m_beginRow, m_endRow); row++)
-                {
-                    m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, col, row, -1));
-                }
-            }
+            m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, std::min(m_beginCol, m_endCol), 
+                                                                                           std::min(m_beginRow, m_endRow), 
+                                                                                           std::max(m_beginCol, m_endCol), 
+                                                                                           std::max(m_beginRow, m_endRow), 
+                                                                                           -1));
 
             Update();
         }

@@ -40,6 +40,8 @@ enum
     MODE_RECTANGLE_TILE_TOOL_ID =   1008,
     FILL_WITH_TILE_TOOL_ID =        1009,
     ERASE_ALL_TILES_TOOL_ID =       1010,
+    UNDO_TOOL_ID =                  1011,
+    REDO_TOOL_ID =                  1012,
 
 
     //TileEditor IDs

@@ -27,29 +27,31 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include <iostream>
+
+#include <wx/config.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
-#include <wx/textdlg.h>
-#include <wx/settings.h>
-#include <wx/config.h>
 #include <wx/msgdlg.h>
+#include <wx/settings.h>
+#include <wx/textdlg.h>
 
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCpp/Project.h"
+#include "GDCpp/CommonTools.h"
 
 #include "TileMapObjectEditor.h"
 #include "TileMapObject.h"
 #include "TileSetConfigurationEditor.h"
 #include "TileMapConfigurationEditor.h"
 #include "TileEditor.h"
+#include "TileMapObjectEditorCommands.h"
 
 TileMapObjectEditor::TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 TileMapObjectEditorBase(parent),
@@ -178,7 +180,10 @@ void TileMapObjectEditor::OnTileEditToolClicked(wxCommandEvent& event)
 void TileMapObjectEditor::OnChangeMapSizeButtonClicked(wxCommandEvent& event)
 {
     TileMapConfigurationEditor dialog(this, tileMap);
-    dialog.ShowModal();
+    if(dialog.ShowModal() == 1)
+    {
+        m_tileMapPanel->ClearCommands();
+    }
 
     m_tileMapPanel->Update();
 }
@@ -216,6 +221,15 @@ void TileMapObjectEditor::OnFillLayerToolClicked(wxCommandEvent& event)
 {
     if(wxMessageBox(_("Are you sure you want to fill the whole layer with that tile ?"), _("Confirm"), wxYES_NO|wxICON_QUESTION|wxNO_DEFAULT, this) == wxYES)
         m_tileMapPanel->FillLayer(m_tileMapPanel->GetCurrentLayer(), m_tileSetPanel->GetSelectedTile());
+}
+
+void TileMapObjectEditor::OnRedoToolClicked(wxCommandEvent& event)
+{
+    m_tileMapPanel->Redo();
+}
+void TileMapObjectEditor::OnUndoToolClicked(wxCommandEvent& event)
+{
+    m_tileMapPanel->Undo();
 }
 
 #endif

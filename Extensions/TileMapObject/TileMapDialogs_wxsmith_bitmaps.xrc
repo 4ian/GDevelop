@@ -11,6 +11,8 @@
   <object class="wxBitmap" name="options16">../../Binaries/Output/Release_Windows/res/icons_default/options16.png</object>
   <object class="wxBitmap" name="pathfindingobstacleicon16">../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</object>
   <object class="wxBitmap" name="rectangle">../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</object>
+  <object class="wxBitmap" name="redo16">../../Binaries/Output/Release_Windows/res/icons_default/redo16.png</object>
   <object class="wxBitmap" name="remove16">../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</object>
   <object class="wxBitmap" name="tilemasktrianglebr16">../../Binaries/Output/Release_Windows/res/tilemasktrianglebr16.png</object>
+  <object class="wxBitmap" name="undo16">../../Binaries/Output/Release_Windows/res/icons_default/undo16.png</object>
 </resource>

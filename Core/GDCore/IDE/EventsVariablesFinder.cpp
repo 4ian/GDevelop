@@ -23,7 +23,7 @@ namespace gd
 
 class CallbacksForSearchingVariable : public gd::ParserCallbacks
 {
-    public:
+public:
 
     CallbacksForSearchingVariable(std::set<std::string> & results_, const std::string & parameterType_, const std::string & objectName_ = "") :
     results(results_),
@@ -37,11 +37,8 @@ class CallbacksForSearchingVariable : public gd::ParserCallbacks
     virtual void OnOperator(std::string text) {}
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
     virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
     virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
 
     virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
@@ -64,25 +61,6 @@ class CallbacksForSearchingVariable : public gd::ParserCallbacks
     }
 
     void SearchInParameters(const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
-    {
-        std::string lastObjectParameter = "";
-        for (unsigned int i = 0;i<parameters.size();++i)
-        {
-            if (i >= expressionInfo.parameters.size()) break;
-
-            //The parameter has the searched type...
-            if ( expressionInfo.parameters[i].type == parameterType )
-            {
-                //...remember the value of the parameter.
-                if ( objectName.empty() || objectName == lastObjectParameter)
-                    results.insert(parameters[i].GetPlainString());
-            }
-            //Remember the value of the last "object" parameter.
-            else if (gd::ParameterMetadata::IsObject(expressionInfo.parameters[i].type))
-                lastObjectParameter = parameters[i].GetPlainString();
-        }
-    }
-    void SearchInParameters(const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         std::string lastObjectParameter = "";
         for (unsigned int i = 0;i<parameters.size();++i)

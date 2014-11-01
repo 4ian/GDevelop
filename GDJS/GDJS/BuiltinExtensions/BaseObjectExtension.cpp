@@ -28,7 +28,7 @@ BaseObjectExtension::BaseObjectExtension()
     std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
     std::map<std::string, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
     std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
-    std::map<std::string, gd::StrExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
+    std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
 
     objectActions["MettreX"].codeExtraInformation
         .SetFunctionName("setX").SetAssociatedGetter("getX").SetIncludeFile("runtimeobject.js");

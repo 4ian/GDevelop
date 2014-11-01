@@ -57,29 +57,8 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
-
-    vector<string> parametersCode = codeGenerator.GenerateParametersCodes( parameters, expressionInfo.parameters, context);
-
-    string parametersStr;
-    for (unsigned int i = 0;i<parametersCode.size();++i)
-    {
-        if ( i != 0 ) parametersStr += ", ";
-        parametersStr += parametersCode[i];
-    }
-
-    plainExpression += expressionInfo.codeExtraInformation.functionCallName+"("+parametersStr+")";
-};
-
-void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-{
-    codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
-    //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
-
-    //TODO : A bit of hack here..
-    //Special case : Function without name is a string.
-    if ( functionName.empty() )
+    //Special case: For strings expressions, function without name is a string.
+    if ( GetReturnType() == "string" && functionName.empty() )
     {
         if ( parameters.empty() ) return;
         plainExpression += codeGenerator.ConvertToStringExplicit(parameters[0].GetPlainString());
@@ -120,50 +99,10 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         parametersStr += parametersCode[i];
     }
 
-    std::string output = "0";
+    std::string output = GetReturnType() == "string" ? "\"\"" : "0";
 
     //Get object(s) concerned by function call
     std::vector<std::string> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
-    for (unsigned int i = 0;i<realObjects.size();++i)
-    {
-        context.ObjectsListNeeded(realObjects[i]);
-
-        string objectType = gd::GetTypeOfObject(project, scene, realObjects[i]);
-        const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(codeGenerator.GetPlatform(), objectType);
-
-        //Build string to access the object
-        codeGenerator.AddIncludeFiles(objInfo.includeFiles);
-        output = codeGenerator.GenerateObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
-    }
-
-    plainExpression += output;
-};
-
-void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-{
-    const gd::Project & project = codeGenerator.GetProject();
-    const gd::Layout & scene = codeGenerator.GetLayout();
-
-    codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
-    if ( parameters.empty() ) return;
-
-    //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
-
-    //Prepare parameters
-    vector<string> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
-    string parametersStr;
-    for (unsigned int i = 1;i<parametersCode.size();++i)
-    {
-        if ( i != 1 ) parametersStr += ", ";
-        parametersStr += parametersCode[i];
-    }
-
-    //Get object(s) concerned by function call
-    std::vector<std::string> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
-
-    std::string output = "\"\"";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
         context.ObjectsListNeeded(realObjects[i]);
@@ -203,48 +142,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     //Get object(s) concerned by function call
     std::vector<std::string> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
 
-    std::string output = "0";
-    for (unsigned int i = 0;i<realObjects.size();++i)
-    {
-        context.ObjectsListNeeded(realObjects[i]);
-
-        //Cast the object if needed
-        string automatismType = gd::GetTypeOfAutomatism(project, scene, parameters[1].GetPlainString());
-        const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(codeGenerator.GetPlatform(), automatismType);
-
-        //Build string to access the automatism
-        codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
-        output = codeGenerator.GenerateObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
-    }
-
-    plainExpression += output;
-};
-
-void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-{
-    const gd::Project & project = codeGenerator.GetProject();
-    const gd::Layout & scene = codeGenerator.GetLayout();
-
-    codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
-    if ( parameters.size() < 2 ) return;
-
-    //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
-
-    //Prepare parameters
-    vector<string> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
-    string parametersStr;
-    for (unsigned int i = 2;i<parametersCode.size();++i)
-    {
-        if ( i != 2 ) parametersStr += ", ";
-        parametersStr += parametersCode[i];
-    }
-
-    //Get object(s) concerned by function call
-    std::vector<std::string> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
-
-    std::string output = "\"\"";
+    std::string output = GetReturnType() == "string" ? "\"\"" : "0";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
         context.ObjectsListNeeded(realObjects[i]);

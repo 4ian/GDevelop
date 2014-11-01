@@ -33,6 +33,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/Dialogs/AdvancedEntryDialog.h"
+#include "GDCore/IDE/wxTools/TreeItemExpressionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
@@ -389,8 +390,8 @@ lastErrorPos(std::string::npos)
         for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
 	        keywords += " "+it->first;
 
-	    const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
-        for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	    const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
 	        keywords += " "+it->first;
 
         //Add keywords of objects expressions
@@ -401,8 +402,8 @@ lastErrorPos(std::string::npos)
             for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 
@@ -414,8 +415,8 @@ lastErrorPos(std::string::npos)
             for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 	}
@@ -558,7 +559,7 @@ void EditExpressionDialog::RefreshLists()
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    TreeItemExpressionInfoData * associatedData = new TreeItemExpressionInfoData(it->first, it->second);
+                    gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
                     ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
@@ -593,7 +594,7 @@ void EditExpressionDialog::RefreshLists()
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    TreeItemExpressionInfoData * associatedData = new TreeItemExpressionInfoData(it->first, it->second);
+                    gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
                     ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
@@ -624,7 +625,7 @@ void EditExpressionDialog::RefreshLists()
                     IDimage = imageListVal->GetImageCount()-1;
                 }
 
-                TreeItemExpressionInfoData * associatedData = new TreeItemExpressionInfoData(it->first, it->second);
+                gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
                 ValList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
         }
@@ -761,7 +762,7 @@ void EditExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
 {
     if ( !itemObj.IsOk() ) return;
 
-    TreeItemExpressionInfoData * infos = dynamic_cast<TreeItemExpressionInfoData *>(ObjList->GetItemData(itemObj));
+    gd::TreeItemExpressionMetadata * infos = dynamic_cast<gd::TreeItemExpressionMetadata *>(ObjList->GetItemData(itemObj));
     if ( infos != NULL )
     {
         if ( infos->GetExpressionMetadata().parameters.empty() ) return; //Not even a parameter for the object ?
@@ -800,7 +801,7 @@ void EditExpressionDialog::OnAddValBtClick(wxCommandEvent& event)
 {
     if ( !itemVal.IsOk() ) return;
 
-    TreeItemExpressionInfoData * infos = dynamic_cast<TreeItemExpressionInfoData *>(ValList->GetItemData(itemVal));
+    gd::TreeItemExpressionMetadata * infos = dynamic_cast<gd::TreeItemExpressionMetadata *>(ValList->GetItemData(itemVal));
     if ( infos != NULL )
     {
         string parametersStr;

@@ -20,7 +20,6 @@ namespace gd { class ObjectMetadata; }
 namespace gd { class AutomatismMetadata; }
 namespace gd { class BaseEvent; }
 namespace gd { class EventMetadata; }
-namespace gd { class StrExpressionMetadata; }
 namespace gd { class EventCodeGenerator; }
 namespace gd { class ArbitraryResourceWorker; }
 namespace gd { class AutomatismsSharedData; }
@@ -127,7 +126,7 @@ public:
      * \brief Declare a new string expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::StrExpressionMetadata & AddStrExpression(const std::string & name_,
+    gd::ExpressionMetadata & AddStrExpression(const std::string & name_,
                                            const std::string & fullname_,
                                            const std::string & description_,
                                            const std::string & group_,
@@ -307,7 +306,7 @@ public:
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressions();
+    std::map<std::string, gd::ExpressionMetadata > & GetAllStrExpressions();
 
     /**
      * \brief Return a reference to a map containing the names of the actions, related to the object type, and the metadata associated with.
@@ -327,7 +326,7 @@ public:
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType);
+    std::map<std::string, gd::ExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
@@ -347,7 +346,7 @@ public:
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType);
+    std::map<std::string, gd::ExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType);
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
@@ -408,7 +407,7 @@ private:
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;
     std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > strExpressionsInfos;
     std::map<std::string, gd::EventMetadata > eventsInfos;
     #endif
 
@@ -418,7 +417,7 @@ private:
     static std::map<std::string, gd::InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
     static std::map<std::string, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
     static std::map<std::string, gd::ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
-    static std::map<std::string, gd::StrExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
+    static std::map<std::string, gd::ExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
     #endif
 };
 

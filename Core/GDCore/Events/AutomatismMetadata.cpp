@@ -100,7 +100,7 @@ gd::ExpressionMetadata & AutomatismMetadata::AddExpression(const std::string & n
 #endif
 }
 
-gd::StrExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::string & name,
+gd::ExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::string & name,
                                        const std::string & fullname,
                                        const std::string & description,
                                        const std::string & group,
@@ -108,7 +108,7 @@ gd::StrExpressionMetadata & AutomatismMetadata::AddStrExpression(const std::stri
 {
 #if defined(GD_IDE_ONLY)
     //Be careful, automatisms expression do not have namespace ( not necessary as we refer to the auomatism name in the expression )
-    strExpressionsInfos[name] = StrExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
+    strExpressionsInfos[name] = ExpressionMetadata(extensionNamespace, name, fullname, description, group, smallicon);
     return strExpressionsInfos[name];
 #endif
 }

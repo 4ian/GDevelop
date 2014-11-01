@@ -79,32 +79,32 @@ public:
     /**
      * \return the selected polygon index
      */
-    int GetSelectedPolygon() const {return selectedPolygon;};
+    unsigned int GetSelectedPolygon() const {return selectedPolygon;};
 
     /**
      * \return the selected point index
      */
-    int GetSelectedPoint() const {return selectedPolygonPoint;};
+    unsigned int GetSelectedPoint() const {return selectedPolygonPoint;};
 
     /**
      * Change the selected polygon.
      * \param polygon polygon index
      */
-    void SetSelectedPolygon(int polygon) {selectedPolygon = polygon;};
+    void SetSelectedPolygon(unsigned int polygon) {selectedPolygon = polygon;};
 
     /**
      * Change the selected point.
      * \param point point index
      */
-    void SetSelectedPoint(int point) {selectedPolygonPoint = point;};
+    void SetSelectedPoint(unsigned int point) {selectedPolygonPoint = point;};
 
 private:
     PolygonEditionHelper(const PolygonEditionHelper&) {};
     PolygonEditionHelper& operator=(PolygonEditionHelper) {};
 
     bool movingPolygonPoint;
-    int selectedPolygon;
-    int selectedPolygonPoint;
+    unsigned int selectedPolygon;
+    unsigned int selectedPolygonPoint;
     int xSelectionOffset;
     int ySelectionOffset;
 };

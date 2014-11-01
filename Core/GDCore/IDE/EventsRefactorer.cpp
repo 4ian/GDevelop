@@ -45,20 +45,6 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
-        std::string parametersStr;
-        for (unsigned int i = 0;i<parameters.size();++i)
-        {
-            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
-                continue; //Skip code only parameter which are not included in function calls.
-
-            if ( !parametersStr.empty() ) parametersStr += ",";
-            parametersStr += parameters[i].GetPlainString();
-        }
-        plainExpression += functionName+"("+parametersStr+")";
-    };
-
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-    {
         //Special case : Function without name is a litteral string.
         if ( functionName.empty() )
         {
@@ -97,41 +83,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-    {
-        if ( parameters.empty() ) return;
-
-        std::string parametersStr;
-        for (unsigned int i = 1;i<parameters.size();++i)
-        {
-            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
-                continue; //Skip code only parameter which are not included in function calls.
-
-            if ( !parametersStr.empty() ) parametersStr += ",";
-            parametersStr += parameters[i].GetPlainString();
-        }
-        plainExpression += (parameters[0].GetPlainString() == oldName ? newName : parameters[0].GetPlainString())
-                               +"."+functionName+"("+parametersStr+")";
-    };
-
     virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
-    {
-        if ( parameters.size() < 2 ) return;
-
-        std::string parametersStr;
-        for (unsigned int i = 2;i<parameters.size();++i)
-        {
-            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
-                continue; //Skip code only parameter which are not included in function calls.
-
-            if ( !parametersStr.empty() ) parametersStr += ",";
-            parametersStr += parameters[i].GetPlainString();
-        }
-        plainExpression += (parameters[0].GetPlainString() == oldName ? newName : parameters[0].GetPlainString())
-                               +"."+parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
-    };
-
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         if ( parameters.size() < 2 ) return;
 
@@ -177,10 +129,10 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
     }
 
 
-    private :
-        std::string & plainExpression;
-        std::string newName;
-        std::string oldName;
+private:
+    std::string & plainExpression;
+    std::string newName;
+    std::string oldName;
 };
 
 class CallbacksForRemovingObject : public gd::ParserCallbacks
@@ -203,10 +155,6 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
     {
     };
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-    {
-    };
-
     virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
@@ -214,21 +162,7 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
-    {
-        if ( parameters.empty() ) return;
-
-        if ( parameters[0].GetPlainString() == name ) objectPresent = true;
-    };
-
     virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
-    {
-        if ( parameters.empty() ) return;
-
-        if ( parameters[0].GetPlainString() == name ) objectPresent = true;
-    };
-
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
@@ -260,8 +194,8 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
     }
 
 
-    private :
-        std::string name;
+private:
+    std::string name;
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string oldName, std::string newName)

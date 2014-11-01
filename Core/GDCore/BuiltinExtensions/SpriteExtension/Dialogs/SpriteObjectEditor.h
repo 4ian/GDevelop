@@ -263,15 +263,9 @@ private:
 
     bool editingMask;
     bool editingPoint;
+    bool deletingMaskTreeItems; //Used to workaround an event being called when using maskTree->DeleteAllItems().
 
     std::string renamedPointOldName;
-
-    bool movingPolygon;
-    unsigned int selectedPolygon;
-    bool movingPolygonPoint;
-    unsigned int selectedPolygonPoint;
-    float xSelectionOffset;
-    float ySelectionOffset;
 
     gd::PolygonEditionHelper polygonEditionHelper;
 

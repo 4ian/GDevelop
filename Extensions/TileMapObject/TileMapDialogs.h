@@ -58,7 +58,6 @@ protected:
     virtual void OnTileSetConfigureButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileEditToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTileInsertionModeChanged(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnFillLayerToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnClearLayerToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnUndoToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnRedoToolClicked(wxCommandEvent& event) { event.Skip(); }

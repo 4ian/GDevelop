@@ -159,6 +159,7 @@
                       <bitmap>../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</bitmap>
                     </object>
                     <object class="tool" name="m_toolbarItem502">
+                      <radio>1</radio>
                       <label>
                         <![CDATA[Fill this space]]>
                       </label>

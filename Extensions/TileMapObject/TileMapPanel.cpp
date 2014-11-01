@@ -291,6 +291,15 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
             Update();
         }
     }
+    else if(m_insertionMode == FillMode)
+    {
+        if(event.GetEventType() == wxEVT_LEFT_DOWN)
+        {
+            m_commandProcessor.Submit(new FloodFillCommand(*m_tilemap, m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted));
+
+            Update();
+        }
+    }
 }
 
 wxPoint TileMapPanel::GetPositionOfTile(int column, int row)

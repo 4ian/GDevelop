@@ -44,7 +44,8 @@ public:
     enum InsertionMode
     {
         PencilMode,
-        RectangleMode
+        RectangleMode,
+        FillMode
     };
 
     TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=wxHSCROLL|wxVSCROLL);

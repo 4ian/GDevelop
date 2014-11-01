@@ -84,7 +84,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     m_toolbar492->AddTool(MODE_RECTANGLE_TILE_TOOL_ID, _("Rectangle mode"), wxXmlResource::Get()->LoadBitmap(wxT("rectangle")), wxNullBitmap, wxITEM_RADIO, _("Rectangle mode\nAdd tile in a rectangle from the position where the mouse was pressed to the position the mouse was released."), wxT(""), NULL);
     
-    m_toolbar492->AddTool(FILL_WITH_TILE_TOOL_ID, _("Fill this space"), wxXmlResource::Get()->LoadBitmap(wxT("fill16")), wxNullBitmap, wxITEM_NORMAL, _("Fill the space with the selected tile"), wxT(""), NULL);
+    m_toolbar492->AddTool(MODE_FILL_TOOL_ID, _("Fill this space"), wxXmlResource::Get()->LoadBitmap(wxT("fill16")), wxNullBitmap, wxITEM_RADIO, _("Fill the space with the selected tile"), wxT(""), NULL);
     
     m_toolbar492->AddTool(ERASE_ALL_TILES_TOOL_ID, _("Erase all the layer"), wxXmlResource::Get()->LoadBitmap(wxT("delete16")), wxNullBitmap, wxITEM_NORMAL, _("Delete all the tiles from the current layer."), wxT(""), NULL);
     
@@ -185,7 +185,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     this->Connect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Connect(MODE_SINGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Connect(MODE_RECTANGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
-    this->Connect(FILL_WITH_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnFillLayerToolClicked), NULL, this);
+    this->Connect(MODE_FILL_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Connect(ERASE_ALL_TILES_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnClearLayerToolClicked), NULL, this);
     this->Connect(UNDO_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnUndoToolClicked), NULL, this);
     this->Connect(REDO_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnRedoToolClicked), NULL, this);
@@ -205,7 +205,7 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     this->Disconnect(EDIT_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileEditToolClicked), NULL, this);
     this->Disconnect(MODE_SINGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Disconnect(MODE_RECTANGLE_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
-    this->Disconnect(FILL_WITH_TILE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnFillLayerToolClicked), NULL, this);
+    this->Disconnect(MODE_FILL_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileInsertionModeChanged), NULL, this);
     this->Disconnect(ERASE_ALL_TILES_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnClearLayerToolClicked), NULL, this);
     this->Disconnect(UNDO_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnUndoToolClicked), NULL, this);
     this->Disconnect(REDO_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnRedoToolClicked), NULL, this);

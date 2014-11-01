@@ -209,6 +209,10 @@ void TileMapObjectEditor::OnTileInsertionModeChanged(wxCommandEvent& event)
     {
         m_tileMapPanel->SetInsertionMode(TileMapPanel::RectangleMode);
     }
+    else if(event.GetId() == MODE_FILL_TOOL_ID)
+    {
+        m_tileMapPanel->SetInsertionMode(TileMapPanel::FillMode);
+    }
 }
 
 void TileMapObjectEditor::OnClearLayerToolClicked(wxCommandEvent& event)

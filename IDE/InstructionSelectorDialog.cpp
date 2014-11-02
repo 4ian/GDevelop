@@ -197,6 +197,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     SetSizer(BoxSizer6);
     BoxSizer6->Fit(this);
     BoxSizer6->SetSizeHints(this);
+    SetMinSize(wxSize(500,500));
     Center();
 
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);

@@ -162,7 +162,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     invertCheckboxSizer->AddGrowableRow(0);
     invertedCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Invert the condition"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     invertedCheck->SetValue(false);
-    invertedCheck->SetToolTip(_("Check so as to that the condition verify the reverse of what it should do."));
+    invertedCheck->SetToolTip(_("When inverted, a condition will check the negation of what it normally does."));
     invertCheckboxSizer->Add(invertedCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     invertBox->Add(invertCheckboxSizer, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     rightPartSizer->Add(invertBox, 0, wxALL | wxALIGN_BOTTOM, 5);

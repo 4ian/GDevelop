@@ -130,26 +130,26 @@ std::string InstructionSentenceFormatter::LabelFromType(const std::string & type
 {
     if ( type.empty() ) return "";
     else if ( type == "expression" ) return _("Expression");
-    else if ( gd::ParameterMetadata::IsObject(type) ) return _("Choose the object");
-    else if ( type == "automatism" ) return _("Choose automatism");
-    else if ( type == "operator" ) return _("Choose the operator");
-    else if ( type == "relationalOperator" ) return _( "Choose the relational operator" );
-    else if ( type == "file" ) return _("Choose the file");
-    else if ( type == "key" ) return _( "Choose the key" );
-    else if ( type == "mouse" ) return _( "Choose the button" );
+    else if ( gd::ParameterMetadata::IsObject(type) ) return _("Object");
+    else if ( type == "automatism" ) return _("Automatism");
+    else if ( type == "operator" ) return _("Operator");
+    else if ( type == "relationalOperator" ) return _( "Relational operator" );
+    else if ( type == "file" ) return _("File");
+    else if ( type == "key" ) return _( "Key" );
+    else if ( type == "mouse" ) return _( "Mouse button" );
     else if ( type == "yesorno" ) return _("Yes or no");
-    else if ( type == "police" ) return _("Choose the font");
-    else if ( type == "color" ) return _("Choose the color");
+    else if ( type == "police" ) return _("Font");
+    else if ( type == "color" ) return _("Color");
     else if ( type == "trueorfalse" ) return _( "True or False" );
-    else if ( type == "string" ) return _("Edit the text");
-    else if ( type == "musicfile" ) return _("Choose the music");
-    else if ( type == "soundfile" ) return _("Choose the sound");
-    else if ( type == "password" ) return _("Create a password");
-    else if ( type == "layer" ) return _("Choose the layer");
-    else if ( type == "joyaxis" ) return _("Choose axis");
-    else if ( type == "objectvar" ) return _("Choose a variable of the object");
-    else if ( type == "scenevar" ) return _("Choose the scene variable");
-    else if ( type == "globalvar" ) return _("Choose the global variable");
+    else if ( type == "string" ) return _("String");
+    else if ( type == "musicfile" ) return _("Music");
+    else if ( type == "soundfile" ) return _("Sound");
+    else if ( type == "password" ) return _("Password");
+    else if ( type == "layer" ) return _("Layer");
+    else if ( type == "joyaxis" ) return _("Joystick axis");
+    else if ( type == "objectvar" ) return _("Variable of the object");
+    else if ( type == "scenevar" ) return _("Scene variable");
+    else if ( type == "globalvar" ) return _("Global variable");
 
     return _("Unknown");
 }

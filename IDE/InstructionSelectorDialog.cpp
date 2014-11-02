@@ -118,6 +118,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     treeSizer->AddGrowableRow(0);
 
     instructionsTree = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
+    instructionsTree->SetMinSize(wxSize(300,-1));
     instructionsTree->SetToolTip(editingAction ? _("Choose the action to use") : _("Choose the condition to use"));
 
     treeSizer->Add(instructionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -174,8 +175,8 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
     FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-    moreBt = new wxButton(this, ID_BUTTON4, editingAction ? _("More actions") : _("More conditions"), wxDefaultPosition, wxSize(119,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
-    FlexGridSizer6->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    moreBt = new wxButton(this, ID_BUTTON4, editingAction ? _("More actions") : _("More conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    FlexGridSizer6->Add(moreBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
     FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer5->AddGrowableRow(0);
@@ -222,7 +223,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     if (editingAction) invertBox->Show(false);
     RefreshList();
     Center();
-    SetSize(wxDefaultCoord, 600);
+    SetSize(800, 600);
 }
 
 InstructionSelectorDialog::~InstructionSelectorDialog()
@@ -260,35 +261,30 @@ wxTreeItemId InstructionSelectorDialog::GetGroupItem(wxTreeCtrl * treeCtrl, wxTr
     return parent;
 }
 
-void InstructionSelectorDialog::SelectInstruction(const std::string & type)
+bool InstructionSelectorDialog::SelectInstruction(const std::string & type, wxTreeItemId parent)
 {
-    const gd::InstructionMetadata & instructionMetadata = editingAction ?
-        gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), instructionType) :
-        gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), instructionType);
-
-    //Select the instruction in the treectrl
-    wxTreeItemId groupItem = GetGroupItem(instructionsTree, instructionsTree->GetRootItem(),
-        instructionMetadata.GetGroup(), false);
-    if(groupItem.IsOk())
+    wxTreeItemIdValue cookie;
+    for(wxTreeItemId instructionItem = instructionsTree->GetFirstChild(parent, cookie);
+        instructionItem.IsOk();
+        instructionItem = instructionsTree->GetNextChild(parent, cookie))
     {
-        wxTreeItemIdValue cookie;
-        for(wxTreeItemId instructionItem = instructionsTree->GetFirstChild(groupItem, cookie);
-            instructionItem.IsOk();
-            instructionItem = instructionsTree->GetNextChild(groupItem, cookie))
+        gd::TreeItemStringData *itemData = dynamic_cast<gd::TreeItemStringData*>(instructionsTree->GetItemData(instructionItem));
+        if(itemData && itemData->GetString() == type)
         {
-            gd::TreeItemStringData *itemData = dynamic_cast<gd::TreeItemStringData*>(instructionsTree->GetItemData(instructionItem));
-            if(itemData == NULL)
-                continue;
+            instructionsTree->EnsureVisible(instructionItem);
+            instructionsTree->SelectItem(instructionItem);
+            return true; //Found, stop here.
+        }
 
-            if(itemData->GetString() == type)
-            {
-                //It's the current instruction item
-                instructionsTree->EnsureVisible(instructionItem);
-                instructionsTree->SelectItem(instructionItem);
-                break;
-            }
+        if (instructionsTree->ItemHasChildren(instructionItem))
+        {
+            bool result = SelectInstruction(type, instructionItem);
+            if (result)
+                return true;
         }
     }
+
+    return false; //Instruction item not found in the children of parent item.
 }
 
 bool InstructionSelectorDialog::MatchSearchCriteria(std::string search, const gd::InstructionMetadata & instrMetadata)
@@ -437,7 +433,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
         gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), instructionType);
 
     //Select the current selected instruction
-    SelectInstruction(instructionType);
+    SelectInstruction(instructionType, instructionsTree->GetRootItem());
 
     //Display instruction main properties
     instructionNameTxt->SetLabel( instructionMetadata.GetFullName() );
@@ -534,13 +530,11 @@ void InstructionSelectorDialog::RefreshFromInstruction()
 
         }
     }
-    Layout();
+    Layout(); //Ensure widgets just added are properly rendered.
     GridSizer1->Layout();
 
     if (!editingAction)
         invertedCheck->SetValue(isInverted);
-
-    Layout();
 }
 
 void InstructionSelectorDialog::OnParameterBtClick(wxCommandEvent& event)

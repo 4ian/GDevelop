@@ -115,7 +115,11 @@ private:
     void OnOptionalCheckboxClick(wxCommandEvent& event);
     bool MatchSearchCriteria(std::string search, const gd::InstructionMetadata & instrMetadata);
 
-    void SelectInstruction(const std::string &type);
+    /**
+     * \brief Find & Select the instruction in the tree, in the children of the specified item.
+     * \return true if th instruction was found and selected.
+     */
+    bool SelectInstruction(const std::string &type, wxTreeItemId parent);
 	wxTreeItemId GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr, bool insertIfNotExist = true);
 
 	const bool editingAction; ///< True if an action is being edited, false if it's a condition.

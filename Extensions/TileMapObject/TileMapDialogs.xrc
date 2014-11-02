@@ -158,13 +158,13 @@
                       </longhelp>
                       <bitmap>../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</bitmap>
                     </object>
-                    <object class="separator"/>
                     <object class="tool" name="m_toolbarItem502">
+                      <radio>1</radio>
                       <label>
-                        <![CDATA[Fill layer]]>
+                        <![CDATA[Fill this space]]>
                       </label>
                       <tooltip>
-                        <![CDATA[Fill the whole layer with the selected tile.]]>
+                        <![CDATA[Fill the space with the selected tile]]>
                       </tooltip>
                       <longhelp>
                         <![CDATA[]]>
@@ -182,6 +182,25 @@
                         <![CDATA[]]>
                       </longhelp>
                       <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</bitmap>
+                    </object>
+                    <object class="separator"/>
+                    <object class="tool" name="m_toolbarItem520">
+                      <label>
+                        <![CDATA[Undo]]>
+                      </label>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/undo16.png</bitmap>
+                    </object>
+                    <object class="tool" name="m_toolbarItem522">
+                      <label>
+                        <![CDATA[Redo]]>
+                      </label>
+                      <longhelp>
+                        <![CDATA[]]>
+                      </longhelp>
+                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/redo16.png</bitmap>
                     </object>
                     <object class="separator"/>
                   </object>

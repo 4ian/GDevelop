@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #include <algorithm>
 #include <wx/dcbuffer.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "TileMapObjectEditorCommands.h"
 
 TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) :
     wxScrolledWindow(parent, id, pos, size, style),
@@ -39,7 +40,8 @@ TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, 
     m_tilemap(NULL),
     m_mapCurrentLayer(0),
     m_insertionMode(PencilMode),
-    m_isDrawingRectangle(false)
+    m_isDrawingRectangle(false),
+    m_commandProcessor()
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 
@@ -58,6 +60,7 @@ TileMapPanel::~TileMapPanel()
 
 void TileMapPanel::SetTileMap(TileMap *tilemap)
 {
+    m_commandProcessor.ClearCommands();
     m_tilemap = tilemap;
     Update();
 }
@@ -229,14 +232,16 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
         {
             if(event.LeftIsDown()) //Left mouse button pressed
             {
-                //Add a tile to the current position
-                m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted);
+                //Add a tile to the current position (only if the tile has not been set before)
+                if(m_tilemap->GetTile(m_mapCurrentLayer, currentColumn, currentRow) != m_tileToBeInserted)
+                    m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted));
                 Refresh();
             }
             else if(event.RightIsDown())
             {
                 //Remove the tile
-                m_tilemap->SetTile(m_mapCurrentLayer, currentColumn, currentRow, -1);
+                if(m_tilemap->GetTile(m_mapCurrentLayer, currentColumn, currentRow) != m_tileToBeInserted)
+                    m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, currentColumn, currentRow, -1));
                 Refresh();
             }
         }
@@ -263,13 +268,11 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
             m_endRow = currentRow;
             m_isDrawingRectangle = false;
 
-            for(int col = std::min(m_beginCol, m_endCol); col <= std::max(m_beginCol, m_endCol); col++)
-            {
-                for(int row = std::min(m_beginRow, m_endRow); row <= std::max(m_beginRow, m_endRow); row++)
-                {
-                    m_tilemap->SetTile(m_mapCurrentLayer, col, row, m_tileToBeInserted);
-                }
-            }
+            m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, std::min(m_beginCol, m_endCol), 
+                                                                                           std::min(m_beginRow, m_endRow), 
+                                                                                           std::max(m_beginCol, m_endCol), 
+                                                                                           std::max(m_beginRow, m_endRow), 
+                                                                                           m_tileToBeInserted));
 
             Update();
         }
@@ -279,13 +282,20 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
             m_endRow = currentRow;
             m_isDrawingRectangle = false;
 
-            for(int col = std::min(m_beginCol, m_endCol); col <= std::max(m_beginCol, m_endCol); col++)
-            {
-                for(int row = std::min(m_beginRow, m_endRow); row <= std::max(m_beginRow, m_endRow); row++)
-                {
-                    m_tilemap->SetTile(m_mapCurrentLayer, col, row, -1);
-                }
-            }
+            m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, std::min(m_beginCol, m_endCol), 
+                                                                                           std::min(m_beginRow, m_endRow), 
+                                                                                           std::max(m_beginCol, m_endCol), 
+                                                                                           std::max(m_beginRow, m_endRow), 
+                                                                                           -1));
+
+            Update();
+        }
+    }
+    else if(m_insertionMode == FillMode)
+    {
+        if(event.GetEventType() == wxEVT_LEFT_DOWN)
+        {
+            m_commandProcessor.Submit(new FloodFillCommand(*m_tilemap, m_mapCurrentLayer, currentColumn, currentRow, m_tileToBeInserted));
 
             Update();
         }

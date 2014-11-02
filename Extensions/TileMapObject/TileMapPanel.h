@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #define TILEMAPPANEL_H
 
 #include "wx/wx.h"
+#include <wx/cmdproc.h>
 
 #include <iostream>
 #include <map>
@@ -43,7 +44,8 @@ public:
     enum InsertionMode
     {
         PencilMode,
-        RectangleMode
+        RectangleMode,
+        FillMode
     };
 
     TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=wxHSCROLL|wxVSCROLL);
@@ -87,6 +89,22 @@ public:
      */
     void SetInsertionMode(InsertionMode newInsertionMode);
 
+    /**
+     * Undo the last command
+     */
+    void Undo() {m_commandProcessor.Undo(); Update();};
+
+    /**
+     * Redo the last undone command
+     */
+    void Redo() {m_commandProcessor.Redo(); Update();};
+
+    /**
+     * Clear the undo/redo historic
+     */
+    void ClearCommands() {m_commandProcessor.ClearCommands();};
+
+    //React to the selection change in TileSetPanel
     void OnTileSetSelectionChanged(TileSelectionEvent &event);
 
 protected:
@@ -113,6 +131,9 @@ private:
     int m_beginRow;
     int m_endCol;
     int m_endRow;
+
+    //Command processor, to be able to undo/redo actions
+    wxCommandProcessor m_commandProcessor;
 
 };
 

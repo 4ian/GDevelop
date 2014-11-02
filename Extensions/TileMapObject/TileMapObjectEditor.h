@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "TileMapDialogs.h"
 
 #include <wx/bitmap.h>
+#include <wx/cmdproc.h>
 
 #include "TileMap.h"
 #include "TileSet.h"
@@ -49,6 +50,8 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual ~TileMapObjectEditor();
 
     protected:
+        virtual void OnRedoToolClicked(wxCommandEvent& event);
+        virtual void OnUndoToolClicked(wxCommandEvent& event);
         virtual void OnClearLayerToolClicked(wxCommandEvent& event);
         virtual void OnFillLayerToolClicked(wxCommandEvent& event);
         virtual void OnTileInsertionModeChanged(wxCommandEvent& event);

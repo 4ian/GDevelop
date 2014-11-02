@@ -4,7 +4,7 @@
 
 //(*InternalHeaders(GridSetupDialog)
 #include <wx/bitmap.h>
-#include "GDCore/Tools/Localization.h"
+#include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -20,6 +20,12 @@ namespace gd
 {
 
 //(*IdInit(GridSetupDialog)
+const long GridSetupDialog::ID_STATICTEXT2 = wxNewId();
+const long GridSetupDialog::ID_TEXTCTRL1 = wxNewId();
+const long GridSetupDialog::ID_STATICTEXT7 = wxNewId();
+const long GridSetupDialog::ID_STATICTEXT8 = wxNewId();
+const long GridSetupDialog::ID_TEXTCTRL4 = wxNewId();
+const long GridSetupDialog::ID_STATICTEXT9 = wxNewId();
 const long GridSetupDialog::ID_STATICTEXT3 = wxNewId();
 const long GridSetupDialog::ID_TEXTCTRL2 = wxNewId();
 const long GridSetupDialog::ID_STATICTEXT4 = wxNewId();
@@ -41,9 +47,11 @@ BEGIN_EVENT_TABLE(GridSetupDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-GridSetupDialog::GridSetupDialog(wxWindow* parent, int & width, int & height, bool & snap_, int & r_, int & g_, int & b_) :
+GridSetupDialog::GridSetupDialog(wxWindow* parent, int & width, int & height, int & x, int & y, bool & snap_, int & r_, int & g_, int & b_) :
 gridWidth(width),
 gridHeight(height),
+gridOffsetX(x),
+gridOffsetY(y),
 snap(snap_),
 r(r_),
 g(g_),
@@ -59,6 +67,18 @@ b(b_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Grid offset X:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	offsetXEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer2->Add(offsetXEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	FlexGridSizer2->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("Grid offset Y:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	FlexGridSizer2->Add(StaticText8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	offsetYEdit = new wxTextCtrl(this, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	FlexGridSizer2->Add(offsetYEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	FlexGridSizer2->Add(StaticText9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Width of a cell:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	widthEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(55,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
@@ -110,6 +130,8 @@ b(b_)
 	//*)
 
 	snapCheck->SetValue(snap);
+	offsetXEdit->ChangeValue(ToString(gridOffsetX));
+	offsetYEdit->ChangeValue(ToString(gridOffsetY));
 	widthEdit->ChangeValue(ToString(gridWidth));
 	heightEdit->ChangeValue(ToString(gridHeight));
     colorPanel->SetBackgroundColour( wxColor(r,g,b) );
@@ -136,6 +158,8 @@ void GridSetupDialog::OnokBtClick(wxCommandEvent& event)
         return;
     }
 
+    gridOffsetX = ToInt(static_cast<string>(offsetXEdit->GetValue()));
+    gridOffsetY = ToInt(static_cast<string>(offsetYEdit->GetValue()));
     gridWidth = ToInt(static_cast<string>(widthEdit->GetValue()));
     gridHeight = ToInt(static_cast<string>(heightEdit->GetValue()));
 

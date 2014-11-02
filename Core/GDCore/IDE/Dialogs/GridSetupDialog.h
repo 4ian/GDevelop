@@ -29,19 +29,25 @@ class GridSetupDialog: public wxDialog
 {
 public:
 
-    GridSetupDialog(wxWindow* parent, int & width, int & height, bool & snap_, int & r_, int & g_, int & b_);
+    GridSetupDialog(wxWindow* parent, int & width, int & height, int & x, int & y, bool & snap_, int & r_, int & g_, int & b_);
     virtual ~GridSetupDialog();
 
     //(*Declarations(GridSetupDialog)
+    wxStaticText* StaticText9;
     wxStaticBitmap* StaticBitmap2;
     wxTextCtrl* widthEdit;
+    wxTextCtrl* offsetYEdit;
+    wxStaticText* StaticText2;
     wxStaticText* StaticText6;
     wxTextCtrl* heightEdit;
+    wxStaticText* StaticText8;
     wxStaticText* StaticText1;
     wxStaticText* StaticText3;
     wxButton* cancelBt;
     wxPanel* colorPanel;
+    wxTextCtrl* offsetXEdit;
     wxStaticText* StaticText5;
+    wxStaticText* StaticText7;
     wxStaticLine* StaticLine1;
     wxHyperlinkCtrl* helpBt;
     wxStaticText* StaticText4;
@@ -50,6 +56,8 @@ public:
     //*)
     int & gridWidth;
     int & gridHeight;
+    int & gridOffsetX;
+    int & gridOffsetY;
     bool & snap;
     int & r;
     int & g;
@@ -58,6 +66,12 @@ public:
 protected:
 
     //(*Identifiers(GridSetupDialog)
+    static const long ID_STATICTEXT2;
+    static const long ID_TEXTCTRL1;
+    static const long ID_STATICTEXT7;
+    static const long ID_STATICTEXT8;
+    static const long ID_TEXTCTRL4;
+    static const long ID_STATICTEXT9;
     static const long ID_STATICTEXT3;
     static const long ID_TEXTCTRL2;
     static const long ID_STATICTEXT4;

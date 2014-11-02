@@ -16,6 +16,8 @@ LayoutEditorCanvasOptions::LayoutEditorCanvasOptions() :
     snap( true ),
     gridWidth( 32 ),
     gridHeight( 32 ),
+    gridOffsetX( 0 ),
+    gridOffsetY( 0 ),
     gridR( 158 ),
     gridG( 180 ),
     gridB( 255 ),
@@ -31,6 +33,8 @@ void LayoutEditorCanvasOptions::SerializeTo(SerializerElement & element) const
     element.SetAttribute( "snap", snap);
     element.SetAttribute( "gridWidth", gridWidth );
     element.SetAttribute( "gridHeight", gridHeight );
+    element.SetAttribute( "gridOffsetX", gridOffsetX );
+    element.SetAttribute( "gridOffsetY", gridOffsetY );
     element.SetAttribute( "gridR", gridR );
     element.SetAttribute( "gridG", gridG );
     element.SetAttribute( "gridB", gridB );
@@ -46,6 +50,8 @@ void LayoutEditorCanvasOptions::UnserializeFrom(const SerializerElement & elemen
     windowMask = element.GetBoolAttribute("windowMask");
     gridWidth = element.GetIntAttribute("gridWidth", 32);
     gridHeight = element.GetIntAttribute("gridHeight", 32);
+    gridOffsetX = element.GetIntAttribute("gridOffsetX", 0);
+    gridOffsetY = element.GetIntAttribute("gridOffsetY", 0);
     gridR = element.GetIntAttribute("gridR", 158);
     gridG = element.GetIntAttribute("gridG", 180);
     gridB = element.GetIntAttribute("gridB", 255);

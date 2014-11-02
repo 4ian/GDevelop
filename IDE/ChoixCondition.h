@@ -142,7 +142,9 @@ private:
 	void RefreshObjectConditionsList();
     void OnABtClick(wxCommandEvent& event);
     void OnFacClicked(wxCommandEvent& event);
-	wxTreeItemId GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr);
+
+    void SelectCondition(const std::string &type);
+	wxTreeItemId GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr, bool insertIfNotExist = true);
 
 	wxImageList * imageList;
 	std::string selectedObject;

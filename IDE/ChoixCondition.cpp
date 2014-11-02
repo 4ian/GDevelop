@@ -288,7 +288,7 @@ void ChoixCondition::RefreshAllLists()
     RefreshList();
 }
 
-wxTreeItemId ChoixCondition::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr)
+wxTreeItemId ChoixCondition::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr, bool insertIfNotExist)
 {
     std::vector<std::string> groups = SplitString<string>(groupStr, '/');
 
@@ -304,13 +304,64 @@ wxTreeItemId ChoixCondition::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId pa
             if ( treeCtrl->HasChildren(groupItem) ) latestGroupPos++;
             groupItem = treeCtrl->GetNextSibling(groupItem);
         }
-        if ( !groupItem.IsOk() )
+        if ( !groupItem.IsOk() && insertIfNotExist)
             groupItem = treeCtrl->InsertItem(parent, latestGroupPos, groups[i], 0);
+        else if ( !groupItem.IsOk() && !insertIfNotExist)
+            return groupItem;
 
         parent = groupItem;
     }
 
     return parent;
+}
+
+void ChoixCondition::SelectCondition(const std::string &type)
+{
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), type);
+
+    //Select the action in the treectrl
+    wxTreeItemId groupItem = GetGroupItem(ConditionsTree, ConditionsTree->GetRootItem(), instructionMetadata.GetGroup(), false);
+    if(groupItem.IsOk())
+    {
+        wxTreeItemIdValue cookie;
+        for(wxTreeItemId instructionItem = ConditionsTree->GetFirstChild(groupItem, cookie); instructionItem.IsOk(); instructionItem = ConditionsTree->GetNextChild(groupItem, cookie))
+        {
+            gd::TreeItemStringData *itemData = dynamic_cast<gd::TreeItemStringData*>(ConditionsTree->GetItemData(instructionItem));
+            if(itemData == NULL)
+                continue;
+
+            if(itemData->GetString() == type)
+            {
+                //It's the current action item
+                ConditionsTree->EnsureVisible(instructionItem);
+                ConditionsTree->SelectItem(instructionItem);
+                break;
+            }
+        }
+    }
+    wxTreeItemIdValue cookie2;
+    for(wxTreeItemId extensionItem = ConditionsTree->GetFirstChild(ConditionsTree->GetRootItem(), cookie2); extensionItem.IsOk(); extensionItem = ConditionsTree->GetNextChild(ConditionsTree->GetRootItem(), cookie2))
+    {
+        wxTreeItemId groupItem = GetGroupItem(ConditionsTree, extensionItem, instructionMetadata.GetGroup(), false);
+        if(groupItem.IsOk())
+        {
+            wxTreeItemIdValue cookie;
+            for(wxTreeItemId instructionItem = ConditionsTree->GetFirstChild(groupItem, cookie); instructionItem.IsOk(); instructionItem = ConditionsTree->GetNextChild(groupItem, cookie))
+            {
+                gd::TreeItemStringData *itemData = dynamic_cast<gd::TreeItemStringData*>(ConditionsTree->GetItemData(instructionItem));
+                if(itemData == NULL)
+                    continue;
+
+                if(itemData->GetString() == type)
+                {
+                    //It's the current action item
+                    ConditionsTree->EnsureVisible(instructionItem);
+                    ConditionsTree->SelectItem(instructionItem);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -609,8 +660,11 @@ void ChoixCondition::RefreshFromCondition()
 {
     if ( Type.empty() ) return;
 
-    //Display action main properties
+    //Display conditions main properties
     const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
+
+    //Select the current condition
+    SelectCondition(Type);
 
     NomConditionTxt->SetLabel( instructionMetadata.GetFullName() );
     NomConditionTxt->Wrap( 450 );

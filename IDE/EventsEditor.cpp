@@ -40,8 +40,7 @@
 #include "SearchEvents.h"
 #include "CreateTemplate.h"
 #include "ChoixTemplateEvent.h"
-#include "ChoixCondition.h"
-#include "ChoixAction.h"
+#include "InstructionSelectorDialog.h"
 #include "GDCore/IDE/Clipboard.h"
 #undef CreateEvent //Disable an annoying macro
 #undef DrawText //Disable an annoying macro
@@ -854,43 +853,22 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
         if (item.instruction == NULL || item.instructionList == NULL || item.event == NULL) return;
 
-        if ( item.isCondition )
+        InstructionSelectorDialog dialog(this, game, scene, !item.isCondition);
+        dialog.instructionType = item.instruction->GetType();
+        dialog.Param = item.instruction->GetParameters();
+        dialog.isInverted = item.instruction->IsInverted();
+        dialog.RefreshFromInstruction();
+        dialog.Fit();
+
+        if ( dialog.ShowModal() == 0)
         {
-            ChoixCondition dialog(this, game, scene);
-            dialog.Type = item.instruction->GetType();
-            dialog.Param = item.instruction->GetParameters();
-            dialog.conditionInverted = item.instruction->IsInverted();
-            dialog.RefreshFromCondition();
-            dialog.Fit();
+            item.instruction->SetType( dialog.instructionType );
+            item.instruction->SetParameters( dialog.Param );
+            item.instruction->SetInverted( dialog.isInverted );
 
-            if ( dialog.ShowModal() == 0)
-            {
-                item.instruction->SetType( dialog.Type );
-                item.instruction->SetParameters( dialog.Param );
-                item.instruction->SetInverted( dialog.conditionInverted );
-
-                item.event->eventHeightNeedUpdate = true;
-                Refresh();
-                ChangesMadeOnEvents();
-            }
-        }
-        else
-        {
-            ChoixAction dialog(this, game, scene);
-            dialog.Type = item.instruction->GetType();
-            dialog.Param = item.instruction->GetParameters();
-            dialog.RefreshFromAction();
-            dialog.Fit();
-
-            if ( dialog.ShowModal() == 0)
-            {
-                item.instruction->SetType( dialog.Type );
-                item.instruction->SetParameters( dialog.Param );
-
-                item.event->eventHeightNeedUpdate = true;
-                Refresh();
-                ChangesMadeOnEvents();
-            }
+            item.event->eventHeightNeedUpdate = true;
+            Refresh();
+            ChangesMadeOnEvents();
         }
     }
     else if (itemsAreas.IsOnInstructionList(event.GetX(), event.GetY()) )
@@ -899,36 +877,18 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
         if ( item.instructionList == NULL || item.event == NULL) return;
 
-        if ( item.isConditionList )
+        InstructionSelectorDialog dialog(this, game, scene, !item.isConditionList);
+        if ( dialog.ShowModal() == 0)
         {
-            ChoixCondition dialog(this, game, scene);
-            if ( dialog.ShowModal() == 0)
-            {
-                gd::Instruction instruction;
-                instruction.SetType( dialog.Type );
-                instruction.SetParameters( dialog.Param );
-                instruction.SetInverted( dialog.conditionInverted );
+            gd::Instruction instruction;
+            instruction.SetType( dialog.instructionType );
+            instruction.SetParameters( dialog.Param );
+            instruction.SetInverted( dialog.isInverted );
 
-                item.instructionList->push_back(instruction);
-                item.event->eventHeightNeedUpdate = true;
-                Refresh();
-                ChangesMadeOnEvents();
-            }
-        }
-        else
-        {
-            ChoixAction dialog(this, game, scene);
-            if ( dialog.ShowModal() == 0)
-            {
-                gd::Instruction instruction;
-                instruction.SetType( dialog.Type );
-                instruction.SetParameters( dialog.Param );
-
-                item.instructionList->push_back(instruction);
-                item.event->eventHeightNeedUpdate = true;
-                Refresh();
-                ChangesMadeOnEvents();
-            }
+            item.instructionList->push_back(instruction);
+            item.event->eventHeightNeedUpdate = true;
+            Refresh();
+            ChangesMadeOnEvents();
         }
     }
     //Event selection?
@@ -1265,37 +1225,19 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
     gd::InstructionListItem listHighlighted = selection.GetHighlightedInstructionList();
     if ( listHighlighted.instructionList == NULL ) return;
 
-    if ( listHighlighted.isConditionList )
+    InstructionSelectorDialog dialog(this, game, scene, !listHighlighted.isConditionList);
+    if ( dialog.ShowModal() == 0)
     {
-        ChoixCondition dialog(this, game, scene);
-        if ( dialog.ShowModal() == 0)
-        {
-            gd::Instruction instruction;
-            instruction.SetType(dialog.Type);
-            instruction.SetParameters(dialog.Param);
-            instruction.SetInverted(dialog.conditionInverted);
+        gd::Instruction instruction;
+        instruction.SetType(dialog.instructionType);
+        instruction.SetParameters(dialog.Param);
+        instruction.SetInverted(dialog.isInverted);
 
-            listHighlighted.instructionList->push_back(instruction);
-            listHighlighted.event->eventHeightNeedUpdate = true;
-            EnsureTriggerOnceIsLastCondition(*listHighlighted.instructionList);
-            Refresh();
-            ChangesMadeOnEvents();
-        }
-    }
-    else
-    {
-        ChoixAction dialog(this, game, scene);
-        if ( dialog.ShowModal() == 0)
-        {
-            gd::Instruction instruction;
-            instruction.SetType(dialog.Type);
-            instruction.SetParameters(dialog.Param);
-
-            listHighlighted.instructionList->push_back(instruction);
-            listHighlighted.event->eventHeightNeedUpdate = true;
-            Refresh();
-            ChangesMadeOnEvents();
-        }
+        listHighlighted.instructionList->push_back(instruction);
+        listHighlighted.event->eventHeightNeedUpdate = true;
+        EnsureTriggerOnceIsLastCondition(*listHighlighted.instructionList);
+        Refresh();
+        ChangesMadeOnEvents();
     }
 }
 
@@ -1744,43 +1686,22 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
 
     if (item.instruction == NULL || item.instructionList == NULL || item.event == NULL) return;
 
-    if ( item.isCondition )
+    InstructionSelectorDialog dialog(this, game, scene, !item.isCondition);
+    dialog.instructionType = item.instruction->GetType();
+    dialog.Param = item.instruction->GetParameters();
+    dialog.isInverted = item.instruction->IsInverted();
+    dialog.RefreshFromInstruction();
+    dialog.Fit();
+
+    if ( dialog.ShowModal() == 0)
     {
-        ChoixCondition dialog(this, game, scene);
-        dialog.Type = item.instruction->GetType();
-        dialog.Param = item.instruction->GetParameters();
-        dialog.conditionInverted = item.instruction->IsInverted();
-        dialog.RefreshFromCondition();
-        dialog.Fit();
+        item.instruction->SetType( dialog.instructionType );
+        item.instruction->SetParameters( dialog.Param );
+        item.instruction->SetInverted( dialog.isInverted );
 
-        if ( dialog.ShowModal() == 0)
-        {
-            item.instruction->SetType( dialog.Type );
-            item.instruction->SetParameters( dialog.Param );
-            item.instruction->SetInverted( dialog.conditionInverted );
-
-            item.event->eventHeightNeedUpdate = true;
-            Refresh();
-            ChangesMadeOnEvents();
-        }
-    }
-    else
-    {
-        ChoixAction dialog(this, game, scene);
-        dialog.Type = item.instruction->GetType();
-        dialog.Param = item.instruction->GetParameters();
-        dialog.RefreshFromAction();
-        dialog.Fit();
-
-        if ( dialog.ShowModal() == 0)
-        {
-            item.instruction->SetType( dialog.Type );
-            item.instruction->SetParameters( dialog.Param );
-
-            item.event->eventHeightNeedUpdate = true;
-            Refresh();
-            ChangesMadeOnEvents();
-        }
+        item.event->eventHeightNeedUpdate = true;
+        Refresh();
+        ChangesMadeOnEvents();
     }
 }
 

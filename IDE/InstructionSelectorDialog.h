@@ -4,10 +4,9 @@
  * This project is released under the GNU General Public License.
  */
 
-#ifndef CHOOSEACTIONDIALOG_H
-#define CHOOSEACTIONDIALOG_H
+#ifndef INSTRUCTIONSELECTORDIALOG_H
+#define INSTRUCTIONSELECTORDIALOG_H
 
-//(*Headers(ChoixAction)
 #include <wx/treectrl.h>
 #include <wx/notebook.h>
 #include <wx/sizer.h>
@@ -20,7 +19,6 @@
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-//*)
 #include <wx/srchctrl.h>
 #include <wx/checkbox.h>
 #include <wx/imaglist.h>
@@ -28,66 +26,55 @@
 #include "GDCore/Events/Expression.h"
 namespace gd { class Layout; }
 namespace gd { class Project; }
+namespace gd { class InstructionMetadata; }
 
 #include <string>
 #include <vector>
 
 using namespace std;
 
-class ChoixAction: public wxDialog
+class InstructionSelectorDialog: public wxDialog
 {
 public:
 
-	ChoixAction(wxWindow* parent, gd::Project & game_, gd::Layout & scene_);
-	virtual ~ChoixAction();
+	InstructionSelectorDialog(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, bool chooseAction);
+	virtual ~InstructionSelectorDialog();
 	void RefreshList();
-	void RefreshFromAction();
+	void RefreshFromInstruction();
 
-    //Les données de l'action à modifier
-    string Type;
     gd::Project & game;
     gd::Layout & scene;
-    vector < gd::Expression > Param;
 
-	//(*Declarations(ChoixAction)
+    std::string instructionType; ///< The type of the selected instruction
+    vector < gd::Expression > Param; ///< The value of the parameters
+    bool isInverted; ///< True if the condition is inverted
+
 	wxButton* OkBt;
 	wxSearchCtrl* searchCtrl;
 	wxStaticBitmap* ActionImg;
 	wxNotebook* Notebook1;
-	wxStaticText* NomActionTxt;
-	wxTreeCtrl* globalObjectGroups;
+	wxStaticText* instructionNameTxt;
 	wxStaticBitmap* StaticBitmap1;
 	wxFlexGridSizer* GridSizer1;
 	wxPanel* Panel1;
+	wxCheckBox* invertedCheck;
 	wxHyperlinkCtrl* HyperlinkCtrl1;
-	wxTreeCtrl* ObjetsList;
 	wxStaticLine* StaticLine2;
-	wxTreeCtrl* objectActionsTree;
 	wxButton* moreBt;
 	wxButton* CancelBt;
 	wxStaticLine* StaticLine1;
-	wxTreeCtrl* globalObjectsList;
 	wxNotebook* objectsListsNotebook;
 	wxSearchCtrl* objectsSearchCtrl;
-	wxStaticText* ActionTextTxt;
-	wxTreeCtrl* GroupesList;
+	wxStaticText* instructionDescriptionTxt;
 	wxCheckBox* objSortCheck;
-	wxTreeCtrl* ActionsTree;
-	//*)
+	wxTreeCtrl* instructionsTree;
 
 protected:
 
-	//(*Identifiers(ChoixAction)
 	static const long ID_TREECTRL1;
-	static const long ID_TREECTRL2;
-	static const long ID_TREECTRL3;
-	static const long ID_TREECTRL4;
-	static const long ID_TREECTRL5;
 	static const long ID_NOTEBOOK2;
 	static const long ID_TEXTCTRL2;
-	static const long ID_TREECTRL6;
 	static const long ID_PANEL1;
-	static const long ID_NOTEBOOK1;
 	static const long ID_TEXTCTRL1;
 	static const long ID_STATICBITMAP1;
 	static const long ID_STATICTEXT1;
@@ -100,10 +87,10 @@ protected:
 	static const long ID_HYPERLINKCTRL1;
 	static const long ID_BUTTON1;
 	static const long ID_BUTTON2;
-	//*)
 	static const long ID_TEXTARRAY;
 	static const long ID_EDITARRAY;
 	static const long ID_BUTTONARRAY;
+	static const long ID_CHECKBOX1;
 	static const long ID_CHECKARRAY;
 
 private:
@@ -115,30 +102,23 @@ private:
 	vector < wxBitmapButton * > ParaBmpBt;
 	vector < wxTextCtrl * > ParaEdit;
 
-	//(*Handlers(ChoixAction)
 	void OnOkBtClick(wxCommandEvent& event);
 	void OnCancelBtClick(wxCommandEvent& event);
-	void OnAideBtClick(wxCommandEvent& event);
-	void OnActionsTreeSelectionChanged(wxTreeEvent& event);
-	void OnextSortCheckClick(wxCommandEvent& event);
-	void OnobjSortCheckClick(wxCommandEvent& event);
+	void OnHelpBtClick(wxCommandEvent& event);
+	void OninstructionsTreeSelectionChanged(wxTreeEvent& event);
 	void OnmoreBtClick(wxCommandEvent& event);
-	void OnObjetsListSelectionChanged(wxTreeEvent& event);
-	void OnobjectActionsTreeSelectionChanged(wxTreeEvent& event);
-	void OnobjectsSearchCtrlText(wxCommandEvent& event);
 	void OnsearchCtrlText(wxCommandEvent& event);
-	void OnActionsTreeItemActivated(wxTreeEvent& event);
-	void OnobjectActionsTreeItemActivated(wxTreeEvent& event);
-	//*)
-	void RefreshAllLists();
+	void OninstructionsTreeItemActivated(wxTreeEvent& event);
+	void OnobjectinstructionsTreeItemActivated(wxTreeEvent& event);
 	void RefreshObjectsLists();
-	void RefreshObjectActionsList();
-	void OnABtClick(wxCommandEvent& event);
-    void OnFacClicked(wxCommandEvent& event);
+	void OnParameterBtClick(wxCommandEvent& event);
+    void OnOptionalCheckboxClick(wxCommandEvent& event);
+    bool MatchSearchCriteria(std::string search, const gd::InstructionMetadata & instrMetadata);
 
-    void SelectAction(const std::string &type);
+    void SelectInstruction(const std::string &type);
 	wxTreeItemId GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr, bool insertIfNotExist = true);
 
+	const bool editingAction; ///< True if an action is being edited, false if it's a condition.
 	wxImageList * imageList;
 	std::string selectedObject;
 

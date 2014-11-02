@@ -86,6 +86,7 @@ const long InstructionSelectorDialog::ID_CHECKBOX1 = wxNewId();
 InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, bool chooseAction) :
     game(game_),
     scene(scene_),
+    isInverted(false),
     editingAction(chooseAction)
 {
     wxBoxSizer* BoxSizer4;

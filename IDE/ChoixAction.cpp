@@ -274,7 +274,7 @@ void ChoixAction::RefreshAllLists()
     RefreshList();
 }
 
-wxTreeItemId ChoixAction::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr)
+wxTreeItemId ChoixAction::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr, bool insertIfNotExist)
 {
 	std::vector<std::string> groups = SplitString<string>(groupStr, '/');
 
@@ -290,13 +290,66 @@ wxTreeItemId ChoixAction::GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId paren
 	        if ( treeCtrl->HasChildren(groupItem) ) latestGroupPos++;
 	        groupItem = treeCtrl->GetNextSibling(groupItem);
 	    }
-	    if ( !groupItem.IsOk() )
+	    if ( !groupItem.IsOk() && insertIfNotExist)
 	        groupItem = treeCtrl->InsertItem(parent, latestGroupPos, groups[i], 0);
+	   	else if( !groupItem.IsOk() && !insertIfNotExist)
+	   	{
+	   		return groupItem;
+	   	}
 
 	    parent = groupItem;
     }
 
     return parent;
+}
+
+void ChoixAction::SelectAction(const std::string &type)
+{
+	const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), type);
+
+    //Select the action in the treectrl
+    wxTreeItemId groupItem = GetGroupItem(ActionsTree, ActionsTree->GetRootItem(), instructionMetadata.GetGroup(), false);
+    if(groupItem.IsOk())
+    {
+    	wxTreeItemIdValue cookie;
+    	for(wxTreeItemId instructionItem = ActionsTree->GetFirstChild(groupItem, cookie); instructionItem.IsOk(); instructionItem = ActionsTree->GetNextChild(groupItem, cookie))
+    	{
+    		gd::TreeItemStringData *itemData = dynamic_cast<gd::TreeItemStringData*>(ActionsTree->GetItemData(instructionItem));
+    		if(itemData == NULL)
+    			continue;
+
+    		if(itemData->GetString() == type)
+    		{
+    			//It's the current action item
+    			ActionsTree->EnsureVisible(instructionItem);
+    			ActionsTree->SelectItem(instructionItem);
+    			break;
+    		}
+    	}
+    }
+    wxTreeItemIdValue cookie2;
+    for(wxTreeItemId extensionItem = ActionsTree->GetFirstChild(ActionsTree->GetRootItem(), cookie2); extensionItem.IsOk(); extensionItem = ActionsTree->GetNextChild(ActionsTree->GetRootItem(), cookie2))
+    {
+	    wxTreeItemId groupItem = GetGroupItem(ActionsTree, extensionItem, instructionMetadata.GetGroup(), false);
+	    if(groupItem.IsOk())
+	    {
+	    	wxTreeItemIdValue cookie;
+	    	for(wxTreeItemId instructionItem = ActionsTree->GetFirstChild(groupItem, cookie); instructionItem.IsOk(); instructionItem = ActionsTree->GetNextChild(groupItem, cookie))
+	    	{
+	    		gd::TreeItemStringData *itemData = dynamic_cast<gd::TreeItemStringData*>(ActionsTree->GetItemData(instructionItem));
+	    		if(itemData == NULL)
+	    			continue;
+
+	    		if(itemData->GetString() == type)
+	    		{
+	    			//It's the current action item
+	    			ActionsTree->EnsureVisible(instructionItem);
+	    			ActionsTree->SelectItem(instructionItem);
+	    			break;
+	    		}
+	    	}
+	    }
+	}
 }
 
 /**
@@ -596,6 +649,9 @@ void ChoixAction::RefreshFromAction()
     if ( Type.empty() ) return;
 
     const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), Type);
+
+    //Select the current selected action
+    SelectAction(Type);
 
     //Display action main properties
     NomActionTxt->SetLabel( instructionMetadata.GetFullName() );

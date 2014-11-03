@@ -1068,8 +1068,8 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
 
                 if ( options.grid && options.snap )
                 {
-                    newX = std::floor(newX/options.gridWidth +0.5)*options.gridWidth;
-                    newY = std::floor(newY/options.gridHeight+0.5)*options.gridHeight;
+                    newX = std::floor((newX-options.gridOffsetX)/options.gridWidth +0.5)*options.gridWidth + options.gridOffsetX;
+                    newY = std::floor((newY-options.gridOffsetY)/options.gridHeight+0.5)*options.gridHeight + options.gridOffsetY;
                 }
 
                 //Move the initial instance
@@ -1298,7 +1298,7 @@ void LayoutEditorCanvas::OnGridBtClick( wxCommandEvent & event )
 
 void LayoutEditorCanvas::OnGridSetupBtClick( wxCommandEvent & event )
 {
-    GridSetupDialog dialog(this, options.gridWidth, options.gridHeight, options.snap, options.gridR, options.gridG, options.gridB);
+    GridSetupDialog dialog(this, options.gridWidth, options.gridHeight, options.gridOffsetX, options.gridOffsetY, options.snap, options.gridR, options.gridG, options.gridB);
     dialog.ShowModal();
 }
 

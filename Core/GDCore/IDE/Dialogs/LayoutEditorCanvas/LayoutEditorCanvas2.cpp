@@ -380,14 +380,14 @@ void LayoutEditorCanvas::RenderGrid()
     int initialYPos = floor((editionView.getCenter().y-editionView.getSize().y/2) / options.gridHeight)-options.gridHeight;
     initialYPos *= options.gridHeight;
 
-    for ( int Xpos = initialXPos;Xpos < (editionView.getCenter().x+editionView.getSize().x/2) ; Xpos += options.gridWidth )
+    for ( int Xpos = initialXPos + options.gridOffsetX; Xpos < (editionView.getCenter().x+editionView.getSize().x/2); Xpos += options.gridWidth )
     {
         sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(Xpos, initialYPos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
                               sf::Vertex(ConvertToWindowCoordinates(Xpos, editionView.getCenter().y+editionView.getSize().y/2, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
         draw(line, 2, sf::Lines);
     }
 
-    for ( int Ypos = initialYPos;Ypos < (editionView.getCenter().y+editionView.getSize().y/2) ; Ypos += options.gridHeight )
+    for ( int Ypos = initialYPos + options.gridOffsetY; Ypos < (editionView.getCenter().y+editionView.getSize().y/2); Ypos += options.gridHeight )
     {
         sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(initialXPos, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
                               sf::Vertex(ConvertToWindowCoordinates(editionView.getCenter().x+editionView.getSize().x/2, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};

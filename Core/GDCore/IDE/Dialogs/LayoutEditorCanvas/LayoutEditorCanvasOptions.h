@@ -42,6 +42,8 @@ public:
     bool snap; ///< True if snap to grid activated in editor
     int gridWidth; ///< Grid width in editor
     int gridHeight; ///< Grid height in editor
+    int gridOffsetX; ///< Grid X offset
+    int gridOffsetY; ///< Grid Y offset
     int gridR; ///< Grid red color in editor
     int gridG; ///< Grid green color in editor
     int gridB; ///< Grid blue color in editor

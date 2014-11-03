@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="GridSetup">
+	<object class="wxDialog" name="GridSetupDialog">
 		<title>Grid parameters</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
@@ -10,6 +10,50 @@
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 					<cols>3</cols>
 					<growablecols>1</growablecols>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+							<label>Grid offset X:</label>
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="offsetXEdit" member="yes" />
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+							<label>pixels</label>
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+							<label>Grid offset Y:</label>
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="offsetYEdit" member="yes" />
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
+							<label>pixels</label>
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
 							<label>Width of a cell:</label>

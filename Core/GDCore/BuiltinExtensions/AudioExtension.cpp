@@ -243,7 +243,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("MusicPlaying",
                    _("A music is being played"),
                    _("Test if the music on a channel is being played"),
-                   _("The music on channel _PARAM1_ is being played"),
+                   _("Music on channel _PARAM1_ is being played"),
                    _("Audio/Musics on channels"),
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png")
@@ -254,7 +254,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("MusicPaused",
                    _("A music is paused"),
                    _("Test if the music on the specified channel is paused."),
-                   _("The music on channel _PARAM1_ is paused"),
+                   _("Music on channel _PARAM1_ is paused"),
                    _("Audio/Musics on channels"),
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png")
@@ -265,7 +265,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("MusicStopped",
                    _("A music is stopped"),
                    _("Test if the music on the specified channel is stopped."),
-                   _("The music on channel _PARAM1_ is stopped"),
+                   _("Music on channel _PARAM1_ is stopped"),
                    _("Audio/Musics on channels"),
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png")
@@ -276,7 +276,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("SoundPlaying",
                    _("A sound is being played"),
                    _("Test if the sound on a channel is being played."),
-                   _("Thee sound on channel _PARAM1_ is being played"),
+                   _("Sound on channel _PARAM1_ is being played"),
                    _("Audio/Sounds on channels"),
                    "res/conditions/sonplaying24.png",
                    "res/conditions/sonplaying.png")
@@ -287,7 +287,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("SoundPaused",
                    _("A sound is paused"),
                    _("Test if the sound on the specified channel is paused."),
-                   _("The sound on channel _PARAM1_ is paused"),
+                   _("Sound on channel _PARAM1_ is paused"),
                    _("Audio/Sounds on channels"),
                    "res/conditions/sonpaused24.png",
                    "res/conditions/sonpaused.png")
@@ -298,7 +298,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("SoundStopped",
                    _("A sound is stopped"),
                    _("Test if the sound on the specified channel is stopped."),
-                   _("The sound on channel _PARAM1_ is stopped"),
+                   _("Sound on channel _PARAM1_ is stopped"),
                    _("Audio/Sounds on channels"),
                    "res/conditions/sonstopped24.png",
                    "res/conditions/sonstopped.png")

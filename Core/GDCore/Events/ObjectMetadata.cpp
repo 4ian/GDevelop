@@ -30,6 +30,7 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 #if defined(GD_IDE_ONLY)
     SetFullName(std::string(fullname_));
     SetDescription(std::string(informations_));
+    iconFilename = icon24x24;
 #if !defined(GD_NO_WX_GUI)
     if ( gd::SkinHelper::IconExists(icon24x24, 24) )
         SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));

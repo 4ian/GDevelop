@@ -56,9 +56,9 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         {
             for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
             {
+                std::string type = allActionsVectors[i]->at( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
-                    std::string type = allActionsVectors[i]->at( k ).GetType();
                     bool extensionHasAction = false;
 
                     const std::map<string, gd::InstructionMetadata> & allActions = allGameExtensions[e]->GetAllActions();
@@ -96,9 +96,9 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         {
             for ( unsigned int k = 0;k < allConditionsVector[i]->size() ;k++ )
             {
+                std::string type = allConditionsVector[i]->at( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
-                    std::string type = allConditionsVector[i]->at( k ).GetType();
                     bool extensionHasCondition = false;
 
                     const std::map<string, gd::InstructionMetadata> & allConditions = allGameExtensions[e]->GetAllConditions();

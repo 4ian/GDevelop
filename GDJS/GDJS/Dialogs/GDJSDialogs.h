@@ -26,6 +26,8 @@
 #include <wx/imaglist.h>
 #include <wx/statbox.h>
 #include <wx/checkbox.h>
+#include <wx/stc/stc.h>
+#include <wx/bmpbuttn.h>
 
 class BaseUploadOnlineDialog : public wxDialog
 {
@@ -135,6 +137,31 @@ protected:
 public:
     BaseIntelXDKPackageDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Package the game with Intel XDK"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~BaseIntelXDKPackageDialog();
+};
+
+
+class BaseJsCodeEventDialog : public wxDialog
+{
+protected:
+    wxStyledTextCtrl* codeEdit;
+    wxStaticText* m_staticText180;
+    wxStaticText* m_staticText184;
+    wxTextCtrl* objectsEdit;
+    wxBitmapButton* m_bmpButton188;
+    wxStaticBitmap* m_staticBitmap190;
+    wxHyperlinkCtrl* m_hyperLink170;
+    wxButton* cancelBt;
+    wxButton* okBt;
+
+protected:
+    virtual void onObjectsButtonClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void onHelpBtClick(wxHyperlinkEvent& event) { event.Skip(); }
+    virtual void onCancelBtClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void onOkBtClick(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    BaseJsCodeEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the Javascript code"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    virtual ~BaseJsCodeEventDialog();
 };
 
 #endif

@@ -604,3 +604,154 @@ BaseIntelXDKPackageDialog::~BaseIntelXDKPackageDialog()
     m_button10812->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseIntelXDKPackageDialog::OnCloseClicked), NULL, this);
     
 }
+
+BaseJsCodeEventDialog::BaseJsCodeEventDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCB65InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer160 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer160->SetFlexibleDirection( wxBOTH );
+    flexGridSizer160->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer160->AddGrowableCol(0);
+    flexGridSizer160->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer160);
+    
+    wxFlexGridSizer* flexGridSizer162 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer162->SetFlexibleDirection( wxBOTH );
+    flexGridSizer162->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer162->AddGrowableCol(0);
+    flexGridSizer162->AddGrowableRow(0);
+    
+    flexGridSizer160->Add(flexGridSizer162, 1, wxALL|wxEXPAND, 0);
+    
+    codeEdit = new wxStyledTextCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), 0);
+    codeEdit->SetFocus();
+    // Configure the fold margin
+    codeEdit->SetMarginType     (4, wxSTC_MARGIN_SYMBOL);
+    codeEdit->SetMarginMask     (4, wxSTC_MASK_FOLDERS);
+    codeEdit->SetMarginSensitive(4, true);
+    codeEdit->SetMarginWidth    (4, 16);
+    
+    codeEdit->SetProperty(wxT("fold"),wxT("1"));
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN,    wxSTC_MARK_ARROWDOWN);
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDER,        wxSTC_MARK_ARROW);
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDERSUB,     wxSTC_MARK_BACKGROUND);
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL,    wxSTC_MARK_BACKGROUND);
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDEREND,     wxSTC_MARK_ARROW);
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_ARROWDOWN);
+    codeEdit->MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_BACKGROUND);
+    // Configure the tracker margin
+    codeEdit->SetMarginWidth(1, 0);
+    
+    // Configure the symbol margin
+    codeEdit->SetMarginType (2, wxSTC_MARGIN_SYMBOL);
+    codeEdit->SetMarginMask (2, ~(wxSTC_MASK_FOLDERS));
+    codeEdit->SetMarginWidth(2, 0);
+    codeEdit->SetMarginSensitive(2, true);
+    
+    // Configure the line numbers margin
+    int codeEdit_PixelWidth = 4 + 5 *codeEdit->TextWidth(wxSTC_STYLE_LINENUMBER, wxT("9"));
+    codeEdit->SetMarginType(0, wxSTC_MARGIN_NUMBER);
+    codeEdit->SetMarginWidth(0,codeEdit_PixelWidth);
+    
+    // Configure the line symbol margin
+    codeEdit->SetMarginType(3, wxSTC_MARGIN_FORE);
+    codeEdit->SetMarginMask(3, 0);
+    codeEdit->SetMarginWidth(3,0);
+    // Select the lexer
+    codeEdit->SetLexer(wxSTC_LEX_ESCRIPT);
+    // Set default font / styles
+    codeEdit->StyleClearAll();
+    codeEdit->SetWrapMode(0);
+    codeEdit->SetIndentationGuides(0);
+    codeEdit->SetKeyWords(0, wxT(""));
+    codeEdit->SetKeyWords(1, wxT(""));
+    codeEdit->SetKeyWords(2, wxT(""));
+    codeEdit->SetKeyWords(3, wxT(""));
+    codeEdit->SetKeyWords(4, wxT(""));
+    
+    flexGridSizer162->Add(codeEdit, 0, wxALL|wxEXPAND, 5);
+    
+    wxFlexGridSizer* flexGridSizer178 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer178->SetFlexibleDirection( wxBOTH );
+    flexGridSizer178->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer178->AddGrowableCol(0);
+    
+    flexGridSizer162->Add(flexGridSizer178, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticText180 = new wxStaticText(this, wxID_ANY, _("Scenes can be accessed using 'runtimeScene' variable."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer178->Add(m_staticText180, 0, wxALL, 5);
+    
+    wxFlexGridSizer* flexGridSizer182 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer182->SetFlexibleDirection( wxBOTH );
+    flexGridSizer182->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer182->AddGrowableCol(1);
+    
+    flexGridSizer178->Add(flexGridSizer182, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticText184 = new wxStaticText(this, wxID_ANY, _("Pick these objects into 'objects' variable:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer182->Add(m_staticText184, 0, wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    objectsEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer182->Add(objectsEdit, 0, wxALL|wxEXPAND, 5);
+    
+    m_bmpButton188 = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("object16")), wxDefaultPosition, wxSize(-1,-1), wxBU_AUTODRAW);
+    
+    flexGridSizer182->Add(m_bmpButton188, 0, wxALL, 5);
+    
+    wxFlexGridSizer* flexGridSizer164 = new wxFlexGridSizer(1, 4, 0, 0);
+    flexGridSizer164->SetFlexibleDirection( wxBOTH );
+    flexGridSizer164->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer164->AddGrowableCol(1);
+    
+    flexGridSizer160->Add(flexGridSizer164, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticBitmap190 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer164->Add(m_staticBitmap190, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    m_hyperLink170 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/usingjsevents"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink170->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink170->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink170->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer164->Add(m_hyperLink170, 0, wxRIGHT|wxTOP|wxBOTTOM, 5);
+    
+    cancelBt = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer164->Add(cancelBt, 0, wxALL, 5);
+    
+    okBt = new wxButton(this, wxID_ANY, _("Ok"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer164->Add(okBt, 0, wxALL, 5);
+    
+    SetSizeHints(500,300);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    Centre(wxBOTH);
+    // Connect events
+    m_bmpButton188->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseJsCodeEventDialog::onObjectsButtonClick), NULL, this);
+    m_hyperLink170->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(BaseJsCodeEventDialog::onHelpBtClick), NULL, this);
+    cancelBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseJsCodeEventDialog::onCancelBtClick), NULL, this);
+    okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseJsCodeEventDialog::onOkBtClick), NULL, this);
+    
+}
+
+BaseJsCodeEventDialog::~BaseJsCodeEventDialog()
+{
+    m_bmpButton188->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseJsCodeEventDialog::onObjectsButtonClick), NULL, this);
+    m_hyperLink170->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(BaseJsCodeEventDialog::onHelpBtClick), NULL, this);
+    cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseJsCodeEventDialog::onCancelBtClick), NULL, this);
+    okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseJsCodeEventDialog::onOkBtClick), NULL, this);
+    
+}

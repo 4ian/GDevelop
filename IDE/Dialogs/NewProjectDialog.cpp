@@ -319,7 +319,7 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
 
 void NewProjectDialog::OnbrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choose a file for the project" ), newProjectBaseFolder, _("Project.gdg"), "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog dialog( this, _("Choose a file for the project"), newProjectBaseFolder, _("Project.gdg"), "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
 
     if ( dialog.ShowModal() != wxID_CANCEL )
     {

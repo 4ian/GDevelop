@@ -388,7 +388,7 @@ void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
     wxString examplesDir = wxGetCwd()+"/Examples/";
     #endif
 
-    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"GDevelop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));

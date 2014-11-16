@@ -120,6 +120,7 @@ gd::PlatformExtension * CreateGDJSDestroyOutsideAutomatismExtension();
 gd::PlatformExtension * CreateGDJSTiledSpriteObjectExtension();
 gd::PlatformExtension * CreateGDJSDraggableAutomatismExtension();
 gd::PlatformExtension * CreateGDJSTopDownMovementAutomatismExtension();
+gd::PlatformExtension * CreateGDJSTextObjectExtension();
 }
 #endif
 
@@ -175,6 +176,7 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     #endif
 };
 

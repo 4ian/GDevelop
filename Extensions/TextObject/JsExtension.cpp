@@ -31,17 +31,19 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 
+void DeclareTextObjectExtension(gd::PlatformExtension & extension);
+
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
+class TextObjectJsExtension : public gd::PlatformExtension
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
      */
-    JsExtension()
+    TextObjectJsExtension()
     {
         SetExtensionInformation("TextObject",
                               _("Text object"),
@@ -49,7 +51,7 @@ public:
                               "Compil Games",
                               "zlib/libpng License (Open Source)");
 
-        CloneExtension("GDevelop C++ platform", "TextObject");
+        DeclareTextObjectExtension(*this);
 
         GetObjectMetadata("TextObject::Text").SetIncludeFile("TextObject/textruntimeobject.js");
 
@@ -90,21 +92,30 @@ public:
         GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"].codeExtraInformation
             .SetFunctionName("setColor").SetIncludeFile("TextObject/textruntimeobject.js");
 
-        StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
-        /* Font action
-           SetUnderlined action
-           IsUnderlined condition
-        */
+        //Unimplemented actions and conditions:
+        GetAllActionsForObject("TextObject::Text")["TextObject::Font"].codeExtraInformation
+            .SetFunctionName("");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetUnderlined"].codeExtraInformation
+            .SetFunctionName("");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::IsUnderlined"].codeExtraInformation
+            .SetFunctionName("");
+
+        StripUnimplementedInstructionsAndExpressions();
     };
-    virtual ~JsExtension() {};
+    virtual ~TextObjectJsExtension() {};
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension * CreateGDJSTextObjectExtension() {
+    return new TextObjectJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+    return new TextObjectJsExtension;
 }
 
 /**
@@ -114,4 +125,5 @@ extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {
     delete p;
 }
+#endif
 #endif

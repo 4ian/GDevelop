@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Object.h"
-
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/FontManager.h"
@@ -145,15 +145,19 @@ void TextObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool TextObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/texticon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void TextObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     TextObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
+#endif
 }
 #endif
 

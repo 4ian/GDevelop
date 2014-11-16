@@ -142,6 +142,7 @@ public:
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDescription() const { return description; }
     const std::string & GetGroup() const { return group; }
+    const std::string & GetSmallIconFilename() const { return smallIconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif

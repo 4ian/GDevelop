@@ -162,10 +162,10 @@ void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Rende
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;
 
-    sprite.setOrigin( associatedSprite->GetCentre().GetX(), associatedSprite->GetCentre().GetY() ); ;
+    sprite.setOrigin( associatedSprite->GetCenter().GetX(), associatedSprite->GetCenter().GetY() ); ;
     sprite.setRotation( shouldNotRotate ? 0 : instance.GetAngle() );
-    sprite.setPosition( instance.GetX() + (associatedSprite->GetCentre().GetX() - associatedSprite->GetOrigine().GetX())*fabs(scaleX),
-                        instance.GetY() + (associatedSprite->GetCentre().GetY() - associatedSprite->GetOrigine().GetY())*fabs(scaleY) );
+    sprite.setPosition( instance.GetX() + (associatedSprite->GetCenter().GetX() - associatedSprite->GetOrigin().GetX())*fabs(scaleX),
+                        instance.GetY() + (associatedSprite->GetCenter().GetY() - associatedSprite->GetOrigin().GetY())*fabs(scaleY) );
     sprite.setScale(scaleX, scaleY);
 
     renderTarget.draw(sprite);
@@ -188,8 +188,8 @@ sf::Vector2f SpriteObject::GetInitialInstanceOrigin(gd::InitialInstance & instan
     float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/associatedSprite->GetSFMLTexture()->texture.getSize().x : 1;
     float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/associatedSprite->GetSFMLTexture()->texture.getSize().y : 1;
 
-    return sf::Vector2f(((float)associatedSprite->GetOrigine().GetX())*fabs(scaleX),
-                        ((float)associatedSprite->GetOrigine().GetY())*fabs(scaleY));
+    return sf::Vector2f(((float)associatedSprite->GetOrigin().GetX())*fabs(scaleX),
+                        ((float)associatedSprite->GetOrigin().GetY())*fabs(scaleY));
 }
 #endif
 

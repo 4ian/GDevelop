@@ -650,14 +650,14 @@ public:
      * Default implementation check if objectName is only composed of a-z,A-Z,0-9 or _ characters an
      * if does not conflict with an expression.
      */
-    bool ValidateObjectName(const std::string & objectName);
+    static bool ValidateObjectName(const std::string & objectName);
 
     /**
      * Return a message that will be displayed when an invalid object name has been entered.
      *
      * \note This message will be displayed by the IDE into a tooltip.
      */
-    std::string GetBadObjectNameWarning();
+    static std::string GetBadObjectNameWarning();
 
     ///@}
 

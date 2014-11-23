@@ -155,7 +155,7 @@ object(object_)
     m_mgr.SetManagedWindow( this );
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( resourcesEditor, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Image Bank Editor" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(true).MinSize(210, 100) );
+    m_mgr.AddPane( resourcesEditor, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _("Images Bank Editor") ).MaximizeButton( true ).MinimizeButton( false ).Show(true).MinSize(210, 100) );
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
     m_mgr.Update();

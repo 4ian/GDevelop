@@ -108,6 +108,9 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
 
 TextFormatting InstructionSentenceFormatter::GetFormattingFromType(const std::string & type)
 {
+    if (gd::ParameterMetadata::IsObject(type))
+        return typesFormatting["object"];
+
     return typesFormatting[type];
 }
 

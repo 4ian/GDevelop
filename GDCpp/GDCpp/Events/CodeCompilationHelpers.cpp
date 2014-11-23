@@ -90,20 +90,13 @@ namespace
         bool aDependencyIsNotCompiled = false;
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
-            vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), *i));
+            if (!game.HasSourceFile(*i, "C++")) continue;
+            gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
-            if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
+            if (SourceFileNeedRecompilation(game, sourceFile))
             {
-                if (SourceFileNeedRecompilation(game, *(*sourceFile)))
-                {
-                    CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(game, *(*sourceFile), optionalScene);
-                    aDependencyIsNotCompiled = true;
-                }
-            }
-            else
-            {
-                std::cout << "WARNING: Source file not found:" << *i <<".";
+                CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(game, sourceFile, optionalScene);
+                aDependencyIsNotCompiled = true;
             }
         }
         for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
@@ -126,31 +119,24 @@ namespace
         bool aDependencyIsNotCompiled = false;
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
-            vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), *i));
+            if (!game.HasSourceFile(*i, "C++")) continue;
+            gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
-            if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
-            {
-                CodeCompilerTask task;
-                task.compilerCall.compilationForRuntime = true;
-                task.compilerCall.optimize = false;
-                task.compilerCall.eventsGeneratedCode = false;
+            CodeCompilerTask task;
+            task.compilerCall.compilationForRuntime = true;
+            task.compilerCall.optimize = false;
+            task.compilerCall.eventsGeneratedCode = false;
 
-                wxFileName inputFile((*sourceFile)->GetFileName());
-                inputFile.MakeAbsolute(wxFileName::FileName(game.GetProjectFile()).GetPath());
-                task.compilerCall.inputFile = ToString(inputFile.GetFullPath());
-                task.compilerCall.outputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+ToString((*sourceFile).get())+"RuntimeObjectFile.o");
-                task.compilerCall.extraHeaderDirectories.push_back(ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
-                task.scene = NULL;
-                task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(optionalScene));
-                task.userFriendlyName = "Compilation of file "+task.compilerCall.inputFile;
+            wxFileName inputFile(sourceFile.GetFileName());
+            inputFile.MakeAbsolute(wxFileName::FileName(game.GetProjectFile()).GetPath());
+            task.compilerCall.inputFile = ToString(inputFile.GetFullPath());
+            task.compilerCall.outputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+ToString(&sourceFile)+"RuntimeObjectFile.o");
+            task.compilerCall.extraHeaderDirectories.push_back(ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
+            task.scene = NULL;
+            task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(optionalScene));
+            task.userFriendlyName = "Compilation of file "+task.compilerCall.inputFile;
 
-                CodeCompiler::Get()->AddTask(task);
-            }
-            else
-            {
-                std::cout << "WARNING: Source file not found:" << *i <<".";
-            }
+            CodeCompiler::Get()->AddTask(task);
         }
         for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
         {
@@ -209,14 +195,11 @@ namespace
 
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
-            vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), *i));
+            if (!game.HasSourceFile(*i, "C++")) continue;
+            gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
-            if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
-            {
-                std::cout << "Added GD" << ToString((*sourceFile).get()) << "ObjectFile.o (Created from a Source file) to the linking." << std::endl;
-                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+ToString((*sourceFile).get())+"ObjectFile.o"));
-            }
+            std::cout << "Added GD" << ToString(&sourceFile) << "ObjectFile.o (Created from a Source file) to the linking." << std::endl;
+            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+ToString(&sourceFile)+"ObjectFile.o"));
         }
         for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
         {

@@ -256,7 +256,6 @@ void StartHerePage::RefreshNewsUsingUpdateChecker()
 	else
 		newsTxt->SetLabel(_("No news for now!"));
 
-	std::cout << "Size" << newsTxtSizer->GetSize().x;
 	newsTxt->Wrap(newsTxtSizer->GetSize().x);
 
 	newsLink1->SetLabel(checker->newsLinkLabel1);

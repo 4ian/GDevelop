@@ -223,9 +223,9 @@ mainEditor(mainEditor_)
 	MenuItem8 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM12, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem8->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	externalEventsContextMenu.Append(MenuItem8);
-	MenuItem14 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM18, _("Create a new C++ file"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem14 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM18, _("Create a new source file"), wxEmptyString, wxITEM_NORMAL);
 	sourceFilesContextMenu.Append(MenuItem14);
-	MenuItem10 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM14, _("Add an already existing C++ file"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem10 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM14, _("Add an already existing source file"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	sourceFilesContextMenu.Append(MenuItem10);
 	MenuItem11 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM15, _("Edit"), wxEmptyString, wxITEM_NORMAL);
@@ -236,9 +236,9 @@ mainEditor(mainEditor_)
 	MenuItem12->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 	sourceFileContextMenu.Append(MenuItem12);
 	sourceFileContextMenu.AppendSeparator();
-	MenuItem15 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM19, _("Create a new C++ file"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem15 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM19, _("Create a new source file"), wxEmptyString, wxITEM_NORMAL);
 	sourceFileContextMenu.Append(MenuItem15);
-	MenuItem13 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM17, _("Add an already existing C++ file"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM17, _("Add an already existing source file"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem13->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
 	sourceFileContextMenu.Append(MenuItem13);
 	MenuItem16 = new wxMenuItem((&emptyExternalLayoutsContextMenu), ID_MENUITEM20, _("Add an external layout"), wxEmptyString, wxITEM_NORMAL);
@@ -473,17 +473,18 @@ void ProjectManager::Refresh()
         }
 
         boost::shared_ptr<gd::Project> game = boost::dynamic_pointer_cast<gd::Project>(mainEditor.games[i]);
-        if ( game !=  boost::shared_ptr<gd::Project>() && game->useExternalSourceFiles )
+        if ( game !=  boost::shared_ptr<gd::Project>() && game->UseExternalSourceFiles() )
         {
             gdTreeItemProjectData * sourceFilesItemData = new gdTreeItemProjectData("SourceFiles", "", mainEditor.games[i].get());
-            wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("C++ source files"), 5 ,5, sourceFilesItemData);
-            for (unsigned int j = 0;j<game->externalSourceFiles.size();++j)
+            wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Source files"), 5 ,5, sourceFilesItemData);
+            const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game->GetAllSourceFiles();
+            for (unsigned int j = 0;j<allFiles.size();++j)
             {
-                if ( game->externalSourceFiles[j]->IsGDManaged() )
+                if ( allFiles[j]->IsGDManaged() )
                     continue;
 
-                gdTreeItemProjectData * sourceFileItem = new gdTreeItemProjectData("SourceFile", game->externalSourceFiles[j]->GetFileName(), game.get());
-                projectsTree->AppendItem(sourceFilesItem, game->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
+                gdTreeItemProjectData * sourceFileItem = new gdTreeItemProjectData("SourceFile", allFiles[j]->GetFileName(), game.get());
+                projectsTree->AppendItem(sourceFilesItem, allFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
             }
         }
 
@@ -664,24 +665,8 @@ void ProjectManager::EditSourceFile(gd::Project * game, std::string filename, si
 {
     //Having a game associated with the editor is optional
     gd::Project * associatedGame = NULL;
-    if ( game )
-    {
-        vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), filename));
-
-        if ( sourceFile != game->externalSourceFiles.end() )
-        {
-            associatedGame = game;
-            /*if ((*sourceFile)->IsGDManaged()) //We're trying to open a GD-managed source file: Let's open the editor of the associated event.
-            {
-                boost::shared_ptr<BaseEvent> event = (*sourceFile)->GetAssociatedEvent().lock();
-                if ( event != boost::shared_ptr<BaseEvent>() )
-                {
-                    event->EditEvent()
-                }
-            }*/
-        }
-    }
+    if ( game && game->HasSourceFile(filename))
+        associatedGame = game;
 
     //As we're opening a "real" file, first check if it exists
     if ( !wxFileExists(filename) )
@@ -1869,7 +1854,7 @@ void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    wxFileDialog fileDialog( this, _("Choose one or more files to add"), "", "", _("C++ sources|*.cpp;*.cxx|All files|*.*"), wxFD_MULTIPLE );
+    wxFileDialog fileDialog( this, _("Choose one or more files to add"), "", "", _("All files|*.*"), wxFD_MULTIPLE );
     if ( fileDialog.ShowModal() != wxID_OK ) return;
 
     wxArrayString files;
@@ -1879,10 +1864,11 @@ void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
 
     for ( unsigned int i = 0; i < files.GetCount();i++ )
     {
-        boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
-        sourceFile->SetFileName(string(files[i].mb_str()));
+    	std::string language = AutodetectFileLanguage(ToString(files[i]));
 
-        game->externalSourceFiles.push_back(sourceFile);
+	    wxFileName filename(files[i]); //Files are added with their paths relative to the project directory
+	    filename.MakeRelativeTo(wxFileName::FileName(game->GetProjectFile()).GetPath());
+	    game->InsertNewSourceFile(ToString(filename.GetFullPath()), language);
     }
 
     Refresh();
@@ -1894,21 +1880,20 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<SourceFile> >::iterator sourceFile =
-        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), data->GetSecondString()));
-
-    if ( sourceFile == game->externalSourceFiles.end() )
+    std::string name = data->GetSecondString();
+    if (!game->HasSourceFile(name))
     {
         gd::LogWarning(_("File not found"));
         return;
     }
 
     //Updating editors
+    gd::SourceFile & sourceFile = game->GetSourceFile(name);
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && editorPtr->filename == (*sourceFile)->GetFileName())
+        if ( editorPtr != NULL && editorPtr->filename == sourceFile.GetFileName())
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
@@ -1917,10 +1902,16 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
         }
     }
 
-    game->externalSourceFiles.erase(sourceFile);
+    game->RemoveSourceFile(name);
 
     //Updating tree
     projectsTree->Delete(selectedItem);
+}
+
+std::string ProjectManager::AutodetectFileLanguage(wxString filename)
+{
+	wxFileName file = wxFileName::FileName(filename);
+    return file.GetExt().Lower() == "js" ? "Javascript" : "C++";
 }
 
 void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
@@ -1929,28 +1920,32 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    wxFileDialog dialog( this, _( "Choose a file name" ), "", "", "Source C++ (*.cpp)|*.cpp|Header C++ (*.h)|*.h", wxFD_SAVE|wxFD_OVERWRITE_PROMPT );
+    //Try to find the preferred extension:
+    std::string wildcard = "*.*";
+    std::string platformName = game->GetCurrentPlatform().GetName();
+    if (platformName == "GDevelop C++ platform")
+    	wildcard = "C++ source file (*.cpp)|*.cpp|C++ Header (*.h)|*.h";
+    else if (platformName == "GDevelop JS platform")
+    	wildcard = "Javascript source file (*.js)|*.js";
+
+    wxFileDialog dialog(this, _( "Choose a file name" ), "", "", wildcard, wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if ( dialog.ShowModal() == wxID_CANCEL )
         return;
 
-    //Creating an empty file
+    //TODO: Create file with some contents adapted to the chosen platform.
+    //Create an empty file
     std::ofstream file;
-    file.open ( ToString(dialog.GetPath()).c_str() );
+    file.open(ToString(dialog.GetPath()).c_str());
     file << "\n";
     file.close();
 
-    //Adding it to the game source files.
-    boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
+    std::string language = AutodetectFileLanguage(dialog.GetPath());
 
+    //Add it to the game source files.
     wxFileName filename(dialog.GetPath()); //Files are added with their paths relative to the project directory
     filename.MakeRelativeTo(wxFileName::FileName(game->GetProjectFile()).GetPath());
-    sourceFile->SetFileName(ToString(filename.GetFullPath()));
+    game->InsertNewSourceFile(ToString(filename.GetFullPath()), language);
 
-    vector< boost::shared_ptr<SourceFile> >::iterator alreadyExistingSourceFile =
-        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), ToString(filename.GetFullPath())));
-
-    if ( alreadyExistingSourceFile == game->externalSourceFiles.end() )
-        game->externalSourceFiles.push_back(sourceFile);
     Refresh();
 }
 

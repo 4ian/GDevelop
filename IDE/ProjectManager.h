@@ -243,6 +243,7 @@ private:
 	void OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event);
 	void AddExternalLayoutToGame(gd::Project * project);
 	void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
+	std::string AutodetectFileLanguage(wxString filename);
 
     wxTreeItemId selectedItem;
     std::string itemTextBeforeEditing;

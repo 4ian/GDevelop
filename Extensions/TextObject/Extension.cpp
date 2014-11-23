@@ -273,14 +273,14 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 /**
  * \brief This class declares information about the C++ extension.
  */
-class CppExtension : public ExtensionBase
+class Extension : public ExtensionBase
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
      */
-    CppExtension()
+    Extension()
     {
         DeclareTextObjectExtension(*this);
         AddRuntimeObject(GetObjectMetadata("TextObject::Text"),
@@ -288,7 +288,7 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~CppExtension() {};
+    virtual ~Extension() {};
 };
 
 #if !defined(EMSCRIPTEN)
@@ -297,7 +297,7 @@ public:
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
-    return new CppExtension;
+    return new Extension;
 }
 
 /**

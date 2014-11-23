@@ -102,14 +102,11 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
 
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
-            vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), *i));
+            if (!game.HasSourceFile(*i, "C++")) continue;
+            const gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
-            if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
-            {
-                std::cout << "Added GD" << gd::ToString((*sourceFile).get()) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
-                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
-            }
+            std::cout << "Added GD" << gd::ToString(&sourceFile) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
+            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&sourceFile)+"RuntimeObjectFile.o"));
         }
     }
     for (unsigned int l= 0;l<game.GetExternalEventsCount();++l)
@@ -449,7 +446,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             }
         }
     }
-    if ( game.useExternalSourceFiles )
+    if ( game.UseExternalSourceFiles() )
     {
         if ( wxCopyFile( "dynext.dxgd", tempDir + "/" + "dynext.dxgd", true ) == false )
             diagnosticManager.AddError(gd::ToString(_( "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n" )));

@@ -250,13 +250,15 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
     displayedNameEdit->SetValue(editedEvent.GetDisplayedName());
     displayCodeCheck->SetValue(editedEvent.IsCodeDisplayedInEditor());
 
-    for (unsigned int i = 0;i<game.externalSourceFiles.size();++i)
+	const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
+    for (unsigned int i = 0;i<allFiles.size();++i)
     {
-        if ( game.externalSourceFiles[i]->IsGDManaged() ) continue;
+        if ( allFiles[i]->IsGDManaged() ) continue;
+        if ( allFiles[i]->GetLanguage() != "C++" ) continue;
 
-        dependenciesList->Append(game.externalSourceFiles[i]->GetFileName());
+        dependenciesList->Append(allFiles[i]->GetFileName());
 
-        if ( std::find(editedEvent.GetDependencies().begin(), editedEvent.GetDependencies().end(), game.externalSourceFiles[i]->GetFileName() ) != editedEvent.GetDependencies().end() )
+        if ( std::find(editedEvent.GetDependencies().begin(), editedEvent.GetDependencies().end(), allFiles[i]->GetFileName() ) != editedEvent.GetDependencies().end() )
             dependenciesList->Check(dependenciesList->GetCount()-1, true);
     }
 
@@ -282,11 +284,13 @@ void EditCppCodeEvent::OnokBtClick(wxCommandEvent& event)
 
     std::vector<std::string> dependencies;
     unsigned int listIndex = 0;
-    for (unsigned int i = 0;i<game.externalSourceFiles.size();++i)
+	const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
+    for (unsigned int i = 0;i<allFiles.size();++i)
     {
-        if ( game.externalSourceFiles[i]->IsGDManaged() ) continue;
+        if ( allFiles[i]->IsGDManaged() ) continue;
+        if ( allFiles[i]->GetLanguage() != "C++" ) continue;
 
-        if ( dependenciesList->IsChecked(listIndex) ) dependencies.push_back(game.externalSourceFiles[i]->GetFileName());
+        if ( dependenciesList->IsChecked(listIndex) ) dependencies.push_back(allFiles[i]->GetFileName());
         listIndex++;
     }
     editedEvent.SetDependencies(dependencies);

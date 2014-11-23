@@ -76,10 +76,11 @@ void ProjectPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 {
     if (project) project->OnChangeInPropertyGrid(propertyGrid, event);
 
+    //Handle some special properties:
     if ( event.GetPropertyName() == _("Name of the project") && associatedTree != NULL)
         associatedTree->SetItemText(associatedTreeItem, event.GetProperty()->GetValue());
 
-    if ( event.GetPropertyName() == _("Activate the use of C++ source files") && associatedProjectManager != NULL)
+    if ( event.GetPropertyName() == _("Activate the use of C++/JS source files") && associatedProjectManager != NULL)
         associatedProjectManager->Refresh();
 
     if (project) project->SetDirty();

@@ -59,21 +59,6 @@ public:
     bool IsGDManaged() const { return gdManaged; };
 
     /**
-     * \brief When a source file is GD-managed, it is usually created for a specific event ( C++ Code Event ).
-     *
-     * Using this method, the event can store in the source file a (weak) pointer to itself,
-     * so that we can show to the user the event if the compilation fails in the source file.
-     */
-    void SetAssociatedEvent(boost::weak_ptr<BaseEvent> event) { associatedGdEvent = event; };
-
-    /**
-     * \brief Return a (weak) pointer to the event associated to the source file, if any.
-     *
-     * \see SetAssociatedEvent
-     */
-    boost::weak_ptr<BaseEvent> GetAssociatedEvent() const { return associatedGdEvent; };
-
-    /**
      * \brief Change the language of the source file
      */
     void SetLanguage(std::string lang) { language = lang; }
@@ -81,14 +66,14 @@ public:
     /**
      * \brief Get the language of the source file
      */
-    const std::string & SetLanguage() const { return language; }
+    const std::string & GetLanguage() const { return language; }
 
 private:
 
     std::string filename; ///< Filename
     time_t lastBuildTimeStamp; ///< Time of the last build
     bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by GDevelop.
-    std::string language; ///< String identifying the language of this source file (typically C++ or Javascript).
+    std::string language; ///< String identifying the language of this source file (typically "C++ or "Javascript").
     boost::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.
 };
 

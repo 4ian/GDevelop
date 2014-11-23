@@ -101,6 +101,8 @@ public:
             .SetFunctionName("");
 
         StripUnimplementedInstructionsAndExpressions();
+
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
     virtual ~TextObjectJsExtension() {};
 };

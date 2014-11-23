@@ -79,13 +79,13 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
 
     gd::Project exportedProject = project;
 
-    //Export resources ( *before* generating events as some resources filenames may be updated )
+    //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
     //Generate events code
     if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         return false;
 
-    //Strip the project ( *after* generating events as the events may use strioped things ( objects groups... ) )
+    //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
     gd::ProjectStripper::StripProject(exportedProject);
     exportedProject.SetFirstLayout(layout.GetName());
 

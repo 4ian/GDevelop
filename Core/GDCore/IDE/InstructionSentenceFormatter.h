@@ -20,21 +20,25 @@ namespace gd
 {
 
 /**
- * \brief Generate user friendly sentences and information from an action.
+ * \brief Generate user friendly sentences and information from an action or condition metadata.
  */
 class GD_CORE_API InstructionSentenceFormatter
 {
 public:
 
     /**
-     * \brief Create a sentence from an action
+     * \brief Create a sentence from an instruction and its metadata.
+     *
+     * Sentence is provided in the gd::InstructionMetadata passed as parameter.
+     * Parameters placeholders ("_PARAMx_", x being the parameter index) are replaced
+     * by their values stored in the isntruction passed as parameter.
      */
-    std::string Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos);
+    std::string Translate(const gd::Instruction & instr, const gd::InstructionMetadata & metadata);
 
     /**
-     * \brief Create a formatted sentence from an action
+     * \brief Create a formatted sentence from an instruction and its metadata.
      */
-    std::vector< std::pair<std::string, gd::TextFormatting> > GetAsFormattedText(const gd::Instruction & action, const gd::InstructionMetadata & infos);
+    std::vector< std::pair<std::string, gd::TextFormatting> > GetAsFormattedText(const gd::Instruction & instr, const gd::InstructionMetadata & metadata);
 
     /**
      * \brief Return the TextFormatting object associated to the \a type.
@@ -42,20 +46,21 @@ public:
     TextFormatting GetFormattingFromType(const std::string & type);
 
     /**
-     * \brief Return the label of a button from parameter type
+     * \brief Return the label of a parameter type
      */
     std::string LabelFromType(const std::string & type);
+
+    /**
+     * \brief Load the configuration from the default configuration,
+     * or saved configuration if one was saved with wxWidgets.
+     */
+    void LoadTypesFormattingFromConfig();
 
     #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Return the bitmap of a button from parameter type
      */
     wxBitmap BitmapFromType(const std::string & type);
-
-    /**
-     * Load the configuration from wxConfigBase
-     */
-    void LoadTypesFormattingFromConfig();
 
     /**
      * Save the configuration to wxConfigBase

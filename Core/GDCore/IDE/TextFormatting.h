@@ -29,12 +29,12 @@ public:
     ~TextFormatting() {}
 
     /**
-     * \bref Return true if the bold style must be applied.
+     * \brief Return true if the bold style must be applied.
      */
     bool IsBold() const { return bold; }
 
     /**
-     * \bref Return true if the italic style must be applied.
+     * \brief Return true if the italic style must be applied.
      */
     bool IsItalic() const { return italic; }
 
@@ -51,20 +51,49 @@ public:
      */
     unsigned int GetColorBlue() const { return colorBlue; }
 
+    /**
+     * Change the color of the text.
+     */
+    TextFormatting & SetColor(unsigned int r, unsigned int g, unsigned int b)
+    {
+        colorRed = r;
+        colorGreen = g;
+        colorBlue = b;
+        return *this;
+    }
+
+    /**
+     * \brief Set if the bold style must be applied.
+     */
+    TextFormatting & SetBold(bool enable = true)
+    {
+        bold = enable;
+        return *this;
+    }
+
+    /**
+     * \brief Set if the italic style must be applied.
+     */
+    TextFormatting & SetItalic(bool enable = true)
+    {
+        italic = enable;
+        return *this;
+    }
+
     #if !defined(GD_NO_WX_GUI)
     /**
-     * Return the color of the text in a wxWidgets "wxColor" object.
+     * \brief Return the color of the text in a wxWidgets "wxColor" object.
+     * \note Shortcut for GetColor* methods.
      */
     wxColor GetWxColor() const { return wxColor(colorRed, colorGreen, colorBlue); }
 
     /**
-     * Change the color of the text.
+     * \brief Change the color of the text using a wxWidgets color.
+     * \note Shortcut for SetColor(color.Red(), color.Green(), color.Blue())
      */
-    void SetColor(wxColor color)
+    TextFormatting & SetColor(wxColor color)
     {
-    	colorRed = color.Red();
-    	colorGreen = color.Green();
-    	colorBlue = color.Blue();
+    	return SetColor(color.Red(), color.Green(), color.Blue());
     }
     #endif
 

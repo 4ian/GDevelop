@@ -51,7 +51,7 @@ License
 * Extensions (in the Extensions folder) are using zlib/libpng license.
 * The name, GDevelop, and its logo are the exclusive property of Florian Rival.
 
-Games exported with GDevelop are based on the native and/or HTML5 platforms (see *Core*, *GDCpp* and *GDJS* folders): these platforms are distributed under the LPGL v3 license, so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.
+Games exported with GDevelop are based on the native and/or HTML5 platforms (see *Core*, *GDCpp* and *GDJS* folders): these platforms are distributed under the LGPL v3 license, so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.
 
 
 [CMake]:http://www.cmake.org/

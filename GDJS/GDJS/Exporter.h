@@ -119,6 +119,18 @@ private:
     bool ExportEventsCode(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles);
 
     /**
+     * \brief Copy the external source files used by the game into the export directory, and add them into files
+     * to be included.
+     *
+     * Files are named "ext-codeX.js", X being the number of the layout in the project.
+     * \param project The project with resources to be exported.
+     * \param outputDir The directory where the events code must be generated.
+     * \param includesFiles A reference to a vector that will be filled with JS files to be exported along with the project.
+     * ( including "ext-codeX.js" files ).
+     */
+    bool ExportExternalSourceFiles(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles);
+
+    /**
      * \brief Generate the standard index file and save it to the export directory.
      *
      * The includes files must be relative to the export directory.

@@ -92,6 +92,7 @@ private:
     void UpdateListColumnsWidth();
     void RefreshTemplateList();
     void RefreshPlatformList();
+    void SendAnalyticsData();
 
     wxString newProjectBaseFolder; ///< Computed in the constructor
 

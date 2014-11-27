@@ -160,41 +160,4 @@ gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, gd:
     return ChangesMade;
 }
 
-/**
- * Initialize from another RepeatEvent.
- * Used by copy ctor and assignement operator
- */
-void RepeatEvent::Init(const RepeatEvent & event)
-{
-    events = event.events;
-
-    conditions = event.conditions;
-    actions = event.actions;
-    repeatNumberExpression = event.repeatNumberExpression;
-}
-
-/**
- * Custom copy operator
- */
-RepeatEvent::RepeatEvent(const RepeatEvent & event) :
-    BaseEvent(event),
-    repeatNumberExpression("")
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-RepeatEvent& RepeatEvent::operator=(const RepeatEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
-}
-
 }

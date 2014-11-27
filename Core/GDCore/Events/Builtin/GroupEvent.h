@@ -29,7 +29,7 @@ class GD_CORE_API GroupEvent : public gd::BaseEvent
 public:
     GroupEvent();
     virtual ~GroupEvent() {};
-    virtual gd::BaseEvent * Clone() const { return new GroupEvent(*this);}
+    virtual gd::GroupEvent * Clone() const { return new GroupEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -51,17 +51,17 @@ public:
     /**
      * \brief Get background color red component.
      */
-    unsigned int getBackgroundColorR() const { return colorR; };
+    unsigned int GetBackgroundColorR() const { return colorR; };
 
     /**
      * \brief Get background color green component.
      */
-    unsigned int getBackgroundColorG() const { return colorG; };
+    unsigned int GetBackgroundColorG() const { return colorG; };
 
     /**
      * \brief Get background color blue component.
      */
-    unsigned int getBackgroundColorB() const { return colorB; };
+    unsigned int GetBackgroundColorB() const { return colorB; };
 
     virtual bool CanHaveSubEvents() const {return true;}
     virtual const gd::EventsList & GetSubEvents() const {return events;};

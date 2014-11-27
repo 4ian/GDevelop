@@ -164,42 +164,6 @@ gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, g
     return ChangesMade;
 }
 
-/**
- * Initialize from another FunctionEvent.
- * Used by copy ctor and assignement operator
- */
-void FunctionEvent::Init(const FunctionEvent & event)
-{
-    events = event.events;
-    name = event.name;
-    objectsPassedAsArgument = event.objectsPassedAsArgument;
-    conditions = event.conditions;
-    actions = event.actions;
-}
-
-/**
- * Custom copy operator
- */
-FunctionEvent::FunctionEvent(const FunctionEvent & event) :
-BaseEvent(event)
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-FunctionEvent& FunctionEvent::operator=(const FunctionEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
-}
-
 const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName)
 {
     for (unsigned int i = 0;i<events.size();++i)

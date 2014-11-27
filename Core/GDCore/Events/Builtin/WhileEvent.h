@@ -28,11 +28,8 @@ class GD_CORE_API WhileEvent : public gd::BaseEvent
 {
 public:
     WhileEvent() : infiniteLoopWarning(true), justCreatedByTheUser(true) {};
-    WhileEvent(const WhileEvent & event);
     virtual ~WhileEvent() {};
-
-    WhileEvent& operator=(const WhileEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new WhileEvent(*this);}
+    virtual gd::WhileEvent * Clone() const { return new WhileEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -42,11 +39,9 @@ public:
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
-    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
     const std::vector < gd::Instruction > & GetActions() const { return actions; };
     std::vector < gd::Instruction > & GetActions() { return actions; };
-    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
     const std::vector < gd::Instruction > & GetWhileConditions() const { return whileConditions; };
     std::vector < gd::Instruction > & GetWhileConditions() { return whileConditions; };
@@ -78,8 +73,6 @@ public:
     virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
 private:
-    void Init(const WhileEvent & event);
-
     std::vector < gd::Instruction > whileConditions;
     std::vector < gd::Instruction > conditions;
     std::vector < gd::Instruction > actions;

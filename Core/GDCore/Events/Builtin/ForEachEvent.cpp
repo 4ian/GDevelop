@@ -161,41 +161,4 @@ gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, gd
     return ChangesMade;
 }
 
-/**
- * Initialize from another ForEachEvent.
- * Used by copy ctor and assignement operator
- */
-void ForEachEvent::Init(const ForEachEvent & event)
-{
-    events = event.events;
-
-    conditions = event.conditions;
-    actions = event.actions;
-    objectsToPick = event.objectsToPick;
-}
-
-/**
- * Custom copy operator
- */
-ForEachEvent::ForEachEvent(const ForEachEvent & event) :
-BaseEvent(event),
-objectsToPick("")
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-ForEachEvent& ForEachEvent::operator=(const ForEachEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
-}
-
 }

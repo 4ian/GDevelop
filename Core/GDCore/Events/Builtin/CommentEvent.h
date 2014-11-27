@@ -27,7 +27,7 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent
 public:
     CommentEvent() : BaseEvent(), r(255), v(230), b(109), textR(0), textG(0), textB(0) {};
     virtual ~CommentEvent() {};
-    virtual gd::BaseEvent * Clone() const { return new CommentEvent(*this);}
+    virtual gd::CommentEvent * Clone() const { return new CommentEvent(*this);}
 
     virtual void SerializeTo(SerializerElement & element) const;
     virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);

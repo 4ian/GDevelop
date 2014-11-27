@@ -8,8 +8,8 @@ GroupEventDialog::GroupEventDialog(wxWindow* parent, gd::GroupEvent & event_)
     event(event_)
 {
 	groupNameEdit->SetValue(event.GetName());
-	backColorBt->SetBackgroundColour(wxColour(event.getBackgroundColorR(), event.getBackgroundColorG(), event.getBackgroundColorB() ));
-	backColorBt->SetForegroundColour(wxColour(255-event.getBackgroundColorR(), 255-event.getBackgroundColorG(), 255-event.getBackgroundColorB() ));
+	backColorBt->SetBackgroundColour(wxColour(event.GetBackgroundColorR(), event.GetBackgroundColorG(), event.GetBackgroundColorB() ));
+	backColorBt->SetForegroundColour(wxColour(255-event.GetBackgroundColorR(), 255-event.GetBackgroundColorG(), 255-event.GetBackgroundColorB() ));
 }
 
 GroupEventDialog::~GroupEventDialog()

@@ -181,41 +181,4 @@ gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, gd::P
     return ChangesMade;
 }
 
-/**
- * Initialize from another TimedEvent.
- * Used by copy ctor and assignement operator
- */
-void TimedEvent::Init(const TimedEvent & event)
-{
-    events = event.events;
-
-    name = event.name;
-    timeout = event.timeout;
-    conditions = event.conditions;
-    actions = event.actions;
-}
-
-/**
- * Custom copy operator
- */
-TimedEvent::TimedEvent(const TimedEvent & event) :
-BaseEvent(event)
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-TimedEvent& TimedEvent::operator=(const TimedEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
-}
-
 #endif

@@ -28,11 +28,8 @@ class GD_CORE_API StandardEvent : public gd::BaseEvent
 {
 public:
     StandardEvent();
-    StandardEvent(const StandardEvent & event);
     virtual ~StandardEvent();
-
-    StandardEvent& operator=(const StandardEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new StandardEvent(*this);}
+    virtual gd::StandardEvent * Clone() const { return new StandardEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -42,10 +39,9 @@ public:
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
-    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
+
     const std::vector < gd::Instruction > & GetActions() const { return actions; };
     std::vector < gd::Instruction > & GetActions() { return actions; };
-    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
     virtual std::vector < const std::vector<gd::Instruction>* > GetAllConditionsVectors() const;
     virtual std::vector < const std::vector<gd::Instruction>* > GetAllActionsVectors() const;
@@ -66,8 +62,6 @@ public:
     virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const;
 
 private:
-    void Init(const StandardEvent & event);
-
     std::vector < gd::Instruction > conditions;
     std::vector < gd::Instruction > actions;
     EventsList events;

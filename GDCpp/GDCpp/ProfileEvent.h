@@ -22,7 +22,7 @@ public:
     virtual ~ProfileEvent();
 
     ProfileEvent& operator=(const ProfileEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new ProfileEvent(*this);}
+    virtual ProfileEvent * Clone() const { return new ProfileEvent(*this);}
 
     void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 

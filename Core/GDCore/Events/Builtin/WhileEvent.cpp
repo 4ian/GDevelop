@@ -176,43 +176,5 @@ gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::
     return ChangesMade;
 }
 
-/**
- * Initialize from another WhileEvent.
- * Used by copy ctor and assignement operator
- */
-void WhileEvent::Init(const WhileEvent & event)
-{
-    events = event.events;
-
-    whileConditions = event.whileConditions;
-    conditions = event.conditions;
-    actions = event.actions;
-    infiniteLoopWarning = event.infiniteLoopWarning;
-    justCreatedByTheUser = event.justCreatedByTheUser;
-}
-
-/**
- * Custom copy operator
- */
-WhileEvent::WhileEvent(const WhileEvent & event) :
-BaseEvent(event)
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-WhileEvent& WhileEvent::operator=(const WhileEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
-}
-
 }
 #endif

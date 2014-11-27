@@ -25,11 +25,8 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent
 {
 public:
     RepeatEvent();
-    RepeatEvent(const RepeatEvent & event);
     virtual ~RepeatEvent() {};
-
-    RepeatEvent& operator=(const RepeatEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new RepeatEvent(*this);}
+    virtual gd::RepeatEvent * Clone() const { return new RepeatEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -39,11 +36,9 @@ public:
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
-    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
     const std::vector < gd::Instruction > & GetActions() const { return actions; };
     std::vector < gd::Instruction > & GetActions() { return actions; };
-    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
     const std::string & GetRepeatExpression() const { return repeatNumberExpression.GetPlainString(); };
     void SetRepeatExpression(std::string repeatNumberExpression_) { repeatNumberExpression = gd::Expression(repeatNumberExpression_); };
@@ -74,8 +69,6 @@ public:
     virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
 private:
-    void Init(const RepeatEvent & event);
-
     gd::Expression repeatNumberExpression;
     std::vector < gd::Instruction > conditions;
     std::vector < gd::Instruction > actions;

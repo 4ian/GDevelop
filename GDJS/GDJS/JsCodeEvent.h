@@ -27,7 +27,7 @@ public:
     JsCodeEvent();
     virtual ~JsCodeEvent() {};
 
-    virtual gd::BaseEvent * Clone() const { return new JsCodeEvent(*this);}
+    virtual JsCodeEvent * Clone() const { return new JsCodeEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}

@@ -49,11 +49,8 @@ class GD_EXTENSION_API TimedEvent : public gd::BaseEvent
 {
 public:
     TimedEvent();
-    TimedEvent(const TimedEvent & event);
     virtual ~TimedEvent();
-
-    TimedEvent& operator=(const TimedEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new TimedEvent(*this);}
+    virtual TimedEvent * Clone() const { return new TimedEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -63,11 +60,9 @@ public:
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
-    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
     const std::vector < gd::Instruction > & GetActions() const { return actions; };
     std::vector < gd::Instruction > & GetActions() { return actions; };
-    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
     std::string GetName() const { return name; };
     void SetName(std::string name_) { name = name_; };
@@ -103,8 +98,6 @@ public:
     std::vector< TimedEvent* > codeGenerationChildren;
 
 private:
-    void Init(const TimedEvent & event);
-
     std::string name;
     gd::Expression timeout;
     std::vector < gd::Instruction > conditions;

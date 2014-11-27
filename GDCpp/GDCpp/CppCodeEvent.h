@@ -30,7 +30,7 @@ public:
     virtual ~CppCodeEvent() {};
 
     CppCodeEvent& operator=(const CppCodeEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new CppCodeEvent(*this);}
+    virtual CppCodeEvent * Clone() const { return new CppCodeEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}

@@ -122,39 +122,4 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
 #endif
 }
 
-/**
- * Initialize from another StandardEvent.
- * Used by copy ctor and assignement operator
- */
-void StandardEvent::Init(const StandardEvent & event)
-{
-    events = event.events;
-
-    conditions = event.conditions;
-    actions = event.actions;
-}
-
-/**
- * Custom copy constructor
- */
-StandardEvent::StandardEvent(const StandardEvent & event) :
-BaseEvent(event)
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-StandardEvent& StandardEvent::operator=(const StandardEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
-}
-
 }

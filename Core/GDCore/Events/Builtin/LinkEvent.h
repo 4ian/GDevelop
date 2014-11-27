@@ -20,7 +20,7 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent
 public:
     LinkEvent() : BaseEvent(), includeAll(true), includeStart(std::string::npos), includeEnd(std::string::npos), linkWasInvalid(false) {};
     virtual ~LinkEvent();
-    virtual gd::BaseEvent * Clone() const { return new LinkEvent(*this);}
+    virtual gd::LinkEvent * Clone() const { return new LinkEvent(*this);}
 
     /**
      * Get the link target ( i.e. the scene or external events the link refers to )

@@ -30,11 +30,8 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent
 {
 public:
     ForEachEvent();
-    ForEachEvent(const ForEachEvent & event);
     virtual ~ForEachEvent() {};
-
-    ForEachEvent& operator=(const ForEachEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new ForEachEvent(*this);}
+    virtual gd::ForEachEvent * Clone() const { return new ForEachEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -44,11 +41,9 @@ public:
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
-    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
     const std::vector < gd::Instruction > & GetActions() const { return actions; };
     std::vector < gd::Instruction > & GetActions() { return actions; };
-    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
     std::string GetObjectToPick() const { return objectsToPick.GetPlainString(); };
     void SetObjectToPick(std::string objectsToPick_) { objectsToPick = gd::Expression(objectsToPick_); };
@@ -79,8 +74,6 @@ public:
     virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
 private:
-    void Init(const ForEachEvent & event);
-
     gd::Expression objectsToPick;
     std::vector < gd::Instruction > conditions;
     std::vector < gd::Instruction > actions;

@@ -42,6 +42,7 @@ JsCodeEventDialog::JsCodeEventDialog(wxWindow* parent, gdjs::JsCodeEvent & event
     codeEdit->SetKeyWords(0, wxT("break case catch continue default delete do else finally for function if in instanceof new return switch this throw try typeof var void while with"));
     codeEdit->SetKeyWords(1, wxT("null true false"));
     codeEdit->SetKeyWords(2, wxT("push join slice splice Math exec match split length toString alert window"));
+    codeEdit->SetTabWidth(4);
 
     codeEdit->SetMarginWidth (MARGIN_LINE_NUMBERS, 20);
     codeEdit->StyleSetForeground (wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );

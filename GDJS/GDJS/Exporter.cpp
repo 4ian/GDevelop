@@ -25,6 +25,7 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -84,6 +85,13 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     //Generate events code
     if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         return false;
+
+    //Export source files
+    if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    {
+        gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
+        return false;
+    }
 
     //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
     gd::ProjectStripper::StripProject(exportedProject);
@@ -404,6 +412,28 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     return true;
 }
 
+bool Exporter::ExportExternalSourceFiles(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles)
+{
+    const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = project.GetAllSourceFiles();
+    for (unsigned int i = 0;i<allFiles.size();++i)
+    {
+        if (allFiles[i] == boost::shared_ptr<gd::SourceFile>() ) continue;
+        if (allFiles[i]->GetLanguage() != "Javascript" ) continue;
+
+        gd::SourceFile & file = *allFiles[i];
+
+        std::string filename = file.GetFileName();
+        fs.MakeAbsolute(filename, fs.DirNameFrom(project.GetProjectFile()));
+        std::string outFilename = "ext-code"+gd::ToString(i)+".js";
+        if (!fs.CopyFile(filename, outputDir+outFilename))
+            gd::LogWarning(_("Could not copy external file") + filename);
+
+        InsertUnique(includesFiles, outputDir+outFilename);
+    }
+
+    return true;
+}
+
 bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, std::string exportDir, bool minify)
 {
     #if !defined(GD_NO_WX_GUI)
@@ -563,7 +593,14 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         //Export events
         if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         {
-            gd::LogError(_("Error during exporting: Unable to export events ( "+lastError+")."));
+            gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
+            return false;
+        }
+
+        //Export source files
+        if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+        {
+            gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
             return false;
         }
 

@@ -20,6 +20,7 @@
 #endif
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
+#include "GDCore/IDE/Analytics/AnalyticsSender.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/PlatformManager.h"
 
@@ -281,12 +282,19 @@ NewProjectDialog::~NewProjectDialog()
 void NewProjectDialog::OncreateProjectBtClick(wxCommandEvent& event)
 {
     chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    SendAnalyticsData();
     EndModal(1);
 }
 void NewProjectDialog::OntemplateListItemActivated(wxListEvent& event)
 {
     chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    SendAnalyticsData();
     EndModal(1);
+}
+
+void NewProjectDialog::SendAnalyticsData()
+{
+    gd::AnalyticsSender::Get()->SendNewGameCreated(chosenTemplatePlatform, chosenTemplateFile);
 }
 
 

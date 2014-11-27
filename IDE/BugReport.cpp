@@ -219,7 +219,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
         }
     }
     if ( rapport == "" )
-        rapport = "Pas de rapport d'erreur de GDevelop";
+        rapport = "No GDevelop error report";
 
     wxString report;
     report += "GD Error report:\n\n";

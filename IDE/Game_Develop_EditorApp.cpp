@@ -40,6 +40,7 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/Analytics/AnalyticsSender.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
@@ -404,7 +405,10 @@ bool Game_Develop_EditorApp::OnInit()
         mainEditor->RefreshNews();
     }
 
-    //Pay what you want reminder
+    //Notify opening of the program.
+    gd::AnalyticsSender::Get()->SendProgramOpening();
+
+    //Feedback reminder
     if (!recoveringFromBug)
     {
         int result = 3;

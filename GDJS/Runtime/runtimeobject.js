@@ -161,7 +161,7 @@ gdjs.RuntimeObject.prototype.getNameId = function() {
 /**
  * Get the unique identifier of the object.<br>
  * The identifier is set by the runtimeScene owning the object.<br>
- * You can also use the id property ( this._bject.id ) for increased efficiency instead of
+ * You can also use the id property (this._object.id) for increased efficiency instead of
  * calling this method.
  *
  * @method getUniqueId
@@ -169,8 +169,8 @@ gdjs.RuntimeObject.prototype.getNameId = function() {
  */
 gdjs.RuntimeObject.prototype.getUniqueId = function() {
     return this.id;
-};
-
+}
+;
 /**
  * Set the position of the object.
  *
@@ -778,7 +778,7 @@ gdjs.RuntimeObject.prototype.hasAutomatism = function(name) {
 };
 
 /**
- * De/activate an automatism of the object.<br>
+ * De/activate an automatism of the object.
  *
  * @method activateAutomatism
  * @param name {String} The automatism name.
@@ -791,13 +791,13 @@ gdjs.RuntimeObject.prototype.activateAutomatism = function(name, enable) {
 };
 
 /**
- * De/activate an automatism of the object.<br>
+ * Check if an automatism is activated
  *
- * @method activateAutomatism
+ * @method automatismActivated
  * @param name {String} The automatism name.
  * @return true if the automatism is activated.
  */
-gdjs.RuntimeObject.prototype.automatismActivated = function(name, enable) {
+gdjs.RuntimeObject.prototype.automatismActivated = function(name) {
     if ( this._automatismsTable.containsKey(name) ) {
         this._automatismsTable.get(name).activated();
     }

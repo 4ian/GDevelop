@@ -100,3 +100,91 @@ LayersEditorPanelBase::~LayersEditorPanelBase()
     delete m_auimgr;
 
 }
+
+BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC629BInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer41 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer41->SetFlexibleDirection( wxBOTH );
+    flexGridSizer41->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer41->AddGrowableCol(0);
+    flexGridSizer41->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer41);
+    
+    wxFlexGridSizer* flexGridSizer43 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer43->SetFlexibleDirection( wxBOTH );
+    flexGridSizer43->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer43->AddGrowableCol(1);
+    
+    flexGridSizer41->Add(flexGridSizer43, 1, wxALL|wxEXPAND, 5);
+    
+    m_staticText49 = new wxStaticText(this, wxID_ANY, _("Group name:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer43->Add(m_staticText49, 0, wxALL, 5);
+    
+    groupNameEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer43->Add(groupNameEdit, 0, wxALL|wxEXPAND, 5);
+    
+    flexGridSizer43->Add(0, 0, 1, wxALL, 5);
+    
+    backColorBt = new wxButton(this, wxID_ANY, _("Choose background color"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer43->Add(backColorBt, 0, wxALL|wxEXPAND, 5);
+    
+    m_staticLine47 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
+    
+    flexGridSizer41->Add(m_staticLine47, 0, wxALL|wxEXPAND, 5);
+    
+    wxFlexGridSizer* flexGridSizer45 = new wxFlexGridSizer(0, 4, 0, 0);
+    flexGridSizer45->SetFlexibleDirection( wxBOTH );
+    flexGridSizer45->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer45->AddGrowableCol(1);
+    
+    flexGridSizer41->Add(flexGridSizer45, 1, wxALL|wxEXPAND, 5);
+    
+    m_staticBitmap63 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer45->Add(m_staticBitmap63, 0, wxALL, 5);
+    
+    m_hyperLink65 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/group_events"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink65->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink65->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink65->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer45->Add(m_hyperLink65, 0, wxRIGHT, 5);
+    
+    okBt = new wxButton(this, wxID_ANY, _("Ok"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer45->Add(okBt, 0, wxALL|wxALIGN_RIGHT, 5);
+    
+    cancelBt = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer45->Add(cancelBt, 0, wxALL, 5);
+    
+    SetSizeHints(400,200);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    Centre(wxBOTH);
+    // Connect events
+    backColorBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onChooseBackgroundBtClick), NULL, this);
+    okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onOkBtClick), NULL, this);
+    cancelBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onCancelBtClick), NULL, this);
+    
+}
+
+BaseGroupEventDialog::~BaseGroupEventDialog()
+{
+    backColorBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onChooseBackgroundBtClick), NULL, this);
+    okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onOkBtClick), NULL, this);
+    cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onCancelBtClick), NULL, this);
+    
+}

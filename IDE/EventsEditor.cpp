@@ -1362,7 +1362,9 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & p
 
     //Create event
     gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent(eventType);
-    if ( !eventToAdd ) return;
+    if ( !eventToAdd ) {
+    	return;
+    }
     if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
 
     //Adding event

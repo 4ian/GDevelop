@@ -21,6 +21,14 @@
 #include <wx/toolbar.h>
 #include <wx/sizer.h>
 #include <wx/listctrl.h>
+#include <wx/dialog.h>
+#include <wx/iconbndl.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/button.h>
+#include <wx/statline.h>
+#include <wx/statbmp.h>
+#include <wx/hyperlink.h>
 
 class LayersEditorPanelBase : public wxPanel
 {
@@ -53,6 +61,29 @@ protected:
 public:
     LayersEditorPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~LayersEditorPanelBase();
+};
+
+
+class BaseGroupEventDialog : public wxDialog
+{
+protected:
+    wxStaticText* m_staticText49;
+    wxTextCtrl* groupNameEdit;
+    wxButton* backColorBt;
+    wxStaticLine* m_staticLine47;
+    wxStaticBitmap* m_staticBitmap63;
+    wxHyperlinkCtrl* m_hyperLink65;
+    wxButton* okBt;
+    wxButton* cancelBt;
+
+protected:
+    virtual void onChooseBackgroundBtClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void onOkBtClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void onCancelBtClick(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~BaseGroupEventDialog();
 };
 
 #endif

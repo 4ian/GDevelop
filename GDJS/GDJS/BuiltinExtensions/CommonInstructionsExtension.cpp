@@ -550,6 +550,20 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     {
         class CodeGen : public gd::EventMetadata::CodeGenerator
         {
+            virtual std::string Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                return codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        GetAllEvents()["BuiltinCommonInstructions::Group"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
+
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 JsCodeEvent & event = dynamic_cast<JsCodeEvent&>(event_);

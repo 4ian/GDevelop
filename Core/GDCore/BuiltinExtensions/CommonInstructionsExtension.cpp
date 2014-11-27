@@ -13,6 +13,7 @@
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
 #endif
 
 using namespace std;
@@ -95,6 +96,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
               _("Repeat the event for each specified object."),
               "", "res/foreach.png",
               boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent));
+
+    extension.AddEvent("Group", _("Group"),
+              _("Group containing events"),
+              "", "res/foreach.png",
+              boost::shared_ptr<gd::BaseEvent>(new gd::GroupEvent));
 #endif
 }
 

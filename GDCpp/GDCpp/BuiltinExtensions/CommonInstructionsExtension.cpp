@@ -202,7 +202,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
-
     {
         class CodeGen : public gd::EventMetadata::CodeGenerator
         {
@@ -535,6 +534,20 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::ForEach"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
+
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                return codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        GetAllEvents()["BuiltinCommonInstructions::Group"]
             .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 

@@ -136,7 +136,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
 #if !defined(GD_NO_WX_GUI)
     dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
     dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
-    wxRect rect(x+1, y, width, GetRenderedHeight(width, platform)-2);
+    wxRect rect(x+1, y, width-2, GetRenderedHeight(width, platform)-2);
     dc.DrawRectangle(rect);
 
     dc.DrawBitmap( gd::SkinHelper::GetIcon("events", 24), x+4, y + 1, true);

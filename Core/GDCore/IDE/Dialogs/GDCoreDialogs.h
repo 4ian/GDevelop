@@ -26,6 +26,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/statbmp.h>
 #include <wx/hyperlink.h>
@@ -70,6 +71,7 @@ protected:
     wxStaticText* m_staticText49;
     wxTextCtrl* groupNameEdit;
     wxButton* backColorBt;
+    wxCheckBox* hideCheck;
     wxStaticLine* m_staticLine47;
     wxStaticBitmap* m_staticBitmap63;
     wxHyperlinkCtrl* m_hyperLink65;

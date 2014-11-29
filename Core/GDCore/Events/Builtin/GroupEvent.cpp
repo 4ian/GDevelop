@@ -28,9 +28,9 @@ namespace gd
 
 GroupEvent::GroupEvent() :
     BaseEvent(),
-    colorR(128),
-    colorG(128),
-    colorB(240)
+    colorR(221),
+    colorG(216),
+    colorB(255)
 {
 }
 
@@ -78,22 +78,24 @@ void GroupEvent::SetBackgroundColor(unsigned int colorR_, unsigned int colorG_, 
 void GroupEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    dc.SetBrush( wxBrush( wxColour( colorR, colorG, colorB ) ) );
-    dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
-    wxRect rect(x+1, y, width, GetRenderedHeight(width, platform)-2);
+    wxString groupTitle = name.empty() ? _("Untitled group") : name;
+    wxColour backgroundColor = wxColour(colorR, colorG, colorB);
+    wxColour textColor = wxColour(0, 0, 0);
+    if (IsDisabled())
+    {
+        backgroundColor.MakeDisabled();
+        textColor = wxColour(160, 160, 160);
+    }
+
+    dc.SetBrush(wxBrush(backgroundColor));
+    dc.SetPen(wxPen(backgroundColor.ChangeLightness(70)));
+    wxRect rect(x+1, y, width-2, GetRenderedHeight(width, platform)-2);
     dc.DrawRectangle(rect);
 
-    wxString groupTitle = name.empty() ? _("Untitled group") : name;
-
-    dc.SetTextBackground( wxColour( colorR, colorG, colorB ) );
-    if ( !IsDisabled() )
-        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
-    else
-        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
-    dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( groupTitle, x+32, y + 3 );
-    wxRendererNative::Get().DrawDropArrow(NULL, dc, wxRect(x+2, y+2, 30, 30));
-    wxRect lien = dc.GetTextExtent(groupTitle);
+    dc.SetTextBackground(backgroundColor);
+    dc.SetTextForeground(textColor);
+    dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxFONTWEIGHT_BOLD ) );
+    dc.DrawText( groupTitle, x+5, y + 5 );
 #endif
 }
 

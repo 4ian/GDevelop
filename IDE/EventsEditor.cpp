@@ -573,7 +573,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
         dc.SetTextForeground(wxColour(0,0,0));
 
         gd::EventsRenderingHelper::Get()->SetConditionsColumnWidth(conditionColumnWidth-x);
-        unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
+        unsigned int width = eventsPanel->GetSize().x-x-6 > 0 ? eventsPanel->GetSize().x-x-6 : 1;
         unsigned int height = events[i].GetRenderedHeight(width, game.GetCurrentPlatform());
 
         if( !(y+static_cast<int>(height) < 0 || y > eventsPanel->GetSize().y) ) //Render only if needed

@@ -139,6 +139,13 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
     
     flexGridSizer43->Add(backColorBt, 0, wxALL|wxEXPAND, 5);
     
+    flexGridSizer43->Add(0, 0, 1, wxALL, 5);
+    
+    hideCheck = new wxCheckBox(this, wxID_ANY, _("Hide the events contained in the group"), wxDefaultPosition, wxSize(-1,-1), 0);
+    hideCheck->SetValue(false);
+    
+    flexGridSizer43->Add(hideCheck, 0, wxALL, 5);
+    
     m_staticLine47 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
     
     flexGridSizer41->Add(m_staticLine47, 0, wxALL|wxEXPAND, 5);

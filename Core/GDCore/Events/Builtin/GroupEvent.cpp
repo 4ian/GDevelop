@@ -28,6 +28,7 @@ namespace gd
 
 GroupEvent::GroupEvent() :
     BaseEvent(),
+    creationTime(0),
     colorR(221),
     colorG(216),
     colorB(255)
@@ -37,19 +38,34 @@ GroupEvent::GroupEvent() :
 void GroupEvent::SerializeTo(SerializerElement & element) const
 {
     element.SetAttribute("name", name);
+    element.SetAttribute("source", source);
+    element.SetAttribute("creationTime", (int)creationTime);
     element.SetAttribute("colorR", (int)colorR);
     element.SetAttribute("colorG", (int)colorG);
     element.SetAttribute("colorB", (int)colorB);
     gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
+
+    gd::SerializerElement & parametersElement = element.AddChild("parameters");
+    parametersElement.ConsiderAsArrayOf("parameter");
+    for ( unsigned int i = 0;i < parameters.size();++i)
+        parametersElement.AddChild("parameter").SetValue(parameters[i]);
 }
 
 void GroupEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
     name = element.GetStringAttribute("name");
+    source = element.GetStringAttribute("source");
+    creationTime = element.GetIntAttribute("creationTime");
     colorR = element.GetIntAttribute("colorR");
     colorG = element.GetIntAttribute("colorG");
     colorB = element.GetIntAttribute("colorB");
     gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events"));
+
+    parameters.clear();
+    gd::SerializerElement & parametersElement = element.GetChild("parameters");
+    parametersElement.ConsiderAsArrayOf("parameters");
+    for ( unsigned int i = 0;i < parametersElement.GetChildrenCount();++i)
+        parameters.push_back(parametersElement.GetChild(i).GetValue().GetString());
 }
 
 gd::BaseEvent::EditEventReturnType GroupEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene, gd::MainFrameWrapper & mainFrameWrapper)

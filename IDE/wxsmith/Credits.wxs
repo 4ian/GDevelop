@@ -151,7 +151,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-												<value>GDevelop is an open source software:&#x0A;&#x0A;  * The IDE is distributed under the GPL v3 license.&#x0A;  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.&#x0A;  * Extensions are distributed under the zlib/libpng license.&#x0A;  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.&#x0A;&#x0A;About games created with GDevelop&#x0A;&#x0A;Games exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source.</value>
+												<value>GDevelop is an open source software:&#x0A;&#x0A;  * The Core library, the native and HTML5 platforms and all extensions (respectively Core, GDCpp, GDJS and Extensions folders) are under the MIT license.&#x0A;  * The IDE (in the IDE folder) is licensed with GPL v3.&#x0A;  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.&#x0A;&#x0A;About games created with GDevelop&#x0A;&#x0A;Games exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the MIT license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source.</value>
 												<size>272,51</size>
 												<style>wxTE_MULTILINE|wxTE_READONLY</style>
 											</object>

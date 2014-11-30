@@ -459,7 +459,7 @@ sudo apt-get install libfreetype6-dev
                                   _("Text object"),
                                   _("Extension allowing to use an object displaying a text."),
                                   "Florian Rival",
-                                  "zlib/libpng License (Open Source)");
+                                  "Open Source (MIT License)");
  * \endcode
 
 The first parameter is the name of the extension. Choose carefully the name of the extension, as projects are directly referring to it.

@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "TimeExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -23,7 +23,7 @@ TimeExtension::TimeExtension()
                           _("Time"),
                           _("Built-in extension providing actions and conditions about the time."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllConditions()["Timer"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.runtimeScene.timerElapsedTime");

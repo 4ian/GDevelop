@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "JoystickExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -23,7 +23,7 @@ JoystickExtension::JoystickExtension()
                           _("Joysticks features"),
                           _("Built-in extension allowing to use joysticks"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     //Nothing is available for now.
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:

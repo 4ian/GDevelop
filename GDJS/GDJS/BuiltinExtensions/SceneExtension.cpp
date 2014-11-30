@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "SceneExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -23,7 +23,7 @@ SceneExtension::SceneExtension()
                           _("Scene management features"),
                           _("Built-in extension allowing to manipulate scenes"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllExpressions()["Random"].codeExtraInformation
         .SetFunctionName("gdjs.random");

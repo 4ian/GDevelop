@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "MouseExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -23,7 +23,7 @@ MouseExtension::MouseExtension()
                           _("Mouse features"),
                           _("Built-in extensions allowing to use the mouse"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllConditions()["SourisX"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");

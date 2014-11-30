@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "AdvancedExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -20,7 +20,7 @@ AdvancedExtension::AdvancedExtension()
                           _("Advanced control features"),
                           _("Built-in extension providing advanced control features."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllConditions()["Toujours"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.returnFalse").SetIncludeFile("commontools.js");
 }

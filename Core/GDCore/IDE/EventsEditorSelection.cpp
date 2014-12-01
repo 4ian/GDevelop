@@ -300,7 +300,7 @@ std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool de
 
     ClearSelection();
 
-    std::cout << "RETURNING THIS LIST" << std::endl;
+    std::cout << "RETURNING THIS LIST" << list << "," << list->size() << std::endl;
     for (std::vector<gd::Instruction>::iterator i = list->begin(); i != list->end(); ++i)
     {
         std::cout << i->GetType() << std::endl;

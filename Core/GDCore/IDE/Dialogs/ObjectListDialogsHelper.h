@@ -86,7 +86,9 @@ private:
     std::string searchText;
     bool groupsAllowed;
 
+#if !defined(GD_NO_WX_GUI)
     wxImageList *imageList;
+#endif
 };
 
 }

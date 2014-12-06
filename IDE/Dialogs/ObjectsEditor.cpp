@@ -95,6 +95,7 @@ namespace
 		    //Add the corresponding tree item into the group tree item
 		    wxTreeItemId objectIntoGroupItem = treeCtrl->AppendItem(itemUnderMouse, objectName, 0);
 		    treeCtrl->SetItemTextColour(objectIntoGroupItem, wxColour(128, 128, 128));
+		    treeCtrl->SetItemData(objectIntoGroupItem, new gd::TreeItemStringData("ObjectInGroup"));
 
 		    return true;
 		}
@@ -446,6 +447,7 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
             {
             	wxTreeItemId objectItem = objectsList->AppendItem( item, *it, 0 );
             	objectsList->SetItemTextColour(objectItem, wxColour(128, 128, 128));
+            	objectsList->SetItemData(objectItem, new gd::TreeItemStringData("ObjectInGroup"));
             }
 
             lastAddedItem = item;
@@ -480,7 +482,7 @@ void ObjectsEditor::OnobjectsListItemMenu(wxTreeEvent& event)
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
     wxArrayTreeItemIds selection;
 
-    if ( objectsList->GetSelections(selection) > 1 )
+    if ( objectsList->GetSelections(selection) > 1 || (data && data->GetString() == "ObjectInGroup") )
     {
         PopupMenu( &multipleContextMenu );
     }
@@ -992,6 +994,27 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupDeleted(project, globalGroup ? NULL : layout, groupName);
+        }
+        else if( data->GetString() == "ObjectInGroup")
+        {
+        	//Remove the object from its group
+        	wxTreeItemId groupItem = objectsList->GetItemParent(selection[i]);
+        	if(!groupItem.IsOk())
+        		continue;
+
+        	bool globalGroup = data->GetString() == "GlobalGroup";
+            std::string groupName = ToString(objectsList->GetItemText( selection[i] ));
+
+            std::vector<gd::ObjectGroup> & objectsGroups =
+                globalGroup || !layout ? project.GetObjectGroups() : layout->GetObjectGroups();
+
+            vector<gd::ObjectGroup>::iterator g = std::find_if( objectsGroups.begin(),
+                                                            objectsGroups.end(),
+                                                            std::bind2nd(gd::GroupHasTheSameName(), groupName));
+            if( g != objectsGroups.end() && g->Find(objectName))
+            {
+            	g->RemoveObject(objectName);
+            }
         }
     }
 

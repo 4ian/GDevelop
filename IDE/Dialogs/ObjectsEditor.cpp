@@ -998,12 +998,13 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
         else if( data->GetString() == "ObjectInGroup")
         {
         	//Remove the object from its group
+        	std::string objectName = ToString(objectsList->GetItemText( selection[i] ));
         	wxTreeItemId groupItem = objectsList->GetItemParent(selection[i]);
         	if(!groupItem.IsOk())
         		continue;
 
         	bool globalGroup = data->GetString() == "GlobalGroup";
-            std::string groupName = ToString(objectsList->GetItemText( selection[i] ));
+            std::string groupName = ToString(objectsList->GetItemText( groupItem ));
 
             std::vector<gd::ObjectGroup> & objectsGroups =
                 globalGroup || !layout ? project.GetObjectGroups() : layout->GetObjectGroups();

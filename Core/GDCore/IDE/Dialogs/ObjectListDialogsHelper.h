@@ -15,13 +15,16 @@ namespace gd { class ClassWithObjects; }
 namespace gd { class ObjectGroup; }
 class wxTreeCtrl;
 class wxTreeItemId;
+#if !defined(GD_NO_WX_GUI)
+#include <wx/image.h>
+#include <wx/imaglist.h>
+#endif
 
 namespace gd
 {
 
 /**
  * \brief Utility class used to display objects lists into controls.
- * \todo Thumbnail support for wxWidgets
  *
  * \see ChooseObjectDialog
  *
@@ -35,7 +38,7 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true) {};
+    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true), imageList(new wxImageList(24,24, true)) {};
     virtual ~ObjectListDialogsHelper() {};
 
     void SetSearchText(std::string searchText_);
@@ -82,6 +85,8 @@ private:
     std::string objectTypeAllowed;
     std::string searchText;
     bool groupsAllowed;
+
+    wxImageList *imageList;
 };
 
 }

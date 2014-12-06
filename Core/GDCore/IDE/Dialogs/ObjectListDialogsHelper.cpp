@@ -9,6 +9,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include <boost/algorithm/string.hpp>
 #if !defined(GD_NO_WX_GUI)
@@ -156,9 +157,15 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
 void ObjectListDialogsHelper::RefreshList(wxTreeCtrl * objectsList)
 {
     objectsList->DeleteAllItems();
+    objectsList->AssignImageList(imageList);
     objectsList->AddRoot( "Root" );
-    wxTreeItemId objectsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Objects"));
-    wxTreeItemId groupsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Groups"));
+
+    imageList->RemoveAll();
+    imageList->Add(gd::SkinHelper::GetIcon("object", 24));
+    imageList->Add(gd::SkinHelper::GetIcon("group", 24));
+
+    wxTreeItemId objectsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Objects"), 0);
+    wxTreeItemId groupsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Groups"), 1);
 
     AddObjectsToList(objectsList, objectsRootItem, layout, false, false);
     if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, layout.GetObjectGroups(), false, false);
@@ -181,16 +188,16 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
         if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
         {
-            /*int thumbnailID = -1;
+            int thumbnailID = -1;
             wxBitmap thumbnail;
             if ( objects.GetObject(i).GenerateThumbnail(project, thumbnail)  && thumbnail.IsOk() )
             {
-                objectsImagesList->Add(thumbnail);
-                thumbnailID = objectsImagesList->GetImageCount()-1;
-            }*/
+                imageList->Add(thumbnail);
+                thumbnailID = imageList->GetImageCount()-1;
+            }
 
             wxTreeItemId item = objectsList->AppendItem( rootItem,
-                objects.GetObject(i).GetName()/*, thumbnailID*/ );
+                objects.GetObject(i).GetName(), thumbnailID );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
             if ( globalObjects ) objectsList->SetItemBold(item, true);
 
@@ -211,7 +218,7 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
-            wxTreeItemId item = objectsList->AppendItem( rootItem, groups[i].GetName()/*, 1*/ );
+            wxTreeItemId item = objectsList->AppendItem( rootItem, groups[i].GetName(), 1 );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
             if ( globalGroup ) objectsList->SetItemBold(item, true);
 

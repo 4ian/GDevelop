@@ -47,6 +47,65 @@
 
 using namespace std;
 
+namespace
+{
+	/**
+	 * Allow to drop an object in a group.
+	 */
+	class ObjectsListDnd : public wxTextDropTarget
+	{
+	public:
+		ObjectsListDnd(wxTreeCtrl *ctrl, gd::Project & project_, gd::Layout * layout_) : treeCtrl(ctrl), project(project_), layout(layout_) {};
+
+		virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& text)
+		{
+			std::string objectName = text.ToStdString();
+
+			//Get the item under the mouse
+			int dropFlags;
+			wxTreeItemId itemUnderMouse = treeCtrl->HitTest(wxPoint(x, y), dropFlags);
+
+			if(!itemUnderMouse.IsOk())
+				return false; //If not on an item, stop.
+
+			//Find if the item is a group (global ? local ?)
+			gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(treeCtrl->GetItemData(itemUnderMouse));
+
+			std::vector<gd::ObjectGroup> *groups = NULL;
+			if(data && data->GetString() == "LayoutGroup" && layout)
+				groups = &layout->GetObjectGroups();
+			else if(data && data->GetString() == "GlobalGroup")
+				groups = &project.GetObjectGroups();
+			else
+				return false;
+
+			//Find the group
+			std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(), 
+																     bind2nd(gd::GroupHasTheSameName(), treeCtrl->GetItemText(itemUnderMouse)));
+		    if ( group != groups->end() && !group->Find(objectName))
+		    {
+		    	//Add the object in the group
+		    	group->AddObject(objectName);
+		    }
+		    else
+		    {
+		    	return false;
+		    }
+
+		    //Add the corresponding tree item into the group tree item
+		    wxTreeItemId objectIntoGroupItem = treeCtrl->AppendItem(itemUnderMouse, objectName, 0);
+		    treeCtrl->SetItemTextColour(objectIntoGroupItem, wxColour(128, 128, 128));
+
+		    return true;
+		}
+
+	private:
+		wxTreeCtrl *treeCtrl;
+		gd::Project & project;
+    	gd::Layout * layout;
+	};
+}
+
 namespace gd {
 
 //(*IdInit(ObjectsEditor)
@@ -114,7 +173,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_ROW_LINES|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
+	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer1->Add(objectsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxNO_BORDER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(searchCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -238,6 +297,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 
     objectsImagesList = new wxImageList(24,24, true);
     objectsList->AssignImageList(objectsImagesList);
+    objectsList->SetDropTarget(new ObjectsListDnd(objectsList, project, layout));
 
     Refresh();
 }
@@ -314,6 +374,8 @@ void ObjectsEditor::ConnectEvents()
 
 void ObjectsEditor::Refresh()
 {
+
+
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
     objectsImagesList->Add(gd::SkinHelper::GetIcon("object", 24));
@@ -328,7 +390,8 @@ void ObjectsEditor::Refresh()
     AddObjectsToList(project, true);
     AddGroupsToList(project.GetObjectGroups(), true);
 
-    objectsList->ExpandAll();
+    objectsList->Expand(objectsRootItem);
+    objectsList->Expand(groupsRootItem);
 }
 
 wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, bool globalObjects)
@@ -378,6 +441,12 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
             wxTreeItemId item = objectsList->AppendItem( groupsRootItem, groups[i].GetName(), 1 );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
             if ( globalGroup ) objectsList->SetItemBold(item, true);
+
+            for(std::vector<std::string>::const_iterator it = groups[i].GetAllObjectsNames().begin(); it != groups[i].GetAllObjectsNames().end(); it++)
+            {
+            	wxTreeItemId objectItem = objectsList->AppendItem( item, *it, 0 );
+            	objectsList->SetItemTextColour(objectItem, wxColour(128, 128, 128));
+            }
 
             lastAddedItem = item;
         }
@@ -744,6 +813,7 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
     {
         bool globalGroup = data->GetString() == "GlobalGroup";
         gd::ObjectGroup * group = GetSelectedGroup();
+        objectsList->Expand(lastSelectedItem);
         if (group && layout)
         {
             EditObjectGroup dialog(this, project, *layout, *group); //TODO: Layout is mandatory here
@@ -959,7 +1029,7 @@ void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
 
     Refresh();
     //Select again the moved item
-    wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
+    wxTreeItemId item = objectsList->GetLastChild(objectsRootItem);
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
@@ -1001,7 +1071,7 @@ void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
 
     Refresh();
     //Select again the moved item
-    wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
+    wxTreeItemId item = objectsList->GetLastChild(objectsRootItem);
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
@@ -1246,7 +1316,6 @@ void ObjectsEditor::OnobjectsListBeginDrag(wxTreeEvent& event)
         dragSource.DoDragDrop( true );
     }
 }
-
 
 void ObjectsEditor::UpdateAssociatedPropertiesPanel()
 {

@@ -19,6 +19,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
 namespace gd
 {
@@ -157,6 +158,11 @@ void ChooseObjectDialog::OnAucunBtClick(wxCommandEvent& event)
 void ChooseObjectDialog::OnObjetsListSelectionChanged(wxTreeEvent& event)
 {
     item = event.GetItem();
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    if(!data)
+    	ChoisirBt->Disable();
+    else
+    	ChoisirBt->Enable();
 }
 
 void ChooseObjectDialog::OnObjetsListItemRightClick(wxTreeEvent& event)
@@ -168,6 +174,11 @@ void ChooseObjectDialog::OnObjetsListItemRightClick(wxTreeEvent& event)
 void ChooseObjectDialog::OnObjetsListItemActivated(wxTreeEvent& event)
 {
     item = event.GetItem();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    if(!data)
+    	return;
+
     wxCommandEvent uselessEvent;
     OnChoisirBtClick(uselessEvent);
 }

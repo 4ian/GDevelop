@@ -320,11 +320,13 @@ void ObjectsEditor::Refresh()
     objectsImagesList->Add(gd::SkinHelper::GetIcon("group", 24));
 
     objectsList->AddRoot( "Root", 0 );
+    objectsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Objects"), 0);
+    groupsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Groups"), 1);
 
-    if ( layout ) latestObjItem = AddObjectsToList(*layout, false);
-    if ( layout ) latestGroupItem = AddGroupsToList(layout->GetObjectGroups(), false);
-    latestGlobalObjItem = AddObjectsToList(project, true);
-    latestGlobalGroupItem = AddGroupsToList(project.GetObjectGroups(), true);
+    AddObjectsToList(*layout, false);
+    AddGroupsToList(layout->GetObjectGroups(), false);
+    AddObjectsToList(project, true);
+    AddGroupsToList(project.GetObjectGroups(), true);
 
     objectsList->ExpandAll();
 }
@@ -350,20 +352,13 @@ wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, boo
                 thumbnailID = objectsImagesList->GetImageCount()-1;
             }
 
-            wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(),
+            wxTreeItemId item = objectsList->AppendItem( objectsRootItem,
                 objects.GetObject(i).GetName(), thumbnailID );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
             if ( globalObjects ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }
-    }
-
-    if ( !globalObjects && objects.GetObjectsCount() == 0 )
-    {
-        wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), _("No objects"), 0 );
-        substituteObjItem = item;
-        lastAddedItem = item;
     }
 
     project.SetDirty();
@@ -380,19 +375,12 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
     {
         if ( ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
-            wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName(), 1 );
+            wxTreeItemId item = objectsList->AppendItem( groupsRootItem, groups[i].GetName(), 1 );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
             if ( globalGroup ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }
-    }
-
-    if ( !globalGroup && groups.empty() )
-    {
-        wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), _("No groups"), 1 );
-        substituteGroupItem = item;
-        lastAddedItem = item;
     }
 
     project.SetDirty();
@@ -427,7 +415,7 @@ void ObjectsEditor::OnobjectsListItemMenu(wxTreeEvent& event)
     {
         PopupMenu( &multipleContextMenu );
     }
-    else if ( lastSelectedItem == substituteGroupItem || lastSelectedItem == substituteObjItem )
+    else if (lastSelectedItem == objectsRootItem || lastSelectedItem == groupsRootItem)
         PopupMenu( &emptyContextMenu );
     else if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
@@ -802,9 +790,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     objects.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), ToString(name), objects.GetObjectsCount());
 
     //And to the TreeCtrl
-    wxTreeItemId previous = layout ? latestObjItem : latestGlobalObjItem;
-    wxTreeItemId itemAdded = objectsList->InsertItem( objectsList->GetRootItem(), previous, name );
-    if ( previous == substituteObjItem ) objectsList->Delete(substituteObjItem);
+    wxTreeItemId itemAdded = objectsList->AppendItem( objectsRootItem, name );
 
     //Reload thumbnail
     int thumbnailID = -1;
@@ -818,7 +804,6 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
 
     //Data
     objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutObject") );
-    latestObjItem = itemAdded;
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, layout, objects.GetObject(name));
@@ -827,6 +812,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
 
     gd::LogStatus( _( "The object was correctly added" ) );
+    objectsList->Expand(objectsRootItem);
 }
 
 void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
@@ -847,15 +833,15 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     objectsGroups.push_back( newGroup );
 
-    wxTreeItemId previous = layout ? latestGroupItem : latestGlobalGroupItem;
-    wxTreeItemId itemAdded = objectsList->InsertItem( rootId, previous, name, 1 );
+    wxTreeItemId itemAdded = objectsList->AppendItem( groupsRootItem, name, 1 );
     objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutGroup") );
-    if ( previous == substituteGroupItem ) objectsList->Delete(substituteGroupItem);
-    latestGroupItem = itemAdded;
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, layout ? layout : NULL, name);
     gd::LogStatus( _( "The group was correctly added." ) );
+
+    //Make sure that the group root item is expanded
+    objectsList->Expand(groupsRootItem);
 }
 
 

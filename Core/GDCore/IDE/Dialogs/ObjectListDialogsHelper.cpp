@@ -157,16 +157,18 @@ void ObjectListDialogsHelper::RefreshList(wxTreeCtrl * objectsList)
 {
     objectsList->DeleteAllItems();
     objectsList->AddRoot( "Root" );
+    wxTreeItemId objectsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Objects"));
+    wxTreeItemId groupsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Groups"));
 
-    AddObjectsToList(objectsList, layout, false, false);
-    if ( groupsAllowed ) AddGroupsToList(objectsList, layout.GetObjectGroups(), false, false);
-    AddObjectsToList(objectsList, project, true, false);
-    if ( groupsAllowed ) AddGroupsToList(objectsList, project.GetObjectGroups(), true, false);
+    AddObjectsToList(objectsList, objectsRootItem, layout, false, false);
+    if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, layout.GetObjectGroups(), false, false);
+    AddObjectsToList(objectsList, objectsRootItem, project, true, false);
+    if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, project.GetObjectGroups(), true, false);
 
     objectsList->ExpandAll();
 }
 
-wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty)
+wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty)
 {
     bool searching = searchText.empty() ? false : true;
 
@@ -187,26 +189,19 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
                 thumbnailID = objectsImagesList->GetImageCount()-1;
             }*/
 
-            wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(),
+            wxTreeItemId item = objectsList->AppendItem( rootItem,
                 objects.GetObject(i).GetName()/*, thumbnailID*/ );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
-            if ( globalObjects ) objectsList->SetItemTextColour(item, wxColour(40,40,45));
+            if ( globalObjects ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }
     }
 
-    if ( substituteIfEmpty && !globalObjects && objects.GetObjectsCount() == 0 )
-    {
-        wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), _("No objects"), 0 );
-        //substituteObjItem = item; Todo: Getter for the substitute.
-        lastAddedItem = item;
-    }
-
     return lastAddedItem;
 }
 
-wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, const std::vector <ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty)
+wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const std::vector <ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty)
 {
     bool searching = searchText.empty() ? false : true;
 
@@ -216,19 +211,12 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
-            wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName()/*, 1*/ );
+            wxTreeItemId item = objectsList->AppendItem( rootItem, groups[i].GetName()/*, 1*/ );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
-            if ( globalGroup ) objectsList->SetItemTextColour(item, wxColour(40,40,45));
+            if ( globalGroup ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }
-    }
-
-    if ( substituteIfEmpty && !globalGroup && groups.empty() )
-    {
-        wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), _("No groups"), 1 );
-        //substituteGroupItem = item; Todo: Getter for the substitute.
-        lastAddedItem = item;
     }
 
     return lastAddedItem;

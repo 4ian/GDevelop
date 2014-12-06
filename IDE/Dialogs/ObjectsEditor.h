@@ -195,14 +195,11 @@ private:
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;
 
+    wxTreeItemId objectsRootItem;
+    wxTreeItemId groupsRootItem;
+
     std::string renamedItemOldName;
     wxTreeItemId lastSelectedItem;
-    wxTreeItemId latestObjItem;
-    wxTreeItemId latestGlobalObjItem;
-    wxTreeItemId latestGroupItem;
-    wxTreeItemId latestGlobalGroupItem;
-    wxTreeItemId substituteObjItem;
-    wxTreeItemId substituteGroupItem;
 
     DECLARE_EVENT_TABLE()
 };

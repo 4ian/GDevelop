@@ -74,8 +74,8 @@ public:
     #endif
 
 private:
-    wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty);
-    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, const std::vector <gd::ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty);
+    wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty);
+    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const std::vector <gd::ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty);
 
     const Project & project;
     const Layout & layout;

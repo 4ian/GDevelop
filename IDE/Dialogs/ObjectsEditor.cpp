@@ -353,7 +353,7 @@ wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, boo
             wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(),
                 objects.GetObject(i).GetName(), thumbnailID );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
-            if ( globalObjects ) objectsList->SetItemTextColour(item, wxColour(40,40,45));
+            if ( globalObjects ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }
@@ -382,7 +382,7 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
         {
             wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName(), 1 );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
-            if ( globalGroup ) objectsList->SetItemTextColour(item, wxColour(40,40,45));
+            if ( globalGroup ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }

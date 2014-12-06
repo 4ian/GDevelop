@@ -818,16 +818,6 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         bool globalGroup = data->GetString() == "GlobalGroup";
         gd::ObjectGroup * group = GetSelectedGroup();
         objectsList->Expand(lastSelectedItem);
-        if (group && layout)
-        {
-            EditObjectGroup dialog(this, project, *layout, *group); //TODO: Layout is mandatory here
-            if ( dialog.ShowModal() == 1 )
-                *group = dialog.group;
-
-            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupEdited(project, globalGroup ? NULL : layout, group->GetName());
-            return;
-        }
     }
 
     mainFrameWrapper.GetMainEditor()->SetFocus();

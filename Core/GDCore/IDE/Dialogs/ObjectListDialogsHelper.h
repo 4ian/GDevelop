@@ -38,7 +38,13 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true), imageList(new wxImageList(24,24, true)) {};
+    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true)
+    {
+        #if !defined(GD_NO_WX_GUI)
+        imageList = new wxImageList(24,24, true);
+        #endif
+    };
+
     virtual ~ObjectListDialogsHelper() {};
 
     void SetSearchText(std::string searchText_);

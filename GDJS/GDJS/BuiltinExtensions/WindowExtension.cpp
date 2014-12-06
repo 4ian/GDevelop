@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "WindowExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -21,7 +21,7 @@ WindowExtension::WindowExtension()
                           _("Window features"),
                           _("Built-in extension allowing to manipulate the game's window"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllActions()["SetFullScreen"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.window.setFullScreen");

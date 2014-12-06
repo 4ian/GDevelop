@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/PlatformDefinition/Platform.h"

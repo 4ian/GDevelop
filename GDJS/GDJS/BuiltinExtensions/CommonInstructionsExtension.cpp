@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "CommonInstructionsExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -39,7 +39,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                           _("Standard events"),
                           _("Built-in extension providing standard events."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     {
         class CodeGen : public gd::EventMetadata::CodeGenerator

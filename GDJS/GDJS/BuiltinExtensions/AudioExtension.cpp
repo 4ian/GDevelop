@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * This project is released under the MIT License.
  */
 #include "AudioExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -21,7 +21,7 @@ AudioExtension::AudioExtension()
                           _("Audio"),
                           _("Builtin audio extension"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllActions()["PlaySound"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.sound.playSound");

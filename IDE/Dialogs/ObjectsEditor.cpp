@@ -561,6 +561,14 @@ void ObjectsEditor::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
 {
     if ( !event.GetLabel().empty() ) //event.GetLabel() is empty on linux.
         renamedItemOldName = gd::ToString(event.GetLabel());
+
+    lastSelectedItem = event.GetItem();
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
+
+    if(!data || data->GetString() == "ObjectInGroup")
+    {
+        event.Veto();
+    }
 }
 
 void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
@@ -572,10 +580,9 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 
     lastSelectedItem = event.GetItem();
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
-    if (!data) return;
 
     //Rename an object
-    if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
+    if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         bool globalObject = data->GetString() == "GlobalObject";
         gd::ClassWithObjects * objects = layout;
@@ -698,6 +705,12 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupRenamed(project, globalGroup ? NULL : layout, newName, oldName);
         }
+    }
+    else
+    {
+        //Undo the item text change
+        event.Veto();
+        return;
     }
 
     project.SetDirty();

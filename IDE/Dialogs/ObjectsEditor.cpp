@@ -445,12 +445,7 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
             if ( globalGroup ) objectsList->SetItemBold(item, true);
 
-            for(std::vector<std::string>::const_iterator it = groups[i].GetAllObjectsNames().begin(); it != groups[i].GetAllObjectsNames().end(); it++)
-            {
-                wxTreeItemId objectItem = objectsList->AppendItem( item, *it, 0 );
-                objectsList->SetItemTextColour(objectItem, wxColour(128, 128, 128));
-                objectsList->SetItemData(objectItem, new gd::TreeItemStringData("ObjectInGroup"));
-            }
+            UpdateGroup(item);
 
             lastAddedItem = item;
         }
@@ -458,6 +453,44 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
 
     project.SetDirty();
     return lastAddedItem;
+}
+
+void ObjectsEditor::UpdateGroup(wxTreeItemId groupItem)
+{
+    if(!groupItem.IsOk())
+        return;
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(groupItem));
+    bool wasExpanded = objectsList->IsExpanded(groupItem);
+
+    if(!data || (data->GetString() != "LayoutGroup" && data->GetString() != "GlobalGroup"))
+        return;
+
+    //Clear the group item content
+    objectsList->DeleteChildren(groupItem);
+
+    std::vector<gd::ObjectGroup> & groups = (data->GetString() == "LayoutGroup") ? layout->GetObjectGroups() : project.GetObjectGroups();
+
+    //Find the group in the container
+    vector<gd::ObjectGroup>::iterator i = std::find_if( groups.begin(),
+                                                        groups.end(),
+                                                        std::bind2nd(gd::GroupHasTheSameName(), objectsList->GetItemText(groupItem).ToStdString()));
+
+    if ( i != groups.end() )
+    {
+        //Add all objects items into the group item
+        for(std::vector<std::string>::const_iterator it = i->GetAllObjectsNames().begin(); it != i->GetAllObjectsNames().end(); it++)
+        {
+            wxTreeItemId objectItem = objectsList->AppendItem( groupItem, *it, 0 );
+            objectsList->SetItemTextColour(objectItem, wxColour(128, 128, 128));
+            objectsList->SetItemData(objectItem, new gd::TreeItemStringData("ObjectInGroup"));
+        }
+    }
+    else
+    {
+        //If the group has not been found, we delete it from the tree
+        objectsList->Delete(groupItem);
+    }
 }
 
 void ObjectsEditor::OnobjectsListItemActivated(wxTreeEvent& event)
@@ -657,6 +690,13 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             //TODO: Factor this? And change the name in external events.
         }
 
+        //Update the groups items (without refreshing the entire tree control)
+        wxTreeItemIdValue cookie;
+        for(wxTreeItemId groupItem = objectsList->GetFirstChild(groupsRootItem, cookie); groupItem.IsOk(); groupItem = objectsList->GetNextChild(groupsRootItem, cookie))
+        {
+            UpdateGroup(groupItem);
+        }
+
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObject ? NULL : layout, objects->GetObject(newName), oldName);
     }
@@ -712,6 +752,8 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         event.Veto();
         return;
     }
+
+    renamedItemOldName = newName;
 
     project.SetDirty();
 }

@@ -55,7 +55,8 @@ namespace
     class ObjectsListDnd : public wxTextDropTarget
     {
     public:
-        ObjectsListDnd(wxTreeCtrl *ctrl, gd::Project & project_, gd::Layout * layout_) : treeCtrl(ctrl), project(project_), layout(layout_) {};
+        ObjectsListDnd(wxTreeCtrl *ctrl, wxTreeItemId groupsRootItem_, gd::Project & project_, gd::Layout * layout_) 
+         : treeCtrl(ctrl), groupsRootItem(groupsRootItem_), project(project_), layout(layout_) {};
 
         virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& text)
         {
@@ -71,39 +72,86 @@ namespace
             //Find if the item is a group (global ? local ?)
             gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(treeCtrl->GetItemData(itemUnderMouse));
 
-            std::vector<gd::ObjectGroup> *groups = NULL;
-            if(data && data->GetString() == "LayoutGroup" && layout)
-                groups = &layout->GetObjectGroups();
-            else if(data && data->GetString() == "GlobalGroup")
-                groups = &project.GetObjectGroups();
-            else
-                return false;
-
-            //Find the group
-            std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(), 
-                                                                     bind2nd(gd::GroupHasTheSameName(), treeCtrl->GetItemText(itemUnderMouse)));
-            if ( group != groups->end() && !group->Find(objectName))
+            if(data)
             {
-                //Add the object in the group
-                group->AddObject(objectName);
+                std::vector<gd::ObjectGroup> *groups = NULL;
+                if(data && data->GetString() == "LayoutGroup" && layout)
+                    groups = &layout->GetObjectGroups();
+                else if(data && data->GetString() == "GlobalGroup")
+                    groups = &project.GetObjectGroups();
+                else
+                    return false;
+
+                //Find the group
+                std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(), 
+                                                                         bind2nd(gd::GroupHasTheSameName(), treeCtrl->GetItemText(itemUnderMouse)));
+                if ( group != groups->end() && !group->Find(objectName))
+                {
+                    //Add the object in the group
+                    group->AddObject(objectName);
+                }
+                else
+                {
+                    return false;
+                }
+
+                //Add the corresponding tree item into the group tree item
+                wxTreeItemId objectIntoGroupItem = treeCtrl->AppendItem(itemUnderMouse, objectName, 0);
+                treeCtrl->SetItemTextColour(objectIntoGroupItem, wxColour(128, 128, 128));
+                treeCtrl->SetItemData(objectIntoGroupItem, new gd::TreeItemStringData("ObjectInGroup"));
+
+                treeCtrl->Expand(itemUnderMouse);
+            }
+            else if(itemUnderMouse == groupsRootItem)
+            {
+                //Create a new group
+                gd::ObjectGroup newGroup;
+                newGroup.AddObject(gd::ToString(text));
+
+                std::vector<gd::ObjectGroup> & objectsGroups = !layout ? project.GetObjectGroups() : layout->GetObjectGroups();
+
+                std::string name = gd::ToString(text) + "Group";
+                for (unsigned int i = 2;
+                    std::find_if( objectsGroups.begin(), objectsGroups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
+                        != objectsGroups.end();
+                    ++i)
+                    name = gd::ToString(text) + "Group" + gd::ToString(i);
+
+                newGroup.SetName( name );
+
+                objectsGroups.push_back( newGroup );
+
+                //Add the group item
+                wxTreeItemId itemAdded = treeCtrl->AppendItem( groupsRootItem, name, 1 );
+                treeCtrl->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutGroup") );
+
+                //Add the object item into the group item
+                wxTreeItemId objectItem = treeCtrl->AppendItem( itemAdded, text, 0 );
+                treeCtrl->SetItemTextColour(objectItem, wxColour(128, 128, 128));
+                treeCtrl->SetItemData(objectItem, new gd::TreeItemStringData("ObjectInGroup"));
+
+                //Notify the game of the new group
+                for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, layout ? layout : NULL, name);
+                gd::LogStatus( _( "The group was correctly added." ) );
+
+                //Expand the new group item
+                treeCtrl->Expand(itemAdded);
+
+                return true;
             }
             else
             {
                 return false;
             }
-
-            //Add the corresponding tree item into the group tree item
-            wxTreeItemId objectIntoGroupItem = treeCtrl->AppendItem(itemUnderMouse, objectName, 0);
-            treeCtrl->SetItemTextColour(objectIntoGroupItem, wxColour(128, 128, 128));
-            treeCtrl->SetItemData(objectIntoGroupItem, new gd::TreeItemStringData("ObjectInGroup"));
-
-            treeCtrl->Expand(itemUnderMouse);
 
             return true;
         }
 
     private:
         wxTreeCtrl *treeCtrl;
+        wxTreeItemId groupsRootItem;
+
         gd::Project & project;
         gd::Layout * layout;
     };
@@ -300,7 +348,6 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 
     objectsImagesList = new wxImageList(24,24, true);
     objectsList->AssignImageList(objectsImagesList);
-    objectsList->SetDropTarget(new ObjectsListDnd(objectsList, project, layout));
 
     Refresh();
 }
@@ -377,7 +424,7 @@ void ObjectsEditor::ConnectEvents()
 
 void ObjectsEditor::Refresh()
 {
-
+    delete objectsList->GetDropTarget();
 
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
@@ -395,6 +442,8 @@ void ObjectsEditor::Refresh()
 
     objectsList->Expand(objectsRootItem);
     objectsList->Expand(groupsRootItem);
+
+    objectsList->SetDropTarget(new ObjectsListDnd(objectsList, groupsRootItem, project, layout));
 }
 
 wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, bool globalObjects)
@@ -601,6 +650,7 @@ void ObjectsEditor::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
     if(!data || data->GetString() == "ObjectInGroup")
     {
         event.Veto();
+        return;
     }
 }
 
@@ -937,7 +987,6 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
 void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 {
     gd::ObjectGroup newGroup;
-    wxTreeItemId rootId = objectsList->GetRootItem();
 
     vector<gd::ObjectGroup> & objectsGroups = !layout ? project.GetObjectGroups() : layout->GetObjectGroups();
 
@@ -1082,6 +1131,16 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
                 g->RemoveObject(objectName);
             }
         }
+
+        //Delete the item from the tree control
+        objectsList->Delete(selection[i]);
+    }
+
+    //Update the groups items (without refreshing the entire tree control)
+    wxTreeItemIdValue cookie;
+    for(wxTreeItemId groupItem = objectsList->GetFirstChild(groupsRootItem, cookie); groupItem.IsOk(); groupItem = objectsList->GetNextChild(groupsRootItem, cookie))
+    {
+        UpdateGroup(groupItem);
     }
 
     //Call the notifiers
@@ -1089,9 +1148,6 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, layout, objectsDeleted);
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, NULL, gObjectsDeleted);
-
-    //Remove the real items in the list
-    Refresh();
 }
 
 void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
@@ -1396,6 +1452,8 @@ void ObjectsEditor::OnobjectsListBeginDrag(wxTreeEvent& event)
 
     if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
     {
+        objectsList->SetItemText(groupsRootItem, _("Create a new group"));
+
         gd::Object * object = GetSelectedObject();
         if ( !object ) return;
 
@@ -1403,6 +1461,8 @@ void ObjectsEditor::OnobjectsListBeginDrag(wxTreeEvent& event)
         wxDropSource dragSource( this );
         dragSource.SetData( objectName );
         dragSource.DoDragDrop( true );
+
+        objectsList->SetItemText(groupsRootItem, _("Groups"));
     }
 }
 

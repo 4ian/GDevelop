@@ -229,11 +229,20 @@ gdjs.RuntimeGame.prototype.getMouseX = function() {
 gdjs.RuntimeGame.prototype.getMouseY = function() {
 	return this._mouseY;
 };
-
+/**
+ * Get the default width of the game: canvas is created with this width,
+ * and cameras are created using this width.
+ * @method getDefaultWidth
+ */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
     return this._defaultWidth;
 };
 
+/**
+ * Get the default height of the game: canvas is created with this height,
+ * and cameras are created using this height.
+ * @method getDefaultHeight
+ */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
     return this._defaultHeight;
 };
@@ -256,6 +265,23 @@ gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
  */
 gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
     this._defaultHeight = height;
+};
+
+
+/**
+ * Get the current width of the canvas.
+ * @method getCurrentWidth
+ */
+gdjs.RuntimeGame.prototype.getCurrentWidth = function() {
+    return this._currentWidth;
+};
+
+/**
+ * Get the current height of the canvas.
+ * @method getCurrentHeight
+ */
+gdjs.RuntimeGame.prototype.getCurrentHeight = function() {
+    return this._currentHeight;
 };
 
 /**
@@ -581,11 +607,8 @@ gdjs.RuntimeGame.prototype.createStandardCanvas = function(canvasArea) {
  * Resize the canvas, according to _isFullscreen, _forceFullscreen, _currentWidth,
  * _currentHeight, _marginTop, _marginLeft, _marginRight, _marginBottom, _keepRatio.
  *
- * If fullscreen is activated
- *
  * @method _resizeCanvas
  * @private
- * @static
  */
 gdjs.RuntimeGame.prototype._resizeCanvas = function() {
     var keepRatio = this._keepRatio;

@@ -21,8 +21,6 @@ public :
 
     WindowExtension();
     virtual ~WindowExtension() {};
-
-    virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker);
 };
 
 }

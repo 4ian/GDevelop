@@ -41,8 +41,17 @@ gdjs.evtTools.window.getWindowTitle = function() {
 gdjs.evtTools.window.getWindowWidth = function() {
     return window.innerWidth;
 };
+
 gdjs.evtTools.window.getWindowHeight = function() {
     return window.innerHeight;
+};
+
+gdjs.evtTools.window.getCanvasWidth = function(runtimeScene) {
+	return runtimeScene.getGame().getCurrentWidth();
+};
+
+gdjs.evtTools.window.getCanvasHeight = function(runtimeScene) {
+	return runtimeScene.getGame().getCurrentHeight();
 };
 
 gdjs.evtTools.window.openURL = function(url) {
@@ -55,4 +64,4 @@ gdjs.evtTools.window.openURL = function(url) {
     } else {
         window.open(url);
     }
-}
+};

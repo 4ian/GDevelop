@@ -91,16 +91,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("New title"), "",false);
 
-    extension.AddExpression("SceneWindowWidth", _("Width of the scene's window"), _("Width of the scene's window"), _("Screen"), "res/window.png")
+    extension.AddExpression("SceneWindowWidth", _("Width of the scene window"), _("Width of the scene window (or scene canvas for HTML5 games)"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "");
 
-    extension.AddExpression("SceneWindowHeight", _("Height of the scene's window"), _("Height of the scene's window"), _("Screen"), "res/window.png")
+    extension.AddExpression("SceneWindowHeight", _("Height of the scene window"), _("Height of the scene window (or scene canvas for HTML5 games)"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "");
 
+    extension.AddExpression("ScreenWidth", _("Width of the screen/page"), _("Width of the screen (or the page for HTML5 games in browser)"), _("Screen"), "res/display16.png");
 
-    extension.AddExpression("ScreenWidth", _("Width of the current resolution"), _("Width of the current resolution"), _("Screen"), "res/display16.png");
-
-    extension.AddExpression("ScreenHeight", _("Height of the current resolution"), _("Height of the current resolution"), _("Screen"), "res/display16.png");
+    extension.AddExpression("ScreenHeight", _("Height of the screen/page"), _("Height of the screen (or the page for HTML5 games in browser)"), _("Screen"), "res/display16.png");
 
     extension.AddExpression("ColorDepth", _("Color depth"), _("Color depth"), _("Screen"), "res/display16.png");
 

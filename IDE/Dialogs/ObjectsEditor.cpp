@@ -424,8 +424,6 @@ void ObjectsEditor::ConnectEvents()
 
 void ObjectsEditor::Refresh()
 {
-    delete objectsList->GetDropTarget();
-
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
     objectsImagesList->Add(gd::SkinHelper::GetIcon("object", 24));

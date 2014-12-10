@@ -202,7 +202,7 @@ mainEditor(mainEditor_)
 	StaticText3->SetFont(StaticText3Font);
 	FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	newsTxtSizer = new wxFlexGridSizer(0, 3, 0, 0);
-	newsTxt = new wxStaticText(this, ID_STATICTEXT4, _("No news for now!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	newsTxt = new wxStaticText(this, ID_STATICTEXT4, _("No news for now!"), wxDefaultPosition, wxSize(550, -1), 0, _T("ID_STATICTEXT4"));
 	newsTxtSizer->Add(newsTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(newsTxtSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -256,7 +256,7 @@ void StartHerePage::RefreshNewsUsingUpdateChecker()
 	else
 		newsTxt->SetLabel(_("No news for now!"));
 
-	newsTxt->Wrap(newsTxtSizer->GetSize().x);
+	newsTxt->Wrap(550);
 
 	newsLink1->SetLabel(checker->newsLinkLabel1);
 	newsLink1->SetURL(checker->newsLink1);

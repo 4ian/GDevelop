@@ -1115,7 +1115,11 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
             if(!groupItem.IsOk())
                 continue;
 
-            bool globalGroup = data->GetString() == "GlobalGroup";
+            gd::TreeItemStringData * groupData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(groupItem));
+            if (!groupData) 
+                continue;
+
+            bool globalGroup = (groupData->GetString() == "GlobalGroup");
             std::string groupName = ToString(objectsList->GetItemText( groupItem ));
 
             std::vector<gd::ObjectGroup> & objectsGroups =

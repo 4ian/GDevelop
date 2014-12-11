@@ -204,6 +204,8 @@ BEGIN_EVENT_TABLE(ObjectsEditor,wxPanel)
     //*)
 END_EVENT_TABLE()
 
+wxRibbonButtonBar *ObjectsEditor::objectsRibbonBar = NULL;
+
 ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_) :
     project(project_),
     layout(layout_),
@@ -375,11 +377,11 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
 
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object"));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
+        objectsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        objectsRibbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
+        objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object"));
+        objectsRibbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
+        objectsRibbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -821,23 +823,14 @@ void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
     if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         objectsList->SetToolTip( "" );
+        objectsRibbonBar->EnableButton(idRibbonUp, true);
+        objectsRibbonBar->EnableButton(idRibbonDown, true);
     }
     else if ( data && (data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup") )
     {
-        gd::ObjectGroup * group = GetSelectedGroup();
-        if ( !group ) return;
-
-        wxString tooltip = _("Contents of group \"");
-        tooltip += group->GetName();
-        tooltip += "\" :\n";
-        vector < string > allObjects = group->GetAllObjectsNames();
-        for (unsigned int j = 0;j< allObjects.size() && j < 10;++j)
-        {
-            tooltip += allObjects.at(j)+"\n";
-            if ( j == 9 ) tooltip += "...";
-        }
-        objectsList->SetToolTip( tooltip );
-
+        objectsList->SetToolTip(_("Unfold the group to see the objects inside it."));
+        objectsRibbonBar->EnableButton(idRibbonUp, false);
+        objectsRibbonBar->EnableButton(idRibbonDown, false);
     }
 
     UpdateAssociatedPropertiesPanel();

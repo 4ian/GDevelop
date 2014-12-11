@@ -193,6 +193,8 @@ private:
     gd::Layout * layout; ///< Layout edited. Can be NULL.
     gd::MainFrameWrapper & mainFrameWrapper;
 
+    static wxRibbonButtonBar *objectsRibbonBar;
+
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;
 

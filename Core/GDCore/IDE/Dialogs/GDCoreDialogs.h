@@ -30,6 +30,7 @@
 #include <wx/statline.h>
 #include <wx/statbmp.h>
 #include <wx/hyperlink.h>
+#include <wx/htmllbox.h>
 
 class LayersEditorPanelBase : public wxPanel
 {
@@ -86,6 +87,29 @@ protected:
 public:
     BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~BaseGroupEventDialog();
+};
+
+
+class BaseEventStoreDialog : public wxDialog
+{
+protected:
+    wxSimpleHtmlListBox* templatesList;
+    wxTextCtrl* searchCtrl5;
+    wxStaticText* nameTxt;
+    wxStaticText* descriptionTxt;
+    wxStaticLine* m_staticLine979;
+    wxStaticLine* m_staticLine7911;
+    wxButton* okBt;
+    wxButton* cancelBt;
+
+protected:
+    virtual void OnSelectionChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOkBtClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCancelBtClick(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    BaseEventStoreDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add a template from the event store"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    virtual ~BaseEventStoreDialog();
 };
 
 #endif

@@ -77,16 +77,13 @@ const long InstructionSelectorDialog::ID_STATICBITMAP2 = wxNewId();
 const long InstructionSelectorDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long InstructionSelectorDialog::ID_BUTTON1 = wxNewId();
 const long InstructionSelectorDialog::ID_BUTTON2 = wxNewId();
-const long InstructionSelectorDialog::ID_EDITARRAY = wxNewId();
-const long InstructionSelectorDialog::ID_TEXTARRAY = wxNewId();
-const long InstructionSelectorDialog::ID_BUTTONARRAY = wxNewId();
-const long InstructionSelectorDialog::ID_CHECKARRAY = wxNewId();
 const long InstructionSelectorDialog::ID_CHECKBOX1 = wxNewId();
 
 InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, bool chooseAction) :
     game(game_),
     scene(scene_),
     isInverted(false),
+    parametersHelper(this, ParaFac, ParaSpacer1, ParaText, ParaSpacer2, ParaBmpBt, ParaEdit),
     editingAction(chooseAction)
 {
     wxBoxSizer* BoxSizer4;
@@ -200,6 +197,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     SetMinSize(wxSize(500,500));
     Center();
 
+    parametersHelper.SetSizer(GridSizer1);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeSelectionChanged);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&InstructionSelectorDialog::OnsearchCtrlText);
@@ -444,93 +442,17 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapManager::Get()->unknownAction24);
 
-    //Update controls count
-    while ( ParaEdit.size() < instructionMetadata.parameters.size() )
-    {
-        const string num =ToString( ParaEdit.size() );
-        long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
-
-        //Addings controls
-        ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
-        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
-        ParaSpacer1.push_back( new wxPanel(this) );
-        ParaSpacer2.push_back( new wxPanel(this) );
-        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
-        ParaBmpBt.push_back( new wxBitmapButton( this, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
-
-        //Connecting events
-        Connect( id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( InstructionSelectorDialog::OnParameterBtClick ) );
-        Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( InstructionSelectorDialog::OnOptionalCheckboxClick ) );
-
-        //Placing controls
-        GridSizer1->Add( ParaFac.back(), 1, wxALL | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaText.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaSpacer1.back(), 0, 0 );
-        GridSizer1->Add( ParaSpacer2.back(), 0, 0 );
-        GridSizer1->Add( ParaEdit.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaBmpBt.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-
-        ParaSpacer1.back()->Show(false);
-        ParaSpacer2.back()->Show(false);
-    }
-    while ( ParaEdit.size() > instructionMetadata.parameters.size() )
-    {
-        ParaFac.back()->Destroy();
-        ParaFac.erase(ParaFac.begin()+ParaFac.size()-1);
-        ParaText.back()->Destroy();
-        ParaText.erase(ParaText.begin()+ParaText.size()-1);
-        ParaSpacer1.back()->Destroy();
-        ParaSpacer1.erase(ParaSpacer1.begin()+ParaSpacer1.size()-1);
-        ParaSpacer2.back()->Destroy();
-        ParaSpacer2.erase(ParaSpacer2.begin()+ParaSpacer2.size()-1);
-        ParaEdit.back()->Destroy();
-        ParaEdit.erase(ParaEdit.begin()+ParaEdit.size()-1);
-        ParaBmpBt.back()->Destroy();
-        ParaBmpBt.erase(ParaBmpBt.begin()+ParaBmpBt.size()-1);
+    //Update parameters controls
+    parametersHelper.UpdateControls(instructionMetadata.parameters.size());
+    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ ) {
+        parametersHelper.UpdateParameterContent(i,
+            !instructionMetadata.parameters[i].codeOnly,
+            instructionMetadata.parameters[i].optional,
+            instructionMetadata.parameters[i].description,
+            instructionMetadata.parameters[i].type,
+            i < Param.size() ? Param[i].GetPlainString() : "");
     }
 
-    //Update parameters
-    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
-    {
-        if (instructionMetadata.parameters[i].codeOnly)
-        {
-            ParaFac.at(i)->Show(false);
-            ParaText.at(i)->Show(false);
-            ParaBmpBt.at(i)->Show(false);
-            ParaEdit.at(i)->Show(false);
-        }
-        else
-        {
-            ParaFac.at(i)->Show(instructionMetadata.parameters[i].optional);
-            ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
-
-            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(":") );
-            ParaText.at(i)->Show();
-
-            if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
-            ParaEdit.at(i)->Show();
-
-            ParaBmpBt.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( gd::InstructionSentenceFormatter::Get()->LabelFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
-
-            //De/activate widgets if parameter is optional
-            bool disable = instructionMetadata.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty();
-            ParaBmpBt.at(i)->Enable(!disable);
-            ParaText.at(i)->Enable(!disable);
-            ParaEdit.at(i)->Enable(!disable);
-            ParaFac.at(i)->SetValue(!disable);
-
-            //Add defaults
-            if ( !instructionMetadata.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
-            {
-                if ( instructionMetadata.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
-                else if ( instructionMetadata.parameters[i].type == "string" ) ParaEdit.at( i )->SetValue("\"\"");
-                else if ( instructionMetadata.parameters[i].type == "operator" ) ParaEdit.at( i )->SetValue("=");
-            }
-
-        }
-    }
     Layout(); //Ensure widgets just added are properly rendered.
     GridSizer1->Layout();
 
@@ -786,17 +708,6 @@ void InstructionSelectorDialog::OnParameterBtClick(wxCommandEvent& event)
             return;
         }
     }
-}
-
-void InstructionSelectorDialog::OnOptionalCheckboxClick(wxCommandEvent& event)
-{
-    unsigned int i = gd::ToInt(gd::ToString(wxWindow::FindFocus()->GetName()));
-    if (i > ParaFac.size()) return;
-
-    bool enable = ParaFac.at(i)->GetValue();
-    ParaBmpBt.at(i)->Enable(enable);
-    ParaText.at(i)->Enable(enable);
-    ParaEdit.at(i)->Enable(enable);
 }
 
 void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)

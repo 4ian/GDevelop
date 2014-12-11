@@ -130,6 +130,9 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer43->Add(m_staticText49, 0, wxALL, 5);
     
     groupNameEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    groupNameEdit->SetHint(wxT(""));
+    #endif
     
     flexGridSizer43->Add(groupNameEdit, 0, wxALL|wxEXPAND, 5);
     
@@ -193,5 +196,116 @@ BaseGroupEventDialog::~BaseGroupEventDialog()
     backColorBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onChooseBackgroundBtClick), NULL, this);
     okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onOkBtClick), NULL, this);
     cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onCancelBtClick), NULL, this);
+    
+}
+
+BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC629BInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer731 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer731->SetFlexibleDirection( wxBOTH );
+    flexGridSizer731->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer731->AddGrowableCol(0);
+    flexGridSizer731->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer731);
+    
+    wxFlexGridSizer* flexGridSizer752 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer752->SetFlexibleDirection( wxBOTH );
+    flexGridSizer752->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer752->AddGrowableCol(1);
+    flexGridSizer752->AddGrowableRow(0);
+    
+    flexGridSizer731->Add(flexGridSizer752, 1, wxALL|wxEXPAND, 0);
+    
+    wxFlexGridSizer* flexGridSizer853 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer853->SetFlexibleDirection( wxBOTH );
+    flexGridSizer853->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer853->AddGrowableCol(0);
+    flexGridSizer853->AddGrowableRow(0);
+    
+    flexGridSizer752->Add(flexGridSizer853, 1, wxALL|wxEXPAND, 0);
+    
+    templatesList = new wxSimpleHtmlListBox(this, wxID_ANY);
+    flexGridSizer853->Add(templatesList, 0, wxALL|wxEXPAND, 5);
+    templatesList->SetMinSize(wxSize(200,-1));
+    
+    searchCtrl5 = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    searchCtrl5->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer853->Add(searchCtrl5, 0, wxALL|wxEXPAND, 5);
+    
+    wxFlexGridSizer* flexGridSizer916 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer916->SetFlexibleDirection( wxBOTH );
+    flexGridSizer916->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer916->AddGrowableCol(0);
+    
+    flexGridSizer752->Add(flexGridSizer916, 1, wxALL|wxEXPAND, 0);
+    
+    nameTxt = new wxStaticText(this, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxSize(-1,-1), 0);
+    wxFont nameTxtFont(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    nameTxt->SetFont(nameTxtFont);
+    
+    flexGridSizer916->Add(nameTxt, 0, wxALL, 5);
+    
+    descriptionTxt = new wxStaticText(this, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer916->Add(descriptionTxt, 0, wxALL, 5);
+    
+    m_staticLine979 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
+    
+    flexGridSizer916->Add(m_staticLine979, 0, wxALL|wxEXPAND, 5);
+    
+    wxFlexGridSizer* parametersSizer10 = new wxFlexGridSizer(0, 2, 0, 0);
+    parametersSizer10->SetFlexibleDirection( wxBOTH );
+    parametersSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer916->Add(parametersSizer10, 1, wxALL|wxEXPAND, 5);
+    
+    m_staticLine7911 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
+    
+    flexGridSizer731->Add(m_staticLine7911, 0, wxALL|wxEXPAND, 0);
+    
+    wxFlexGridSizer* flexGridSizer7712 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer7712->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7712->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7712->AddGrowableCol(0);
+    
+    flexGridSizer731->Add(flexGridSizer7712, 1, wxALL|wxEXPAND, 0);
+    
+    okBt = new wxButton(this, wxID_ANY, _("Ok"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer7712->Add(okBt, 0, wxALL|wxALIGN_RIGHT, 5);
+    
+    cancelBt = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer7712->Add(cancelBt, 0, wxALL, 5);
+    
+    SetMinSize( wxSize(500,300) );
+    SetSizeHints(600,300);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    Centre(wxBOTH);
+    // Connect events
+    templatesList->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(BaseEventStoreDialog::OnSelectionChanged), NULL, this);
+    okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnOkBtClick), NULL, this);
+    cancelBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnCancelBtClick), NULL, this);
+    
+}
+
+BaseEventStoreDialog::~BaseEventStoreDialog()
+{
+    templatesList->Disconnect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(BaseEventStoreDialog::OnSelectionChanged), NULL, this);
+    okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnOkBtClick), NULL, this);
+    cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnCancelBtClick), NULL, this);
     
 }

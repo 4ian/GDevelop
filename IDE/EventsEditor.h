@@ -192,8 +192,7 @@ private:
     static const long idRibbonCopy;
     static const long idRibbonCut;
     static const long idRibbonPaste;
-    static const long idRibbonTemplate;
-    static const long idRibbonCreateTemplate;
+    static const long idRibbonEventStore;
     static const long idRibbonHelp;
     static const long idSearchReplace;
     static const long idRibbonProfiling;
@@ -261,8 +260,7 @@ private:
     //*)
     void UpdateRibbonBars();
     void OnHelpBtClick(wxCommandEvent& event);
-    void OnTemplateBtClick(wxCommandEvent& event);
-    void OnCreateTemplateBtClick(wxCommandEvent& event);
+    void OnEventStoreBtClick(wxCommandEvent& event);
     void OnSearchBtClick(wxCommandEvent& event);
     void OnProfilingBtClick(wxCommandEvent& event);
     void OnPlatformBtClick(wxRibbonButtonBarEvent& event);

@@ -27,6 +27,7 @@
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/EventStoreDialog.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
@@ -87,8 +88,7 @@ const long EventsEditor::idRibbonRedo = wxNewId();
 const long EventsEditor::idRibbonCopy = wxNewId();
 const long EventsEditor::idRibbonCut = wxNewId();
 const long EventsEditor::idRibbonPaste = wxNewId();
-const long EventsEditor::idRibbonTemplate = wxNewId();
-const long EventsEditor::idRibbonCreateTemplate = wxNewId();
+const long EventsEditor::idRibbonEventStore = wxNewId();
 const long EventsEditor::idRibbonHelp = wxNewId();
 const long EventsEditor::idRibbonProfiling = wxNewId();
 const long EventsEditor::idRibbonPlatform = wxNewId();
@@ -427,6 +427,11 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : "", gd::SkinHelper::GetRibbonIcon("add"));
     }
     {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("GDevApp.com"), gd::SkinHelper::GetRibbonIcon("template"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        templateRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        templateRibbonBar->AddButton(idRibbonEventStore, !hideLabels ? _("Insert from the events store") : "", gd::SkinHelper::GetRibbonIcon("addtemplate"));
+    }
+    {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Delete"), gd::SkinHelper::GetRibbonIcon("delete"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         deleteRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : "", gd::SkinHelper::GetRibbonIcon("deleteselected"));
@@ -443,12 +448,6 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
         clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
         clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
-    }
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Templates"), gd::SkinHelper::GetRibbonIcon("template"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        templateRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        templateRibbonBar->AddButton(idRibbonTemplate, !hideLabels ? _("Insert") : "", gd::SkinHelper::GetRibbonIcon("template"));
-        templateRibbonBar->AddButton(idRibbonCreateTemplate, !hideLabels ? _("Create") : "", gd::SkinHelper::GetRibbonIcon("addtemplate"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Search"), gd::SkinHelper::GetRibbonIcon("search"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -486,8 +485,7 @@ void EventsEditor::ConnectEvents()
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventCopyMenuSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventCutMenuSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventPasteMenuSelected, NULL, this);
-    mainFrameWrapper.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnTemplateBtClick, NULL, this);
-    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnCreateTemplateBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonEventStore, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnEventStoreBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnSearchBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnProfilingBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonPlatform, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EventsEditor::OnPlatformBtClick, NULL, this);
@@ -727,7 +725,6 @@ void EventsEditor::UpdateRibbonBars()
     if ( deleteRibbonBar != NULL ) deleteRibbonBar->EnableButton(idRibbonDelEvent, selection.HasSelectedEvents() || selection.HasSelectedInstructions());
     if ( clipboardRibbonBar != NULL ) clipboardRibbonBar->EnableButton(idRibbonCopy, selection.HasSelectedEvents()|| selection.HasSelectedInstructions());
     if ( clipboardRibbonBar != NULL ) clipboardRibbonBar->EnableButton(idRibbonCut, selection.HasSelectedEvents()|| selection.HasSelectedInstructions());
-    if ( templateRibbonBar != NULL ) templateRibbonBar->EnableButton(idRibbonTemplate, selection.HasSelectedEvents());
     if ( undoRibbonBar != NULL ) undoRibbonBar->EnableButton(idRibbonUndo, !history.empty());
     if ( undoRibbonBar != NULL ) undoRibbonBar->EnableButton(idRibbonRedo, !redoHistory.empty());
 }
@@ -1604,27 +1601,7 @@ void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
     gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
 }
 
-void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )
-{
-    std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
-    if ( eventsSelected.empty() )
-    {
-        gd::LogMessage(_("Please select events to use so as to create the template, and then click again on the Create button."));
-        return;
-    }
-
-    EventsList eventsToUse;
-    for (unsigned int i = 0;i<eventsSelected.size();++i)
-    {
-        if (eventsSelected[i].event != boost::shared_ptr<gd::BaseEvent>())
-            eventsToUse.InsertEvent(*eventsSelected[i].event);
-    }
-
-    CreateTemplate dialog( this, eventsToUse );
-    dialog.ShowModal();
-}
-
-void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
+void EventsEditor::OnEventStoreBtClick( wxCommandEvent& event )
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
     if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL )
@@ -1633,11 +1610,11 @@ void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
         return;
     }
 
-    ChoixTemplateEvent dialog( this, game );
+    gd::EventStoreDialog dialog( this );
     if ( dialog.ShowModal() != 1 ) return;
 
     //Insert new events
-    eventsSelected[0].eventsList->InsertEvents(dialog.finalTemplate.events, 0, (size_t)-1, eventsSelected[0].positionInList);
+    //eventsSelected[0].eventsList->InsertEvents(dialog.finalTemplate.events, 0, (size_t)-1, eventsSelected[0].positionInList);
 
     ChangesMadeOnEvents();
 }

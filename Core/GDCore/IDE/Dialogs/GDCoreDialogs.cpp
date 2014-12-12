@@ -130,9 +130,6 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer43->Add(m_staticText49, 0, wxALL, 5);
     
     groupNameEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
-    #if wxVERSION_NUMBER >= 3000
-    groupNameEdit->SetHint(wxT(""));
-    #endif
     
     flexGridSizer43->Add(groupNameEdit, 0, wxALL|wxEXPAND, 5);
     
@@ -216,13 +213,9 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer731->AddGrowableRow(0);
     this->SetSizer(flexGridSizer731);
     
-    wxFlexGridSizer* flexGridSizer752 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer752->SetFlexibleDirection( wxBOTH );
-    flexGridSizer752->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer752->AddGrowableCol(1);
-    flexGridSizer752->AddGrowableRow(0);
+    wxBoxSizer* boxSizer134 = new wxBoxSizer(wxHORIZONTAL);
     
-    flexGridSizer731->Add(flexGridSizer752, 1, wxALL|wxEXPAND, 0);
+    flexGridSizer731->Add(boxSizer134, 1, wxALL|wxEXPAND, 0);
     
     wxFlexGridSizer* flexGridSizer853 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer853->SetFlexibleDirection( wxBOTH );
@@ -230,16 +223,13 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer853->AddGrowableCol(0);
     flexGridSizer853->AddGrowableRow(0);
     
-    flexGridSizer752->Add(flexGridSizer853, 1, wxALL|wxEXPAND, 0);
+    boxSizer134->Add(flexGridSizer853, 2, wxALL|wxEXPAND, 0);
     
     templatesList = new wxSimpleHtmlListBox(this, wxID_ANY);
     flexGridSizer853->Add(templatesList, 0, wxALL|wxEXPAND, 5);
     templatesList->SetMinSize(wxSize(200,-1));
     
     searchCtrl5 = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
-    #if wxVERSION_NUMBER >= 3000
-    searchCtrl5->SetHint(wxT(""));
-    #endif
     
     flexGridSizer853->Add(searchCtrl5, 0, wxALL|wxEXPAND, 5);
     
@@ -247,16 +237,17 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer916->SetFlexibleDirection( wxBOTH );
     flexGridSizer916->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer916->AddGrowableCol(0);
+    flexGridSizer916->AddGrowableRow(3);
     
-    flexGridSizer752->Add(flexGridSizer916, 1, wxALL|wxEXPAND, 0);
+    boxSizer134->Add(flexGridSizer916, 3, wxALL|wxEXPAND, 0);
     
-    nameTxt = new wxStaticText(this, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxSize(-1,-1), 0);
+    nameTxt = new wxStaticText(this, wxID_ANY, _("No template chosen"), wxDefaultPosition, wxSize(-1,-1), 0);
     wxFont nameTxtFont(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     nameTxt->SetFont(nameTxtFont);
     
     flexGridSizer916->Add(nameTxt, 0, wxALL, 5);
     
-    descriptionTxt = new wxStaticText(this, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxSize(-1,-1), 0);
+    descriptionTxt = new wxStaticText(this, wxID_ANY, _("Choose a template in the list"), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer916->Add(descriptionTxt, 0, wxALL, 5);
     
@@ -264,11 +255,8 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     
     flexGridSizer916->Add(m_staticLine979, 0, wxALL|wxEXPAND, 5);
     
-    wxFlexGridSizer* parametersSizer10 = new wxFlexGridSizer(0, 2, 0, 0);
-    parametersSizer10->SetFlexibleDirection( wxBOTH );
-    parametersSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer916->Add(parametersSizer10, 1, wxALL|wxEXPAND, 5);
+    parametersSizer = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer916->Add(parametersSizer, 0, wxALL|wxEXPAND, 5);
     
     m_staticLine7911 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
     

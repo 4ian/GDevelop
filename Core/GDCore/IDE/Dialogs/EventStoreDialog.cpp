@@ -1,7 +1,15 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <sstream>
+#include <ctime>
 #include "EventStoreDialog.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/CommonTools.h"
 #include "SFML/Network.hpp"
 #include <wx/htmllbox.h>
@@ -12,12 +20,18 @@ namespace gd
 const std::string EventStoreDialog::host = "http://localhost";
 const int EventStoreDialog::port = 3000;
 
-EventStoreDialog::EventStoreDialog(wxWindow* parent)
-    : BaseEventStoreDialog(parent)
+EventStoreDialog::EventStoreDialog(wxWindow* parent, gd::Project & project_, gd::Layout & layout_)
+    : BaseEventStoreDialog(parent),
+    project(project_),
+    layout(layout_),
+    parametersHelper(this, paramCheckboxes, paramSpacers1, paramTexts, paramSpacers2, paramBmpBts, paramEdits)
 {
+    parametersHelper.SetSizer(parametersSizer);
+    templatesList->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(EventStoreDialog::OnSelectionChanged), NULL, this);
 
 	FetchTemplates();
 	RefreshList();
+    okBt->Enable(false);
 }
 
 EventStoreDialog::~EventStoreDialog()
@@ -83,6 +97,7 @@ void EventStoreDialog::RefreshList()
 
 void EventStoreDialog::RefreshTemplate()
 {
+    okBt->Enable();
     nameTxt->SetLabel(loadedTemplate.GetChild("name").GetValue().GetString());
     descriptionTxt->SetLabel(loadedTemplate.GetChild("description").GetValue().GetString());
 
@@ -91,7 +106,52 @@ void EventStoreDialog::RefreshTemplate()
 
 void EventStoreDialog::RefreshParameters()
 {
+    const SerializerElement & parameters = loadedTemplate.GetChild("parameters");
+    parameters.ConsiderAsArrayOf("Parameter");
+    parametersHelper.UpdateControls(parameters.GetChildrenCount());
 
+    for (unsigned int i = 0;i<parameters.GetChildrenCount();++i)
+    {
+        const SerializerElement & parameter = parameters.GetChild(i);
+
+        gd::ParameterMetadata metadata;
+        metadata.type = parameter.GetChild("type").GetValue().GetString();
+        metadata.description = parameter.GetChild("description").GetValue().GetString();
+        parametersHelper.UpdateParameterContent(i, metadata,
+            parameter.GetChild("value").GetValue().GetString());
+    }
+}
+
+void EventStoreDialog::InstantiateTemplate()
+{
+    //Create the group event that will contain the template
+    gd::GroupEvent emptyEvent;
+    groupEvent = emptyEvent;
+    groupEvent.SetType("BuiltinCommonInstructions::Group");
+    groupEvent.SetName(loadedTemplate.GetChild("name").GetValue().GetString());
+    groupEvent.SetCreationTimestamp(std::time(0));
+    groupEvent.SetSource(host+"/events/"+loadedTemplate.GetChild("_id").GetValue().GetString());
+
+    //Insert the template events
+    gd::EventsList templateEvents;
+    templateEvents.UnserializeFrom(project,
+        gd::Serializer::FromJSON(loadedTemplate.GetChild("content").GetValue().GetString()));
+    groupEvent.GetSubEvents().InsertEvents(templateEvents, 0, templateEvents.GetEventsCount());
+
+    const SerializerElement & parameters = loadedTemplate.GetChild("parameters");
+    parameters.ConsiderAsArrayOf("Parameter");
+    parametersHelper.UpdateControls(parameters.GetChildrenCount());
+
+    for (unsigned int i = 0;i<parameters.GetChildrenCount() && i < paramEdits.size();++i)
+    {
+        const SerializerElement & parameter = parameters.GetChild(i);
+        std::string newValue = gd::ToString(paramEdits[i]->GetValue());
+
+        groupEvent.GetCreationParameters().push_back(newValue);
+
+        gd::EventsRefactorer::ReplaceStringInEvents(project, layout, groupEvent.GetSubEvents(),
+            parameter.GetChild("value").GetValue().GetString(), newValue, true, true, true);
+    }
 }
 
 void EventStoreDialog::OnCancelBtClick(wxCommandEvent& event)
@@ -100,6 +160,7 @@ void EventStoreDialog::OnCancelBtClick(wxCommandEvent& event)
 }
 void EventStoreDialog::OnOkBtClick(wxCommandEvent& event)
 {
+    InstantiateTemplate();
 	EndModal(1);
 }
 void EventStoreDialog::OnSearchCtrlText(wxCommandEvent& event)
@@ -128,3 +189,4 @@ void EventStoreDialog::OnSelectionChanged(wxCommandEvent& event)
 }
 
 }
+#endif

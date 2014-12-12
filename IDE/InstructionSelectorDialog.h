@@ -109,7 +109,6 @@ private:
 	void OninstructionsTreeItemActivated(wxTreeEvent& event);
 	void OnobjectinstructionsTreeItemActivated(wxTreeEvent& event);
 	void RefreshObjectsLists();
-	void OnParameterBtClick(wxCommandEvent& event);
     bool MatchSearchCriteria(std::string search, const gd::InstructionMetadata & instrMetadata);
 
     /**

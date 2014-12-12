@@ -8,9 +8,12 @@
 #define GDCore_ParameterControlsHelper_H
 #include <vector>
 #include <wx/event.h>
+#include "GDCore/Events/InstructionMetadata.h"
+namespace gd { class Project; }
+namespace gd { class Layout; }
 class wxCommandEvent;
 class wxWindow;
-class wxGridSizer;
+class wxFlexGridSizer;
 class wxCheckBox;
 class wxPanel;
 class wxStaticText;
@@ -43,35 +46,62 @@ public:
         paramSpacers1(paramSpacers1_),
         paramTexts(paramTexts_),
         paramSpacers2(paramSpacers2_),
-        paramBmpBts(paramBmpBts_)
+        paramBmpBts(paramBmpBts_),
+        editionCallback(NULL)
     {
     };
+
+    virtual ~ParameterControlsHelper() {};
 
     /**
      * \brief Set the sizer where controls must be created.
      * \note The sizer must be contained inside the window set in the constructor.
+     * \return *this
      */
-    ParameterControlsHelper & SetSizer(wxGridSizer * sizer_)
-    {
-        sizer = sizer_;
-        return *this;
-    }
+    ParameterControlsHelper & SetSizer(wxFlexGridSizer * sizer_);
 
-    virtual ~ParameterControlsHelper() {};
+    /**
+     * \brief Create/destroy the controls for displaying the specified number of parameters.
+     * \warning The sizer must have been set.
+     * \see gd::ParameterControlsHelper::SetSizer
+     */
+    void UpdateControls(unsigned int count);
 
-    void UpdateControls(unsigned int size);
-    void UpdateParameterContent(unsigned int i, bool show, bool isOptional,
-        std::string description, std::string type, std::string content);
+    /**
+     * \brief Update the controls of a parameter using the specified content
+     * and the metadata provided.
+     * \note A copy of the metadata is stored.
+     */
+    void UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, std::string content);
+
+    typedef void (* EditParameterCallback)(gd::Project &, gd::Layout &, const ParameterMetadata & paramMetadata,
+        std::vector<wxTextCtrl * > & paramEdits, unsigned int paramIndex);
+
+    /**
+     * \brief Set the function that will be called when a parameter should be edited.
+     * \param function The function to be called
+     * \param project The project that will be passed to the function
+     * \param layout The layout that will be passed to the function
+     */
+    void SetEditParameterCallback(EditParameterCallback function, gd::Project & project, gd::Layout & layout) {
+        editionCallback = function;
+        editionCallbackProject = &project;
+        editionCallbackLayout = &layout;
+    };
 
 private:
     wxWindow * window;
-    wxGridSizer * sizer;
+    wxFlexGridSizer * sizer;
     std::vector < wxCheckBox * > & paramCheckboxes;
     std::vector < wxPanel * > & paramSpacers1;
     std::vector < wxStaticText * > & paramTexts;
     std::vector < wxPanel * > & paramSpacers2;
     std::vector < wxBitmapButton * > & paramBmpBts;
     std::vector < wxTextCtrl * > & paramEdits;
+    std::vector < gd::ParameterMetadata > paramMetadata;
+    EditParameterCallback editionCallback;
+    gd::Project * editionCallbackProject;
+    gd::Layout * editionCallbackLayout;
 
     static const long ID_TEXTARRAY;
     static const long ID_EDITARRAY;

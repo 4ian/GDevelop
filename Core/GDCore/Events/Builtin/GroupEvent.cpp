@@ -29,9 +29,9 @@ namespace gd
 GroupEvent::GroupEvent() :
     BaseEvent(),
     creationTime(0),
-    colorR(221),
-    colorG(216),
-    colorB(255)
+    colorR(74),
+    colorG(176),
+    colorB(228)
 {
 }
 
@@ -96,7 +96,7 @@ void GroupEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
 #if !defined(GD_NO_WX_GUI)
     wxString groupTitle = name.empty() ? _("Untitled group") : name;
     wxColour backgroundColor = wxColour(colorR, colorG, colorB);
-    wxColour textColor = wxColour(0, 0, 0);
+    wxColour textColor = colorR + colorG + colorB > 200*3 ? *wxBLACK : *wxWHITE;
     if (IsDisabled())
     {
         backgroundColor.MakeDisabled();

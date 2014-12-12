@@ -1,9 +1,19 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef EVENTSTOREDIALOG_H
 #define EVENTSTOREDIALOG_H
 #include "SFML/Network.hpp"
 #include "GDCoreDialogs.h"
 #include <vector>
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
+namespace gd { class Project; }
+namespace gd { class Layout; }
 class wxCheckBox;
 class wxPanel;
 class wxStaticText;
@@ -22,8 +32,18 @@ namespace gd
 class GD_CORE_API EventStoreDialog : public BaseEventStoreDialog
 {
 public:
-    EventStoreDialog(wxWindow* parent);
+    EventStoreDialog(wxWindow* parent, gd::Project & project, gd::Layout & layout);
+
+    /**
+     * \brief Get the GroupEvent that was instantiated with the selected template
+     * and the parameters entered by the user.
+     * \note Only relevant when ShowModal() returned 1.
+     */
+    const gd::GroupEvent & GetGroupEvent() { return groupEvent; }
+
     virtual ~EventStoreDialog();
+
+
 protected:
     virtual void OnCancelBtClick(wxCommandEvent& event);
     virtual void OnOkBtClick(wxCommandEvent& event);
@@ -36,18 +56,25 @@ protected:
 	std::vector < wxPanel * > paramSpacers2;
 	std::vector < wxBitmapButton * > paramBmpBts;
 	std::vector < wxTextCtrl * > paramEdits;
+    gd::ParameterControlsHelper parametersHelper;
+
+    gd::Project & project;
+    gd::Layout & layout;
 
     gd::SerializerElement loadedTemplate;
     gd::SerializerElement templates;
     static const std::string host;
     static const int port;
+    gd::GroupEvent groupEvent; ///< The event group created from the template
 
     sf::Http::Response::Status FetchTemplates();
     sf::Http::Response::Status FetchTemplate(std::string id);
     void RefreshTemplate();
     void RefreshList();
     void RefreshParameters();
+    void InstantiateTemplate();
 };
 
 }
 #endif // EVENTSTOREDIALOG_H
+#endif

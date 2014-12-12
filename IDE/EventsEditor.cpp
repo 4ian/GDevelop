@@ -857,7 +857,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
         dialog.RefreshFromInstruction();
         dialog.Fit();
 
-        if ( dialog.ShowModal() == 0)
+        if (dialog.ShowModal() == 0)
         {
             item.instruction->SetType( dialog.instructionType );
             item.instruction->SetParameters( dialog.Param );
@@ -875,7 +875,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
         if ( item.instructionList == NULL || item.event == NULL) return;
 
         InstructionSelectorDialog dialog(this, game, scene, !item.isConditionList);
-        if ( dialog.ShowModal() == 0)
+        if (dialog.ShowModal() == 0)
         {
             gd::Instruction instruction;
             instruction.SetType( dialog.instructionType );
@@ -1223,7 +1223,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
     if ( listHighlighted.instructionList == NULL ) return;
 
     InstructionSelectorDialog dialog(this, game, scene, !listHighlighted.isConditionList);
-    if ( dialog.ShowModal() == 0)
+    if (dialog.ShowModal() == 0)
     {
         gd::Instruction instruction;
         instruction.SetType(dialog.instructionType);
@@ -1610,11 +1610,11 @@ void EventsEditor::OnEventStoreBtClick( wxCommandEvent& event )
         return;
     }
 
-    gd::EventStoreDialog dialog( this );
-    if ( dialog.ShowModal() != 1 ) return;
+    gd::EventStoreDialog dialog(this, game, scene);
+    if (dialog.ShowModal() != 1) return;
 
     //Insert new events
-    //eventsSelected[0].eventsList->InsertEvents(dialog.finalTemplate.events, 0, (size_t)-1, eventsSelected[0].positionInList);
+    eventsSelected[0].eventsList->InsertEvent(dialog.GetGroupEvent(), eventsSelected[0].positionInList);
 
     ChangesMadeOnEvents();
 }
@@ -1672,7 +1672,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
     dialog.RefreshFromInstruction();
     dialog.Fit();
 
-    if ( dialog.ShowModal() == 0)
+    if (dialog.ShowModal() == 0)
     {
         item.instruction->SetType( dialog.instructionType );
         item.instruction->SetParameters( dialog.Param );

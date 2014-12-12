@@ -98,6 +98,7 @@ protected:
     wxStaticText* nameTxt;
     wxStaticText* descriptionTxt;
     wxStaticLine* m_staticLine979;
+    wxFlexGridSizer* parametersSizer;
     wxStaticLine* m_staticLine7911;
     wxButton* okBt;
     wxButton* cancelBt;

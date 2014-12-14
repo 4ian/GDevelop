@@ -41,8 +41,13 @@ public:
      */
     const gd::GroupEvent & GetGroupEvent() { return groupEvent; }
 
-    virtual ~EventStoreDialog();
+    /**
+     * \brief Update the dialog to show the specified template with the parameters
+     * filled with the specified content.
+     **/
+    void RefreshWith(std::string templateId, const std::vector<std::string> & parameters);
 
+    virtual ~EventStoreDialog();
 
 protected:
     virtual void OnCancelBtClick(wxCommandEvent& event);
@@ -62,13 +67,13 @@ protected:
     gd::Layout & layout;
 
     gd::SerializerElement loadedTemplate;
-    gd::SerializerElement templates;
+    static gd::SerializerElement * templates;
     static const std::string host;
     static const int port;
     gd::GroupEvent groupEvent; ///< The event group created from the template
 
-    sf::Http::Response::Status FetchTemplates();
     sf::Http::Response::Status FetchTemplate(std::string id);
+    sf::Http::Response::Status FetchTemplates(bool forceFetch = false);
     void RefreshTemplate();
     void RefreshList();
     void RefreshParameters();

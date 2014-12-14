@@ -31,6 +31,8 @@
 #include <wx/statbmp.h>
 #include <wx/hyperlink.h>
 #include <wx/htmllbox.h>
+#include "wx/srchctrl.h"
+#include <wx/scrolwin.h>
 
 class LayersEditorPanelBase : public wxPanel
 {
@@ -85,7 +87,7 @@ protected:
     virtual void onCancelBtClick(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE);
+    BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~BaseGroupEventDialog();
 };
 
@@ -94,22 +96,26 @@ class BaseEventStoreDialog : public wxDialog
 {
 protected:
     wxSimpleHtmlListBox* templatesList;
-    wxTextCtrl* searchCtrl5;
+    wxSearchCtrl* searchCtrl;
     wxStaticText* nameTxt;
-    wxStaticText* descriptionTxt;
+    wxStaticText* authorTxt;
+    wxTextCtrl* descriptionEdit;
     wxStaticLine* m_staticLine979;
+    wxScrolledWindow* m_scrollWin148;
     wxFlexGridSizer* parametersSizer;
     wxStaticLine* m_staticLine7911;
+    wxStaticBitmap* m_staticBitmap631;
+    wxHyperlinkCtrl* m_hyperLink652;
     wxButton* okBt;
     wxButton* cancelBt;
 
 protected:
-    virtual void OnSelectionChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnSearchCtrlText(wxCommandEvent& event) { event.Skip(); }
     virtual void OnOkBtClick(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelBtClick(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    BaseEventStoreDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add a template from the event store"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    BaseEventStoreDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add a template from the event store"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,450), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~BaseEventStoreDialog();
 };
 

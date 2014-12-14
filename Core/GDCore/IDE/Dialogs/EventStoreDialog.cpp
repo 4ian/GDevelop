@@ -12,13 +12,15 @@
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/CommonTools.h"
 #include "SFML/Network.hpp"
+#include <boost/algorithm/string.hpp>
 #include <wx/htmllbox.h>
 
 namespace gd
 {
 
-const std::string EventStoreDialog::host = "http://localhost";
-const int EventStoreDialog::port = 3000;
+const std::string EventStoreDialog::host = "http://gdevapp.com";
+const int EventStoreDialog::port = 80;
+gd::SerializerElement * EventStoreDialog::templates = NULL;
 
 EventStoreDialog::EventStoreDialog(wxWindow* parent, gd::Project & project_, gd::Layout & layout_)
     : BaseEventStoreDialog(parent),
@@ -26,7 +28,7 @@ EventStoreDialog::EventStoreDialog(wxWindow* parent, gd::Project & project_, gd:
     layout(layout_),
     parametersHelper(this, paramCheckboxes, paramSpacers1, paramTexts, paramSpacers2, paramBmpBts, paramEdits)
 {
-    parametersHelper.SetSizer(parametersSizer);
+    parametersHelper.SetWindow(m_scrollWin148).SetSizer(parametersSizer);
     templatesList->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(EventStoreDialog::OnSelectionChanged), NULL, this);
 
 	FetchTemplates();
@@ -38,8 +40,19 @@ EventStoreDialog::~EventStoreDialog()
 {
 }
 
-sf::Http::Response::Status EventStoreDialog::FetchTemplates()
+void EventStoreDialog::RefreshWith(std::string templateId, const std::vector<std::string> & parameters)
 {
+    FetchTemplate(templateId);
+    RefreshTemplate();
+    for(unsigned int i = 0;i<parameters.size() && i<paramEdits.size();++i) {
+        paramEdits[i]->SetValue(parameters[i]);
+    }
+}
+
+sf::Http::Response::Status EventStoreDialog::FetchTemplates(bool forceFetch)
+{
+    if (templates && !forceFetch) return sf::Http::Response::Ok;
+
     // Create request
     sf::Http Http(host, port);
     sf::Http::Request request;
@@ -50,7 +63,10 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplates()
     sf::Http::Response response = Http.sendRequest(request, sf::seconds(2));
 
     if (response.getStatus() == sf::Http::Response::Ok)
-        templates = Serializer::FromJSON(response.getBody());
+    {
+        if (templates) delete templates;
+        templates = new gd::SerializerElement(Serializer::FromJSON(response.getBody()));
+    }
 
     return response.getStatus();
 }
@@ -58,7 +74,7 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplates()
 sf::Http::Response::Status EventStoreDialog::FetchTemplate(std::string id)
 {
     nameTxt->SetLabel("Loading the template...");
-    descriptionTxt->SetLabel("");
+    descriptionEdit->SetValue("");
 
     wxSafeYield();
 
@@ -79,19 +95,30 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplate(std::string id)
 
 void EventStoreDialog::RefreshList()
 {
-	templatesList->Clear();
-	templates.ConsiderAsArrayOf("Template");
-	for (unsigned int i = 0;i<templates.GetChildrenCount();++i) {
-		const SerializerElement & eventTemplate = templates.GetChild(i);
-        wxString name = eventTemplate.GetChild("name").GetValue().GetString();
-        wxString desc = eventTemplate.GetChild("description").GetValue().GetString();
-		wxString id = eventTemplate.GetChild("_id").GetValue().GetString();
-        if (desc.size() > 50) {
-            desc.Truncate(50).Append(_("..."));
-        }
+    templatesList->Clear();
+    std::string searchText = gd::ToString(searchCtrl->GetValue());
+    boost::to_upper(searchText);
+    bool searching = searchText.empty() ? false : true;
 
-        wxStringClientData * data = new wxStringClientData(id);
-		templatesList->Append("<b>"+name+"</b><br>"+desc, data);
+    if (!templates) return;
+	templates->ConsiderAsArrayOf("Template");
+	for (unsigned int i = 0;i<templates->GetChildrenCount();++i) {
+		const SerializerElement & eventTemplate = templates->GetChild(i);
+        std::string name = eventTemplate.GetChild("name").GetValue().GetString();
+        std::string desc = eventTemplate.GetChild("description").GetValue().GetString();
+
+        if (!searching || boost::to_upper_copy(name).find(searchText) != std::string::npos
+            || boost::to_upper_copy(desc).find(searchText) != std::string::npos)
+        {
+    		wxString id = eventTemplate.GetChild("_id").GetValue().GetString();
+            if (desc.size() > 50) {
+                desc.resize(50);
+                desc += "...";
+            }
+
+            wxStringClientData * data = new wxStringClientData(id);
+    		templatesList->Append("<b>"+name+"</b><br>"+desc, data);
+        }
 	}
 }
 
@@ -99,9 +126,12 @@ void EventStoreDialog::RefreshTemplate()
 {
     okBt->Enable();
     nameTxt->SetLabel(loadedTemplate.GetChild("name").GetValue().GetString());
-    descriptionTxt->SetLabel(loadedTemplate.GetChild("description").GetValue().GetString());
+    descriptionEdit->SetValue(loadedTemplate.GetChild("description").GetValue().GetString());
+    authorTxt->SetLabel(_("By ")+loadedTemplate.GetChild("_ownerId").
+        GetChild("local").GetChild("username").GetValue().GetString());
 
     RefreshParameters();
+    Layout();
 }
 
 void EventStoreDialog::RefreshParameters()
@@ -165,6 +195,7 @@ void EventStoreDialog::OnOkBtClick(wxCommandEvent& event)
 }
 void EventStoreDialog::OnSearchCtrlText(wxCommandEvent& event)
 {
+    RefreshList();
 }
 
 void EventStoreDialog::OnSelectionChanged(wxCommandEvent& event)
@@ -183,7 +214,7 @@ void EventStoreDialog::OnSelectionChanged(wxCommandEvent& event)
     else
     {
         nameTxt->SetLabel("Unable to load the template");
-        descriptionTxt->SetLabel("An error occured during the loading (Code: "+gd::ToString(status)+" )");
+        descriptionEdit->SetValue("An error occured during the loading (Code: "+gd::ToString(status)+" )");
     }
 
 }

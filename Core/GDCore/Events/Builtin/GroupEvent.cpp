@@ -20,6 +20,7 @@
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/IDE/Dialogs/GroupEventDialog.h"
+#include "GDCore/IDE/Dialogs/EventStoreDialog.h"
 
 using namespace std;
 
@@ -74,11 +75,30 @@ gd::BaseEvent::EditEventReturnType GroupEvent::EditEvent(wxWindow* parent_, gd::
         events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard");
 
 #if !defined(GD_NO_WX_GUI)
-    GroupEventDialog dialog(parent_, *this);
-    dialog.ShowModal();
+    if (source.empty())
+    {
+        GroupEventDialog dialog(parent_, *this);
+        dialog.ShowModal();
+        return ChangesMadeButNoNeedForEventsRecompilation;
+    }
+    else
+    {
+        gd::EventStoreDialog dialog(parent_, project, scene);
+
+        size_t found = source.rfind("/");
+        if (found != std::string::npos && found < source.size()-1) {
+            std::string sourceId = source.substr(found+1, source.size());
+            dialog.RefreshWith(sourceId, parameters);
+        }
+
+        if (dialog.ShowModal() != 1) return Cancelled;
+
+        //Insert new events
+        *this = dialog.GetGroupEvent();
+        return ChangesMade;
+    }
 #endif
 
-    return ChangesMadeButNoNeedForEventsRecompilation;
 }
 
 void GroupEvent::SetBackgroundColor(unsigned int colorR_, unsigned int colorG_, unsigned int colorB_)

@@ -45,7 +45,7 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
         paramSpacers1.push_back(new wxPanel(window));
         paramSpacers2.push_back(new wxPanel(window));
         paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num )));
-        paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num));
+        paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxSize(32,-1), wxBU_AUTODRAW, wxDefaultValidator, num));
 
         //Connecting events
         window->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ParameterControlsHelper::OnParameterBtClick, this, id);

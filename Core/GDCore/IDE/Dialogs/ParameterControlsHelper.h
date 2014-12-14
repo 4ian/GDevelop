@@ -53,6 +53,8 @@ public:
 
     virtual ~ParameterControlsHelper() {};
 
+    ParameterControlsHelper & SetWindow(wxWindow * window_) { window = window_; return *this; };
+
     /**
      * \brief Set the sizer where controls must be created.
      * \note The sizer must be contained inside the window set in the constructor.

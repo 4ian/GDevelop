@@ -1603,18 +1603,15 @@ void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnEventStoreBtClick( wxCommandEvent& event )
 {
-    std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
-    if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL )
-    {
-        gd::LogMessage(_("Please select an event before adding a template."));
-        return;
-    }
-
     gd::EventStoreDialog dialog(this, game, scene);
     if (dialog.ShowModal() != 1) return;
 
     //Insert new events
-    eventsSelected[0].eventsList->InsertEvent(dialog.GetGroupEvent(), eventsSelected[0].positionInList);
+    std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
+    if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL )
+    	events->InsertEvent(dialog.GetGroupEvent());
+    else
+    	eventsSelected[0].eventsList->InsertEvent(dialog.GetGroupEvent(), eventsSelected[0].positionInList);
 
     ChangesMadeOnEvents();
 }

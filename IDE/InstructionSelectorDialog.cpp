@@ -32,25 +32,11 @@
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
-#include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
-#include "ChoixClavier.h"
-#include "SigneModification.h"
-#include "GeneratePassword.h"
-#include "ChoiceJoyAxis.h"
-#include "ChoiceFile.h"
-#include "SigneTest.h"
-#include "ChoixBouton.h"
-#include "TrueOrFalse.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
@@ -83,7 +69,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     game(game_),
     scene(scene_),
     isInverted(false),
-    parametersHelper(this, ParaFac, ParaSpacer1, ParaText, ParaSpacer2, ParaBmpBt, ParaEdit),
+    parametersHelper(ParaFac, ParaSpacer1, ParaText, ParaSpacer2, ParaBmpBt, ParaEdit),
     editingAction(chooseAction)
 {
     wxBoxSizer* BoxSizer4;
@@ -197,7 +183,8 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     SetMinSize(wxSize(500,500));
     Center();
 
-    parametersHelper.SetSizer(GridSizer1);
+    parametersHelper.SetWindowAndSizer(this, GridSizer1)
+        .SetProjectAndLayout(game, scene);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeSelectionChanged);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&InstructionSelectorDialog::OnsearchCtrlText);

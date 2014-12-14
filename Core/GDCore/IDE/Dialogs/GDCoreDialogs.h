@@ -101,7 +101,7 @@ protected:
     wxStaticText* authorTxt;
     wxTextCtrl* descriptionEdit;
     wxStaticLine* m_staticLine979;
-    wxScrolledWindow* m_scrollWin148;
+    wxScrolledWindow* parametersScrolledWindow;
     wxFlexGridSizer* parametersSizer;
     wxStaticLine* m_staticLine7911;
     wxStaticBitmap* m_staticBitmap631;

@@ -26,9 +26,10 @@ EventStoreDialog::EventStoreDialog(wxWindow* parent, gd::Project & project_, gd:
     : BaseEventStoreDialog(parent),
     project(project_),
     layout(layout_),
-    parametersHelper(this, paramCheckboxes, paramSpacers1, paramTexts, paramSpacers2, paramBmpBts, paramEdits)
+    parametersHelper(paramCheckboxes, paramSpacers1, paramTexts, paramSpacers2, paramBmpBts, paramEdits)
 {
-    parametersHelper.SetWindow(m_scrollWin148).SetSizer(parametersSizer);
+    parametersHelper.SetWindowAndSizer(parametersScrolledWindow, parametersSizer)
+        .SetProjectAndLayout(project, layout);
     templatesList->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(EventStoreDialog::OnSelectionChanged), NULL, this);
 
 	FetchTemplates();

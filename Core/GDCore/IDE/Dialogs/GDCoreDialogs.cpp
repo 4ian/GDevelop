@@ -262,13 +262,13 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     
     boxSizer145->Add(m_staticLine979, 0, wxLEFT|wxRIGHT|wxEXPAND, 5);
     
-    m_scrollWin148 = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxVSCROLL);
-    m_scrollWin148->SetScrollRate(0, 5);
+    parametersScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxVSCROLL);
+    parametersScrolledWindow->SetScrollRate(0, 5);
     
-    boxSizer145->Add(m_scrollWin148, 1, wxALL|wxEXPAND, 0);
+    boxSizer145->Add(parametersScrolledWindow, 1, wxALL|wxEXPAND, 0);
     
     wxGridSizer* gridSizer150 = new wxGridSizer(0, 1, 0, 0);
-    m_scrollWin148->SetSizer(gridSizer150);
+    parametersScrolledWindow->SetSizer(gridSizer150);
     
     parametersSizer = new wxFlexGridSizer(0, 3, 0, 0);
     gridSizer150->Add(parametersSizer, 1, wxALL|wxEXPAND, 0);

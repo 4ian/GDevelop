@@ -2623,7 +2623,7 @@
 												}, {
 													"type":	"string",
 													"m_label":	"Name:",
-													"m_value":	"m_scrollWin148"
+													"m_value":	"parametersScrolledWindow"
 												}, {
 													"type":	"multi-string",
 													"m_label":	"Tooltip:",

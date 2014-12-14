@@ -24,6 +24,8 @@ using namespace std;
 namespace gd
 {
 
+
+ParameterControlsHelper::EditParameterFunction ParameterControlsHelper::editionCallback = NULL;
 const long ParameterControlsHelper::ID_EDITARRAY = wxNewId();
 const long ParameterControlsHelper::ID_TEXTARRAY = wxNewId();
 const long ParameterControlsHelper::ID_BUTTONARRAY = wxNewId();
@@ -138,256 +140,22 @@ void ParameterControlsHelper::OnParameterBtClick(wxCommandEvent& event)
 {
     unsigned int i = ToInt(gd::ToString(wxWindow::FindFocus()->GetName()));
     if (i >= paramMetadata.size() || i >= paramEdits.size()) return;
-    if (!editionCallback) return;
+    if (!editionCallback || !editionCallbackProject || !editionCallbackLayout) return;
 
     const ParameterMetadata & metadata = paramMetadata[i];
-    editionCallback(*editionCallbackProject, *editionCallbackLayout, metadata, paramEdits, i);
-
-    /*
-    if ( gd::ParameterMetadata::IsObject(metadata.GetType()) )
-    {
-        gd::ChooseObjectDialog dialog(this, game, scene, true, metadata.GetExtraInfo());
-        if ( dialog.ShowModal() == 1 )
-        {
-            paramEdits.at(i)->ChangeValue(dialog.GetChosenObject());
-        }
-        return;
-    }
-    else if ( metadata.GetType() == "automatism" )
-    {
-        std::string object = paramEdits.empty() ? "" : paramEdits[0]->GetValue().mb_str();
-        gd::ChooseAutomatismDialog dialog(this, game, scene, object, metadata.GetExtraInfo());
-        if ( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.GetChosenAutomatism());
-
-        return;
-    }
-    else if ( metadata.GetType() == "expression" )
-    {
-        gd::EditExpressionDialog dialog(this, ToString( paramEdits.at(i)->GetValue() ), game, scene);
-        if ( dialog.ShowModal() == 1 )
-        {
-            paramEdits.at(i)->ChangeValue(dialog.GetExpression());
-        }
-        return;
-    }
-    else if ( metadata.GetType() == "mouse" )
-    {
-        ChoixBouton dialog(this, ToString( paramEdits.at(i)->GetValue() ));
-        if ( dialog.ShowModal() == 1 )
-        {
-            paramEdits.at(i)->ChangeValue(dialog.bouton);
-        }
-        return;
-    }
-    else if ( metadata.GetType() == "key" )
-    {
-        ChoixClavier dialog(this, ToString( paramEdits.at(i)->GetValue() ));
-        if ( dialog.ShowModal() == 1 )
-        {
-            paramEdits.at(i)->ChangeValue(dialog.selectedKey);
-        }
-        return;
-    }
-    else if ( metadata.GetType() == "string" )
-    {
-        gd::EditStrExpressionDialog dialog(this, ToString( paramEdits.at(i)->GetValue() ), game, scene);
-        if ( dialog.ShowModal() == 1 )
-        {
-            paramEdits.at(i)->ChangeValue(dialog.GetExpression());
-        }
-        return;
-    }
-    else if ( metadata.GetType() == "relationalOperator" )
-    {
-        SigneTest dialog(this);
-        int chosenOperator = dialog.ShowModal();
-
-        if ( chosenOperator == 1 )
-            paramEdits.at(i)->ChangeValue("=");
-        if ( chosenOperator == 2 )
-            paramEdits.at(i)->ChangeValue(">");
-        if ( chosenOperator == 3 )
-            paramEdits.at(i)->ChangeValue("<");
-        if ( chosenOperator == 4 )
-            paramEdits.at(i)->ChangeValue(">=");
-        if ( chosenOperator == 5 )
-            paramEdits.at(i)->ChangeValue("<=");
-        if ( chosenOperator == 6 )
-            paramEdits.at(i)->ChangeValue("!=");
-
-        return;
-    }
-    else if ( metadata.GetType() == "color" )
-    {
-        wxColour color = wxGetColourFromUser(this, wxColour(0,0,0));
-        if ( color.IsOk() )
-        {
-            wxString r; r << static_cast<int>(color.Red());
-            wxString v; v << static_cast<int>(color.Green());
-            wxString b; b << static_cast<int>(color.Blue());
-
-            paramEdits.at(i)->ChangeValue("\""+r+";"+v+";"+b+"\"");
-        }
-        return;
-    }
-    else if ( metadata.GetType() == "police" )
-    {
-        wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-        wxFileDialog dialog(this, _("Choose a font ( ttf/ttc files )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
-        dialog.ShowModal();
-
-        if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
-        {
-            wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
-            paramEdits[i]->ChangeValue(filename.GetFullPath());
-        }
-
-        return;
-    }
-    else if ( metadata.GetType() == "musicfile" )
-    {
-        wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-        wxFileDialog dialog(this, _("Choose a music ( ogg files )"), gameDirectory, "", _("Audio files (*.ogg)|*.ogg"));
-        dialog.ShowModal();
-
-        if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
-        {
-            wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
-            paramEdits[i]->ChangeValue(filename.GetFullPath());
-        }
-
-        return;
-    }
-    else if ( metadata.GetType() == "soundfile" )
-    {
-        wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-        wxFileDialog dialog(this, _("Choose a sound"), gameDirectory, "", _("Audio files (*.wav, *.ogg)|*.wav;*.ogg"));
-        dialog.ShowModal();
-
-        if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
-        {
-            wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
-            paramEdits[i]->ChangeValue(filename.GetFullPath());
-        }
-
-        return;
-    }
-    else if ( metadata.GetType() == "operator" )
-    {
-        SigneModification dialog(this);
-        int retour = dialog.ShowModal();
-
-        if ( retour == 1 )
-            paramEdits.at(i)->ChangeValue("=");
-        if ( retour == 2 )
-            paramEdits.at(i)->ChangeValue("+");
-        if ( retour == 3 )
-            paramEdits.at(i)->ChangeValue("-");
-        if ( retour == 4 )
-            paramEdits.at(i)->ChangeValue("*");
-        if ( retour == 5 )
-            paramEdits.at(i)->ChangeValue("/");
-
-        return;
-    }
-    else if ( metadata.GetType() == "password" )
-    {
-        GeneratePassword dialog(this);
-
-        if ( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.mdp);
-
-        return;
-    }
-    else if ( metadata.GetType() == "trueorfalse" )
-    {
-        TrueOrFalse dialog(this, _("Choose True or False to fill the parameter"), _("True or False"));
-        if ( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(_("True"));
-        else
-            paramEdits.at(i)->ChangeValue(_("False"));
-    }
-    else if ( metadata.GetType() == "yesorno" )
-    {
-        if (wxMessageBox(_("Choose yes or no to fullfil this parameter:"), _("Yes or no") ,wxYES_NO ) == wxYES)
-            paramEdits.at(i)->ChangeValue(_("yes"));
-        else
-            paramEdits.at(i)->ChangeValue(_("no"));
-
-        return;
-    }
-    else if ( metadata.GetType() == "layer" )
-    {
-        gd::ChooseLayerDialog dialog(this, scene);
-        if( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.GetChosenLayer());
-
-        return;
-    }
-    else if ( metadata.GetType() == "joyaxis" )
-    {
-        ChoiceJoyAxis dialog(this, static_cast<string>( paramEdits.at(i)->GetValue() ), game, scene);
-        if( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.joyaxis);
-
-        return;
-    }
-    else if ( metadata.GetType() == "file" )
-    {
-        ChoiceFile dialog(this, ToString( paramEdits.at(i)->GetValue() ), game, scene);
-
-        if ( dialog.ShowModal() == 1 )
-            paramEdits[i]->ChangeValue(dialog.file);
-
-        return;
-    }
-    else if ( metadata.GetType() == "objectvar" )
-    {
-        if ( paramEdits.empty() ) return;
-
-        std::string objectWanted = ToString(paramEdits[0]->GetValue());
-        gd::Object * object = NULL;
-
-        if ( scene.HasObjectNamed(objectWanted) )
-            object = &scene.GetObject(objectWanted);
-        else if ( game.HasObjectNamed(objectWanted) )
-            object = &game.GetObject(objectWanted);
-        else
-            return;
-
-        gd::ChooseVariableDialog dialog(this, object->GetVariables());
-        dialog.SetAssociatedObject(&game, &scene, object);
-        if ( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.GetSelectedVariable());
-
-        return;
-    }
-    else if ( metadata.GetType() == "scenevar" )
-    {
-        gd::ChooseVariableDialog dialog(this, scene.GetVariables());
-        dialog.SetAssociatedLayout(&game, &scene);
-        if ( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.GetSelectedVariable());
-
-        return;
-    }
-    else if ( metadata.GetType() == "globalvar" )
-    {
-        gd::ChooseVariableDialog dialog(this, game.GetVariables());
-        dialog.SetAssociatedProject(&game);
-        if ( dialog.ShowModal() == 1 )
-            paramEdits.at(i)->ChangeValue(dialog.GetSelectedVariable());
-
-        return;
-    }*/
+    editionCallback(window, *editionCallbackProject, *editionCallbackLayout, metadata, paramEdits, i);
 }
 
-ParameterControlsHelper & ParameterControlsHelper::SetSizer(wxFlexGridSizer * sizer_)
+ParameterControlsHelper & ParameterControlsHelper::SetWindowAndSizer(wxWindow * window_, wxFlexGridSizer * sizer_)
 {
+    window = window_;
     sizer = sizer_;
-    sizer->SetCols(3);
-    sizer->AddGrowableCol(1);
+
+    if(sizer)
+    {
+        sizer->SetCols(3);
+        sizer->AddGrowableCol(1);
+    }
     return *this;
 }
 

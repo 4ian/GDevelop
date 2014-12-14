@@ -182,6 +182,11 @@ private:
     gd::ObjectGroup * GetSelectedGroup();
     void UpdateAssociatedPropertiesPanel();
 
+    wxTreeItemId GetLastLayoutObjectItem() const;
+    wxTreeItemId GetLastGlobalObjectItem() const;
+    wxTreeItemId GetLastLayoutGroupItem() const;
+    wxTreeItemId GetLastGlobalGroupItem() const;
+
     //Tools functions
     bool HasGroupNamed(std::string name, std::vector<gd::ObjectGroup> & groups);
     gd::ObjectGroup & GetGroup(std::string name, std::vector<gd::ObjectGroup> & groups);

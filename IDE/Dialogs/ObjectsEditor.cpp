@@ -950,7 +950,12 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     objects.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), ToString(name), objects.GetObjectsCount());
 
     //And to the TreeCtrl
-    wxTreeItemId itemAdded = objectsList->AppendItem( objectsRootItem, name );
+    wxTreeItemId itemAdded;
+    wxTreeItemId lastLayoutObject = GetLastLayoutObjectItem();
+    if(lastLayoutObject.IsOk())
+        itemAdded = objectsList->InsertItem(objectsRootItem, lastLayoutObject, name);
+    else
+        itemAdded = objectsList->AppendItem( objectsRootItem, name );
 
     //Reload thumbnail
     int thumbnailID = -1;
@@ -1401,7 +1406,22 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, NULL, project.GetObject(objectName));
         }
 
-        Refresh();
+        //Delete the old item
+        int oldImage = objectsList->GetItemImage(lastSelectedItem);
+        objectsList->Delete(lastSelectedItem);
+
+        //Add the new item
+        wxTreeItemId newItem;
+        wxTreeItemId lastGlobalItem = GetLastGlobalObjectItem();
+        if(lastGlobalItem.IsOk())
+        {
+            newItem = objectsList->InsertItem(objectsRootItem, lastGlobalItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
+        }
+        else
+        {
+            newItem = objectsList->AppendItem(objectsRootItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
+        }
+        objectsList->SetItemBold(newItem, true);
     }
     //Group clicked?
     else if ( data->GetString() == "LayoutGroup" )
@@ -1489,6 +1509,71 @@ void ObjectsEditor::UpdateAssociatedPropertiesPanel()
         //TODO: Use the associated property grid for groups
         if ( propPnl ) propPnl->SelectedObject(NULL);
     }
+}
+
+wxTreeItemId ObjectsEditor::GetLastLayoutObjectItem() const
+{
+    wxTreeItemIdValue cookie;
+
+    wxTreeItemId item = objectsList->GetFirstChild(objectsRootItem, cookie);
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    
+    while(item.IsOk() && (!data || data->GetString() == "LayoutObject"))
+    {
+        item = objectsList->GetNextChild(objectsRootItem, cookie);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return wxTreeItemId();
+
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
+}
+
+wxTreeItemId ObjectsEditor::GetLastGlobalObjectItem() const
+{
+    wxTreeItemIdValue cookie;
+
+    wxTreeItemId item;
+    wxTreeItemId lastLayoutItem = GetLastLayoutObjectItem();
+    if(!lastLayoutItem.IsOk())
+        item = objectsList->GetFirstChild(objectsRootItem, cookie);
+    else
+        item = objectsList->GetNextSibling(item);
+
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    
+    while(item.IsOk() && (!data || data->GetString() == "GlobalObject"))
+    {
+        item = objectsList->GetNextSibling(item);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return wxTreeItemId();
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
+}
+
+wxTreeItemId ObjectsEditor::GetLastLayoutGroupItem() const
+{
+
+}
+
+wxTreeItemId ObjectsEditor::GetLastGlobalGroupItem() const
+{
+
 }
 
 bool ObjectsEditor::HasGroupNamed(std::string name, std::vector<gd::ObjectGroup> & groups)

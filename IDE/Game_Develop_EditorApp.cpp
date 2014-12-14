@@ -36,11 +36,13 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Analytics/AnalyticsSender.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
@@ -50,11 +52,11 @@
 #include "ConsoleManager.h"
 #include "BugReport.h"
 #include "CompilationChecker.h"
-#include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
 #include "Dialogs/ReminderDialog.h"
+#include "Dialogs/ParameterEditorLauncher.h"
 
 using namespace gd;
 
@@ -367,6 +369,9 @@ bool Game_Develop_EditorApp::OnInit()
 
     cout << "* Loading events editor configuration" << endl;
     gd::InstructionSentenceFormatter::Get()->LoadTypesFormattingFromConfig();
+
+    cout << "* Connecting parameters editors" << endl;
+    gd::ParameterControlsHelper::SetEditParameterFunction(&ParameterEditorLauncher::LaunchEditor);
 
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;

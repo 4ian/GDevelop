@@ -66,8 +66,6 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 {
 	if(!xmlElement) return;
 
-	element.HideWarnings();
-
 	const TiXmlAttribute * attr = xmlElement->FirstAttribute();
 	while(attr)
 	{

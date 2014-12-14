@@ -290,6 +290,6 @@ void wxC629BInitBitmapResources()
     XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_properties16.png"), xml_res_file_4, xml_res_size_4, wxT("image/x-apple-ios-png"));
     XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_refreshicon.png"), xml_res_file_5, xml_res_size_5, wxT("image/x-apple-ios-png"));
     XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_icons_default_up16.png"), xml_res_file_6, xml_res_size_6, wxT("image/x-apple-ios-png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$_home_victor_Developpement_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"), xml_res_file_7, xml_res_size_7, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$_home_victor_Developpement_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$_home_florian_Programmation_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"), xml_res_file_7, xml_res_size_7, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDCoreDialogs_dialogs_bitmaps.cpp$_home_florian_Programmation_GD_Core_GDCore_IDE_Dialogs_GDCoreDialogs_dialogs_bitmaps.xrc"));
 }

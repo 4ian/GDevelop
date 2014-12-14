@@ -111,7 +111,7 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer41 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer41 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer41->SetFlexibleDirection( wxBOTH );
     flexGridSizer41->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer41->AddGrowableCol(0);
@@ -193,5 +193,133 @@ BaseGroupEventDialog::~BaseGroupEventDialog()
     backColorBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onChooseBackgroundBtClick), NULL, this);
     okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onOkBtClick), NULL, this);
     cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onCancelBtClick), NULL, this);
+    
+}
+
+BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC629BInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer731 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer731->SetFlexibleDirection( wxBOTH );
+    flexGridSizer731->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer731->AddGrowableCol(0);
+    flexGridSizer731->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer731);
+    
+    wxBoxSizer* boxSizer134 = new wxBoxSizer(wxHORIZONTAL);
+    
+    flexGridSizer731->Add(boxSizer134, 1, wxALL|wxEXPAND, 0);
+    
+    wxFlexGridSizer* flexGridSizer853 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer853->SetFlexibleDirection( wxBOTH );
+    flexGridSizer853->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer853->AddGrowableCol(0);
+    flexGridSizer853->AddGrowableRow(0);
+    
+    boxSizer134->Add(flexGridSizer853, 2, wxALL|wxEXPAND, 0);
+    
+    templatesList = new wxSimpleHtmlListBox(this, wxID_ANY);
+    flexGridSizer853->Add(templatesList, 0, wxALL|wxEXPAND, 5);
+    templatesList->SetMinSize(wxSize(200,-1));
+    
+    searchCtrl = new wxSearchCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    searchCtrl->SetFocus();
+    
+    flexGridSizer853->Add(searchCtrl, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 5);
+    
+    wxBoxSizer* boxSizer145 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer134->Add(boxSizer145, 3, wxALL|wxEXPAND, 0);
+    
+    nameTxt = new wxStaticText(this, wxID_ANY, _("No template chosen"), wxDefaultPosition, wxSize(-1,-1), 0);
+    wxFont nameTxtFont(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    nameTxt->SetFont(nameTxtFont);
+    
+    boxSizer145->Add(nameTxt, 0, wxALL|wxEXPAND, 5);
+    nameTxt->SetMinSize(wxSize(350,-1));
+    
+    authorTxt = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxALIGN_RIGHT);
+    
+    boxSizer145->Add(authorTxt, 0, wxLEFT|wxRIGHT|wxALIGN_RIGHT, 5);
+    
+    wxBoxSizer* boxSizer146 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer145->Add(boxSizer146, 0, wxALL|wxEXPAND, 0);
+    
+    descriptionEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxTE_READONLY|wxTE_MULTILINE);
+    
+    boxSizer146->Add(descriptionEdit, 0, wxALL|wxEXPAND, 5);
+    descriptionEdit->SetMinSize(wxSize(-1,55));
+    
+    m_staticLine979 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
+    
+    boxSizer145->Add(m_staticLine979, 0, wxLEFT|wxRIGHT|wxEXPAND, 5);
+    
+    parametersScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxVSCROLL);
+    parametersScrolledWindow->SetScrollRate(0, 5);
+    
+    boxSizer145->Add(parametersScrolledWindow, 1, wxALL|wxEXPAND, 0);
+    
+    wxGridSizer* gridSizer150 = new wxGridSizer(0, 1, 0, 0);
+    parametersScrolledWindow->SetSizer(gridSizer150);
+    
+    parametersSizer = new wxFlexGridSizer(0, 3, 0, 0);
+    gridSizer150->Add(parametersSizer, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticLine7911 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
+    
+    flexGridSizer731->Add(m_staticLine7911, 0, wxALL|wxEXPAND, 0);
+    
+    wxFlexGridSizer* flexGridSizer7712 = new wxFlexGridSizer(0, 4, 0, 0);
+    flexGridSizer7712->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7712->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7712->AddGrowableCol(1);
+    
+    flexGridSizer731->Add(flexGridSizer7712, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticBitmap631 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer7712->Add(m_staticBitmap631, 0, wxALL, 5);
+    
+    m_hyperLink652 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/event_store"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink652->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink652->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink652->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer7712->Add(m_hyperLink652, 0, wxRIGHT, 5);
+    
+    okBt = new wxButton(this, wxID_ANY, _("Ok"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer7712->Add(okBt, 0, wxALL|wxALIGN_RIGHT, 5);
+    
+    cancelBt = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer7712->Add(cancelBt, 0, wxALL, 5);
+    
+    SetMinSize( wxSize(500,300) );
+    SetSizeHints(750,450);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    Centre(wxBOTH);
+    // Connect events
+    searchCtrl->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(BaseEventStoreDialog::OnSearchCtrlText), NULL, this);
+    okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnOkBtClick), NULL, this);
+    cancelBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnCancelBtClick), NULL, this);
+    
+}
+
+BaseEventStoreDialog::~BaseEventStoreDialog()
+{
+    searchCtrl->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(BaseEventStoreDialog::OnSearchCtrlText), NULL, this);
+    okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnOkBtClick), NULL, this);
+    cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnCancelBtClick), NULL, this);
     
 }

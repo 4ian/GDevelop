@@ -32,25 +32,11 @@
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
-#include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
-#include "ChoixClavier.h"
-#include "SigneModification.h"
-#include "GeneratePassword.h"
-#include "ChoiceJoyAxis.h"
-#include "ChoiceFile.h"
-#include "SigneTest.h"
-#include "ChoixBouton.h"
-#include "TrueOrFalse.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
@@ -77,16 +63,13 @@ const long InstructionSelectorDialog::ID_STATICBITMAP2 = wxNewId();
 const long InstructionSelectorDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long InstructionSelectorDialog::ID_BUTTON1 = wxNewId();
 const long InstructionSelectorDialog::ID_BUTTON2 = wxNewId();
-const long InstructionSelectorDialog::ID_EDITARRAY = wxNewId();
-const long InstructionSelectorDialog::ID_TEXTARRAY = wxNewId();
-const long InstructionSelectorDialog::ID_BUTTONARRAY = wxNewId();
-const long InstructionSelectorDialog::ID_CHECKARRAY = wxNewId();
 const long InstructionSelectorDialog::ID_CHECKBOX1 = wxNewId();
 
 InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, bool chooseAction) :
     game(game_),
     scene(scene_),
     isInverted(false),
+    parametersHelper(ParaFac, ParaSpacer1, ParaText, ParaSpacer2, ParaBmpBt, ParaEdit),
     editingAction(chooseAction)
 {
     wxBoxSizer* BoxSizer4;
@@ -200,6 +183,8 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     SetMinSize(wxSize(500,500));
     Center();
 
+    parametersHelper.SetWindowAndSizer(this, GridSizer1)
+        .SetProjectAndLayout(game, scene);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeSelectionChanged);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&InstructionSelectorDialog::OnsearchCtrlText);
@@ -444,359 +429,17 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapManager::Get()->unknownAction24);
 
-    //Update controls count
-    while ( ParaEdit.size() < instructionMetadata.parameters.size() )
-    {
-        const string num =ToString( ParaEdit.size() );
-        long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
-
-        //Addings controls
-        ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
-        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
-        ParaSpacer1.push_back( new wxPanel(this) );
-        ParaSpacer2.push_back( new wxPanel(this) );
-        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
-        ParaBmpBt.push_back( new wxBitmapButton( this, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
-
-        //Connecting events
-        Connect( id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( InstructionSelectorDialog::OnParameterBtClick ) );
-        Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( InstructionSelectorDialog::OnOptionalCheckboxClick ) );
-
-        //Placing controls
-        GridSizer1->Add( ParaFac.back(), 1, wxALL | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaText.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaSpacer1.back(), 0, 0 );
-        GridSizer1->Add( ParaSpacer2.back(), 0, 0 );
-        GridSizer1->Add( ParaEdit.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaBmpBt.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-
-        ParaSpacer1.back()->Show(false);
-        ParaSpacer2.back()->Show(false);
-    }
-    while ( ParaEdit.size() > instructionMetadata.parameters.size() )
-    {
-        ParaFac.back()->Destroy();
-        ParaFac.erase(ParaFac.begin()+ParaFac.size()-1);
-        ParaText.back()->Destroy();
-        ParaText.erase(ParaText.begin()+ParaText.size()-1);
-        ParaSpacer1.back()->Destroy();
-        ParaSpacer1.erase(ParaSpacer1.begin()+ParaSpacer1.size()-1);
-        ParaSpacer2.back()->Destroy();
-        ParaSpacer2.erase(ParaSpacer2.begin()+ParaSpacer2.size()-1);
-        ParaEdit.back()->Destroy();
-        ParaEdit.erase(ParaEdit.begin()+ParaEdit.size()-1);
-        ParaBmpBt.back()->Destroy();
-        ParaBmpBt.erase(ParaBmpBt.begin()+ParaBmpBt.size()-1);
+    //Update parameters controls
+    parametersHelper.UpdateControls(instructionMetadata.parameters.size());
+    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ ) {
+        parametersHelper.UpdateParameterContent(i, instructionMetadata.parameters[i],
+            i < Param.size() ? Param[i].GetPlainString() : "");
     }
 
-    //Update parameters
-    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
-    {
-        if (instructionMetadata.parameters[i].codeOnly)
-        {
-            ParaFac.at(i)->Show(false);
-            ParaText.at(i)->Show(false);
-            ParaBmpBt.at(i)->Show(false);
-            ParaEdit.at(i)->Show(false);
-        }
-        else
-        {
-            ParaFac.at(i)->Show(instructionMetadata.parameters[i].optional);
-            ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
-
-            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(":") );
-            ParaText.at(i)->Show();
-
-            if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
-            ParaEdit.at(i)->Show();
-
-            ParaBmpBt.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( gd::InstructionSentenceFormatter::Get()->LabelFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
-
-            //De/activate widgets if parameter is optional
-            bool disable = instructionMetadata.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty();
-            ParaBmpBt.at(i)->Enable(!disable);
-            ParaText.at(i)->Enable(!disable);
-            ParaEdit.at(i)->Enable(!disable);
-            ParaFac.at(i)->SetValue(!disable);
-
-            //Add defaults
-            if ( !instructionMetadata.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
-            {
-                if ( instructionMetadata.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
-                else if ( instructionMetadata.parameters[i].type == "string" ) ParaEdit.at( i )->SetValue("\"\"");
-                else if ( instructionMetadata.parameters[i].type == "operator" ) ParaEdit.at( i )->SetValue("=");
-            }
-
-        }
-    }
-    Layout(); //Ensure widgets just added are properly rendered.
     GridSizer1->Layout();
 
     if (!editingAction)
         invertedCheck->SetValue(isInverted);
-}
-
-void InstructionSelectorDialog::OnParameterBtClick(wxCommandEvent& event)
-{
-    unsigned int i = ToInt(gd::ToString(wxWindow::FindFocus()->GetName()));
-
-    const gd::InstructionMetadata & instructionMetadata = editingAction ?
-        gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), instructionType) :
-        gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), instructionType);
-
-    if ( i < ParaEdit.size() && i < instructionMetadata.parameters.size())
-    {
-        if ( gd::ParameterMetadata::IsObject(instructionMetadata.parameters[i].type) )
-        {
-            gd::ChooseObjectDialog dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
-            if ( dialog.ShowModal() == 1 )
-            {
-                ParaEdit.at(i)->ChangeValue(dialog.GetChosenObject());
-            }
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "automatism" )
-        {
-            std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
-            gd::ChooseAutomatismDialog dialog(this, game, scene, object, instructionMetadata.parameters[i].supplementaryInformation);
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.GetChosenAutomatism());
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "expression" )
-        {
-            gd::EditExpressionDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
-            if ( dialog.ShowModal() == 1 )
-            {
-                ParaEdit.at(i)->ChangeValue(dialog.GetExpression());
-            }
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "mouse" )
-        {
-            ChoixBouton dialog(this, ToString( ParaEdit.at(i)->GetValue() ));
-            if ( dialog.ShowModal() == 1 )
-            {
-                ParaEdit.at(i)->ChangeValue(dialog.bouton);
-            }
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "key" )
-        {
-            ChoixClavier dialog(this, ToString( ParaEdit.at(i)->GetValue() ));
-            if ( dialog.ShowModal() == 1 )
-            {
-                ParaEdit.at(i)->ChangeValue(dialog.selectedKey);
-            }
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "string" )
-        {
-            gd::EditStrExpressionDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
-            if ( dialog.ShowModal() == 1 )
-            {
-                ParaEdit.at(i)->ChangeValue(dialog.GetExpression());
-            }
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "relationalOperator" )
-        {
-            SigneTest dialog(this);
-            int chosenOperator = dialog.ShowModal();
-
-            if ( chosenOperator == 1 )
-                ParaEdit.at(i)->ChangeValue("=");
-            if ( chosenOperator == 2 )
-                ParaEdit.at(i)->ChangeValue(">");
-            if ( chosenOperator == 3 )
-                ParaEdit.at(i)->ChangeValue("<");
-            if ( chosenOperator == 4 )
-                ParaEdit.at(i)->ChangeValue(">=");
-            if ( chosenOperator == 5 )
-                ParaEdit.at(i)->ChangeValue("<=");
-            if ( chosenOperator == 6 )
-                ParaEdit.at(i)->ChangeValue("!=");
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "color" )
-        {
-            wxColour color = wxGetColourFromUser(this, wxColour(0,0,0));
-            if ( color.IsOk() )
-            {
-                wxString r; r << static_cast<int>(color.Red());
-                wxString v; v << static_cast<int>(color.Green());
-                wxString b; b << static_cast<int>(color.Blue());
-
-                ParaEdit.at(i)->ChangeValue("\""+r+";"+v+";"+b+"\"");
-            }
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "police" )
-        {
-            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choose a font ( ttf/ttc files )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
-            dialog.ShowModal();
-
-            if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
-            {
-                wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
-                ParaEdit[i]->ChangeValue(filename.GetFullPath());
-            }
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "musicfile" )
-        {
-            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choose a music ( ogg files )"), gameDirectory, "", _("Audio files (*.ogg)|*.ogg"));
-            dialog.ShowModal();
-
-            if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
-            {
-                wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
-                ParaEdit[i]->ChangeValue(filename.GetFullPath());
-            }
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "soundfile" )
-        {
-            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choose a sound"), gameDirectory, "", _("Audio files (*.wav, *.ogg)|*.wav;*.ogg"));
-            dialog.ShowModal();
-
-            if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
-            {
-                wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
-                ParaEdit[i]->ChangeValue(filename.GetFullPath());
-            }
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "operator" )
-        {
-            SigneModification dialog(this);
-            int retour = dialog.ShowModal();
-
-            if ( retour == 1 )
-                ParaEdit.at(i)->ChangeValue("=");
-            if ( retour == 2 )
-                ParaEdit.at(i)->ChangeValue("+");
-            if ( retour == 3 )
-                ParaEdit.at(i)->ChangeValue("-");
-            if ( retour == 4 )
-                ParaEdit.at(i)->ChangeValue("*");
-            if ( retour == 5 )
-                ParaEdit.at(i)->ChangeValue("/");
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "password" )
-        {
-            GeneratePassword dialog(this);
-
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.mdp);
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "trueorfalse" )
-        {
-            TrueOrFalse dialog(this, _("Choose True or False to fill the parameter"), _("True or False"));
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(_("True"));
-            else
-                ParaEdit.at(i)->ChangeValue(_("False"));
-        }
-        else if ( instructionMetadata.parameters[i].type == "yesorno" )
-        {
-            if (wxMessageBox(_("Choose yes or no to fullfil this parameter:"), _("Yes or no") ,wxYES_NO ) == wxYES)
-                ParaEdit.at(i)->ChangeValue(_("yes"));
-            else
-                ParaEdit.at(i)->ChangeValue(_("no"));
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "layer" )
-        {
-            gd::ChooseLayerDialog dialog(this, scene);
-            if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.GetChosenLayer());
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "joyaxis" )
-        {
-            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
-            if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.joyaxis);
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "file" )
-        {
-            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
-
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit[i]->ChangeValue(dialog.file);
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "objectvar" )
-        {
-            if ( ParaEdit.empty() ) return;
-
-            std::string objectWanted = ToString(ParaEdit[0]->GetValue());
-            gd::Object * object = NULL;
-
-            if ( scene.HasObjectNamed(objectWanted) )
-                object = &scene.GetObject(objectWanted);
-            else if ( game.HasObjectNamed(objectWanted) )
-                object = &game.GetObject(objectWanted);
-            else
-                return;
-
-            gd::ChooseVariableDialog dialog(this, object->GetVariables());
-            dialog.SetAssociatedObject(&game, &scene, object);
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "scenevar" )
-        {
-            gd::ChooseVariableDialog dialog(this, scene.GetVariables());
-            dialog.SetAssociatedLayout(&game, &scene);
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
-
-            return;
-        }
-        else if ( instructionMetadata.parameters[i].type == "globalvar" )
-        {
-            gd::ChooseVariableDialog dialog(this, game.GetVariables());
-            dialog.SetAssociatedProject(&game);
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.GetSelectedVariable());
-
-            return;
-        }
-    }
-}
-
-void InstructionSelectorDialog::OnOptionalCheckboxClick(wxCommandEvent& event)
-{
-    unsigned int i = gd::ToInt(gd::ToString(wxWindow::FindFocus()->GetName()));
-    if (i > ParaFac.size()) return;
-
-    bool enable = ParaFac.at(i)->GetValue();
-    ParaBmpBt.at(i)->Enable(enable);
-    ParaText.at(i)->Enable(enable);
-    ParaEdit.at(i)->Enable(enable);
 }
 
 void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)

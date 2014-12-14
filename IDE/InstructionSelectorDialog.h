@@ -24,6 +24,7 @@
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
 #include "GDCore/Events/Expression.h"
+#include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
 namespace gd { class Layout; }
 namespace gd { class Project; }
 namespace gd { class InstructionMetadata; }
@@ -87,11 +88,7 @@ protected:
 	static const long ID_HYPERLINKCTRL1;
 	static const long ID_BUTTON1;
 	static const long ID_BUTTON2;
-	static const long ID_TEXTARRAY;
-	static const long ID_EDITARRAY;
-	static const long ID_BUTTONARRAY;
 	static const long ID_CHECKBOX1;
-	static const long ID_CHECKARRAY;
 
 private:
 
@@ -101,6 +98,7 @@ private:
 	vector < wxPanel * > ParaSpacer2;
 	vector < wxBitmapButton * > ParaBmpBt;
 	vector < wxTextCtrl * > ParaEdit;
+	gd::ParameterControlsHelper parametersHelper;
 
 	void OnOkBtClick(wxCommandEvent& event);
 	void OnCancelBtClick(wxCommandEvent& event);
@@ -111,8 +109,6 @@ private:
 	void OninstructionsTreeItemActivated(wxTreeEvent& event);
 	void OnobjectinstructionsTreeItemActivated(wxTreeEvent& event);
 	void RefreshObjectsLists();
-	void OnParameterBtClick(wxCommandEvent& event);
-    void OnOptionalCheckboxClick(wxCommandEvent& event);
     bool MatchSearchCriteria(std::string search, const gd::InstructionMetadata & instrMetadata);
 
     /**

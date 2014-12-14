@@ -30,6 +30,9 @@
 #include <wx/statline.h>
 #include <wx/statbmp.h>
 #include <wx/hyperlink.h>
+#include <wx/htmllbox.h>
+#include "wx/srchctrl.h"
+#include <wx/scrolwin.h>
 
 class LayersEditorPanelBase : public wxPanel
 {
@@ -84,8 +87,36 @@ protected:
     virtual void onCancelBtClick(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE);
+    BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~BaseGroupEventDialog();
+};
+
+
+class BaseEventStoreDialog : public wxDialog
+{
+protected:
+    wxSimpleHtmlListBox* templatesList;
+    wxSearchCtrl* searchCtrl;
+    wxStaticText* nameTxt;
+    wxStaticText* authorTxt;
+    wxTextCtrl* descriptionEdit;
+    wxStaticLine* m_staticLine979;
+    wxScrolledWindow* parametersScrolledWindow;
+    wxFlexGridSizer* parametersSizer;
+    wxStaticLine* m_staticLine7911;
+    wxStaticBitmap* m_staticBitmap631;
+    wxHyperlinkCtrl* m_hyperLink652;
+    wxButton* okBt;
+    wxButton* cancelBt;
+
+protected:
+    virtual void OnSearchCtrlText(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOkBtClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCancelBtClick(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    BaseEventStoreDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add a template from the event store"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,450), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    virtual ~BaseEventStoreDialog();
 };
 
 #endif

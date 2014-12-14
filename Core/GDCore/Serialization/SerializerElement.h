@@ -200,12 +200,6 @@ public:
 	const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
     ///@}
 
-	/**
-	 * Hide any deprecated warning concerning how child and attributes are named.
-	 * Useful when unserializing from an old file.
-	 */
-    void HideWarnings() { hideWarning = true; };
-
 	static SerializerElement nullElement;
 private:
 
@@ -216,7 +210,6 @@ private:
 	std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > children;
 	mutable std::string arrayOf;
 	mutable std::string deprecatedArrayOf;
-	bool hideWarning;
 };
 
 }

@@ -39,8 +39,6 @@
 #include "LogFileManager.h"
 #include "GDCpp/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
-#include "CreateTemplate.h"
-#include "ChoixTemplateEvent.h"
 #include "InstructionSelectorDialog.h"
 #include "GDCore/IDE/Clipboard.h"
 #undef CreateEvent //Disable an annoying macro

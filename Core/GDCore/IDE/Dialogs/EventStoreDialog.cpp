@@ -32,6 +32,7 @@ EventStoreDialog::EventStoreDialog(wxWindow* parent, gd::Project & project_, gd:
         .SetProjectAndLayout(project, layout);
     templatesList->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(EventStoreDialog::OnSelectionChanged), NULL, this);
 
+    descriptionEdit->SetValue(_("Please choose a template in the list."));
 	FetchTemplates();
 	RefreshList();
     okBt->Enable(false);

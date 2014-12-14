@@ -24,7 +24,7 @@
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {
-    return scene.GetLayer(layer).GetVisibility();
+    return scene.GetRuntimeLayer(layer).GetVisibility();
 }
 
 void GD_API ShowLayer( RuntimeScene & scene, const std::string & layer )

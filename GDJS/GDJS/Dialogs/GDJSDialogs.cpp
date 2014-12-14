@@ -13,100 +13,6 @@ extern void wxCB65InitBitmapResources();
 static bool bBitmapLoaded = false;
 
 
-BaseUploadOnlineDialog::BaseUploadOnlineDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-    : wxDialog(parent, id, title, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxCB65InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    
-    wxFlexGridSizer* flexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer3->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3->AddGrowableCol(0);
-    flexGridSizer3->AddGrowableRow(1);
-    this->SetSizer(flexGridSizer3);
-    
-    m_staticText15 = new wxStaticText(this, wxID_ANY, _("Your game have been packaged and is ready to be uploaded!  Enter the information about your game in the fields and then click on 'Upload my game'."), wxDefaultPosition, wxSize(-1,-1), 0);
-    m_staticText15->Wrap(700);
-    
-    flexGridSizer3->Add(m_staticText15, 0, wxALL, 5);
-    
-    webView = wxWebView::New(this,wxID_ANY,"www.gamedevshare.com/send.php",wxDefaultPosition,wxSize(278,334),wxWebViewBackendDefault, wxNO_BORDER);
-    flexGridSizer3->Add(webView, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-    
-    wxFlexGridSizer* flexGridSizer13 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer13->SetFlexibleDirection( wxBOTH );
-    flexGridSizer13->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer13->AddGrowableCol(0);
-    flexGridSizer13->AddGrowableRow(0);
-    
-    flexGridSizer3->Add(flexGridSizer13, 1, wxALL|wxEXPAND, 0);
-    
-    wxFlexGridSizer* flexGridSizer19 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer19->SetFlexibleDirection( wxBOTH );
-    flexGridSizer19->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer19->AddGrowableCol(1);
-    flexGridSizer19->AddGrowableRow(0);
-    
-    flexGridSizer13->Add(flexGridSizer19, 1, wxALL|wxEXPAND, 0);
-    
-    m_staticText151 = new wxStaticText(this, wxID_ANY, _("The file to be uploaded was saved at this location on your computer:"), wxDefaultPosition, wxSize(-1,-1), 0);
-    m_staticText151->Wrap(700);
-    
-    flexGridSizer19->Add(m_staticText151, 0, wxALL, 5);
-    
-    packageLocationEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxTE_READONLY);
-    
-    flexGridSizer19->Add(packageLocationEdit, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 5);
-    
-    m_staticLine25 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
-    
-    flexGridSizer3->Add(m_staticLine25, 0, wxTOP|wxEXPAND, 5);
-    
-    wxFlexGridSizer* flexGridSizer27 = new wxFlexGridSizer(0, 3, 0, 0);
-    flexGridSizer27->SetFlexibleDirection( wxBOTH );
-    flexGridSizer27->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer27->AddGrowableCol(1);
-    flexGridSizer27->AddGrowableRow(0);
-    
-    flexGridSizer3->Add(flexGridSizer27, 1, wxTOP|wxBOTTOM|wxEXPAND, 0);
-    
-    m_staticBitmap31 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("helpicon")), wxDefaultPosition, wxSize(-1,-1), 0 );
-    
-    flexGridSizer27->Add(m_staticBitmap31, 0, wxALL, 5);
-    
-    m_hyperLink29 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtodistribute"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    m_hyperLink29->SetNormalColour(wxColour(wxT("#0000FF")));
-    m_hyperLink29->SetHoverColour(wxColour(wxT("#0000FF")));
-    m_hyperLink29->SetVisitedColour(wxColour(wxT("#FF0000")));
-    
-    flexGridSizer27->Add(m_hyperLink29, 0, wxALL, 5);
-    
-    m_button6 = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxSize(-1,-1), 0);
-    
-    flexGridSizer27->Add(m_button6, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
-    
-    SetMinSize( wxSize(800,750) );
-    SetSizeHints(800,750);
-    if ( GetSizer() ) {
-         GetSizer()->Fit(this);
-    }
-    Centre(wxBOTH);
-    // Connect events
-    m_button6->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseUploadOnlineDialog::OnCloseBtClicked), NULL, this);
-    
-}
-
-BaseUploadOnlineDialog::~BaseUploadOnlineDialog()
-{
-    m_button6->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseUploadOnlineDialog::OnCloseBtClicked), NULL, this);
-    
-}
-
 BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
     : wxDialog(parent, id, title, pos, size, style)
 {
@@ -131,49 +37,6 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     exportChoice = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxBK_DEFAULT);
     
     flexGridSizer33->Add(exportChoice, 0, wxALL, 5);
-    
-    m_panel63 = new wxPanel(exportChoice, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
-    exportChoice->AddPage(m_panel63, _("GameDevShare.com"), true);
-    
-    wxFlexGridSizer* flexGridSizer55 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer55->SetFlexibleDirection( wxBOTH );
-    flexGridSizer55->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer55->AddGrowableCol(0);
-    flexGridSizer55->AddGrowableRow(1);
-    m_panel63->SetSizer(flexGridSizer55);
-    
-    gdsharelogoPanel = new wxPanel(m_panel63, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
-    gdsharelogoPanel->SetBackgroundColour(wxColour(wxT("rgb(51,16,69)")));
-    
-    flexGridSizer55->Add(gdsharelogoPanel, 0, wxALL, 0);
-    
-    wxFlexGridSizer* flexGridSizer63 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer63->SetFlexibleDirection( wxBOTH );
-    flexGridSizer63->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    gdsharelogoPanel->SetSizer(flexGridSizer63);
-    
-    m_staticBitmap57 = new wxStaticBitmap(gdsharelogoPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gdsharelogo")), wxDefaultPosition, wxSize(-1,-1), 0 );
-    
-    flexGridSizer63->Add(m_staticBitmap57, 0, wxALL, 0);
-    
-    m_staticText65 = new wxStaticText(m_panel63, wxID_ANY, _("GameDevShare.com is a free online gaming platform for\ngames created with GDevelop."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_CENTRE);
-    
-    flexGridSizer55->Add(m_staticText65, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_TOP, 10);
-    
-    wxStaticBoxSizer* staticBoxSizer110 = new wxStaticBoxSizer( new wxStaticBox(m_panel63, wxID_ANY, _("Note")), wxVERTICAL);
-    
-    flexGridSizer55->Add(staticBoxSizer110, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM, 5);
-    
-    wxFlexGridSizer* flexGridSizer116 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer116->SetFlexibleDirection( wxBOTH );
-    flexGridSizer116->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer116->AddGrowableCol(0);
-    
-    staticBoxSizer110->Add(flexGridSizer116, 1, wxALL|wxEXPAND, 0);
-    
-    m_staticText67 = new wxStaticText(m_panel63, wxID_ANY, _("Just click on the \"Export\" button and GDevelop will\npackage your game in a single zip file. Then you'll be\nasked for some information (Name of your game, your\nemail address) and the game will be uploaded on the website."), wxDefaultPosition, wxSize(-1,-1), 0);
-    
-    flexGridSizer116->Add(m_staticText67, 0, wxALL|wxEXPAND|wxALIGN_CENTER, 5);
     
     m_panel61 = new wxPanel(exportChoice, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
     exportChoice->AddPage(m_panel61, _("Export to a website"), false);
@@ -281,7 +144,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     cocoonjslogoPanel22 = new wxPanel(m_panel118, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
     cocoonjslogoPanel22->SetBackgroundColour(wxColour(wxT("rgb(51,16,69)")));
     
-    flexGridSizer5511->Add(cocoonjslogoPanel22, 0, wxALL, 0);
+    flexGridSizer5511->Add(cocoonjslogoPanel22, 0, wxALL|wxALIGN_CENTER, 0);
     
     wxFlexGridSizer* flexGridSizer6333 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer6333->SetFlexibleDirection( wxBOTH );
@@ -324,7 +187,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     cocoonjslogoPanel2 = new wxPanel(m_panel71, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
     cocoonjslogoPanel2->SetBackgroundColour(wxColour(wxT("rgb(51,16,69)")));
     
-    flexGridSizer551->Add(cocoonjslogoPanel2, 0, wxALL, 0);
+    flexGridSizer551->Add(cocoonjslogoPanel2, 0, wxALL|wxALIGN_CENTER, 0);
     
     wxFlexGridSizer* flexGridSizer633 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer633->SetFlexibleDirection( wxBOTH );

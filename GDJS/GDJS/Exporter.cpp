@@ -33,7 +33,6 @@
 #include "GDJS/Exporter.h"
 #include "GDJS/EventsCodeGenerator.h"
 #include "GDJS/Dialogs/ProjectExportDialog.h"
-#include "GDJS/Dialogs/UploadOnlineDialog.h"
 #include "GDJS/Dialogs/CocoonJSUploadDialog.h"
 #include "GDJS/Dialogs/IntelXDKPackageDialog.h"
 #undef CopyFile //Disable an annoying macro
@@ -542,21 +541,20 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
     ProjectExportDialog dialog(NULL, project);
     if ( dialog.ShowModal() != 1 ) return;
 
-    bool exportForGDShare = dialog.GetExportType() == ProjectExportDialog::GameDevShare;
     bool exportForCocoonJS = dialog.GetExportType() == ProjectExportDialog::CocoonJS;
     bool exportForIntelXDK = dialog.GetExportType() == ProjectExportDialog::IntelXDK;
 
     ExportWholeProject(project, dialog.GetExportDir(), dialog.RequestMinify(),
-        exportForGDShare, exportForCocoonJS, exportForIntelXDK);
+        exportForCocoonJS, exportForIntelXDK);
     #else
     gd::LogError("BAD USE: Exporter::ShowProjectExportDialog is not available.");
     #endif
 }
 
 bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
-    bool minify, bool exportForGDShare, bool exportForCocoonJS, bool exportForIntelXDK)
+    bool minify, bool exportForCocoonJS, bool exportForIntelXDK)
 {
-    bool exportToZipFile = exportForGDShare || exportForCocoonJS;
+    bool exportToZipFile = exportForCocoonJS;
 
     {
         #if !defined(GD_NO_WX_GUI)
@@ -629,7 +627,6 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         ExportIncludesAndLibs(includesFiles, exportDir, minify);
         bool indexFile = false;
         if (exportForIntelXDK) indexFile = ExportIntelXDKIndexFile(exportedProject, exportDir, includesFiles, additionalSpec);
-        else if (exportForGDShare) indexFile = ExportMetadataFile(exportedProject, exportDir, includesFiles);
         else indexFile = ExportStandardIndexFile(exportedProject, exportDir, includesFiles, additionalSpec);
 
         if ( !indexFile)
@@ -681,12 +678,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
 
     //Finished!
     #if !defined(GD_NO_WX_GUI)
-    if ( exportForGDShare )
-    {
-        UploadOnlineDialog uploadDialog(NULL, project.GetName(), exportDir+wxFileName::GetPathSeparator()+"packaged_game.zip");
-        uploadDialog.ShowModal();
-    }
-    else if ( exportForCocoonJS )
+    if ( exportForCocoonJS )
     {
         CocoonJSUploadDialog uploadDialog(NULL, exportDir+wxFileName::GetPathSeparator()+"packaged_game.zip");
         uploadDialog.ShowModal();

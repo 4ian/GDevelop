@@ -15,51 +15,23 @@
 #include <wx/artprov.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/webview.h>
-#include <wx/textctrl.h>
-#include <wx/statline.h>
-#include <wx/statbmp.h>
-#include <wx/hyperlink.h>
-#include <wx/button.h>
 #include <wx/choicebk.h>
 #include <wx/panel.h>
 #include <wx/imaglist.h>
-#include <wx/statbox.h>
+#include <wx/textctrl.h>
+#include <wx/button.h>
 #include <wx/checkbox.h>
+#include <wx/hyperlink.h>
+#include <wx/statbox.h>
+#include <wx/statbmp.h>
 #include <wx/stc/stc.h>
 #include <wx/bmpbuttn.h>
-
-class BaseUploadOnlineDialog : public wxDialog
-{
-protected:
-    wxStaticText* m_staticText15;
-    wxWebView* webView;
-    wxStaticText* m_staticText151;
-    wxTextCtrl* packageLocationEdit;
-    wxStaticLine* m_staticLine25;
-    wxStaticBitmap* m_staticBitmap31;
-    wxHyperlinkCtrl* m_hyperLink29;
-    wxButton* m_button6;
-
-protected:
-    virtual void OnCloseBtClicked(wxCommandEvent& event) { event.Skip(); }
-
-public:
-    BaseUploadOnlineDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Upload to GameDevShare.com"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,750), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-    virtual ~BaseUploadOnlineDialog();
-};
-
 
 class BaseProjectExportDialog : public wxDialog
 {
 protected:
     wxStaticText* m_staticText59;
     wxChoicebook* exportChoice;
-    wxPanel* m_panel63;
-    wxPanel* gdsharelogoPanel;
-    wxStaticBitmap* m_staticBitmap57;
-    wxStaticText* m_staticText65;
-    wxStaticText* m_staticText67;
     wxPanel* m_panel61;
     wxStaticText* ID_STATICTEXT4;
     wxTextCtrl* exportFolderEdit;

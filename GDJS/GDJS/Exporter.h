@@ -53,7 +53,7 @@ public:
      * Called by ShowProjectExportDialog if the user clicked on Ok.
      */
     bool ExportWholeProject(gd::Project & project, std::string exportDir,
-        bool minify, bool exportForGDShare, bool exportForCocoonJS, bool exportForIntelXDK);
+        bool minify, bool exportForCocoonJS, bool exportForIntelXDK);
 
     /**
      * \brief Return the error that occurred during the last export.

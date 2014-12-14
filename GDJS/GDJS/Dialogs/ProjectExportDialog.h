@@ -28,7 +28,6 @@ public:
     enum ExportType
     {
         Normal,
-        GameDevShare,
         IntelXDK,
         CocoonJS
     };

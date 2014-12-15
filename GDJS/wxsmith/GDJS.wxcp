@@ -5265,7 +5265,7 @@
 												}, {
 													"type":	"multi-string",
 													"m_label":	"Label:",
-													"m_value":	"Scenes can be accessed using 'runtimeScene' variable."
+													"m_value":	"The scene can be accessed using 'runtimeScene' variable."
 												}, {
 													"type":	"string",
 													"m_label":	"Wrap:",

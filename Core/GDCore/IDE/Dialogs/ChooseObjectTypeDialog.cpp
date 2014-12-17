@@ -151,6 +151,7 @@ ChooseObjectTypeDialog::~ChooseObjectTypeDialog()
 
 void ChooseObjectTypeDialog::RefreshList()
 {
+    selectedObjectType = "";
     objectsList->DeleteAllItems();
 
     wxImageList * imageList = new wxImageList(32,32);
@@ -187,6 +188,10 @@ void ChooseObjectTypeDialog::RefreshList()
                 objectsList->SetItemPtrData(index, wxPtrToUInt(associatedData));
                 if ( !extensionEnabled ) objectsList->SetItemTextColour(index, wxColor(128,128,128));
 
+                //Ensure the selected object type is the focused element (focused element is not considered
+                //as selected with wxGTK).
+                selectedObjectType = selectedObjectType.empty() || extensionEnabled ?
+                    objectsTypes[j] : selectedObjectType;
 	        }
 	    }
 	}

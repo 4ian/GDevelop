@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	152,
+		"m_objCounter":	154,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxC629BInitBitmapResources",
 		"m_bitmapsFile":	"GDCoreDialogs_dialogs_bitmaps.cpp",
@@ -2866,7 +2866,7 @@
 								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
-									"m_value":	"4"
+									"m_value":	"5"
 								}, {
 									"type":	"string",
 									"m_label":	"# Rows:",
@@ -2874,7 +2874,7 @@
 								}, {
 									"type":	"string",
 									"m_label":	"Growable columns:",
-									"m_value":	"1"
+									"m_value":	"2"
 								}, {
 									"type":	"string",
 									"m_label":	"Growable rows:",
@@ -2892,11 +2892,11 @@
 							"m_children":	[{
 									"m_type":	4409,
 									"proportion":	0,
-									"border":	5,
+									"border":	15,
 									"gbSpan":	"1,1",
 									"gbPosition":	"0,0",
 									"m_styles":	[],
-									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+									"m_sizerFlags":	["wxLEFT", "wxTOP", "wxBOTTOM"],
 									"m_properties":	[{
 											"type":	"winid",
 											"m_label":	"ID:",
@@ -2967,7 +2967,7 @@
 									"gbSpan":	"1,1",
 									"gbPosition":	"0,0",
 									"m_styles":	["wxHL_DEFAULT_STYLE"],
-									"m_sizerFlags":	["wxRIGHT"],
+									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 									"m_properties":	[{
 											"type":	"winid",
 											"m_label":	"ID:",
@@ -3032,6 +3032,93 @@
 											"type":	"string",
 											"m_label":	"URL:",
 											"m_value":	"http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/event_store"
+										}, {
+											"type":	"colour",
+											"m_label":	"Normal Colour:",
+											"colour":	"#0000FF"
+										}, {
+											"type":	"colour",
+											"m_label":	"Visited Colour:",
+											"colour":	"#FF0000"
+										}, {
+											"type":	"colour",
+											"m_label":	"Hover Colour:",
+											"colour":	"#0000FF"
+										}],
+									"m_events":	[],
+									"m_children":	[]
+								}, {
+									"m_type":	4438,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	["wxHL_DEFAULT_STYLE"],
+									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL"],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_hyperLink154"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	""
+										}, {
+											"type":	"colour",
+											"m_label":	"Bg Colour:",
+											"colour":	"<Default>"
+										}, {
+											"type":	"colour",
+											"m_label":	"Fg Colour:",
+											"colour":	"<Default>"
+										}, {
+											"type":	"font",
+											"m_label":	"Font:",
+											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Hidden",
+											"m_value":	false
+										}, {
+											"type":	"bool",
+											"m_label":	"Disabled",
+											"m_value":	false
+										}, {
+											"type":	"bool",
+											"m_label":	"Focused",
+											"m_value":	false
+										}, {
+											"type":	"string",
+											"m_label":	"Class Name:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Include File:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Style:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Publish your own events on GDevApp.com"
+										}, {
+											"type":	"string",
+											"m_label":	"URL:",
+											"m_value":	"https://gdevapp.com"
 										}, {
 											"type":	"colour",
 											"m_label":	"Normal Colour:",

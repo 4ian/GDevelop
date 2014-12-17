@@ -277,23 +277,30 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     
     flexGridSizer731->Add(m_staticLine7911, 0, wxALL|wxEXPAND, 0);
     
-    wxFlexGridSizer* flexGridSizer7712 = new wxFlexGridSizer(0, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer7712 = new wxFlexGridSizer(0, 5, 0, 0);
     flexGridSizer7712->SetFlexibleDirection( wxBOTH );
     flexGridSizer7712->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer7712->AddGrowableCol(1);
+    flexGridSizer7712->AddGrowableCol(2);
     
     flexGridSizer731->Add(flexGridSizer7712, 1, wxALL|wxEXPAND, 0);
     
     m_staticBitmap631 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
     
-    flexGridSizer7712->Add(m_staticBitmap631, 0, wxALL, 5);
+    flexGridSizer7712->Add(m_staticBitmap631, 0, wxLEFT|wxTOP|wxBOTTOM, 15);
     
     m_hyperLink652 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/event_store"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink652->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink652->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink652->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer7712->Add(m_hyperLink652, 0, wxRIGHT, 5);
+    flexGridSizer7712->Add(m_hyperLink652, 0, wxALL, 5);
+    
+    m_hyperLink154 = new wxHyperlinkCtrl(this, wxID_ANY, _("Publish your own events on GDevApp.com"), wxT("https://gdevapp.com"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink154->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink154->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink154->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer7712->Add(m_hyperLink154, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
     
     okBt = new wxButton(this, wxID_ANY, _("Ok"), wxDefaultPosition, wxSize(-1,-1), 0);
     

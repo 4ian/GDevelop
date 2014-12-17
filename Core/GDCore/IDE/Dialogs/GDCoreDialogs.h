@@ -106,6 +106,7 @@ protected:
     wxStaticLine* m_staticLine7911;
     wxStaticBitmap* m_staticBitmap631;
     wxHyperlinkCtrl* m_hyperLink652;
+    wxHyperlinkCtrl* m_hyperLink154;
     wxButton* okBt;
     wxButton* cancelBt;
 

@@ -955,7 +955,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     if(lastLayoutObject.IsOk())
         itemAdded = objectsList->InsertItem(objectsRootItem, lastLayoutObject, name);
     else
-        itemAdded = objectsList->AppendItem( objectsRootItem, name );
+        itemAdded = objectsList->PrependItem(objectsRootItem, name);
 
     //Reload thumbnail
     int thumbnailID = -1;
@@ -997,7 +997,14 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     objectsGroups.push_back( newGroup );
 
-    wxTreeItemId itemAdded = objectsList->AppendItem( groupsRootItem, name, 1 );
+    wxTreeItemId itemAdded;
+    wxTreeItemId lastLayoutItem = GetLastLayoutGroupItem();
+    if(lastLayoutItem.IsOk())
+        itemAdded = objectsList->InsertItem(groupsRootItem, lastLayoutItem, name, 1);
+    else
+        itemAdded = objectsList->PrependItem(groupsRootItem, name, 1);
+
+    //wxTreeItemId itemAdded = objectsList->AppendItem( groupsRootItem, name, 1 );
     objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutGroup") );
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -1422,6 +1429,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             newItem = objectsList->AppendItem(objectsRootItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
         }
         objectsList->SetItemBold(newItem, true);
+        objectsList->SelectItem(newItem);
     }
     //Group clicked?
     else if ( data->GetString() == "LayoutGroup" )
@@ -1444,7 +1452,27 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, NULL, groupName);
         }
 
-        Refresh();
+        //Add the item corresponding to the global group
+        bool wasExpanded = objectsList->IsExpanded(lastSelectedItem);
+        objectsList->Delete(lastSelectedItem);
+
+        wxTreeItemId newItem;
+        wxTreeItemId lastGlobalItem = GetLastGlobalGroupItem();
+        if(lastGlobalItem.IsOk())
+        {
+            newItem = objectsList->InsertItem(groupsRootItem, lastGlobalItem, groupName, 1, 1, new gd::TreeItemStringData("GlobalGroup"));
+        }
+        else
+        {
+            newItem = objectsList->AppendItem(groupsRootItem, groupName, 1, 1, new gd::TreeItemStringData("GlobalGroup"));
+        }
+        objectsList->SetItemBold(newItem, true);
+        objectsList->SelectItem(newItem);
+
+        UpdateGroup(newItem); //Update the group item content
+
+        if(wasExpanded) //Expand the group item if it was expanded before
+            objectsList->Expand(newItem);
     }
 }
 
@@ -1528,8 +1556,7 @@ wxTreeItemId ObjectsEditor::GetLastLayoutObjectItem() const
     }
 
     if(!data || !item.IsOk())
-        return wxTreeItemId();
-
+        return objectsList->GetLastChild(objectsRootItem);
 
     item = objectsList->GetPrevSibling(item);
 
@@ -1559,7 +1586,7 @@ wxTreeItemId ObjectsEditor::GetLastGlobalObjectItem() const
     }
 
     if(!data || !item.IsOk())
-        return wxTreeItemId();
+        return objectsList->GetLastChild(objectsRootItem);
 
     item = objectsList->GetPrevSibling(item);
 
@@ -1568,12 +1595,56 @@ wxTreeItemId ObjectsEditor::GetLastGlobalObjectItem() const
 
 wxTreeItemId ObjectsEditor::GetLastLayoutGroupItem() const
 {
+    wxTreeItemIdValue cookie;
 
+    wxTreeItemId item = objectsList->GetFirstChild(groupsRootItem, cookie);
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    
+    while(item.IsOk() && (!data || data->GetString() == "LayoutGroup"))
+    {
+        item = objectsList->GetNextChild(groupsRootItem, cookie);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return objectsList->GetLastChild(groupsRootItem);
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
 }
 
 wxTreeItemId ObjectsEditor::GetLastGlobalGroupItem() const
 {
+    wxTreeItemIdValue cookie;
 
+    wxTreeItemId item;
+    wxTreeItemId lastLayoutItem = GetLastLayoutGroupItem();
+    if(!lastLayoutItem.IsOk())
+        item = objectsList->GetFirstChild(groupsRootItem, cookie);
+    else
+        item = objectsList->GetNextSibling(item);
+
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    
+    while(item.IsOk() && (!data || data->GetString() == "GlobalGroup"))
+    {
+        item = objectsList->GetNextSibling(item);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return objectsList->GetLastChild(groupsRootItem);
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
 }
 
 bool ObjectsEditor::HasGroupNamed(std::string name, std::vector<gd::ObjectGroup> & groups)

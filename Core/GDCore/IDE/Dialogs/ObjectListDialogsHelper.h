@@ -15,13 +15,16 @@ namespace gd { class ClassWithObjects; }
 namespace gd { class ObjectGroup; }
 class wxTreeCtrl;
 class wxTreeItemId;
+#if !defined(GD_NO_WX_GUI)
+#include <wx/image.h>
+#include <wx/imaglist.h>
+#endif
 
 namespace gd
 {
 
 /**
  * \brief Utility class used to display objects lists into controls.
- * \todo Thumbnail support for wxWidgets
  *
  * \see ChooseObjectDialog
  *
@@ -35,7 +38,13 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true) {};
+    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true)
+    {
+        #if !defined(GD_NO_WX_GUI)
+        imageList = new wxImageList(24,24, true);
+        #endif
+    };
+
     virtual ~ObjectListDialogsHelper() {};
 
     void SetSearchText(std::string searchText_);
@@ -74,14 +83,18 @@ public:
     #endif
 
 private:
-    wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty);
-    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, const std::vector <gd::ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty);
+    wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty);
+    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const std::vector <gd::ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty);
 
     const Project & project;
     const Layout & layout;
     std::string objectTypeAllowed;
     std::string searchText;
     bool groupsAllowed;
+
+#if !defined(GD_NO_WX_GUI)
+    wxImageList *imageList;
+#endif
 };
 
 }

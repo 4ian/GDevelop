@@ -615,12 +615,14 @@ void MainFrame::OnClose( wxCloseEvent& event )
 
             if (whatToDo == wxCANCEL) return;
             else if ( whatToDo == wxYES ) {
-                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) )
+                if (!Save(*games[i], games[i]->GetProjectFile()))
                     gd::LogError( _("Save failed!") );
                 else
                     gd::LogStatus( _("Project properly saved.") );
             }
         }
+
+        if (projectManager) projectManager->CloseGame(games[i].get());
     }
 
     wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );

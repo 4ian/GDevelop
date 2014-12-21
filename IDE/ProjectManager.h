@@ -57,6 +57,11 @@ public:
      */
 	void OnRibbonCloseSelected(wxRibbonButtonBarEvent& event);
 
+    /**
+     * Close the specified game
+     */
+	void CloseGame(gd::Project * project);
+
 	MainFrame & mainEditor;
 
 	//(*Declarations(ProjectManager)
@@ -233,7 +238,6 @@ private:
 	void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
 	void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 	void EditExtensionsOfGame(gd::Project & project);
-	void CloseGame(gd::Project * project);
 	void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
 	void AddLayoutToProject(gd::Project * project, unsigned int position);
 	void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);

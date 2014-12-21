@@ -161,7 +161,8 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
 	Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftUp);
 	Connect(wxEVT_LEFT_DCLICK,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftDClick);
 	Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnRightUp);
-	Connect(wxEVT_MIDDLE_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleDown);
+    Connect(wxEVT_MIDDLE_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleDown);
+	Connect(wxEVT_MIDDLE_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleUp);
 	Connect(wxEVT_MOTION,(wxObjectEventFunction)&LayoutEditorCanvas::OnMotion);
 	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnKey);
 	Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnKeyUp);
@@ -1089,22 +1090,19 @@ void LayoutEditorCanvas::OnMiddleDown( wxMouseEvent &event )
     if ( !editing ) return;
 
     //User can move the view thanks to middle click
-    if ( !isMovingView )
-    {
-        isMovingView = true;
-        movingViewMouseStartPosition = sf::Vector2f(sf::Mouse::getPosition(*this));
-        movingViewStartPosition = getView().getCenter();
-        SetCursor( wxCursor( wxCURSOR_SIZING ) );
-
-        return;
-    }
-    else
-    {
-        isMovingView = false;
-        SetCursor( wxNullCursor );
-    }
+    isMovingView = true;
+    movingViewMouseStartPosition = sf::Vector2f(sf::Mouse::getPosition(*this));
+    movingViewStartPosition = getView().getCenter();
+    SetCursor(wxCursor(wxCURSOR_SIZING));
 }
 
+void LayoutEditorCanvas::OnMiddleUp(wxMouseEvent & event)
+{
+    if ( !editing ) return;
+
+    isMovingView = false;
+    SetCursor(wxNullCursor);
+}
 
 void LayoutEditorCanvas::OnLeftDClick( wxMouseEvent &event )
 {

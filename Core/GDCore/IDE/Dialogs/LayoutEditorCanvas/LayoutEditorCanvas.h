@@ -320,6 +320,7 @@ protected:
     virtual void OnKey( wxKeyEvent& evt );
     virtual void OnKeyUp( wxKeyEvent& evt );
     virtual void OnMiddleDown( wxMouseEvent &event );
+    virtual void OnMiddleUp( wxMouseEvent &event );
     virtual void OnMouseWheel( wxMouseEvent &event );
     virtual void OnRightUp( wxMouseEvent &event );
     virtual void OnMotion( wxMouseEvent &event );

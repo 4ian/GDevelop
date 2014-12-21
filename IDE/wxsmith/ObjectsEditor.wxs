@@ -120,7 +120,7 @@
 		</object>
 		<object class="wxMenu" variable="groupContextMenu" member="yes">
 			<object class="wxMenuItem" name="IdGroupEdit" variable="editMenuItem" member="no">
-				<label>Edit</label>
+				<label>Add object(s) to group</label>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;properties&quot;, 16)' />
 				<handler function="OnMenuEditObjectSelected" entry="EVT_MENU" />
 			</object>

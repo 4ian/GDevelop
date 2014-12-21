@@ -114,6 +114,7 @@ canSelectGroup(canSelectGroup_)
         objectsList->SetWindowStyleFlag(objectsList->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
     }
 
+	ChoisirBt->SetMinSize(wxSize(-1, 25)); //Ensure the choose button is not hidden.
     SetSize(400, 500);
 	Refresh();
 }
@@ -149,12 +150,6 @@ void ChooseObjectDialog::OnAnnulerBtClick(wxCommandEvent& event)
     EndModal(0);
 }
 
-void ChooseObjectDialog::OnAucunBtClick(wxCommandEvent& event)
-{
-    objectChosen.clear();
-    EndModal(1);
-}
-
 void ChooseObjectDialog::OnObjetsListSelectionChanged(wxTreeEvent& event)
 {
     item = event.GetItem();
@@ -181,59 +176,6 @@ void ChooseObjectDialog::OnObjetsListItemActivated(wxTreeEvent& event)
 
     wxCommandEvent uselessEvent;
     OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnGroupesListSelectionChanged(wxTreeEvent& event)
-{
-    itemGroups = event.GetItem();
-}
-void ChooseObjectDialog::OnGroupesListItemRightClick(wxTreeEvent& event)
-{
-    itemGroups = event.GetItem();
-    PopupMenu(&Menu2);
-}
-
-void ChooseObjectDialog::OnGroupesListItemActivated(wxTreeEvent& event)
-{
-    itemGroups = event.GetItem();
-    wxCommandEvent uselessEvent;
-    OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnglobalObjectsListSelectionChanged(wxTreeEvent& event)
-{
-    itemGlobal = event.GetItem();
-}
-
-void ChooseObjectDialog::OnglobalObjectsListItemRightClick(wxTreeEvent& event)
-{
-    itemGlobal = event.GetItem();
-    PopupMenu(&Menu1);
-}
-
-void ChooseObjectDialog::OnglobalObjectGroupsSelectionChanged(wxTreeEvent& event)
-{
-    itemGlobalGroups = event.GetItem();
-}
-
-void ChooseObjectDialog::OnglobalObjectsListItemActivated(wxTreeEvent& event)
-{
-    itemGlobal = event.GetItem();
-    wxCommandEvent uselessEvent;
-    OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnglobalObjectGroupsItemActivated(wxTreeEvent& event)
-{
-    itemGlobalGroups = event.GetItem();
-    wxCommandEvent uselessEvent;
-    OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnglobalObjectGroupsItemRightClick(wxTreeEvent& event)
-{
-    itemGlobalGroups = event.GetItem();
-    PopupMenu(&Menu2);
 }
 
 void ChooseObjectDialog::OnsearchCtrlText(wxCommandEvent& event)

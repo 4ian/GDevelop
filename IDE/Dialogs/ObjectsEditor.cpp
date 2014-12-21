@@ -24,6 +24,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
@@ -273,7 +274,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
     MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete\tDEL"), _("Delete all selected items"), wxITEM_NORMAL);
     MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
     multipleContextMenu.Append(MenuItem2);
-    editMenuItem = new wxMenuItem((&groupContextMenu), IdGroupEdit, _("Edit"), wxEmptyString, wxITEM_NORMAL);
+    editMenuItem = new wxMenuItem((&groupContextMenu), IdGroupEdit, _("Add object(s) to group"), wxEmptyString, wxITEM_NORMAL);
     editMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
     groupContextMenu.Append(editMenuItem);
     MenuItem4 = new wxMenuItem((&groupContextMenu), idModName, _("Rename"), wxEmptyString, wxITEM_NORMAL);
@@ -939,11 +940,20 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         bool globalGroup = data->GetString() == "GlobalGroup";
         gd::ObjectGroup * group = GetSelectedGroup();
         objectsList->Expand(lastSelectedItem);
+
+        if (!group || !layout) return;
+
+        ChooseObjectDialog dialog(this, project, *layout, /*canSelectGroup=*/false, "", /*multipleSelection=*/true);
+        if (dialog.ShowModal() == 1) { //Add objects to the group
+            for(unsigned int i = 0;i < dialog.GetChosenObjects().size();++i)
+                group->AddObject(dialog.GetChosenObjects()[i]);
+        }
+
+        UpdateGroup(lastSelectedItem);
     }
 
     mainFrameWrapper.GetMainEditor()->SetFocus();
 }
-
 
 void ObjectsEditor::OnMenuPropertiesSelected(wxCommandEvent& event)
 {

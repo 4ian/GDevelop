@@ -99,7 +99,6 @@ private:
     void OnObjetsListSelectionChanged(wxTreeEvent& event);
     void OnChoisirBtClick(wxCommandEvent& event);
     void OnAnnulerBtClick(wxCommandEvent& event);
-    void OnAucunBtClick(wxCommandEvent& event);
     void OnObjetsListItemRightClick(wxTreeEvent& event);
     void OnGroupesListSelectionChanged(wxTreeEvent& event);
     void OnObjetsListItemActivated(wxTreeEvent& event);
@@ -119,10 +118,7 @@ private:
      */
     void Refresh();
 
-    wxTreeItemId item;
-    wxTreeItemId itemGroups;
-    wxTreeItemId itemGlobal;
-    wxTreeItemId itemGlobalGroups;
+    wxTreeItemId item; ///< The selected item in the tree.
 
     Project & project;
     gd::Layout & layout;

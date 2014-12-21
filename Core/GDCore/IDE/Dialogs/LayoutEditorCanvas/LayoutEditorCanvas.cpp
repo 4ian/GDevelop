@@ -1027,6 +1027,8 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
             float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
             it->first->SetAngle(newAngle);
         }
+
+        UpdateMouseResizeCursor(currentDraggableBt);
     }
     else //No buttons being used
     {
@@ -1049,11 +1051,18 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
                 mouseX, mouseY )) );
 
         //Check if there is a gui element hovered inside the layout
+        bool hoveringSomething = false;
         for (unsigned int i = 0;i<guiElements.size();++i)
         {
-            if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) )
+            if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) ) {
                 OnGuiElementHovered(guiElements[i]);
+                hoveringSomething = true;
+            }
         }
+
+        //Ensure cursor returns to the default cursor on wxGTK
+        if (!hoveringSomething && !isMovingView)
+            SetCursor(wxNullCursor);
 
         if ( isMovingInstance )
         {
@@ -1409,13 +1418,15 @@ gd::Object * LayoutEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialIns
 void LayoutEditorCanvas::UpdateMouseResizeCursor(const std::string & currentDraggableBt)
 {
     if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeDown"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZENS));
-    if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeRight"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZEWE));
-    if ( currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightDown"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZENWSE));
-    if ( currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeLeftDown"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZENESW));
+        SetCursor(wxCursor(wxCURSOR_SIZENS));
+    else if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeRight"  )
+        SetCursor(wxCursor(wxCURSOR_SIZEWE));
+    else if ( currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightDown"  )
+        SetCursor(wxCursor(wxCURSOR_SIZENWSE));
+    else if ( currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeLeftDown"  )
+        SetCursor(wxCursor(wxCURSOR_SIZENESW));
+    else if ( currentDraggableBt == "angle" )
+        SetCursor(wxCursor(wxCURSOR_HAND));
 }
 
 bool LayoutEditorCanvas::PreviewPaused() const

@@ -109,6 +109,7 @@ protected:
     static const long ID_MENUITEM6;
     //*)
     static const long idRibbonAdd;
+    static const long idRibbonAddGroup;
     static const long idRibbonDel;
     static const long idRibbonUp;
     static const long idRibbonDown;
@@ -199,6 +200,7 @@ private:
     gd::MainFrameWrapper & mainFrameWrapper;
 
     static wxRibbonButtonBar *objectsRibbonBar;
+    static wxRibbonButtonBar *selectionRibbonBar;
 
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;

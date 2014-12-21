@@ -188,6 +188,7 @@ const long ObjectsEditor::ID_MENUITEM5 = wxNewId();
 const long ObjectsEditor::ID_MENUITEM6 = wxNewId();
 //*)
 const long ObjectsEditor::idRibbonAdd = wxNewId();
+const long ObjectsEditor::idRibbonAddGroup = wxNewId();
 const long ObjectsEditor::idRibbonDel = wxNewId();
 const long ObjectsEditor::idRibbonUp = wxNewId();
 const long ObjectsEditor::idRibbonDown = wxNewId();
@@ -199,12 +200,13 @@ const long ObjectsEditor::idRibbonPaste = wxNewId();
 const long ObjectsEditor::idRibbonHelp = wxNewId();
 const long ObjectsEditor::idRibbonRefresh = wxNewId();
 
+wxRibbonButtonBar *ObjectsEditor::objectsRibbonBar = NULL;
+wxRibbonButtonBar *ObjectsEditor::selectionRibbonBar = NULL;
+
 BEGIN_EVENT_TABLE(ObjectsEditor,wxPanel)
     //(*EventTable(ObjectsEditor)
     //*)
 END_EVENT_TABLE()
-
-wxRibbonButtonBar *ObjectsEditor::objectsRibbonBar = NULL;
 
 ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_) :
     project(project_),
@@ -379,15 +381,16 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         objectsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         objectsRibbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
+        objectsRibbonBar->AddButton(idRibbonAddGroup, !hideLabels ? _("Add a group") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new group to the list of the objects of the scene"));
         objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object"));
         objectsRibbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
         objectsRibbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
-        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected object"));
+        selectionRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
+        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected object"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -412,6 +415,7 @@ void ObjectsEditor::OnHelpSelected( wxCommandEvent& event )
 void ObjectsEditor::ConnectEvents()
 {
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAddGroup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnAddGroupSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnMoveupSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnMoveDownSelected, NULL, this);
@@ -825,12 +829,14 @@ void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
         objectsList->SetToolTip( "" );
         objectsRibbonBar->EnableButton(idRibbonUp, true);
         objectsRibbonBar->EnableButton(idRibbonDown, true);
+        selectionRibbonBar->EnableButton(idRibbonModProp, true);
     }
     else if ( data && (data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup") )
     {
         objectsList->SetToolTip(_("Unfold the group to see the objects inside it."));
         objectsRibbonBar->EnableButton(idRibbonUp, false);
         objectsRibbonBar->EnableButton(idRibbonDown, false);
+        selectionRibbonBar->EnableButton(idRibbonModProp, false);
     }
 
     UpdateAssociatedPropertiesPanel();
@@ -1551,7 +1557,7 @@ wxTreeItemId ObjectsEditor::GetLastLayoutObjectItem() const
     
     while(item.IsOk() && (!data || data->GetString() == "LayoutObject"))
     {
-        item = objectsList->GetNextChild(objectsRootItem, cookie);
+        item = objectsList->GetNextSibling(item);
         data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
     }
 
@@ -1605,7 +1611,7 @@ wxTreeItemId ObjectsEditor::GetLastLayoutGroupItem() const
     
     while(item.IsOk() && (!data || data->GetString() == "LayoutGroup"))
     {
-        item = objectsList->GetNextChild(groupsRootItem, cookie);
+        item = objectsList->GetNextSibling(item);
         data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
     }
 

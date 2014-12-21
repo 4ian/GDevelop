@@ -166,18 +166,6 @@ private:
      */
     bool CompleteIndexFile(std::string & indexFileContent, std::string customCss, std::string customHtml, std::string exportDir, const std::vector<std::string> & includesFiles, std::string additionalSpec);
 
-    /**
-     * \brief Generate the metadata file and save it to the export directory.
-     * The metadata is used for the online game sharing service.
-     *
-     * The includes files must be relative to the export directory.
-     *
-     * \param project The project with layouts to be exported.
-     * \param exportDir The directory where the preview/export must be done.
-     * \param includesFiles The JS files to be included in the metadata
-     */
-    bool ExportMetadataFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles);
-
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     std::string lastError; ///< The last error that occurred.
 };

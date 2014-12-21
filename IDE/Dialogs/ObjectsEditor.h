@@ -182,6 +182,7 @@ private:
     gd::Object * GetSelectedObject();
     gd::ObjectGroup * GetSelectedGroup();
     void UpdateAssociatedPropertiesPanel();
+    void SelectItem(wxTreeItemId parent, std::string name, std::string dataStr1, std::string dataStr2);
 
     wxTreeItemId GetLastLayoutObjectItem() const;
     wxTreeItemId GetLastGlobalObjectItem() const;
@@ -199,8 +200,9 @@ private:
     gd::Layout * layout; ///< Layout edited. Can be NULL.
     gd::MainFrameWrapper & mainFrameWrapper;
 
-    static wxRibbonButtonBar *objectsRibbonBar;
-    static wxRibbonButtonBar *selectionRibbonBar;
+    static wxRibbonButtonBar * objectsRibbonBar;
+    static wxRibbonButtonBar * selectionRibbonBar;
+    static wxRibbonButtonBar * clipboardRibbonBar;
 
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;

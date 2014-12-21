@@ -55,7 +55,7 @@ namespace
     class ObjectsListDnd : public wxTextDropTarget
     {
     public:
-        ObjectsListDnd(wxTreeCtrl *ctrl, wxTreeItemId groupsRootItem_, gd::Project & project_, gd::Layout * layout_) 
+        ObjectsListDnd(wxTreeCtrl *ctrl, wxTreeItemId groupsRootItem_, gd::Project & project_, gd::Layout * layout_)
          : treeCtrl(ctrl), groupsRootItem(groupsRootItem_), project(project_), layout(layout_) {};
 
         virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& text)
@@ -83,7 +83,7 @@ namespace
                     return false;
 
                 //Find the group
-                std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(), 
+                std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(),
                                                                          bind2nd(gd::GroupHasTheSameName(), treeCtrl->GetItemText(itemUnderMouse)));
                 if ( group != groups->end() && !group->Find(objectName))
                 {
@@ -202,6 +202,7 @@ const long ObjectsEditor::idRibbonRefresh = wxNewId();
 
 wxRibbonButtonBar *ObjectsEditor::objectsRibbonBar = NULL;
 wxRibbonButtonBar *ObjectsEditor::selectionRibbonBar = NULL;
+wxRibbonButtonBar *ObjectsEditor::clipboardRibbonBar = NULL;
 
 BEGIN_EVENT_TABLE(ObjectsEditor,wxPanel)
     //(*EventTable(ObjectsEditor)
@@ -394,10 +395,10 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
-        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
-        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
+        clipboardRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
+        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
+        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -820,23 +821,41 @@ void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
     mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 
-    //Get the selected item
+    //Get the selected item and update the ribbon
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
 
-    //Object clicked?
+    objectsRibbonBar->EnableButton(idRibbonUp, false);
+    objectsRibbonBar->EnableButton(idRibbonDown, false);
+    objectsRibbonBar->EnableButton(idRibbonDel, false);
+    clipboardRibbonBar->EnableButton(idRibbonCopy, false);
+    clipboardRibbonBar->EnableButton(idRibbonCut, false);
+    clipboardRibbonBar->EnableButton(idRibbonPaste, false);
+    selectionRibbonBar->EnableButton(idRibbonModProp, false);
+    selectionRibbonBar->EnableButton(idRibbonModName, false);
     if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         objectsList->SetToolTip( "" );
         objectsRibbonBar->EnableButton(idRibbonUp, true);
         objectsRibbonBar->EnableButton(idRibbonDown, true);
+        objectsRibbonBar->EnableButton(idRibbonDel, true);
+        clipboardRibbonBar->EnableButton(idRibbonCopy, true);
+        clipboardRibbonBar->EnableButton(idRibbonCut, true);
+        clipboardRibbonBar->EnableButton(idRibbonPaste, true);
         selectionRibbonBar->EnableButton(idRibbonModProp, true);
+        selectionRibbonBar->EnableButton(idRibbonModName, true);
     }
     else if ( data && (data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup") )
     {
         objectsList->SetToolTip(_("Unfold the group to see the objects inside it."));
-        objectsRibbonBar->EnableButton(idRibbonUp, false);
-        objectsRibbonBar->EnableButton(idRibbonDown, false);
-        selectionRibbonBar->EnableButton(idRibbonModProp, false);
+        objectsRibbonBar->EnableButton(idRibbonDel, true);
+        clipboardRibbonBar->EnableButton(idRibbonCopy, true);
+        clipboardRibbonBar->EnableButton(idRibbonCut, true);
+        clipboardRibbonBar->EnableButton(idRibbonPaste, true);
+        selectionRibbonBar->EnableButton(idRibbonModName, true);
+    }
+    else if ( data && (data->GetString() == "ObjectInGroup"))
+    {
+        objectsRibbonBar->EnableButton(idRibbonDel, true);
     }
 
     UpdateAssociatedPropertiesPanel();
@@ -1010,7 +1029,6 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
     else
         itemAdded = objectsList->PrependItem(groupsRootItem, name, 1);
 
-    //wxTreeItemId itemAdded = objectsList->AppendItem( groupsRootItem, name, 1 );
     objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutGroup") );
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -1035,7 +1053,7 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
     {
         if (!selection[i].IsOk()) continue;
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(selection[i]));
-        if (!data) 
+        if (!data)
             continue;
 
         if(data->GetString() == "ObjectInGroup")
@@ -1127,7 +1145,7 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
                 continue;
 
             gd::TreeItemStringData * groupData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(groupItem));
-            if (!groupData) 
+            if (!groupData)
                 continue;
 
             bool globalGroup = (groupData->GetString() == "GlobalGroup");
@@ -1186,23 +1204,7 @@ void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
     }
 
     Refresh();
-    //Select again the moved item
-    wxTreeItemId item = objectsList->GetLastChild(objectsRootItem);
-    while ( item.IsOk() )
-    {
-        gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-        if (itemData)
-        {
-            if (objectsList->GetItemText( item ) == name
-                && itemData->GetString() == dataStr
-                && itemData->GetSecondString() == dataStr2)
-            {
-                objectsList->SelectItem(item);
-                return;
-            }
-        }
-        item = objectsList->GetPrevSibling(item);
-    }
+    SelectItem(objectsRootItem, name, dataStr, dataStr2); //Select again the moved item
 }
 
 void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
@@ -1228,15 +1230,19 @@ void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
     }
 
     Refresh();
-    //Select again the moved item
-    wxTreeItemId item = objectsList->GetLastChild(objectsRootItem);
+    SelectItem(objectsRootItem, name, dataStr, dataStr2); //Select again the moved item
+}
+
+void ObjectsEditor::SelectItem(wxTreeItemId parent, std::string name, std::string dataStr1, std::string dataStr2)
+{
+    wxTreeItemId item = objectsList->GetLastChild(parent);
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
         if (itemData)
         {
             if (objectsList->GetItemText( item ) == name
-                && itemData->GetString() == dataStr
+                && itemData->GetString() == dataStr1
                 && itemData->GetSecondString() == dataStr2)
             {
                 objectsList->SelectItem(item);
@@ -1554,7 +1560,7 @@ wxTreeItemId ObjectsEditor::GetLastLayoutObjectItem() const
         return wxTreeItemId();
 
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-    
+
     while(item.IsOk() && (!data || data->GetString() == "LayoutObject"))
     {
         item = objectsList->GetNextSibling(item);
@@ -1584,7 +1590,7 @@ wxTreeItemId ObjectsEditor::GetLastGlobalObjectItem() const
         return wxTreeItemId();
 
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-    
+
     while(item.IsOk() && (!data || data->GetString() == "GlobalObject"))
     {
         item = objectsList->GetNextSibling(item);
@@ -1608,7 +1614,7 @@ wxTreeItemId ObjectsEditor::GetLastLayoutGroupItem() const
         return wxTreeItemId();
 
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-    
+
     while(item.IsOk() && (!data || data->GetString() == "LayoutGroup"))
     {
         item = objectsList->GetNextSibling(item);
@@ -1638,7 +1644,7 @@ wxTreeItemId ObjectsEditor::GetLastGlobalGroupItem() const
         return wxTreeItemId();
 
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-    
+
     while(item.IsOk() && (!data || data->GetString() == "GlobalGroup"))
     {
         item = objectsList->GetNextSibling(item);

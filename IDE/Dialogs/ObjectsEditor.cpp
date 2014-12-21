@@ -380,19 +380,19 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects and groups"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         objectsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         objectsRibbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
-        objectsRibbonBar->AddButton(idRibbonAddGroup, !hideLabels ? _("Add a group") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new group to the list of the objects of the scene"));
-        objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object"));
+        objectsRibbonBar->AddButton(idRibbonAddGroup, !hideLabels ? _("Add a group") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new group to the scene"));
+        objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object or group"));
         objectsRibbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
         objectsRibbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selection"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         selectionRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
-        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected object"));
+        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected item"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

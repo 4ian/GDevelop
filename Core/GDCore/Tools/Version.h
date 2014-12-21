@@ -4,8 +4,8 @@
 namespace AutoVersion{
 
 	//Date Version Types
-	static const char GDCore_DATE[] = "15";
-	static const char GDCore_MONTH[] = "10";
+	static const char GDCore_DATE[] = "21";
+	static const char GDCore_MONTH[] = "12";
 	static const char GDCore_YEAR[] = "2014";
 
 	//Software Status
@@ -14,18 +14,13 @@ namespace AutoVersion{
 
 	//Standard Version Type
 	static const long GDCore_MAJOR = 3;
-	static const long GDCore_MINOR = 5;
-	static const long GDCore_BUILD = 75;
+	static const long GDCore_MINOR = 6;
+	static const long GDCore_BUILD = 76;
 	static const long GDCore_REVISION = 0;
 
 	//Miscellaneous Version Types
-	#define GDCore_RC_FILEVERSION 3,5,75,0
-	#define GDCore_RC_FILEVERSION_STRING "3, 5, 75, 0\0"
-	static const char GDCore_FULLVERSION_STRING[] = "3.5.75.0";
-
-	//These values are to keep track of your versioning state, don't modify them.
-	static const long GDCore_BUILD_HISTORY = 0;
-
-
+	#define GDCore_RC_FILEVERSION 3,6,76,0
+	#define GDCore_RC_FILEVERSION_STRING "3, 6, 76, 0\0"
+	static const char GDCore_FULLVERSION_STRING[] = "3.6.76.0";
 }
 #endif //GDCORE_VERSION_H

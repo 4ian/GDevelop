@@ -20,12 +20,12 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/NewProjectDialog.h"
+#include "Dialogs/StartHerePage.h"
 #include "BuildMessagesPnl.h"
 #include "MainFrame.h"
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
 #include "ProjectManager.h"
-#include "StartHerePage.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 
 using namespace gd;

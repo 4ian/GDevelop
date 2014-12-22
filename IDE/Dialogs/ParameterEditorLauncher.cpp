@@ -12,6 +12,7 @@
 #include <wx/imaglist.h>
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
+#include <wx/filename.h>
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include <wx/config.h>

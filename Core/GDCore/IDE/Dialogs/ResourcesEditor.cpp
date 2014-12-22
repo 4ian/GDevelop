@@ -181,7 +181,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     emptyMenu.Append(MenuItem2);
     emptyMenu.AppendSeparator();
     MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
+    MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/foldericon.png"))));
     emptyMenu.Append(MenuItem6);
     MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
@@ -195,7 +195,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     folderMenu.Append(MenuItem10);
     folderMenu.AppendSeparator();
     MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
+    MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/foldericon.png"))));
     folderMenu.Append(MenuItem5);
     folderMenu.AppendSeparator();
     MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _("Move up\tCtrl-J"), wxEmptyString, wxITEM_NORMAL);

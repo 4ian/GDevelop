@@ -23,19 +23,23 @@ class BaseStartHerePage : public wxPanel
 protected:
     wxStaticBitmap* logoBmp;
     wxStaticText* m_staticText9;
-    wxStaticText* m_staticText15;
+    wxStaticBitmap* gettingStartedBmp;
+    wxStaticText* gettingStartedTxt;
     wxHyperlinkCtrl* m_hyperLink17;
     wxHyperlinkCtrl* m_hyperLink231;
     wxHyperlinkCtrl* m_hyperLink23;
-    wxStaticText* m_staticText1539;
+    wxStaticBitmap* latestProjectsBmp;
+    wxStaticText* latestProjectsTxt;
     wxHyperlinkCtrl* lastProject1Bt;
     wxHyperlinkCtrl* lastProject2Bt;
     wxHyperlinkCtrl* lastProject3Bt;
-    wxStaticText* m_staticText153;
+    wxStaticBitmap* communityBmp;
+    wxStaticText* communityTxt;
     wxHyperlinkCtrl* m_hyperLink175;
     wxHyperlinkCtrl* m_hyperLink2316;
     wxHyperlinkCtrl* m_hyperLink237;
-    wxStaticText* m_staticText15315;
+    wxStaticBitmap* newsBmp;
+    wxStaticText* newsTxt;
     wxTextCtrl* newsEdit;
     wxHyperlinkCtrl* newsLink1;
     wxHyperlinkCtrl* newsLink2;

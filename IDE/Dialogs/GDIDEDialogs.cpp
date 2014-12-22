@@ -58,11 +58,20 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     centerSizer->Add(gettingstartedSizer, 1, wxALL|wxEXPAND, 10);
     
-    m_staticText15 = new wxStaticText(this, wxID_ANY, _("Getting started"), wxDefaultPosition, wxSize(-1,-1), 0);
-    wxFont m_staticText15Font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_staticText15->SetFont(m_staticText15Font);
+    wxFlexGridSizer* flexGridSizer82 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer82->SetFlexibleDirection( wxBOTH );
+    flexGridSizer82->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    gettingstartedSizer->Add(m_staticText15, 0, wxALL, 0);
+    gettingstartedSizer->Add(flexGridSizer82, 0, wxALL, 0);
+    
+    gettingStartedBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer82->Add(gettingStartedBmp, 0, wxRIGHT|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
+    
+    gettingStartedTxt = new wxStaticText(this, wxID_ANY, _("Getting started"), wxDefaultPosition, wxSize(-1,-1), 0);
+    gettingStartedTxt->SetForegroundColour(wxColour(wxT("rgb(120,120,120)")));
+    
+    flexGridSizer82->Add(gettingStartedTxt, 0, wxALL, 3);
     
     wxFlexGridSizer* flexGridSizer21 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer21->SetFlexibleDirection( wxBOTH );
@@ -71,31 +80,25 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     gettingstartedSizer->Add(flexGridSizer21, 1, wxALL|wxEXPAND, 5);
     
     m_hyperLink17 = new wxHyperlinkCtrl(this, wxID_ANY, _("Start a platformer game in 5 minutes"), wxT("https://www.youtube.com/watch?v=5jdOR-NAiSA"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont m_hyperLink17Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_hyperLink17->SetFont(m_hyperLink17Font);
     m_hyperLink17->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink17->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink17->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer21->Add(m_hyperLink17, 0, wxALL, 0);
+    flexGridSizer21->Add(m_hyperLink17, 0, wxALL, 3);
     
     m_hyperLink231 = new wxHyperlinkCtrl(this, wxID_ANY, _("Step-by-step Beginner Tutorial"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial2"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont m_hyperLink231Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_hyperLink231->SetFont(m_hyperLink231Font);
     m_hyperLink231->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink231->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink231->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer21->Add(m_hyperLink231, 0, wxALL, 0);
+    flexGridSizer21->Add(m_hyperLink231, 0, wxALL, 3);
     
     m_hyperLink23 = new wxHyperlinkCtrl(this, wxID_ANY, _("More videos and tutorials on the wiki"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont m_hyperLink23Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_hyperLink23->SetFont(m_hyperLink23Font);
     m_hyperLink23->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink23->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink23->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer21->Add(m_hyperLink23, 0, wxALL, 0);
+    flexGridSizer21->Add(m_hyperLink23, 0, wxALL, 3);
     
     wxFlexGridSizer* latestProjectsSizer = new wxFlexGridSizer(0, 1, 0, 0);
     latestProjectsSizer->SetFlexibleDirection( wxBOTH );
@@ -103,11 +106,20 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     centerSizer->Add(latestProjectsSizer, 1, wxALL|wxEXPAND, 10);
     
-    m_staticText1539 = new wxStaticText(this, wxID_ANY, _("Latest projects"), wxDefaultPosition, wxSize(-1,-1), 0);
-    wxFont m_staticText1539Font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_staticText1539->SetFont(m_staticText1539Font);
+    wxFlexGridSizer* flexGridSizer85 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer85->SetFlexibleDirection( wxBOTH );
+    flexGridSizer85->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    latestProjectsSizer->Add(m_staticText1539, 0, wxALL, 0);
+    latestProjectsSizer->Add(flexGridSizer85, 0, wxALL, 0);
+    
+    latestProjectsBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer85->Add(latestProjectsBmp, 0, wxRIGHT|wxBOTTOM, 5);
+    
+    latestProjectsTxt = new wxStaticText(this, wxID_ANY, _("Latest projects"), wxDefaultPosition, wxSize(-1,-1), 0);
+    latestProjectsTxt->SetForegroundColour(wxColour(wxT("rgb(120,120,120)")));
+    
+    flexGridSizer85->Add(latestProjectsTxt, 0, wxALL, 3);
     
     wxFlexGridSizer* flexGridSizer21410 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer21410->SetFlexibleDirection( wxBOTH );
@@ -116,31 +128,25 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     latestProjectsSizer->Add(flexGridSizer21410, 1, wxALL|wxEXPAND, 5);
     
     lastProject1Bt = new wxHyperlinkCtrl(this, wxID_ANY, _("-"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont lastProject1BtFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    lastProject1Bt->SetFont(lastProject1BtFont);
     lastProject1Bt->SetNormalColour(wxColour(wxT("#0000FF")));
     lastProject1Bt->SetHoverColour(wxColour(wxT("#0000FF")));
     lastProject1Bt->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer21410->Add(lastProject1Bt, 0, wxALL, 0);
+    flexGridSizer21410->Add(lastProject1Bt, 0, wxALL, 3);
     
     lastProject2Bt = new wxHyperlinkCtrl(this, wxID_ANY, _("-"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont lastProject2BtFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    lastProject2Bt->SetFont(lastProject2BtFont);
     lastProject2Bt->SetNormalColour(wxColour(wxT("#0000FF")));
     lastProject2Bt->SetHoverColour(wxColour(wxT("#0000FF")));
     lastProject2Bt->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer21410->Add(lastProject2Bt, 0, wxALL, 0);
+    flexGridSizer21410->Add(lastProject2Bt, 0, wxALL, 3);
     
     lastProject3Bt = new wxHyperlinkCtrl(this, wxID_ANY, _("-"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont lastProject3BtFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    lastProject3Bt->SetFont(lastProject3BtFont);
     lastProject3Bt->SetNormalColour(wxColour(wxT("#0000FF")));
     lastProject3Bt->SetHoverColour(wxColour(wxT("#0000FF")));
     lastProject3Bt->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer21410->Add(lastProject3Bt, 0, wxALL, 0);
+    flexGridSizer21410->Add(lastProject3Bt, 0, wxALL, 3);
     
     wxFlexGridSizer* communitySizer = new wxFlexGridSizer(0, 1, 0, 0);
     communitySizer->SetFlexibleDirection( wxBOTH );
@@ -148,11 +154,20 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     centerSizer->Add(communitySizer, 1, wxALL|wxEXPAND, 10);
     
-    m_staticText153 = new wxStaticText(this, wxID_ANY, _("Community"), wxDefaultPosition, wxSize(-1,-1), 0);
-    wxFont m_staticText153Font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_staticText153->SetFont(m_staticText153Font);
+    wxFlexGridSizer* flexGridSizer91 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer91->SetFlexibleDirection( wxBOTH );
+    flexGridSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    communitySizer->Add(m_staticText153, 0, wxALL, 0);
+    communitySizer->Add(flexGridSizer91, 0, wxALL, 0);
+    
+    communityBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer91->Add(communityBmp, 0, wxRIGHT|wxBOTTOM, 5);
+    
+    communityTxt = new wxStaticText(this, wxID_ANY, _("Community"), wxDefaultPosition, wxSize(-1,-1), 0);
+    communityTxt->SetForegroundColour(wxColour(wxT("rgb(120,120,120)")));
+    
+    flexGridSizer91->Add(communityTxt, 0, wxALL, 3);
     
     wxFlexGridSizer* flexGridSizer214 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer214->SetFlexibleDirection( wxBOTH );
@@ -161,31 +176,25 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     communitySizer->Add(flexGridSizer214, 1, wxALL|wxEXPAND, 5);
     
     m_hyperLink175 = new wxHyperlinkCtrl(this, wxID_ANY, _("Go on GDevelop community forums"), wxT("http://forum.compilgames.net/viewforum.php?f=17"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont m_hyperLink175Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_hyperLink175->SetFont(m_hyperLink175Font);
     m_hyperLink175->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink175->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink175->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer214->Add(m_hyperLink175, 0, wxALL, 0);
+    flexGridSizer214->Add(m_hyperLink175, 0, wxALL, 3);
     
     m_hyperLink2316 = new wxHyperlinkCtrl(this, wxID_ANY, _("Facebook page"), wxT("https://www.facebook.com/GameDevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont m_hyperLink2316Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_hyperLink2316->SetFont(m_hyperLink2316Font);
     m_hyperLink2316->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink2316->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink2316->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer214->Add(m_hyperLink2316, 0, wxALL, 0);
+    flexGridSizer214->Add(m_hyperLink2316, 0, wxALL, 3);
     
     m_hyperLink237 = new wxHyperlinkCtrl(this, wxID_ANY, _("Follow GDevelop on Twitter"), wxT("https://twitter.com/Game_Develop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
-    wxFont m_hyperLink237Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_hyperLink237->SetFont(m_hyperLink237Font);
     m_hyperLink237->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink237->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink237->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer214->Add(m_hyperLink237, 0, wxALL, 0);
+    flexGridSizer214->Add(m_hyperLink237, 0, wxALL, 3);
     
     wxFlexGridSizer* newsSizer = new wxFlexGridSizer(0, 1, 0, 0);
     newsSizer->SetFlexibleDirection( wxBOTH );
@@ -193,11 +202,20 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     centerSizer->Add(newsSizer, 1, wxALL|wxEXPAND, 10);
     
-    m_staticText15315 = new wxStaticText(this, wxID_ANY, _("Latest news"), wxDefaultPosition, wxSize(-1,-1), 0);
-    wxFont m_staticText15315Font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Ubuntu"));
-    m_staticText15315->SetFont(m_staticText15315Font);
+    wxFlexGridSizer* flexGridSizer88 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer88->SetFlexibleDirection( wxBOTH );
+    flexGridSizer88->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    newsSizer->Add(m_staticText15315, 0, wxALL, 0);
+    newsSizer->Add(flexGridSizer88, 0, wxALL, 0);
+    
+    newsBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer88->Add(newsBmp, 0, wxRIGHT|wxBOTTOM, 5);
+    
+    newsTxt = new wxStaticText(this, wxID_ANY, _("Latest news"), wxDefaultPosition, wxSize(-1,-1), 0);
+    newsTxt->SetForegroundColour(wxColour(wxT("rgb(120,120,120)")));
+    
+    flexGridSizer88->Add(newsTxt, 0, wxALL, 3);
     
     newsEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxTE_READONLY|wxTE_MULTILINE);
     
@@ -237,7 +255,7 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     donateBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
     
-    bottomSizer->Add(donateBmp, 0, wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
+    bottomSizer->Add(donateBmp, 0, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 4);
     
     donateLinkBt = new wxHyperlinkCtrl(this, wxID_ANY, _("Donate if you like it"), wxT("http://www.compilgames.net/donate.php"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     donateLinkBt->SetNormalColour(wxColour(wxT("#0000FF")));
@@ -248,7 +266,7 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     githubBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
     
-    bottomSizer->Add(githubBmp, 0, wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
+    bottomSizer->Add(githubBmp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     
     m_hyperLink57 = new wxHyperlinkCtrl(this, wxID_ANY, _("Contribute on GitHub"), wxT("https://github.com/4ian/GD"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink57->SetNormalColour(wxColour(wxT("#0000FF")));

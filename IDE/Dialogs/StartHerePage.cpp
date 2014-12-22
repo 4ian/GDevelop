@@ -7,6 +7,7 @@
 #include <wx/config.h>
 #include "StartHerePage.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "../UpdateChecker.h"
 #include "../MainFrame.h"
 
@@ -14,6 +15,17 @@ StartHerePage::StartHerePage(wxWindow* parent, MainFrame & mainEditor_)
     : BaseStartHerePage(parent),
     mainEditor(mainEditor_)
 {
+	wxFont titleFont(13,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	gettingStartedTxt->SetFont(titleFont);
+	communityTxt->SetFont(titleFont);
+	newsTxt->SetFont(titleFont);
+	latestProjectsTxt->SetFont(titleFont);
+
+	gettingStartedBmp->SetBitmap(gd::SkinHelper::GetIcon("gettingStarted", 24));
+	communityBmp->SetBitmap(gd::SkinHelper::GetIcon("community", 24));
+	newsBmp->SetBitmap(gd::SkinHelper::GetIcon("news", 24));
+	latestProjectsBmp->SetBitmap(gd::SkinHelper::GetIcon("open", 24));
+
 	logoBmp->SetBitmap(wxBitmap("res/GD-logo-simple.png", wxBITMAP_TYPE_ANY));
 	donateBmp->SetBitmap(wxBitmap("res/hearticon.png", wxBITMAP_TYPE_ANY));
 	githubBmp->SetBitmap(wxBitmap("res/github16.png", wxBITMAP_TYPE_ANY));

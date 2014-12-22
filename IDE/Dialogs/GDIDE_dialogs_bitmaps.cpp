@@ -43,6 +43,6 @@ void wxCraftergfm8VaInitBitmapResources()
         else wxFileSystem::AddHandler(new wxMemoryFSHandlerBase);
     }
 
-    XRC_ADD_FILE(wxT("XRC_resource/GDIDE_dialogs_bitmaps.cpp$_home_florian_Programmation_GD_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"), xml_res_file_0, xml_res_size_0, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDIDE_dialogs_bitmaps.cpp$_home_florian_Programmation_GD_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDIDE_dialogs_bitmaps.cpp$D__Florian_Programmation_GameDevelop3_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"), xml_res_file_0, xml_res_size_0, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDIDE_dialogs_bitmaps.cpp$D__Florian_Programmation_GameDevelop3_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"));
 }

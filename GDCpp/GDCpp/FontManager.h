@@ -21,6 +21,8 @@ public:
     /**
      * \brief Return a pointer to an SFML font.
      *
+     * The font is stored in the font manager.
+     *
      * Example :
      * \code
      * sfmlText.SetFont(*fontManager->GetFont(fontName));
@@ -56,6 +58,7 @@ private:
     void EnsureDefaultFontIsLoaded();
 
     std::map < std::string, sf::Font* > fonts; ///< The font being loaded.
+    std::map < std::string, char* > fontsBuffer; ///< The buffer associated to each font, if any.
     sf::Font * defaultFont; ///< The default font used when no font is specified. Initialized at first use.
 
     FontManager() : defaultFont(NULL) {};

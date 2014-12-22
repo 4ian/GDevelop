@@ -7,7 +7,7 @@ This project is released under the MIT License.
 #include "SoundWrapperBase.h"
 
 #include "GDCpp/Project.h"
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 
 ///////////////// SoundWrapperBase /////////////////
 
@@ -139,10 +139,10 @@ float SoundWrapper::GetPitch() const
 bool SoundWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene)
 {
     #if !defined(GD_IDE_ONLY)
-    if(gd::RessourcesLoader::Get()->HasFile(filename))
+    if(gd::ResourcesLoader::Get()->HasFile(filename))
     {
-        if(m_buffer.loadFromMemory(gd::RessourcesLoader::Get()->LoadBinaryFile(filename),
-                                   gd::RessourcesLoader::Get()->GetBinaryFileSize(filename)))
+        if(m_buffer.loadFromMemory(gd::ResourcesLoader::Get()->LoadBinaryFile(filename),
+                                   gd::ResourcesLoader::Get()->GetBinaryFileSize(filename)))
         {
             m_sound.setBuffer(m_buffer);
             return true;
@@ -265,10 +265,10 @@ float MusicWrapper::GetPitch() const
 bool MusicWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene)
 {
     #if !defined(GD_IDE_ONLY)
-    if(gd::RessourcesLoader::Get()->HasFile(filename))
+    if(gd::ResourcesLoader::Get()->HasFile(filename))
     {
-        if(m_music.openFromMemory(gd::RessourcesLoader::Get()->LoadBinaryFile(filename),
-                                  gd::RessourcesLoader::Get()->GetBinaryFileSize(filename)))
+        if(m_music.openFromMemory(gd::ResourcesLoader::Get()->LoadBinaryFile(filename),
+                                  gd::ResourcesLoader::Get()->GetBinaryFileSize(filename)))
         {
             return true;
         }

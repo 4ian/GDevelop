@@ -1,5 +1,5 @@
 #include "ShaderManager.h"
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 #include <iostream>
 #include <sstream>
 
@@ -25,7 +25,7 @@ boost::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std
 
     for (unsigned int i = 0;i<shaders.size();++i)
     {
-        std::string file = gd::RessourcesLoader::Get()->LoadPlainText(shaders[i]);
+        std::string file = gd::ResourcesLoader::Get()->LoadPlainText(shaders[i]);
 
         std::istringstream linesStream(file);
 

@@ -90,6 +90,13 @@ private:
     std::set<PlatformAutomatism*> GetPotentialCollidingObjects(double maxMovementLength);
 
     /**
+     * \brief Separate the object from all platforms passed as parameter, except ladders.
+     * \param candidates The platform to be tested for collision
+     * \param excludeJumpThrus If set to true, the jump thru platform will be excluded.
+     */
+    void SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus);
+
+    /**
      * \brief Among the platforms passed in parameter, return a list of the platforms colliding with the object.
      * \note Ladders are *always* excluded from the test.
      * \param candidates The platform to be tested for collision

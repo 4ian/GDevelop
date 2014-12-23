@@ -267,6 +267,11 @@ void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<Runti
         }
     }
 
+    SeparateFromObjects(objects);
+}
+
+void RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & objects)
+{
     sf::Vector2f moveVector;
     vector<Polygon2d> hitBoxes = GetHitBoxes();
     for (unsigned int j = 0;j<objects.size(); ++j)

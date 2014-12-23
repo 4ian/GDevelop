@@ -113,6 +113,9 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
         requestedDeltaY += this._floorPlatform.owner.getY() - this._floorLastY;
     }
 
+    //Ensure the object is not stuck
+    this._separateFromPlatforms(this._potentialCollidingObjects, true);
+
     //Move the object on x axis.
     var oldX = object.getX();
     if ( requestedDeltaX !== 0 ) {
@@ -363,6 +366,32 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWith = function(can
     }
 
     return false;
+};
+
+/**
+ * Separate the object from all platforms passed in parameter.
+ * @param candidates The platform to be tested for collision
+ * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+ */
+gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = function(candidates, excludeJumpThrus)
+{
+    excludeJumpThrus = !!excludeJumpThrus;
+
+    var objects = [];
+    for (var k in candidates) {
+        if (candidates.hasOwnProperty(k)) {
+            var platform = candidates[k];
+
+            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+            if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
+
+            objects.push(platform.owner);
+        }
+    }
+
+    var objectsLists = new Hashtable();
+    objectsLists.put("", objects);
+    this.owner.separateFromObjects(objectsLists);
 };
 
 /**

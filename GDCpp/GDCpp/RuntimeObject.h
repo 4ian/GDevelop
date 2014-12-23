@@ -203,6 +203,14 @@ public:
     bool IsCollidingWith(RuntimeObject * other);
 
     /**
+     * \brief Check collision with each object of the list using their hitboxes, and move the object
+     * according to the sum of the move vector returned by each collision test.
+     * \note Bounding circles of objects are *not* checked.
+     * \param objects The vector of objects to be used.
+     */
+    void SeparateFromObjects(const std::vector<RuntimeObject*> & objects);
+
+    /**
      * \brief Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
      * \note The default implementation does nothing.
      */

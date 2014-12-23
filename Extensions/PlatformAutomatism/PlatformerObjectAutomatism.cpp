@@ -65,11 +65,11 @@ void PlatformerObjectAutomatism::OnOwnerChanged()
     oldHeight = object->GetHeight();
 }
 
-bool PlatformerObjectAutomatism::SetSlopeMaxAngle(double slopeMaxAngle_)
+bool PlatformerObjectAutomatism::SetSlopeMaxAngle(double newMaxAngle)
 {
-    if (slopeMaxAngle < 0 || slopeMaxAngle >= 90) return false;
+    if (newMaxAngle < 0 || newMaxAngle >= 90) return false;
 
-    slopeMaxAngle = slopeMaxAngle_;
+    slopeMaxAngle = newMaxAngle;
     if ( slopeMaxAngle == 45 )
         slopeClimbingFactor = 1; //Avoid rounding errors
     else
@@ -146,6 +146,9 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
         requestedDeltaX += floorPlatform->GetObject()->GetX() - floorLastX;
         requestedDeltaY += floorPlatform->GetObject()->GetY() - floorLastY;
     }
+
+    //Ensure the object is not stuck
+    SeparateFromPlatforms(potentialObjects, true);
 
     //Move the object on x axis.
     double oldX = object->GetX();
@@ -373,6 +376,22 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     //5) Track the movement
     hasReallyMoved = abs(object->GetX()-oldX) >= 1;
+}
+
+void PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus)
+{
+    std::vector<RuntimeObject*> objects;
+    for (std::set<PlatformAutomatism*>::iterator it = candidates.begin();
+         it != candidates.end();
+         ++it)
+    {
+        if ( (*it)->GetPlatformType() == PlatformAutomatism::Ladder ) continue;
+        if ( excludeJumpThrus && (*it)->GetPlatformType() == PlatformAutomatism::Jumpthru ) continue;
+
+        objects.push_back((*it)->GetObject());
+    }
+
+    object->SeparateFromObjects(objects);
 }
 
 std::set<PlatformAutomatism*> PlatformerObjectAutomatism::GetPlatformsCollidingWith(const std::set<PlatformAutomatism*> & candidates,

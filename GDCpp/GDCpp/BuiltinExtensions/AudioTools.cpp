@@ -7,7 +7,7 @@
 #include <string>
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/SoundManager.h"
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 #undef PlaySound //Gniark!
 
 /**
@@ -131,7 +131,7 @@ void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repe
 
     boost::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
-    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::Get();
+    gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
     if(ressourcesLoader->HasFile(file))
     {
         unsigned int size = ressourcesLoader->GetBinaryFileSize(file);
@@ -158,7 +158,7 @@ void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, 
 
     boost::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
-    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::Get();
+    gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
     if(ressourcesLoader->HasFile(file))
     {
         unsigned int size = ressourcesLoader->GetBinaryFileSize(file);

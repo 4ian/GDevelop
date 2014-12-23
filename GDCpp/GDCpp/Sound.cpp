@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 #include "GDCpp/SoundManager.h"
 
 using namespace std;
@@ -17,7 +17,7 @@ Sound::Sound(string pFile) :
 file(pFile),
 volume(100)
 {
-    buffer = gd::RessourcesLoader::Get()->LoadSoundBuffer(file);
+    buffer = gd::ResourcesLoader::Get()->LoadSoundBuffer(file);
     sound.setBuffer(buffer);
 }
 
@@ -34,7 +34,7 @@ Sound::~Sound()
 Sound::Sound(const Sound & copy) :
     file(copy.file)
 {
-    buffer = gd::RessourcesLoader::Get()->LoadSoundBuffer(file);
+    buffer = gd::ResourcesLoader::Get()->LoadSoundBuffer(file);
     sound.setBuffer(buffer);
 }
 

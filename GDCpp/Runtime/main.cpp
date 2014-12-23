@@ -16,7 +16,7 @@
 
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/SceneNameMangler.h"
@@ -77,7 +77,7 @@ int main( int argc, char *p_argv[] )
     gd::ExtensionsLoader::LoadAllExtensions(".", CppPlatform::Get());
     gd::ExtensionsLoader::ExtensionsLoadingDone(".");
     //Load resource file
-    gd::RessourcesLoader * resLoader = gd::RessourcesLoader::Get();
+    gd::ResourcesLoader * resLoader = gd::ResourcesLoader::Get();
     if (!resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executablePath+"/gam.egd" )

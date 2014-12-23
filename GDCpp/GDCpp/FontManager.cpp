@@ -1,5 +1,5 @@
 #include "GDCpp/FontManager.h"
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
@@ -16,11 +16,19 @@ FontManager::~FontManager()
 
 void FontManager::UnloadAllFonts()
 {
-    //Need to explicit delete fonts
+    //Need to explicit delete fonts...
     for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
-        delete (*it).second;
+    {
+        if ((*it).second) delete (*it).second;
+    }
+    //...and their buffers
+    for ( map<string, char*>::iterator it=fontsBuffer.begin() ; it != fontsBuffer.end(); ++it )
+    {
+        if ((*it).second) delete (*it).second;
+    }
 
     fonts.clear();
+    fontsBuffer.clear();
     if ( defaultFont ) delete defaultFont;
     defaultFont = NULL;
 }
@@ -37,6 +45,8 @@ void FontManager::EnsureDefaultFontIsLoaded()
         defaultFont = new sf::Font;
         if ( !defaultFont->loadFromMemory(data, sizeof(data)) )
             std::cout << "ERROR: Failed to load the default font!" << std::endl;
+        else
+            std::cout << "Loaded default font" << std::endl;
     }
 }
 
@@ -54,12 +64,15 @@ const sf::Font * FontManager::GetFont(const string & fontName)
         return fonts[fontName];
 
     //Load an new font
-    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::Get();
-    sf::Font * font = ressourcesLoader->LoadFont(fontName);
-    if ( font )
+    gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
+    std::pair<sf::Font *, char*> font = ressourcesLoader->LoadFont(fontName);
+    if (font.first)
     {
-        fonts[fontName] = font;
-        return font;
+        if (font.second) //Store the buffer if any.
+            fontsBuffer[fontName] = font.second;
+
+        fonts[fontName] = font.first;
+        return font.first;
     }
 
     //Loading failed: Fall back to the default font.

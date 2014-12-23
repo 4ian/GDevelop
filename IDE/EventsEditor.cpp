@@ -906,6 +906,11 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
 void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
 {
+	#if !defined(__WXGTK__)
+	if (!liveEditingPanel->IsShown())
+		eventsPanel->SetFocus();
+	#endif
+
     //Column resizing
     if ( (event.GetX() >= conditionColumnWidth-2 && event.GetX() <= conditionColumnWidth+2) || isResizingColumns)
     {

@@ -41,7 +41,8 @@ Links
 
 * [GDevelop forums](http://forum.compilgames.net)
 * [GDevelop homepage](http://www.compilgames.net)
-* [GDevelop wiki](http://wiki.compilgames.net), and in particular [How to translate GD](http://www.wiki.compilgames.net/doku.php/en/game_develop/articles/translate_gd).
+* [GDevelop wiki](http://wiki.compilgames.net)
+* Help translate GD in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
 
 License
 -------

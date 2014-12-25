@@ -48,6 +48,8 @@ protected:
     wxHyperlinkCtrl* donateLinkBt;
     wxStaticBitmap* githubBmp;
     wxHyperlinkCtrl* m_hyperLink57;
+    wxStaticBitmap* localeBmp;
+    wxHyperlinkCtrl* m_hyperLink572;
 
 protected:
     virtual void OnLastProject1Click(wxHyperlinkEvent& event) { event.Skip(); }

@@ -243,7 +243,7 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     flexGridSizer77->Add(newsLink2, 0, wxLEFT|wxRIGHT, 5);
     
-    wxFlexGridSizer* bottomSizer = new wxFlexGridSizer(0, 5, 0, 0);
+    wxFlexGridSizer* bottomSizer = new wxFlexGridSizer(0, 7, 0, 0);
     bottomSizer->SetFlexibleDirection( wxBOTH );
     bottomSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -274,6 +274,17 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     m_hyperLink57->SetVisitedColour(wxColour(wxT("#FF0000")));
     
     bottomSizer->Add(m_hyperLink57, 0, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
+    
+    localeBmp = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    bottomSizer->Add(localeBmp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    
+    m_hyperLink572 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help to translate GD in your language"), wxT("https://crowdin.com/project/gdevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink572->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink572->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink572->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    bottomSizer->Add(m_hyperLink572, 0, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
     
     SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
     SetSizeHints(700,500);

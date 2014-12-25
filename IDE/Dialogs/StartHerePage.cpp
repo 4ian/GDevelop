@@ -27,6 +27,7 @@ StartHerePage::StartHerePage(wxWindow* parent, MainFrame & mainEditor_)
 	latestProjectsBmp->SetBitmap(gd::SkinHelper::GetIcon("open", 24));
 
 	logoBmp->SetBitmap(wxBitmap("res/GD-logo-simple.png", wxBITMAP_TYPE_ANY));
+	localeBmp->SetBitmap(wxBitmap("res/locale.png", wxBITMAP_TYPE_ANY));
 	donateBmp->SetBitmap(wxBitmap("res/hearticon.png", wxBITMAP_TYPE_ANY));
 	githubBmp->SetBitmap(wxBitmap("res/github16.png", wxBITMAP_TYPE_ANY));
 

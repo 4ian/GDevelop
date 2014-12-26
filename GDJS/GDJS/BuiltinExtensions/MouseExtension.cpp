@@ -59,9 +59,9 @@ MouseExtension::MouseExtension()
         .codeExtraInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 
     AddAction("CentreSourisY",
-                   _("Center mouse verticaly"),
+                   _("Center mouse vertically"),
                    _("Put the cursor in the middle of the screen vertically."),
-                   _("Center mouse verticaly"),
+                   _("Center mouse vertically"),
                    _("Mouse"),
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")

@@ -31,9 +31,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddAction("CentreSourisY",
-                   _("Center cursor verticaly"),
+                   _("Center cursor vertically"),
                    _("Put the cursor in the middle of the screen vertically."),
-                   _("Center cursor verticaly"),
+                   _("Center cursor vertically"),
                    _("Mouse and touch"),
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")

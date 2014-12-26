@@ -25,7 +25,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>GDevelop can not read the MP3 format ( owing to license&#x0A;and algorithms patented by Fraunhofer-Gesellschaft ), you can&#x0A;convert a MP3 file to the free OGG Vobris format or WAV.</label>
+										<label>GDevelop can not read the MP3 format (owing to license&#x0A;and algorithms patented by Fraunhofer-Gesellschaft), you can&#x0A;convert a MP3 file to the free OGG Vorbis format or WAV.</label>
 										<size>336,54</size>
 										<style>wxALIGN_CENTRE</style>
 									</object>

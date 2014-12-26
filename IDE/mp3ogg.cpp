@@ -60,7 +60,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/mp3ogg.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("GDevelop can not read the MP3 format ( owing to license\nand algorithms patented by Fraunhofer-Gesellschaft ), you can\nconvert a MP3 file to the free OGG Vobris format or WAV."), wxDefaultPosition, wxSize(336,54), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("GDevelop can not read the MP3 format (owing to license\nand algorithms patented by Fraunhofer-Gesellschaft), you can\nconvert a MP3 file to the free OGG Vorbis format or WAV."), wxDefaultPosition, wxSize(336,54), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);

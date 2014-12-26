@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-25 15:12+0100\n"
+"POT-Creation-Date: 2014-12-26 12:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,9 +130,9 @@ msgstr ""
 
 #: ../IDE/mp3ogg.cpp:63
 msgid ""
-"GDevelop can not read the MP3 format ( owing to license\n"
-"and algorithms patented by Fraunhofer-Gesellschaft ), you can\n"
-"convert a MP3 file to the free OGG Vobris format or WAV."
+"GDevelop can not read the MP3 format (owing to license\n"
+"and algorithms patented by Fraunhofer-Gesellschaft), you can\n"
+"convert a MP3 file to the free OGG Vorbis format or WAV."
 msgstr ""
 
 #: ../IDE/mp3ogg.cpp:71
@@ -328,8 +328,8 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:86
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:79
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:55
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:164
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:291
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:167
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:297
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:101
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:510
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:512
@@ -705,8 +705,8 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditComment.cpp:78
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:90
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:83
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:171
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:305
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:174
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:311
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:92
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:44
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:162
@@ -754,8 +754,8 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditComment.cpp:80
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:92
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:85
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:175
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:309
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:178
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:315
 #: ../Core/GDCore/IDE/Dialogs/ChooseLayerDialog.cpp:52
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:164
 #: ../Core/GDCore/IDE/Dialogs/AdvancedEntryDialog.cpp:60
@@ -4076,7 +4076,7 @@ msgid "Back Color"
 msgstr ""
 
 #: ../IDE/wxstedit/src/stedlgs_wdr.cpp:148
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:138
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:141
 msgid "Choose background color"
 msgstr ""
 
@@ -16361,7 +16361,7 @@ msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:351
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1745
-msgid "Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"
+msgid "Supported image files|*.jpg;*.png|All files|*.*"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:355
@@ -17307,15 +17307,15 @@ msgstr ""
 msgid "Group name:"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:144
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:147
 msgid "Hide the events contained in the group"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:241
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:247
 msgid "No template chosen"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:298
+#: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:304
 msgid "Publish your own events on GDevApp.com"
 msgstr ""
 
@@ -21627,7 +21627,7 @@ msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:34
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:36
-msgid "Center cursor verticaly"
+msgid "Center cursor vertically"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:35

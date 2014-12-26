@@ -133,14 +133,14 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 		gdjs.callbacksRuntimeSceneLoaded[i](this);
 	}
 
-    isLoaded = true;
+    this._isLoaded = true;
 };
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
 	if ( !this._isLoaded ) return;
 
     this._eventsContext = new gdjs.EventsContext();
-	for(var i = 0;i<gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
+	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
 		gdjs.callbacksRuntimeSceneUnloaded[i](this);
 	}
 };
@@ -161,7 +161,7 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
 		var newObject = that.createObject(objectName);
 
 		if ( newObject !== null ) {
-            newObject.setPosition(parseFloat(instanceData.x)+xPos, parseFloat(instanceData.y)+yPos);
+            newObject.setPosition(parseFloat(instanceData.x) + xPos, parseFloat(instanceData.y) + yPos);
             newObject.setZOrder(parseFloat(instanceData.zOrder));
             newObject.setAngle(parseFloat(instanceData.angle));
             newObject.setLayer(instanceData.layer);
@@ -175,7 +175,7 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
  * Set the function called each time the runtimeScene is stepped.<br>
  * The function will be passed the runtimeScene as argument.
  *
- * Note this.this is already set up by the runtimeScene constructor and this.you should
+ * Note that this is already set up by the runtimeScene constructor and that you should
  * not need to use this method.
  *
  * @method setEventsFunction
@@ -238,8 +238,8 @@ gdjs.RuntimeScene.prototype._updateTime = function() {
  * Empty the list of the removed objects:<br>
  * When an object is removed from the scene, it is still kept in the _instancesRemoved member
  * of the RuntimeScene.<br>
- * This method should be called regularly ( after events or automatisms steps ) so as to clear this list
- * and allows the removed objects to be cached ( or destroyed if the cache is full ).<br>
+ * This method should be called regularly (after events or automatisms steps) so as to clear this list
+ * and allows the removed objects to be cached (or destroyed if the cache is full).<br>
  * The removed objects could not be sent directly to the cache, as events may still be using them after
  * removing them from the scene for example.
  *
@@ -572,7 +572,7 @@ gdjs.RuntimeScene.prototype.isFirstFrame = function() {
 /**
  * Set the time scale of the scene
  * @method setTimeScale
- * @param timeScale {Number} The new time scale ( Must be positive ).
+ * @param timeScale {Number} The new time scale (must be positive).
  */
 gdjs.RuntimeScene.prototype.setTimeScale = function(timeScale) {
 	if ( timeScale >= 0 ) this._timeScale = timeScale;
@@ -620,4 +620,3 @@ gdjs.RuntimeScene.prototype.getRequestedScene = function() {
 gdjs.RuntimeScene.prototype.requestSceneChange = function(sceneName) {
 	this._requestedScene = sceneName;
 };
-

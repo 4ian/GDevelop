@@ -266,7 +266,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
 
         return;
     }
-    else if ( metadata.GetType() == "layoutvar" )
+    else if ( metadata.GetType() == "scenevar" )
     {
         gd::ChooseVariableDialog dialog(parent, layout.GetVariables());
         dialog.SetAssociatedLayout(&project, &layout);

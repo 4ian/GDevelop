@@ -130,6 +130,9 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer43->Add(m_staticText49, 0, wxALL, 5);
     
     groupNameEdit = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    groupNameEdit->SetHint(wxT(""));
+    #endif
     
     flexGridSizer43->Add(groupNameEdit, 0, wxALL|wxEXPAND, 5);
     
@@ -231,6 +234,9 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     
     searchCtrl = new wxSearchCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
     searchCtrl->SetFocus();
+    #if wxVERSION_NUMBER >= 3000
+    searchCtrl->SetHint(wxT(""));
+    #endif
     
     flexGridSizer853->Add(searchCtrl, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 5);
     
@@ -286,21 +292,21 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     
     m_staticBitmap631 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
     
-    flexGridSizer7712->Add(m_staticBitmap631, 0, wxLEFT|wxTOP|wxBOTTOM, 15);
+    flexGridSizer7712->Add(m_staticBitmap631, 0, wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
     
     m_hyperLink652 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/event_store"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink652->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink652->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink652->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer7712->Add(m_hyperLink652, 0, wxALL, 5);
+    flexGridSizer7712->Add(m_hyperLink652, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
     m_hyperLink154 = new wxHyperlinkCtrl(this, wxID_ANY, _("Publish your own events on GDevApp.com"), wxT("https://gdevapp.com"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink154->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink154->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink154->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer7712->Add(m_hyperLink154, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    flexGridSizer7712->Add(m_hyperLink154, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     
     okBt = new wxButton(this, wxID_ANY, _("Ok"), wxDefaultPosition, wxSize(-1,-1), 0);
     

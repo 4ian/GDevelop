@@ -1742,7 +1742,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_MULTIPLE );
+        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE );
         wxString projectDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
 
         if ( FileDialog.ShowModal() == wxID_OK )

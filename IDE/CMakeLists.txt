@@ -21,17 +21,7 @@ set(GDCORE_include_dir ${GD_base_dir}/Core)
 set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
 set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-set(boost_include_dir ${GD_base_dir}/ExtLibs/boost)
-set(sfml_include_dir ${GD_base_dir}/ExtLibs/SFML/include)
-IF(WIN32)
-	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(sfml_lib_dir ${GD_base_dir}/ExtLibs/SFML/build-mingw-debug/lib)
-	ELSE()
-		set(sfml_lib_dir ${GD_base_dir}/ExtLibs/SFML/build-mingw-release/lib)
-	ENDIF()
-ELSE()
-	set(sfml_lib_dir ${GD_base_dir}/ExtLibs/SFML/build-linux/lib)
-ENDIF()
+
 IF(WIN32) #Special case for wxWidgets on Windows
 	set(wxwidgets_include_dir ${GD_base_dir}/ExtLibs/wxwidgets/include)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -156,7 +146,7 @@ ELSE()
 			WORKING_DIRECTORY ${GD_base_dir}/scripts)
 		add_custom_command(TARGET GDIDE
 			POST_BUILD
-			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib
 			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
 	ENDIF()
 ENDIF()

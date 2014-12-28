@@ -57,7 +57,12 @@ public:
         if ( topic != "GDevelop IDE" ) return NULL;
 
         //Check that there are no modal dialogs active
+        
+        #if (wxUSE_STD_CONTAINERS == 1) //Not the same code if wxWidgets is built with std containers
+        wxWindowList::compatibility_iterator node = wxTopLevelWindows.GetFirst();
+		#else
         wxWindowList::Node * node = wxTopLevelWindows.GetFirst();
+        #endif
         while(node)
         {
             wxDialog * dialog = wxDynamicCast(node->GetData(), wxDialog);

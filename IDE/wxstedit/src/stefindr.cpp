@@ -217,7 +217,12 @@ typedef wxList wxSizerItemList;
 wxSizer *FindSizerSizer(wxSizer *sizer, wxSizer *topSizer)
 {
     wxSizerItemList &sizerList = topSizer->GetChildren();
+
+    #if (wxUSE_STD_CONTAINERS == 1) //Not the same code if wxWidgets is built with std containers
+    wxSizerItemList::compatibility_iterator node = sizerList.GetFirst();
+    #else
     wxNode *node = (wxNode*)sizerList.GetFirst();
+    #endif
 
     while (node)
     {
@@ -243,7 +248,12 @@ wxSizer *FindSizerSizer(wxSizer *sizer, wxSizer *topSizer)
 wxSizer *FindSizerWindow(wxWindow *win, wxSizer *topSizer)
 {
     wxSizerItemList &sizerList = topSizer->GetChildren();
+    
+    #if (wxUSE_STD_CONTAINERS == 1) //Not the same code if wxWidgets is built with std containers
+    wxSizerItemList::compatibility_iterator node = sizerList.GetFirst();
+    #else
     wxNode *node = (wxNode*)sizerList.GetFirst();
+    #endif
 
     while (node)
     {

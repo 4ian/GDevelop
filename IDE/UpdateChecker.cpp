@@ -62,7 +62,8 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
         return;
     }
 
-    TiXmlDocument doc( wxFileName::GetTempDir()+"/GDTemporaries/"+"updateinfo.xml" );
+	std::string updateInfoFileName = wxFileName::GetTempDir().ToStdString()+"/GDTemporaries/updateinfo.xml";
+    TiXmlDocument doc( updateInfoFileName.c_str() );
     if ( !doc.LoadFile() )
     {
         gd::LogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );

@@ -114,7 +114,7 @@ void GroupEvent::SetBackgroundColor(unsigned int colorR_, unsigned int colorG_, 
 void GroupEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
-    wxString groupTitle = name.empty() ? _("Untitled group") : name;
+    wxString groupTitle = name.empty() ? _("Untitled group") : wxString(name);
     wxColour backgroundColor = wxColour(colorR, colorG, colorB);
     wxColour textColor = colorR + colorG + colorB > 200*3 ? *wxBLACK : *wxWHITE;
     if (IsDisabled())
@@ -144,7 +144,7 @@ unsigned int GroupEvent::GetRenderedHeight(unsigned int width, const gd::Platfor
         wxBitmap fakeBmp(1,1);
         dc.SelectObject(fakeBmp);
 
-        wxString groupTitle = name.empty() ? _("Untitled group") : name;
+        wxString groupTitle = name.empty() ? _("Untitled group") : wxString(name);
 
         dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
         wxRect text = dc.GetTextExtent(groupTitle);

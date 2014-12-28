@@ -33,6 +33,7 @@
 #include <wx/ribbon/buttonbar.h>
 
 #include "MainFrame.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
@@ -59,9 +60,7 @@
 #include "mp3ogg.h"
 #include "ImportImage.h"
 #include "Dialogs/StartHerePage.h"
-#include "Dialogs/HtmlViewerPnl.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
-#include "Dialogs/HelpViewerDlg.h"
 
 //(*IdInit(MainFrame)
 const long MainFrame::ID_AUINOTEBOOK1 = wxNewId();
@@ -504,10 +503,6 @@ MainFrame::~MainFrame()
 
     //Deinitialize the frame manager
     m_mgr.UnInit();
-
-    cout << "Destroying the help provider";
-    HelpProvider::Get()->DestroySingleton();
-    cout << "." << endl;
 }
 
 /** Change current project

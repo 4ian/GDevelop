@@ -43,7 +43,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/SPARK/include)
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
 ELSE()
-	find_package(wxWidgets COMPONENTS core base ribbon webview stc aui propgrid richtext html xrc REQUIRED)
+	find_package(wxWidgets COMPONENTS core base ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
 	find_package(PkgConfig REQUIRED)
 	pkg_check_modules(GTK2 REQUIRED gtk+-2.0)

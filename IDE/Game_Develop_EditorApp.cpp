@@ -54,7 +54,7 @@
 #include "CompilationChecker.h"
 #include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
-#include "Dialogs/HelpViewerDlg.h"
+#include "Dialogs/HelpProvider.h"
 #include "Dialogs/ReminderDialog.h"
 #include "Dialogs/ParameterEditorLauncher.h"
 
@@ -361,11 +361,8 @@ bool Game_Develop_EditorApp::OnInit()
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
     //Set help provider
-    {
-        gd::HelpFileAccess::Get()->SetHelpProvider(::HelpProvider::Get());
-        ::HelpProvider::Get()->SetParentWindow(mainEditor);
-    }
-    cout << "* Help provider set" << endl;
+    cout << "* Setting help provider" << endl;
+    gd::HelpFileAccess::Get()->SetHelpProvider(::HelpProvider::Get());
 
     cout << "* Loading events editor configuration" << endl;
     gd::InstructionSentenceFormatter::Get()->LoadTypesFormattingFromConfig();
@@ -455,6 +452,8 @@ int Game_Develop_EditorApp::OnExit()
     cout << ".";
     gd::Clipboard::Get()->DestroySingleton();
     cout << ".";
+    ::HelpProvider::Get()->DestroySingleton();
+    cout << "." << endl;
     gd::HelpFileAccess::Get()->DestroySingleton();
     cout << "." << endl;
 

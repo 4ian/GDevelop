@@ -8,8 +8,9 @@ install:
 #Download and compile dependencies
   - cd ExtLibs
   - sudo apt-get install p7zip-full
-  #SFML dependencies:
+    #SFML dependencies:
   - sudo apt-get install libopenal-dev libjpeg-dev libglew-dev libudev-dev libxrandr-dev libsndfile1-dev libglu1-mesa-dev libfreetype6-dev
+  - cd ..
 #Compile the tests only
   - mkdir .build-tests
   - cd .build-tests

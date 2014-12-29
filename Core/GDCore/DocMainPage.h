@@ -40,34 +40,16 @@
  * <b>Windows</b>
  *
  * Follow these three steps to be able to compile GDevelop and the extensions:
- * -# \subpage installWinWxWidgets
  * -# \subpage installWinCompiler
  * -# \ref installAndUseCMake
  * <br>
  *
  * <b>GNU/Linux</b>
- * -# \subpage installLinux
+ * -# \subpage installLinuxLib
  * -# \subpage installAndUseCMake
  *
  * See the recommended tools and conventions for working on GDevelop on this page:
  * \subpage recommendedToolsAndConventions
- */
-
-/**
- *  \page installWinWxWidgets (Windows) Download & extract wxWidgets
- *
- * \section download Download
-
- * You can download a precompiled version of wxWidgets used by GDevelop using this link:<br>
- * - http://www.compilgames.net/code/GameDevelopSDK/wxwidgets.7z
- *
- * It is already built for windows, and for an use with the TDM-GCC compiler.
- *
- * \section uncompress Uncompress
- * By default, GDevelop projects search the libraries in the ExtLibs
- * (located at the root of the SDK) directory ( ExtLibs/SFML, ExtLibs/wxWidgets... ).
- *
- * Uncompress the wxWidgets.7z archive in this directory.
  */
 
 /**
@@ -165,7 +147,7 @@
  */
 
 /**
- *  \page installLinux (Linux) Install development files
+ *  \page installLinuxLib (Linux) Install development files
  *
  * \section installLibs Install development libraries
  *

@@ -4,12 +4,6 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)
 
-project(GameDevelop)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-IF(NOT WIN32)
-	SET(CMAKE_SKIP_BUILD_RPATH  FALSE) #Avoid errors when packaging for linux.
-ENDIF()
-
 # Macro for defining an option
 macro(gd_set_option var default type docstring)
     if(NOT DEFINED ${var})
@@ -26,6 +20,25 @@ gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
 gd_set_option(NO_GUI FALSE BOOL "TRUE to build without any GUI (no wxWidgets GUI, no SFML)")
 IF (EMSCRIPTEN)
 	set(NO_GUI TRUE) #Force disable gui when compiling with emscripten.
+	set(BUILD_GDCPP FALSE) #Force disable GDC++ when compiling with emscripten.
+	set(BUILD_IDE FALSE) #Force disable IDE when compiling with emscripten.
+ENDIF()
+
+#Setting up installation directory, for Linux. (Has to be done before "project" command)
+IF(NOT WIN32)
+	set(GD_INSTALL_PREFIX /opt/gdevelop/)
+
+	#As we embed SFML, prevent it to be installed system-wide
+	if (NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+		set(GD_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+	endif()
+	set(CMAKE_INSTALL_PREFIX "${GD_INSTALL_PREFIX}/useless")
+ENDIF()
+
+project(GDevelop)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+IF(NOT WIN32)
+	SET(CMAKE_SKIP_BUILD_RPATH  FALSE) #Avoid errors when packaging for linux.
 ENDIF()
 
 #Sanity checks
@@ -38,7 +51,6 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 ENDIF()
 
 
-
 #Add all the CMakeLists:
 ADD_SUBDIRECTORY(ExtLibs)
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Core/CMakeLists.txt" AND BUILD_CORE)
@@ -47,13 +59,11 @@ ENDIF()
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/CMakeLists.txt" AND BUILD_GDJS)
 	ADD_SUBDIRECTORY(GDJS)
 ENDIF()
-IF (NOT EMSCRIPTEN) #Disable GDCpp and the IDE when compiling with emscripten
-	IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/CMakeLists.txt"  AND BUILD_GDCPP)
-		ADD_SUBDIRECTORY(GDCpp)
-	ENDIF()
-	IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/IDE/CMakeLists.txt"  AND BUILD_IDE)
-		ADD_SUBDIRECTORY(IDE)
-	ENDIF()
+IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/CMakeLists.txt"  AND BUILD_GDCPP)
+	ADD_SUBDIRECTORY(GDCpp)
+ENDIF()
+IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/IDE/CMakeLists.txt"  AND BUILD_IDE)
+	ADD_SUBDIRECTORY(IDE)
 ENDIF()
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Extensions/CMakeLists.txt"  AND BUILD_EXTENSIONS)
 	ADD_SUBDIRECTORY(Extensions)

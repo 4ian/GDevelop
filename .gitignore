@@ -28,8 +28,7 @@
 /Binaries/Releases/**/*.tar.lzma
 /Binaries/Releases/**/*.zip
 /Binaries/Releases/**/*.deb
-Binaries/Packaging/debian-package/opt/
-Binaries/Packaging/debian-package/debian
+Binaries/Packaging/debian-source-package/gdevelop/
 /WebIDE
 *.depend
 *.layout

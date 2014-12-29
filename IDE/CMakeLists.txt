@@ -137,9 +137,14 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 
-	#Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
-	#output directory, and need to be copied.
-	IF(NOT WIN32)
+	IF(WIN32)
+        add_custom_command(TARGET GDIDE
+			POST_BUILD
+			COMMAND "${GD_base_dir}/IDE/scripts/copyWindowsLibraries.bat" "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}" "${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib"
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+    ELSE()
+        #Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
+        #output directory, and need to be copied.
 		add_custom_command(TARGET GDIDE
 			POST_BUILD
 			COMMAND sh "CopyWindowsToLinuxReleaseFiles.sh" ${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}

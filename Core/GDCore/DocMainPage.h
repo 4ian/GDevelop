@@ -33,12 +33,14 @@
  */
 
 /**
- * \page setupDevEnv Setting up the development environnement
+ * \page setupDevEnv Setting up the development environment
+ *
+ * If you didn't already downloaded GDevelop, get and extract the source from [GitHub](https://github.com/4ian/GD).
  *
  * <b>Windows</b>
  *
- * Follow these three step to be able to compile GDevelop and the extensions:
- * -# \subpage installWinLibs
+ * Follow these three steps to be able to compile GDevelop and the extensions:
+ * -# \subpage installWinWxWidgets
  * -# \subpage installWinCompiler
  * -# \ref installAndUseCMake
  * <br>
@@ -52,23 +54,20 @@
  */
 
 /**
- *  \page installWinLibs (Windows) Download and install SFML, wxWidgets and Boost
+ *  \page installWinWxWidgets (Windows) Download & extract wxWidgets
  *
- * GDevelop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of GDevelop and
- * the extensions, GDevelop require the extensions to use the same version of the libraries.
  * \section download Download
 
- * You can download the specific versions of the libraries used by the current version of GDevelop using these links:<br>
- * - http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
+ * You can download a precompiled version of wxWidgets used by GDevelop using this link:<br>
  * - http://www.compilgames.net/code/GameDevelopSDK/wxwidgets.7z
- * - http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z
  *
- * They are already built for windows, and for an use with the TDM-GCC compiler.
+ * It is already built for windows, and for an use with the TDM-GCC compiler.
  *
  * \section uncompress Uncompress
  * By default, GDevelop projects search the libraries in the ExtLibs
- * (located at the root of the SDK) directory ( ExtLibs/SFML, ExtLibs/wxWidgets... ).<br>
- * Uncompress the libraries in this directory.
+ * (located at the root of the SDK) directory ( ExtLibs/SFML, ExtLibs/wxWidgets... ).
+ *
+ * Uncompress the wxWidgets.7z archive in this directory.
  */
 
 /**
@@ -103,13 +102,13 @@
  */
 
 /**
- *  \page installAndUseCMake (All) Install and use Cmake
+ *  \page installAndUseCMake (All) Install CMake & launch the build
  *
- * Building is done using CMake: It is an open-source build system that can generate build files for lots of IDE and build tools ( Makefiles... ).
+ * Building is done using CMake: It is an open-source build system that can generate build files for lots of IDE and build tools (Makefiles...).
  *
  * \section installAndUseCMake_download Download and install CMake
  *
- * First, install CMake: <br>
+ * First, install CMake:
  * Download it [here](http://www.cmake.org/cmake/resources/software.html) or get it using your package manager if you're
  * using a Linux distribution.
  *
@@ -117,7 +116,7 @@
  *
  * \subsection installAndUseCMake_use_gui Using the GUI
  *
- * - Start the CMake user interface ( _cmake-gui_ ). Choose the GD root directory as the source directory, and Binaries/.build as the directory where to build the binaries:
+ * - Start the CMake user interface (_cmake-gui_). Choose the GD root directory as the source directory, and Binaries/.build as the directory where to build the binaries:
 
  \image html usecmake1.png
 
@@ -126,14 +125,13 @@
 
   \image html usecmake2.png
 
- * - When you click on Finish, CMake do a first configuration. Adjust any variable if necessary (no changes is needed by default), then click on Generate.
+ * - When you click on Finish, CMake do a first configuration. If **errors occurred*, make sure that you have download all required development libraries.
+ * - Adjust any variable if necessary (no changes is needed by default), then click on Generate.
 
   \image html usecmake3.png
 
- * - You can then launch a terminal/command prompt, go to the *.build* folder ( `cd GDRootFolder/Binaries/.build` ) and launch the build
+ * - You can then launch a terminal/command prompt, go to the .build folder ( `cd GDRootFolder/Binaries/.build` ) and launch the build
  * using the generator you've choosen: `mingw32-make`, or `make` on Linux.
- *
- * Binaries are created into *Binaries/Output/Release_{OS}* folder, where {OS} can be Windows or Linux for example.
  *
  * \subsection installAndUseCMake_use_cmd Using the command line
  *
@@ -156,79 +154,24 @@
  * ninja
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * Binaries are of course also created into *Binaries/Output/Release_{OS}* folder.
+ * \section installAndUseCMake_launch Launch GDevelop
+ *
+ * Binaries are created into *Binaries/Output/Release_{OS}* folder.
+ *
+ * To launch GDevelop in Windows, double click on **GDIDE**. For Linux, launch **StartGDevelop.sh**.
+ *
+ * If the build failed, check that you've properly installed wxWidgets and that you have installed any required
+ * development library.
  */
 
 /**
  *  \page installLinux (Linux) Install development files
  *
- * \section downloadGD Download and extract GDevelop for Linux
- *
- * If you didn't already downloaded GDevelop for Linux, do it now from [the official website](http://www.compilgames.net/).
- *
- * Then extract all the files inside the <b>GameDevelop</b> folder inside the *Binaries/Output/Release_Linux/ * folder
- * of the SDK. ( You should have files like libGDCore.so now present in Binaries/Output/Release_Linux )
- *
- * \section download Download, (build) and install libraries
+ * \section installLibs Install development libraries
  *
  * GDevelop is compiled with gcc under Linux.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by GDevelop and
- * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of gcc.<br>
- *
- * \subsection sfml SFML
- *
- * GDevelop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
- *
- * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which GDevelop is distributed officially:
- *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs.
- *  - If you compile GD for another version of Ubuntu or a different distro, extract the archive inside the folder ExtLibs, and *recompile* SFML using CMake into
- *  a folder called **build-linux**. It's easy, just follow [this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php). Again, be sure
- *  to build the binaries into **ExtLibs/SFML/build-linux**. If you have difficulties, read this page: \subpage buildSFML, it details the dependencies you need
- *  to install.
- *
- * \subsection boost Boost
-
- * Boost version used by GDevelop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
- * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
- * \subsection wxWidgets wxWidgets
-
- * wxWidgets version used by GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2 <br>
- * First extract the archive inside the folder ExtLibs.
- *
- * Be sure to have GTK+ 3.0 and WebKitGTK development files installed:
- * \code
- * sudo apt-get install libgtk-3-dev
- * sudo apt-get install libwebkitgtk-3.0-dev
- * \endcode
- *
- * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
- * \code
- * ./configure --enable-ribbon --enable-webview
- * make
- * sudo make install
- * \endcode
- *
- * \subsection installcmake Install CMake
- * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
- */
-
-/**
- * \page buildSFML (Linux) Manually build SFML
- *
- * If you're compiling GDevelop for another distro that is the not the distro for which GDevelop is officially distributed
- * (i.e: The latest Ubuntu), you have to recompile SFML.
- *
- * \section downloadSFML Download SFML
- *
- * Download the SFML archive from this page: \ref installLinux
- *
- * Extract it in ExtLibs folder. Go in the SFML directory that was created, and delete **build-linux** folder (it's the
- * folder where SFML was built for Ubuntu).
- *
- * \section installDep Install dependencies and build SFML
- *
- * You'll surely have to install dependencies so that SFML can be built. On Ubuntu, here are the commands to be launched
- * to install all dependencies:
+ * You need to have some packages to be installed before starting to build GD. These packages can vary according to the distribution you use.
+ * On Ubuntu, you may want to install these packages:
 \code
 sudo apt-get install libopenal-dev
 sudo apt-get install libjpeg-dev
@@ -240,22 +183,15 @@ sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 \endcode
  *
- * Then, use CMake to build SFML: Follow **[this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php)** from the
- * official SFML website. Just be sure to build SFML into a folder called **build-linux**.
+ * \subsection wxWidgets Install wxWidgets development libraries
  *
- * Most of the time, you just have to launch CMake in the build-linux folder:
- * \code
- * cd ExtLibs/SFML
- * mkdir build-linux
- * cd build-linux
- * cmake ..
- * make
- * \endcode
+ * Most distributions have wxWidgets 3 development libraries available: install them using your package manager. On Ubuntu:
+\code
+sudo apt-get install libwxgtk3.0-dev
+\endcode
  *
- * Remember that it is mandatory to have this **build-linux** folder as GDevelop will use the libraries created into this folder.
- * Pay attention to it if you use the GUI version of CMake.
- *
- * If you have errors when launching cmake, make sure you have installed all dependencies.²
+ * \subsection installcmake Install CMake
+ * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
  */
 
 /**

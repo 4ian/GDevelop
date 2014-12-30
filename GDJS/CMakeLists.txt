@@ -47,10 +47,8 @@ IF(WIN32) #Special case for wxWidgets on Windows
 ELSEIF (NOT EMSCRIPTEN)
 	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
-	include_directories(${GTK2_INCLUDE_DIRS})
-	link_directories(${GTK2_LIBRARY_DIRS})
+	include_directories(${GTK_INCLUDE_DIRS})
+	link_directories(${GTK_LIBRARY_DIRS})
 ENDIF(WIN32)
 
 #Defines
@@ -87,7 +85,7 @@ ELSE()
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK2_CFLAGS_OTHER})
+	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 #The target
@@ -134,7 +132,7 @@ ELSE()
 		target_link_libraries(GDJS ws2_32 user32)
 	ELSE()
 		target_link_libraries(GDJS ${wxWidgets_LIBRARIES})
-		target_link_libraries(GDJS ${GTK2_LIBRARIES})
+		target_link_libraries(GDJS ${GTK_LIBRARIES})
 	ENDIF(WIN32)
 ENDIF()
 

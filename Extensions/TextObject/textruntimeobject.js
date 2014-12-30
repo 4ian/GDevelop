@@ -275,4 +275,4 @@ gdjs.TextRuntimeObject.prototype.setZOrder = function(z) {
         this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._text, z);
         this.zOrder = z;
     }
-};Le
+};

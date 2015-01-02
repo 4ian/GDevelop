@@ -212,7 +212,7 @@ gdjs.TextRuntimeObject.prototype.setItalic = function(enable) {
 };
 
 /**
- * Set bold for your object text.
+ * Hide or show the object
  * @method hide
  * @param enable {Boolean} Set it to true to hide the object, false to show it.
  */

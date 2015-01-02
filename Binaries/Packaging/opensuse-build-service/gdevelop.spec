@@ -28,13 +28,22 @@ GDevelop game creator
 %setup -q -n gdevelop-%{version}
 
 %build
+
+#Configuration
 rm Binaries/Packaging/debian-source-package/extra-files/gdevelop.desktop
 cd Binaries
 rm -rf .build
 mkdir .build
 cd .build
 cmake ../..
-make
+
+#Force to make SFML first (sometime forgot one sfml lib causing the whole build to fail)
+cd ExtLibs/SFML
+make %{?_smp_mflags}
+
+#Build the whole project
+cd ../..
+make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT

@@ -8,7 +8,7 @@ Exec=sh -c "gdevelop %F"
 Icon=GDevelop
 Terminal=false
 Type=Application
-Categories=Development;Utility;
+Categories=Development;IDE
 Name=GDevelop
 
 Name[fr_FR]=GDevelop

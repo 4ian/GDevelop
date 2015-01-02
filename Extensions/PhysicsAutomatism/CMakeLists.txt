@@ -42,12 +42,10 @@ include_directories(${GDCpp_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
 ELSE()
-	find_package(wxWidgets COMPONENTS core base ribbon stc aui propgrid richtext html xrc REQUIRED)
+	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
-	include_directories(${GTK2_INCLUDE_DIRS})
-	link_directories(${GTK2_LIBRARY_DIRS})
+	include_directories(${GTK_INCLUDE_DIRS})
+	link_directories(${GTK_LIBRARY_DIRS})
 ENDIF(WIN32)
 IF(NOT TARGET GDCore) #Ensure that the build will work even when GDCore is not in the target list.
 link_directories(${GDCORE_lib_dir})
@@ -97,7 +95,7 @@ ELSE()
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
 	add_definitions( -DGD_EXTENSION_API= )
-	add_definitions(${GTK2_CFLAGS_OTHER})
+	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 
@@ -147,7 +145,7 @@ IF(WIN32)
 ELSE()
 	target_link_libraries(PhysicsAutomatism ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
 	target_link_libraries(PhysicsAutomatism ${wxWidgets_LIBRARIES})
-	target_link_libraries(PhysicsAutomatism ${GTK2_LIBRARIES})
+	target_link_libraries(PhysicsAutomatism ${GTK_LIBRARIES})
 ENDIF(WIN32)
 
 

@@ -43,10 +43,8 @@ IF(WIN32) #Special case for wxWidgets on Windows
 ELSE()
 	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
-	include_directories(${GTK2_INCLUDE_DIRS})
-	link_directories(${GTK2_LIBRARY_DIRS})
+	include_directories(${GTK_INCLUDE_DIRS})
+	link_directories(${GTK_LIBRARY_DIRS})
 ENDIF(WIN32)
 
 #Defines
@@ -77,7 +75,7 @@ ELSE()
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK2_CFLAGS_OTHER})
+	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 
@@ -126,7 +124,7 @@ IF(WIN32)
 ELSE()
 	target_link_libraries(GDIDE ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
 	target_link_libraries(GDIDE ${wxWidgets_LIBRARIES})
-	target_link_libraries(GDIDE ${GTK2_LIBRARIES})
+	target_link_libraries(GDIDE ${GTK_LIBRARIES})
 	target_link_libraries(GDIDE GLU GL)
 ENDIF(WIN32)
 
@@ -137,9 +135,14 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 
-	#Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
-	#output directory, and need to be copied.
-	IF(NOT WIN32)
+	IF(WIN32)
+        add_custom_command(TARGET GDIDE
+			POST_BUILD
+			COMMAND "${GD_base_dir}/IDE/scripts/copyWindowsLibraries.bat" "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}" "${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib"
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+    ELSE()
+        #Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
+        #output directory, and need to be copied.
 		add_custom_command(TARGET GDIDE
 			POST_BUILD
 			COMMAND sh "CopyWindowsToLinuxReleaseFiles.sh" ${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}

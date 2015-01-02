@@ -38,4 +38,4 @@ rm -R gdevelop-$GD_VERSION_WITH_REV/Binaries/Output/Release_Windows/*
 #Recreate the tar.gz with the added sources
 rm gdevelop_$GD_VERSION_WITH_REV.orig.tar.gz
 tar -zcvf ../gdevelop_$GD_VERSION_WITH_REV.orig.tar.gz gdevelop-$GD_VERSION_WITH_REV
-
+rm -rf opensuse-build-service/gdevelop

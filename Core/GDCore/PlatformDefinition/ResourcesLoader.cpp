@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <utility>
 #include <cstring>
 #undef LoadImage //Undef a macro from windows.h
 
@@ -32,7 +33,8 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
         return std::make_pair<sf::Font*, char*>(NULL, NULL);
     }
 
-    return std::make_pair<sf::Font*, char*>(font, NULL);
+    //Extra (sf::Font*) added to avoid a compilation error with Clang 3.3
+    return std::make_pair<sf::Font*, char*>((sf::Font*)font, NULL);
 }
 
 sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const string & filename )

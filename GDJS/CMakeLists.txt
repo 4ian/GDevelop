@@ -22,8 +22,7 @@ ENDIF()
 set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(GDCORE_include_dir ${GD_base_dir}/Core)
 set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-set(boost_include_dir ${GD_base_dir}/ExtLibs/boost)
-set(sfml_include_dir ${GD_base_dir}/ExtLibs/SFML/include)
+
 IF(WIN32) #Special case for wxWidgets on Windows
 	set(wxwidgets_include_dir ${GD_base_dir}/ExtLibs/wxwidgets/include)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -46,12 +45,10 @@ ENDIF()
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
 ELSEIF (NOT EMSCRIPTEN)
-	find_package(wxWidgets COMPONENTS core base ribbon webview stc aui propgrid richtext html xrc REQUIRED)
+	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-	include_directories(${GTK3_INCLUDE_DIRS})
-	link_directories(${GTK3_LIBRARY_DIRS})
+	include_directories(${GTK_INCLUDE_DIRS})
+	link_directories(${GTK_LIBRARY_DIRS})
 ENDIF(WIN32)
 
 #Defines
@@ -88,7 +85,7 @@ ELSE()
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK3_CFLAGS_OTHER})
+	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 #The target
@@ -135,7 +132,7 @@ ELSE()
 		target_link_libraries(GDJS ws2_32 user32)
 	ELSE()
 		target_link_libraries(GDJS ${wxWidgets_LIBRARIES})
-		target_link_libraries(GDJS ${GTK3_LIBRARIES})
+		target_link_libraries(GDJS ${GTK_LIBRARIES})
 	ENDIF(WIN32)
 ENDIF()
 

@@ -26,9 +26,9 @@ Full and detailed instructions are in the getting started page of the [documenta
 Basically:
 
 * Install and launch [CMake].
-* Choose this directory as the source directory, and a hidden directory like Binaries/.build
+* Choose this directory as the source directory, and a new directory like Binaries/.build
 as the directory where to build. Files will be output in Binaries/Output anyway.
-* Be sure to have [3rd party libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) downloaded and extract in *ExtLibs* folder. On Windows, be sure to use the same version of [the compiler](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) for better compatibility.
+* On Linux, be sure to have [required development libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) installed. On Windows, be sure to use the same version of [the compiler](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) for better compatibility.
 * Generate the Makefile (or [Ninja] build file) and launch it.
 
 Documentation

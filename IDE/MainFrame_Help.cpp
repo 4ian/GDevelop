@@ -9,7 +9,6 @@
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "Dialogs/HelpViewerDlg.h"
 #include "Credits.h"
 #include "MAJ.h"
 

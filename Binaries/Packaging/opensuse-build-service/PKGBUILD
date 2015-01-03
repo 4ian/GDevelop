@@ -1,0 +1,51 @@
+# Maintainer: Victor Levasseur <victorlevasseur52@gmail.com>
+
+pkgname=gdevelop
+pkgver=3.6.76
+pkgrel=8
+pkgdesc="GDevelop game creator"
+arch=('i686' 'x86_64')
+url="http://www.compilgames.net"
+license=('GPL' 'MIT' 'zlib/png')
+groups=()
+makedepends=('cmake' 'git' 'curl')
+depends=('gcc' 'wxgtk' 'openal' 'p7zip' 'glew' 'libsndfile' 'systemd' 'libjpeg-turbo')
+
+source=( "gdevelop_$pkgver.orig.tar.gz" 'gdevelop.desktop')
+md5sums=(SKIP SKIP)
+
+build() {
+  cd "$srcdir"/$pkgname-$pkgver
+  rm Binaries/Packaging/debian-source-package/extra-files/gdevelop.desktop
+  cd Binaries
+  rm -rf .build
+  mkdir .build
+  cd .build
+  cmake ../..
+
+  #Force to make SFML first (sometime forgot one sfml lib causing the whole build to fail)
+  cd ExtLibs/SFML
+  make
+
+  #Build the whole project
+  cd ../..
+  make
+}
+
+package() {
+  cd "$srcdir"/$pkgname-$pkgver
+
+  #Create installation folder and copy all file inside it
+  mkdir -p "$pkgdir"/opt/gdevelop
+  mkdir -p "$pkgdir"/usr/share/applications
+  mkdir -p "$pkgdir"/usr/bin
+  mkdir -p "$pkgdir"/usr/share/pixmaps
+  cp -R Binaries/Output/Release_Linux/* "$pkgdir"/opt/gdevelop
+
+  #Copy other files
+  cp Binaries/Packaging/debian-source-package/extra-files/gdevelop "$pkgdir"/usr/bin/
+
+  #Update the icon
+  cp -T Binaries/Output/Release_Linux/res/icon48linux.png "$pkgdir"/usr/share/pixmaps/GDevelop.png
+  cp "$srcdir"/gdevelop.desktop "$pkgdir"/usr/share/applications
+}

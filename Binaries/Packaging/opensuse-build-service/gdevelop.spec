@@ -4,7 +4,7 @@ Release:	0.1%{?dist}
 Summary:        GDevelop game creator
 
 Group:          extra
-License:        GPLv2 LGPLv2 MIT
+License:        GPL LGPL MIT
 URL:            http://www.compilgames.net
 
 Source0:        gdevelop_%{version}.orig.tar.gz

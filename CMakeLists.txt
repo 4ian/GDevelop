@@ -29,7 +29,7 @@ ENDIF()
 
 project(GDevelop)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-IF(NOT WIN32)
+IF(NOT WIN32 AND NOT BUILD_TESTS)
 	SET(CMAKE_SKIP_BUILD_RPATH  TRUE) #Avoid errors when packaging for linux.
 ENDIF()
 

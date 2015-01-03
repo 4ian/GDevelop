@@ -8,7 +8,7 @@ arch=('i686' 'x86_64')
 url="http://www.compilgames.net"
 license=('GPL' 'MIT' 'zlib/png')
 groups=()
-makedepends=('cmake' 'git' 'curl')
+makedepends=('rsync' 'cmake' 'git' 'curl')
 depends=('gcc' 'wxgtk' 'openal' 'p7zip' 'glew' 'libsndfile' 'systemd' 'libjpeg-turbo')
 
 source=( "gdevelop_$pkgver.orig.tar.gz" 'gdevelop.desktop')

@@ -9,13 +9,6 @@ CUR_DIR=$(pwd)
 
 echo "Started the OBS packaging process, using latest '$BRANCH' git tree"
 
-#Create the changelog file for debian/ubuntu only
-echo "gdevelop ($GD_VERSION_WITH_REV-1) trusty; urgency=low" > opensuse-build-service/debian.changelog
-echo "" >> opensuse-build-service/debian.changelog
-echo "  * Released $GD_VERSION" >> opensuse-build-service/debian.changelog
-echo "" >> debian-source-package/extra-files/debian/changelog
-echo " -- Florian <Florian.Rival@gmail.com>  $DATE" >> opensuse-build-service/debian.changelog
-
 if [ -d "opensuse-build-service/gdevelop" ]; then
 	rm -rf opensuse-build-service/gdevelop
 fi

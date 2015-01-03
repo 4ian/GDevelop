@@ -40,12 +40,7 @@ mkdir .build
 cd .build
 cmake ../..
 
-#Force to make SFML first (sometime forgot one sfml lib causing the whole build to fail)
-cd ExtLibs/SFML
-make %{?_smp_mflags}
-
 #Build the whole project
-cd ../..
 make %{?_smp_mflags}
 
 %install

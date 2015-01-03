@@ -18,6 +18,7 @@ install:
   - make -j 4
   - cd ..
 script:
+  - export LD_LIBRARY_PATH=./Output/Release_Linux:$LD_LIBRARY_PATH
   - cd .build-tests
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests

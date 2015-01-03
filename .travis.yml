@@ -17,8 +17,9 @@ install:
   - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_EXTENSIONS=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..
   - make -j 4
   - cd ..
+
 script:
-  - export LD_LIBRARY_PATH=./Output/Release_Linux:$LD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=$PWD/Binaries/Output/Release_Linux:$LD_LIBRARY_PATH
   - cd .build-tests
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests

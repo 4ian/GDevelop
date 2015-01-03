@@ -1,4 +1,4 @@
-Name:           GDevelop
+Name:           gdevelop
 Version:        3.6.76
 Release:	0.1%{?dist}
 Summary:        GDevelop game creator
@@ -22,7 +22,10 @@ BuildRequires:  libudev-devel libjpeg8-devel wxWidgets-3_0-devel
 Requires:       gcc-c++ p7zip 
 
 %description 
-GDevelop game creator
+GDevelop is a full featured, open source game development software, 
+allowing to create HTML5 and native games without needing any knowledge 
+in a specific programming language. All the game logic is made thanks 
+to an intuitive and powerful event based system.
 
 %prep
 %setup -q -n gdevelop-%{version}

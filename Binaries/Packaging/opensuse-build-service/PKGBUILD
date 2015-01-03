@@ -3,7 +3,7 @@
 pkgname=gdevelop
 pkgver=3.6.76
 pkgrel=8
-pkgdesc="GDevelop game creator"
+pkgdesc="GDevelop is a full featured, open source game development software, allowing to create HTML5 and native games without needing any knowledge in a specific programming language. All the game logic is made thanks to an intuitive and powerful event based system."
 arch=('i686' 'x86_64')
 url="http://www.compilgames.net"
 license=('GPL' 'MIT' 'zlib/png')

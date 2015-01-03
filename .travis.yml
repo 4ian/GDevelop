@@ -19,7 +19,7 @@ install:
   - cd ..
 
 script:
-  - export LD_LIBRARY_PATH=$PWD/Binaries/Output/Release_Linux:$LD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=$PWD/Binaries/Output/Release_Linux:$PWD/../lib:$LD_LIBRARY_PATH
   - cd .build-tests
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests

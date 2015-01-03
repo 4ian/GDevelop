@@ -17,12 +17,7 @@ gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build GDevelop JS Platform")
 gd_set_option(BUILD_IDE TRUE BOOL "TRUE to build the IDE")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
 gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
-gd_set_option(NO_GUI FALSE BOOL "TRUE to build without any GUI (no wxWidgets GUI, no SFML)")
-IF (EMSCRIPTEN)
-	set(NO_GUI TRUE) #Force disable gui when compiling with emscripten.
-	set(BUILD_GDCPP FALSE) #Force disable GDC++ when compiling with emscripten.
-	set(BUILD_IDE FALSE) #Force disable IDE when compiling with emscripten.
-ENDIF()
+gd_set_option(NO_GUI FALSE BOOL "TRUE to build without wxWidgets GUI")
 
 #Setting up installation directory, for Linux. (Has to be done before "project" command)
 IF(NOT WIN32)
@@ -45,6 +40,11 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	IF(NOT WIN32)
 		SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
 	ENDIF()
+ENDIF()
+IF (EMSCRIPTEN)
+	set(NO_GUI TRUE CACHE BOOL "" FORCE) #Force disable gui when compiling with emscripten.
+	set(BUILD_GDCPP FALSE CACHE BOOL "" FORCE) #Force disable GDC++ when compiling with emscripten.
+	set(BUILD_IDE FALSE CACHE BOOL "" FORCE) #Force disable IDE when compiling with emscripten.
 ENDIF()
 
 

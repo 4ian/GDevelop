@@ -128,6 +128,12 @@ ELSE()
 	target_link_libraries(GDIDE GLU GL)
 ENDIF(WIN32)
 
+#Pre build tasks
+###
+IF(NOT WIN32 AND NOT EMSCRIPTEN)
+	execute_process(COMMAND sh cleanLinuxLibraries.sh ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+		WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+ENDIF()
 
 #Post build tasks
 ###

@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <utility>
 #include <cstring>
 #include "GDCpp/Music.h"
 #undef LoadImage //Undef a macro from windows.h

@@ -13,11 +13,11 @@ Source2:	gdevelop-rpmlintrc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  git update-desktop-files rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel
+BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel
 %if 0%{?fedora}
-BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
+BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel desktop-file-utils
 %else
-BuildRequires:  libudev-devel libjpeg8-devel wxWidgets-3_0-devel 
+BuildRequires:  update-desktop-files libudev-devel libjpeg8-devel wxWidgets-3_0-devel 
 %endif
 Requires:       gcc-c++ p7zip 
 
@@ -58,7 +58,11 @@ cp Binaries/Packaging/debian-source-package/extra-files/gdevelop "$RPM_BUILD_ROO
 
 #Update the icon
 cp -T Binaries/Output/Release_Linux/res/icon48linux.png "$RPM_BUILD_ROOT"/usr/share/pixmaps/GDevelop.png
+%if 0%{?fedora}
+desktop-file-install --vendor="" --dir=%{buildroot}%{_datadir}/applications/ %{_sourcedir}/gdevelop.desktop
+%else
 %suse_update_desktop_file -i gdevelop
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT

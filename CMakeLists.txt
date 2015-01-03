@@ -26,12 +26,9 @@ ENDIF()
 
 #Setting up installation directory, for Linux. (Has to be done before "project" command)
 IF(NOT WIN32)
-	set(GD_INSTALL_PREFIX /opt/gdevelop/)
+	gd_set_option(GD_INSTALL_PREFIX "/opt/gdevelop/" STRING "The directory where GDevelop should be installed")
 
 	#As we embed SFML, prevent it to be installed system-wide
-	if (NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-		set(GD_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-	endif()
 	set(CMAKE_INSTALL_PREFIX "${GD_INSTALL_PREFIX}/useless")
 ENDIF()
 

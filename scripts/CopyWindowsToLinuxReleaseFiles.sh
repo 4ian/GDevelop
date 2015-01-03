@@ -11,9 +11,15 @@ echo "Copying versioned files from Release_Windows to '$DESTINATION'..."
 
 cd ../Binaries/Output/Release_Windows
 git archive --format tar.gz --output ../allRuntimeFiles.tar master
-cd ..
-tar -xzf allRuntimeFiles.tar -C "$DESTINATION"
-rm allRuntimeFiles.tar
+if [ $? -eq 0 ]; then
+	cd ..
+	tar -xzf allRuntimeFiles.tar -C "$DESTINATION"
+	rm allRuntimeFiles.tar
+else
+	echo "Can't use git to copy versioned file, fallback to copy the entire Release_Windows to '$DESTINATION'..."
+	cd ..
+	cp -a Release_Windows/. Release_Linux/
+fi
 cd ../../scripts/
 
 echo "Done."

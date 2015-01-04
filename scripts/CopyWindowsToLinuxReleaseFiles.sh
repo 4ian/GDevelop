@@ -18,7 +18,7 @@ if [ $? -eq 0 ]; then
 else
 	echo "Can't use git to copy versioned file, fallback to copy the entire Release_Windows to '$DESTINATION'..."
 	cd ..
-	cp -a Release_Windows/. Release_Linux/
+	cp -a Release_Windows/. $DESTINATION/
 fi
 cd ../../scripts/
 

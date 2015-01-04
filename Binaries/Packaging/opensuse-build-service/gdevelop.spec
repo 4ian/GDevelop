@@ -49,6 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 #Create installation folder and copy all file inside it
 mkdir -p "$RPM_BUILD_ROOT"/opt/gdevelop
 mkdir -p "$RPM_BUILD_ROOT"/usr/share/applications
+mkdir -p "$RPM_BUILD_ROOT"/usr/share/mime/packages
 mkdir -p "$RPM_BUILD_ROOT"/usr/bin
 mkdir -p "$RPM_BUILD_ROOT"/usr/share/pixmaps
 cp -R Binaries/Output/Release_Linux/* "$RPM_BUILD_ROOT"/opt/gdevelop

@@ -84,6 +84,10 @@ rm -rf $RPM_BUILD_ROOT
 update-desktop-database
 update-mime-database
 
+%postun
+update-desktop-database
+update-mime-database
+
 %doc
 
 

@@ -14,13 +14,13 @@ Source100:	gdevelop-rpmlintrc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel
+BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel desktop-file-utils
 %if 0%{?fedora}
-BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel desktop-file-utils
+BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
 %else
 BuildRequires:  update-desktop-files libudev-devel libjpeg8-devel wxWidgets-3_0-devel 
 %endif
-Requires:       gcc-c++ p7zip 
+Requires:       gcc-c++ p7zip
 
 %description 
 GDevelop is a full featured, open source game development software, 
@@ -80,23 +80,19 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/pixmaps/GDevelop.png
 /usr/share/mime/packages/gdevelop.xml
 
-%post
-%if 0%{?suse_version} >= 1140
-%desktop_database_post
-%else
-update-mime-database %{_datadir}/mime &> /dev/null || :
-update-desktop-database &> /dev/null || :
-%endif
-
-%postun
-%if 0%{?suse_version} >= 1140
-%desktop_database_postun
-%else
-update-mime-database %{_datadir}/mime &> /dev/null || :
-update-desktop-database &> /dev/null || :
-%endif
-
 %doc
 
+%post
+update-mime-database %{_datadir}/mime >/dev/null 2>&1 || :
+update-desktop-database >/dev/null 2>&1 || :
+touch --no-create %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
+
+%postun
+update-mime-database %{_datadir}/mime >/dev/null 2>&1 || :
+update-desktop-database >/dev/null 2>&1 || :
+if [ $1 -eq 0 ] ; then
+    touch --no-create %{_datadir}/icons/hicolor >/dev/null 2>&1
+    gtk-update-icon-cache %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
+fi
 
 %changelog

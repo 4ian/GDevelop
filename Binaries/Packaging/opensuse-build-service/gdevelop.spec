@@ -9,7 +9,8 @@ URL:            http://www.compilgames.net
 
 Source0:        gdevelop_%{version}.orig.tar.gz
 Source1:	gdevelop.desktop
-Source2:	gdevelop-rpmlintrc
+Source2:	gdevelop.xml
+Source100:	gdevelop-rpmlintrc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -64,6 +65,9 @@ desktop-file-install --vendor="" --dir=%{buildroot}%{_datadir}/applications/ %{_
 %suse_update_desktop_file -i gdevelop
 %endif
 
+#Add MIME type
+cp %{S:2} "$RPM_BUILD_ROOT"/usr/share/mime/packages
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -74,6 +78,11 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/gdevelop
 /usr/share/applications/gdevelop.desktop
 /usr/share/pixmaps/GDevelop.png
+/usr/share/mime/packages/gdevelop.xml
+
+%post
+update-desktop-database
+update-mime-database
 
 %doc
 

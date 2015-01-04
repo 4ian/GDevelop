@@ -73,9 +73,9 @@ void TileMapPanel::FillLayer(int layer, int tile)
     if(!m_tilemap)
         return;
 
-    for (int col = 0; col < m_tilemap->GetColumnsCount(); col++)
+    for (unsigned int col = 0; col < m_tilemap->GetColumnsCount(); col++)
     {
-        for (int row = 0; row < m_tilemap->GetRowsCount(); row++)
+        for (unsigned int row = 0; row < m_tilemap->GetRowsCount(); row++)
         {
             m_tilemap->SetTile(layer, col, row, tile);
         }
@@ -200,7 +200,7 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
         return;
 
     //Get the current tile position (column and row)
-    int currentColumn, currentRow;
+    unsigned int currentColumn, currentRow;
     wxPoint mousePos = CalcUnscrolledPosition(event.GetPosition());
     GetTileAt(mousePos, currentColumn, currentRow);
 
@@ -221,8 +221,7 @@ void TileMapPanel::OnMouseEvent(wxMouseEvent &event)
             else if(event.RightIsDown())
             {
                 //Remove the tile
-                if(m_tilemap->GetTile(m_mapCurrentLayer, currentColumn, currentRow) != m_tileToBeInserted)
-                    m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, currentColumn, currentRow, -1));
+                m_commandProcessor.Submit(new ChangeTileCommand(*m_tilemap, m_mapCurrentLayer, currentColumn, currentRow, -1));
                 Refresh();
             }
         }
@@ -288,7 +287,7 @@ wxPoint TileMapPanel::GetPositionOfTile(int column, int row)
     return wxPoint(column *(m_tileset->tileSize.x), row * (m_tileset->tileSize.y));
 }
 
-void TileMapPanel::GetTileAt(wxPoint position, int &tileCol, int &tileRow)
+void TileMapPanel::GetTileAt(wxPoint position, unsigned int &tileCol, unsigned int &tileRow)
 {
     tileCol = (int)(position.x / m_tileset->tileSize.x);
     tileRow = (int)(position.y / m_tileset->tileSize.y);

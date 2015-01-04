@@ -89,10 +89,14 @@ public:
 
     virtual bool Do()
     {
+        if (m_col < 0 || m_col >= m_tileMap.GetColumnsCount() || m_row < 0 || m_row >= m_tileMap.GetRowsCount())
+            return true; //Out of bound position.
+
         m_tileChanged.clear();
         m_oldTileId = m_tileMap.GetTile(m_layer, m_col, m_row);
 
-        FloodFill(m_col, m_row);
+        if (m_newTileId != m_oldTileId) //Beware, flood fill will loop forever if replacing a tile with the same!
+            FloodFill(m_col, m_row);
 
         return true;
     }

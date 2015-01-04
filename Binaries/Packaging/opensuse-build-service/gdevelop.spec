@@ -29,46 +29,46 @@ in a specific programming language. All the game logic is made thanks
 to an intuitive and powerful event based system.
 
 %prep
-	%setup -q -n gdevelop-%{version}
+%setup -q -n gdevelop-%{version}
 
 %build
-	#Configuration
-	rm Binaries/Packaging/debian-source-package/extra-files/gdevelop.desktop
-	cd Binaries
-	rm -rf .build
-	mkdir .build
-	cd .build
-	cmake ../..
+#Configuration
+rm Binaries/Packaging/debian-source-package/extra-files/gdevelop.desktop
+cd Binaries
+rm -rf .build
+mkdir .build
+cd .build
+cmake ../..
 
-	#Build the whole project
-	make %{?_smp_mflags}
+#Build the whole project
+make %{?_smp_mflags}
 
 %install
-	rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
-	#Create installation folder and copy all file inside it
-	mkdir -p "$RPM_BUILD_ROOT"/opt/gdevelop
-	mkdir -p "$RPM_BUILD_ROOT"/usr/share/applications
-	mkdir -p "$RPM_BUILD_ROOT"/usr/bin
-	mkdir -p "$RPM_BUILD_ROOT"/usr/share/pixmaps
-	cp -R Binaries/Output/Release_Linux/* "$RPM_BUILD_ROOT"/opt/gdevelop
+#Create installation folder and copy all file inside it
+mkdir -p "$RPM_BUILD_ROOT"/opt/gdevelop
+mkdir -p "$RPM_BUILD_ROOT"/usr/share/applications
+mkdir -p "$RPM_BUILD_ROOT"/usr/bin
+mkdir -p "$RPM_BUILD_ROOT"/usr/share/pixmaps
+cp -R Binaries/Output/Release_Linux/* "$RPM_BUILD_ROOT"/opt/gdevelop
 
-	#Copy other files
-	cp Binaries/Packaging/debian-source-package/extra-files/gdevelop "$RPM_BUILD_ROOT"/usr/bin/
+#Copy other files
+cp Binaries/Packaging/debian-source-package/extra-files/gdevelop "$RPM_BUILD_ROOT"/usr/bin/
 
-	#Update the icon
-	cp -T Binaries/Output/Release_Linux/res/icon48linux.png "$RPM_BUILD_ROOT"/usr/share/pixmaps/GDevelop.png
-	%if 0%{?fedora}
-	desktop-file-install --vendor="" --dir=%{buildroot}%{_datadir}/applications/ %{_sourcedir}/gdevelop.desktop
-	%else
-	%suse_update_desktop_file -i gdevelop
-	%endif
+#Update the icon
+cp -T Binaries/Output/Release_Linux/res/icon48linux.png "$RPM_BUILD_ROOT"/usr/share/pixmaps/GDevelop.png
+%if 0%{?fedora}
+desktop-file-install --vendor="" --dir=%{buildroot}%{_datadir}/applications/ %{_sourcedir}/gdevelop.desktop
+%else
+%suse_update_desktop_file -i gdevelop
+%endif
 
-	#Add MIME type
-	cp %{S:2} "$RPM_BUILD_ROOT"/usr/share/mime/packages
+#Add MIME type
+cp %{S:2} "$RPM_BUILD_ROOT"/usr/share/mime/packages
 
 %clean
-	rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
@@ -80,20 +80,20 @@ to an intuitive and powerful event based system.
 /usr/share/mime/packages/gdevelop.xml
 
 %post
-	%if 0%{?suse_version} >= 1140
-		%desktop_database_post
-	%else
-		update-mime-database %{_datadir}/mime &> /dev/null || :
-		update-desktop-database &> /dev/null || :
-	%endif
+%if 0%{?suse_version} >= 1140
+%desktop_database_post
+%else
+update-mime-database %{_datadir}/mime &> /dev/null || :
+update-desktop-database &> /dev/null || :
+%endif
 
 %postun
-	%if 0%{?suse_version} >= 1140
-		%desktop_database_postun
-	%else
-		update-mime-database %{_datadir}/mime &> /dev/null || :
-		update-desktop-database &> /dev/null || :
-	%endif
+%if 0%{?suse_version} >= 1140
+%desktop_database_postun
+%else
+update-mime-database %{_datadir}/mime &> /dev/null || :
+update-desktop-database &> /dev/null || :
+%endif
 
 %doc
 

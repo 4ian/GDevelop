@@ -1,3 +1,8 @@
 #!/bin/bash
 cd /opt/gdevelop
-sh StartGDevelop.sh
+if [ -z ${1+x} ];
+then
+	sh StartGDevelop.sh
+else
+	sh StartGDevelop.sh $1
+fi

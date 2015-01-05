@@ -97,6 +97,8 @@ gd::BaseEvent::EditEventReturnType GroupEvent::EditEvent(wxWindow* parent_, gd::
         *this = dialog.GetGroupEvent();
         return ChangesMade;
     }
+#else
+    return Cancelled;
 #endif
 
 }

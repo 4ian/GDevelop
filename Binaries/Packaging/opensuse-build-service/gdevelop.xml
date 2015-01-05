@@ -3,6 +3,5 @@
   <mime-type type="application/x-gdevelop-project">
      <comment>GDevelop project</comment>
      <glob pattern="*.gdg"/>
-     <sub-class-of type="application/xml"/>
   </mime-type>
 </mime-info>

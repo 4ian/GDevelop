@@ -114,8 +114,8 @@ void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
         bool yVelocityWasPositive = yVelocity >= 0;
         xVelocity -= deceleration*timeDelta*cos(directionInRad);
         yVelocity -= deceleration*timeDelta*sin(directionInRad);
-        if ( xVelocity > 0 ^ xVelocityWasPositive ) xVelocity = 0;
-        if ( yVelocity > 0 ^ yVelocityWasPositive ) yVelocity = 0;
+        if ( (xVelocity > 0) ^ xVelocityWasPositive ) xVelocity = 0;
+        if ( (yVelocity > 0) ^ yVelocityWasPositive ) yVelocity = 0;
     }
 
     float speed = sqrt(xVelocity*xVelocity+yVelocity*yVelocity);
@@ -136,7 +136,7 @@ void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
         bool diffWasPositive = angularDiff >= 0;
 
         float newAngle = object->GetAngle()+(diffWasPositive ? -1.0 : 1.0)*angularSpeed*timeDelta;
-        if( GDpriv::MathematicalTools::angleDifference(newAngle, directionInDeg+angleOffset) > 0 ^ diffWasPositive)
+        if( (GDpriv::MathematicalTools::angleDifference(newAngle, directionInDeg+angleOffset) > 0) ^ diffWasPositive)
             newAngle = directionInDeg+angleOffset;
         object->SetAngle(newAngle);
 

@@ -16,7 +16,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel desktop-file-utils
 %if 0%{?fedora}
-BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
+#wallpoet-fonts is temporary fix for Fedora 21
+BuildRequires:	wallpoet-fonts systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
 %else
 BuildRequires:  update-desktop-files libudev-devel libjpeg8-devel wxWidgets-3_0-devel 
 %endif
@@ -38,7 +39,12 @@ cd Binaries
 rm -rf .build
 mkdir .build
 cd .build
+#Fedora's wx-config name contains the version (wx-config-3.0 instead of wx-config and wxrc-3.0 instead of wxrc-3.0)
+%if 0%{?fedora}
+cmake ../.. -DwxWidgets_CONFIG_EXECUTABLE=/usr/bin/wx-config-3.0 -DwxWidgets_wxrc_EXECUTABLE=/usr/bin/wxrc-3.0
+%else
 cmake ../..
+%endif
 
 #Build the whole project
 make %{?_smp_mflags}

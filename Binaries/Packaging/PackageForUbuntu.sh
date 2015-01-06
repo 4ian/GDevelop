@@ -3,6 +3,7 @@
 GPG_PUBLIC_KEY=0xA8025399
 GD_VERSION=3.6.76
 GD_VERSION_WITH_REV="$GD_VERSION"015
+DISTRO=trusty
 BRANCH=master
 DATE=$(LC_ALL=C date +'%a, %d %b %Y %T %z')
 GD_BASE_DIR=$(pwd)/../../
@@ -11,7 +12,7 @@ CUR_DIR=$(pwd)
 echo "Started the debian source packaging process, using latest '$BRANCH' git tree"
 
 #Create the changelog file
-echo "gdevelop ($GD_VERSION_WITH_REV-1) trusty; urgency=low" > debian-source-package/extra-files/debian/changelog
+echo "gdevelop ($GD_VERSION_WITH_REV-1~$DISTRO) $DISTRO; urgency=low" > debian-source-package/extra-files/debian/changelog
 echo "" >> debian-source-package/extra-files/debian/changelog
 echo "  * Released $GD_VERSION" >> debian-source-package/extra-files/debian/changelog
 echo "" >> debian-source-package/extra-files/debian/changelog

@@ -28,8 +28,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
                _("Tile Map"),
                _("Displays a tile map"),
                "CppPlatform/Extensions/TileMapIcon.png",
-               &CreateTileMapObject,
-               &DestroyTileMapObject);
+               &CreateTileMapObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
@@ -180,7 +179,7 @@ public:
     {
         DeclareTileMapObjectExtension(*this);
         AddRuntimeObject(GetObjectMetadata("TileMapObject::TileMap"),
-            "RuntimeTileMapObject", CreateRuntimeTileMapObject, DestroyRuntimeTileMapObject);
+            "RuntimeTileMapObject", CreateRuntimeTileMapObject);
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

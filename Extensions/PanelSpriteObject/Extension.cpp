@@ -37,10 +37,9 @@ public:
                        _("Panel Sprite"),
                        _("Object displaying a panel sprite."),
                        "CppPlatform/Extensions/PanelSpriteIcon.png",
-                       &CreatePanelSpriteObject,
-                       &DestroyPanelSpriteObject);
+                       &CreatePanelSpriteObject);
 
-            AddRuntimeObject(obj, "RuntimePanelSpriteObject", CreateRuntimePanelSpriteObject, DestroyRuntimePanelSpriteObject);
+            AddRuntimeObject(obj, "RuntimePanelSpriteObject", CreateRuntimePanelSpriteObject);
             #if defined(GD_IDE_ONLY)
 
             obj.SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");

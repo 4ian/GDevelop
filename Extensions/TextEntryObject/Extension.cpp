@@ -34,10 +34,9 @@ public:
                        _("Text entry"),
                        _("Invisible object used to get the text entered with the keyboard"),
                        "CppPlatform/Extensions/textentry.png",
-                       &CreateTextEntryObject,
-                       &DestroyTextEntryObject);
+                       &CreateTextEntryObject);
 
-            AddRuntimeObject(obj, "RuntimeTextEntryObject", CreateRuntimeTextEntryObject, DestroyRuntimeTextEntryObject);
+            AddRuntimeObject(obj, "RuntimeTextEntryObject", CreateRuntimeTextEntryObject);
 
         #if defined(GD_IDE_ONLY)
             TextEntryObject::LoadEdittimeIcon();

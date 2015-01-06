@@ -24,8 +24,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                _("Sprite"),
                _("Animated object which can be used for most elements of a game"),
                "CppPlatform/Extensions/spriteicon.png",
-               &CreateSpriteObject,
-               &DestroySpriteObject);
+               &CreateSpriteObject);
 
     #if defined(GD_IDE_ONLY)
     obj.AddAction("Opacity",

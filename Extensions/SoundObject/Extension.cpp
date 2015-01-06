@@ -40,10 +40,9 @@ public:
                        _("Sound"),
                        _("Invisible object emitting a sound which can be moved in the space."),
                        "CppPlatform/Extensions/soundicon32.png",
-                       &CreateSoundObject,
-                       &DestroySoundObject);
+                       &CreateSoundObject);
 
-            AddRuntimeObject(obj, "RuntimeSoundObject", CreateRuntimeSoundObject, DestroyRuntimeSoundObject);
+            AddRuntimeObject(obj, "RuntimeSoundObject", CreateRuntimeSoundObject);
 
             #if defined(GD_IDE_ONLY)
             SoundObject::LoadEdittimeIcon();

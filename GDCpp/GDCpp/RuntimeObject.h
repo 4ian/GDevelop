@@ -435,11 +435,6 @@ protected:
 };
 
 /**
- * As extensions, a function used to delete the object. ( Simply a "delete object;" )
- */
-void DestroyBaseRuntimeObject(RuntimeObject * object);
-
-/**
  * As extensions, a function used to create an object. ( Simply a "return new RuntimeObject(name);" )
  */
 RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);

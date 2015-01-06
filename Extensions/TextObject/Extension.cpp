@@ -27,8 +27,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                _("Text"),
                _("Displays a text"),
                "CppPlatform/Extensions/texticon.png",
-               &CreateTextObject,
-               &DestroyTextObject);
+               &CreateTextObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TextObject/TextObject.h");
@@ -265,7 +264,7 @@ public:
     {
         DeclareTextObjectExtension(*this);
         AddRuntimeObject(GetObjectMetadata("TextObject::Text"),
-            "RuntimeTextObject", CreateRuntimeTextObject, DestroyRuntimeTextObject);
+            "RuntimeTextObject", CreateRuntimeTextObject);
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

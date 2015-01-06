@@ -34,10 +34,9 @@ public:
                        _("Drawer"),
                        _("Allows to draw simple shapes on the screen"),
                        "CppPlatform/Extensions/primitivedrawingicon.png",
-                       &CreateDrawerObject,
-                       &DestroyDrawerObject);
+                       &CreateDrawerObject);
 
-            AddRuntimeObject(obj, "RuntimeDrawerObject", CreateRuntimeDrawerObject, DestroyRuntimeDrawerObject);
+            AddRuntimeObject(obj, "RuntimeDrawerObject", CreateRuntimeDrawerObject);
 
             #if defined(GD_IDE_ONLY)
             DrawerObject::LoadEdittimeIcon();

@@ -32,7 +32,6 @@ class EventsCodeGenerator;
 #undef CreateEvent
 
 //Declare typedefs for objects creations/destructions functions
-typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
 typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
 
@@ -50,7 +49,6 @@ typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const
 class GD_API ExtensionBase : public gd::PlatformExtension
 {
 public :
-
     ExtensionBase() {};
     virtual ~ExtensionBase();
 
@@ -58,22 +56,15 @@ public :
      * \brief To be called so as to declare the creation and destruction function of a RuntimeObject associated to a gd::Object.
      * \param object The object associated to the RuntimeObject being declared.
      * \param className The C++ class name associated to the RuntimeObject.
-     * \param createFun The function used to create the object.
-     * \param destroyFun The function used to destroy the object.
+     * \param createFun A function taking a reference to a RuntimeScene and to a const reference to a gd::Object and returning a pointer
+     * to the RuntimeObject created.
      */
-    void AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun, DestroyRuntimeObjectFunPtr destroyFun);
+    void AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun);
 
     /**
      * \brief Return a function to create the runtime object if the type is handled by the extension
      */
-    CreateRuntimeObjectFunPtr        GetRuntimeObjectCreationFunctionPtr(std::string objectType) const;
-
-    /**
-     * \brief Return the function to destroy the runtime object, if the type is handled by the extension.
-     *
-     * Used to make sure that the runtime object from an extension is deleted by the same extension.
-     */
-    DestroyRuntimeObjectFunPtr       GetDestroyRuntimeObjectFunction(std::string objectType) const;
+    CreateRuntimeObjectFunPtr GetRuntimeObjectCreationFunctionPtr(std::string objectType) const;
 
     /**
      * \brief Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
@@ -138,7 +129,6 @@ protected :
 
 private:
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjectCreationFunctionTable;
-    std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjectDestroyFunctionTable;
 };
 
 #endif // EXTENSIONBASE_H

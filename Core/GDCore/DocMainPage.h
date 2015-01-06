@@ -421,11 +421,10 @@ Actions are declared like this :
                            _("Name displayed to users"),
                            _("Description"),
                            "path-to-an-32-by-32-icon.png",
-                           &FunctionForCreatingTheObject,
-                           &FunctionForDestroyingTheObject);
+                           &FunctionForCreatingTheObject);
 
         //Extra function to call for the C++ platform:
-        AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName, DestroyRuntimeObjectName);
+        AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName);
  * \endcode
  *
  * *FunctionForCreatingTheObject* and *FunctionForDestroyingTheObject* are two functions that must be provided with the object,
@@ -531,10 +530,9 @@ public:
                        _("Description"),
                        "CppPlatform/Extensions/myicon.png",
                        &CreateMyObject,
-                       &DestroyMyObject,
-                       "ObjectClassName");
+                       &DestroyMyObject);
 
-            AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName, DestroyRuntimeObjectName);
+            AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName);
 
             #if defined(GD_IDE_ONLY)
             obj.SetIncludeFile("MyExtension/MyIncludeFile.h");

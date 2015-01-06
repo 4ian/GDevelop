@@ -200,10 +200,8 @@ public:
     #endif
 
 private:
-
-    std::vector < boost::shared_ptr<PlatformExtension> >    extensionsLoaded; ///< Extensions of the platform
-    std::map < std::string, CreateFunPtr >                  creationFunctionTable; ///< Creation functions for objects
-    std::map < std::string, DestroyFunPtr >                 destroyFunctionTable; ///< Destroy functions for objects
+    std::vector < boost::shared_ptr<PlatformExtension> > extensionsLoaded; ///< Extensions of the platform
+    std::map < std::string, CreateFunPtr > creationFunctionTable; ///< Creation functions for objects
 
     #if defined(GD_IDE_ONLY)
     static ChangesNotifier defaultEmptyChangesNotifier;

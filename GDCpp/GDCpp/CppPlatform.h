@@ -101,7 +101,6 @@ public:
 private:
 
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
-    std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
 #if defined(GD_IDE_ONLY)
     static ChangesNotifier changesNotifier;
 #if !defined(GD_NO_WX_GUI)

@@ -35,10 +35,9 @@ public:
                            _("Light"),
                            _("Emits light that can be stopped by objects"),
                            "CppPlatform/Extensions/lightIcon32.png",
-                           &CreateLightObject,
-                           &DestroyLightObject);
+                           &CreateLightObject);
 
-                AddRuntimeObject(obj, "RuntimeLightObject", CreateRuntimeLightObject,DestroyRuntimeLightObject);
+                AddRuntimeObject(obj, "RuntimeLightObject", CreateRuntimeLightObject);
 
                 #if defined(GD_IDE_ONLY)
                 LightObject::LoadEdittimeIcon();

@@ -28,8 +28,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                _("Tiled Sprite"),
                _("Displays an image repeated over an area"),
                "CppPlatform/Extensions/TiledSpriteIcon.png",
-               &CreateTiledSpriteObject,
-               &DestroyTiledSpriteObject);
+               &CreateTiledSpriteObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
@@ -184,7 +183,7 @@ public:
     {
         DeclareTiledSpriteObjectExtension(*this);
         AddRuntimeObject(GetObjectMetadata("TiledSpriteObject::TiledSprite"),
-            "RuntimeTiledSpriteObject", CreateRuntimeTiledSpriteObject, DestroyRuntimeTiledSpriteObject);
+            "RuntimeTiledSpriteObject", CreateRuntimeTiledSpriteObject);
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

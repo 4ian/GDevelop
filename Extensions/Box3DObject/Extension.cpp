@@ -34,10 +34,9 @@ public:
                        _("3D Box"),
                        _("Displays a 3D Box"),
                        "CppPlatform/Extensions/Box3Dicon.png",
-                       &CreateBox3DObject,
-                       &DestroyBox3DObject);
+                       &CreateBox3DObject);
 
-            AddRuntimeObject(obj, "RuntimeBox3DObject", CreateRuntimeBox3DObject, DestroyRuntimeBox3DObject);
+            AddRuntimeObject(obj, "RuntimeBox3DObject", &CreateRuntimeBox3DObject);
 
             #if defined(GD_IDE_ONLY)
 

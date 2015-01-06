@@ -258,7 +258,7 @@ class Extension : public ExtensionBase
 public:
 
     /**
-     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     Extension()
     {
@@ -278,13 +278,5 @@ public:
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
-}
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
 }
 #endif

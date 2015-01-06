@@ -21,7 +21,7 @@ class DraggableAutomatismJsExtension : public gd::PlatformExtension
 public:
 
     /**
-     * \brief Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     DraggableAutomatismJsExtension()
     {
@@ -52,14 +52,6 @@ extern "C" gd::PlatformExtension * CreateGDJSDraggableAutomatismExtension() {
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
     return new DraggableAutomatismJsExtension;
-}
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {
-    delete p;
 }
 #endif
 #endif

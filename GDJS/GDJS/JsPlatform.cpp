@@ -169,8 +169,8 @@ JsPlatform::JsPlatform() :
     gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/PlatformAutomatism."+extension, *this); std::cout.flush();
     gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/PathfindingAutomatism."+extension, *this); std::cout.flush();
     gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/TopDownMovementAutomatism."+extension, *this); std::cout.flush();
-    std::cout << "done." << std::endl;
     #else
+    std::cout << "* Loading other extensions... "; std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
@@ -178,6 +178,7 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     #endif
+    std::cout << "done." << std::endl;
 };
 
 JsPlatform & JsPlatform::Get()

@@ -316,9 +316,8 @@ sudo apt-get install libwxgtk3.0-dev
  * \subsection extensionloading Extensions loading
  *
  * A single dynamic library file can contains an extension for more than one platform:<br>
- * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a pair of creation/destruction functions for each platform
- * (the names of these functions can vary. The C++ platform
- * expects functions called *CreateGDExtension* and *DestroyGDExtension* while JS Platform search for functions called *CreateGDJSExtension* and *DestroyGDJSExtension*).
+ * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a creation function for each platform
+ * (The C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
  *
  * \subsection extensionexample Edit or write a new extension
  *
@@ -332,7 +331,7 @@ sudo apt-get install libwxgtk3.0-dev
  *
  * \section writeANewExtension_createNewExtension Create a new extension
  *
- * Creation of a new extension can be made by following these steps :<br>
+ * Creation of a new extension can be made by following these steps:<br>
  *
  * - Copy the directory of an extension and rename it:
  * \image html createnew1.png
@@ -345,16 +344,8 @@ sudo apt-get install libwxgtk3.0-dev
  * If your extension is fairly simple, you can create it from the AES Extension. <br>
  * If your extension need an object, you can use for instance the TextObject Extension as a starting point.<br>
  * <br>
- * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake).
+ * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake). After doing that, just compile as usual.
  *
- * \section writeANewExtension_installExtension Use the extension with GDevelop
- *
- * To make your extension usable with GDevelop, you have to:
- * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *GDevelop folder*.
- * -# For the C++ platform, copy **all needed include file** (.h files) inside a folder with the name of your extension located into <i>(GDevelop folder)/CppPlatform/Extensions/include</i>.<br>
- *  You can use a *small script* (batch file on Windows) to copy all the needed includes files in a single click.<br>
- * -# For the JS platform, there is a script in *GDJS/scripts* called **CopyRuntimeToGD**. Launch it to automatically copy the .js files of your extension into *Binaries/Output/Release_{OS}/JsPlatform/...*.
- * -# <b>Translations catalog files</b> (.po/.mo files) must be put into xxxPlatform/Extensions/locale/<b>language</b>/myExtension.mo (Example : CppPlatform/Extensions/locale/fr_FR/myExtension.mo)
  */
 
 /**
@@ -574,12 +565,6 @@ public:
 // -- Do not need to be modified. --
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
-}
-
-// Used by GDevelop to destroy the extension class
-// -- Do not need to be modified. --
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
 }
  * \endcode
  */

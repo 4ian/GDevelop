@@ -54,10 +54,6 @@ public:
      */
     virtual std::string GetExtensionCreateFunctionName() { return "CreateGDExtension"; }
 
-    /** \brief The name of the function searched in an extension file to destroy the extension
-     */
-    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDExtension"; }
-
 #if defined(GD_IDE_ONLY)
     virtual std::string GetIcon() const { return "CppPlatform/icon32.png"; }
 

@@ -26,7 +26,6 @@
 #endif
 
 typedef gd::PlatformExtension* (*createExtension)();
-typedef void (*destroyExtension)(gd::PlatformExtension*);
 
 using namespace std;
 
@@ -172,7 +171,7 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
 
     //Libraries are loaded using dlopen(.., RTLD_LAZY|RTLD_LOCAL) meaning that their symbols are not available for other libraries
     //nor for LLVM/Clang. We then reload set them as global to make their symbols available for LLVM/Clang. We couldn't mark them
-    //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
+    //as global when loading them as every extension use the same "CreateGDExtension" symbol.
     //SetLibraryGlobal is also setting RTLD_NOW to ensure that all symbols are resolved: Otherwise, we can get weird
     //"symbol lookup error" even if the symbols exist in the extensions!
     for (unsigned int i = 0;i<librariesLoaded.size();++i)
@@ -184,10 +183,10 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
 
 void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform & platform)
 {
-    if ( platform.GetExtensionCreateFunctionName().empty() || platform.GetExtensionDestroyFunctionName().empty() )
+    if ( platform.GetExtensionCreateFunctionName().empty() )
     {
         cout << "Unable to load extension " << fullpath << ":" << endl;
-        cout << "The plaftorm does not support extensions creation/destruction." << endl;
+        cout << "The plaftorm does not support extensions creation." << endl;
         return;
     }
 
@@ -207,11 +206,10 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     }
 
     createExtension create_extension = (createExtension)GetSymbol(extensionHdl, platform.GetExtensionCreateFunctionName().c_str());
-    destroyExtension destroy_extension = (destroyExtension)GetSymbol(extensionHdl, platform.GetExtensionDestroyFunctionName().c_str());
 
-    if ( create_extension == NULL || destroy_extension == NULL )
+    if (create_extension == NULL)
     {
-        cout << "Unable to load extension " << fullpath << " ( no valid create/destroy functions )." << endl;
+        cout << "Unable to load extension " << fullpath << " (Creation function symbol not found)." << endl;
 
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         CloseLibrary(extensionHdl);
@@ -247,8 +245,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     #endif
     #if defined(__GNUC__)
     else if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
-              extensionPtr->compilationInfo.gccMinorVersion != __GNUC_MINOR__ /*||
-              extensionPtr->compilationInfo.gccPatchLevel != __GNUC_PATCHLEVEL__*/ )
+              extensionPtr->compilationInfo.gccMinorVersion != __GNUC_MINOR__ )
         error += "Not the same GNU Compiler version.\n";
 
     #endif
@@ -275,7 +272,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         #if defined(RELEASE)//Load extension despite errors in non release build
 
         //Destroy the extension class THEN unload the library from memory
-        destroy_extension(extensionPtr);
+        delete extensionPtr;
         CloseLibrary(extensionHdl);
         #endif
 
@@ -289,7 +286,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         #endif
     }
 
-    boost::shared_ptr<gd::PlatformExtension> extension(extensionPtr, destroy_extension);
+    boost::shared_ptr<gd::PlatformExtension> extension(extensionPtr);
     platform.AddExtension(extension);
     return;
 }

@@ -411,35 +411,27 @@ Actions are declared like this :
         gd::ObjectMetadata & obj = AddObject("Name",
                            _("Name displayed to users"),
                            _("Description"),
-                           "path-to-an-32-by-32-icon.png",
+                           "path-to-a-32-by-32-icon.png",
                            &FunctionForCreatingTheObject);
-
-        //Extra function to call for the C++ platform:
-        AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName);
  * \endcode
  *
- * *FunctionForCreatingTheObject* and *FunctionForDestroyingTheObject* are two functions that must be provided with the object,
- * the first one to create an object and the second to delete an object previously created. They are similar to the functions
- * used to create and destroy a platform. They should look just like this:
+ * *FunctionForCreatingTheObject* is a function that must just create the object. It should look like this:
  *
  * \code
-void DestroyTextObject(gd::Object * object)
-{
-    delete object;
-}
-
 gd::Object * CreateTextObject(std::string name)
 {
     return new TextObject(name);
 }
  * \endcode
  *
- * The *C++ platform* also requires that you call *AddRuntimeObject* to declares the RuntimeObject class associated to the object being declared:<br>
- * You must pass as parameter the name of the class inheriting from RuntimeObject and two functions used to create and destroy an instance of the
+ * The *C++ platform* also requires that you call *AddRuntimeObject* to declare the RuntimeObject class associated to the object being declared:<br>
+ * You must pass as parameter the name of the class inheriting from RuntimeObject and a function used to create an instance of the
  * RuntimeObject.
  *
- * You will also want to specify where the object is located using gd::ObjectMetadata::SetIncludeFile. For example:
+ * You will also want to specify the .h file associated to the object using gd::ObjectMetadata::SetIncludeFile. For example:
  * \code
+//obj is the gd::ObjectMetadata returned when you called AddObject.
+AddRuntimeObject(obj, "RuntimeTextObject", CreateRuntimeTextObject);
 obj.SetIncludeFile("TextObject/TextObject.h");
  * \endcode
  *
@@ -450,25 +442,25 @@ obj.SetIncludeFile("TextObject/TextObject.h");
  *
  * Events are declared like this :
  * \code
-    AddEvent("Name",
-                  _("Name displayed to users"),
-                  "Description",
-                  "Group",
-                  "path-to-a-16-by-16-icon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new EventClassName))
+AddEvent("Name",
+         _("Name displayed to users"),
+         "Description",
+         "Group",
+         "path-to-a-16-by-16-icon.png",
+         boost::shared_ptr<gd::BaseEvent>(new EventClassName))
  * \endcode
  *
  * The event must be able to generate its code when events are being translated to C++ or Javascript:<br>
  * This is done by calling SetCodeGenerator. For example:
  *
  * \code
-        AddEvent("Standard",
-                  _("Standard event"),
-                  _("Standard event: Actions are run if conditions are fulfilled."),
-                  "",
-                  "res/eventaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+AddEvent("Standard",
+         _("Standard event"),
+         _("Standard event: Actions are run if conditions are fulfilled."),
+         "",
+         "res/eventaddicon.png",
+         boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
+	.SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
  * \section automatismsDeclaration Declaring the automatisms
@@ -477,15 +469,15 @@ Automatisms are declared like objects:
 
 
  * \code
-        gd::AutomatismMetadata & aut = AddAutomatism("Name",
-                          _("Name displayed to users"),
-                          _("DefaultNameUsedInEditor"),
-                          _("Description."),
-                          "Group",
-                          "path-to-a-32-by-32-icon.png",
-                          "AutomatismClassName",
-                          boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
-                          boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+gd::AutomatismMetadata & aut = AddAutomatism("Name",
+	_("Name displayed to users"),
+	_("DefaultNameUsedInEditor"),
+	_("Description."),
+	"Group",
+	"path-to-a-32-by-32-icon.png",
+	"AutomatismClassName",
+	boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
+	boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
  * \endcode
  * The last line can be replaced by <code>boost::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
  *

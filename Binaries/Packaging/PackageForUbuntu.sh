@@ -2,8 +2,8 @@
 
 GPG_PUBLIC_KEY=0xA8025399
 GD_VERSION=3.6.76
-GD_VERSION_WITH_REV="$GD_VERSION"008
-BRANCH=improved-extlibs-cmakelists
+GD_VERSION_WITH_REV="$GD_VERSION"015
+BRANCH=master
 DATE=$(LC_ALL=C date +'%a, %d %b %Y %T %z')
 GD_BASE_DIR=$(pwd)/../../
 CUR_DIR=$(pwd)

@@ -94,7 +94,7 @@ protected:
 
 private:
     wxPoint GetPositionOfTile(int column, int row);
-    void GetTileAt(wxPoint position, int &tileCol, int &tileRow);
+    void GetTileAt(wxPoint position, unsigned int &tileCol, unsigned int &tileRow);
 
     //Tile to be inserted
     int m_tileToBeInserted;
@@ -108,10 +108,10 @@ private:
 
     //Some parameters for the Rectangle Mode
     bool m_isDrawingRectangle;
-    int m_beginCol;
-    int m_beginRow;
-    int m_endCol;
-    int m_endRow;
+    unsigned int m_beginCol;
+    unsigned int m_beginRow;
+    unsigned int m_endCol;
+    unsigned int m_endRow;
 
     //Command processor, to be able to undo/redo actions
     wxCommandProcessor m_commandProcessor;

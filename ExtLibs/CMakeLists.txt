@@ -35,6 +35,7 @@ IF(NOT NO_GUI)
 	ELSE()
 		#Use wx-config on *nix:
 		find_package(PkgConfig REQUIRED)
+		find_package(wxWidgets REQUIRED)
 		EXEC_PROGRAM(${wxWidgets_CONFIG_EXECUTABLE} ARGS --query-toolkit OUTPUT_VARIABLE WXWIDGETS_GTK_VERSION)
 		IF(${WXWIDGETS_GTK_VERSION} MATCHES "gtk2")
 			pkg_check_modules(GTK2 REQUIRED gtk+-2.0)

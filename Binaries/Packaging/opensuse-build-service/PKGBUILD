@@ -11,8 +11,8 @@ groups=()
 makedepends=('rsync' 'cmake' 'git' 'curl')
 depends=('gcc' 'wxgtk' 'openal' 'p7zip' 'glew' 'libsndfile' 'systemd' 'libjpeg-turbo')
 
-source=( "gdevelop_$pkgver.orig.tar.gz" 'gdevelop.desktop')
-md5sums=(SKIP SKIP)
+source=( "gdevelop_$pkgver.orig.tar.gz")
+md5sums=(SKIP)
 
 build() {
   cd "$srcdir"/$pkgname-$pkgver
@@ -31,5 +31,5 @@ package() {
   cd Binaries/.build
   make install DESTDIR="$pkgdir"
   #Remove sfml installed libs
-  rm -rf $RPM_BUILD_ROOT/usr/local
+  rm -rf "$pkgdir"/usr/local
 }

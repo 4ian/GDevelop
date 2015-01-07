@@ -47,10 +47,13 @@ make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+cd Binaries/.build
 make install DESTDIR=$RPM_BUILD_ROOT
+#Remove sfml installed libs
+rm -rf $RPM_BUILD_ROOT/usr/local
 
 %if 0%{?fedora}
-desktop-file-valide %{buildroot}%{_datadir}/applications/gdevelop.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/gdevelop.desktop
 %else
 %suse_update_desktop_file gdevelop
 %endif

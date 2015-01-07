@@ -28,5 +28,8 @@ build() {
 
 package() {
   cd "$srcdir"/$pkgname-$pkgver
+  cd Binaries/.build
   make install DESTDIR="$pkgdir"
+  #Remove sfml installed libs
+  rm -rf $RPM_BUILD_ROOT/usr/local
 }

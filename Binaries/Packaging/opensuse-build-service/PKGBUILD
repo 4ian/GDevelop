@@ -29,18 +29,5 @@ build() {
 
 package() {
   cd "$srcdir"/$pkgname-$pkgver
-
-  #Create installation folder and copy all file inside it
-  mkdir -p "$pkgdir"/opt/gdevelop
-  mkdir -p "$pkgdir"/usr/share/applications
-  mkdir -p "$pkgdir"/usr/bin
-  mkdir -p "$pkgdir"/usr/share/pixmaps
-  cp -R Binaries/Output/Release_Linux/* "$pkgdir"/opt/gdevelop
-
-  #Copy other files
-  cp Binaries/Packaging/debian-source-package/extra-files/gdevelop "$pkgdir"/usr/bin/
-
-  #Update the icon
-  cp -T Binaries/Output/Release_Linux/res/icon48linux.png "$pkgdir"/usr/share/pixmaps/GDevelop.png
-  cp "$srcdir"/gdevelop.desktop "$pkgdir"/usr/share/applications
+  make install DESTDIR="$pkgdir"
 }

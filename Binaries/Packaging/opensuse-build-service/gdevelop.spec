@@ -16,8 +16,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel desktop-file-utils
 %if 0%{?fedora}
-#wallpoet-fonts is temporary fix for Fedora 21
-BuildRequires:	wallpoet-fonts systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
+BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
 %else
 BuildRequires:  update-desktop-files libudev-devel libjpeg8-devel wxWidgets-3_0-devel 
 %endif
@@ -34,7 +33,6 @@ to an intuitive and powerful event based system.
 
 %build
 #Configuration
-rm Binaries/Packaging/debian-source-package/extra-files/gdevelop.desktop
 cd Binaries
 rm -rf .build
 mkdir .build
@@ -51,28 +49,13 @@ make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
 
-#Create installation folder and copy all file inside it
-mkdir -p "$RPM_BUILD_ROOT"/opt/gdevelop
-mkdir -p "$RPM_BUILD_ROOT"/usr/share/applications
-mkdir -p "$RPM_BUILD_ROOT"/usr/share/mime/packages
-mkdir -p "$RPM_BUILD_ROOT"/usr/bin
-mkdir -p "$RPM_BUILD_ROOT"/usr/share/pixmaps
-cp -R Binaries/Output/Release_Linux/* "$RPM_BUILD_ROOT"/opt/gdevelop
-
-#Copy other files
-cp Binaries/Packaging/debian-source-package/extra-files/gdevelop "$RPM_BUILD_ROOT"/usr/bin/
-
-#Update the icon
-cp -T Binaries/Output/Release_Linux/res/icon48linux.png "$RPM_BUILD_ROOT"/usr/share/pixmaps/GDevelop.png
 %if 0%{?fedora}
-desktop-file-install --vendor="" --dir=%{buildroot}%{_datadir}/applications/ %{_sourcedir}/gdevelop.desktop
+desktop-file-valide %{buildroot}%{_datadir}/applications/gdevelop.desktop
 %else
-%suse_update_desktop_file -i gdevelop
+%suse_update_desktop_file gdevelop
 %endif
-
-#Add MIME type
-cp %{S:2} "$RPM_BUILD_ROOT"/usr/share/mime/packages
 
 %clean
 rm -rf $RPM_BUILD_ROOT

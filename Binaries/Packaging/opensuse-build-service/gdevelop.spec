@@ -8,8 +8,6 @@ License:        GPL LGPL MIT
 URL:            http://www.compilgames.net
 
 Source0:        gdevelop_%{version}.orig.tar.gz
-Source1:	gdevelop.desktop
-Source2:	gdevelop.xml
 Source100:	gdevelop-rpmlintrc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)

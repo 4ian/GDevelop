@@ -16,7 +16,6 @@ md5sums=(SKIP SKIP)
 
 build() {
   cd "$srcdir"/$pkgname-$pkgver
-  rm Binaries/Packaging/debian-source-package/extra-files/gdevelop.desktop
   cd Binaries
   rm -rf .build
   mkdir .build

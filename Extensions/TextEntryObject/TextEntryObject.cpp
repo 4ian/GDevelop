@@ -47,8 +47,6 @@ void RuntimeTextEntryObject::UpdateTime(float)
 {
     if (!activated || scene == NULL) return;
 
-    std::string textEntered;
-
     //Retrieve text entered
     const std::vector<sf::Event> & events = scene->GetRenderTargetEvents();
     for (unsigned int i = 0;i<events.size();++i)

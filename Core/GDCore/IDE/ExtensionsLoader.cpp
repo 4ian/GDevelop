@@ -32,7 +32,7 @@ using namespace std;
 namespace gd
 {
 
-void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Platform & platform)
+void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Platform & platform, bool forgiving)
 {
     std::cout << "Loading extensions for " << platform.GetName() << "... ";
     string suffix = "";
@@ -77,7 +77,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
             }
             #endif
 
-            LoadExtension(directory+"/"+lec, platform);
+            LoadExtension(directory+"/"+lec, platform, forgiving);
 
             //Everything is ok : Delete the log file
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -109,7 +109,7 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
             }
             #endif
 
-			LoadExtension(f.cFileName, platform);
+			LoadExtension(f.cFileName, platform, forgiving);
 
             //Everything is ok : Delete the log file
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -181,7 +181,7 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
     #endif
 }
 
-void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform & platform)
+void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform & platform, bool forgiving)
 {
     if ( platform.GetExtensionCreateFunctionName().empty() )
     {
@@ -209,14 +209,16 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
 
     if (create_extension == NULL)
     {
-        cout << "Unable to load extension " << fullpath << " (Creation function symbol not found)." << endl;
+        if (!forgiving)
+        {
+            cout << "Unable to load extension " << fullpath << " (Creation function symbol not found)." << endl;
+            #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+            wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations." ));
+            wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
+            #endif
+        }
 
-        #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         CloseLibrary(extensionHdl);
-        wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations." ));
-        wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
-        #endif
-
         return;
     }
 

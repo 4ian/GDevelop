@@ -5,10 +5,6 @@ Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
 Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-/**
- * Contributors to the extension:
- * Florian Rival ( Minor changes, added offsets, HTML5 port )
- */
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"

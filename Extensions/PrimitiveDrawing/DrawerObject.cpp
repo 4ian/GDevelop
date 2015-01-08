@@ -344,30 +344,11 @@ void RuntimeDrawerObject::DrawCircle( float x, float y, float radius )
     shapesToDraw.push_back(command);
 }
 
-void DestroyRuntimeDrawerObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeDrawerObject(scene, object);
 }
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyDrawerObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreateDrawerObject(std::string name)
 {
     return new DrawerObject(name);

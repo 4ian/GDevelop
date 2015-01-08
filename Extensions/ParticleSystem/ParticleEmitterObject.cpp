@@ -827,28 +827,9 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase & other)
     destroyWhenNoParticles = other.destroyWhenNoParticles;
 }
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyParticleEmitterObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreateParticleEmitterObject(std::string name)
 {
     return new ParticleEmitterObject(name);
-}
-
-void DestroyRuntimeParticleEmitterObject(RuntimeObject * object)
-{
-    delete object;
 }
 
 RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object)

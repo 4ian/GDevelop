@@ -292,30 +292,11 @@ void RuntimeLightObject::SetGlobalColor(const std::string & colorStr)
     SetGlobalColor(sf::Color( ToInt(colors[0]),ToInt(colors[1]),ToInt(colors[2]) ));
 }
 
-void DestroyRuntimeLightObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeLightObject(scene, object);
 }
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyLightObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreateLightObject(std::string name)
 {
     return new LightObject(name);

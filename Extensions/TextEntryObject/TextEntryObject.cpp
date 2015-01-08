@@ -105,30 +105,11 @@ unsigned int RuntimeTextEntryObject::GetNumberOfProperties() const
 }
 #endif
 
-void DestroyRuntimeTextEntryObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeTextEntryObject(scene, object);
 }
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyTextEntryObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreateTextEntryObject(std::string name)
 {
     return new TextEntryObject(name);

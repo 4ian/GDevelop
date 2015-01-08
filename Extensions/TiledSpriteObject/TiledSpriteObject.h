@@ -114,9 +114,7 @@ private:
     boost::shared_ptr<SFMLTextureWrapper> texture;
 };
 
-void DestroyTiledSpriteObject(gd::Object * object);
 gd::Object * CreateTiledSpriteObject(std::string name);
-
-void DestroyRuntimeTiledSpriteObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object);
+
 #endif // TILEDSPRITEOBJECT_H

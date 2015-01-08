@@ -154,10 +154,7 @@ private:
     sf::Color globalLightColor;
 };
 
-void DestroyLightObject(gd::Object * object);
 gd::Object * CreateLightObject(std::string name);
-
-void DestroyRuntimeLightObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // LightObject_H

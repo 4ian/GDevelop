@@ -310,7 +310,6 @@ typedef std::vector < boost::shared_ptr<gd::Object> > ObjList;
  */
 typedef boost::shared_ptr<gd::Object> ObjSPtr;
 
-void GD_CORE_API DestroyBaseObject(gd::Object * object);
 gd::Object * GD_CORE_API CreateBaseObject(std::string name);
 
 #endif // GDCORE_OBJECT_H

@@ -215,11 +215,6 @@ void Object::SerializeTo(SerializerElement & element) const
 
 }
 
-void DestroyBaseObject(gd::Object * object)
-{
-    delete object;
-}
-
 gd::Object * CreateBaseObject(std::string name)
 {
     return new gd::Object(name);

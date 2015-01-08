@@ -67,7 +67,6 @@ private:
     sf::VertexArray vertexArray;
 };
 
-void DestroyTileMapObject(gd::Object * object);
 gd::Object * CreateTileMapObject(std::string name);
 
 #endif // TILEDSPRITEOBJECT_H

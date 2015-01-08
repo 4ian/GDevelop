@@ -77,10 +77,7 @@ private:
     bool activated;
 };
 
-void DestroyTextEntryObject(gd::Object * object);
 gd::Object * CreateTextEntryObject(std::string name);
-
-void DestroyRuntimeTextEntryObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTENTRYOBJECT_H

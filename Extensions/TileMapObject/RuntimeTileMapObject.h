@@ -99,7 +99,6 @@ bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<Runt
                          std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
                          bool conditionInverted);
 
-void DestroyRuntimeTileMapObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif

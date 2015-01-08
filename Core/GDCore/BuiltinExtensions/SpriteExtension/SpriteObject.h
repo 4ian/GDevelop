@@ -128,7 +128,6 @@ private:
     static Animation badAnimation; //< Bad animation when an out of bound animation is requested.
 };
 
-GD_CORE_API void DestroySpriteObject(gd::Object * object);
 GD_CORE_API gd::Object * CreateSpriteObject(std::string name);
 
 }

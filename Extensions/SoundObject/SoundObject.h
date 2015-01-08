@@ -163,12 +163,8 @@ private:
     void Init(const RuntimeSoundObject &other);
 };
 
-void DestroySoundObject(gd::Object * object);
 gd::Object * CreateSoundObject(std::string name);
-
-void DestroyRuntimeSoundObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object & object);
-
 
 #endif // SoundObject_H
 

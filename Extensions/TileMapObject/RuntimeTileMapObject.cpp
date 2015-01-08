@@ -264,11 +264,6 @@ bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<Runt
     return TwoObjectListsTest(tileMapList, objectLists, conditionInverted, &TileCollisionInnerTest, TileExtraParameter(layer, column, row));
 }
 
-void DestroyRuntimeTileMapObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeTileMapObject(scene, object);

@@ -5,8 +5,8 @@ Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#ifndef PLATFORMEROBJECTAUTOMATISM_H
-#define PLATFORMEROBJECTAUTOMATISM_H
+#ifndef PATHFINDINGAUTOMATISM_H
+#define PATHFINDINGAUTOMATISM_H
 #include "GDCpp/Automatism.h"
 #include "GDCpp/Object.h"
 #include <SFML/System/Vector2.hpp>
@@ -124,5 +124,5 @@ private:
     bool reachedEnd;
 
 };
-#endif // PLATFORMEROBJECTAUTOMATISM_H
+#endif // PATHFINDINGAUTOMATISM_H
 

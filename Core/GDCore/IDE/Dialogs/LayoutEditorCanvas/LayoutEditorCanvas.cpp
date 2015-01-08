@@ -95,6 +95,7 @@ const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM50 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM25 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM10 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM5 = wxNewId();
+wxRibbonButtonBar * LayoutEditorCanvas::modeRibbonBar = NULL;
 
 LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, LayoutEditorCanvasOptions & options_, gd::MainFrameWrapper & mainFrameWrapper_) :
     project(project_),
@@ -298,6 +299,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     setFramerateLimit(30);
     editionView.setCenter( (project.GetMainWindowDefaultWidth()/2),(project.GetMainWindowDefaultHeight()/2));
     RecreateRibbonToolbar();
+    UpdateModeButtonsState();
 }
 
 LayoutEditorCanvas::~LayoutEditorCanvas()
@@ -417,6 +419,14 @@ void LayoutEditorCanvas::OnPreviewForPlatformSelected( wxCommandEvent & event )
     OnPreviewBtClick(useless);
 }
 
+void LayoutEditorCanvas::UpdateModeButtonsState()
+{
+    if (!modeRibbonBar) return;
+
+    modeRibbonBar->EnableButton(idRibbonEditMode, !editing);
+    modeRibbonBar->EnableButton(idRibbonPreviewMode, editing);
+}
+
 /**
  * Go in preview mode
  */
@@ -442,6 +452,7 @@ void LayoutEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
 
     std::cout << "Switching to preview mode..." << std::endl;
 
+    UpdateModeButtonsState();
     UpdateSize();
     UpdateScrollbars();
 
@@ -476,6 +487,7 @@ void LayoutEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
     if ( currentPreviewer ) currentPreviewer->StopPreview();
 
     //Let the IDE go back to edition state
+    UpdateModeButtonsState();
     UpdateSize();
     UpdateScrollbars();
     ReloadResources();
@@ -498,9 +510,9 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
 
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
-        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
+        modeRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
+        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

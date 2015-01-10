@@ -7,7 +7,7 @@ export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 if [ -z ${1+x} ]; then
 	./GDIDE
 else
-	./GDIDE $1
+	./GDIDE "$1"
 fi
 
 if [ "$?" = "127" ]; then

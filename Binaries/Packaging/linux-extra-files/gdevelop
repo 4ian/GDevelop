@@ -4,5 +4,5 @@ if [ -z ${1+x} ];
 then
 	sh StartGDevelop.sh
 else
-	sh StartGDevelop.sh $1
+	sh StartGDevelop.sh "$1"
 fi

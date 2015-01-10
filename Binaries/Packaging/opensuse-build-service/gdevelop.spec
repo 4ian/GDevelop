@@ -1,6 +1,6 @@
 Name:           gdevelop
-Version:        3.6.76
-Release:	0.1%{?dist}
+Version:        MACRO_GD_VERSION
+Release:		MACRO_PACKAGE_REV
 Summary:        GDevelop game creator
 
 Group:          extra

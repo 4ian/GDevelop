@@ -88,11 +88,10 @@ gd::ObjectMetadata & PlatformExtension::AddObject(const std::string & name,
                                const std::string & fullname,
                                const std::string & informations,
                                const std::string & icon24x24,
-                               CreateFunPtr createFunPtrP,
-                               DestroyFunPtr destroyFunPtrP)
+                               CreateFunPtr createFunPtrP)
 {
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
-    objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP, destroyFunPtrP);
+    objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP);
     return objectsInfos[nameWithNamespace];
 }
 
@@ -290,14 +289,6 @@ CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(std::string objectT
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.createFunPtr;
-
-    return NULL;
-}
-
-DestroyFunPtr PlatformExtension::GetDestroyObjectFunction(std::string objectType) const
-{
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-        return objectsInfos.find(objectType)->second.destroyFunPtr;
 
     return NULL;
 }

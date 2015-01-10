@@ -119,7 +119,6 @@ bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platform
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
         runtimeObjCreationFunctionTable[objectsTypes[i]] = extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
-        runtimeObjDestroyFunctionTable[objectsTypes[i]] = extension->GetDestroyRuntimeObjectFunction(objectsTypes[i]);
     }
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -137,12 +136,12 @@ boost::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene &
     if ( runtimeObjCreationFunctionTable.find(type) == runtimeObjCreationFunctionTable.end() )
     {
         std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
-        return boost::shared_ptr<RuntimeObject> ();
+        return boost::shared_ptr<RuntimeObject>();
     }
 
     //Create a new object with the type we want.
     RuntimeObject * newObject = runtimeObjCreationFunctionTable[type](scene, object);
-    return boost::shared_ptr<RuntimeObject> (newObject, runtimeObjDestroyFunctionTable[type]);
+    return boost::shared_ptr<RuntimeObject>(newObject);
 }
 
 #if defined(GD_IDE_ONLY)

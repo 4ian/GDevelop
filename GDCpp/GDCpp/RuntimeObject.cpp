@@ -636,11 +636,6 @@ void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const std::stri
     variable.RemoveChild(childName);
 }
 
-void DestroyBaseRuntimeObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeObject(scene, object);

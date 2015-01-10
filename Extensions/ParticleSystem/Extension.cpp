@@ -17,7 +17,7 @@ This project is released under the MIT License.
 #include <boost/version.hpp>
 
 /**
- * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+ * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
  */
 Extension::Extension()
 {
@@ -33,42 +33,19 @@ Extension::Extension()
                    _("Particles emitter"),
                    _("Displays a large number of small particles to create visual effects"),
                    "CppPlatform/Extensions/particleSystemicon.png",
-                   &CreateParticleEmitterObject,
-                   &DestroyParticleEmitterObject);
+                   &CreateParticleEmitterObject);
 
-        AddRuntimeObject(obj, "RuntimeParticleEmitterObject", CreateRuntimeParticleEmitterObject, DestroyRuntimeParticleEmitterObject);
+        AddRuntimeObject(obj, "RuntimeParticleEmitterObject", CreateRuntimeParticleEmitterObject);
+
         #if defined(GD_IDE_ONLY)
-
         obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
         //Declaration is too big to be compiled by GCC in one file, unless you have 4GB+ ram. :/
         ExtensionSubDeclaration1(obj);
         ExtensionSubDeclaration2(obj);
         ExtensionSubDeclaration3(obj);
-
         #endif
-
     }
-
-    /* Work in progress
-    {
-    gd::AutomatismMetadata & aut = AddAutomatism("ParticleObstacleAutomatism",
-              _("Obstacle"),
-              _("ParticleObstacle"),
-              _("Automatisme permettant de repousser les particules"),
-              "",
-              "res/path32.png",
-              ParticleObstacleAutomatism,
-              AutomatismsSharedData)
-
-        #if defined(GD_IDE_ONLY)
-
-        automatismInfo.SetIncludeFile("ParticleSystem/ParticleObstacleAutomatism.h");
-
-        #endif
-
-    }
-    */
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
 };
@@ -80,12 +57,3 @@ Extension::Extension()
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
-}
-

@@ -398,7 +398,13 @@ protected:
      * Called when the ribbon buttons of edition mode must be created inside ribbonToolbar.
      * \see CreatePreviewRibbonTools
      */
-    virtual void CreateEditionRibbonTools();
+    void CreateEditionRibbonTools();
+
+    /**
+     * \brief Toggle the disabled state of the Edition and Preview button according
+     * to the state of the editor (editing or previewing).
+     */
+    void UpdateModeButtonsState();
 
     /**
      * Return a pointer to the smallest initial instance under the cursor.
@@ -426,12 +432,12 @@ protected:
     /**
      * Undo last changes.
      */
-    virtual void Undo(unsigned int times = 1);
+    void Undo(unsigned int times = 1);
 
     /**
      * Redo last changes.
      */
-    virtual void Redo(unsigned int times = 1);
+    void Redo(unsigned int times = 1);
 
     /**
      * Update the mouse according to the selected button
@@ -496,6 +502,7 @@ protected:
     wxMenu noObjectContextMenu;
     wxMenu zoomMenu;
     wxMenu platformsMenu;
+    static wxRibbonButtonBar * modeRibbonBar;
 
     DECLARE_EVENT_TABLE()
     friend class InstancesInAreaPicker;

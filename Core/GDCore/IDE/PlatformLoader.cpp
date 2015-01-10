@@ -62,6 +62,7 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         boost::shared_ptr<gd::Platform> platform;
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
+        if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform, true);
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         gd::LocaleManager::Get()->AddPath("./JsPlatform/Extensions/locale");
         #endif

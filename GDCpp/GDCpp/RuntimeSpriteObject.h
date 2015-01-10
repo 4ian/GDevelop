@@ -189,7 +189,6 @@ private:
     static gd::Animation    badAnimation;
 };
 
-GD_API void DestroyRuntimeSpriteObject(RuntimeObject * object);
 GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // SPRITEOBJECT_H

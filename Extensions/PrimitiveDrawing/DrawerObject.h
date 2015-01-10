@@ -163,10 +163,7 @@ private:
     std::vector < DrawingCommand > shapesToDraw;
 };
 
-void DestroyRuntimeDrawerObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object);
-
-void DestroyDrawerObject(gd::Object * object);
 gd::Object * CreateDrawerObject(std::string name);
 
 #endif // DRAWEROBJECT_H

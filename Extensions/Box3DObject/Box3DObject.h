@@ -142,10 +142,7 @@ private:
     boost::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
-void DestroyRuntimeBox3DObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);
-
-void DestroyBox3DObject(gd::Object * object);
 gd::Object * CreateBox3DObject(std::string name);
 
 #endif // BOX3DOBJECT_H

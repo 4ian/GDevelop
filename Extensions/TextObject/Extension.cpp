@@ -27,8 +27,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                _("Text"),
                _("Displays a text"),
                "CppPlatform/Extensions/texticon.png",
-               &CreateTextObject,
-               &DestroyTextObject);
+               &CreateTextObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TextObject/TextObject.h");
@@ -259,13 +258,13 @@ class Extension : public ExtensionBase
 public:
 
     /**
-     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     Extension()
     {
         DeclareTextObjectExtension(*this);
         AddRuntimeObject(GetObjectMetadata("TextObject::Text"),
-            "RuntimeTextObject", CreateRuntimeTextObject, DestroyRuntimeTextObject);
+            "RuntimeTextObject", CreateRuntimeTextObject);
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
@@ -279,13 +278,5 @@ public:
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
-}
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
 }
 #endif

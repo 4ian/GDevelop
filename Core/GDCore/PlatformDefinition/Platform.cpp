@@ -45,7 +45,6 @@ bool Platform::AddExtension(boost::shared_ptr<gd::PlatformExtension> extension)
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
         creationFunctionTable[objectsTypes[i]] = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
-        destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
     }
 
     extensionsLoaded.push_back(extension);
@@ -91,7 +90,7 @@ boost::shared_ptr<gd::Object> Platform::CreateObject(std::string type, const std
     gd::Object * object = (creationFunctionTable.find(type)->second)(name);
     object->SetType(type);
 
-    return boost::shared_ptr<gd::Object> (object, destroyFunctionTable.find(type)->second);
+    return boost::shared_ptr<gd::Object> (object);
 }
 
 gd::Automatism* Platform::CreateAutomatism(const std::string & automatismType) const

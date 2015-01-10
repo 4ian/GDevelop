@@ -16,7 +16,7 @@ SpriteExtension::SpriteExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension(*this);
 
     gd::ObjectMetadata & obj = GetObjectMetadata("Sprite");
-    AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
+    AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("GDCpp/RuntimeSpriteObject.h");

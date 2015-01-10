@@ -34,7 +34,7 @@ gdjs.RuntimeGame = function(data, spec)
     this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
 
     //Rendering (see createStandardCanvas method)
-    this._isFullscreen = false; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
+    this._isFullscreen = true; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
     this._forceFullscreen = spec.forceFullscreen || false; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
     this._renderer = null;
     this._canvasArea = null;
@@ -366,7 +366,6 @@ gdjs.RuntimeGame.prototype.bindStandardEvents = function(window, document) {
         return;
     }
 
-    var isMSIE = /*@cc_on!@*/0;
     this._renderer.view.style.cssText="idtkscale:'ScaleAspectFill';"; //CocoonJS support
 
     var game = this;

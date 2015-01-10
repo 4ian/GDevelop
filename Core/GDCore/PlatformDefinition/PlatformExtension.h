@@ -141,15 +141,9 @@ public:
      * \param icon The 24x24 icon of the object: res/icons_[SkinName]/[iconName]24.png will be first tried,
      * and then if it does not exists, the full entered name will be tried.
      * \param createFunPtr The name of the function that create the object
-     * \param destroyFunPtr The name of the function that destroy the object
      *
-     * Example of the create/destroy function:
+     * Example of the create function:
      \code
-    void DestroyMyObject(gd::Object * object)
-    {
-        delete object;
-    }
-
     gd::Object * CreateMyObject(std::string name)
     {
         return new MyObject(name);
@@ -160,8 +154,7 @@ public:
                                    const std::string & fullname_,
                                    const std::string & description_,
                                    const std::string & icon24x24_,
-                                   CreateFunPtr createFunPtrP,
-                                   DestroyFunPtr destroyFunPtrP);
+                                   CreateFunPtr createFunPtrP);
 
     /**
      * \brief Declare a new automatism as being part of the extension.
@@ -246,11 +239,6 @@ public:
      * \brief Return a function to create the object if the type is handled by the extension
      */
     CreateFunPtr GetObjectCreationFunctionPtr(std::string objectType) const;
-
-    /**
-     * \brief Make sure that the object from an extension is deleted by the same extension.
-     */
-    DestroyFunPtr GetDestroyObjectFunction(std::string objectType) const;
 
     /**
      * \brief Create a custom event.

@@ -9,6 +9,7 @@
  * @namespace gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
+ * @namespace gdjs
  */
 gdjs.TextRuntimeObject = function(runtimeScene, objectData)
 {
@@ -104,7 +105,7 @@ gdjs.TextRuntimeObject.prototype.setY = function(y) {
  * @method setAngle
  * @param {Number} example for red : "255;0;0"
  */
- 
+
  /**
  * Set the angle of the object.
  * @method setAngle

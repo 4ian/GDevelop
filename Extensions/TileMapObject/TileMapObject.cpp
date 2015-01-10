@@ -152,20 +152,6 @@ void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFr
 }
 #endif
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyTileMapObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreateTileMapObject(std::string name)
 {
     return new TileMapObject(name);

@@ -23,7 +23,7 @@ class Extension : public ExtensionBase
 public:
 
     /**
-     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     Extension()
     {
@@ -40,10 +40,9 @@ public:
                        _("Sound"),
                        _("Invisible object emitting a sound which can be moved in the space."),
                        "CppPlatform/Extensions/soundicon32.png",
-                       &CreateSoundObject,
-                       &DestroySoundObject);
+                       &CreateSoundObject);
 
-            AddRuntimeObject(obj, "RuntimeSoundObject", CreateRuntimeSoundObject, DestroyRuntimeSoundObject);
+            AddRuntimeObject(obj, "RuntimeSoundObject", CreateRuntimeSoundObject);
 
             #if defined(GD_IDE_ONLY)
             SoundObject::LoadEdittimeIcon();
@@ -509,12 +508,3 @@ public:
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
-}
-

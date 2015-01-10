@@ -39,10 +39,6 @@ public:
      */
     virtual std::string GetExtensionCreateFunctionName() { return "CreateGDJSExtension"; }
 
-    /** \brief The name of the function searched in an extension file to destroy the extension
-     */
-    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDJSExtension"; }
-
     #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Expose the previewer to the IDE

@@ -23,7 +23,7 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension
 public:
 
     /**
-     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     TiledSpriteObjectJsExtension()
     {
@@ -74,14 +74,6 @@ extern "C" gd::PlatformExtension * CreateGDJSTiledSpriteObjectExtension() {
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
     return new TiledSpriteObjectJsExtension;
-}
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {
-    delete p;
 }
 #endif
 #endif

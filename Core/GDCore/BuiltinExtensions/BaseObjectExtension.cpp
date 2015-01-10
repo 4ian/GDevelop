@@ -23,8 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                _("Base object"),
                _("Base object"),
                "res/objeticon24.png",
-               &CreateBaseObject,
-               &DestroyBaseObject);
+               &CreateBaseObject);
 
     #if defined(GD_IDE_ONLY)
     obj.AddCondition("PosX",

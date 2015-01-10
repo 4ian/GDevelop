@@ -316,9 +316,8 @@ sudo apt-get install libwxgtk3.0-dev
  * \subsection extensionloading Extensions loading
  *
  * A single dynamic library file can contains an extension for more than one platform:<br>
- * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a pair of creation/destruction functions for each platform
- * (the names of these functions can vary. The C++ platform
- * expects functions called *CreateGDExtension* and *DestroyGDExtension* while JS Platform search for functions called *CreateGDJSExtension* and *DestroyGDJSExtension*).
+ * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a creation function for each platform
+ * (The C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
  *
  * \subsection extensionexample Edit or write a new extension
  *
@@ -332,7 +331,7 @@ sudo apt-get install libwxgtk3.0-dev
  *
  * \section writeANewExtension_createNewExtension Create a new extension
  *
- * Creation of a new extension can be made by following these steps :<br>
+ * Creation of a new extension can be made by following these steps:<br>
  *
  * - Copy the directory of an extension and rename it:
  * \image html createnew1.png
@@ -345,16 +344,8 @@ sudo apt-get install libwxgtk3.0-dev
  * If your extension is fairly simple, you can create it from the AES Extension. <br>
  * If your extension need an object, you can use for instance the TextObject Extension as a starting point.<br>
  * <br>
- * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake).
+ * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake). After doing that, just compile as usual.
  *
- * \section writeANewExtension_installExtension Use the extension with GDevelop
- *
- * To make your extension usable with GDevelop, you have to:
- * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *GDevelop folder*.
- * -# For the C++ platform, copy **all needed include file** (.h files) inside a folder with the name of your extension located into <i>(GDevelop folder)/CppPlatform/Extensions/include</i>.<br>
- *  You can use a *small script* (batch file on Windows) to copy all the needed includes files in a single click.<br>
- * -# For the JS platform, there is a script in *GDJS/scripts* called **CopyRuntimeToGD**. Launch it to automatically copy the .js files of your extension into *Binaries/Output/Release_{OS}/JsPlatform/...*.
- * -# <b>Translations catalog files</b> (.po/.mo files) must be put into xxxPlatform/Extensions/locale/<b>language</b>/myExtension.mo (Example : CppPlatform/Extensions/locale/fr_FR/myExtension.mo)
  */
 
 /**
@@ -420,36 +411,27 @@ Actions are declared like this :
         gd::ObjectMetadata & obj = AddObject("Name",
                            _("Name displayed to users"),
                            _("Description"),
-                           "path-to-an-32-by-32-icon.png",
-                           &FunctionForCreatingTheObject,
-                           &FunctionForDestroyingTheObject);
-
-        //Extra function to call for the C++ platform:
-        AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName, DestroyRuntimeObjectName);
+                           "path-to-a-32-by-32-icon.png",
+                           &FunctionForCreatingTheObject);
  * \endcode
  *
- * *FunctionForCreatingTheObject* and *FunctionForDestroyingTheObject* are two functions that must be provided with the object,
- * the first one to create an object and the second to delete an object previously created. They are similar to the functions
- * used to create and destroy a platform. They should look just like this:
+ * *FunctionForCreatingTheObject* is a function that must just create the object. It should look like this:
  *
  * \code
-void DestroyTextObject(gd::Object * object)
-{
-    delete object;
-}
-
 gd::Object * CreateTextObject(std::string name)
 {
     return new TextObject(name);
 }
  * \endcode
  *
- * The *C++ platform* also requires that you call *AddRuntimeObject* to declares the RuntimeObject class associated to the object being declared:<br>
- * You must pass as parameter the name of the class inheriting from RuntimeObject and two functions used to create and destroy an instance of the
+ * The *C++ platform* also requires that you call *AddRuntimeObject* to declare the RuntimeObject class associated to the object being declared:<br>
+ * You must pass as parameter the name of the class inheriting from RuntimeObject and a function used to create an instance of the
  * RuntimeObject.
  *
- * You will also want to specify where the object is located using gd::ObjectMetadata::SetIncludeFile. For example:
+ * You will also want to specify the .h file associated to the object using gd::ObjectMetadata::SetIncludeFile. For example:
  * \code
+//obj is the gd::ObjectMetadata returned when you called AddObject.
+AddRuntimeObject(obj, "RuntimeTextObject", CreateRuntimeTextObject);
 obj.SetIncludeFile("TextObject/TextObject.h");
  * \endcode
  *
@@ -460,25 +442,25 @@ obj.SetIncludeFile("TextObject/TextObject.h");
  *
  * Events are declared like this :
  * \code
-    AddEvent("Name",
-                  _("Name displayed to users"),
-                  "Description",
-                  "Group",
-                  "path-to-a-16-by-16-icon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new EventClassName))
+AddEvent("Name",
+         _("Name displayed to users"),
+         "Description",
+         "Group",
+         "path-to-a-16-by-16-icon.png",
+         boost::shared_ptr<gd::BaseEvent>(new EventClassName))
  * \endcode
  *
  * The event must be able to generate its code when events are being translated to C++ or Javascript:<br>
  * This is done by calling SetCodeGenerator. For example:
  *
  * \code
-        AddEvent("Standard",
-                  _("Standard event"),
-                  _("Standard event: Actions are run if conditions are fulfilled."),
-                  "",
-                  "res/eventaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+AddEvent("Standard",
+         _("Standard event"),
+         _("Standard event: Actions are run if conditions are fulfilled."),
+         "",
+         "res/eventaddicon.png",
+         boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
+	.SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
  * \section automatismsDeclaration Declaring the automatisms
@@ -487,15 +469,15 @@ Automatisms are declared like objects:
 
 
  * \code
-        gd::AutomatismMetadata & aut = AddAutomatism("Name",
-                          _("Name displayed to users"),
-                          _("DefaultNameUsedInEditor"),
-                          _("Description."),
-                          "Group",
-                          "path-to-a-32-by-32-icon.png",
-                          "AutomatismClassName",
-                          boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
-                          boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+gd::AutomatismMetadata & aut = AddAutomatism("Name",
+	_("Name displayed to users"),
+	_("DefaultNameUsedInEditor"),
+	_("Description."),
+	"Group",
+	"path-to-a-32-by-32-icon.png",
+	"AutomatismClassName",
+	boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
+	boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
  * \endcode
  * The last line can be replaced by <code>boost::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
  *
@@ -531,10 +513,9 @@ public:
                        _("Description"),
                        "CppPlatform/Extensions/myicon.png",
                        &CreateMyObject,
-                       &DestroyMyObject,
-                       "ObjectClassName");
+                       &DestroyMyObject);
 
-            AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName, DestroyRuntimeObjectName);
+            AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName);
 
             #if defined(GD_IDE_ONLY)
             obj.SetIncludeFile("MyExtension/MyIncludeFile.h");
@@ -576,12 +557,6 @@ public:
 // -- Do not need to be modified. --
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
-}
-
-// Used by GDevelop to destroy the extension class
-// -- Do not need to be modified. --
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
 }
  * \endcode
  */

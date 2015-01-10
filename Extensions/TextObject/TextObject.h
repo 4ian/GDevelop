@@ -177,11 +177,7 @@ private:
     float angle;
 };
 
-void DestroyTextObject(gd::Object * object);
 gd::Object * CreateTextObject(std::string name);
-
-void DestroyRuntimeTextObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTOBJECT_H
-

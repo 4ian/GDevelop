@@ -349,11 +349,6 @@ float RuntimeSoundObject::GetPitch() const
     return m_sound->GetPitch();
 }
 
-void DestroyRuntimeSoundObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeSoundObject(scene, object);
@@ -363,9 +358,3 @@ gd::Object * CreateSoundObject(std::string name)
 {
     return new SoundObject(name);
 }
-
-void DestroySoundObject(gd::Object * object)
-{
-    delete object;
-}
-

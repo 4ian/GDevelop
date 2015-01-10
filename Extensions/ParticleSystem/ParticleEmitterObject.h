@@ -284,10 +284,7 @@ private:
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
 };
 
-void DestroyParticleEmitterObject(gd::Object * object);
 gd::Object * CreateParticleEmitterObject(std::string name);
-
-void DestroyRuntimeParticleEmitterObject(RuntimeObject * object);
 RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // PARTICLEEMITTEROBJECT_H

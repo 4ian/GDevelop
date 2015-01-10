@@ -19,7 +19,7 @@ class JsExtension : public gd::PlatformExtension
 public:
 
     /**
-     * \brief Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     JsExtension()
     {
@@ -53,13 +53,5 @@ public:
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
     return new JsExtension;
-}
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDJSExtension(gd::PlatformExtension * p) {
-    delete p;
 }
 #endif

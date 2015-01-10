@@ -322,30 +322,11 @@ void RuntimePanelSpriteObject::ChangeAndReloadImage(const std::string &txtName, 
     texture = scene.GetImageManager()->GetSFMLTexture(textureName);
 }
 
-void DestroyRuntimePanelSpriteObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimePanelSpriteObject(scene, object);
 }
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyPanelSpriteObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreatePanelSpriteObject(std::string name)
 {
     return new PanelSpriteObject(name);

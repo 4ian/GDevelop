@@ -5,10 +5,6 @@ Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
 Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-/**
- * Contributors to the extension:
- * Florian Rival ( Minor changes, added offsets, HTML5 port )
- */
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
@@ -28,8 +24,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                _("Tiled Sprite"),
                _("Displays an image repeated over an area"),
                "CppPlatform/Extensions/TiledSpriteIcon.png",
-               &CreateTiledSpriteObject,
-               &DestroyTiledSpriteObject);
+               &CreateTiledSpriteObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
@@ -178,13 +173,13 @@ class Extension : public ExtensionBase
 public:
 
     /**
-     * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
+     * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
     Extension()
     {
         DeclareTiledSpriteObjectExtension(*this);
         AddRuntimeObject(GetObjectMetadata("TiledSpriteObject::TiledSprite"),
-            "RuntimeTiledSpriteObject", CreateRuntimeTiledSpriteObject, DestroyRuntimeTiledSpriteObject);
+            "RuntimeTiledSpriteObject", CreateRuntimeTiledSpriteObject);
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
@@ -198,13 +193,5 @@ public:
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
-}
-
-/**
- * Used by GDevelop to destroy the extension class
- * -- Do not need to be modified. --
- */
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
 }
 #endif

@@ -687,12 +687,6 @@ AnimationProxy & AnimationProxy::operator=(const AnimationProxy & rhs)
     return *this;
 }
 
-
-void DestroyRuntimeSpriteObject(RuntimeObject * object)
-{
-    delete object;
-}
-
 RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeSpriteObject(scene, object);

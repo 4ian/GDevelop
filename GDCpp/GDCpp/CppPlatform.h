@@ -54,10 +54,6 @@ public:
      */
     virtual std::string GetExtensionCreateFunctionName() { return "CreateGDExtension"; }
 
-    /** \brief The name of the function searched in an extension file to destroy the extension
-     */
-    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDExtension"; }
-
 #if defined(GD_IDE_ONLY)
     virtual std::string GetIcon() const { return "CppPlatform/icon32.png"; }
 
@@ -101,7 +97,6 @@ public:
 private:
 
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
-    std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
 #if defined(GD_IDE_ONLY)
     static ChangesNotifier changesNotifier;
 #if !defined(GD_NO_WX_GUI)

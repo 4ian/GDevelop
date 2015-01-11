@@ -18,6 +18,7 @@ This project is released under the MIT License.
 #include "GDCpp/CommonTools.h"
 
 bool DraggableAutomatism::somethingDragged = false;
+bool DraggableAutomatism::leftPressedLastFrame = false;
 
 DraggableAutomatism::DraggableAutomatism() :
     dragged(false)
@@ -27,7 +28,8 @@ DraggableAutomatism::DraggableAutomatism() :
 void DraggableAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     //Begin drag ?
-    if ( !dragged && sf::Mouse::isButtonPressed(sf::Mouse::Left) && !somethingDragged )
+    if ( !dragged && sf::Mouse::isButtonPressed(sf::Mouse::Left) &&
+        !leftPressedLastFrame && !somethingDragged )
     {
         RuntimeLayer & theLayer = scene.GetRuntimeLayer(object->GetLayer());
         for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
@@ -64,6 +66,12 @@ void DraggableAutomatism::DoStepPreEvents(RuntimeScene & scene)
         object->SetX(mousePos.x-xOffset);
         object->SetY(mousePos.y-yOffset);
     }
+
+}
+
+void DraggableAutomatism::DoStepPostEvents(RuntimeScene & scene)
+{
+    leftPressedLastFrame = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 }
 
 void DraggableAutomatism::OnDeActivate()

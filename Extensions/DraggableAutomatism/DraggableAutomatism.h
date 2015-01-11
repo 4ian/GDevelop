@@ -34,12 +34,14 @@ public:
 
 private:
     virtual void DoStepPreEvents(RuntimeScene & scene);
+    virtual void DoStepPostEvents(RuntimeScene & scene);
 
     float xOffset;
     float yOffset;
     unsigned int dragCameraIndex; ///< The camera being used to move the object. ( The layer is the object's layer ).
     bool dragged; ///< True if the object is being dragged.
     static bool somethingDragged; ///< Used to avoid start dragging an object while another is being dragged.
+    static bool leftPressedLastFrame; ///< Used to only start dragging when clicking.
 };
 
 #endif // DRAGGABLEAUTOMATISM_H

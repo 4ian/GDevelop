@@ -8,6 +8,7 @@ arch=('i686' 'x86_64')
 url="http://www.compilgames.net"
 license=('GPL' 'MIT' 'zlib/png')
 groups=()
+install='PKGBUILD.install'
 makedepends=('rsync' 'cmake' 'git' 'curl')
 depends=('gcc' 'wxgtk' 'openal' 'p7zip' 'glew' 'libsndfile' 'systemd' 'libjpeg-turbo')
 

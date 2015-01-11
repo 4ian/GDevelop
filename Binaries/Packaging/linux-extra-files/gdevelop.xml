@@ -3,5 +3,6 @@
   <mime-type type="application/x-gdevelop-project">
      <comment>GDevelop project</comment>
      <glob pattern="*.gdg"/>
+	<icon name="GDevelop-projects"/>
   </mime-type>
 </mime-info>

@@ -68,5 +68,6 @@ cd ..
 m4 -DMACRO_GD_VERSION=$GD_VERSION -DMACRO_PACKAGE_REV=$PACKAGE_REV gdevelop.spec >> final/gdevelop.spec
 m4 -DMACRO_GD_VERSION=$GD_VERSION -DMACRO_PACKAGE_REV=$PACKAGE_REV PKGBUILD >> final/PKGBUILD
 cp gdevelop-rpmlintrc final
+cp PKGBUILD.install final
 
 echo "Packaging process finished."

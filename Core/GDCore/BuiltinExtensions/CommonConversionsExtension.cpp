@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonConversionsExtens
                           _("Standard Conversions"),
                           _("Built-in extension providing standard conversions expressions."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
 

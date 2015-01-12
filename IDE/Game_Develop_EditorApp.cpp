@@ -62,18 +62,6 @@ using namespace gd;
 
 IMPLEMENT_APP(Game_Develop_EditorApp)
 
-void MessageLoading( string message, float avancement )
-{
-    // utiliser un flux de sortie pour créer la chaîne
-    std::ostringstream oss;
-    // écrire la valeur dans le flux
-    oss << avancement;
-    // renvoyer une string
-    string pourcent =  oss.str();
-
-    gd::LogStatus( gd::ToString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
-}
-
 /**
  * Program entry point
  */

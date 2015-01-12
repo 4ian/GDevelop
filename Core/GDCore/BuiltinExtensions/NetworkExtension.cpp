@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
                           _("Basic internet features"),
                           _("Built-in extension providing network features."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("EnvoiDataNet",

@@ -53,7 +53,7 @@ public:
     RuntimeScene(const RuntimeScene & scene);
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display.
-    RuntimeGame *                       game; ///< Pointer to the game the scene is linked to.
+    RuntimeGame *                           game; ///< Pointer to the game the scene is linked to.
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
@@ -72,7 +72,7 @@ public:
     inline RuntimeVariablesContainer & GetVariables() { return variables; }
 
     /**
-     * \brief Shortcut for game.GetImageManager()
+     * \brief Shortcut for game->GetImageManager()
      * \return The image manager of the game.
      */
     boost::shared_ptr<gd::ImageManager> GetImageManager() const;
@@ -147,6 +147,11 @@ public:
     void GotoSceneWhenEventsAreFinished(int scene);
 
     /**
+     * \brief Return the key code (see sf::Keyboard::Key) of the latest pressed key.
+     */
+    int GetLastPressedKey() { return lastPressedKey; }
+
+    /**
      * Render and play the scene one frame.
      * \return -1 for doing nothing, -2 to quit the game, another number to change the scene
      */
@@ -183,17 +188,10 @@ public:
     inline bool IsFirstLoop() const { return firstLoop; };
 
     /**
-     * Notify the scene that something ( Like an open file dialog ) stopped scene rendering for a certain amount of time.
+     * Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
      * \param pauseTime_ Pause duration, in microseconds.
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
-
-    void ManageRenderTargetEvents();
-
-    /**
-     * Order an object list according to object's Z coordinate.
-     */
-    bool OrderObjectsByZOrder( RuntimeObjList & objList );
 
     /**
      * Get a read-only list of SFML events managed by the render target.
@@ -232,16 +230,39 @@ public:
 protected:
 
     /**
-     * Render a frame in the window
+     * \brief Handle the events made on the scene's window
+     */
+    void ManageRenderTargetEvents();
+
+    /**
+     * \brief Order an object list according to object's Z coordinate.
+     */
+    bool OrderObjectsByZOrder( RuntimeObjList & objList );
+
+    /**
+     * \brief Render a frame in the window
      */
     void Render();
+
+    /**
+     * \brief To be called once during a step, to launch automatisms pre-events steps.
+     */
     void ManageObjectsBeforeEvents();
+
+    /**
+     * \brief To be called once during a step, to remove objects marked as deleted in events,
+     * and to update objects position, forces and automatisms.
+     */
     void ManageObjectsAfterEvents();
+
     bool UpdateTime();
+
+    bool DisplayLegacyTexts(std::string layer = "");
 
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     std::vector<sf::Event>                  renderTargetEvents;
+    int                                     lastPressedKey;
     signed int                              realElapsedTime; ///< Elapsed time since last frame, in microseconds, without taking time scale in account.
     signed int                              elapsedTime; ///< Elapsed time since last frame, in microseconds ( elapsedTime = realElapsedTime*timeScale ).
     double                                  timeScale; ///< Time scale
@@ -255,10 +276,8 @@ protected:
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
-    CppPlatform *                           platform;
 
-    std::vector < Text >                    textes; ///<Deprecated way of displaying a text
-    bool DisplayLegacyTexts(std::string layer = "");
+    std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
 
     void Init(const RuntimeScene & scene);
 

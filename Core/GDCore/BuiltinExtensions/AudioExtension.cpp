@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                           _("Audio"),
                           _("Builtin audio extension"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("PlaySoundCanal",

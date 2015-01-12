@@ -31,7 +31,7 @@ public:
                               _("Sound object"),
                               _("Extension allowing to use spatialized sounds."),
                               "Thomas Flecy, Victor Levasseur et al.",
-                              "Freeware");
+                              "Open source (MIT License)");
 
 
         //Declaration of all objects available

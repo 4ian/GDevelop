@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
                           _("Variable features"),
                           _("Built-in extension allowing to manipulate variables"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("VarScene",

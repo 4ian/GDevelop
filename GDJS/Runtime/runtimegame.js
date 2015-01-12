@@ -57,6 +57,7 @@ gdjs.RuntimeGame = function(data, spec)
 
     //Inputs :
     this._pressedKeys = new Hashtable();
+    this._lastPressedKey = 0;
     this._pressedMouseButtons = new Array(5);
     this._mouseX = 0;
     this._mouseY = 0;
@@ -161,6 +162,7 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
  */
 gdjs.RuntimeGame.prototype.onKeyPressed = function(keyCode) {
 	this._pressedKeys.put(keyCode, true);
+    this._lastPressedKey = keyCode;
 };
 
 /**
@@ -170,6 +172,15 @@ gdjs.RuntimeGame.prototype.onKeyPressed = function(keyCode) {
  */
 gdjs.RuntimeGame.prototype.onKeyReleased = function(keyCode) {
 	this._pressedKeys.put(keyCode, false);
+};
+
+/**
+ * Return the code of the last key that was pressed.
+ * @return {Number} The code of the last key pressed.
+ * @method getLastPressedKey
+ */
+gdjs.RuntimeGame.prototype.getLastPressedKey = function() {
+    return this._lastPressedKey;
 };
 
 /**
@@ -185,10 +196,10 @@ gdjs.RuntimeGame.prototype.isKeyPressed = function(keyCode) {
  * Return true if any key is pressed
  * @method anyKeyPressed
  */
-gdjs.RuntimeGame.prototype.anyKeyPressed = function(keyCode) {
+gdjs.RuntimeGame.prototype.anyKeyPressed = function() {
 	var allKeys = this._pressedKeys.entries();
 
-	for(var i = 0, len = allKeys.length;i<len;++i) {
+	for(var i = 0, len = allKeys.length;i < len;++i) {
 		if (allKeys[i][1]) {
 			return true;
 		}

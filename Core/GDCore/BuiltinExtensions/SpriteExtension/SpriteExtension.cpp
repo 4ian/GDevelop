@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                           _("Sprite"),
                           _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("Sprite",
                _("Sprite"),

@@ -19,18 +19,14 @@ KeyboardExtension::KeyboardExtension()
 {
     gd::BuiltinExtensionsImplementer::ImplementsKeyboardExtension(*this);
 
-    SetExtensionInformation("BuiltinKeyboard",
-                          _("Keyboard features"),
-                          _("Built-in extensions allowing to use keyboard"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
     GetAllConditions()["KeyPressed"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
     GetAllConditions()["KeyFromTextPressed"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
     GetAllConditions()["AnyKeyPressed"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.anyKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllStrExpressions()["LastPressedKey"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.lastPressedKey").SetIncludeFile("inputtools.js");
 }
 
 }

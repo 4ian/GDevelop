@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
                           _("Scene management features"),
                           _("Built-in extension allowing to manipulate scenes"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
 

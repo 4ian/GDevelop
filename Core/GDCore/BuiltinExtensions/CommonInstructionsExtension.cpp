@@ -26,7 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
                           _("Standard events"),
                           _("Built-in extension providing standard events."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
 #if defined(GD_IDE_ONLY)
     extension.AddCondition("Or",

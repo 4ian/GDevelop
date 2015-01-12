@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
                           _("Joysticks features"),
                           _("Built-in extension allowing to use joysticks"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("JoystickButtonDown",

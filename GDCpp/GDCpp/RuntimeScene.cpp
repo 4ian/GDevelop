@@ -47,9 +47,6 @@
 
 RuntimeLayer RuntimeScene::badRuntimeLayer;
 
-void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
-//La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
-
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
     renderWindow(renderWindow_),
     game(game_),
@@ -97,7 +94,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     objectsInstances = scene.objectsInstances.CopyAndCloneAllObjects();
 
     variables = scene.GetVariables();
-    textes = scene.textes;
+    legacyTexts = scene.legacyTexts;
     timers = scene.timers;
     pauseTime = scene.pauseTime;
 
@@ -196,16 +193,9 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 
 int RuntimeScene::RenderAndStep()
 {
-    //Gestion pré-évènements
-    {
-        ManageRenderTargetEvents();
-    }
-    {
-        UpdateTime();
-    }
-    {
-        ManageObjectsBeforeEvents();
-    }
+    ManageRenderTargetEvents();
+    UpdateTime();
+    ManageObjectsBeforeEvents();
     SoundManager::Get()->ManageGarbage();
 
     #if defined(GD_IDE_ONLY)
@@ -217,9 +207,9 @@ int RuntimeScene::RenderAndStep()
     #endif
 
     {
-#if !defined(RELEASE)
+        #if !defined(RELEASE)
         BT_PROFILE("Events");
-#endif
+        #endif
         GetCodeExecutionEngine()->Execute();
     }
 
@@ -231,23 +221,15 @@ int RuntimeScene::RenderAndStep()
     }
     #endif
 
-    //Gestions post-évènement
-    {
-        ManageObjectsAfterEvents();
-    }
+    ManageObjectsAfterEvents();
 
     #if defined(GD_IDE_ONLY)
-    if( debugger )
-    {
-        debugger->Update();
-    }
+    if( debugger ) debugger->Update();
     #endif
 
     //Rendering
-    {
-        Render();
-        textes.clear(); //Legacy texts
-    }
+    Render();
+    legacyTexts.clear();
 
     #if defined(GD_IDE_ONLY)
     if( GetProfiler() && GetProfiler()->profilingActivated )
@@ -260,7 +242,6 @@ int RuntimeScene::RenderAndStep()
     #endif
 
     firstLoop = false; //The first frame was rendered
-
     return specialAction;
 }
 
@@ -279,6 +260,10 @@ void RuntimeScene::ManageRenderTargetEvents()
         {
             running = false;
             renderWindow->close();
+        }
+        else if ( event.type == sf::Event::KeyPressed )
+        {
+            lastPressedKey = event.key.code;
         }
         else if (event.type == sf::Event::Resized)
         {
@@ -305,7 +290,6 @@ void RuntimeScene::ManageRenderTargetEvents()
 void RuntimeScene::RenderWithoutStep()
 {
     ManageRenderTargetEvents();
-
     Render();
 
     #if defined(GD_IDE_ONLY)
@@ -423,16 +407,17 @@ bool RuntimeScene::OrderObjectsByZOrder( RuntimeObjList & objList )
 
 void RuntimeScene::DisplayText(Text & text)
 {
-    textes.push_back(text);
+    legacyTexts.push_back(text);
 }
+
 bool RuntimeScene::DisplayLegacyTexts(string layer)
 {
     if (!renderWindow) return false;
 
-    for ( unsigned int i = 0;i < textes.size();i++ )
+    for ( unsigned int i = 0;i < legacyTexts.size();i++ )
     {
-        if ( textes[i].layer == layer )
-            textes[i].Draw(*renderWindow);
+        if ( legacyTexts[i].layer == layer )
+            legacyTexts[i].Draw(*renderWindow);
     }
 
     return true;
@@ -449,9 +434,6 @@ RuntimeLayer & RuntimeScene::GetRuntimeLayer(const std::string & name)
     return badRuntimeLayer;
 }
 
-/**
- * Delete objects, updates time and launch automatisms
- */
 void RuntimeScene::ManageObjectsAfterEvents()
 {
     //Delete objects that were removed.
@@ -479,15 +461,11 @@ void RuntimeScene::ManageObjectsAfterEvents()
     }
 }
 
-/**
- * Manage objects before launching events
- */
 void RuntimeScene::ManageObjectsBeforeEvents()
 {
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
         allObjects[id]->DoAutomatismsPreEvents(*this);
-
 }
 
 void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
@@ -583,7 +561,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     //Clear RuntimeScene datas
     objectsInstances.Clear();
-    textes.clear();
+    legacyTexts.clear();
     timers.clear();
     firstLoop = true;
     elapsedTime = 0;

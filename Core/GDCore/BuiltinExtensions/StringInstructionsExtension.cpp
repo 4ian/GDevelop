@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                           _("Text manipulation"),
                           _("Built-in extension providing expressions for manipulating texts."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddStrExpression("NewLine",

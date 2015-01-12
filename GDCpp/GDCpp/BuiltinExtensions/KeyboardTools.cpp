@@ -15,119 +15,15 @@ bool GD_API IsKeyPressed(RuntimeScene & scene, std::string key)
     if ( !scene.RenderWindowHasFocus() && scene.IsInputDisabledWhenFocusIsLost() )
         return false;
 
-    if ( key == "a" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::A ); }
-    if ( key == "b" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::B ); }
-    if ( key == "c" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::C ); }
-    if ( key == "d" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::D ); }
-    if ( key == "e" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::E ); }
-    if ( key == "f" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F ); }
-    if ( key == "g" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::G ); }
-    if ( key == "h" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::H ); }
-    if ( key == "i" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::I ); }
-    if ( key == "j" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::J ); }
-    if ( key == "k" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::K ); }
-    if ( key == "l" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::L ); }
-    if ( key == "m" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::M ); }
-    if ( key == "n" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::N ); }
-    if ( key == "o" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::O ); }
-    if ( key == "p" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::P ); }
-    if ( key == "q" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Q ); }
-    if ( key == "r" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::R ); }
-    if ( key == "s" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::S ); }
-    if ( key == "t" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::T ); }
-    if ( key == "u" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::U ); }
-    if ( key == "v" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::V ); }
-    if ( key == "w" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::W ); }
-    if ( key == "x" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::X ); }
-    if ( key == "y" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Y ); }
-    if ( key == "z" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Z ); }
-
-    if ( key == "Num9" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num9 ); }
-    if ( key == "Num8" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num8 ); }
-    if ( key == "Num7" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num7 ); }
-    if ( key == "Num6" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num6 ); }
-    if ( key == "Num5" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num5 ); }
-    if ( key == "Num4" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num4 ); }
-    if ( key == "Num3" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num3 ); }
-    if ( key == "Num2" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num2 ); }
-    if ( key == "Num1" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num1 ); }
-    if ( key == "Num0" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Num0 ); }
-
-    if ( key == "Escape" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Escape ); }
-    if ( key == "RControl" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::RControl ); }
-    if ( key == "RShift" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ); }
-    if ( key == "RAlt" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::RAlt ); }
-    if ( key == "LControl" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::LControl ); }
-    if ( key == "LShift" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ); }
-    if ( key == "LAlt" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::LAlt ); }
-    if ( key == "LSystem" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::LSystem ); }
-    if ( key == "RSystem" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::RSystem ); }
-    if ( key == "Menu" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Menu ); }
-    if ( key == "LBracket" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::LBracket ); }
-    if ( key == "RBracket" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::RBracket ); }
-    if ( key == "SemiColon" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::SemiColon ); }
-    if ( key == "Comma" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Comma ); }
-    if ( key == "Period" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Period ); }
-    if ( key == "Quote" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Quote ); }
-    if ( key == "Slash" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Slash ); }
-    if ( key == "BackSlash" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::BackSlash ); }
-    if ( key == "Tilde" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Tilde ); }
-    if ( key == "Equal" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Equal ); }
-    if ( key == "Dash" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Dash ); }
-    if ( key == "Space" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Space ); }
-    if ( key == "Return" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Return ); }
-    if ( key == "Back" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::BackSpace ); }
-    if ( key == "Tab" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Tab ); }
-    if ( key == "PageUp" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::PageUp ); }
-    if ( key == "PageDown" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::PageDown ); }
-    if ( key == "End" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::End ); }
-    if ( key == "Home" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Home ); }
-    if ( key == "Insert" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Insert ); }
-    if ( key == "Delete" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Delete ); }
-
-    if ( key == "Add" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Add ); }
-    if ( key == "Subtract" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Subtract ); }
-    if ( key == "Multiply" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Multiply ); }
-    if ( key == "Divide" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Divide ); }
-
-    if ( key == "Left" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Left ); }
-    if ( key == "Right" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Right ); }
-    if ( key == "Up" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Up ); }
-    if ( key == "Down" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Down ); }
-
-    if ( key == "Numpad0" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad0 ); }
-    if ( key == "Numpad1" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad1 ); }
-    if ( key == "Numpad2" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad2 ); }
-    if ( key == "Numpad3" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad3 ); }
-    if ( key == "Numpad4" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad4 ); }
-    if ( key == "Numpad5" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad5 ); }
-    if ( key == "Numpad6" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad6 ); }
-    if ( key == "Numpad7" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad7 ); }
-    if ( key == "Numpad8" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad8 ); }
-    if ( key == "Numpad9" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Numpad9 ); }
-
-    if ( key == "F1" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F1 ); }
-    if ( key == "F2" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F2 ); }
-    if ( key == "F3" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F3 ); }
-    if ( key == "F4" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F4 ); }
-    if ( key == "F5" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F5 ); }
-    if ( key == "F6" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F6 ); }
-    if ( key == "F7" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F7 ); }
-    if ( key == "F8" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F8 ); }
-    if ( key == "F9" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F9 ); }
-    if ( key == "F10" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F10 ); }
-    if ( key == "F11" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F11 ); }
-    if ( key == "F12" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F12 ); }
-    if ( key == "F13" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F13 ); }
-    if ( key == "F14" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F14 ); }
-    if ( key == "F15" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::F15 ); }
-
-    if ( key == "Pause" ) { return sf::Keyboard::isKeyPressed( sf::Keyboard::Pause ); }
+    const std::map<std::string, int> & keyMap = GetKeyNameToSfKeyMap();
+    std::map<std::string, int>::const_iterator it = keyMap.find(key);
+    if (it != keyMap.end())
+        return sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(it->second));
 
     return false;
 }
 
-bool GD_API AnyKeyIsPressed( RuntimeScene & scene )
+bool GD_API AnyKeyIsPressed(RuntimeScene & scene)
 {
     if ( !scene.RenderWindowHasFocus() && scene.IsInputDisabledWhenFocusIsLost() )
         return false;
@@ -140,4 +36,152 @@ bool GD_API AnyKeyIsPressed( RuntimeScene & scene )
     }
 
     return false;
+}
+
+std::string GD_API LastPressedKey(RuntimeScene & scene)
+{
+    const std::map<int, std::string> & keyMap = GetSfKeyToKeyNameMap();
+    std::map<int, std::string>::const_iterator it = keyMap.find(scene.GetLastPressedKey());
+    if (it != keyMap.end())
+        return it->second;
+
+    return "";
+}
+
+
+const std::map<std::string, int> & GD_API GetKeyNameToSfKeyMap()
+{
+    static bool initialized = false;
+    static std::map<std::string, int> * map = new std::map<std::string, int>();
+    if (!initialized)
+    {
+        (*map)["a"] = sf::Keyboard::A;
+        (*map)["b"] = sf::Keyboard::B;
+        (*map)["c"] = sf::Keyboard::C;
+        (*map)["d"] = sf::Keyboard::D;
+        (*map)["e"] = sf::Keyboard::E;
+        (*map)["f"] = sf::Keyboard::F;
+        (*map)["g"] = sf::Keyboard::G;
+        (*map)["h"] = sf::Keyboard::H;
+        (*map)["i"] = sf::Keyboard::I;
+        (*map)["j"] = sf::Keyboard::J;
+        (*map)["k"] = sf::Keyboard::K;
+        (*map)["l"] = sf::Keyboard::L;
+        (*map)["m"] = sf::Keyboard::M;
+        (*map)["n"] = sf::Keyboard::N;
+        (*map)["o"] = sf::Keyboard::O;
+        (*map)["p"] = sf::Keyboard::P;
+        (*map)["q"] = sf::Keyboard::Q;
+        (*map)["r"] = sf::Keyboard::R;
+        (*map)["s"] = sf::Keyboard::S;
+        (*map)["t"] = sf::Keyboard::T;
+        (*map)["u"] = sf::Keyboard::U;
+        (*map)["v"] = sf::Keyboard::V;
+        (*map)["w"] = sf::Keyboard::W;
+        (*map)["x"] = sf::Keyboard::X;
+        (*map)["y"] = sf::Keyboard::Y;
+        (*map)["z"] = sf::Keyboard::Z;
+
+        (*map)["Num9"] = sf::Keyboard::Num9;
+        (*map)["Num8"] = sf::Keyboard::Num8;
+        (*map)["Num7"] = sf::Keyboard::Num7;
+        (*map)["Num6"] = sf::Keyboard::Num6;
+        (*map)["Num5"] = sf::Keyboard::Num5;
+        (*map)["Num4"] = sf::Keyboard::Num4;
+        (*map)["Num3"] = sf::Keyboard::Num3;
+        (*map)["Num2"] = sf::Keyboard::Num2;
+        (*map)["Num1"] = sf::Keyboard::Num1;
+        (*map)["Num0"] = sf::Keyboard::Num0;
+
+        (*map)["Escape"] = sf::Keyboard::Escape;
+        (*map)["RControl"] = sf::Keyboard::RControl;
+        (*map)["RShift"] = sf::Keyboard::RShift;
+        (*map)["RAlt"] = sf::Keyboard::RAlt;
+        (*map)["LControl"] = sf::Keyboard::LControl;
+        (*map)["LShift"] = sf::Keyboard::LShift;
+        (*map)["LAlt"] = sf::Keyboard::LAlt;
+        (*map)["LSystem"] = sf::Keyboard::LSystem;
+        (*map)["RSystem"] = sf::Keyboard::RSystem;
+        (*map)["Menu"] = sf::Keyboard::Menu;
+        (*map)["LBracket"] = sf::Keyboard::LBracket;
+        (*map)["RBracket"] = sf::Keyboard::RBracket;
+        (*map)["SemiColon"] = sf::Keyboard::SemiColon;
+        (*map)["Comma"] = sf::Keyboard::Comma;
+        (*map)["Period"] = sf::Keyboard::Period;
+        (*map)["Quote"] = sf::Keyboard::Quote;
+        (*map)["Slash"] = sf::Keyboard::Slash;
+        (*map)["BackSlash"] = sf::Keyboard::BackSlash;
+        (*map)["Tilde"] = sf::Keyboard::Tilde;
+        (*map)["Equal"] = sf::Keyboard::Equal;
+        (*map)["Dash"] = sf::Keyboard::Dash;
+        (*map)["Space"] = sf::Keyboard::Space;
+        (*map)["Return"] = sf::Keyboard::Return;
+        (*map)["Back"] = sf::Keyboard::BackSpace;
+        (*map)["Tab"] = sf::Keyboard::Tab;
+        (*map)["PageUp"] = sf::Keyboard::PageUp;
+        (*map)["PageDown"] = sf::Keyboard::PageDown;
+        (*map)["End"] = sf::Keyboard::End;
+        (*map)["Home"] = sf::Keyboard::Home;
+        (*map)["Insert"] = sf::Keyboard::Insert;
+        (*map)["Delete"] = sf::Keyboard::Delete;
+
+        (*map)["Add"] = sf::Keyboard::Add;
+        (*map)["Subtract"] = sf::Keyboard::Subtract;
+        (*map)["Multiply"] = sf::Keyboard::Multiply;
+        (*map)["Divide"] = sf::Keyboard::Divide;
+
+        (*map)["Left"] = sf::Keyboard::Left;
+        (*map)["Right"] = sf::Keyboard::Right;
+        (*map)["Up"] = sf::Keyboard::Up;
+        (*map)["Down"] = sf::Keyboard::Down;
+
+        (*map)["Numpad0"] = sf::Keyboard::Numpad0;
+        (*map)["Numpad1"] = sf::Keyboard::Numpad1;
+        (*map)["Numpad2"] = sf::Keyboard::Numpad2;
+        (*map)["Numpad3"] = sf::Keyboard::Numpad3;
+        (*map)["Numpad4"] = sf::Keyboard::Numpad4;
+        (*map)["Numpad5"] = sf::Keyboard::Numpad5;
+        (*map)["Numpad6"] = sf::Keyboard::Numpad6;
+        (*map)["Numpad7"] = sf::Keyboard::Numpad7;
+        (*map)["Numpad8"] = sf::Keyboard::Numpad8;
+        (*map)["Numpad9"] = sf::Keyboard::Numpad9;
+
+        (*map)["F1"] = sf::Keyboard::F1;
+        (*map)["F2"] = sf::Keyboard::F2;
+        (*map)["F3"] = sf::Keyboard::F3;
+        (*map)["F4"] = sf::Keyboard::F4;
+        (*map)["F5"] = sf::Keyboard::F5;
+        (*map)["F6"] = sf::Keyboard::F6;
+        (*map)["F7"] = sf::Keyboard::F7;
+        (*map)["F8"] = sf::Keyboard::F8;
+        (*map)["F9"] = sf::Keyboard::F9;
+        (*map)["F10"] = sf::Keyboard::F10;
+        (*map)["F11"] = sf::Keyboard::F11;
+        (*map)["F12"] = sf::Keyboard::F12;
+        (*map)["F13"] = sf::Keyboard::F13;
+        (*map)["F14"] = sf::Keyboard::F14;
+        (*map)["F15"] = sf::Keyboard::F15;
+
+        (*map)["Pause"] = sf::Keyboard::Pause;
+
+        initialized = true;
+    }
+
+    return *map;
+}
+
+const std::map<int, std::string> & GD_API GetSfKeyToKeyNameMap()
+{
+    static bool initialized = false;
+    static std::map<int, std::string> * map = new std::map<int, std::string>();
+    if (!initialized)
+    {
+        const std::map<std::string, int> & keyMap = GetKeyNameToSfKeyMap();
+        for(std::map<std::string, int>::const_iterator it = keyMap.begin();it!=keyMap.end();++it)
+            (*map)[it->second] = it->first;
+
+        initialized = true;
+    }
+
+    return *map;
 }

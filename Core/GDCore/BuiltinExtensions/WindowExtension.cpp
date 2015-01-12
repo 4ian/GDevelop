@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                           _("Window features"),
                           _("Built-in extension allowing to manipulate the game's window"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("EcrireTexte",

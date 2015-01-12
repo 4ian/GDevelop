@@ -17,7 +17,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                           _("Base object"),
                           _("Base object"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("",
                _("Base object"),

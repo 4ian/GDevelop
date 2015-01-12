@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtensio
                           _("External layouts"),
                           _("Built-in extension providing actions and conditions related to external layouts"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("CreateObjectsFromExternalLayout",

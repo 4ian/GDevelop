@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(gd::P
                           _("Advanced control features"),
                           _("Built-in extension providing advanced control features."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("Toujours",

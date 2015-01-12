@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                           _("Mouse features"),
                           _("Built-in extensions allowing to use the mouse"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("CentreSourisX",

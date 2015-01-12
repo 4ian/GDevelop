@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                           _("Time"),
                           _("Built-in extension providing actions and conditions about the time."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
 

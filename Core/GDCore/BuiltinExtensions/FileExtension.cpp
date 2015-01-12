@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
                           _("Storage and files"),
                           _("Built-in extension providing functions to store data and manipulate files."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("GroupExists",

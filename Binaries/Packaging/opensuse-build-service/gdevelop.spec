@@ -98,8 +98,10 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/icons/hicolor/128x128/mimetypes/applications-x-gdevelop-project.png
 /usr/share/icons/hicolor/256x256/apps/GDevelop.png
 /usr/share/icons/hicolor/256x256/mimetypes/applications-x-gdevelop-project.png
-/usr/share/icons/hicolor/scalable/apps/GDevelop.png
-/usr/share/icons/hicolor/scalable/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/scalable/apps/GDevelop.svg
+/usr/share/icons/hicolor/scalable/mimetypes/applications-x-gdevelop-project.svg
+/usr/share/icons/hicolor/scalable/apps/GDevelop-lowres.svg
+/usr/share/icons/hicolor/scalable/mimetypes/applications-x-gdevelop-project-lowres.svg
 
 #Mime
 /usr/share/mime/packages/gdevelop.xml

@@ -1,0 +1,15 @@
+
+post_install() {
+	update-mime-database %{_datadir}/mime >/dev/null 2>&1 || :
+	update-desktop-database >/dev/null 2>&1 || :
+	touch --no-create %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
+}
+
+post_remove() {
+	update-mime-database %{_datadir}/mime >/dev/null 2>&1 || :
+	update-desktop-database >/dev/null 2>&1 || :
+	if [ $1 -eq 0 ] ; then
+		touch --no-create %{_datadir}/icons/hicolor >/dev/null 2>&1
+		gtk-update-icon-cache %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
+	fi
+}

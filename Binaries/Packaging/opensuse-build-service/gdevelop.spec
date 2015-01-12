@@ -74,10 +74,34 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 
+#GDevelop files
 /opt/gdevelop
+
+#Launch script
 /usr/bin/gdevelop
+
+#Desktop file
 /usr/share/applications/gdevelop.desktop
-/usr/share/pixmaps/GDevelop.png
+
+#Icons
+/usr/share/icons/hicolor/16x16/apps/GDevelop.png
+/usr/share/icons/hicolor/16x16/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/24x24/apps/GDevelop.png
+/usr/share/icons/hicolor/24x24/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/32x32/apps/GDevelop.png
+/usr/share/icons/hicolor/32x32/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/48x48/apps/GDevelop.png
+/usr/share/icons/hicolor/48x48/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/64x64/apps/GDevelop.png
+/usr/share/icons/hicolor/64x64/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/128x128/apps/GDevelop.png
+/usr/share/icons/hicolor/128x128/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/256x256/apps/GDevelop.png
+/usr/share/icons/hicolor/256x256/mimetypes/applications-x-gdevelop-project.png
+/usr/share/icons/hicolor/scalable/apps/GDevelop.png
+/usr/share/icons/hicolor/scalable/mimetypes/applications-x-gdevelop-project.png
+
+#Mime
 /usr/share/mime/packages/gdevelop.xml
 
 %post

@@ -10,8 +10,8 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64px"
-   height="64px"
+   width="256"
+   height="256"
    id="svg3126"
    version="1.1"
    inkscape:version="0.48.5 r10040"
@@ -258,10 +258,10 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.5796213"
-     inkscape:cx="-17.653558"
-     inkscape:cy="40.435874"
-     inkscape:current-layer="g4158"
+     inkscape:zoom="0.80957032"
+     inkscape:cx="128.45575"
+     inkscape:cy="39.814734"
+     inkscape:current-layer="svg3126"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
@@ -278,31 +278,34 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      id="layer1"
      inkscape:label="Layer 1"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     transform="translate(0,192)">
     <path
        inkscape:connector-curvature="0"
        style="fill:#604878;fill-opacity:1"
-       d="m 0,-5e-7 63.999997,0 L 63.999997,64 0,64 z"
+       d="m 0,-192 255.99999,0 0,256 L 0,64 z"
        id="rect3961-3" />
     <path
        style="fill:#000000;fill-opacity:0.19607843"
-       d="M 0 0 L 0 20 C 4.3842988 25.375959 9.3461335 28.523091 13.5625 30.03125 C 24.515679 33.951705 35.76109 34.098476 46.625 31.1875 C 53.786786 29.268505 59.605183 27.093476 64 25.25 L 64 0 L 54.65625 0 C 54.488643 4.2564195 54.28125 9.25 54.28125 9.25 C 45.47096 12.545016 30.588841 16.231551 21.34375 12.1875 C 16.591965 10.109367 13.20374 6.103126 11.03125 0 L 0 0 z M 0 40.03125 L 0 61.28125 C 2.7984702 62.365055 5.7005511 63.2721 8.6875 64 L 49.25 64 C 51.803525 63.481526 54.390693 62.886662 57 62.1875 C 59.443849 61.532673 61.772938 60.853652 64 60.15625 L 64 40.9375 C 61.012319 42.004548 57.722886 43.042079 54.03125 44.03125 C 32.52097 49.794912 13.819177 48.55463 0 40.03125 z "
-       id="rect3961" />
+       d="m 0,-192 0,80 c 17.537195,21.503835 37.384534,34.092368 54.25,40.124998 43.812716,15.68182 88.79436,16.268904 132.25,4.625008 28.64714,-7.675986 51.92073,-16.376103 69.5,-23.750004 L 256,-192 l -37.375,0 c -0.67043,17.02568 -1.5,37 -1.5,37 -35.24116,13.18006 -94.76964,27.92621 -131.75,11.75 -19.00714,-8.31253 -32.56004,-24.33749 -41.25,-48.75 L 0,-192 z M 0,-31.875002 0,53.124999 C 11.193881,57.460225 22.802204,61.088396 34.75,64 L 197,64 c 10.2141,-2.073897 20.56277,-4.453347 31,-7.25 9.7754,-2.61931 19.09175,-5.335394 28,-8.124998 l 0,-76.875004 c -11.95072,4.268195 -25.10846,8.418321 -39.875,12.375 C 130.08388,7.1796466 55.276708,2.2185193 0,-31.875002 z"
+       id="rect3961"
+       inkscape:connector-curvature="0" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="Logo">
+     inkscape:label="Logo"
+     transform="translate(0,192)">
     <g
        id="g4158"
-       transform="matrix(0.32891005,0,0,0.32891005,21.834205,22.089782)">
+       transform="matrix(1.3156402,0,0,1.3156402,87.33682,-103.64087)">
       <g
          inkscape:export-ydpi="50.027794"
          inkscape:export-xdpi="50.027794"

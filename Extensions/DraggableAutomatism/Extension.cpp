@@ -60,7 +60,6 @@ public:
         DeclareDraggableAutomatismExtension(*this);
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~Extension() {};
 };
 
 #if !defined(EMSCRIPTEN)

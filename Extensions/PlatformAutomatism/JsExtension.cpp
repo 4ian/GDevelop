@@ -88,7 +88,6 @@ public:
         }
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~PlatformAutomatismJsExtension() {};
 };
 
 //We need a specific function to create the extension with emscripten.

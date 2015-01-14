@@ -41,7 +41,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~DestroyOutsideAutomatismJsExtension() {};
 };
 
 //We need a specific function to create the extension with emscripten.

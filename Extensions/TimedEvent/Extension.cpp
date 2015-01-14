@@ -195,7 +195,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~Extension() {};
 
     #if defined(GD_IDE_ONLY)
     bool HasDebuggingProperties() const { return true; };

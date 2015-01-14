@@ -17,14 +17,14 @@ This project is released under the MIT License.
 void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PanelSpriteObject",
-        _("Panel Sprite Object"),
-        _("Extension allowing to use panel sprite objects."),
-        "Victor Levasseur",
+        _("Panel Sprite (9-patch) Object"),
+        _("Extension allowing to use panel sprite (\"9-patch\") objects."),
+        "Victor Levasseur and Florian Rival",
         "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("PanelSprite",
-        _("Panel Sprite"),
-        _("Object displaying a panel sprite."),
+        _("Panel Sprite (\"9-patch\")"),
+        _("An image with edges and corners that are stretched separately from the fill."),
         "CppPlatform/Extensions/PanelSpriteIcon.png",
         &CreatePanelSpriteObject);
 
@@ -141,7 +141,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~Extension() {};
 };
 
 #if !defined(EMSCRIPTEN)

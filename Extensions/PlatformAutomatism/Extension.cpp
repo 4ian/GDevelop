@@ -462,7 +462,6 @@ public:
         ScenePlatformObjectsManager::managers.erase(&scene);
     }
 
-    virtual ~Extension() {};
 };
 
 #if !defined(EMSCRIPTEN)

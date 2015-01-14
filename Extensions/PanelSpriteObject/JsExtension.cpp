@@ -43,7 +43,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~PanelSpriteObjectJsExtension() {};
 };
 
 #if defined(EMSCRIPTEN)

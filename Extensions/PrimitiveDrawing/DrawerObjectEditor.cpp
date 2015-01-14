@@ -55,7 +55,7 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Edition of the Drawer object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edition of the Shape Painter object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -98,7 +98,7 @@ object(object_)
 	wxString __wxRadioBoxChoices_1[2] =
 	{
 		_("Absolute"),
-		_("Relative to the position of the Drawer object")
+		_("Relative to the position of the Shape Painter object")
 	};
 	coordinatesRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Drawing coordinates"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	FlexGridSizer6->Add(coordinatesRadio, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

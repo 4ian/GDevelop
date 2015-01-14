@@ -43,7 +43,7 @@ DrawerObjectBase::DrawerObjectBase() :
     outlineColorG(0),
     outlineColorB(0),
     outlineOpacity(255),
-    absoluteCoordinates(true)
+    absoluteCoordinates(false)
 {
 }
 
@@ -145,7 +145,7 @@ void DrawerObject::LoadEdittimeIcon()
 
 bool DrawerObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
-    thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }

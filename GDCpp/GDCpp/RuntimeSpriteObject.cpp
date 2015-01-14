@@ -299,8 +299,7 @@ void RuntimeSpriteObject::MakeColorTransparent( const std::string & colorStr )
 void RuntimeSpriteObject::SetColor(const std::string & colorStr)
 {
     std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
-
-    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+    if ( colors.size() < 3 ) return; //Color is not valid
 
     SetColor(  ToInt(colors[0]),
                ToInt(colors[1]),

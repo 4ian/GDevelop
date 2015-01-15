@@ -38,7 +38,6 @@ public:
             .SetFunctionName("isDragged").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~DraggableAutomatismJsExtension() {};
 };
 
 #if defined(EMSCRIPTEN)

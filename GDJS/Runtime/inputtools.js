@@ -7,9 +7,6 @@
 /**
  * Tools related to input ( Keyboard, mouse ), for events generated code.
  *
- * TODO : Map all keys<br>
- * TODO : Implement others buttons for mouse<br>
- *
  * @namespace gdjs.evtTools
  * @class input
  * @static

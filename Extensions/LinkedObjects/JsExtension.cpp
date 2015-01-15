@@ -44,7 +44,6 @@ public:
 
         StripUnimplementedInstructionsAndExpressions();
     };
-    virtual ~JsExtension() {};
 };
 
 /**

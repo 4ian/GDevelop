@@ -50,7 +50,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~TextEntryObjectJsExtension() {};
 };
 
 #if defined(EMSCRIPTEN)

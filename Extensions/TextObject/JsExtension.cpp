@@ -85,7 +85,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~TextObjectJsExtension() {};
 };
 
 #if defined(EMSCRIPTEN)

@@ -43,7 +43,7 @@ DrawerObjectBase::DrawerObjectBase() :
     outlineColorG(0),
     outlineColorB(0),
     outlineOpacity(255),
-    absoluteCoordinates(true)
+    absoluteCoordinates(false)
 {
 }
 
@@ -145,7 +145,7 @@ void DrawerObject::LoadEdittimeIcon()
 
 bool DrawerObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
-    thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
@@ -167,57 +167,21 @@ void RuntimeDrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string
 
 bool RuntimeDrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if      ( propertyNb == 0 )
+    if ( propertyNb == 0 )
     {
-        string r, gb, g, b;
-        {
-            size_t separationPos = newValue.find(";");
+        std::vector < std::string > colors = SplitString<std::string>(newValue, ';');
+        if ( colors.size() < 3 ) return false; //Color is not valid
 
-            if ( separationPos > newValue.length())
-                return false;
-
-            r = newValue.substr(0, separationPos);
-            gb = newValue.substr(separationPos+1, newValue.length());
-        }
-
-        {
-            size_t separationPos = gb.find(";");
-
-            if ( separationPos > gb.length())
-                return false;
-
-            g = gb.substr(0, separationPos);
-            b = gb.substr(separationPos+1, gb.length());
-        }
-
-        SetFillColor(ToInt(r), ToInt(g), ToInt(b));
+        SetFillColor(ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]));
     }
     else if ( propertyNb == 1 ) { SetFillOpacity(ToFloat(newValue)); }
     else if ( propertyNb == 2 ) { SetOutlineSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
     {
-        string r, gb, g, b;
-        {
-            size_t separationPos = newValue.find(";");
+        std::vector < std::string > colors = SplitString<std::string>(newValue, ';');
+        if ( colors.size() < 3 ) return false; //Color is not valid
 
-            if ( separationPos > newValue.length())
-                return false;
-
-            r = newValue.substr(0, separationPos);
-            gb = newValue.substr(separationPos+1, newValue.length());
-        }
-
-        {
-            size_t separationPos = gb.find(";");
-
-            if ( separationPos > gb.length())
-                return false;
-
-            g = gb.substr(0, separationPos);
-            b = gb.substr(separationPos+1, gb.length());
-        }
-
-        SetOutlineColor(ToInt(r), ToInt(g), ToInt(b));
+        SetOutlineColor(ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]));
     }
     else if ( propertyNb == 4 ) { SetOutlineOpacity(ToFloat(newValue)); }
 
@@ -276,7 +240,6 @@ void DrawerObjectBase::SetOutlineOpacity(float val)
 void DrawerObjectBase::SetFillColor( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
-
     if ( colors.size() < 3 ) return;
 
     fillColorR = ToInt(colors[0]);
@@ -290,8 +253,7 @@ void DrawerObjectBase::SetFillColor( const std::string & color )
 void DrawerObjectBase::SetOutlineColor( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
-
-    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+    if ( colors.size() < 3 ) return;
 
     outlineColorR = ToInt(colors[0]);
     outlineColorG = ToInt(colors[1]);
@@ -303,7 +265,7 @@ void RuntimeDrawerObject::DrawRectangle( float x, float y, float x2, float y2 )
     float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
     float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
 
-    DrawingCommand command(sf::RectangleShape(sf::Vector2f(x2-x+Xgap, y2-y+Ygap)));
+    DrawingCommand command(sf::RectangleShape(sf::Vector2f(x2-x, y2-y)));
     command.rectangleShape.setPosition(x+Xgap, y+Ygap);
     command.rectangleShape.setFillColor(sf::Color(GetFillColorR(), GetFillColorG(), GetFillColorB(), GetFillOpacity()));
     command.rectangleShape.setOutlineThickness(GetOutlineSize());

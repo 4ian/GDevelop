@@ -105,7 +105,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~Extension() {};
 
     /**
      * The extension must be aware of objects deletion

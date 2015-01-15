@@ -31,7 +31,7 @@ public:
         //Declaration of all objects available
         {
             gd::ObjectMetadata & obj = AddObject("Drawer",
-                       _("Drawer"),
+                       _("Shape painter"),
                        _("Allows to draw simple shapes on the screen"),
                        "CppPlatform/Extensions/primitivedrawingicon.png",
                        &CreateDrawerObject);
@@ -265,7 +265,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~Extension() {};
 };
 
 /**

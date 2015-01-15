@@ -69,7 +69,6 @@ public:
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
-    virtual ~TopDownMovementAutomatismJsExtension() {};
 };
 
 #if defined(EMSCRIPTEN)

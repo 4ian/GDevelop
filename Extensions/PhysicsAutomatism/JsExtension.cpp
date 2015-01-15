@@ -146,7 +146,6 @@ public:
 
         StripUnimplementedInstructionsAndExpressions();
     };
-    virtual ~JsExtension() {};
 };
 
 /**

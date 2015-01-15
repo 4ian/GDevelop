@@ -972,6 +972,8 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
 void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
 {
+    if (!editing) return;
+
     //First check if we're using a resize button
     if ( currentDraggableBt.substr(0,6) == "resize")
     {
@@ -1055,12 +1057,8 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
         double mouseX = GetMouseXOnLayout();
         double mouseY = GetMouseYOnLayout();
 
-        if ( !editing )
-            gd::LogStatus( gd::ToString(wxString::Format( wxString(_( "Position %f;%f (Base layer, camera 0)." )),
-                mouseX, mouseY )) );
-        else
-            gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
-                mouseX, mouseY )) );
+        gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
+            mouseX, mouseY )) );
 
         //Check if there is a gui element hovered inside the layout
         bool hoveringSomething = false;

@@ -551,7 +551,7 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
             if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "automatism")
             {
                 gd::ChooseAutomatismDialog dialog(this, project, layout, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
-                if ( dialog.ShowModal() == 1 )
+                if ( dialog.DeduceAutomatism() || dialog.ShowModal() == 1 )
                     automatismStr = dialog.GetChosenAutomatism()+"::";
             }
             else

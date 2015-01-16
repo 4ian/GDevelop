@@ -60,7 +60,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     {
         std::string object = paramEdits.empty() ? "" : paramEdits[0]->GetValue().mb_str();
         gd::ChooseAutomatismDialog dialog(parent, project, layout, object, metadata.GetExtraInfo());
-        if ( dialog.ShowModal() == 1 )
+        if (dialog.DeduceAutomatism() || dialog.ShowModal() == 1 )
             editCtrl->ChangeValue(dialog.GetChosenAutomatism());
 
         return;

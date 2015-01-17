@@ -70,4 +70,23 @@ m4 -DMACRO_GD_VERSION=$GD_VERSION -DMACRO_PACKAGE_REV=$PACKAGE_REV PKGBUILD >> f
 cp gdevelop-rpmlintrc final
 cp PKGBUILD.install final
 
+#Create the changelog and open an editor to edit it
+echo -n "* " >> changelog.tmp
+echo -n `LC_TIME=en_US date +"%a %b %e %Y"` >> changelog.tmp
+echo -n " " >> changelog.tmp
+echo -n `git config --get user.name` >> changelog.tmp
+echo -n " <" >> changelog.tmp
+echo -n `git config --get user.email` >> changelog.tmp
+echo "> $GD_VERSION-$PACKAGE_REV" >> changelog.tmp
+echo -n "- " >> changelog.tmp
+
+"${EDITOR:-nano}" changelog.tmp
+
+#Add  the changelog at the end of the spec and as a separate file for PKGBUILD
+mapfile < changelog.tmp
+echo "${MAPFILE[@]}" >> final/gdevelop.spec
+mv changelog.tmp final/PKGBUILD.changelog
+
+#End
+
 echo "Packaging process finished."

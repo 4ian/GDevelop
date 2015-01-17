@@ -1,15 +1,18 @@
 
 post_install() {
-	update-mime-database %{_datadir}/mime >/dev/null 2>&1 || :
-	update-desktop-database >/dev/null 2>&1 || :
-	touch --no-create %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
+	update-mime-database usr/share/mime
+	update-desktop-database
+	gtk-update-icon-cache -q -t -f usr/share/icons/hicolor
+}
+
+post_upgrade() {
+	update-mime-database usr/share/mime
+	update-desktop-database
+	gtk-update-icon-cache -q -t -f usr/share/icons/hicolor
 }
 
 post_remove() {
-	update-mime-database %{_datadir}/mime >/dev/null 2>&1 || :
-	update-desktop-database >/dev/null 2>&1 || :
-	if [ $1 -eq 0 ] ; then
-		touch --no-create %{_datadir}/icons/hicolor >/dev/null 2>&1
-		gtk-update-icon-cache %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
-	fi
+	update-mime-database usr/share/mime
+	update-desktop-database
+	gtk-update-icon-cache -q -t -f usr/share/icons/hicolor
 }

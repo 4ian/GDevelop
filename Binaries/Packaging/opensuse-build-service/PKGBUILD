@@ -10,8 +10,8 @@ license=('GPL' 'MIT' 'zlib/png')
 groups=()
 install='PKGBUILD.install'
 makedepends=('rsync' 'cmake' 'git' 'curl')
-depends=('gcc' 'wxgtk' 'openal' 'p7zip' 'glew' 'libsndfile' 'systemd' 'libjpeg-turbo')
-
+depends=('gcc' 'wxgtk' 'openal' 'p7zip' 'glew' 'libsndfile' 'systemd' 'libjpeg-turbo' 'desktop-file-utils' 'gtk-update-icon-cache')
+changelog='PKGBUILD.changelog'
 source=( "gdevelop_$pkgver.orig.tar.gz")
 md5sums=(SKIP)
 

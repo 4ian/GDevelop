@@ -119,4 +119,5 @@ if [ $1 -eq 0 ] ; then
 	gtk-update-icon-cache %{_datadir}/icons/hicolor >/dev/null 2>&1 || :
 fi
 
+#Keep the changelog at the end as the packaging script adds the changelog at the end
 %changelog

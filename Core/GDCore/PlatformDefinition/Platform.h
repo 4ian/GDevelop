@@ -27,6 +27,8 @@ namespace gd { class ProjectExporter; }
 typedef void (*DestroyFunPtr)(gd::Object*);
 typedef gd::Object * (*CreateFunPtr)(std::string name);
 
+#undef CreateEvent
+
 namespace gd
 {
 

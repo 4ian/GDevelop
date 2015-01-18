@@ -31,6 +31,7 @@ namespace gd { class AutomatismsSharedData; }
 namespace gd { class BaseEvent; }
 namespace gd { class SerializerElement; }
 #undef GetObject //Disable an annoying macro
+#undef CreateEvent
 
 namespace gd
 {

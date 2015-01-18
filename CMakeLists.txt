@@ -47,6 +47,8 @@ IF (EMSCRIPTEN)
 	set(BUILD_IDE FALSE CACHE BOOL "" FORCE) #Force disable IDE when compiling with emscripten.
 ENDIF()
 
+#Activate C++11
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 #Add all the CMakeLists:
 ADD_SUBDIRECTORY(ExtLibs)

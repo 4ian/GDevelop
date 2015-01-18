@@ -13,6 +13,8 @@ namespace gd { class BaseEvent; }
 namespace gd { class SerializerElement; }
 class TiXmlElement;
 
+#undef CreateEvent
+
 namespace gd
 {
 

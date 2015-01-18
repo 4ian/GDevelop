@@ -17,6 +17,8 @@
 #include <wx/filefn.h>
 #endif
 
+#undef CopyFile //Remove a Windows macro
+
 namespace gd
 {
 

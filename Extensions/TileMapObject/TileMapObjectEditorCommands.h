@@ -118,7 +118,7 @@ private:
         int oldTileId = m_tileMap.GetTile(m_layer, col, row);
         m_tileMap.SetTile(m_layer, col, row, m_newTileId);
 
-        m_tileChanged.push_back(std::make_pair<int, int>(col, row)); //Add the tile to the list of changed tiles
+        m_tileChanged.push_back(std::make_pair(col, row)); //Add the tile to the list of changed tiles
 
         if(col + 1 < m_tileMap.GetColumnsCount() && m_tileMap.GetTile(m_layer, col + 1, row) == oldTileId)
         {

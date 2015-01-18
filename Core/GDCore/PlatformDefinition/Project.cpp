@@ -46,6 +46,8 @@
 
 using namespace std;
 
+#undef CreateEvent
+
 namespace gd
 {
 

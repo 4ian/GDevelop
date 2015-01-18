@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#undef CopyFile //Remove a Windows macro
+
 namespace gd
 {
 

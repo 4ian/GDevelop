@@ -60,7 +60,7 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
         size_t bufferSize = resFile.GetFileSize(filename);
         if (buffer==NULL) {
             cout << "Failed to get the file of a font from resource file:" << filename << endl;
-            return std::make_pair<sf::Font*, char*>(NULL, NULL);
+            return std::make_pair((sf::Font*)NULL, (char*)NULL);
         }
 
         sf::Font * font = new sf::Font();
@@ -72,7 +72,7 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
             cout << "Failed to load a font from resource file: " << filename << endl;
             delete font;
             delete fontBuffer;
-            return std::make_pair<sf::Font*, char*>(NULL, NULL);
+            return std::make_pair((sf::Font*)NULL, (char*)NULL);
         }
 
         return std::make_pair(font, fontBuffer);
@@ -87,7 +87,7 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
             return std::make_pair<sf::Font*, char*>(NULL, NULL);
         }
 
-        return std::make_pair<sf::Font*, char*>(font, NULL);
+        return std::make_pair(font, (char*)nullptr);
     }
 }
 

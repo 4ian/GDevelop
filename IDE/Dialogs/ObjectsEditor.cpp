@@ -1074,7 +1074,7 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
 
     if(objectsInGroupCount != selection.GetCount())
     {
-        answer = wxMessageBox(selection.GetCount() <= 1 ? _("Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )\?") :
+        answer = wxMessageBox(selection.GetCount() <= 1 ? wxString(_("Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )\?")) :
                                                           wxString::Format(wxString(_("Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )\?")), selection.GetCount() - objectsInGroupCount),
                               _("Confirm deletion"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 

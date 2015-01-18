@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
-#include "DrawerObject.h"
+#include "ShapePainterObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeScene.h"
@@ -23,17 +23,17 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "DrawerObjectEditor.h"
+#include "ShapePainterObjectEditor.h"
 #endif
 
 #if defined(GD_IDE_ONLY)
-sf::Texture DrawerObject::edittimeIconImage;
-sf::Sprite DrawerObject::edittimeIcon;
+sf::Texture ShapePainterObject::edittimeIconImage;
+sf::Sprite ShapePainterObject::edittimeIcon;
 #endif
 
 using namespace std;
 
-DrawerObjectBase::DrawerObjectBase() :
+ShapePainterObjectBase::ShapePainterObjectBase() :
     fillColorR( 255 ),
     fillColorG( 255 ),
     fillColorB( 255 ),
@@ -47,19 +47,19 @@ DrawerObjectBase::DrawerObjectBase() :
 {
 }
 
-DrawerObject::DrawerObject(std::string name_) :
+ShapePainterObject::ShapePainterObject(std::string name_) :
     gd::Object(name_)
 {
 }
 
-RuntimeDrawerObject::RuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object) :
+RuntimeShapePainterObject::RuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object) :
     RuntimeObject(scene, object)
 {
-    const DrawerObject & drawerObject = static_cast<const DrawerObject&>(object);
-    DrawerObjectBase::operator=(drawerObject);
+    const ShapePainterObject & drawerObject = static_cast<const ShapePainterObject&>(object);
+    ShapePainterObjectBase::operator=(drawerObject);
 }
 
-void DrawerObjectBase::UnserializeFrom(const gd::SerializerElement & element)
+void ShapePainterObjectBase::UnserializeFrom(const gd::SerializerElement & element)
 {
     fillOpacity = element.GetChild("fillOpacity", 0, "FillOpacity").GetValue().GetInt();
     outlineSize = element.GetChild("outlineSize", 0, "OutlineSize").GetValue().GetInt();
@@ -76,13 +76,13 @@ void DrawerObjectBase::UnserializeFrom(const gd::SerializerElement & element)
     absoluteCoordinates = element.GetChild("absoluteCoordinates", 0, "AbsoluteCoordinates").GetValue().GetBool();
 }
 
-void DrawerObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
+void ShapePainterObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    DrawerObjectBase::UnserializeFrom(element);
+    ShapePainterObjectBase::UnserializeFrom(element);
 }
 
 #if defined(GD_IDE_ONLY)
-void DrawerObjectBase::SerializeTo(gd::SerializerElement & element) const
+void ShapePainterObjectBase::SerializeTo(gd::SerializerElement & element) const
 {
     element.AddChild("fillOpacity").SetValue(fillOpacity);
     element.AddChild("outlineSize").SetValue(outlineSize);
@@ -98,16 +98,16 @@ void DrawerObjectBase::SerializeTo(gd::SerializerElement & element) const
     element.AddChild("absoluteCoordinates").SetValue(absoluteCoordinates);
 }
 
-void DrawerObject::DoSerializeTo(gd::SerializerElement & element) const
+void ShapePainterObject::DoSerializeTo(gd::SerializerElement & element) const
 {
-    DrawerObjectBase::SerializeTo(element);
+    ShapePainterObjectBase::SerializeTo(element);
 }
 #endif
 
 /**
  * Render object at runtime
  */
-bool RuntimeDrawerObject::Draw( sf::RenderTarget& renderTarget )
+bool RuntimeShapePainterObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden )
@@ -131,32 +131,32 @@ bool RuntimeDrawerObject::Draw( sf::RenderTarget& renderTarget )
 /**
  * Render object at edittime
  */
-void DrawerObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
+void ShapePainterObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
     edittimeIcon.setPosition(instance.GetX(), instance.GetY());
     renderTarget.draw(edittimeIcon);
 }
 
-void DrawerObject::LoadEdittimeIcon()
+void ShapePainterObject::LoadEdittimeIcon()
 {
     edittimeIconImage.loadFromFile("CppPlatform/Extensions/primitivedrawingicon.png");
     edittimeIcon.setTexture(edittimeIconImage);
 }
 
-bool DrawerObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
+bool ShapePainterObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
     thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void DrawerObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
+void ShapePainterObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    DrawerObjectEditor dialog(parent, game, *this);
+    ShapePainterObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 
-void RuntimeDrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Fill color");    value = ToString(GetFillColorR())+";"+ToString(GetFillColorG())+";"+ToString(GetFillColorB());}
     else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = ToString(GetFillOpacity());}
@@ -165,7 +165,7 @@ void RuntimeDrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string
     else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = ToString(GetOutlineOpacity());}
 }
 
-bool RuntimeDrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -188,7 +188,7 @@ bool RuntimeDrawerObject::ChangeProperty(unsigned int propertyNb, string newValu
     return true;
 }
 
-unsigned int RuntimeDrawerObject::GetNumberOfProperties() const
+unsigned int RuntimeShapePainterObject::GetNumberOfProperties() const
 {
     return 5;
 }
@@ -197,14 +197,14 @@ unsigned int RuntimeDrawerObject::GetNumberOfProperties() const
 /**
  * Change the color filter of the sprite object
  */
-void DrawerObjectBase::SetFillColor( unsigned int r, unsigned int g, unsigned int b )
+void ShapePainterObjectBase::SetFillColor( unsigned int r, unsigned int g, unsigned int b )
 {
     fillColorR = r;
     fillColorG = g;
     fillColorB = b;
 }
 
-void DrawerObjectBase::SetFillOpacity(float val)
+void ShapePainterObjectBase::SetFillOpacity(float val)
 {
     if ( val > 255 )
         val = 255;
@@ -217,14 +217,14 @@ void DrawerObjectBase::SetFillOpacity(float val)
 /**
  * Change the color filter of the sprite object
  */
-void DrawerObjectBase::SetOutlineColor( unsigned int r, unsigned int g, unsigned int b )
+void ShapePainterObjectBase::SetOutlineColor( unsigned int r, unsigned int g, unsigned int b )
 {
     outlineColorR = r;
     outlineColorG = g;
     outlineColorB = b;
 }
 
-void DrawerObjectBase::SetOutlineOpacity(float val)
+void ShapePainterObjectBase::SetOutlineOpacity(float val)
 {
     if ( val > 255 )
         val = 255;
@@ -237,7 +237,7 @@ void DrawerObjectBase::SetOutlineOpacity(float val)
 /**
  * Change the fill color
  */
-void DrawerObjectBase::SetFillColor( const std::string & color )
+void ShapePainterObjectBase::SetFillColor( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
     if ( colors.size() < 3 ) return;
@@ -250,7 +250,7 @@ void DrawerObjectBase::SetFillColor( const std::string & color )
 /**
  * Change the color of the outline
  */
-void DrawerObjectBase::SetOutlineColor( const std::string & color )
+void ShapePainterObjectBase::SetOutlineColor( const std::string & color )
 {
     vector < string > colors = SplitString <string> (color, ';');
     if ( colors.size() < 3 ) return;
@@ -260,7 +260,7 @@ void DrawerObjectBase::SetOutlineColor( const std::string & color )
     outlineColorB = ToInt(colors[2]);
 }
 
-void RuntimeDrawerObject::DrawRectangle( float x, float y, float x2, float y2 )
+void RuntimeShapePainterObject::DrawRectangle( float x, float y, float x2, float y2 )
 {
     float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
     float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
@@ -274,7 +274,7 @@ void RuntimeDrawerObject::DrawRectangle( float x, float y, float x2, float y2 )
     shapesToDraw.push_back(command);
 }
 
-void RuntimeDrawerObject::DrawLine( float x, float y, float x2, float y2, float thickness )
+void RuntimeShapePainterObject::DrawLine( float x, float y, float x2, float y2, float thickness )
 {
     float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
     float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
@@ -291,7 +291,7 @@ void RuntimeDrawerObject::DrawLine( float x, float y, float x2, float y2, float 
     shapesToDraw.push_back(command);
 }
 
-void RuntimeDrawerObject::DrawCircle( float x, float y, float radius )
+void RuntimeShapePainterObject::DrawCircle( float x, float y, float radius )
 {
     float Xgap = AreCoordinatesAbsolute() ? 0 : GetX();
     float Ygap = AreCoordinatesAbsolute() ? 0 : GetY();
@@ -299,6 +299,7 @@ void RuntimeDrawerObject::DrawCircle( float x, float y, float radius )
     sf::CircleShape circle(radius);
     DrawingCommand command(circle);
     command.circleShape.setPosition(x+Xgap, y+Ygap);
+    command.circleShape.setOrigin(radius, radius);
     command.circleShape.setFillColor(sf::Color(GetFillColorR(), GetFillColorG(), GetFillColorB(), GetFillOpacity()));
     command.circleShape.setOutlineThickness(GetOutlineSize());
     command.circleShape.setOutlineColor(sf::Color(GetOutlineColorR(), GetOutlineColorG(), GetOutlineColorB(), GetOutlineOpacity()));
@@ -306,13 +307,13 @@ void RuntimeDrawerObject::DrawCircle( float x, float y, float radius )
     shapesToDraw.push_back(command);
 }
 
-RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object)
+RuntimeObject * CreateRuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object)
 {
-    return new RuntimeDrawerObject(scene, object);
+    return new RuntimeShapePainterObject(scene, object);
 }
 
-gd::Object * CreateDrawerObject(std::string name)
+gd::Object * CreateShapePainterObject(std::string name)
 {
-    return new DrawerObject(name);
+    return new ShapePainterObject(name);
 }
 

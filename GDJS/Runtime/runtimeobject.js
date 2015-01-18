@@ -99,10 +99,10 @@ gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avo
  * Called each time the scene is rendered.
  *
  * @method updateTime
- * @param elapsedTime {Number} The time elapsedTime since the last frame, in <b>seconds</b>.
+ * @param elapsedTime {Number} The time elapsedTime since the last frame, in **seconds**.
  */
 gdjs.RuntimeObject.prototype.updateTime = function(elapsedTime) {
-    //Update the forces
+    //Nothing to do.
 };
 
 /**

@@ -61,7 +61,9 @@
  *
  * \section installWinCompiler_download Download
  *
- * The current version of the compiler used by GDevelop can be found and downloaded on the website : http://www.compilgames.net
+ * Download the current version of the compiler used by GDevelop on Windows here:
+ *
+ * &http://www.compilgames.net/code/GameDevelopSDK/tdm-gcc-4.5.2.exe
  *
  * \section installWinCompiler_install Installation
  *

@@ -752,7 +752,7 @@
 					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" fwddecl="0" i18n="1" name="ConsoleFrame" language="CPP" />
 					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" fwddecl="0" i18n="1" name="SpriteInitialPositionPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" fwddecl="0" i18n="1" name="TextObjectEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" fwddecl="0" i18n="1" name="DrawerObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/ShapePainterObjectEditor.wxs" src="ShapePainterObjectEditor.cpp" hdr="ShapePainterObjectEditor.h" fwddecl="0" i18n="1" name="ShapePainterObjectEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" fwddecl="0" i18n="1" name="ProjectManager" language="CPP" />
 					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" fwddecl="0" i18n="1" name="StartHerePage" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />

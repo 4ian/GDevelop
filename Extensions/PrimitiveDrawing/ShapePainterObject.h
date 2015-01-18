@@ -23,10 +23,10 @@ namespace gd { class ImageManager; }
 namespace gd { class Object; }
 namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
-class wxBitmap;
-namespace gd { class Project; }
-class wxWindow;
 namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
+class wxBitmap;
+class wxWindow;
 #endif
 
 /**
@@ -46,11 +46,11 @@ public:
 /**
  * \brief Base object storing the setup of a drawer object.
  */
-class GD_EXTENSION_API DrawerObjectBase
+class GD_EXTENSION_API ShapePainterObjectBase
 {
-public :
-    DrawerObjectBase();
-    virtual ~DrawerObjectBase() {};
+public:
+    ShapePainterObjectBase();
+    virtual ~ShapePainterObjectBase() {};
 
     virtual void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
@@ -106,14 +106,14 @@ private:
 };
 
 /**
- * \brief The Drawer object used for storage and by the IDE.
+ * \brief The Shape Painter object used for storage and by the IDE.
  */
-class GD_EXTENSION_API DrawerObject : public gd::Object, public DrawerObjectBase
+class GD_EXTENSION_API ShapePainterObject : public gd::Object, public ShapePainterObjectBase
 {
-public :
-    DrawerObject(std::string name_);
-    virtual ~DrawerObject() {};
-    virtual gd::Object * Clone() const { return new DrawerObject(*this); }
+public:
+    ShapePainterObject(std::string name_);
+    virtual ~ShapePainterObject() {};
+    virtual gd::Object * Clone() const { return new ShapePainterObject(*this); }
 
     #if defined(GD_IDE_ONLY)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
@@ -134,12 +134,12 @@ private:
     #endif
 };
 
-class GD_EXTENSION_API RuntimeDrawerObject : public RuntimeObject, public DrawerObjectBase
+class GD_EXTENSION_API RuntimeShapePainterObject : public RuntimeObject, public ShapePainterObjectBase
 {
-public :
-    RuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object);
-    virtual ~RuntimeDrawerObject() {};
-    virtual RuntimeObject * Clone() const { return new RuntimeDrawerObject(*this);}
+public:
+    RuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object);
+    virtual ~RuntimeShapePainterObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeShapePainterObject(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
@@ -163,8 +163,8 @@ private:
     std::vector < DrawingCommand > shapesToDraw;
 };
 
-RuntimeObject * CreateRuntimeDrawerObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreateDrawerObject(std::string name);
+RuntimeObject * CreateRuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object);
+gd::Object * CreateShapePainterObject(std::string name);
 
 #endif // DRAWEROBJECT_H
 

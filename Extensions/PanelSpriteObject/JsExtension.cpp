@@ -1,8 +1,7 @@
 /**
 
-GDevelop - Tiled Sprite Extension
+GDevelop - Panel Sprite Extension
 Copyright (c) 2012 Victor Levasseur (victorlevasseur01@orange.fr)
-Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="DrawerObjectEditor">
+	<object class="wxDialog" name="ShapePainterObjectEditor">
 		<title>Edition of the Shape Painter object</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">

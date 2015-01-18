@@ -4,7 +4,7 @@ echo "This script will add the files needed by OBS in :\n'$PWD/opensuse-build-se
 echo "Before that, enter those information:"
 
 #Auto-detect last GDevelop version and current branch
-(git tag -l *.*.* --sort -v:refname) > versions
+(git tag -l *.*.* | sort -V -r) > versions
 read autoversion < versions
 (git rev-parse --abbrev-ref HEAD) > branch
 read autobranch < branch

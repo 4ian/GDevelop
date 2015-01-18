@@ -272,7 +272,7 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
  * @param z {Number} The new Z order position of the object
  */
 gdjs.TextRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z != this.zOrder ) {
+    if ( z !== this.zOrder ) {
         this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._text, z);
         this.zOrder = z;
     }

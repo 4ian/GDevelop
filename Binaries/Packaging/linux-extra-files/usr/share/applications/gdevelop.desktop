@@ -1,13 +1,11 @@
 [Desktop Entry]
-Version=3.6
-Encoding=UTF-8
+Version=1.0
 Name=GDevelop
-GenericName=IDE
+GenericName=Game creator IDE
 Comment=HTML5 and native game development software
 Exec=sh -c "gdevelop %F"
-Icon=/opt/gdevelop/res/icon128linux.png
+MimeType=application/x-gdevelop-project;
+Icon=GDevelop
 Terminal=false
 Type=Application
-Categories=Application;Development;
-Name=GDevelop
-
+Categories=Development;IDE;

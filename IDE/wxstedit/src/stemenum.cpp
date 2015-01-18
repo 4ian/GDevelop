@@ -850,7 +850,11 @@ wxAcceleratorTable wxSTEditorMenuManager::CreateAcceleratorTable(wxArrayPtrVoid&
 
     return wxAcceleratorTable(entries.GetCount(),
 #if wxCHECK_VERSION(2,5,0)
+	#if (wxUSE_STD_CONTAINERS == 0)
                               (wxAcceleratorEntry*)entries.begin());
+    #else
+							  (wxAcceleratorEntry*)&(*entries.begin()));
+    #endif
 #else
                               (wxAcceleratorEntry*)entries[0]);
 #endif // wxCHECK_VERSION(2,5,0)
@@ -969,7 +973,11 @@ void wxSTEditorMenuManager::DestroyMenuItem(wxMenu *menu, int menu_id, bool clea
 
     // find any separators that are next to each other and delete them
     wxMenuItemList &menuItems = menu->GetMenuItems();
+    #if (wxUSE_STD_CONTAINERS == 1)
+    wxMenuItemList::compatibility_iterator node = menuItems.GetFirst();
+    #else
     wxwxMenuItemListNode *node = menuItems.GetFirst();
+    #endif
 
     // delete leading separator
     if (node && ((wxMenuItem*)node->GetData())->IsSeparator())

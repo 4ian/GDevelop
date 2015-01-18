@@ -101,14 +101,14 @@ void JsPlatform::OnIDEInitialized()
 }
 
 #if !defined(GD_NO_WX_GUI)
-boost::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
+std::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
-    return boost::shared_ptr<gd::LayoutEditorPreviewer>(new Previewer(editor.GetProject(), editor.GetLayout()));
+    return std::shared_ptr<gd::LayoutEditorPreviewer>(new Previewer(editor.GetProject(), editor.GetLayout()));
 }
 
-boost::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const
+std::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const
 {
-    return boost::shared_ptr<gd::ProjectExporter>(new Exporter(gd::NativeFileSystem::Get()));
+    return std::shared_ptr<gd::ProjectExporter>(new Exporter(gd::NativeFileSystem::Get()));
 }
 #endif
 
@@ -129,35 +129,35 @@ JsPlatform::JsPlatform() :
 {
     //Adding built-in extensions.
     std::cout << "* Loading builtin extensions... "; std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SpriteExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CommonConversionsExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new VariablesExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MouseExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new KeyboardExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new JoystickExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new SceneExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new TimeExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new MathematicalToolsExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new CameraExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AudioExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new FileExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new NetworkExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new WindowExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new StringInstructionsExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new AdvancedExtension)); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(new ExternalLayoutsExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new BaseObjectExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new SpriteExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new CommonConversionsExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new VariablesExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new MouseExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new KeyboardExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new JoystickExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new SceneExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new TimeExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new MathematicalToolsExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new CameraExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new AudioExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new FileExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new NetworkExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new WindowExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new StringInstructionsExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new AdvancedExtension)); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(new ExternalLayoutsExtension)); std::cout.flush();
     std::cout << "done." << std::endl;
 
     #if defined(EMSCRIPTEN) //When compiling with emscripten, hardcode extensions to load.
     std::cout << "* Loading other extensions... "; std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformAutomatismExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideAutomatismExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableAutomatismExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     #endif
     std::cout << "done." << std::endl;
 };

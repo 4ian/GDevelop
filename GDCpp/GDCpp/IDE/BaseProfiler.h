@@ -28,7 +28,7 @@ public:
 
     btClock profileClock;
     unsigned long int time;
-    boost::weak_ptr<gd::BaseEvent> originalEvent;
+    std::weak_ptr<gd::BaseEvent> originalEvent;
 };
 
 /**

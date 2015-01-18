@@ -6,6 +6,9 @@
 #include <wx/msw/winundef.h>
 #endif*/
 
+#include <map>
+#include <memory>
+
 #include <wx/toolbar.h>
 
 #include "GDCpp/RuntimeScene.h"
@@ -48,7 +51,8 @@ private:
 
     RuntimeScene & scene;
 
-    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> > objectsInTree;
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId>, std::owner_less<std::weak_ptr<RuntimeObject>>> objectsInTree; 
+    //(Use std::owner_less to allow comparison between weak_ptr)
     std::map < std::string, wxTreeItemId > initialObjects;
     bool mustRecreateTree;
 

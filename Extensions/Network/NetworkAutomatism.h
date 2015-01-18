@@ -71,7 +71,7 @@ private:
     bool sending;
     unsigned int objectNetworkId;
 
-    boost::shared_ptr<RuntimeSceneNetworkDatas> runtimeScenesNetworkDatas;
+    std::shared_ptr<RuntimeSceneNetworkDatas> runtimeScenesNetworkDatas;
 };
 
 #endif // NETWORKAUTOMATISM_H

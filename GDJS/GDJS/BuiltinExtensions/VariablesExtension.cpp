@@ -84,7 +84,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -118,7 +118,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -157,7 +157,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarGlobal"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarGlobal"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -191,7 +191,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarGlobalTxt"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarGlobalTxt"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
 }
 

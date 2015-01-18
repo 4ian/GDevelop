@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/IDE/ArbitraryEventsWorker.h"
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}

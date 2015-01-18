@@ -293,7 +293,7 @@ void InstructionSelectorDialog::RefreshList()
     bool searching = search.empty() ? false : true;
 
     //Insert extension instructions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
     for (unsigned int i = 0;i<extensions.size();++i)
     {
         //Verify if that extension is enabled

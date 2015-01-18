@@ -135,7 +135,7 @@ SerializerElement & SerializerElement::AddChild(std::string name)
 		}
 	}
 
-	boost::shared_ptr<SerializerElement> newElement(new SerializerElement);
+	std::shared_ptr<SerializerElement> newElement(new SerializerElement);
 	children.push_back(std::make_pair(name, newElement));
 
 	return *newElement;
@@ -152,7 +152,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 	unsigned int currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
-		if (children[i].second == boost::shared_ptr<SerializerElement>())
+		if (children[i].second == std::shared_ptr<SerializerElement>())
 			continue;
 
 		if (children[i].first == arrayOf || children[i].first.empty() || (!deprecatedArrayOf.empty() && children[i].first == deprecatedArrayOf))
@@ -183,7 +183,7 @@ SerializerElement & SerializerElement::GetChild(std::string name, unsigned int i
 	unsigned int currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
-		if (children[i].second == boost::shared_ptr<SerializerElement>())
+		if (children[i].second == std::shared_ptr<SerializerElement>())
 			continue;
 
 		if (children[i].first == name || (!arrayOf.empty() && children[i].first.empty()) || (!deprecatedName.empty() && children[i].first == deprecatedName))
@@ -216,7 +216,7 @@ unsigned int SerializerElement::GetChildrenCount(std::string name, std::string d
 	unsigned int currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
-		if (children[i].second == boost::shared_ptr<SerializerElement>())
+		if (children[i].second == std::shared_ptr<SerializerElement>())
 			continue;
 
 		if (children[i].first == name || (!arrayOf.empty() && children[i].first.empty()) || (!deprecatedName.empty() && children[i].first == deprecatedName))
@@ -230,7 +230,7 @@ bool SerializerElement::HasChild(const std::string & name, std::string deprecate
 {
 	for (size_t i = 0; i < children.size(); ++i)
 	{
-		if (children[i].second == boost::shared_ptr<SerializerElement>())
+		if (children[i].second == std::shared_ptr<SerializerElement>())
 			continue;
 
 		if (children[i].first == name || (!deprecatedName.empty() && children[i].first == deprecatedName))

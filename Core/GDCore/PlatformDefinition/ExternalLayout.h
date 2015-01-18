@@ -8,7 +8,7 @@
 #define GDCORE_EXTERNALLAYOUT_H
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class SerializerElement; }
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
@@ -91,8 +91,8 @@ private:
 /**
  * \brief Functor testing ExternalLayout' name
  */
-struct ExternalLayoutHasName : public std::binary_function<boost::shared_ptr<gd::ExternalLayout>, std::string, bool> {
-    bool operator()(const boost::shared_ptr<gd::ExternalLayout> & externalLayout, std::string name) const { return externalLayout->GetName() == name; }
+struct ExternalLayoutHasName : public std::binary_function<std::shared_ptr<gd::ExternalLayout>, std::string, bool> {
+    bool operator()(const std::shared_ptr<gd::ExternalLayout> & externalLayout, std::string name) const { return externalLayout->GetName() == name; }
 };
 
 }

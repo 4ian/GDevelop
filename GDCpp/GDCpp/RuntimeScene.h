@@ -12,7 +12,7 @@
 #include <string>
 #include <map>
 #include <SFML/System.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCpp/ObjInstancesHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
@@ -75,7 +75,7 @@ public:
      * \brief Shortcut for game->GetImageManager()
      * \return The image manager of the game.
      */
-    boost::shared_ptr<gd::ImageManager> GetImageManager() const;
+    std::shared_ptr<gd::ImageManager> GetImageManager() const;
 
     /**
      * Get the layer with specified name.
@@ -92,7 +92,7 @@ public:
      * Get the AutomatismsRuntimeSharedData associated with automatism.
      * Be careful, no check is made to ensure that the shared data exist.
      */
-    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
+    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -116,9 +116,9 @@ public:
      * \param container The object containing the initial instances to be created
      * \param xOffset The offset on x axis to be applied to objects created
      * \param yOffset The offset on y axis to be applied to objects created
-     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
+     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
      */
-    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap = NULL);
+    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap = NULL);
 
     /**
      * Change the window used for rendering the scene
@@ -217,13 +217,13 @@ public:
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
-    boost::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
+    std::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
 
     /**
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
-    void SetCodeExecutionEngine(boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
+    void SetCodeExecutionEngine(std::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
     ///@}
 
 
@@ -273,9 +273,9 @@ protected:
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
-    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    std::map < std::string, std::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
-    boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
+    std::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
 
     std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
 

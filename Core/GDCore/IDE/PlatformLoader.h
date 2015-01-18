@@ -7,7 +7,7 @@
 #ifndef PLATFORMLOADER_H
 #define PLATFORMLOADER_H
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Platform; }
 
 namespace gd
@@ -45,7 +45,7 @@ public:
      * \param fullpath The path to the platform file.
      * \return Smart pointer to the loaded platform. Can be NULL ( if loading failed ).
      */
-    static boost::shared_ptr<gd::Platform> LoadPlatformInManager(std::string fullpath);
+    static std::shared_ptr<gd::Platform> LoadPlatformInManager(std::string fullpath);
 
 private:
     PlatformLoader();

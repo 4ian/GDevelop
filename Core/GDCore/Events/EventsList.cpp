@@ -35,7 +35,7 @@ void EventsList::InsertEvents(const EventsList & otherEvents, size_t begin, size
 
 gd::BaseEvent & EventsList::InsertEvent(const gd::BaseEvent & evt, size_t position)
 {
-	boost::shared_ptr<gd::BaseEvent> event(evt.Clone());
+	std::shared_ptr<gd::BaseEvent> event(evt.Clone());
     if (position<events.size())
         events.insert(events.begin()+position, event);
     else
@@ -44,7 +44,7 @@ gd::BaseEvent & EventsList::InsertEvent(const gd::BaseEvent & evt, size_t positi
     return *event;
 }
 
-void EventsList::InsertEvent(boost::shared_ptr<gd::BaseEvent> event, size_t position)
+void EventsList::InsertEvent(std::shared_ptr<gd::BaseEvent> event, size_t position)
 {
     if (position<events.size())
         events.insert(events.begin()+position, event);
@@ -55,10 +55,10 @@ void EventsList::InsertEvent(boost::shared_ptr<gd::BaseEvent> event, size_t posi
 gd::BaseEvent & EventsList::InsertNewEvent(gd::Project & project, const std::string & eventType, size_t position)
 {
     gd::BaseEventSPtr event = project.CreateEvent(eventType);
-    if ( event == boost::shared_ptr<gd::BaseEvent>())
+    if ( event == std::shared_ptr<gd::BaseEvent>())
     {
         std::cout << "Unknown event of type " << eventType;
-        event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
+        event = std::shared_ptr<gd::BaseEvent>(new EmptyEvent);
     }
 
     InsertEvent(event, position);

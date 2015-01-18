@@ -5,6 +5,7 @@
  */
 
 #include "Layout.h"
+#include <algorithm>
 #include <string>
 #include <vector>
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -184,7 +185,7 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
     {
         if ( automatismsInitialSharedDatas.find(allAutomatismsNames[i]) == automatismsInitialSharedDatas.end() )
         {
-            boost::shared_ptr<gd::AutomatismsSharedData> automatismsSharedDatas = project.CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
+            std::shared_ptr<gd::AutomatismsSharedData> automatismsSharedDatas = project.CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
             if ( automatismsSharedDatas )
             {
                 automatismsSharedDatas->SetName(allAutomatismsNames[i]);
@@ -196,7 +197,7 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
     //Remove useless shared data:
     //First construct the list of existing shared data.
     std::vector < std::string > allSharedData;
-    for (std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
+    for (std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
         allSharedData.push_back(it->first);
@@ -242,7 +243,7 @@ void Layout::SerializeTo(SerializerElement & element) const
 
     SerializerElement & automatismDatasElement = element.AddChild("automatismsSharedData");
     automatismDatasElement.ConsiderAsArrayOf("automatismSharedData");
-    for (std::map<std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
+    for (std::map<std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
         SerializerElement & dataElement = automatismDatasElement.AddChild("automatismSharedData");
@@ -296,8 +297,8 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
         SerializerElement & automatismDataElement = automatismsDataElement.GetChild(i);
         std::string type = automatismDataElement.GetStringAttribute("type", "", "Type");
 
-        boost::shared_ptr<gd::AutomatismsSharedData> sharedData = project.CreateAutomatismSharedDatas(type);
-        if ( sharedData != boost::shared_ptr<gd::AutomatismsSharedData>() )
+        std::shared_ptr<gd::AutomatismsSharedData> sharedData = project.CreateAutomatismSharedDatas(type);
+        if ( sharedData != std::shared_ptr<gd::AutomatismsSharedData>() )
         {
             sharedData->SetName( automatismDataElement.GetStringAttribute("name", "", "Name") );
             sharedData->UnserializeFrom(automatismDataElement);
@@ -327,10 +328,10 @@ void Layout::Init(const Layout & other)
 
     initialObjects.clear();
     for (unsigned int i =0;i<other.initialObjects.size();++i)
-    	initialObjects.push_back( boost::shared_ptr<gd::Object>(other.initialObjects[i]->Clone()) );
+    	initialObjects.push_back( std::shared_ptr<gd::Object>(other.initialObjects[i]->Clone()) );
 
     automatismsInitialSharedDatas.clear();
-    for (std::map< std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = other.automatismsInitialSharedDatas.begin();
+    for (std::map< std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = other.automatismsInitialSharedDatas.begin();
          it != other.automatismsInitialSharedDatas.end();++it)
     {
     	automatismsInitialSharedDatas[it->first] = it->second->Clone();

@@ -26,8 +26,8 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
           "",
           "CppPlatform/Extensions/topdownmovementicon.png",
           "TopDownMovementAutomatism",
-          boost::shared_ptr<gd::Automatism>(new TopDownMovementAutomatism),
-          boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+          std::shared_ptr<gd::Automatism>(new TopDownMovementAutomatism),
+          std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
     #if defined(GD_IDE_ONLY)
 

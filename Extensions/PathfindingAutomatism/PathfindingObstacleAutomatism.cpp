@@ -4,7 +4,7 @@ GDevelop - Pathfinding Automatism Extension
 Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "PathfindingObstacleAutomatism.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"

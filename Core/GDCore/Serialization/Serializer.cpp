@@ -43,10 +43,10 @@ void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
 		}
 
-		const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+		const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
 		for (size_t i = 0; i < children.size(); ++i)
 		{
-			if (children[i].second == boost::shared_ptr<SerializerElement>())
+			if (children[i].second == std::shared_ptr<SerializerElement>())
 				continue;
 
 		    TiXmlElement * xmlChild = new TiXmlElement( children[i].first.c_str() );
@@ -225,10 +225,10 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 					<< " but has attributes. These attributes won't be saved!" << std::endl;
 		    }
 
-			const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+			const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
 			for (size_t i = 0; i < children.size(); ++i)
 			{
-				if (children[i].second == boost::shared_ptr<SerializerElement>())
+				if (children[i].second == std::shared_ptr<SerializerElement>())
 					continue;
 				if (children[i].first != element.ConsideredAsArrayOf())
 				{
@@ -261,10 +261,10 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 		        firstChild = false;
 		    }
 
-			const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+			const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
 			for (size_t i = 0; i < children.size(); ++i)
 			{
-				if (children[i].second == boost::shared_ptr<SerializerElement>())
+				if (children[i].second == std::shared_ptr<SerializerElement>())
 					continue;
 
 		        if ( !firstChild ) str += ",";

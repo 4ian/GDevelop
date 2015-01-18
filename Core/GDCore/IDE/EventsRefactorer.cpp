@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <boost/algorithm/string.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/Events/ExpressionMetadata.h"
@@ -600,7 +600,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
             {
                 if (!eventAddedInResults && SearchStringInConditions(project, layout, *conditionsVectors[j], search, matchCase))
                 {
-                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
+                    results.push_back(EventsSearchResult(std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
                 }
             }
         }
@@ -612,7 +612,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
             {
                 if (!eventAddedInResults && SearchStringInActions(project, layout, *actionsVectors[j], search, matchCase))
                 {
-                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
+                    results.push_back(EventsSearchResult(std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
                 }
             }
         }
@@ -669,7 +669,7 @@ bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layou
     return false;
 }
 
-EventsSearchResult::EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
+EventsSearchResult::EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)

@@ -9,7 +9,7 @@
 #include <string>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -66,7 +66,7 @@ public:
     /**
      * \brief Set that the function must be generated using a custom code generator.
      */
-    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
     {
         optionalCustomCodeGenerator = codeGenerator;
         return *this;
@@ -75,7 +75,7 @@ public:
     bool staticFunction;
     std::string functionCallName;
     std::string optionalIncludeFile;
-    boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+    std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
 };
 
 /**

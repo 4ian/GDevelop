@@ -251,7 +251,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
     displayedNameEdit->SetValue(editedEvent.GetDisplayedName());
     displayCodeCheck->SetValue(editedEvent.IsCodeDisplayedInEditor());
 
-	const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
+	const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
     for (unsigned int i = 0;i<allFiles.size();++i)
     {
         if ( allFiles[i]->IsGDManaged() ) continue;
@@ -285,7 +285,7 @@ void EditCppCodeEvent::OnokBtClick(wxCommandEvent& event)
 
     std::vector<std::string> dependencies;
     unsigned int listIndex = 0;
-	const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
+	const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
     for (unsigned int i = 0;i<allFiles.size();++i)
     {
         if ( allFiles[i]->IsGDManaged() ) continue;

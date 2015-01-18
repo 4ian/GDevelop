@@ -17,7 +17,8 @@
 #include <wx/imaglist.h>
 #include <wx/msgdlg.h>
 #include <wx/settings.h>
-#include <boost/shared_ptr.hpp>
+#include <algorithm>
+#include <memory>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -159,7 +160,7 @@ void ChooseObjectTypeDialog::RefreshList()
     objectsList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     //Insert extension objects
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if this extension is enabled
@@ -227,8 +228,8 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
     if ( selectedObjectType.empty() ) return;
 
     //We need to find the extension the selected object type belongs to so as to activate it if necessary
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-    boost::shared_ptr<PlatformExtension> extension = boost::shared_ptr<PlatformExtension>();
+    const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    std::shared_ptr<PlatformExtension> extension = std::shared_ptr<PlatformExtension>();
 
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
@@ -239,7 +240,7 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
         }
 	}
 
-    if ( extension != boost::shared_ptr<PlatformExtension>() )
+    if ( extension != std::shared_ptr<PlatformExtension>() )
     {
 	    bool extensionEnabled = find(project.GetUsedExtensions().begin(),
                                       project.GetUsedExtensions().end(),

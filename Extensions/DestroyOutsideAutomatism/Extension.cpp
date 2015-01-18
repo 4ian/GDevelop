@@ -25,8 +25,8 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
           "",
           "CppPlatform/Extensions/destroyoutsideicon.png",
           "DestroyOutsideAutomatism",
-          boost::shared_ptr<gd::Automatism>(new DestroyOutsideAutomatism),
-          boost::shared_ptr<gd::AutomatismsSharedData>());
+          std::shared_ptr<gd::Automatism>(new DestroyOutsideAutomatism),
+          std::shared_ptr<gd::AutomatismsSharedData>());
 
     #if defined(GD_IDE_ONLY)
     aut.SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");

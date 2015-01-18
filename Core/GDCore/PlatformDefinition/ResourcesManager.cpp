@@ -40,7 +40,7 @@ void ResourceFolder::Init(const ResourceFolder & other)
     resources.clear();
     for (unsigned int i = 0;i<other.resources.size();++i)
     {
-        resources.push_back(boost::shared_ptr<Resource>(other.resources[i]->Clone()));
+        resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
     }
 }
 #endif
@@ -50,7 +50,7 @@ void ResourcesManager::Init(const ResourcesManager & other)
     resources.clear();
     for (unsigned int i = 0;i<other.resources.size();++i)
     {
-        resources.push_back(boost::shared_ptr<Resource>(other.resources[i]->Clone()));
+        resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
     }
 #if defined(GD_IDE_ONLY)
     folders.clear();
@@ -83,15 +83,15 @@ const Resource & ResourcesManager::GetResource(const std::string & name) const
     return badResource;
 }
 
-boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & kind)
+std::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & kind)
 {
     if (kind == "image")
     {
-        return boost::shared_ptr<Resource>(new ImageResource);
+        return std::shared_ptr<Resource>(new ImageResource);
     }
 
     std::cout << "Bad resource created ( type: " << kind << ")" << std::endl;
-    return boost::shared_ptr<Resource>(new Resource);
+    return std::shared_ptr<Resource>(new Resource);
 }
 
 bool ResourcesManager::HasResource(const std::string & name) const
@@ -123,8 +123,8 @@ bool ResourcesManager::AddResource(const gd::Resource & resource)
     try
     {
         const Resource & castedResource = dynamic_cast<const Resource&>(resource);
-        boost::shared_ptr<Resource> newResource = boost::shared_ptr<Resource>(castedResource.Clone());
-        if ( newResource == boost::shared_ptr<Resource>() ) return false;
+        std::shared_ptr<Resource> newResource = std::shared_ptr<Resource>(castedResource.Clone());
+        if ( newResource == std::shared_ptr<Resource>() ) return false;
 
         resources.push_back(newResource);
     }
@@ -137,7 +137,7 @@ bool ResourcesManager::AddResource(const std::string & name, const std::string &
 {
     if ( HasResource(name) ) return false;
 
-    boost::shared_ptr<ImageResource> image(new ImageResource);
+    std::shared_ptr<ImageResource> image(new ImageResource);
     image->SetFile(filename);
     image->SetName(name);
 
@@ -273,7 +273,7 @@ const Resource & ResourceFolder::GetResource(const std::string & name) const
 
 namespace
 {
-bool MoveResourceUpInList(std::vector< boost::shared_ptr<Resource> > & resources, const std::string & name)
+bool MoveResourceUpInList(std::vector< std::shared_ptr<Resource> > & resources, const std::string & name)
 {
     unsigned int index = std::string::npos;
     for (unsigned int i = 0;i<resources.size();++i)
@@ -294,7 +294,7 @@ bool MoveResourceUpInList(std::vector< boost::shared_ptr<Resource> > & resources
     return false;
 }
 
-bool MoveResourceDownInList(std::vector< boost::shared_ptr<Resource> > & resources, const std::string & name)
+bool MoveResourceDownInList(std::vector< std::shared_ptr<Resource> > & resources, const std::string & name)
 {
     unsigned int index = std::string::npos;
     for (unsigned int i = 0;i<resources.size();++i)
@@ -379,7 +379,7 @@ bool ResourcesManager::MoveFolderDownInList(const std::string & name)
     return false;
 }
 
-boost::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::string & name)
+std::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::string & name)
 {
     for (unsigned int i = 0;i<resources.size();++i)
     {
@@ -387,7 +387,7 @@ boost::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::str
             return resources[i];
     }
 
-    return boost::shared_ptr<gd::Resource>();
+    return std::shared_ptr<gd::Resource>();
 }
 
 bool ResourcesManager::HasFolder(const std::string & name) const
@@ -469,8 +469,8 @@ void ResourceFolder::AddResource(const std::string & name, gd::ResourcesManager 
     try
     {
         ResourcesManager & manager = dynamic_cast<ResourcesManager &>(parentManager);
-        boost::shared_ptr<Resource> resource = boost::dynamic_pointer_cast<Resource>(manager.GetResourceSPtr(name));
-        if ( resource != boost::shared_ptr<Resource>())
+        std::shared_ptr<Resource> resource = std::dynamic_pointer_cast<Resource>(manager.GetResourceSPtr(name));
+        if ( resource != std::shared_ptr<Resource>())
             resources.push_back(resource);
     }
     catch(...)
@@ -492,7 +492,7 @@ void ResourceFolder::RemoveResource(const std::string & name)
 {
     for (unsigned int i = 0;i<resources.size();)
     {
-        if (resources[i] != boost::shared_ptr<Resource>() && resources[i]->GetName() == name)
+        if (resources[i] != std::shared_ptr<Resource>() && resources[i]->GetName() == name)
             resources.erase(resources.begin()+i);
         else
             ++i;
@@ -503,7 +503,7 @@ void ResourcesManager::RemoveResource(const std::string & name)
 {
     for (unsigned int i = 0;i<resources.size();)
     {
-        if (resources[i] != boost::shared_ptr<Resource>() && resources[i]->GetName() == name)
+        if (resources[i] != std::shared_ptr<Resource>() && resources[i]->GetName() == name)
             resources.erase(resources.begin()+i);
         else
             ++i;
@@ -534,7 +534,7 @@ void ResourceFolder::SerializeTo(SerializerElement & element) const
     resourcesElement.ConsiderAsArrayOf("resource");
     for (unsigned int i = 0;i<resources.size();++i)
     {
-        if ( resources[i] == boost::shared_ptr<Resource>() ) continue;
+        if ( resources[i] == std::shared_ptr<Resource>() ) continue;
         resourcesElement.AddChild("resource").SetAttribute("name", resources[i]->GetName());
     }
 }
@@ -550,7 +550,7 @@ void ResourcesManager::UnserializeFrom(const SerializerElement & element)
         std::string kind = resourceElement.GetStringAttribute("kind");
         std::string name = resourceElement.GetStringAttribute("name");
 
-        boost::shared_ptr<Resource> resource = CreateResource(kind);
+        std::shared_ptr<Resource> resource = CreateResource(kind);
         resource->SetName(name);
         resource->UnserializeFrom(resourceElement);
 
@@ -577,7 +577,7 @@ void ResourcesManager::SerializeTo(SerializerElement & element) const
     resourcesElement.ConsiderAsArrayOf("resource");
     for (unsigned int i = 0;i<resources.size();++i)
     {
-        if ( resources[i] == boost::shared_ptr<Resource>() ) break;
+        if ( resources[i] == std::shared_ptr<Resource>() ) break;
 
         SerializerElement & resourceElement = resourcesElement.AddChild("resource");
         resourceElement.SetAttribute("kind", resources[i]->GetKind());

@@ -174,8 +174,8 @@ public:
                   "",
                   "CppPlatform/Extensions/networkicon32.png",
                   "NetworkAutomatism",
-                  boost::shared_ptr<gd::Automatism>(new NetworkAutomatism),
-                  boost::shared_ptr<gd::AutomatismsSharedData>(new SceneNetworkDatas));
+                  std::shared_ptr<gd::Automatism>(new NetworkAutomatism),
+                  std::shared_ptr<gd::AutomatismsSharedData>(new SceneNetworkDatas));
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("Network/NetworkAutomatism.h");

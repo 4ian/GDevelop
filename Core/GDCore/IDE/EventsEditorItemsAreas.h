@@ -8,8 +8,9 @@
 #ifndef EVENTSEDITORITEMSAREAS_H
 #define EVENTSEDITORITEMSAREAS_H
 #include <wx/gdicmn.h>
-#include <boost/weak_ptr.hpp>
-#include <boost/unordered_map.hpp>
+#include <memory>
+#include <unordered_map>
+#include <functional>
 #include <vector>
 #include <utility>
 namespace gd { class EventsList; }
@@ -29,17 +30,16 @@ namespace gd
 class GD_CORE_API EventItem
 {
 public:
-    EventItem(boost::shared_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
+    EventItem(std::shared_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
     EventItem();
     ~EventItem() {};
 
     bool operator==(const gd::EventItem & other) const;
 
-    boost::shared_ptr<gd::BaseEvent> event;
+    std::shared_ptr<gd::BaseEvent> event;
     gd::EventsList * eventsList;
     unsigned int positionInList;
 };
-size_t hash_value(const gd::EventItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that an instruction is displayed somewhere
@@ -63,7 +63,6 @@ public:
     unsigned int positionInList;
     gd::BaseEvent * event;
 };
-size_t hash_value(const gd::InstructionItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that an instruction list is displayed somewhere
@@ -85,7 +84,6 @@ public:
     std::vector<gd::Instruction>* instructionList;
     gd::BaseEvent * event;
 };
-size_t hash_value(const InstructionListItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that a parameter is displayed somewhere
@@ -103,7 +101,6 @@ public:
     gd::Expression * parameter;
     gd::BaseEvent * event;
 };
-size_t hash_value(const ParameterItem & a);
 
 /**
  * \brief Used to indicate to EventsEditorItemsAreas that a fold/unfold button is displayed somewhere
@@ -120,7 +117,6 @@ public:
 
     gd::BaseEvent * event;
 };
-size_t hash_value(const FoldingItem & a);
 
 /**
  * \brief Allow events to indicate where is displayed an instruction or parameter.
@@ -252,5 +248,64 @@ private:
 };
 
 }
+
+//Hash for EventItem, ParameterItem, InstructionItem, InstructionListItem and FoldingItem
+namespace std
+{
+    template<>
+    struct hash<gd::EventItem>
+    {
+        std::size_t operator()(gd::EventItem const& item) const
+        {
+            return (std::hash<gd::BaseEvent*>()(item.event.get())) ^
+                   (std::hash<gd::EventsList*>()(item.eventsList) << 1) ^
+                   (std::hash<unsigned int>()(item.positionInList) << 2);
+        }
+    };
+
+    template<>
+    struct hash<gd::InstructionItem>
+    {
+        std::size_t operator()(gd::InstructionItem const& item) const
+        {
+            return (std::hash<gd::Instruction*>()(item.instruction)) ^ 
+                   (std::hash<std::vector<gd::Instruction>*>()(item.instructionList) << 1) ^ 
+                   (std::hash<unsigned int>()(item.positionInList) << 2) ^
+                   (std::hash<gd::BaseEvent*>()(item.event) << 3) ^ 
+                   (std::hash<bool>()(item.isCondition) << 4);
+        }
+    };
+
+    template<>
+    struct hash<gd::InstructionListItem>
+    {
+        std::size_t operator()(gd::InstructionListItem const& item) const
+        {
+            return (std::hash<std::vector<gd::Instruction>*>()(item.instructionList)) ^ 
+                   (std::hash<gd::BaseEvent*>()(item.event) << 1) ^ 
+                   (std::hash<bool>()(item.isConditionList) << 2);
+        }
+    };
+
+    template<>
+    struct hash<gd::ParameterItem>
+    {
+        std::size_t operator()(gd::ParameterItem const& item) const
+        {
+            return (std::hash<gd::Expression*>()(item.parameter)) ^ 
+                   (std::hash<gd::BaseEvent*>()(item.event) << 1);
+        }
+    };
+
+    template<>
+    struct hash<gd::FoldingItem>
+    {
+        std::size_t operator()(gd::FoldingItem const& item) const
+        {
+            return std::hash<gd::BaseEvent*>()(item.event);
+        }
+    };
+}
+
 #endif // EVENTSEDITORITEMSAREAS_H
 #endif

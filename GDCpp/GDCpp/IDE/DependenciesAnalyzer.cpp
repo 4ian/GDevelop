@@ -1,4 +1,5 @@
 #if defined(GD_IDE_ONLY)
+#include <algorithm>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"

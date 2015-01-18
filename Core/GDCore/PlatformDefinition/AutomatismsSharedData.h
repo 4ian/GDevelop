@@ -7,7 +7,7 @@
 #ifndef AUTOMATISMSSHAREDDATA_H
 #define AUTOMATISMSSHAREDDATA_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 class AutomatismsRuntimeSharedData;
 namespace gd { class SerializerElement; }
@@ -29,7 +29,7 @@ class GD_CORE_API AutomatismsSharedData
 public:
     AutomatismsSharedData() {};
     virtual ~AutomatismsSharedData();
-    virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismsSharedData(*this));}
+    virtual std::shared_ptr<gd::AutomatismsSharedData> Clone() const { return std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismsSharedData(*this));}
 
     /**
      * \brief Change the name identifying the automatism.
@@ -69,9 +69,9 @@ public:
      * Derived class have to redefine this so as to create an appropriate
      * object containing runtime shared datas.
      */
-    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
+    virtual std::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
     {
-        return boost::shared_ptr<AutomatismsRuntimeSharedData>();
+        return std::shared_ptr<AutomatismsRuntimeSharedData>();
     }
 
 private:

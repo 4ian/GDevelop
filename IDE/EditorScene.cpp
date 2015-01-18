@@ -113,10 +113,10 @@ mainFrameWrapper(mainFrameWrapper_)
     layoutEditorCanvas->SetScrollbars(hScrollbar, vScrollbar);
 
     //Create all editors linked to scene canvas.
-    objectsEditor = boost::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, &layout, mainFrameWrapper) );
-    layersEditor =  boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
-    initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, layout.GetInitialInstances(), *layoutEditorCanvas) );
-    propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper));
+    objectsEditor = std::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, &layout, mainFrameWrapper) );
+    layersEditor =  std::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
+    initialInstancesBrowser = std::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, layout.GetInitialInstances(), *layoutEditorCanvas) );
+    propertiesPnl = std::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper));
 
     //Link some editors together
     layoutEditorCanvas->AddAssociatedEditor(objectsEditor.get());

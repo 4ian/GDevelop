@@ -26,7 +26,7 @@ void EventsEditorSelection::ClearSelection(bool refresh)
 
 void EventsEditorSelection::AddEvent(const gd::EventItem & eventSelection)
 {
-    if ( eventSelection.event == boost::shared_ptr<gd::BaseEvent>() || eventSelection.eventsList == NULL )
+    if ( eventSelection.event == std::shared_ptr<gd::BaseEvent>() || eventSelection.eventsList == NULL )
     {
         std::cout << "WARNING, attempted to add a bad event to selection";
         return;
@@ -67,7 +67,7 @@ void EventsEditorSelection::AddInstruction(const gd::InstructionItem & instr)
 std::vector < EventItem > EventsEditorSelection::GetAllSelectedEvents()
 {
     std::vector < EventItem > results;
-    for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+    for (std::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
         results.push_back(*it);
 
     return results;
@@ -76,13 +76,13 @@ std::vector < EventItem > EventsEditorSelection::GetAllSelectedEvents()
 std::vector < EventItem > EventsEditorSelection::GetAllSelectedEventsWithoutSubEvents()
 {
     std::vector < EventItem > results;
-    for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+    for (std::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
         bool isAlreadyIncludedAsSubEvent = false;
-        for (boost::unordered_set< EventItem >::iterator it2 = eventsSelected.begin();it2!=eventsSelected.end();++it2)
+        for (std::unordered_set< EventItem >::iterator it2 = eventsSelected.begin();it2!=eventsSelected.end();++it2)
         {
             if ((*it).event != (*it2).event &&
-                (*it2).event != boost::shared_ptr<gd::BaseEvent>() &&
+                (*it2).event != std::shared_ptr<gd::BaseEvent>() &&
                 (*it2).event->CanHaveSubEvents() )
             {
                 if ( (*it2).event->GetSubEvents().Contains(*(*it).event) )
@@ -104,7 +104,7 @@ std::vector < EventItem > EventsEditorSelection::GetAllSelectedEventsWithoutSubE
 std::vector < gd::InstructionItem > EventsEditorSelection::GetAllSelectedInstructions()
 {
     std::vector < gd::InstructionItem > results;
-    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         results.push_back(*it);
 
     return results;
@@ -112,7 +112,7 @@ std::vector < gd::InstructionItem > EventsEditorSelection::GetAllSelectedInstruc
 
 bool EventsEditorSelection::HasSelectedActions()
 {
-    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         if ( !it->isCondition ) return true;
 
     return false;
@@ -120,7 +120,7 @@ bool EventsEditorSelection::HasSelectedActions()
 
 bool EventsEditorSelection::HasSelectedConditions()
 {
-    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         if ( it->isCondition ) return true;
 
     return false;
@@ -166,9 +166,9 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
     if ( eventHighlighted.eventsList == NULL ) return false;
 
     //Be sure we do not try to drag inside an event selected
-    for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+    for (std::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
-        if ( (*it).event == boost::shared_ptr<gd::BaseEvent>() )
+        if ( (*it).event == std::shared_ptr<gd::BaseEvent>() )
         {
             std::cout << "WARNING: Bad event in selection";
             continue;
@@ -182,18 +182,18 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
 
     //Insert copy of dragged events
     size_t positionInList = !dropAfterHighlightedElement ? eventHighlighted.positionInList : eventHighlighted.positionInList+1;
-    for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+    for (std::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
-        if ( (*it).event != boost::shared_ptr<gd::BaseEvent>() )
+        if ( (*it).event != std::shared_ptr<gd::BaseEvent>() )
             eventHighlighted.eventsList->InsertEvent(*(*it).event, positionInList);
     }
 
     //Remove them from their initial position
     if ( deleteDraggedEvent )
     {
-        for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+        for (std::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
         {
-            if ( (*it).event != boost::shared_ptr<gd::BaseEvent>() && (*it).eventsList != NULL)
+            if ( (*it).event != std::shared_ptr<gd::BaseEvent>() && (*it).eventsList != NULL)
                 (*it).eventsList->RemoveEvent(*(*it).event);
         }
     }
@@ -241,7 +241,7 @@ std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool de
     //Be sure we do not try to drag inside an instruction selected
     if (instructionHighlighted.instruction != NULL)
     {
-        for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+        for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         {
             if ( (*it).instruction == NULL )
             {
@@ -262,7 +262,7 @@ std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool de
 
     //Copy dragged instructions
     std::vector<gd::Instruction> draggedInstructions;
-    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).instruction != NULL )
             draggedInstructions.push_back(*(*it).instruction);
@@ -280,8 +280,8 @@ std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool de
     if ( deleteDraggedInstruction )
     {
         //Update selection as some selected instruction can have become invalid
-        boost::unordered_set< gd::InstructionItem > newInstructionsSelected;
-        for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+        std::unordered_set< gd::InstructionItem > newInstructionsSelected;
+        for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         {
             if ((*it).instructionList == instructionHighlighted.instructionList && (*it).positionInList > instructionHighlighted.positionInList)
             {
@@ -323,7 +323,7 @@ void EventsEditorSelection::DeleteAllInstructionSelected()
 {
     //1) Construct a map with their list and their index in the list
     std::map< std::vector<gd::Instruction>*, std::list<unsigned int> > mapOfDeletionsRequest;
-    for (boost::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).event != NULL ) (*it).event->eventHeightNeedUpdate = true;
         if ( (*it).instructionList != NULL)

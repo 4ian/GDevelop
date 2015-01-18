@@ -59,7 +59,7 @@ void LightObstacleAutomatism::DoStepPostEvents(RuntimeScene & scene)
     //Get a manager for the scene
     if ( RuntimeLightObject::lightManagersList[&scene].expired() )
     {
-        manager = boost::shared_ptr<Light_Manager>(new Light_Manager);
+        manager = std::shared_ptr<Light_Manager>(new Light_Manager);
         RuntimeLightObject::lightManagersList[&scene] = manager;
     }
     else

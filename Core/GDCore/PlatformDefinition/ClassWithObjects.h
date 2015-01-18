@@ -7,7 +7,7 @@
 #define GDCORE_CLASSWITHOBJECTS_H
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Object; }
 namespace gd { class Project; }
 namespace gd { class SerializerElement; }
@@ -113,12 +113,12 @@ public:
     /**
      * Provide a raw access to the vector containing the objects
      */
-    std::vector < boost::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
+    std::vector < std::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
 
     /**
      * Provide a raw access to the vector containing the objects
      */
-    const std::vector < boost::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
+    const std::vector < std::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
     ///@}
 
     /** \name Saving and loading
@@ -137,7 +137,7 @@ public:
     ///@}
 
 protected:
-    std::vector < boost::shared_ptr<gd::Object> > initialObjects; ///< Objects contained.
+    std::vector < std::shared_ptr<gd::Object> > initialObjects; ///< Objects contained.
 };
 
 }

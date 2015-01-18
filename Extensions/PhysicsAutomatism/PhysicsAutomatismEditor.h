@@ -29,7 +29,7 @@ This project is released under the MIT License.
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class PhysicsAutomatism;
@@ -128,7 +128,7 @@ class PhysicsAutomatismEditor: public wxDialog
 
 		gd::Project & game;
         gd::Layout * scene;
-        boost::shared_ptr<ScenePhysicsDatas> sharedDatas;
+        std::shared_ptr<ScenePhysicsDatas> sharedDatas;
 
 		std::vector<sf::Vector2f> coordsVector;
 		unsigned int positioning;

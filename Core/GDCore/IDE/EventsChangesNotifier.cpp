@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <boost/algorithm/string.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"

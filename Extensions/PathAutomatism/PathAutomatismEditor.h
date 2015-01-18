@@ -30,7 +30,7 @@ This project is released under the MIT License.
 #include <wx/dialog.h>
 //*)
 #include <wx/menu.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class PathAutomatism;
@@ -178,7 +178,7 @@ class PathAutomatismEditor: public wxDialog
 
 		gd::Project & game;
         gd::Layout * scene;
-        boost::shared_ptr<ScenePathDatas> sharedDatas;
+        std::shared_ptr<ScenePathDatas> sharedDatas;
 		gd::MainFrameWrapper & mainFrameWrapper;
 
         PathInfo *pathInfo;

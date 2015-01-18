@@ -61,7 +61,7 @@ Project::Project() :
     minFPS(10),
     verticalSync(false)
     #if !defined(GD_NO_WX_GUI)
-    ,imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
+    ,imageManager(std::shared_ptr<gd::ImageManager>(new ImageManager))
     #endif
     #if defined(GD_IDE_ONLY)
     ,useExternalSourceFiles(false),
@@ -106,17 +106,17 @@ Project::~Project()
 {
 }
 
-boost::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, const std::string & name, const std::string & platformName)
+std::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, const std::string & name, const std::string & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        boost::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name);
+        std::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name);
         if ( object ) return object;
     }
 
-    return boost::shared_ptr<gd::Object>();
+    return std::shared_ptr<gd::Object>();
 }
 
 gd::Automatism* Project::CreateAutomatism(const std::string & type, const std::string & platformName)
@@ -132,31 +132,31 @@ gd::Automatism* Project::CreateAutomatism(const std::string & type, const std::s
     return NULL;
 }
 
-boost::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName)
+std::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        boost::shared_ptr<gd::AutomatismsSharedData> automatism = platforms[i]->CreateAutomatismSharedDatas(type);
+        std::shared_ptr<gd::AutomatismsSharedData> automatism = platforms[i]->CreateAutomatismSharedDatas(type);
         if ( automatism ) return automatism;
     }
 
-    return boost::shared_ptr<gd::AutomatismsSharedData>();
+    return std::shared_ptr<gd::AutomatismsSharedData>();
 }
 
 #if defined(GD_IDE_ONLY)
-boost::shared_ptr<gd::BaseEvent> Project::CreateEvent(const std::string & type, const std::string & platformName)
+std::shared_ptr<gd::BaseEvent> Project::CreateEvent(const std::string & type, const std::string & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        boost::shared_ptr<gd::BaseEvent> event = platforms[i]->CreateEvent(type);
+        std::shared_ptr<gd::BaseEvent> event = platforms[i]->CreateEvent(type);
         if ( event ) return event;
     }
 
-    return boost::shared_ptr<gd::BaseEvent>();
+    return std::shared_ptr<gd::BaseEvent>();
 }
 
 Platform & Project::GetCurrentPlatform() const
@@ -252,8 +252,8 @@ void Project::SwapLayouts(unsigned int first, unsigned int second)
     if ( first >= scenes.size() || second >= scenes.size() )
         return;
 
-    boost::shared_ptr<gd::Layout> firstItem = scenes[first];
-    boost::shared_ptr<gd::Layout> secondItem = scenes[second];
+    std::shared_ptr<gd::Layout> firstItem = scenes[first];
+    std::shared_ptr<gd::Layout> secondItem = scenes[second];
     scenes[first] = secondItem;
     scenes[second] = firstItem;
 }
@@ -261,7 +261,7 @@ void Project::SwapLayouts(unsigned int first, unsigned int second)
 
 gd::Layout & Project::InsertNewLayout(const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<gd::Layout> newScene = boost::shared_ptr<gd::Layout>(new Layout);
+    std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout);
     if (position<scenes.size())
         scenes.insert(scenes.begin()+position, newScene);
     else
@@ -277,7 +277,7 @@ gd::Layout & Project::InsertNewLayout(const std::string & name, unsigned int pos
 
 gd::Layout & Project::InsertLayout(const gd::Layout & layout, unsigned int position)
 {
-    boost::shared_ptr<gd::Layout> newScene = boost::shared_ptr<gd::Layout>(new Layout(layout));
+    std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout(layout));
     if (position<scenes.size())
         scenes.insert(scenes.begin()+position, newScene);
     else
@@ -292,7 +292,7 @@ gd::Layout & Project::InsertLayout(const gd::Layout & layout, unsigned int posit
 
 void Project::RemoveLayout(const std::string & name)
 {
-    std::vector< boost::shared_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
+    std::vector< std::shared_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
     if ( scene == scenes.end() ) return;
 
     scenes.erase(scene);
@@ -334,7 +334,7 @@ unsigned int Project::GetExternalEventsCount() const
 
 gd::ExternalEvents & Project::InsertNewExternalEvents(const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
+    std::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
     if (position<externalEvents.size())
         externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
     else
@@ -347,14 +347,14 @@ gd::ExternalEvents & Project::InsertNewExternalEvents(const std::string & name, 
 void Project::InsertExternalEvents(const gd::ExternalEvents & events, unsigned int position)
 {
     if (position<externalEvents.size())
-        externalEvents.insert(externalEvents.begin()+position, boost::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
+        externalEvents.insert(externalEvents.begin()+position, std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
     else
-        externalEvents.push_back(boost::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
+        externalEvents.push_back(std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
 }
 
 void Project::RemoveExternalEvents(const std::string & name)
 {
-    std::vector< boost::shared_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
+    std::vector< std::shared_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
     if ( events == externalEvents.end() ) return;
 
     externalEvents.erase(events);
@@ -365,8 +365,8 @@ void Project::SwapExternalEvents(unsigned int first, unsigned int second)
     if ( first >= externalEvents.size() || second >= externalEvents.size() )
         return;
 
-    boost::shared_ptr<gd::ExternalEvents> firstItem = externalEvents[first];
-    boost::shared_ptr<gd::ExternalEvents> secondItem = externalEvents[second];
+    std::shared_ptr<gd::ExternalEvents> firstItem = externalEvents[first];
+    std::shared_ptr<gd::ExternalEvents> secondItem = externalEvents[second];
     externalEvents[first] = secondItem;
     externalEvents[second] = firstItem;
 }
@@ -376,8 +376,8 @@ void Project::SwapExternalLayouts(unsigned int first, unsigned int second)
     if ( first >= externalLayouts.size() || second >= externalLayouts.size() )
         return;
 
-    boost::shared_ptr<gd::ExternalLayout> firstItem = externalLayouts[first];
-    boost::shared_ptr<gd::ExternalLayout> secondItem = externalLayouts[second];
+    std::shared_ptr<gd::ExternalLayout> firstItem = externalLayouts[first];
+    std::shared_ptr<gd::ExternalLayout> secondItem = externalLayouts[second];
     externalLayouts[first] = secondItem;
     externalLayouts[second] = firstItem;
 }
@@ -418,7 +418,7 @@ unsigned int Project::GetExternalLayoutsCount() const
 
 gd::ExternalLayout & Project::InsertNewExternalLayout(const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<gd::ExternalLayout> newExternalLayout = boost::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
+    std::shared_ptr<gd::ExternalLayout> newExternalLayout = std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
     if (position<externalLayouts.size())
         externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
     else
@@ -430,7 +430,7 @@ gd::ExternalLayout & Project::InsertNewExternalLayout(const std::string & name, 
 
 void Project::InsertExternalLayout(const gd::ExternalLayout & layout, unsigned int position)
 {
-    boost::shared_ptr<gd::ExternalLayout> newLayout(new gd::ExternalLayout(layout));
+    std::shared_ptr<gd::ExternalLayout> newLayout(new gd::ExternalLayout(layout));
 
     if (position<externalLayouts.size())
         externalLayouts.insert(externalLayouts.begin()+position, newLayout);
@@ -440,7 +440,7 @@ void Project::InsertExternalLayout(const gd::ExternalLayout & layout, unsigned i
 
 void Project::RemoveExternalLayout(const std::string & name)
 {
-    std::vector< boost::shared_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
+    std::vector< std::shared_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
     if ( externalLayout == externalLayouts.end() ) return;
 
     externalLayouts.erase(externalLayout);
@@ -676,7 +676,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & externalLayoutElement = externalLayoutsElement.GetChild(i);
 
-        boost::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
+        std::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
         newExternalLayout->UnserializeFrom(externalLayoutElement);
         externalLayouts.push_back(newExternalLayout);
     }
@@ -688,7 +688,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & sourceFileElement = externalSourceFilesElement.GetChild(i);
 
-        boost::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
+        std::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
         newSourceFile->UnserializeFrom(sourceFileElement);
         externalSourceFiles.push_back(newSourceFile);
     }
@@ -938,7 +938,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool Project::HasSourceFile(std::string name, std::string language) const
 {
-    vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
+    vector< std::shared_ptr<SourceFile> >::const_iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(),
         bind2nd(gd::ExternalSourceFileHasName(), name));
 
@@ -960,7 +960,7 @@ const gd::SourceFile & Project::GetSourceFile(const std::string & name) const
 
 void Project::RemoveSourceFile(const std::string & name)
 {
-    std::vector< boost::shared_ptr<gd::SourceFile> >::iterator sourceFile =
+    std::vector< std::shared_ptr<gd::SourceFile> >::iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name));
     if ( sourceFile == externalSourceFiles.end() ) return;
 
@@ -972,7 +972,7 @@ gd::SourceFile & Project::InsertNewSourceFile(const std::string & name, const st
     if (HasSourceFile(name, language))
         return GetSourceFile(name);
 
-    boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+    std::shared_ptr<SourceFile> newSourceFile(new SourceFile);
     newSourceFile->SetLanguage(language);
     newSourceFile->SetFileName(name);
 
@@ -1121,34 +1121,34 @@ void Project::Init(const gd::Project & game)
     //Resources
     resourcesManager = game.resourcesManager;
     #if !defined(GD_NO_WX_GUI)
-    imageManager = boost::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
+    imageManager = std::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
     imageManager->SetGame(this);
     #endif
 
     GetObjects().clear();
     for (unsigned int i =0;i<game.GetObjects().size();++i)
-    	GetObjects().push_back( boost::shared_ptr<gd::Object>(game.GetObjects()[i]->Clone()) );
+    	GetObjects().push_back( std::shared_ptr<gd::Object>(game.GetObjects()[i]->Clone()) );
 
     scenes.clear();
     for (unsigned int i =0;i<game.scenes.size();++i)
-    	scenes.push_back( boost::shared_ptr<gd::Layout>(new gd::Layout(*game.scenes[i])) );
+    	scenes.push_back( std::shared_ptr<gd::Layout>(new gd::Layout(*game.scenes[i])) );
 
     #if defined(GD_IDE_ONLY)
     externalEvents.clear();
     for (unsigned int i =0;i<game.externalEvents.size();++i)
-    	externalEvents.push_back( boost::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(*game.externalEvents[i])) );
+    	externalEvents.push_back( std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(*game.externalEvents[i])) );
     #endif
 
     externalLayouts.clear();
     for (unsigned int i =0;i<game.externalLayouts.size();++i)
-    	externalLayouts.push_back( boost::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
+    	externalLayouts.push_back( std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
 
     #if defined(GD_IDE_ONLY)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
     externalSourceFiles.clear();
     for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
-    	externalSourceFiles.push_back( boost::shared_ptr<gd::SourceFile>(new gd::SourceFile(*game.externalSourceFiles[i])) );
+    	externalSourceFiles.push_back( std::shared_ptr<gd::SourceFile>(new gd::SourceFile(*game.externalSourceFiles[i])) );
     #endif
 
     variables = game.GetVariables();

@@ -15,7 +15,7 @@
  */
 bool GD_API MusicPlaying( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return false;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return false;
 
     return (SoundManager::Get()->GetMusicOnChannel(channel)->GetStatus() == sf::Music::Playing);
 }
@@ -25,7 +25,7 @@ bool GD_API MusicPlaying( RuntimeScene & scene, unsigned int channel )
  */
 bool GD_API MusicPaused( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return false;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return false;
 
     return (SoundManager::Get()->GetMusicOnChannel(channel)->GetStatus() == sf::Music::Paused);
 }
@@ -35,7 +35,7 @@ bool GD_API MusicPaused( RuntimeScene & scene, unsigned int channel )
  */
 bool GD_API MusicStopped( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return false;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return false;
 
     return (SoundManager::Get()->GetMusicOnChannel(channel)->GetStatus() == sf::Music::Stopped);
 }
@@ -46,7 +46,7 @@ bool GD_API MusicStopped( RuntimeScene & scene, unsigned int channel )
  */
 bool GD_API SoundPlaying( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return false;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return false;
 
     return (SoundManager::Get()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Playing);
 }
@@ -56,7 +56,7 @@ bool GD_API SoundPlaying( RuntimeScene & scene, unsigned int channel )
  */
 bool GD_API SoundPaused( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return false;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return false;
 
     return (SoundManager::Get()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Paused);
 }
@@ -66,7 +66,7 @@ bool GD_API SoundPaused( RuntimeScene & scene, unsigned int channel )
  */
 bool GD_API SoundStopped( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return false;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return false;
 
     return (SoundManager::Get()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Stopped);
 }
@@ -79,7 +79,7 @@ void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, 
     SoundManager * soundManager = SoundManager::Get();
 
     //Son à jouer
-    boost::shared_ptr<Sound> sound = boost::shared_ptr<Sound>(new Sound(file));
+    std::shared_ptr<Sound> sound = std::shared_ptr<Sound>(new Sound(file));
     sound->sound.play();
 
     soundManager->SetSoundOnChannel(channel, sound);
@@ -95,7 +95,7 @@ void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repe
     sf::Clock latency;
 
     SoundManager * soundManager = SoundManager::Get();
-    soundManager->sounds.push_back(boost::shared_ptr<Sound>(new Sound(file)));
+    soundManager->sounds.push_back(std::shared_ptr<Sound>(new Sound(file)));
     soundManager->sounds.back()->sound.play();
     soundManager->sounds.back()->sound.setLoop(repeat);
     soundManager->sounds.back()->SetVolume(volume);
@@ -106,21 +106,21 @@ void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repe
 
 void GD_API StopSoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
     SoundManager::Get()->GetSoundOnChannel(channel)->sound.stop();
 }
 
 void GD_API PauseSoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
     SoundManager::Get()->GetSoundOnChannel(channel)->sound.pause();
 }
 
 void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
     SoundManager::Get()->GetSoundOnChannel(channel)->sound.play();
 }
@@ -129,7 +129,7 @@ void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repe
 {
     SoundManager * soundManager = SoundManager::Get();
 
-    boost::shared_ptr<Music> music(new Music);
+    std::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
     gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
     if(ressourcesLoader->HasFile(file))
@@ -156,7 +156,7 @@ void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, 
 {
     SoundManager * soundManager = SoundManager::Get();
 
-    boost::shared_ptr<Music> music(new Music);
+    std::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
     gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
     if(ressourcesLoader->HasFile(file))
@@ -180,49 +180,49 @@ void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, 
 
 void GD_API StopMusicOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
     SoundManager::Get()->GetMusicOnChannel(channel)->Stop();
 }
 
 void GD_API PauseMusicOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
     SoundManager::Get()->GetMusicOnChannel(channel)->Pause();
 }
 
 void GD_API RePlayMusicOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
     SoundManager::Get()->GetMusicOnChannel(channel)->Play();
 }
 
 void GD_API SetSoundVolumeOnChannel( RuntimeScene & scene, unsigned int channel, float volume )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
     SoundManager::Get()->GetSoundOnChannel(channel)->SetVolume(volume);
 }
 
 void GD_API SetMusicVolumeOnChannel( RuntimeScene & scene, unsigned int channel, float volume )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
     SoundManager::Get()->GetMusicOnChannel(channel)->SetVolume(volume);
 }
 
 double GD_API GetSoundVolumeOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return 0;
 
     return SoundManager::Get()->GetSoundOnChannel(channel)->GetVolume();
 }
 
 double GD_API GetMusicVolumeOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return 0;
 
     return SoundManager::Get()->GetMusicOnChannel(channel)->GetVolume();
 }
@@ -240,56 +240,56 @@ double GD_API GetGlobalVolume( RuntimeScene & scene )
 
 void GD_API SetSoundPitchOnChannel( RuntimeScene & scene, unsigned int channel, float pitch )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
     SoundManager::Get()->GetSoundOnChannel(channel)->SetPitch(pitch);
 }
 
 void GD_API SetMusicPitchOnChannel( RuntimeScene & scene, unsigned int channel, float pitch )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
     SoundManager::Get()->GetMusicOnChannel(channel)->SetPitch(pitch);
 }
 
 double GD_API GetSoundPitchOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return 0;
 
     return SoundManager::Get()->GetSoundOnChannel(channel)->GetPitch();
 }
 
 double GD_API GetMusicPitchOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return 0;
 
     return SoundManager::Get()->GetMusicOnChannel(channel)->GetPitch();
 }
 
 void GD_API SetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
     SoundManager::Get()->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset*1000.0);
 }
 
 void GD_API SetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
     SoundManager::Get()->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset*1000.0);
 }
 
 double GD_API GetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( SoundManager::Get()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
+    if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return 0;
 
     return static_cast<double>(SoundManager::Get()->GetSoundOnChannel(channel)->GetPlayingOffset())/1000.0;
 }
 
 double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( SoundManager::Get()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
+    if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return 0;
 
     return static_cast<double>(SoundManager::Get()->GetMusicOnChannel(channel)->GetPlayingOffset())/1000.0;
 }

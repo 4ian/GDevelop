@@ -227,8 +227,8 @@ public:
                       "",
                       "CppPlatform/Extensions/lightObstacleIcon32.png",
                       "LightObstacleAutomatism",
-                      boost::shared_ptr<gd::Automatism>(new LightObstacleAutomatism),
-                      boost::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas));
+                      std::shared_ptr<gd::Automatism>(new LightObstacleAutomatism),
+                      std::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas));
 
             };
 

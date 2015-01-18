@@ -38,8 +38,8 @@ public:
                   "",
                   "CppPlatform/Extensions/AStaricon.png",
                   "PathfindingAutomatism",
-                  boost::shared_ptr<gd::Automatism>(new PathfindingAutomatism),
-                  boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+                  std::shared_ptr<gd::Automatism>(new PathfindingAutomatism),
+                  std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
             #if defined(GD_IDE_ONLY)
 
@@ -437,8 +437,8 @@ public:
                   "",
                   "CppPlatform/Extensions/pathfindingobstacleicon.png",
                   "PathfindingObstacleAutomatism",
-                  boost::shared_ptr<gd::Automatism>(new PathfindingObstacleAutomatism),
-                  boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+                  std::shared_ptr<gd::Automatism>(new PathfindingObstacleAutomatism),
+                  std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");

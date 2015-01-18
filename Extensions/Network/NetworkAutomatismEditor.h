@@ -18,7 +18,7 @@ This project is released under the MIT License.
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class NetworkAutomatism;

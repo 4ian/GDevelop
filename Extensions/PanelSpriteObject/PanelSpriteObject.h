@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define TILEDSPRITEOBJECT_H
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class SFMLTextureWrapper;
 namespace gd { class ImageManager; }
 class RuntimeScene;
@@ -83,7 +83,7 @@ private:
 
     bool smooth;
 
-    boost::shared_ptr<SFMLTextureWrapper> texture;
+    std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
 class GD_EXTENSION_API RuntimePanelSpriteObject : public RuntimeObject
@@ -140,7 +140,7 @@ private:
     float angle;
     bool smooth;
 
-    boost::shared_ptr<SFMLTextureWrapper> texture;
+    std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
 RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object);

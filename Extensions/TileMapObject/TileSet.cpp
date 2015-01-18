@@ -130,7 +130,7 @@ void TileSet::LoadResources(gd::Project &game)
     }
     else
     {
-        m_tilesetTexture = boost::shared_ptr<SFMLTextureWrapper>();
+        m_tilesetTexture = std::shared_ptr<SFMLTextureWrapper>();
     }
 }
 

@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 namespace gd { class AbstractFileSystem; }
 

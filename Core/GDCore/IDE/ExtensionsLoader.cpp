@@ -288,7 +288,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         #endif
     }
 
-    boost::shared_ptr<gd::PlatformExtension> extension(extensionPtr);
+    std::shared_ptr<gd::PlatformExtension> extension(extensionPtr);
     platform.AddExtension(extension);
     return;
 }

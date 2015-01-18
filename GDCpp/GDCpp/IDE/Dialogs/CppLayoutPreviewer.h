@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef SCENEEDITORCANVAS_H
 #define SCENEEDITORCANVAS_H
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -55,9 +55,9 @@ public:
     void ExternalWindowClosed();
 
     /**
-     * Return a boost::shared_ptr to the profiler owned by the editor. Can be NULL.
+     * Return a std::shared_ptr to the profiler owned by the editor. Can be NULL.
      */
-    boost::shared_ptr<ProfileDlg> GetProfileDialog() const { return profiler; }
+    std::shared_ptr<ProfileDlg> GetProfileDialog() const { return profiler; }
 
     virtual void SetParentAuiManager(wxAuiManager * parentAuiManager_);
 
@@ -97,9 +97,9 @@ private:
     static sf::Text reloadingText;
 
     //Editors owned by the previewer
-    boost::shared_ptr<RenderDialog> externalPreviewWindow; ///< The external preview window: Can be NULL if OnPreviewPlayWindowBtClick was not called.
-    boost::shared_ptr<DebuggerGUI> debugger;
-    boost::shared_ptr<ProfileDlg> profiler;
+    std::shared_ptr<RenderDialog> externalPreviewWindow; ///< The external preview window: Can be NULL if OnPreviewPlayWindowBtClick was not called.
+    std::shared_ptr<DebuggerGUI> debugger;
+    std::shared_ptr<ProfileDlg> profiler;
 
     //Custom ribbons buttons identifiers
     static const long idRibbonRefresh;

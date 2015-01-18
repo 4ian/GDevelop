@@ -41,8 +41,8 @@ public:
                       "",
                       "CppPlatform/Extensions/pathicon.png",
                       "PathAutomatism",
-                      boost::shared_ptr<gd::Automatism>(new PathAutomatism),
-                      boost::shared_ptr<gd::AutomatismsSharedData>(new ScenePathDatas));
+                      std::shared_ptr<gd::Automatism>(new PathAutomatism),
+                      std::shared_ptr<gd::AutomatismsSharedData>(new ScenePathDatas));
 
                 #if defined(GD_IDE_ONLY)
 

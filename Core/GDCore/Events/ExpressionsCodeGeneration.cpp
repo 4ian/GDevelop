@@ -54,7 +54,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Special case: For strings expressions, function without name is a string.
@@ -87,7 +87,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -127,7 +127,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(parameters, codeGenerator, context); return; }
 
     //Prepare parameters

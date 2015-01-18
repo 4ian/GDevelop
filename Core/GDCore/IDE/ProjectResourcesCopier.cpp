@@ -57,7 +57,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     }
     else
     {
-        boost::shared_ptr<gd::Project> project(new gd::Project(originalProject));
+        std::shared_ptr<gd::Project> project(new gd::Project(originalProject));
         project->ExposeResources(resourcesMergingHelper);
     }
 

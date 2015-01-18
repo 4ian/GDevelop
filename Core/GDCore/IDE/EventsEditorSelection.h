@@ -9,10 +9,10 @@
 #ifndef EVENTSEDITORSELECTION_H
 #define EVENTSEDITORSELECTION_H
 #include <set>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/unordered_set.hpp>
+#include <memory>
+#include <memory>
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include <unordered_set>
 namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class EventsEditorRefreshCallbacks; }
@@ -175,8 +175,8 @@ public:
 
 private:
 
-    boost::unordered_set< EventItem > eventsSelected; ///< Events selection
-    boost::unordered_set< gd::InstructionItem > instructionsSelected; ///< Events selection
+    std::unordered_set< EventItem > eventsSelected; ///< Events selection
+    std::unordered_set< gd::InstructionItem > instructionsSelected; ///< Events selection
 
     EventItem eventHighlighted;
     bool isOnbottomHandSideOfEvent;

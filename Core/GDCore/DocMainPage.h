@@ -447,7 +447,7 @@ AddEvent("Name",
          "Description",
          "Group",
          "path-to-a-16-by-16-icon.png",
-         boost::shared_ptr<gd::BaseEvent>(new EventClassName))
+         std::shared_ptr<gd::BaseEvent>(new EventClassName))
  * \endcode
  *
  * The event must be able to generate its code when events are being translated to C++ or Javascript:<br>
@@ -459,8 +459,8 @@ AddEvent("Standard",
          _("Standard event: Actions are run if conditions are fulfilled."),
          "",
          "res/eventaddicon.png",
-         boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
-	.SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+         std::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
+	.SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
  * \section automatismsDeclaration Declaring the automatisms
@@ -476,10 +476,10 @@ gd::AutomatismMetadata & aut = AddAutomatism("Name",
 	"Group",
 	"path-to-a-32-by-32-icon.png",
 	"AutomatismClassName",
-	boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
-	boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+	std::shared_ptr<gd::Automatism>(new AutomatismClassName),
+	std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
  * \endcode
- * The last line can be replaced by <code>boost::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
+ * The last line can be replaced by <code>std::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
  *
  * You can then declare the actions, conditions, and expressions related to the automatism like objects:<br>
  * Call AddAction/AddCondition/AddExpression on the <i>aut</i> object.
@@ -535,8 +535,8 @@ public:
                        "",
                        "CppPlatform/Extensions/myicon.png",
                        "PhysicsAutomatism",
-                       boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
-                       boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+                       std::shared_ptr<gd::Automatism>(new AutomatismClassName),
+                       std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
 
             #if defined(GD_IDE_ONLY)
             automatismInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");

@@ -8,6 +8,7 @@
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#include <algorithm>
 #include <iostream>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/SkinHelper.h"
@@ -26,8 +27,8 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
                        const std::string & group_,
                        const std::string & icon24x24,
                        const std::string & className_,
-                       boost::shared_ptr<gd::Automatism> instance_,
-                       boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance_) :
+                       std::shared_ptr<gd::Automatism> instance_,
+                       std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance_) :
     extensionNamespace(extensionNamespace_),
     instance(instance_),
     sharedDatasInstance(sharedDatasInstance_)

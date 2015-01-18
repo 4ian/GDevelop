@@ -20,7 +20,7 @@ class GD_EXTENSION_API RuntimeSceneNetworkDatas : public AutomatismsRuntimeShare
     public:
         RuntimeSceneNetworkDatas(const SceneNetworkDatas & automatismSharedDatas);
         virtual ~RuntimeSceneNetworkDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));}
+        virtual std::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));}
 
     private:
 };

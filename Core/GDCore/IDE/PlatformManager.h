@@ -8,7 +8,7 @@
 #ifndef PLATFORMMANAGER_H
 #define PLATFORMMANAGER_H
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/PlatformDefinition/Platform.h"
 
 namespace gd
@@ -30,7 +30,7 @@ public:
     /**
      * \brief Add a new platform to be used by the IDE
      */
-    bool AddPlatform(boost::shared_ptr<gd::Platform> newPlatform);
+    bool AddPlatform(std::shared_ptr<gd::Platform> newPlatform);
 
     /**
      * \brief Get a pointer to the platform called \a platformName.
@@ -41,7 +41,7 @@ public:
     /**
      * \brief Get a list of all platforms available.
      */
-    const std::vector< boost::shared_ptr<gd::Platform> > & GetAllPlatforms() const { return platformsLoaded; };
+    const std::vector< std::shared_ptr<gd::Platform> > & GetAllPlatforms() const { return platformsLoaded; };
 
     /**
      * \brief Notify each platform that the IDE is ready, by calling their OnIDEInitialized member function.
@@ -70,7 +70,7 @@ public:
         {
             for (unsigned int i = 0;i<_singleton->platformsLoaded.size();++i)
             {
-                if ( _singleton->platformsLoaded[i] != boost::shared_ptr<gd::Platform>() )
+                if ( _singleton->platformsLoaded[i] != std::shared_ptr<gd::Platform>() )
                     _singleton->platformsLoaded[i]->OnIDEClosed();
             }
 
@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    std::vector< boost::shared_ptr<gd::Platform> > platformsLoaded;
+    std::vector< std::shared_ptr<gd::Platform> > platformsLoaded;
 
     PlatformManager();
     virtual ~PlatformManager();

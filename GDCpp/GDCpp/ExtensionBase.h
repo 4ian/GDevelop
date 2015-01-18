@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"

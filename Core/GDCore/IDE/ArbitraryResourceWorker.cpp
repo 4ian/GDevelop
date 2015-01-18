@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "ArbitraryResourceWorker.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -39,13 +39,13 @@ ArbitraryResourceWorker::~ArbitraryResourceWorker()
 void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & events, gd::ArbitraryResourceWorker & worker)
 {
     //Get all extensions used
-    std::vector< boost::shared_ptr<gd::PlatformExtension> > allGameExtensions;
+    std::vector< std::shared_ptr<gd::PlatformExtension> > allGameExtensions;
     std::vector<std::string> usedExtensions = project.GetUsedExtensions();
     for (unsigned int i = 0;i<usedExtensions.size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(usedExtensions[i]);
+        std::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(usedExtensions[i]);
 
-        if ( extension != boost::shared_ptr<gd::PlatformExtension>() )
+        if ( extension != std::shared_ptr<gd::PlatformExtension>() )
             allGameExtensions.push_back(extension);
     }
 

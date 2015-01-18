@@ -88,7 +88,7 @@ private:
 
     bool disabled;
 
-    boost::shared_ptr<Light_Manager> manager;
+    std::shared_ptr<Light_Manager> manager;
 };
 
 #endif // LIGHTOBSTACLEAUTOMATISM_H

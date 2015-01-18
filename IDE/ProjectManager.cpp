@@ -472,12 +472,12 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(externalayoutsItem, mainEditor.games[i]->GetExternalLayout(j).GetName(), 6 , 6, externalLayoutsItemData);
         }
 
-        boost::shared_ptr<gd::Project> game = boost::dynamic_pointer_cast<gd::Project>(mainEditor.games[i]);
-        if ( game !=  boost::shared_ptr<gd::Project>() && game->UseExternalSourceFiles() )
+        std::shared_ptr<gd::Project> game = std::dynamic_pointer_cast<gd::Project>(mainEditor.games[i]);
+        if ( game !=  std::shared_ptr<gd::Project>() && game->UseExternalSourceFiles() )
         {
             gdTreeItemProjectData * sourceFilesItemData = new gdTreeItemProjectData("SourceFiles", "", mainEditor.games[i].get());
             wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Source files"), 5 ,5, sourceFilesItemData);
-            const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game->GetAllSourceFiles();
+            const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game->GetAllSourceFiles();
             for (unsigned int j = 0;j<allFiles.size();++j)
             {
                 if ( allFiles[j]->IsGDManaged() )

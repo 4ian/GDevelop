@@ -25,11 +25,11 @@ void ParticleObstacleAutomatism::DoStepPreEvents(RuntimeScene & scene)
         zone = new SPK::AABox(SPK::Vector3D(object->GetX()*0.25f, object->GetY()*0.25f, 0), SPK::Vector3D(5,5,5));
         modifier = new SPK::Obstacle(zone);
 
-        std::vector < boost::shared_ptr<RuntimeObject> > allObjects = scene.objectsInstances.GetAllObjects();
+        std::vector < std::shared_ptr<RuntimeObject> > allObjects = scene.objectsInstances.GetAllObjects();
         for (unsigned int i = 0;i<allObjects.size();++i)
         {
-            boost::shared_ptr<RuntimeParticleEmitterObject> object = boost::dynamic_pointer_cast<RuntimeParticleEmitterObject>(allObjects[i]);
-            if ( object != boost::shared_ptr<RuntimeParticleEmitterObject>() )
+            std::shared_ptr<RuntimeParticleEmitterObject> object = std::dynamic_pointer_cast<RuntimeParticleEmitterObject>(allObjects[i]);
+            if ( object != std::shared_ptr<RuntimeParticleEmitterObject>() )
             {
                 ParticleSystemWrapper & particleSystemWrapper = object->GetAssociatedParticleSystemWrapper();
                 particleSystemWrapper.group->addModifier(modifier);

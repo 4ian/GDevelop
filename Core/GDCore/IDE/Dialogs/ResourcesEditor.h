@@ -17,7 +17,7 @@
 //*)
 #include <wx/srchctrl.h>
 #include <wx/aui/aui.h>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd { class ResourceLibraryDialog; }
 namespace gd { class Project; }

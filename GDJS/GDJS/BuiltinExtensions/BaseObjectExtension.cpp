@@ -172,7 +172,7 @@ BaseObjectExtension::BaseObjectExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
 
         GetAllActions()["MoveObjects"].codeExtraInformation
-            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
 
     {
@@ -237,7 +237,7 @@ BaseObjectExtension::BaseObjectExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
 
         objectActions["MettreXY"].codeExtraInformation
-            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:

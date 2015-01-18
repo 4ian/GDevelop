@@ -3,6 +3,7 @@
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+#include <algorithm>
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
@@ -102,8 +103,8 @@ gd::AutomatismMetadata & PlatformExtension::AddAutomatism(const std::string & na
                                                       const std::string & group,
                                                       const std::string & icon24x24,
                                                       const std::string & className,
-                                                      boost::shared_ptr<gd::Automatism> instance,
-                                                      boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance)
+                                                      std::shared_ptr<gd::Automatism> instance,
+                                                      std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance)
 {
     std::string nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
     automatismsInfo[nameWithNamespace] = AutomatismMetadata(GetNameSpace(), nameWithNamespace, fullname, defaultName, description, group, icon24x24, className, instance, sharedDatasInstance);
@@ -115,7 +116,7 @@ gd::EventMetadata & PlatformExtension::AddEvent(const std::string & name_,
                                                  const std::string & description_,
                                                  const std::string & group_,
                                                  const std::string & smallicon_,
-                                                 boost::shared_ptr<gd::BaseEvent> instance_)
+                                                 std::shared_ptr<gd::BaseEvent> instance_)
 {
 #if defined(GD_IDE_ONLY)
     std::string nameWithNamespace = GetNameSpace().empty() ? name_ : GetNameSpace()+name_;
@@ -271,17 +272,17 @@ gd::BaseEventSPtr PlatformExtension::CreateEvent(std::string eventType) const
 {
     if ( eventsInfos.find(eventType) != eventsInfos.end()) {
 
-        if (eventsInfos.find(eventType)->second.instance == boost::shared_ptr<BaseEvent>()) {
+        if (eventsInfos.find(eventType)->second.instance == std::shared_ptr<BaseEvent>()) {
             std::cout << "ERROR: Extension " << name << " (" << nameSpace << ")"
                 << " claims to have event of type " << eventType
                 << " but the instance provided is NULL." << std::endl;
-            return boost::shared_ptr<gd::BaseEvent>();
+            return std::shared_ptr<gd::BaseEvent>();
         }
 
         return gd::BaseEventSPtr(eventsInfos.find(eventType)->second.instance->Clone());
     }
 
-    return boost::shared_ptr<gd::BaseEvent>();
+    return std::shared_ptr<gd::BaseEvent>();
 }
 #endif
 
@@ -302,12 +303,12 @@ Automatism* PlatformExtension::CreateAutomatism(std::string type) const
 }
 
 
-boost::shared_ptr<gd::AutomatismsSharedData> PlatformExtension::CreateAutomatismSharedDatas(std::string type) const
+std::shared_ptr<gd::AutomatismsSharedData> PlatformExtension::CreateAutomatismSharedDatas(std::string type) const
 {
     if ( automatismsInfo.find(type) != automatismsInfo.end() && automatismsInfo.find(type)->second.GetSharedDataInstance())
         return automatismsInfo.find(type)->second.GetSharedDataInstance()->Clone();
 
-    return boost::shared_ptr<gd::AutomatismsSharedData>();
+    return std::shared_ptr<gd::AutomatismsSharedData>();
 }
 
 
@@ -383,7 +384,7 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
         return;
     }
 
-    boost::shared_ptr<gd::PlatformExtension> extension = platform->GetExtension(extensionName);
+    std::shared_ptr<gd::PlatformExtension> extension = platform->GetExtension(extensionName);
     if ( !extension ) {
         std::cout << "Unable to clone extension \""<< extensionName << "\" from " << platformName << ": This extension doesn't exist.";
         return;
@@ -395,19 +396,19 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
     {
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllActions().begin();it != GetAllActions().end();++it)
             it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
-                .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+                .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllConditions().begin();it != GetAllConditions().end();++it)
             it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
-                .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+                .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = GetAllExpressions().begin();it != GetAllExpressions().end();++it)
             it->second.codeExtraInformation.SetFunctionName("")
-                .SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
+                .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = GetAllStrExpressions().begin();it != GetAllStrExpressions().end();++it)
             it->second.codeExtraInformation.SetFunctionName("")
-                .SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
+                .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
         for(std::map<std::string, gd::ObjectMetadata >::iterator objIt = objectsInfos.begin();objIt!=objectsInfos.end();++objIt)
         {
@@ -415,19 +416,19 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.conditionsInfos.begin();it != obj.conditionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.expressionsInfos.begin();it != obj.expressionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.strExpressionsInfos.begin();it != obj.strExpressionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
         }
 
         for(std::map<std::string, gd::AutomatismMetadata >::iterator objIt = automatismsInfo.begin();objIt!=automatismsInfo.end();++objIt)
@@ -436,23 +437,23 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.conditionsInfos.begin();it != obj.conditionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.expressionsInfos.begin();it != obj.expressionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.strExpressionsInfos.begin();it != obj.strExpressionsInfos.end();++it)
                 it->second.codeExtraInformation.SetFunctionName("")
-                    .SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
+                    .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
         }
 
         for(std::map<std::string, gd::EventMetadata >::iterator it = eventsInfos.begin();it!=eventsInfos.end();++it)
-            it->second.codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>();
+            it->second.codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>();
     }
 }
 
@@ -461,7 +462,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
     for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllActions().begin();it != GetAllActions().end();)
     {
         if ( it->second.codeExtraInformation.functionCallName.empty() &&
-             it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
+             it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
         {
             GetAllActions().erase(it++);
         }
@@ -471,7 +472,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
     for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllConditions().begin();it != GetAllConditions().end();)
     {
         if ( it->second.codeExtraInformation.functionCallName.empty() &&
-             it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
+             it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
         {
             GetAllConditions().erase(it++);
         }
@@ -481,7 +482,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
     for (std::map<std::string, gd::ExpressionMetadata >::iterator it = GetAllExpressions().begin();it != GetAllExpressions().end();)
     {
         if ( it->second.codeExtraInformation.functionCallName.empty() &&
-             it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
+             it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
         {
             GetAllExpressions().erase(it++);
         }
@@ -491,7 +492,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
     for (std::map<std::string, gd::ExpressionMetadata >::iterator it = GetAllStrExpressions().begin();it != GetAllStrExpressions().end();)
     {
         if ( it->second.codeExtraInformation.functionCallName.empty() &&
-             it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
+             it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
         {
             GetAllStrExpressions().erase(it++);
         }
@@ -505,7 +506,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
             {
                 obj.actionsInfos.erase(it++);
             }
@@ -515,7 +516,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.conditionsInfos.begin();it != obj.conditionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
             {
                 obj.conditionsInfos.erase(it++);
             }
@@ -525,7 +526,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.expressionsInfos.begin();it != obj.expressionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
             {
                 obj.expressionsInfos.erase(it++);
             }
@@ -535,7 +536,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.strExpressionsInfos.begin();it != obj.strExpressionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
             {
                 obj.strExpressionsInfos.erase(it++);
             }
@@ -550,7 +551,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
             {
                 obj.actionsInfos.erase(it++);
             }
@@ -560,7 +561,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.conditionsInfos.begin();it != obj.conditionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>())
             {
                 obj.conditionsInfos.erase(it++);
             }
@@ -570,7 +571,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.expressionsInfos.begin();it != obj.expressionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
             {
                 obj.expressionsInfos.erase(it++);
             }
@@ -580,7 +581,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.strExpressionsInfos.begin();it != obj.strExpressionsInfos.end();)
         {
             if ( it->second.codeExtraInformation.functionCallName.empty() &&
-                 it->second.codeExtraInformation.optionalCustomCodeGenerator == boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
+                 it->second.codeExtraInformation.optionalCustomCodeGenerator == std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>())
             {
                 obj.strExpressionsInfos.erase(it++);
             }
@@ -590,7 +591,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
 
     for(std::map<std::string, gd::EventMetadata >::iterator it = eventsInfos.begin();it!=eventsInfos.end();)
     {
-        if ( it->second.codeGeneration == boost::shared_ptr<gd::EventMetadata::CodeGenerator>())
+        if ( it->second.codeGeneration == std::shared_ptr<gd::EventMetadata::CodeGenerator>())
             eventsInfos.erase(it++);
         else ++it;
     }

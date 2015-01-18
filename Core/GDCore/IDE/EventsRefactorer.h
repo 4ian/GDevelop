@@ -7,8 +7,7 @@
 #define GDCORE_EVENTSREFACTORER_H
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 namespace gd { class EventsList; }
 namespace gd { class Layout; }
 namespace gd { class Platform; }
@@ -16,7 +15,7 @@ namespace gd { class Project; }
 namespace gd { class ExternalEvents; }
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
-namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
+namespace gd {typedef std::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 
 namespace gd
 {
@@ -29,11 +28,11 @@ namespace gd
 class GD_CORE_API EventsSearchResult
 {
 public:
-    EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
+    EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
     EventsSearchResult();
     ~EventsSearchResult() {};
 
-    boost::weak_ptr<gd::BaseEvent> event;
+    std::weak_ptr<gd::BaseEvent> event;
     gd::EventsList * eventsList;
     unsigned int positionInList;
 };

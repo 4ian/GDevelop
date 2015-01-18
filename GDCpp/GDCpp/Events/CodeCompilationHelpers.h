@@ -13,7 +13,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/System.hpp>
 #include "GDCpp/IDE/CodeCompiler.h"
 namespace gd {class ArbitraryResourceWorker;}

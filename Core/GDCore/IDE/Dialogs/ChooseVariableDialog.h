@@ -26,7 +26,7 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class Variable; }
 #include <wx/toolbar.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 namespace gd
@@ -154,7 +154,7 @@ private:
     wxTreeListItem GetPreviousSibling(wxTreeListCtrl * ctrl, wxTreeListItem item);
 
     gd::VariablesContainer & variablesContainer; ///< gd::VariablesContainer storing the variables
-    boost::shared_ptr<gd::VariablesContainer> temporaryContainer; ///< Temporary container used to allow to make temporary changes before applying them to the real variables container if Ok is pressed.
+    std::shared_ptr<gd::VariablesContainer> temporaryContainer; ///< Temporary container used to allow to make temporary changes before applying them to the real variables container if Ok is pressed.
     bool editingOnly; ///< If set to true, the dialog will act as a dialog to edit the variables and not to choose one ( Double click won't close the dialog for example ).
     const gd::Project * associatedProject;
     const gd::Layout * associatedLayout;

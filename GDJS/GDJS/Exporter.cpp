@@ -3,6 +3,7 @@
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+#include <algorithm>
 #include <sstream>
 #include <fstream>
 #include <streambuf>
@@ -348,10 +349,10 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
 
 bool Exporter::ExportExternalSourceFiles(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles)
 {
-    const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = project.GetAllSourceFiles();
+    const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = project.GetAllSourceFiles();
     for (unsigned int i = 0;i<allFiles.size();++i)
     {
-        if (allFiles[i] == boost::shared_ptr<gd::SourceFile>() ) continue;
+        if (allFiles[i] == std::shared_ptr<gd::SourceFile>() ) continue;
         if (allFiles[i]->GetLanguage() != "Javascript" ) continue;
 
         gd::SourceFile & file = *allFiles[i];

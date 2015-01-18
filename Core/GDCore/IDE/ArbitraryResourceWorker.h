@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}
 namespace gd {class EventsList;}

@@ -64,15 +64,15 @@ public:
     MainFrame(wxWindow* parent );
     virtual ~MainFrame();
 
-    vector < boost::shared_ptr<gd::Project> > games; ///< All games opened
+    vector < std::shared_ptr<gd::Project> > games; ///< All games opened
     unsigned int projectCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
 
     /**
      * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
      */
-    inline boost::shared_ptr<gd::Project> GetCurrentGame()
+    inline std::shared_ptr<gd::Project> GetCurrentGame()
     {
-        if ( projectCurrentlyEdited >= games.size()) return boost::shared_ptr<gd::Project> ();
+        if ( projectCurrentlyEdited >= games.size()) return std::shared_ptr<gd::Project> ();
 
         return games[projectCurrentlyEdited];
     }

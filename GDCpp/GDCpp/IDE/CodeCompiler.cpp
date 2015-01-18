@@ -258,7 +258,7 @@ void CodeCompiler::StartTheNextTask()
     NotifyControls();
     bool skip = false; //Set to true if the preworker of the task asked to relaunch the task later.
 
-    if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+    if ( currentTask.preWork != std::shared_ptr<CodeCompilerExtraWork>() )
     {
         std::cout << "Launching pre work..." << std::endl;
         bool result = currentTask.preWork->Execute();
@@ -378,7 +378,7 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
 
     //Now do post work and notify task has been done.
     {
-        if (currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+        if (currentTask.postWork != std::shared_ptr<CodeCompilerExtraWork>() )
         {
             std::cout << "Launching post task" << std::endl;
             currentTask.postWork->compilationSucceeded = compilationSucceeded;
@@ -421,7 +421,7 @@ void CodeCompiler::SendCurrentThreadToGarbage()
     garbageThreads.push_back(currentTaskThread);
     livingGarbageThreadsCount++; //We increment livingGarbageThreadsCount as the thread sent to garbageThreads was alive ( i.e. : doing work )
 
-    currentTaskThread = boost::shared_ptr<sf::Thread>();
+    currentTaskThread = std::shared_ptr<sf::Thread>();
     processLaunched = false;
 }*/
 

@@ -7,7 +7,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/Graphics/Sprite.hpp>
 #include "GDCore/BuiltinExtensions/SpriteExtension/Point.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.h"
@@ -160,17 +160,17 @@ public:
     /**
      * Set a new image to the Sprite
      */
-    void LoadImage(boost::shared_ptr<SFMLTextureWrapper> image);
+    void LoadImage(std::shared_ptr<SFMLTextureWrapper> image);
 
     /**
      * Get SFML Image used by the sprite
      */
-    boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() { return sfmlImage; };
+    std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() { return sfmlImage; };
 
     /**
      * Get SFML Image used by the sprite
      */
-    const boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() const { return sfmlImage; };
+    const std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() const { return sfmlImage; };
 
     /**
      * Make the sprite, if it uses an image from ImageManager,
@@ -184,7 +184,7 @@ private:
 
     #if !defined(EMSCRIPTEN)
     sf::Sprite sfmlSprite; ///< Displayed SFML sprite
-    boost::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
+    std::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
     #endif
     std::string image; ///< Name of the image to be loaded in Image Manager.

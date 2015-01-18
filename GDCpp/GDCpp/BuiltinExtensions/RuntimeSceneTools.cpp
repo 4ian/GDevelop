@@ -95,14 +95,14 @@ void DoCreateObjectOnScene(RuntimeScene & scene, std::string objectName, std::ma
     std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
     std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
 
-    RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
+    RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
 
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
     else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-    if ( newObject == boost::shared_ptr<RuntimeObject> () )
+    if ( newObject == std::shared_ptr<RuntimeObject> () )
         return; //Unable to create the object
 
     //Set up the object
@@ -215,8 +215,8 @@ const std::string& GD_API GetVariableString(const gd::Variable & variable)
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 {
     //Retrieve the image
-    boost::shared_ptr<SFMLTextureWrapper> image = scene.GetImageManager()->GetSFMLTexture(imageName);
-    if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
+    std::shared_ptr<SFMLTextureWrapper> image = scene.GetImageManager()->GetSFMLTexture(imageName);
+    if ( image == std::shared_ptr<SFMLTextureWrapper>() )
         return;
 
     scene.renderWindow->setIcon(image->image.getSize().x, image->image.getSize().y, image->image.getPixelsPtr());

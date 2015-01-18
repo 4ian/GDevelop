@@ -177,12 +177,12 @@ void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, Event
         SerializerElement & eventElem = events.GetChild(i);
         std::string type = eventElem.GetChild("type", 0, "Type").GetValue().GetString();
         gd::BaseEventSPtr event = project.CreateEvent(type);
-        if ( event != boost::shared_ptr<gd::BaseEvent>())
+        if ( event != std::shared_ptr<gd::BaseEvent>())
             event->UnserializeFrom(project, eventElem);
         else
         {
             std::cout << "WARNING: Unknown event of type " << type << std::endl;
-            event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
+            event = std::shared_ptr<gd::BaseEvent>(new EmptyEvent);
         }
 
         event->SetDisabled(eventElem.GetBoolAttribute("disabled"));

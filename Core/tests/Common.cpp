@@ -77,7 +77,7 @@ TEST_CASE( "EventsList", "[common][events]" ) {
     SECTION("Basics") {
         gd::EventsList list;
         gd::EmptyEvent event1;
-        boost::shared_ptr<gd::BaseEvent> event2(new gd::EmptyEvent);
+        std::shared_ptr<gd::BaseEvent> event2(new gd::EmptyEvent);
         list.InsertEvent(event1);
         list.InsertEvent(event2);
         REQUIRE( &list.GetEvent(0) != &event1 ); //First event inserted by copy

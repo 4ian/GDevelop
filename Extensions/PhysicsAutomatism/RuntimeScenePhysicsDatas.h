@@ -22,7 +22,7 @@ class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedData
 public:
     RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas);
     virtual ~RuntimeScenePhysicsDatas();
-    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePhysicsDatas(*this));}
+    virtual std::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePhysicsDatas(*this));}
 
     b2World * world;
     ContactListener * contactListener;

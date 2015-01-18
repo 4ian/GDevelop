@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
@@ -340,7 +340,7 @@ public:
     ///@}
 
     //TODO: Send this to private part.
-    std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
+    std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
     //TODO: GD C++ Platform specific code below
     #if defined(GD_IDE_ONLY)
@@ -457,8 +457,8 @@ private:
  * \brief Functor testing layout name.
  * \see gd::Layout
  */
-struct LayoutHasName : public std::binary_function<boost::shared_ptr<Layout>, std::string, bool> {
-    bool operator()(const boost::shared_ptr<Layout> & layout, std::string name) const { return layout->GetName() == name; }
+struct LayoutHasName : public std::binary_function<std::shared_ptr<Layout>, std::string, bool> {
+    bool operator()(const std::shared_ptr<Layout> & layout, std::string name) const { return layout->GetName() == name; }
 };
 
 /**

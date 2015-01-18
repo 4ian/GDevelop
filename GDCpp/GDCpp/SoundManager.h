@@ -9,7 +9,7 @@
 #include <SFML/Audio.hpp>
 #include "GDCpp/Sound.h"
 #include "GDCpp/Music.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>
@@ -27,28 +27,28 @@ using namespace std;
 class GD_API SoundManager
 {
 public:
-    vector < boost::shared_ptr<Music> >  musics;
-    vector < boost::shared_ptr<Sound> >  sounds;
+    vector < std::shared_ptr<Music> >  musics;
+    vector < std::shared_ptr<Sound> >  sounds;
 
     /**
      * Return pointer to a music on a channel
      */
-    boost::shared_ptr<Music> & GetMusicOnChannel(int channel);
+    std::shared_ptr<Music> & GetMusicOnChannel(int channel);
 
     /**
      * Change music on a channel. Automatically destroy the old music.
      */
-    void SetMusicOnChannel(int channel, boost::shared_ptr<Music> music);
+    void SetMusicOnChannel(int channel, std::shared_ptr<Music> music);
 
     /**
      * Return pointer to a sound on a channel
      */
-    boost::shared_ptr<Sound> & GetSoundOnChannel(int channel);
+    std::shared_ptr<Sound> & GetSoundOnChannel(int channel);
 
     /**
      * Change sound on a channel. Automatically destroy the old sound.
      */
-    void SetSoundOnChannel(int channel, boost::shared_ptr<Sound> sound);
+    void SetSoundOnChannel(int channel, std::shared_ptr<Sound> sound);
 
     /**
      * Get global game sound volume.
@@ -105,8 +105,8 @@ public:
 
 private:
 
-    std::map<unsigned int, boost::shared_ptr<Sound> >  soundsChannel;
-    std::map<unsigned int, boost::shared_ptr<Music> >  musicsChannel;
+    std::map<unsigned int, std::shared_ptr<Sound> >  soundsChannel;
+    std::map<unsigned int, std::shared_ptr<Music> >  musicsChannel;
 
     float globalVolume;
 

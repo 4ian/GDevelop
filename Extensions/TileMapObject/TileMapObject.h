@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon2d.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 
 #include "TileMapProxies.h"

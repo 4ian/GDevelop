@@ -19,11 +19,11 @@ class GD_EXTENSION_API SceneLightObstacleDatas : public gd::AutomatismsSharedDat
 public:
     SceneLightObstacleDatas() {};
     virtual ~SceneLightObstacleDatas() {};
-    virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas(*this));}
+    virtual std::shared_ptr<gd::AutomatismsSharedData> Clone() const { return std::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas(*this));}
 
-    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
+    virtual std::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
     {
-        return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneLightObstacleDatas(*this));
+        return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneLightObstacleDatas(*this));
     }
 
     #if defined(GD_IDE_ONLY)

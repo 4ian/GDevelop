@@ -70,37 +70,37 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
     extension.AddEvent("Standard", _("Standard event"),
               _("Standard event: Actions are run if conditions are fulfilled."),
               "", "res/eventaddicon.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::StandardEvent));
 
     extension.AddEvent("Link", _("Link"),
               _("Link to some external events"),
               "", "res/lienaddicon.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::LinkEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::LinkEvent));
 
     extension.AddEvent("Comment", _("Comment"),
               _("Event displaying a text in the events editor"),
               "", "res/comment.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::CommentEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::CommentEvent));
 
     extension.AddEvent("While", _("While"),
               _("The event is repeated while the conditions are true"),
               "", "res/while.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::WhileEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::WhileEvent));
 
     extension.AddEvent("Repeat", _("Repeat"),
               _("Event repeated a number of times"),
               "", "res/repeat.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent));
 
     extension.AddEvent("ForEach", _("For each object"),
               _("Repeat the event for each specified object."),
               "", "res/foreach.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent));
 
     extension.AddEvent("Group", _("Group"),
               _("Group containing events"),
               "", "res/foreach.png",
-              boost::shared_ptr<gd::BaseEvent>(new gd::GroupEvent));
+              std::shared_ptr<gd::BaseEvent>(new gd::GroupEvent));
 #endif
 }
 

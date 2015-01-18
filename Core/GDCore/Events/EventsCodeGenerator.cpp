@@ -1,4 +1,4 @@
-
+#include <algorithm>
 #include <utility>
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -188,7 +188,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
     AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
     maxConditionsListsSize = std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
-    if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
     {
         context.EnterCustomCondition();
         conditionCode += GenerateReferenceToUpperScopeBoolean("conditionTrue", returnBoolean, context);
@@ -341,7 +341,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 
     AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
 
-    if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
     {
         return instrInfos.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(action, *this, context);
     }

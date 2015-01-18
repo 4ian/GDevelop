@@ -5,7 +5,7 @@ Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "DestroyOutsideAutomatism.h"

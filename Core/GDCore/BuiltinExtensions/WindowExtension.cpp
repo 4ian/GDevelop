@@ -26,6 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    _("Scene"),
                    "res/actions/texte24.png",
                    "res/actions/texte.png")
+        .SetHidden() //Deprecated
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("expression", _("X position"), "",false)

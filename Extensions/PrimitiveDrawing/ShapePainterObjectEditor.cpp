@@ -7,45 +7,45 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 
-#include "DrawerObjectEditor.h"
+#include "ShapePainterObjectEditor.h"
 
-//(*InternalHeaders(DrawerObjectEditor)
+//(*InternalHeaders(ShapePainterObjectEditor)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
 #include <wx/colordlg.h>
 
 #include "GDCpp/Project.h"
-#include "DrawerObject.h"
+#include "ShapePainterObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
-//(*IdInit(DrawerObjectEditor)
-const long DrawerObjectEditor::ID_STATICTEXT3 = wxNewId();
-const long DrawerObjectEditor::ID_BUTTON1 = wxNewId();
-const long DrawerObjectEditor::ID_STATICTEXT5 = wxNewId();
-const long DrawerObjectEditor::ID_SPINCTRL3 = wxNewId();
-const long DrawerObjectEditor::ID_STATICTEXT1 = wxNewId();
-const long DrawerObjectEditor::ID_BUTTON3 = wxNewId();
-const long DrawerObjectEditor::ID_STATICTEXT2 = wxNewId();
-const long DrawerObjectEditor::ID_SPINCTRL2 = wxNewId();
-const long DrawerObjectEditor::ID_STATICTEXT4 = wxNewId();
-const long DrawerObjectEditor::ID_SPINCTRL1 = wxNewId();
-const long DrawerObjectEditor::ID_RADIOBOX1 = wxNewId();
-const long DrawerObjectEditor::ID_STATICLINE1 = wxNewId();
-const long DrawerObjectEditor::ID_BUTTON2 = wxNewId();
-const long DrawerObjectEditor::ID_BUTTON4 = wxNewId();
+//(*IdInit(ShapePainterObjectEditor)
+const long ShapePainterObjectEditor::ID_STATICTEXT3 = wxNewId();
+const long ShapePainterObjectEditor::ID_BUTTON1 = wxNewId();
+const long ShapePainterObjectEditor::ID_STATICTEXT5 = wxNewId();
+const long ShapePainterObjectEditor::ID_SPINCTRL3 = wxNewId();
+const long ShapePainterObjectEditor::ID_STATICTEXT1 = wxNewId();
+const long ShapePainterObjectEditor::ID_BUTTON3 = wxNewId();
+const long ShapePainterObjectEditor::ID_STATICTEXT2 = wxNewId();
+const long ShapePainterObjectEditor::ID_SPINCTRL2 = wxNewId();
+const long ShapePainterObjectEditor::ID_STATICTEXT4 = wxNewId();
+const long ShapePainterObjectEditor::ID_SPINCTRL1 = wxNewId();
+const long ShapePainterObjectEditor::ID_RADIOBOX1 = wxNewId();
+const long ShapePainterObjectEditor::ID_STATICLINE1 = wxNewId();
+const long ShapePainterObjectEditor::ID_BUTTON2 = wxNewId();
+const long ShapePainterObjectEditor::ID_BUTTON4 = wxNewId();
 //*)
 
-BEGIN_EVENT_TABLE(DrawerObjectEditor,wxDialog)
-	//(*EventTable(DrawerObjectEditor)
+BEGIN_EVENT_TABLE(ShapePainterObjectEditor,wxDialog)
+	//(*EventTable(ShapePainterObjectEditor)
 	//*)
 END_EVENT_TABLE()
 
-DrawerObjectEditor::DrawerObjectEditor( wxWindow* parent, gd::Project & game_, DrawerObject & object_ ) :
+ShapePainterObjectEditor::ShapePainterObjectEditor( wxWindow* parent, gd::Project & game_, ShapePainterObject & object_ ) :
 game(game_),
 object(object_)
 {
-	//(*Initialize(DrawerObjectEditor)
+	//(*Initialize(ShapePainterObjectEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
@@ -115,10 +115,10 @@ object(object_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OnfillColorBtClick);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OnoutlineColorBtClick);
-	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OnokBtClick);
-	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OncancelBtClick);
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ShapePainterObjectEditor::OnfillColorBtClick);
+	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ShapePainterObjectEditor::OnoutlineColorBtClick);
+	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ShapePainterObjectEditor::OnokBtClick);
+	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ShapePainterObjectEditor::OncancelBtClick);
 	//*)
 
 	fillOpacityEdit->SetValue(object.GetFillOpacity());
@@ -132,16 +132,16 @@ object(object_)
         coordinatesRadio->SetSelection(1);
 }
 
-DrawerObjectEditor::~DrawerObjectEditor()
+ShapePainterObjectEditor::~ShapePainterObjectEditor()
 {
-	//(*Destroy(DrawerObjectEditor)
+	//(*Destroy(ShapePainterObjectEditor)
 	//*)
 }
 
 /**
  * Click on Ok : Update the object according to the editor.
  */
-void DrawerObjectEditor::OnokBtClick(wxCommandEvent& event)
+void ShapePainterObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetFillOpacity(fillOpacityEdit->GetValue());
     object.SetFillColor(static_cast<int>(fillColorBt->GetBackgroundColour().Red()),
@@ -161,12 +161,12 @@ void DrawerObjectEditor::OnokBtClick(wxCommandEvent& event)
     EndModal(1);
 }
 
-void DrawerObjectEditor::OncancelBtClick(wxCommandEvent& event)
+void ShapePainterObjectEditor::OncancelBtClick(wxCommandEvent& event)
 {
     EndModal(0);
 }
 
-void DrawerObjectEditor::OnfillColorBtClick(wxCommandEvent& event)
+void ShapePainterObjectEditor::OnfillColorBtClick(wxCommandEvent& event)
 {
     wxColour color = wxGetColourFromUser(this, fillColorBt->GetBackgroundColour());
     if ( color.IsOk() )
@@ -175,7 +175,7 @@ void DrawerObjectEditor::OnfillColorBtClick(wxCommandEvent& event)
     }
 }
 
-void DrawerObjectEditor::OnoutlineColorBtClick(wxCommandEvent& event)
+void ShapePainterObjectEditor::OnoutlineColorBtClick(wxCommandEvent& event)
 {
     wxColour color = wxGetColourFromUser(this, outlineColorBt->GetBackgroundColour());
     if ( color.IsOk() )

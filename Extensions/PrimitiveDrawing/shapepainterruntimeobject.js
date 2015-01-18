@@ -103,12 +103,12 @@ gdjs.ShapePainterRuntimeObject.prototype.getFillOpacity = function() {
     return this._fillOpacity;
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.setOutline = function(opacity) {
+gdjs.ShapePainterRuntimeObject.prototype.setOutlineOpacity = function(opacity) {
     this._outlineOpacity = opacity;
     this._graphics.lineStyle(this._outlineSize, this._outlineColor, this._outlineOpacity / 255);
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.getOutline = function() {
+gdjs.ShapePainterRuntimeObject.prototype.getOutlineOpacity = function() {
     return this._outlineOpacity;
 };
 

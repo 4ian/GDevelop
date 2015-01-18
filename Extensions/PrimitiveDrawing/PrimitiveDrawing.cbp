@@ -321,7 +321,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					
+
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -360,8 +360,8 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					
-					
+
+
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
@@ -405,8 +405,8 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-					
-					
+
+
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
@@ -449,7 +449,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
-					
+
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -487,7 +487,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					
+
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -529,7 +529,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
-					
+
 					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option='-DGD_CORE_API=&quot;&quot;' />
@@ -572,10 +572,10 @@
 			<Add directory="../../ExtLibs/SFML/build-mingw-debug/lib" />
 			<Add directory="../../ExtLibs/SFML/build-mingw-release/lib" />
 		</Linker>
-		<Unit filename="DrawerObject.cpp" />
-		<Unit filename="DrawerObject.h" />
-		<Unit filename="DrawerObjectEditor.cpp" />
-		<Unit filename="DrawerObjectEditor.h" />
+		<Unit filename="ShapePainterObject.cpp" />
+		<Unit filename="ShapePainterObject.h" />
+		<Unit filename="ShapePainterObjectEditor.cpp" />
+		<Unit filename="ShapePainterObjectEditor.h" />
 		<Unit filename="Extension.cpp" />
 		<Unit filename="PrimitiveDrawingTools.cpp" />
 		<Unit filename="PrimitiveDrawingTools.h" />
@@ -586,7 +586,7 @@
 			<lib_finder disable_auto="1" />
 			<wxsmith version="1">
 				<resources>
-					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" fwddecl="0" i18n="1" name="DrawerObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/ShapePainterObjectEditor.wxs" src="ShapePainterObjectEditor.cpp" hdr="ShapePainterObjectEditor.h" fwddecl="0" i18n="1" name="ShapePainterObjectEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

@@ -239,7 +239,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setHeight = function(height) {
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z != this.zOrder ) {
+    if ( z !== this.zOrder ) {
         this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._spritesContainer, z);
         this.zOrder = z;
    }

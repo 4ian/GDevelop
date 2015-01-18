@@ -299,6 +299,7 @@ void RuntimeDrawerObject::DrawCircle( float x, float y, float radius )
     sf::CircleShape circle(radius);
     DrawingCommand command(circle);
     command.circleShape.setPosition(x+Xgap, y+Ygap);
+    command.circleShape.setOrigin(radius, radius);
     command.circleShape.setFillColor(sf::Color(GetFillColorR(), GetFillColorG(), GetFillColorB(), GetFillOpacity()));
     command.circleShape.setOutlineThickness(GetOutlineSize());
     command.circleShape.setOutlineColor(sf::Color(GetOutlineColorR(), GetOutlineColorG(), GetOutlineColorB(), GetOutlineOpacity()));

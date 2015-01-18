@@ -16,10 +16,8 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.texture);
     if ( this._tiledSprite === undefined ) {
-        //var texture = PIXI.Texture.fromImage("p2.jpeg");
         this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
-    }
-    else {
+    } else {
         this._tiledSprite.setTexture(texture);
     }
 
@@ -121,7 +119,7 @@ gdjs.TiledSpriteRuntimeObject.prototype.getYOffset = function() {
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z != this.zOrder ) {
+    if ( z !== this.zOrder ) {
         this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._tiledSprite, z);
         this.zOrder = z;
    }

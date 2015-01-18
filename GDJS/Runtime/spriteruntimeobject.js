@@ -758,7 +758,7 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
  * @param z {Number} The new Z order position of the object
  */
 gdjs.SpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z != this.zOrder ) {
+    if ( z !== this.zOrder ) {
         //TODO: Pass the runtimeScene as parameter ?
         this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._sprite, z);
         this.zOrder = z;

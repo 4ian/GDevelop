@@ -7,8 +7,165 @@ This project is released under the MIT License.
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include "DrawerObject.h"
+#include "ShapePainterObject.h"
 #include <boost/version.hpp>
+
+void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
+{
+    extension.SetExtensionInformation("PrimitiveDrawing",
+                  _("Primitive drawing"),
+                  _("Extension allowing to draw shapes and manipulate images."),
+                  "Florian Rival",
+                  "Open source (MIT License)");
+
+    gd::ObjectMetadata & obj = extension.AddObject("Drawer", //"Drawer" is kept for compatibility with GD<=3.6.76
+               _("Shape painter"),
+               _("Allows to draw simple shapes on the screen"),
+               "CppPlatform/Extensions/primitivedrawingicon.png",
+               &CreateShapePainterObject);
+
+    #if defined(GD_IDE_ONLY)
+    ShapePainterObject::LoadEdittimeIcon();
+    obj.SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("Rectangle",
+                   _("Rectangle"),
+                   _("Draw a rectangle on screen"),
+                   _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rectangle with _PARAM0_"),
+                   _("Drawing"),
+                   "res/actions/rectangle24.png",
+                   "res/actions/rectangle.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("expression", _("Top left side: X Position"))
+        .AddParameter("expression", _("Top left side : Y Position"))
+        .AddParameter("expression", _("Bottom right side : X Position"))
+        .AddParameter("expression", _("Bottom right side : Y Position"))
+        .codeExtraInformation.SetFunctionName("DrawRectangle").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("Circle",
+                   _("Circle"),
+                   _("Draw a circle on screen"),
+                   _("Draw at _PARAM1_;_PARAM2_ a circle of radius _PARAM3_ with _PARAM0_"),
+                   _("Drawing"),
+                   "res/actions/circle24.png",
+                   "res/actions/circle.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("expression", _("X position of center"))
+        .AddParameter("expression", _("Y position of center"))
+        .AddParameter("expression", _("Radius ( in pixels )"))
+        .codeExtraInformation.SetFunctionName("DrawCircle").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("Line",
+                   _("Line"),
+                   _("Draw a line  on screen"),
+                   _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness  : _PARAM5_) with _PARAM0_"),
+                   _("Drawing"),
+                   "res/actions/line24.png",
+                   "res/actions/line.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("expression", _("X Position of start point"))
+        .AddParameter("expression", _("Y Position of start point"))
+        .AddParameter("expression", _("X Position of end point"))
+        .AddParameter("expression", _("Y Position of end point"))
+        .AddParameter("expression", _("Thickness ( in pixels )"))
+        .codeExtraInformation.SetFunctionName("DrawLine").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("FillColor",
+                   _("Fill color"),
+                   _("Change the color of filling"),
+                   _("Change fill color of _PARAM0_ to _PARAM1_"),
+                   _("Setup"),
+                   "res/actions/text24.png",
+                   "res/actions/text.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("color", _("Fill color"))
+        .codeExtraInformation.SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("OutlineColor",
+                   _("Outline color"),
+                   _("Modify the color of the outline of future drawings."),
+                   _("Change outline color of _PARAM0_ to _PARAM1_"),
+                   _("Setup"),
+                   "res/actions/color24.png",
+                   "res/actions/color.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("color", _("Color"))
+        .codeExtraInformation.SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("OutlineSize",
+                   _("Outline size"),
+                   _("Modify the size of the outline of future drawings."),
+                   _("Do _PARAM1__PARAM2_ to the size of the outline of _PARAM0_"),
+                   _("Setup"),
+                   "res/actions/outlineSize24.png",
+                   "res/actions/outlineSize.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Size in pixels"))
+        .codeExtraInformation.SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetAssociatedGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddCondition("OutlineSize",
+                   _("Outline size"),
+                   _("Test the size of the outline."),
+                   _("The size of the outline of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Setup"),
+                   "res/conditions/outlineSize24.png",
+                   "res/conditions/outlineSize.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Size to test"))
+        .codeExtraInformation.SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("FillOpacity",
+                   _("Fill opacity"),
+                   _("Modify the opacity of filling of future drawings."),
+                   _("Do _PARAM1__PARAM2_ to the opacity of filling of _PARAM0_"),
+                   _("Setup"),
+                   "res/actions/opacity24.png",
+                   "res/actions/opacity.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .codeExtraInformation.SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetAssociatedGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+
+    obj.AddCondition("FillOpacity",
+                   _("Fill opacity"),
+                   _("Test the value of the opacity of the filling."),
+                   _("The opacity of filling of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Setup"),
+                   "res/conditions/opacity24.png",
+                   "res/conditions/opacity.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
+        .codeExtraInformation.SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddAction("OutlineOpacity",
+                   _("Outline opacity"),
+                   _("Modify the opacity of the outline of future drawings."),
+                   _("Do _PARAM1__PARAM2_ to the opacity of the outline of _PARAM0_"),
+                   _("Setup"),
+                   "res/actions/opacity24.png",
+                   "res/actions/opacity.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .codeExtraInformation.SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetAssociatedGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddCondition("OutlineOpacity",
+                   _("Outline opacity"),
+                   _("Test the opacity of the outline."),
+                   _("The opacity of the outline of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Setup"),
+                   "res/conditions/opacity24.png",
+                   "res/conditions/opacity.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
+        .codeExtraInformation.SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+    #endif
+}
 
 /**
  * \brief This class declares information about the extension.
@@ -22,169 +179,11 @@ public:
      */
     Extension()
     {
-        SetExtensionInformation("PrimitiveDrawing",
-                      _("Primitive drawing"),
-                      _("Extension allowing to draw shapes and manipulate images."),
-                      "Florian Rival",
-                      "Open source (MIT License)");
-
-        //Declaration of all objects available
-        {
-            gd::ObjectMetadata & obj = AddObject("Drawer",
-                       _("Shape painter"),
-                       _("Allows to draw simple shapes on the screen"),
-                       "CppPlatform/Extensions/primitivedrawingicon.png",
-                       &CreateDrawerObject);
-
-            AddRuntimeObject(obj, "RuntimeDrawerObject", CreateRuntimeDrawerObject);
-
-            #if defined(GD_IDE_ONLY)
-            DrawerObject::LoadEdittimeIcon();
-            obj.SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("Rectangle",
-                           _("Rectangle"),
-                           _("Draw a rectangle on screen"),
-                           _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rectangle with _PARAM0_"),
-                           _("Drawing"),
-                           "res/actions/rectangle24.png",
-                           "res/actions/rectangle.png")
-                .AddParameter("object", _("Drawer object"), "Drawer", false)
-                .AddParameter("expression", _("Top left side: X Position"))
-                .AddParameter("expression", _("Top left side : Y Position"))
-                .AddParameter("expression", _("Bottom right side : X Position"))
-                .AddParameter("expression", _("Bottom right side : Y Position"))
-                .codeExtraInformation.SetFunctionName("DrawRectangle").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("Circle",
-                           _("Circle"),
-                           _("Draw a circle on screen"),
-                           _("Draw at _PARAM1_;_PARAM2_ a circle of radius _PARAM3_ with _PARAM0_"),
-                           _("Drawing"),
-                           "res/actions/circle24.png",
-                           "res/actions/circle.png")
-                .AddParameter("object", _("Drawer object"), "Drawer", false)
-                .AddParameter("expression", _("X position of center"))
-                .AddParameter("expression", _("Y position of center"))
-                .AddParameter("expression", _("Radius ( in pixels )"))
-                .codeExtraInformation.SetFunctionName("DrawCircle").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("Line",
-                           _("Line"),
-                           _("Draw a line  on screen"),
-                           _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line ( thickness  : _PARAM5_) with _PARAM0_"),
-                           _("Drawing"),
-                           "res/actions/line24.png",
-                           "res/actions/line.png")
-                .AddParameter("object", _("Drawer object"), "Drawer", false)
-                .AddParameter("expression", _("X Position of start point"))
-                .AddParameter("expression", _("Y Position of start point"))
-                .AddParameter("expression", _("X Position of end point"))
-                .AddParameter("expression", _("Y Position of end point"))
-                .AddParameter("expression", _("Thickness ( in pixels )"))
-                .codeExtraInformation.SetFunctionName("DrawLine").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("FillColor",
-                           _("Fill color"),
-                           _("Change the color of filling"),
-                           _("Change fill color of _PARAM0_ to _PARAM1_"),
-                           _("Setup"),
-                           "res/actions/text24.png",
-                           "res/actions/text.png")
-                .AddParameter("object", _("Drawer object"), "Drawer", false)
-                .AddParameter("color", _("Fill color"))
-                .codeExtraInformation.SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("OutlineColor",
-                           _("Outline color"),
-                           _("Modify the color of the outline of future drawings."),
-                           _("Change outline color of _PARAM0_ to _PARAM1_"),
-                           _("Setup"),
-                           "res/actions/color24.png",
-                           "res/actions/color.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("color", _("Color"))
-                .codeExtraInformation.SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("OutlineSize",
-                           _("Outline size"),
-                           _("Modify the size of the outline of future drawings."),
-                           _("Do _PARAM1__PARAM2_ to the size of the outline of _PARAM0_"),
-                           _("Setup"),
-                           "res/actions/outlineSize24.png",
-                           "res/actions/outlineSize.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Size in pixels"))
-                .codeExtraInformation.SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetAssociatedGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddCondition("OutlineSize",
-                           _("Outline size"),
-                           _("Test the size of the outline."),
-                           _("The size of the outline of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Setup"),
-                           "res/conditions/outlineSize24.png",
-                           "res/conditions/outlineSize.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Size to test"))
-                .codeExtraInformation.SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("FillOpacity",
-                           _("Fill opacity"),
-                           _("Modify the opacity of filling of future drawings."),
-                           _("Do _PARAM1__PARAM2_ to the opacity of filling of _PARAM0_"),
-                           _("Setup"),
-                           "res/actions/opacity24.png",
-                           "res/actions/opacity.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetAssociatedGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-
-            obj.AddCondition("FillOpacity",
-                           _("Fill opacity"),
-                           _("Test the value of the opacity of the filling."),
-                           _("The opacity of filling of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Setup"),
-                           "res/conditions/opacity24.png",
-                           "res/conditions/opacity.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddAction("OutlineOpacity",
-                           _("Outline opacity"),
-                           _("Modify the opacity of the outline of future drawings."),
-                           _("Do _PARAM1__PARAM2_ to the opacity of the outline of _PARAM0_"),
-                           _("Setup"),
-                           "res/actions/opacity24.png",
-                           "res/actions/opacity.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetAssociatedGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-            obj.AddCondition("OutlineOpacity",
-                           _("Outline opacity"),
-                           _("Test the opacity of the outline."),
-                           _("The opacity of the outline of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Setup"),
-                           "res/conditions/opacity24.png",
-                           "res/conditions/opacity.png")
-                .AddParameter("object", _("Object"), "Drawer", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
-
-        #endif
-
-        }
+        DeclarePrimitiveDrawingExtension(*this);
+        AddRuntimeObject(GetObjectMetadata("PrimitiveDrawing::Drawer"),
+            "RuntimeShapePainterObject", CreateRuntimeShapePainterObject);
 
         #if defined(GD_IDE_ONLY)
-
         AddAction("CopyImageOnAnother",
                        _("Copy an image on another"),
                        _("Copy an image on another.\nNote that the source image must be preferably kept loaded in memory."),
@@ -262,11 +261,11 @@ public:
             .codeExtraInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
         #endif
-
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 
+#if !defined(EMSCRIPTEN)
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
@@ -274,3 +273,4 @@ public:
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
+#endif

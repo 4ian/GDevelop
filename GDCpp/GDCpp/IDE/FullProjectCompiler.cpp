@@ -288,8 +288,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Encrypt the source file.
     {
-        ifstream ifile(tempDir+"/GDProjectSrcFile.gdg",ios_base::binary);
-        ofstream ofile(tempDir+"/src",ios_base::binary);
+		std::string ifileName = tempDir.ToStdString() + "/GDProjectSrcFile.gdg";
+		std::string ofileName = tempDir.ToStdString() + "/src";
+		
+        ifstream ifile(ifileName.c_str(), ios_base::binary);
+        ofstream ofile(ofileName.c_str(), ios_base::binary);
 
         // get file size
         ifile.seekg(0,ios_base::end);

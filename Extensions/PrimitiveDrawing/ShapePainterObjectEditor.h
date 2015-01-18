@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #ifndef DRAWEROBJECTEDITOR_H
 #define DRAWEROBJECTEDITOR_H
 
-//(*Headers(DrawerObjectEditor)
+//(*Headers(ShapePainterObjectEditor)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/radiobox.h>
@@ -20,20 +20,20 @@ This project is released under the MIT License.
 #include <wx/dialog.h>
 //*)
 namespace gd { class Project; }
-class DrawerObject;
+class ShapePainterObject;
 namespace gd { class MainFrameWrapper; }
 
 /**
  * The editor dialog for drawer objects
  */
-class DrawerObjectEditor: public wxDialog
+class ShapePainterObjectEditor: public wxDialog
 {
 	public:
 
-		DrawerObjectEditor( wxWindow* parent, gd::Project & game_, DrawerObject & object_ );
-		virtual ~DrawerObjectEditor();
+		ShapePainterObjectEditor( wxWindow* parent, gd::Project & game_, ShapePainterObject & object_ );
+		virtual ~ShapePainterObjectEditor();
 
-		//(*Declarations(DrawerObjectEditor)
+		//(*Declarations(ShapePainterObjectEditor)
 		wxStaticText* StaticText2;
 		wxRadioBox* coordinatesRadio;
 		wxSpinCtrl* outlineSizeEdit;
@@ -52,7 +52,7 @@ class DrawerObjectEditor: public wxDialog
 
 	protected:
 
-		//(*Identifiers(DrawerObjectEditor)
+		//(*Identifiers(ShapePainterObjectEditor)
 		static const long ID_STATICTEXT3;
 		static const long ID_BUTTON1;
 		static const long ID_STATICTEXT5;
@@ -71,7 +71,7 @@ class DrawerObjectEditor: public wxDialog
 
 	private:
 
-		//(*Handlers(DrawerObjectEditor)
+		//(*Handlers(ShapePainterObjectEditor)
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnfillColorBtClick(wxCommandEvent& event);
@@ -79,7 +79,7 @@ class DrawerObjectEditor: public wxDialog
 		//*)
 
 		gd::Project & game;
-		DrawerObject & object;
+		ShapePainterObject & object;
 
 		DECLARE_EVENT_TABLE()
 };

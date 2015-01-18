@@ -4,10 +4,16 @@
 #(Right click on file > Properties)
 
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
-./GDIDE
+if [ -z ${1+x} ]; then
+	./GDIDE
+else
+	./GDIDE "$1"
+fi
+
 if [ "$?" = "127" ]; then
 	mkdir -p ~/.GDevelop
 	./GDIDE 1> ~/.GDevelop/errorMsgWhileLoadingGD.txt 2> ~/.GDevelop/errorMsgWhileLoadingGD.txt
+	
 	errorMsg=$(cat < ~/.GDevelop/errorMsgWhileLoadingGD.txt)
 
 	echo "$errorMsg" | grep "loading shared"

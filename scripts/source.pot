@@ -695,7 +695,7 @@ msgstr ""
 #: ../Extensions/TiledSpriteObject/TiledSpriteObjectEditor.cpp:107
 #: ../Extensions/PathAutomatism/PathAutomatismEditor.cpp:262
 #: ../Extensions/Light/LightObjectEditor.cpp:106
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:109
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:109
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:117
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:89
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:162
@@ -741,7 +741,7 @@ msgstr ""
 #: ../Extensions/TiledSpriteObject/TiledSpriteObjectEditor.cpp:109
 #: ../Extensions/PathAutomatism/PathAutomatismEditor.cpp:264
 #: ../Extensions/Light/LightObjectEditor.cpp:108
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:111
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:111
 #: ../Core/GDCore/Events/Builtin/WhileEvent.cpp:167
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:119
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:91
@@ -9116,15 +9116,15 @@ msgid "Italic"
 msgstr ""
 
 #: ../Extensions/TextObject/TextObjectEditor.cpp:91
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:65
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:79
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:65
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:79
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:100
 msgid "Color :"
 msgstr ""
 
 #: ../Extensions/TextObject/TextObjectEditor.cpp:93
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:67
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:81
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:67
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:81
 msgid "Choose the color"
 msgstr ""
 
@@ -9137,7 +9137,7 @@ msgid "Choose the font"
 msgstr ""
 
 #: ../Extensions/TextObject/TextObjectEditor.cpp:104
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:88
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:88
 msgid "Size :"
 msgstr ""
 
@@ -15521,32 +15521,32 @@ msgstr ""
 msgid "Slope max. angle"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:58
-msgid "Edition of the Drawer object"
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:58
+msgid "Edition of the Shape Painter object"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:62
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:62
 msgid "Filling"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:69
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:83
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:69
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:83
 msgid "Opacity :"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:76
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:76
 msgid "Outline"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:100
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:100
 msgid "Absolute"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:101
-msgid "Relative to the position of the Drawer object"
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:101
+msgid "Relative to the position of the Shape Painter object"
 msgstr ""
 
-#: ../Extensions/PrimitiveDrawing/DrawerObjectEditor.cpp:103
+#: ../Extensions/PrimitiveDrawing/ShapePainterObjectEditor.cpp:103
 msgid "Drawing coordinates"
 msgstr ""
 
@@ -15584,7 +15584,7 @@ msgstr ""
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:67
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:80
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:95
-msgid "Drawer object"
+msgid "Shape Painter object"
 msgstr ""
 
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:54
@@ -15653,7 +15653,7 @@ msgstr ""
 
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:89
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:96
-#: ../Extensions/PrimitiveDrawing/DrawerObject.cpp:161
+#: ../Extensions/PrimitiveDrawing/ShapePainterObject.cpp:161
 msgid "Fill color"
 msgstr ""
 
@@ -15666,7 +15666,7 @@ msgid "Change fill color of _PARAM0_ to _PARAM1_"
 msgstr ""
 
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:100
-#: ../Extensions/PrimitiveDrawing/DrawerObject.cpp:164
+#: ../Extensions/PrimitiveDrawing/ShapePainterObject.cpp:164
 msgid "Outline color"
 msgstr ""
 
@@ -15680,7 +15680,7 @@ msgstr ""
 
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:111
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:123
-#: ../Extensions/PrimitiveDrawing/DrawerObject.cpp:163
+#: ../Extensions/PrimitiveDrawing/ShapePainterObject.cpp:163
 msgid "Outline size"
 msgstr ""
 
@@ -15706,7 +15706,7 @@ msgstr ""
 
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:135
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:148
-#: ../Extensions/PrimitiveDrawing/DrawerObject.cpp:162
+#: ../Extensions/PrimitiveDrawing/ShapePainterObject.cpp:162
 msgid "Fill opacity"
 msgstr ""
 
@@ -15728,7 +15728,7 @@ msgstr ""
 
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:160
 #: ../Extensions/PrimitiveDrawing/Extension.cpp:172
-#: ../Extensions/PrimitiveDrawing/DrawerObject.cpp:165
+#: ../Extensions/PrimitiveDrawing/ShapePainterObject.cpp:165
 msgid "Outline opacity"
 msgstr ""
 

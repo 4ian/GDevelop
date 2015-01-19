@@ -904,7 +904,7 @@ void ResourcesEditor::Refresh()
     resourcesTree->AddRoot( "ImagesBank" );
 
     //Setup search
-    std::string search = boost::to_upper_copy(gd::ToString(searchCtrl->GetValue()));
+    std::string search = gd::StrUppercase(gd::ToString(searchCtrl->GetValue()));
     bool searching = search.empty() ? false : true;
 
     //Folders
@@ -919,7 +919,7 @@ void ResourcesEditor::Refresh()
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
 
-            if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == std::string::npos)
+            if ( searching && gd::StrUppercase(resource.GetName()).find(search) == std::string::npos)
                 continue;
 
             resourcesTree->AppendItem( folderItem, resource.GetName(), -1,-1, new gd::TreeItemStringData("Image", resource.GetName() ));
@@ -933,7 +933,7 @@ void ResourcesEditor::Refresh()
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);
 
-        if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == std::string::npos)
+        if ( searching && gd::StrUppercase(resource.GetName()).find(search) == std::string::npos)
             continue;
 
         resourcesTree->AppendItem( allImagesItem, resource.GetName(), -1, -1, new gd::TreeItemStringData("Image", resource.GetName() ));

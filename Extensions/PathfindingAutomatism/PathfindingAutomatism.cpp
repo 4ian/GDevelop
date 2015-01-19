@@ -56,7 +56,7 @@ bool operator==(const NodePosition &a, const NodePosition &b)
 namespace std
 {
 /**
- * \brief Tool function used to store a NodePosition as key in boost::unordered_set.
+ * \brief Tool function used to store a NodePosition as key in std::unordered_set.
  */
 template<>
 struct hash<NodePosition>

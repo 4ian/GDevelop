@@ -454,7 +454,7 @@ void ObjectsEditor::Refresh()
 
 wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, bool globalObjects)
 {
-    std::string searchText = boost::to_upper_copy(gd::ToString(searchCtrl->GetValue()));
+    std::string searchText = gd::StrUppercase(gd::ToString(searchCtrl->GetValue()));
     bool searching = searchText.empty() ? false : true;
 
     wxTreeItemId lastAddedItem;
@@ -463,7 +463,7 @@ wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, boo
         std::string name = objects.GetObject(i).GetName();
 
         //Only add objects if they match the search criteria
-        if ( ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
+        if ( ( !searching || (searching && gd::StrUppercase(name).find(searchText) != std::string::npos)) )
         {
             int thumbnailID = -1;
             wxBitmap thumbnail;
@@ -488,13 +488,13 @@ wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, boo
 
 wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, bool globalGroup)
 {
-    std::string searchText = boost::to_upper_copy(gd::ToString(searchCtrl->GetValue()));
+    std::string searchText = gd::StrUppercase(gd::ToString(searchCtrl->GetValue()));
     bool searching = searchText.empty() ? false : true;
 
     wxTreeItemId lastAddedItem;
     for (unsigned int i = 0;i<groups.size();++i)
     {
-        if ( ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
+        if ( ( !searching || (searching && gd::StrUppercase(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
             wxTreeItemId item = objectsList->AppendItem( groupsRootItem, groups[i].GetName(), 1 );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));

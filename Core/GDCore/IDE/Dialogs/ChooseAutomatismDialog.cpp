@@ -146,7 +146,7 @@ void ChooseAutomatismDialog::RefreshList()
 	    std::string automatismName = automatisms[i];
 
 		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == gd::GetTypeOfAutomatism(project, layout, automatismName)) &&
-             (!searching || (searching && boost::to_upper_copy(automatismName).find(boost::to_upper_copy(search)) != std::string::npos) ))
+             (!searching || (searching && gd::StrUppercase(automatismName).find(gd::StrUppercase(search)) != std::string::npos) ))
             automatismsList->Append(automatismName);
 	}
 

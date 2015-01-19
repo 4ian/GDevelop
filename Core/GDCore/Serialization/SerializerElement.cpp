@@ -1,5 +1,5 @@
 #include "GDCore/Serialization/SerializerElement.h"
-#include <boost/algorithm/string.hpp>
+
 #include <iostream>
 
 namespace gd

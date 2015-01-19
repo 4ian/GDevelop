@@ -10,7 +10,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
-#include <boost/weak_ptr.hpp>
+
 #include <memory>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>

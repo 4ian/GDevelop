@@ -11,7 +11,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
-#include <boost/algorithm/string.hpp>
+
 #if !defined(GD_NO_WX_GUI)
 #include <wx/treectrl.h>
 #include <wx/bitmap.h>

@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "LinkedObjectsTools.h"
 #include <iostream>
 #include <string>
-#include <boost/weak_ptr.hpp>
+
 #include <memory>
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/RuntimeScene.h"

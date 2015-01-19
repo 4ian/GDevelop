@@ -36,7 +36,6 @@ ENDIF(WIN32)
 
 #Dependencies on external libraries:
 ###
-include_directories(${boost_include_dir})
 include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 IF(NOT TARGET GDCore) #Ensure that the build will work even when GDCore is not in the target list.
@@ -65,10 +64,8 @@ IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 	ENDIF(WIN32)
 ELSEIF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	add_definitions( -DRELEASE )
-	add_definitions( -DBOOST_DISABLE_ASSERTS )
 ELSE()
 	add_definitions( -DDEV )
-	add_definitions( -DBOOST_DISABLE_ASSERTS )
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 IF(WIN32)

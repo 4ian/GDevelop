@@ -51,8 +51,6 @@ class GD_CORE_API CompilationInfo
     int gccPatchLevel;
     #endif
 
-    int boostVersion;
-
     int sfmlMajorVersion;
     int sfmlMinorVersion;
 
@@ -427,7 +425,6 @@ private:
  * \see gd::CompilationInfo
  */
 #define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = false; \
-    compilationInfo.boostVersion = BOOST_VERSION; \
     compilationInfo.sfmlMajorVersion = 2; \
     compilationInfo.sfmlMinorVersion = 0; \
     compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
@@ -442,7 +439,6 @@ private:
  * \see gd::CompilationInfo
  */
 #define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = true;\
-    compilationInfo.boostVersion = BOOST_VERSION; \
     compilationInfo.sfmlMajorVersion = 2; \
     compilationInfo.sfmlMinorVersion = 0; \
     compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \

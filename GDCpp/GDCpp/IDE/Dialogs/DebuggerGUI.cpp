@@ -3,7 +3,7 @@
 
 #include <wx/toolbar.h>
 #include <wx/image.h>
-#include <boost/weak_ptr.hpp>
+
 #include <wx/textdlg.h>
 #include "GDCore/Tools/Log.h"
 #include <algorithm>

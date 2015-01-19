@@ -14,7 +14,7 @@ This project is released under the MIT License.
 #include "ExtensionSubDeclaration2.h"
 #include "ExtensionSubDeclaration3.h"
 #include "Extension.h"
-#include <boost/version.hpp>
+
 
 /**
  * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.

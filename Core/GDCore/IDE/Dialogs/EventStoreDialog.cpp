@@ -12,7 +12,7 @@
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/CommonTools.h"
 #include "SFML/Network.hpp"
-#include <boost/algorithm/string.hpp>
+
 #include <wx/htmllbox.h>
 
 namespace gd

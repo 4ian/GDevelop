@@ -29,8 +29,7 @@ git archive --format tar.gz --output $CUR_DIR/debian-source-package/gdevelop/gde
 cd $CUR_DIR/debian-source-package/gdevelop
 tar zxvf gdevelop_$GD_VERSION_WITH_REV.orig.tar.gz
 
-#We need to include ExtLibs/SFML.7z and ExtLibs/boost.7z because buildbot do not have access to internet
-cp $GD_BASE_DIR/ExtLibs/boost.7z gdevelop-$GD_VERSION_WITH_REV/ExtLibs/
+#We need to include ExtLibs/SFML.7z because buildbot do not have access to internet
 cp $GD_BASE_DIR/ExtLibs/SFML.7z gdevelop-$GD_VERSION_WITH_REV/ExtLibs/
 
 #Recreate the tar.gz with the added sources

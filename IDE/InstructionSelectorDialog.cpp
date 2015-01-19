@@ -20,7 +20,6 @@
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include <wx/config.h>
-#include <boost/algorithm/string.hpp>
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Platform.h"

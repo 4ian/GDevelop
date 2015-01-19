@@ -3,8 +3,9 @@
  * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <boost/algorithm/string.hpp>
+
 #include <memory>
+#include "GDCore/CommonTools.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/Events/ExpressionMetadata.h"

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 

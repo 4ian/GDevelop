@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "ShapePainterObject.h"
-#include <boost/version.hpp>
+
 
 void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
 {

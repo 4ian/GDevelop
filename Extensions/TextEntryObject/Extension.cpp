@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "TextEntryObject.h"
-#include <boost/version.hpp>
+
 
 void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
 {

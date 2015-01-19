@@ -16,7 +16,7 @@
 //*)
 #include <algorithm>
 #include "GDCore/Tools/Log.h"
-#include <boost/algorithm/string.hpp>
+
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Project.h"

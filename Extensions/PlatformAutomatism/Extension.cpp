@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "PlatformerObjectAutomatism.h"
 #include "PlatformAutomatism.h"
 #include "ScenePlatformObjectsManager.h"
-#include <boost/version.hpp>
+
 
 void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
 {

@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "DestroyOutsideAutomatism.h"
-#include <boost/version.hpp>
+
 
 void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
 {

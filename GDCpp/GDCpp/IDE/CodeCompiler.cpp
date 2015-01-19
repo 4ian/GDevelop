@@ -90,7 +90,6 @@ std::string CodeCompilerCall::GetFullCall() const
 
         standardsIncludeDirs.push_back("CppPlatform/include/GDCpp");
         standardsIncludeDirs.push_back("CppPlatform/include/Core");
-        standardsIncludeDirs.push_back("CppPlatform/include/boost");
         standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
         standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
         standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");

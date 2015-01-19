@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "LightObstacleAutomatism.h"
 #include "LightObject.h"
 #include "SceneLightObstacleDatas.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.

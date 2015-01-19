@@ -21,8 +21,6 @@
 #include <wx/richtooltip.h>
 #include <wx/dataobj.h>
 #include <wx/dnd.h>
-#include <boost/algorithm/string.hpp>
-
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"

@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Version.h"
 #include "PathfindingAutomatism.h"
 #include "PathfindingObstacleAutomatism.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.

@@ -8,8 +8,8 @@
 
 #ifndef BASEPROFILER_H
 #define BASEPROFILER_H
+#include <memory>
 #include <vector>
-#include <boost/weak_ptr.hpp>
 #include <SFML/System.hpp>
 #include "GDCpp/profile.h"
 namespace gd { class BaseEvent; }

@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include "GDCpp/AutomatismsSharedData.h"
 #include "GDCore/Tools/Version.h"
 #include "TopDownMovementAutomatism.h"
-#include <boost/version.hpp>
+
 
 void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension)
 {

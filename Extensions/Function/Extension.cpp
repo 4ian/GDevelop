@@ -20,7 +20,7 @@ This project is released under the MIT License.
 #include "GDCore/Events/Instruction.h"
 #endif
 #include "FunctionEvent.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.

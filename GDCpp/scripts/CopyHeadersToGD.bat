@@ -10,12 +10,6 @@ echo Copying GDC++ and extensions header files (*.h) to %destDir%...
 xcopy ..\*.h "%destDir%\include\GDCpp\*.h" /S /Y /Q /D /E
 xcopy ..\..\Core\*.h "%destDir%\include\Core\*.h" /S /Y /Q /D /E
 
-::Boost (shared_ptr and dependencies) headers
-IF NOT EXIST %destDir%\include\boost\ (
-	mkdir "%destDir%\include\boost\"
-	bcp.exe --boost=..\..\ExtLibs\boost\ version config shared_ptr weak_ptr enable_shared_from_this unordered mpl %destDir%\include\boost\
-)
-
 ::SFML headers
 xcopy ..\..\ExtLibs\SFML\include\*.h "%destDir%\include\SFML\include\*.h" /S /Y /Q /D /E
 xcopy ..\..\ExtLibs\SFML\include\*.hpp "%destDir%\include\SFML\include\*.hpp" /S /Y /Q /D /E

@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 #include <memory>
-#include <boost/weak_ptr.hpp>
+
 #include <SFML/Graphics.hpp>
 namespace gd { class Project; }
 

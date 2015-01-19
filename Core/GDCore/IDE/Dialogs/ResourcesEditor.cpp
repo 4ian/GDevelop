@@ -16,7 +16,7 @@
 #include <wx/string.h>
 //*)
 #include <algorithm>
-#include <boost/algorithm/string.hpp>
+
 #include <wx/choicdlg.h>
 #include <wx/toolbar.h>
 #include <wx/config.h>

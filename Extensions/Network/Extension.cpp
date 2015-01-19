@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "GDCpp/CommonTools.h"
 #include "NetworkAutomatism.h"
 #include "NetworkManager.h"
-#include <boost/version.hpp>
+
 #include <SFML/Network.hpp>
 
 /**

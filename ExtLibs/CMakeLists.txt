@@ -1,14 +1,4 @@
 
-#Boost:
-IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost")
-	message( "Downloading Boost... (can take a bit of time, be patient)" )
-	execute_process(COMMAND curl -o boost.7z http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z -\# WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ )
-	message( "Extracting Boost in ExtLibs/boost... (can take a bit of time, be patient)" )
-	execute_process(COMMAND 7za x -y boost.7z WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ OUTPUT_QUIET)
-	file(RENAME boost_1_55_0 boost)
-ENDIF()
-set(boost_include_dir ${CMAKE_CURRENT_SOURCE_DIR}/boost PARENT_SCOPE)
-
 #SFML:
 IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SFML")
 	message( "Downloading SFML... (can take a bit of time, be patient)" )

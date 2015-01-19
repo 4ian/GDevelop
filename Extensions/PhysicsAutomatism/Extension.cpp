@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Version.h"
 #include "PhysicsAutomatism.h"
 #include "ScenePhysicsDatas.h"
-#include <boost/version.hpp>
+
 #include "GDCpp/ExtensionBase.h"
 
 /**

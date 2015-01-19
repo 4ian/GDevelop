@@ -8,6 +8,16 @@ BRANCH=master
 DATE=$(LC_ALL=C date +'%a, %d %b %Y %T %z')
 GD_BASE_DIR=$(pwd)/../../
 CUR_DIR=$(pwd)
+UPLOAD="true"
+
+while test $# -gt 0
+do
+    case "$1" in
+        --no-upload) UPLOAD="false"
+            ;;
+    esac
+    shift
+done
 
 echo "Started the debian source packaging process, using latest '$BRANCH' git tree"
 
@@ -46,4 +56,6 @@ debuild -S -sa -k$GPG_PUBLIC_KEY
 cd ..
 
 #Send ppa
-dput ppa:florian-rival/gdevelop gdevelop_$GD_VERSION_WITH_REV-1_source.changes
+if [ "$UPLOAD" = "true" ]; then
+	dput ppa:florian-rival/gdevelop gdevelop_$GD_VERSION_WITH_REV-1_source.changes
+fi;

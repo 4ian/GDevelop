@@ -148,7 +148,10 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //Ensure the object is not stuck
-    SeparateFromPlatforms(potentialObjects, true);
+    if (SeparateFromPlatforms(potentialObjects, true))
+    {
+        canJump = true; //After being unstuck, the object must be able to jump again.
+    }
 
     //Move the object on x axis.
     double oldX = object->GetX();
@@ -378,7 +381,7 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     hasReallyMoved = abs(object->GetX()-oldX) >= 1;
 }
 
-void PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus)
+bool PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus)
 {
     std::vector<RuntimeObject*> objects;
     for (std::set<PlatformAutomatism*>::iterator it = candidates.begin();
@@ -391,7 +394,7 @@ void PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAu
         objects.push_back((*it)->GetObject());
     }
 
-    object->SeparateFromObjects(objects);
+    return object->SeparateFromObjects(objects);
 }
 
 std::set<PlatformAutomatism*> PlatformerObjectAutomatism::GetPlatformsCollidingWith(const std::set<PlatformAutomatism*> & candidates,

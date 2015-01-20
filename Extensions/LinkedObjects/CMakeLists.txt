@@ -157,3 +157,18 @@ IF(WIN32)
 ELSE()
 	target_link_libraries(LinkedObjects_Runtime sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 ENDIF(WIN32)
+
+#Tests for the GD C++ Runtime extension
+###
+if(BUILD_TESTS)
+	file(
+	    GLOB_RECURSE
+	    test_source_files
+	    tests/*
+	)
+	add_executable(LinkedObjects_Runtime_tests ${test_source_files})
+	target_link_libraries(LinkedObjects_Runtime_tests GDCpp_Runtime)
+	target_link_libraries(LinkedObjects_Runtime_tests LinkedObjects_Runtime)
+	target_link_libraries(LinkedObjects_Runtime_tests sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+	target_link_libraries(LinkedObjects_Runtime_tests GLU GL)
+endif()

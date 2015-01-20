@@ -34,3 +34,21 @@ TEST_CASE( "RuntimeScene", "[common]" ) {
                 REQUIRE(scene.GetName() == "My layout");
 	}
 }
+
+TEST_CASE( "gd::Project", "[common]" ) {
+	SECTION("Basics") {
+		gd::Project project;
+		project.SetName("MyName");
+		project.GetUsedExtensions().push_back("Ext1");
+		project.GetUsedExtensions().push_back("Ext2");
+
+		REQUIRE( project.GetName() == "MyName" );
+
+		SECTION("Copy a project in memory")	 {
+			gd::Project copy = project;
+
+			REQUIRE( copy.GetName() == "MyName" );
+			REQUIRE( copy.GetUsedExtensions().size() == project.GetUsedExtensions().size() );
+		}
+	}
+}

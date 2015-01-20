@@ -324,7 +324,7 @@ gdjs.RuntimeObject.prototype.setAngle = function(angle) {
  */
 gdjs.RuntimeObject.prototype.getAngle = function() {
     return this.angle;
-}
+};
 
 /**
  * Set the layer of the object.

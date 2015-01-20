@@ -53,12 +53,12 @@ gdjs.TiledSpriteRuntimeObject.prototype._updateTilingSpritePosition = function()
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype.setX = function(x) {
-    this.x = x;
+    gdjs.RuntimeObject.prototype.setX.call(this, x);
     this._updateTilingSpritePosition();
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype.setY = function(y) {
-    this.y = y;
+    gdjs.RuntimeObject.prototype.setY.call(this, y);
     this._updateTilingSpritePosition();
 };
 
@@ -69,7 +69,7 @@ gdjs.TiledSpriteRuntimeObject.prototype.setTexture = function(textureName, runti
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype.setAngle = function(angle) {
-    this.angle = angle;
+    gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
     this._tiledSprite.rotation = gdjs.toRad(angle);
 };
 

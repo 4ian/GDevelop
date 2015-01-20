@@ -82,58 +82,6 @@ RuntimeScene::~RuntimeScene()
                               //RuntimeScene members which so need to be destroyed AFTER objects.
 }
 
-void RuntimeScene::Init(const RuntimeScene & scene)
-{
-    renderWindow = scene.renderWindow;
-    game = scene.game;
-    #if defined(GD_IDE_ONLY)
-    debugger = scene.debugger;
-    #endif
-    running = scene.running;
-
-    objectsInstances = scene.objectsInstances.CopyAndCloneAllObjects();
-
-    variables = scene.GetVariables();
-    legacyTexts = scene.legacyTexts;
-    timers = scene.timers;
-    pauseTime = scene.pauseTime;
-
-    SetCodeExecutionEngine(scene.GetCodeExecutionEngine());
-
-    firstLoop = scene.firstLoop;
-    isFullScreen = scene.isFullScreen;
-    realElapsedTime = scene.realElapsedTime;
-    elapsedTime = scene.elapsedTime;
-    timeScale = scene.timeScale;
-    timeFromStart = scene.timeFromStart;
-    specialAction = scene.specialAction;
-    renderTargetEvents = scene.renderTargetEvents;
-    windowHasFocus = scene.windowHasFocus;
-
-    automatismsSharedDatas.clear();
-    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = scene.automatismsSharedDatas.begin();
-         it != scene.automatismsSharedDatas.end();++it)
-    {
-    	automatismsSharedDatas[it->first] = it->second->Clone();
-    }
-}
-
-RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
-{
-    Init(scene);
-}
-
-RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
-{
-    if( (this) != &scene )
-    {
-        Scene::operator=(scene);
-        Init(scene);
-    }
-
-    return *this;
-}
-
 boost::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
 {
     return game->GetImageManager();
@@ -445,7 +393,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
             for (unsigned int i = 0;i<extensionsToBeNotifiedOnObjectDeletion.size();++i)
                 extensionsToBeNotifiedOnObjectDeletion[i]->ObjectDeletedFromScene(*this, allObjects[id].get());
 
-            objectsInstances.RemoveObject(allObjects[id]); //Remove from objects instances, not from the temporary list !
+            objectsInstances.RemoveObject(allObjects[id]); //Remove from objects instances, not from the temporary list!
         }
     }
 
@@ -572,7 +520,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     specialAction = -1;
 
     std::cout << ".";
-    GetCodeExecutionEngine()->runtimeContext.scene = this;
+    codeExecutionEngine->runtimeContext.scene = this;
 
     //Initialize variables
     variables = scene.GetVariables();
@@ -589,20 +537,9 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     std::cout << ".";
     CreateObjectsFrom(instances);
 
-    //Automatisms data
+    //Automatisms shared data
     std::cout << ".";
-    automatismsSharedDatas.clear();
-    for(std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
-        it != scene.automatismsInitialSharedDatas.end();
-        ++it)
-    {
-        boost::shared_ptr<AutomatismsRuntimeSharedData> data = it->second->CreateRuntimeSharedDatas();
-
-        if ( data )
-            automatismsSharedDatas[it->first] = data;
-        else
-            std::cout << "ERROR: Unable to create shared data for automatism \"" << it->second->GetName() <<"\".";
-    }
+    automatismsSharedDatas.LoadFrom(scene.automatismsInitialSharedDatas);
 
     std::cout << ".";
     //Extensions specific initialization

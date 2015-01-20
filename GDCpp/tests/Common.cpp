@@ -25,13 +25,21 @@ TEST_CASE( "RuntimeScene", "[common]" ) {
 	SECTION("Loading from a layout") {
 		gd::Project project;
 		gd::Layout layout;
-                layout.SetName("My layout");
+        layout.SetName("My layout");
+        gd::Variable var1;
+        var1.SetString("Hello");
+        gd::Variable var2;
+        var2.SetValue(42);
+        layout.GetVariables().Insert("MaVar", var1, 0);
+        layout.GetVariables().Insert("MaVar2", var2, 0);
 
 		RuntimeGame game;
 		RuntimeScene scene(NULL, &game);
 
 		scene.LoadFromScene(layout);
-                REQUIRE(scene.GetName() == "My layout");
+        REQUIRE(scene.GetName() == "My layout");
+        REQUIRE(scene.GetVariables().Get("MaVar").GetString() == "Hello");
+        REQUIRE(scene.GetVariables().Get("MaVar2").GetValue() == 42);
 	}
 }
 

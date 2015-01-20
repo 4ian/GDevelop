@@ -13,19 +13,6 @@ void ObjInstancesHolder::AddObject(const RuntimeObjSPtr & object)
     objectsRawPointersInstances[object->GetName()].push_back(object.get());
 }
 
-ObjInstancesHolder ObjInstancesHolder::CopyAndCloneAllObjects() const
-{
-    ObjInstancesHolder newObjInstancesHolder;
-
-    for (boost::unordered_map<std::string, RuntimeObjList>::const_iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
-    {
-        for (unsigned int i = 0;i<it->second.size();++i) //We need to really copy the objects
-            newObjInstancesHolder.AddObject( boost::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
-    }
-
-    return newObjInstancesHolder;
-}
-
 std::vector<RuntimeObject*> ObjInstancesHolder::GetObjectsRawPointers(const std::string & name)
 {
     return objectsRawPointersInstances[name];
@@ -57,4 +44,27 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
     }
 
     AddObject(theObject);
+}
+
+void ObjInstancesHolder::Init(const ObjInstancesHolder & other)
+{
+    for (boost::unordered_map<std::string, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
+        it != other.objectsInstances.end(); ++it )
+    {
+        for (unsigned int i = 0;i<it->second.size();++i) //We need to really copy the objects
+            AddObject( boost::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
+    }
+}
+
+ObjInstancesHolder::ObjInstancesHolder(const ObjInstancesHolder & other)
+{
+    Init(other);
+}
+
+ObjInstancesHolder& ObjInstancesHolder::operator=(const ObjInstancesHolder & other)
+{
+    if( (this) != &other )
+        Init(other);
+
+    return *this;
 }

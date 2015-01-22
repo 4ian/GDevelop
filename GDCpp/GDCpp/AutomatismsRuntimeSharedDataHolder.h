@@ -3,7 +3,7 @@
 #define AUTOMATISMSRUNTIMESHAREDDATAS_HOLDER_H
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class AutomatismsRuntimeSharedData;
 namespace gd { class AutomatismsSharedData; }
 
@@ -22,17 +22,17 @@ public:
      * \warning Be careful, no check is made to ensure that the shared data exist.
      * \param name The name of the automatism for which shared data must be fetched.
 	 */
-    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const;
+    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const;
 
     /**
      * \brief Create all runtime shared data according to the initial shared data passed as argument.
      */
-    void LoadFrom(const std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> > & sharedData);
+    void LoadFrom(const std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> > & sharedData);
 
 private:
     void Init(const AutomatismsRuntimeSharedDataHolder & other);
 
-	std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas;
+	std::map < std::string, std::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas;
 };
 
 #endif

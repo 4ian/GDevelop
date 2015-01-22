@@ -48,11 +48,11 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
 
 void ObjInstancesHolder::Init(const ObjInstancesHolder & other)
 {
-    for (boost::unordered_map<std::string, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
+    for (std::unordered_map<std::string, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
         it != other.objectsInstances.end(); ++it )
     {
         for (unsigned int i = 0;i<it->second.size();++i) //We need to really copy the objects
-            AddObject( boost::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
+            AddObject( std::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
     }
 }
 

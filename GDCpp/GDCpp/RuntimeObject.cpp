@@ -255,7 +255,7 @@ double RuntimeObject::GetDistanceWithObject( RuntimeObject * other )
     return sqrt(GetSqDistanceWithObject(other));
 }
 
-void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
@@ -267,11 +267,12 @@ void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<Runti
         }
     }
 
-    SeparateFromObjects(objects);
+    return SeparateFromObjects(objects);
 }
 
-void RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & objects)
+bool RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & objects)
 {
+    bool moved = false;
     sf::Vector2f moveVector;
     vector<Polygon2d> hitBoxes = GetHitBoxes();
     for (unsigned int j = 0;j<objects.size(); ++j)
@@ -287,6 +288,7 @@ void RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & obje
                     if ( result.collision )
                     {
                         moveVector += result.move_axis;
+                        moved = true;
                     }
                 }
             }
@@ -295,6 +297,7 @@ void RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & obje
     }
     SetX(GetX()+moveVector.x);
     SetY(GetY()+moveVector.y);
+    return moved;
 }
 
 void RuntimeObject::RotateTowardPosition(float Xposition, float Yposition, float speed, RuntimeScene & scene)

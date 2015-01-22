@@ -94,7 +94,7 @@ private:
      * \param candidates The platform to be tested for collision
      * \param excludeJumpThrus If set to true, the jump thru platform will be excluded.
      */
-    void SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus);
+    bool SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus);
 
     /**
      * \brief Among the platforms passed in parameter, return a list of the platforms colliding with the object.

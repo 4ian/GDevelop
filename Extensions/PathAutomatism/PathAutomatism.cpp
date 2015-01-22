@@ -310,7 +310,7 @@ void PathAutomatism::LoadPath(RuntimeScene & scene)
     if(localePaths.count(pathName) == 0)
     {
         if (runtimeScenesPathDatas == NULL)
-            runtimeScenesPathDatas = static_cast<RuntimeScenePathDatas*>(scene.GetAutomatismSharedDatas(name).get());
+            runtimeScenesPathDatas = static_cast<RuntimeScenePathDatas*>(scene.GetAutomatismSharedData(name).get());
 
         if(runtimeScenesPathDatas != NULL && runtimeScenesPathDatas->globalPaths.count(pathName) != 0)
             path = std::vector<sf::Vector2f>(runtimeScenesPathDatas->globalPaths.at(pathName));

@@ -114,7 +114,9 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     }
 
     //Ensure the object is not stuck
-    this._separateFromPlatforms(this._potentialCollidingObjects, true);
+    if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
+        this._canJump = true; //After being unstuck, the object must be able to jump again.
+    }
 
     //Move the object on x axis.
     var oldX = object.getX();
@@ -391,7 +393,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = functi
 
     var objectsLists = new Hashtable();
     objectsLists.put("", objects);
-    this.owner.separateFromObjects(objectsLists);
+    return this.owner.separateFromObjects(objectsLists);
 };
 
 /**

@@ -1108,7 +1108,6 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     author = game.author;
     latestCompilationDirectory = game.latestCompilationDirectory;
-    extensionsUsed = game.GetUsedExtensions();
     objectGroups = game.objectGroups;
 
     GDMajorVersion = game.GDMajorVersion;
@@ -1116,6 +1115,7 @@ void Project::Init(const gd::Project & game)
 
     currentPlatform = game.currentPlatform;
     #endif
+    extensionsUsed = game.extensionsUsed;
     platforms = game.platforms;
 
     //Resources

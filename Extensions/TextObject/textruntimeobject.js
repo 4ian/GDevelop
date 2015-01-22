@@ -86,7 +86,7 @@ gdjs.TextRuntimeObject.prototype._updateTextPosition = function() {
  * @method setX
  */
 gdjs.TextRuntimeObject.prototype.setX = function(x) {
-    this.x = x;
+    gdjs.RuntimeObject.prototype.setX.call(this, x);
     this._updateTextPosition();
 };
 
@@ -95,16 +95,9 @@ gdjs.TextRuntimeObject.prototype.setX = function(x) {
  * @method setY
  */
 gdjs.TextRuntimeObject.prototype.setY = function(y) {
-    this.y = y;
+    gdjs.RuntimeObject.prototype.setY.call(this, y);
     this._updateTextPosition();
 };
-
-
-/**
- * Set object's angle.
- * @method setAngle
- * @param {Number} example for red : "255;0;0"
- */
 
  /**
  * Set the angle of the object.
@@ -112,7 +105,7 @@ gdjs.TextRuntimeObject.prototype.setY = function(y) {
  * @param angle {Number} The new angle of the object
  */
 gdjs.TextRuntimeObject.prototype.setAngle = function(angle) {
-    this.angle = angle;
+    gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
     this._text.rotation = gdjs.toRad(angle);
 };
 
@@ -125,7 +118,7 @@ gdjs.TextRuntimeObject.prototype.setOpacity = function(opacity) {
     if ( opacity > 255 ) opacity = 255;
 
     this.opacity = opacity;
-    this._text.alpha = opacity/255;
+    this._text.alpha = opacity / 255;
 };
 
 /**

@@ -207,8 +207,9 @@ public:
      * according to the sum of the move vector returned by each collision test.
      * \note Bounding circles of objects are *not* checked.
      * \param objects The vector of objects to be used.
+     * \return true if the object was moved.
      */
-    void SeparateFromObjects(const std::vector<RuntimeObject*> & objects);
+    bool SeparateFromObjects(const std::vector<RuntimeObject*> & objects);
 
     /**
      * \brief Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
@@ -403,7 +404,7 @@ public:
     double GetSqDistanceWithObject( RuntimeObject * other );
     double GetDistanceWithObject( RuntimeObject * other );
 
-    void SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    bool SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
     /** \deprecated
      */

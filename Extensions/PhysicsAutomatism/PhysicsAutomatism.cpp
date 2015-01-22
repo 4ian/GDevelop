@@ -130,7 +130,7 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 {
     if ( runtimeScenesPhysicsDatas == NULL )
-        runtimeScenesPhysicsDatas = static_cast<RuntimeScenePhysicsDatas*>(scene.GetAutomatismSharedDatas(name).get());
+        runtimeScenesPhysicsDatas = static_cast<RuntimeScenePhysicsDatas*>(scene.GetAutomatismSharedData(name).get());
 
     //Create body from object
     b2BodyDef bodyDef;

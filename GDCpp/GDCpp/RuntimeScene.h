@@ -14,6 +14,10 @@
 #include <SFML/System.hpp>
 #include <memory>
 #include "GDCpp/ObjInstancesHolder.h"
+#include "GDCpp/RuntimeLayer.h"
+#include "GDCpp/Text.h"
+#include "GDCpp/ManualTimer.h"
+#include "GDCpp/AutomatismsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
 namespace gd { class Project; }
@@ -26,7 +30,6 @@ class AutomatismsRuntimeSharedData;
 class ExtensionBase;
 class Text;
 class CodeExecutionEngine;
-class ManualTimer;
 #undef GetObject //Disable an annoying macro
 
 #if defined(GD_IDE_ONLY)
@@ -48,9 +51,6 @@ class GD_API RuntimeScene : public Scene
 public:
     RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
     virtual ~RuntimeScene();
-
-    RuntimeScene& operator=(const RuntimeScene & scene);
-    RuntimeScene(const RuntimeScene & scene);
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display.
     RuntimeGame *                           game; ///< Pointer to the game the scene is linked to.
@@ -89,10 +89,11 @@ public:
     void DisplayText(Text & text);
 
     /**
-     * Get the AutomatismsRuntimeSharedData associated with automatism.
-     * Be careful, no check is made to ensure that the shared data exist.
+     * \brief Return the shared data for an automatism.
+     * \warning Be careful, no check is made to ensure that the shared data exist.
+     * \param name The name of the automatism for which shared data must be fetched.
      */
-    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
+    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -273,13 +274,10 @@ protected:
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
-    std::map < std::string, std::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
-    std::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
-
+    std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
     std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
-
-    void Init(const RuntimeScene & scene);
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.
 };

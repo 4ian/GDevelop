@@ -22,8 +22,6 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
     if(tileSet.IsDirty())
         return vertexArray;
 
-    int vertexs = 0;
-
     for(int layer = 0; layer < 3; layer++)
     {
         for(int col = 0; col < tileMap.GetColumnsCount(); col++)
@@ -40,7 +38,6 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
                     coords = tileSet.GetTileTextureCoords(0);
                 }
 
-                vertexs += 4;
                 {
                     sf::Vertex vertex(sf::Vector2f(col * tileWidth, row * tileHeight), coords.topLeft);
                     if(tileMap.GetTile(layer, col, row) == -1)
@@ -68,8 +65,6 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
             }
         }
     }
-
-    std::cout << "Generated " << vertexs << " vertexes." << std::endl;
 
     return vertexArray;
 }
@@ -108,13 +103,10 @@ std::vector<Polygon2d> GenerateHitboxes(TileSet &tileSet, TileMap &tileMap)
 
 void UpdateVertexArray(sf::VertexArray &vertexArray, int layer, int col, int row, TileSet &tileSet, TileMap &tileMap)
 {
-    std::cout << "Updating Vertex Array" << std::endl;
-
     if(tileSet.IsDirty())
         return;
 
     const int vertexPos = 4 * (layer * tileMap.GetColumnsCount() * tileMap.GetRowsCount() + col * tileMap.GetRowsCount() + row);
-    std::cout << " at " << vertexPos << std::endl;
 
     TileTextureCoords newCoords = tileMap.GetTile(layer, col, row) != -1 ? tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row)) : tileSet.GetTileTextureCoords(0);
     vertexArray[vertexPos].texCoords = newCoords.topLeft;
@@ -132,8 +124,6 @@ void UpdateVertexArray(sf::VertexArray &vertexArray, int layer, int col, int row
             vertexArray[vertexPos + i].color.a = 255;
         }
     }
-
-    std::cout << " [Done]" << std::endl;
 }
 
 void UpdateHitboxes(std::vector<Polygon2d> &polygons, sf::Vector2f position, int layer, int col, int row, TileSet &tileSet, TileMap &tileMap)

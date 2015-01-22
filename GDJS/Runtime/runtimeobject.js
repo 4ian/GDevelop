@@ -324,7 +324,7 @@ gdjs.RuntimeObject.prototype.setAngle = function(angle) {
  */
 gdjs.RuntimeObject.prototype.getAngle = function() {
     return this.angle;
-}
+};
 
 /**
  * Set the layer of the object.
@@ -811,6 +811,7 @@ gdjs.RuntimeObject.prototype.automatismActivated = function(name) {
  * Separate the object from others objects, using their hitboxes.
  * @method separateFromObjects
  * @param objectsLists Tables of objects
+ * @return true if the object was moved
  */
 gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
 
@@ -821,6 +822,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
         objects.push.apply(objects, lists[i]);
     }
 
+    var moved = false;
     var xMove = 0; var yMove = 0;
     var hitBoxes = this.getHitBoxes();
 
@@ -835,6 +837,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
                     if ( result.collision ) {
                         xMove += result.move_axis[0];
                         yMove += result.move_axis[1];
+                        moved = true;
                     }
                 }
             }
@@ -843,6 +846,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
 
     //Move according to the results returned by the collision algorithm.
     this.setPosition(this.getX()+xMove, this.getY()+yMove);
+    return moved;
 };
 
 gdjs.RuntimeObject.prototype.getDistanceFrom = function(otherObject) {

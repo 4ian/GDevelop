@@ -91,7 +91,7 @@ public:
      * \param position Insertion position. If the position is invalid, the variable is inserted at the end of the variable list.
      * \return Reference to the newly added variable
      */
-    Variable & InsertNew(const std::string & name, unsigned int position);
+    Variable & InsertNew(const std::string & name, unsigned int position = -1);
 
     /**
      * \brief Remove the specified variable from the container.

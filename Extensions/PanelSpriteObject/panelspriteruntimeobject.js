@@ -152,12 +152,12 @@ gdjs.PanelSpriteRuntimeObject.prototype._updateSpritesAndTexturesSize = function
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.setX = function(x) {
-    this.x = x;
+    gdjs.RuntimeObject.prototype.setX.call(this, x);
     this._updateSpritePositions();
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.setY = function(y) {
-    this.y = y;
+    gdjs.RuntimeObject.prototype.setY.call(this, y);
     this._updateSpritePositions();
 };
 
@@ -205,7 +205,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(textureName, runti
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.setAngle = function(angle) {
-    this.angle = angle;
+    gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
     this._spritesContainer.rotation = gdjs.toRad(angle);
 };
 

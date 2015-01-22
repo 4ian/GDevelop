@@ -2,8 +2,8 @@
 #to update the strings to be translated.
 echo "Listing all sources files..."
 
-find ../IDE -name '*.cpp' > /tmp/listfile.txt
-find ../IDE -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
+find ../IDE -name '*.cpp' | grep -v '/wxstedit/' > /tmp/listfile.txt
+find ../IDE -name '*.h' -o -name "*.hpp" | grep -v '/wxstedit/' >> /tmp/listfile.txt
 find ../GDCpp/GDCpp/ -name '*.cpp' >> /tmp/listfile.txt
 find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.cpp' >> /tmp/listfile.txt

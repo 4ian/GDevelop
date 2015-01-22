@@ -13,17 +13,17 @@ AllowNoIcons=yes
 LicenseFile=..\Output\Release_Windows\License-fr.rtf
 InfoBeforeFile=..\Output\Release_Windows\Informations-fr.rtf
 OutputDir=.\
-OutputBaseFilename=gd3676
+OutputBaseFilename=gd3677
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=..\Output\Release_Windows\res\icon.ico
 VersionInfoVersion=3.6
 WizardImageFile=Setup bitmap\wizbmp.bmp
 WizardSmallImageFile=Setup bitmap/smallicon.bmp
-AppCopyright=2008-2014 Florian Rival
+AppCopyright=2008-2015 Florian Rival
 VersionInfoCompany=Florian Rival
 VersionInfoDescription=GDevelop setup
-VersionInfoCopyright=2008-2014 Florian Rival
+VersionInfoCopyright=2008-2015 Florian Rival
 VersionInfoProductName=GDevelop
 VersionInfoProductVersion=3.6
 
@@ -55,7 +55,7 @@ Source: ..\Output\Release_Windows\CppPlatform\*; DestDir: {app}\CppPlatform; Fla
 Source: ..\Output\Release_Windows\JsPlatform\*; DestDir: {app}\JsPlatform; Flags: ignoreversion createallsubdirs recursesubdirs; Components: main
 Source: ..\Output\Release_Windows\locale\*; DestDir: {app}\locale; Flags: ignoreversion createallsubdirs recursesubdirs; Components: main
 Source: ..\Output\Release_Windows\Examples\*; DestDir: {app}\Examples; Flags: ignoreversion createallsubdirs recursesubdirs; Components: example
-Source: ..\Output\Release_Windows\Ressources\*; DestDir: {app}\Ressources; Flags: ignoreversion createallsubdirs recursesubdirs; Components: res
+Source: ..\Output\Release_Windows\Free resources\*; DestDir: {app}\Free resources; Flags: ignoreversion createallsubdirs recursesubdirs; Components: res
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: ..\Output\Release_Windows\icon.ico; DestDir: {app}; Flags: ignoreversion
 Source: ..\Output\Release_Windows\SelectLanguage-en.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: english; Components: main

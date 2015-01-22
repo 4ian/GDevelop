@@ -1,8 +1,8 @@
 @echo off
 echo Listing all sources files...
 
-dir ..\IDE\*.cpp /L /b /s  |find /v /i "\bin\"  > %TEMP%\listfile.txt
-dir ..\IDE\*.h /L /b /s  |find /v /i "\bin\"  >> %TEMP%\listfile.txt
+dir ..\IDE\*.cpp /L /b /s  |find /v /i "\wxstedit\"  > %TEMP%\listfile.txt
+dir ..\IDE\*.h /L /b /s  |find /v /i "\wxstedit\"  >> %TEMP%\listfile.txt
 dir ..\GDCpp\GDCpp\*.cpp /L /B /S >> %TEMP%\listfile.txt
 dir ..\GDCpp\GDCpp\*.h /L /B /S >> %TEMP%\listfile.txt
 dir ..\GDJS\GDJS\*.cpp /L /B /S >> %TEMP%\listfile.txt

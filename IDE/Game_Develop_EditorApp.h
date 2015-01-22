@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -57,7 +57,7 @@ public:
         if ( topic != "GDevelop IDE" ) return NULL;
 
         //Check that there are no modal dialogs active
-        
+
         #if (wxUSE_STD_CONTAINERS == 1) //Not the same code if wxWidgets is built with std containers
         wxWindowList::compatibility_iterator node = wxTopLevelWindows.GetFirst();
 		#else

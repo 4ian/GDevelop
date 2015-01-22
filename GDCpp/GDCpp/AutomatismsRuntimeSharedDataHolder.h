@@ -1,4 +1,8 @@
-
+/*
+ * GDevelop C++ Platform
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
 #ifndef AUTOMATISMSRUNTIMESHAREDDATAS_HOLDER_H
 #define AUTOMATISMSRUNTIMESHAREDDATAS_HOLDER_H
 #include <string>
@@ -10,7 +14,7 @@ namespace gd { class AutomatismsSharedData; }
 /**
  * \brief Contains all the shared data of the automatisms of a RuntimeScene.
  */
-class AutomatismsRuntimeSharedDataHolder
+class GD_API AutomatismsRuntimeSharedDataHolder
 {
 public:
 	AutomatismsRuntimeSharedDataHolder() {};

@@ -1,7 +1,7 @@
 /**
 
 GDevelop - LinkedObjects Extension
-Copyright (c) 2011-2014 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 

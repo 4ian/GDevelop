@@ -1,6 +1,6 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
 
@@ -290,7 +290,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     {
 		std::string ifileName = tempDir.ToStdString() + "/GDProjectSrcFile.gdg";
 		std::string ofileName = tempDir.ToStdString() + "/src";
-		
+
         ifstream ifile(ifileName.c_str(), ios_base::binary);
         ofstream ofile(ofileName.c_str(), ios_base::binary);
 

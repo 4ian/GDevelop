@@ -2,18 +2,21 @@
 
 GPG_PUBLIC_KEY=0xA8025399
 GD_VERSION=3.6.78
-GD_VERSION_WITH_REV="$GD_VERSION"001
-DISTRO=trusty
+GD_VERSION_WITH_REV="$GD_VERSION"002
+DISTRO=utopic
 BRANCH=master
 DATE=$(LC_ALL=C date +'%a, %d %b %Y %T %z')
 GD_BASE_DIR=$(pwd)/../../
 CUR_DIR=$(pwd)
 UPLOAD="true"
+DEBUILD_ARGS=""
 
 while test $# -gt 0
 do
     case "$1" in
         --no-upload) UPLOAD="false"
+            ;;
+        --no-orig-tar-upload) DEBUILD_ARGS="-sd"
             ;;
     esac
     shift
@@ -52,7 +55,7 @@ cp -r $CUR_DIR/debian-source-package/extra-files/debian gdevelop-$GD_VERSION_WIT
 
 #Launch debuild
 cd gdevelop-$GD_VERSION_WITH_REV/
-debuild -S -sa -k$GPG_PUBLIC_KEY
+debuild -S -sa -k$GPG_PUBLIC_KEY $DEBUILD_ARGS
 cd ..
 
 #Send ppa

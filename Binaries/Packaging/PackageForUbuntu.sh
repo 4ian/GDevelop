@@ -1,8 +1,8 @@
 #!/bin/sh
 
 GPG_PUBLIC_KEY=0xA8025399
-GD_VERSION=3.6.76
-GD_VERSION_WITH_REV="$GD_VERSION"015
+GD_VERSION=3.6.78
+GD_VERSION_WITH_REV="$GD_VERSION"001
 DISTRO=trusty
 BRANCH=master
 DATE=$(LC_ALL=C date +'%a, %d %b %Y %T %z')
@@ -57,5 +57,5 @@ cd ..
 
 #Send ppa
 if [ "$UPLOAD" = "true" ]; then
-	dput ppa:florian-rival/gdevelop gdevelop_$GD_VERSION_WITH_REV-1_source.changes
+	dput ppa:florian-rival/gdevelop gdevelop_$GD_VERSION_WITH_REV-1~"$DISTRO"_source.changes
 fi;

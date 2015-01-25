@@ -15,11 +15,12 @@
 #include <wx/string.h>
 //*)
 #include <stdio.h>
+#include <algorithm>
 #include <fstream>
 #include <sys/types.h>
 #include <dirent.h>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
 #endif
@@ -249,7 +250,7 @@ void ProjectExtensionsDialog::RefreshPlatformList()
     imageList->Add(wxBitmap("res/icon32.png", wxBITMAP_TYPE_ANY));
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
+    const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
     const std::vector< Platform * > & usedPlatforms = project.GetUsedPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -295,7 +296,7 @@ void ProjectExtensionsDialog::RefreshExtensionList()
     ExtensionsList->Clear();
     if (!currentPlatform) return;
 
-    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
+    const vector < std::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
 
     //Create the list of available extensions
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
@@ -339,7 +340,7 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
     wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
     if (associatedData == NULL) return;
 
-    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
+    const vector < std::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
 
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
     {
@@ -425,7 +426,7 @@ void ProjectExtensionsDialog::OnplatformListItemSelect(wxListEvent& event)
     {
         std::string chosenPlatform = associatedData->GetString();
 
-        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
+        const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
         for (unsigned int i = 0;i<platforms.size();++i)
         {
             if ( platforms[i]->GetName() == chosenPlatform )
@@ -444,7 +445,7 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
     {
         std::string chosenPlatform = associatedData->GetString();
 
-        const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
+        const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
         for (unsigned int i = 0;i<platforms.size();++i)
         {
             if ( platforms[i]->GetName() == chosenPlatform )

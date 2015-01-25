@@ -21,6 +21,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include <algorithm>
 #include <set>
 #include "GDCore/Tools/Localization.h"
 #include "GDJS/JsCodeEvent.h"
@@ -53,7 +54,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::Link"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::Link"].codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -84,7 +85,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::Standard"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::Standard"].codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -98,7 +99,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::Comment"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::Comment"].codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -188,7 +189,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
 
         GetAllConditions()["BuiltinCommonInstructions::Or"].codeExtraInformation.optionalCustomCodeGenerator =
-            boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
+            std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
     }
 
     {
@@ -212,7 +213,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
 
         GetAllConditions()["BuiltinCommonInstructions::And"].codeExtraInformation.optionalCustomCodeGenerator =
-            boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
+            std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
     }
 
     {
@@ -260,7 +261,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
 
         GetAllConditions()["BuiltinCommonInstructions::Not"].codeExtraInformation.optionalCustomCodeGenerator =
-            boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
+            std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
     }
 
     {
@@ -277,7 +278,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
 
         GetAllConditions()["BuiltinCommonInstructions::Once"].codeExtraInformation.optionalCustomCodeGenerator =
-            boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
+            std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen);
     }
 
     {
@@ -329,7 +330,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::While"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::While"].codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -394,7 +395,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::Repeat"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::Repeat"].codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -544,7 +545,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
-        GetAllEvents()["BuiltinCommonInstructions::ForEach"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
+        GetAllEvents()["BuiltinCommonInstructions::ForEach"].codeGeneration = std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
     {
@@ -558,7 +559,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::Group"]
-            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+            .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -609,8 +610,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Insert some Javascript code into events"),
                   "",
                   "res/source_cpp16.png",
-                  boost::shared_ptr<gd::BaseEvent>(new JsCodeEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  std::shared_ptr<gd::BaseEvent>(new JsCodeEvent))
+                  .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 }
 

@@ -7,8 +7,8 @@
 #define GDCORE_EVENTSCHANGENOTIFIER_H
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
+#include <memory>
 namespace gd { class Layout; }
 namespace gd { class EventsList; }
 namespace gd { class Project; }
@@ -16,7 +16,7 @@ namespace gd { class ExternalEvents; }
 namespace gd { class Platform; }
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
-namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
+namespace gd {typedef std::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 
 namespace gd
 {

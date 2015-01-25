@@ -198,7 +198,7 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
 
 void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
-    boost::shared_ptr<RuntimeObject> newObject = boost::shared_ptr<RuntimeObject>(Clone());
+    std::shared_ptr<RuntimeObject> newObject = std::shared_ptr<RuntimeObject>(Clone());
 
     scene.objectsInstances.AddObject(newObject);
 

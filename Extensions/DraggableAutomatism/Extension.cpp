@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "DraggableAutomatism.h"
-#include <boost/version.hpp>
+
 
 void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
 {
@@ -25,8 +25,8 @@ void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
           "",
           "CppPlatform/Extensions/draggableicon.png",
           "DraggableAutomatism",
-          boost::shared_ptr<gd::Automatism>(new DraggableAutomatism),
-          boost::shared_ptr<gd::AutomatismsSharedData>());
+          std::shared_ptr<gd::Automatism>(new DraggableAutomatism),
+          std::shared_ptr<gd::AutomatismsSharedData>());
 
     #if defined(GD_IDE_ONLY)
     aut.SetIncludeFile("DraggableAutomatism/DraggableAutomatism.h");

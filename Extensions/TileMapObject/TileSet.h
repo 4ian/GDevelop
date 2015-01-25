@@ -234,7 +234,7 @@ public:
 
 private:
 
-    boost::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
+    std::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
     std::vector<TileTextureCoords> m_coords; ///< The tileset coords
 
     std::vector<TileHitbox> m_hitboxes;

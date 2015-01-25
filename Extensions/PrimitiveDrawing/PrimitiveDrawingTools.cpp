@@ -22,7 +22,7 @@ void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const st
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(destName) ) return;
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(srcName) ) return;
 
-    boost::shared_ptr<SFMLTextureWrapper> dest = scene.GetImageManager()->GetSFMLTexture(destName);
+    std::shared_ptr<SFMLTextureWrapper> dest = scene.GetImageManager()->GetSFMLTexture(destName);
 
     //Make sure the coordinates are correct.
     if ( destX < 0 || static_cast<unsigned>(destX) >= dest->texture.getSize().x) return;
@@ -40,7 +40,7 @@ void GD_EXTENSION_API CaptureScreen( RuntimeScene & scene, const std::string & d
     if ( !destFileName.empty() ) capture.saveToFile(destFileName);
     if ( !destImageName.empty() && scene.GetImageManager()->HasLoadedSFMLTexture(destImageName) )
     {
-        boost::shared_ptr<SFMLTextureWrapper> sfmlTexture = scene.GetImageManager()->GetSFMLTexture(destImageName);
+        std::shared_ptr<SFMLTextureWrapper> sfmlTexture = scene.GetImageManager()->GetSFMLTexture(destImageName);
         sfmlTexture->image = capture;
         sfmlTexture->texture.loadFromImage(sfmlTexture->image); //Do not forget to update the associated texture
     }
@@ -54,9 +54,9 @@ namespace
 void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const std::string & imageName, unsigned int width, unsigned int height, const std::string & colorStr )
 {
     //Get or create the texture in memory
-    boost::shared_ptr<SFMLTextureWrapper> newTexture;
+    std::shared_ptr<SFMLTextureWrapper> newTexture;
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(imageName) )
-        newTexture = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+        newTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
     else
         newTexture = scene.GetImageManager()->GetSFMLTexture(imageName);
 
@@ -82,9 +82,9 @@ void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const std::string
 void GD_EXTENSION_API OpenSFMLTextureFromFile( RuntimeScene & scene, const std::string & fileName, const std::string & imageName )
 {
     //Get or create the texture in memory
-    boost::shared_ptr<SFMLTextureWrapper> newTexture;
+    std::shared_ptr<SFMLTextureWrapper> newTexture;
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(imageName) )
-        newTexture = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+        newTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
     else
         newTexture = scene.GetImageManager()->GetSFMLTexture(imageName);
 

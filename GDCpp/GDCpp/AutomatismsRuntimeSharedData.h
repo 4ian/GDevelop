@@ -8,7 +8,7 @@
 #define AUTOMATISMSRUNTIMESHAREDDATAS_H
 
 namespace gd { class AutomatismsSharedData; }
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /**
  * \brief Base class for defining automatisms shared datas used at runtime.
@@ -26,7 +26,7 @@ class AutomatismsRuntimeSharedData
     public:
         AutomatismsRuntimeSharedData() {};
         virtual ~AutomatismsRuntimeSharedData() {};
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedData>(new AutomatismsRuntimeSharedData(*this));}
+        virtual std::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return std::shared_ptr<AutomatismsRuntimeSharedData>(new AutomatismsRuntimeSharedData(*this));}
 
 };
 

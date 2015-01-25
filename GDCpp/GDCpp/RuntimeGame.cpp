@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 RuntimeGame::RuntimeGame()
 {

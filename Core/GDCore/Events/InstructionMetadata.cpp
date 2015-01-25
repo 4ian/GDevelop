@@ -7,6 +7,7 @@
 #include <wx/file.h>
 #include <wx/bitmap.h>
 #endif
+#include <algorithm>
 #include "InstructionMetadata.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"

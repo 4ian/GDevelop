@@ -46,12 +46,12 @@ public:
      * Returns a gd::LayoutEditorPreviewer object which export the layout being edited and
      * then launch the preview in an external browser
      */
-    virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+    virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
 
     /**
      * \brief Expose to the IDE how to export games.
      */
-    virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+    virtual std::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
     #endif
 
     /**

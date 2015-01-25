@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Version.h"
 #include "PathAutomatism.h"
 #include "ScenePathDatas.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.
@@ -41,8 +41,8 @@ public:
                       "",
                       "CppPlatform/Extensions/pathicon.png",
                       "PathAutomatism",
-                      boost::shared_ptr<gd::Automatism>(new PathAutomatism),
-                      boost::shared_ptr<gd::AutomatismsSharedData>(new ScenePathDatas));
+                      std::shared_ptr<gd::Automatism>(new PathAutomatism),
+                      std::shared_ptr<gd::AutomatismsSharedData>(new ScenePathDatas));
 
                 #if defined(GD_IDE_ONLY)
 

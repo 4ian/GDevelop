@@ -14,7 +14,7 @@ This project is released under the MIT License.
 #include "TileMapObject.h"
 #include "RuntimeTileMapObject.h"
 #include <iostream>
-#include <boost/version.hpp>
+
 
 void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 {

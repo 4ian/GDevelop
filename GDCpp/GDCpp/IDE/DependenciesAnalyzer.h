@@ -9,7 +9,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }
@@ -108,7 +108,7 @@ private:
      *
      * \warning The function assumes that there are not cyclic dependencies.
      */
-    bool CheckIfExternalEventsIsLinkedOnlyAtTopLevel(const std::string & externalEventsName, std::vector< boost::shared_ptr<gd::BaseEvent> > & events);
+    bool CheckIfExternalEventsIsLinkedOnlyAtTopLevel(const std::string & externalEventsName, std::vector< std::shared_ptr<gd::BaseEvent> > & events);
 
     std::set< std::string > scenesDependencies;
     std::set< std::string > externalEventsDependencies;

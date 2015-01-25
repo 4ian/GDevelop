@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Version.h"
 #include "PhysicsAutomatism.h"
 #include "ScenePhysicsDatas.h"
-#include <boost/version.hpp>
+
 #include "GDCpp/ExtensionBase.h"
 
 /**
@@ -41,8 +41,8 @@ public:
                   "",
                   "res/physics32.png",
                   "PhysicsAutomatism",
-                  boost::shared_ptr<gd::Automatism>(new PhysicsAutomatism),
-                  boost::shared_ptr<gd::AutomatismsSharedData>(new ScenePhysicsDatas));
+                  std::shared_ptr<gd::Automatism>(new PhysicsAutomatism),
+                  std::shared_ptr<gd::AutomatismsSharedData>(new ScenePhysicsDatas));
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");

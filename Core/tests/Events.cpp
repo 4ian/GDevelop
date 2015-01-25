@@ -17,7 +17,7 @@
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 TEST_CASE( "Events", "[common][events]" ) {
     SECTION("StandardEvent") {
@@ -26,7 +26,7 @@ TEST_CASE( "Events", "[common][events]" ) {
         event.GetActions().push_back(instr);
 
         //Ensuring cloning is working
-        boost::shared_ptr<gd::StandardEvent> cloned(event.Clone());
+        std::shared_ptr<gd::StandardEvent> cloned(event.Clone());
         REQUIRE( cloned->GetActions().size() == 1 );
         REQUIRE( cloned->GetActions()[0].GetType() == "InstructionType" );
     }
@@ -38,7 +38,7 @@ TEST_CASE( "Events", "[common][events]" ) {
         event.SetObjectToPick("Object");
 
         //Ensuring cloning is working
-        boost::shared_ptr<gd::ForEachEvent> cloned(event.Clone());
+        std::shared_ptr<gd::ForEachEvent> cloned(event.Clone());
         REQUIRE( cloned->GetActions().size() == 1 );
         REQUIRE( cloned->GetActions()[0].GetType() == "InstructionType" );
         REQUIRE( event.GetObjectToPick() == "Object" );
@@ -50,7 +50,7 @@ TEST_CASE( "Events", "[common][events]" ) {
         event.SetBackgroundColor(1,2,3);
 
         //Ensuring cloning is working
-        boost::shared_ptr<gd::GroupEvent> cloned(event.Clone());
+        std::shared_ptr<gd::GroupEvent> cloned(event.Clone());
         REQUIRE( cloned->GetName() == "EventName" );
         REQUIRE( cloned->GetBackgroundColorR() == 1 );
         REQUIRE( cloned->GetBackgroundColorG() == 2 );

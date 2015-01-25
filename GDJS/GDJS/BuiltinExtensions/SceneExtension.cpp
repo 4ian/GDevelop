@@ -77,7 +77,7 @@ SceneExtension::SceneExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator;
 
         GetAllConditions()["Egal"].codeExtraInformation
-            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:

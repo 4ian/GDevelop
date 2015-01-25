@@ -9,7 +9,7 @@
 #define EVENTMETADATA_H
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -59,14 +59,14 @@ public:
     /**
      * Set the code generator used when generating code from events.
      */
-    void SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGenerator) { codeGeneration = codeGenerator; }
+    void SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator> codeGenerator) { codeGeneration = codeGenerator; }
 
     EventMetadata(const std::string & name_,
                  const std::string & fullname_,
                  const std::string & description_,
                  const std::string & group_,
                  const std::string & smallicon_,
-                 boost::shared_ptr<gd::BaseEvent> instance);
+                 std::shared_ptr<gd::BaseEvent> instance);
 
     EventMetadata() {};
     virtual ~EventMetadata() {};
@@ -85,8 +85,8 @@ public:
     wxBitmap smallicon;
 #endif
 
-    boost::shared_ptr<gd::BaseEvent> instance;
-    boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGeneration;
+    std::shared_ptr<gd::BaseEvent> instance;
+    std::shared_ptr<gd::EventMetadata::CodeGenerator> codeGeneration;
 };
 
 

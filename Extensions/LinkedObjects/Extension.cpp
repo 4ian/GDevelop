@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "ObjectsLinksManager.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 /**

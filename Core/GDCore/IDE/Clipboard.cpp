@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
@@ -146,7 +146,7 @@ gd::ObjectGroup Clipboard::GetObjectGroup()
     return objectGroupCopied;
 }
 
-void Clipboard::SetInstances( std::vector < boost::shared_ptr<gd::InitialInstance> > instances )
+void Clipboard::SetInstances( std::vector < std::shared_ptr<gd::InitialInstance> > instances )
 {
     instancesCopied = instances;
     hasInstances = true;

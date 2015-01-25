@@ -11,6 +11,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <algorithm>
 #include <wx/msgdlg.h>
 #include <wx/settings.h>
 #include <wx/stc/stc.h>
@@ -165,7 +166,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
     ValList->AddRoot( _( "All special values" ), 0 );
 
     //Insert extension objects expressions
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled

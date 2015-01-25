@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "PanelSpriteObject.h"
-#include <boost/version.hpp>
+
 
 void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 {

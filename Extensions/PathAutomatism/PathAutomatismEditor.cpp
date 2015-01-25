@@ -19,7 +19,7 @@ This project is released under the MIT License.
 #include <cmath>
 #include <limits>
 #include <algorithm>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include <wx/dcbuffer.h>
@@ -328,9 +328,9 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
 	    return;
 	}
 
-	sharedDatas = boost::dynamic_pointer_cast<ScenePathDatas>(scene->automatismsInitialSharedDatas[automatism.GetName()]);
+	sharedDatas = std::dynamic_pointer_cast<ScenePathDatas>(scene->automatismsInitialSharedDatas[automatism.GetName()]);
 
-    if ( sharedDatas == boost::shared_ptr<ScenePathDatas>() )
+    if ( sharedDatas == std::shared_ptr<ScenePathDatas>() )
     {
 	    gd::LogError(_("Unable to access to shared datas : Bad data type."));
 	    return;

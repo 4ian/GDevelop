@@ -42,13 +42,13 @@ public:
      * \param scene The scene the object is going to be used on.
      * \param scene The gd::Object the RuntimeObject must be based on.
      */
-    boost::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, gd::Object & object);
+    std::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, gd::Object & object);
 
     /**
      * \brief Our platform need to do a bit of extra work when adding an extension
      * ( i.e : Storing pointers to creation/destruction functions ).
      */
-    bool AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension);
+    bool AddExtension(std::shared_ptr<gd::PlatformExtension> platformExtension);
 
     /** \brief The name of the function searched in an extension file to create the extension
      */
@@ -66,12 +66,12 @@ public:
     /**
      * \brief Preview can be done directly inside the editor thanks to CppLayoutPreviewer
      */
-    virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+    virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
 
     /**
      * \brief Expose to the IDE how to export games.
      */
-    virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+    virtual std::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
 #endif
 
     /**

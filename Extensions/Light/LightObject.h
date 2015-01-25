@@ -10,8 +10,8 @@ This project is released under the MIT License.
 
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+
+#include <memory>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
 #include "Light.h"
@@ -137,7 +137,7 @@ public :
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
-    static std::map<const gd::Layout*, boost::weak_ptr<Light_Manager> > lightManagersList;
+    static std::map<const gd::Layout*, std::weak_ptr<Light_Manager> > lightManagersList;
 
 private:
     void UpdateGlobalLightMembers();
@@ -146,11 +146,11 @@ private:
 
     sf::Clock updateClock;
 
-    boost::shared_ptr<Light_Manager>  manager; ///< Keep a link to the light manager of the scene.
+    std::shared_ptr<Light_Manager>  manager; ///< Keep a link to the light manager of the scene.
     Light light; ///< Light object used to render light
 
     bool globalLight;
-    boost::shared_ptr<sf::RenderTexture> globalLightImage;
+    std::shared_ptr<sf::RenderTexture> globalLightImage;
     sf::Color globalLightColor;
 };
 

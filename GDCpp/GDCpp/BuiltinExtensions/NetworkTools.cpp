@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <fstream>
+#include <cstring>
 #include <string>
 #include <iomanip>
 #include <SFML/Network.hpp>

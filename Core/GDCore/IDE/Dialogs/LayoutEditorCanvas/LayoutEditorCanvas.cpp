@@ -195,7 +195,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     }
 
     //Prepare undo-related variables
-    latestState = boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
+    latestState = std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
 
     //Generate zoom menu
 	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM5, _("5%"), wxEmptyString, wxITEM_NORMAL);
@@ -271,7 +271,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     //Initialize previewers
     for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
     {
-        boost::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
+        std::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
         previewers[project.GetUsedPlatforms()[i]->GetName()] = previewer;
 
         long id = wxNewId();
@@ -1217,7 +1217,7 @@ void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )
 
 void LayoutEditorCanvas::ChangesMade()
 {
-    history.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(latestState->Clone()));
+    history.push_back(std::shared_ptr<gd::InitialInstancesContainer>(latestState->Clone()));
     redoHistory.clear();
     latestState->Create(instances);
     project.SetDirty();
@@ -1340,11 +1340,11 @@ void LayoutEditorCanvas::Undo(unsigned int times)
     {
         if ( history.empty() ) return;
 
-        redoHistory.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
+        redoHistory.push_back(std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
         instances.Create(*history.back());
         history.pop_back();
 
-        latestState = boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
+        latestState = std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
     }
 }
 
@@ -1363,11 +1363,11 @@ void LayoutEditorCanvas::Redo( unsigned int times )
     {
         if ( redoHistory.empty() ) return;
 
-        history.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
+        history.push_back(std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
         instances.Create(*redoHistory.back());
         redoHistory.pop_back();
 
-        latestState = boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
+        latestState = std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
     }
 }
 
@@ -1454,11 +1454,11 @@ void LayoutEditorCanvas::PausePreview()
 void LayoutEditorCanvas::SetParentAuiManager(wxAuiManager * parentAuiManager_)
 {
     parentAuiManager = parentAuiManager_;
-    for(std::map<std::string, boost::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
+    for(std::map<std::string, std::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
         it != previewers.end();
         ++it)
     {
-        if ( it->second != boost::shared_ptr<gd::LayoutEditorPreviewer>() ) { it->second->SetParentAuiManager(parentAuiManager_); }
+        if ( it->second != std::shared_ptr<gd::LayoutEditorPreviewer>() ) { it->second->SetParentAuiManager(parentAuiManager_); }
     }
 }
 

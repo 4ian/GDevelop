@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef PARTICLESYSTEMWRAPPER_H
 #define PARTICLESYSTEMWRAPPER_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class OpenGLTextureWrapper;
 
 namespace SPK
@@ -57,7 +57,7 @@ class GD_EXTENSION_API ParticleSystemWrapper
         SPK::Sphere * zone;
         SPK::Group * group;
         SPK::GL::GLRenderer * renderer;
-        boost::shared_ptr<OpenGLTextureWrapper> openGLTextureParticle;
+        std::shared_ptr<OpenGLTextureWrapper> openGLTextureParticle;
 
     private:
         void Init(const ParticleSystemWrapper & other);

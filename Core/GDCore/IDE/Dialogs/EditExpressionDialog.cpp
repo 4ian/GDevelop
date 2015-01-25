@@ -5,6 +5,7 @@
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <algorithm>
 #include <string>
 #include <vector>
 //(*InternalHeaders(EditExpressionDialog)
@@ -376,7 +377,7 @@ lastErrorPos(std::string::npos)
 
     //Prepare keyword highlighting
     std::string keywords;
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -514,7 +515,7 @@ void EditExpressionDialog::RefreshLists()
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "All special values" ), 0 );
 
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Insert extension objects expressions
 	for (unsigned int i = 0;i<extensions.size();++i)

@@ -48,6 +48,8 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
 
 void ObjInstancesHolder::Init(const ObjInstancesHolder & other)
 {
+    objectsInstances.clear();
+    objectsRawPointersInstances.clear();
     for (boost::unordered_map<std::string, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
         it != other.objectsInstances.end(); ++it )
     {

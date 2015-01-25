@@ -10,7 +10,7 @@ if [ -d "$DIRECTORY" ]; then
 		ninja
 	fi
 	if [ -f "Makefile" ]; then
-		make
+		make -j 4
 	fi
 else
 	echo "Unable to find your build directory, just make sure that GD is compiled in Release_Linux"

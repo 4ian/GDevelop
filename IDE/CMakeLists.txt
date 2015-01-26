@@ -141,7 +141,7 @@ ELSE()
 	IF(WIN32)
         add_custom_command(TARGET GDIDE
 			POST_BUILD
-			COMMAND "${GD_base_dir}/IDE/scripts/copyWindowsLibraries.bat" "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}" "${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib"
+			COMMAND "${GD_base_dir}/IDE/scripts/copyWindowsLibraries.bat" "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}" "${CMAKE_BINARY_DIR}/ExtLibs/"
 			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
     ELSE()
         #Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
@@ -162,7 +162,7 @@ ENDIF()
 IF(NOT WIN32)
 	install(DIRECTORY ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ DESTINATION "${GD_INSTALL_PREFIX}")
 	install(FILES ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/GDIDE DESTINATION "${GD_INSTALL_PREFIX}" PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ )
-	
+
 	install(FILES ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/share/applications/gdevelop.desktop DESTINATION /usr/share/applications/ PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ )
 	install(DIRECTORY ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/share/icons/ DESTINATION /usr/share/icons/)
 	install(DIRECTORY ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/share/mime/ DESTINATION /usr/share/mime/)

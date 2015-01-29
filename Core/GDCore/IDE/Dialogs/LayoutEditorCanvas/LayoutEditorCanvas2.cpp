@@ -276,8 +276,8 @@ void LayoutEditorCanvas::RenderEdittime()
     //Go back to "window" view before drawing GUI elements
     setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
 
-    RenderInitialWindowBorder();
     if ( options.grid ) RenderGrid();
+    RenderInitialWindowBorder();
 
     if ( renderer.drawResizeButtons )
     {

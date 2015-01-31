@@ -3,7 +3,7 @@
   xmlns="urn:schemas-microsoft-com:asm.v1"
   manifestVersion="1.0">
 <assemblyIdentity
-    name="Game Develop IDE.App"
+    name="GDevelop IDE.App"
     processorArchitecture="x86"
     version="1.0.0.0"
     type="win32"/>

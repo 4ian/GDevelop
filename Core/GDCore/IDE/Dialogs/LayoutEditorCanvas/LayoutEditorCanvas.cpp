@@ -1350,7 +1350,7 @@ void LayoutEditorCanvas::Undo(unsigned int times)
 
 void LayoutEditorCanvas::OnClearHistorySelected(wxCommandEvent& event)
 {
-    if (wxMessageBox("Etes-vous sûr de vouloir supprimer l'historique des modifications ?", "Êtes vous sûr ?",wxYES_NO ) != wxYES)
+    if (wxMessageBox(_("Are you sure you want to clear the Undo History?"), "Clear the history",wxYES_NO ) != wxYES)
         return;
 
     history.clear();

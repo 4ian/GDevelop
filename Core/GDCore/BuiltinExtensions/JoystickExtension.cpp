@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
                           _("Joysticks features"),
                           _("Built-in extension allowing to use joysticks"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("JoystickButtonDown",

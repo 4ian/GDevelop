@@ -1,27 +1,8 @@
 /**
 
 GDevelop - Platform Automatism Extension
-Copyright (c) 2014 Florian Rival (Florian.Rival@gmail.com)
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+Copyright (c) 2014-2015 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
 */
 
 #include <boost/shared_ptr.hpp>
@@ -84,11 +65,11 @@ void PlatformerObjectAutomatism::OnOwnerChanged()
     oldHeight = object->GetHeight();
 }
 
-bool PlatformerObjectAutomatism::SetSlopeMaxAngle(double slopeMaxAngle_)
+bool PlatformerObjectAutomatism::SetSlopeMaxAngle(double newMaxAngle)
 {
-    if (slopeMaxAngle < 0 || slopeMaxAngle >= 90) return false;
+    if (newMaxAngle < 0 || newMaxAngle >= 90) return false;
 
-    slopeMaxAngle = slopeMaxAngle_;
+    slopeMaxAngle = newMaxAngle;
     if ( slopeMaxAngle == 45 )
         slopeClimbingFactor = 1; //Avoid rounding errors
     else
@@ -164,6 +145,12 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     {
         requestedDeltaX += floorPlatform->GetObject()->GetX() - floorLastX;
         requestedDeltaY += floorPlatform->GetObject()->GetY() - floorLastY;
+    }
+
+    //Ensure the object is not stuck
+    if (SeparateFromPlatforms(potentialObjects, true))
+    {
+        canJump = true; //After being unstuck, the object must be able to jump again.
     }
 
     //Move the object on x axis.
@@ -392,6 +379,22 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     //5) Track the movement
     hasReallyMoved = abs(object->GetX()-oldX) >= 1;
+}
+
+bool PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus)
+{
+    std::vector<RuntimeObject*> objects;
+    for (std::set<PlatformAutomatism*>::iterator it = candidates.begin();
+         it != candidates.end();
+         ++it)
+    {
+        if ( (*it)->GetPlatformType() == PlatformAutomatism::Ladder ) continue;
+        if ( excludeJumpThrus && (*it)->GetPlatformType() == PlatformAutomatism::Jumpthru ) continue;
+
+        objects.push_back((*it)->GetObject());
+    }
+
+    return object->SeparateFromObjects(objects);
 }
 
 std::set<PlatformAutomatism*> PlatformerObjectAutomatism::GetPlatformsCollidingWith(const std::set<PlatformAutomatism*> & candidates,

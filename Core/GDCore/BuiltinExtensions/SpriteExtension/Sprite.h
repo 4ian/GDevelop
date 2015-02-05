@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #ifndef SPRITE_H
@@ -109,12 +109,12 @@ public:
     /**
      * Return Origin point.
      */
-    inline const Point & GetOrigine() const { return origine; }
+    inline const Point & GetOrigin() const { return origine; }
 
     /**
      * Return Origin point.
      */
-    inline Point & GetOrigine() { return origine; }
+    inline Point & GetOrigin() { return origine; }
 
     /**
      * Return Centre point.
@@ -122,7 +122,7 @@ public:
      * \warning If the image has not been loaded ( using LoadImage ) and the center point is set as automatic,
      * the returned point won't be correct.
      */
-    inline const Point & GetCentre() const { return centre; }
+    inline const Point & GetCenter() const { return centre; }
 
     /**
      * Return Centre point.
@@ -130,17 +130,17 @@ public:
      * \warning If the image has not been loaded ( using LoadImage ) and the center point is set as automatic,
      * the returned point won't be correct.
      */
-    inline Point & GetCentre() { automaticCentre = false; return centre; }
+    inline Point & GetCenter() { automaticCentre = false; return centre; }
 
     /**
      * Return true if the center point is automatically computed
      */
-    inline bool IsCentreAutomatic() const { return automaticCentre; }
+    inline bool IsDefaultCenterPoint() const { return automaticCentre; }
 
     /**
      * Un/Set automatic centre
      */
-    bool SetCentreAutomatic(bool enabled);
+    bool SetDefaultCenterPoint(bool enabled);
 
     #if !defined(EMSCRIPTEN)
     /** \name Sprite runtime management

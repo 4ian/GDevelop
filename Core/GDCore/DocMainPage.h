@@ -33,42 +33,23 @@
  */
 
 /**
- * \page setupDevEnv Setting up the development environnement
+ * \page setupDevEnv Setting up the development environment
+ *
+ * If you didn't already downloaded GDevelop, get and extract the source from [GitHub](https://github.com/4ian/GD).
  *
  * <b>Windows</b>
  *
- * Follow these three step to be able to compile GDevelop and the extensions:
- * -# \subpage installWinLibs
+ * Follow these three steps to be able to compile GDevelop and the extensions:
  * -# \subpage installWinCompiler
  * -# \ref installAndUseCMake
  * <br>
  *
  * <b>GNU/Linux</b>
- * -# \subpage installLinux
+ * -# \subpage installLinuxLib
  * -# \subpage installAndUseCMake
  *
  * See the recommended tools and conventions for working on GDevelop on this page:
  * \subpage recommendedToolsAndConventions
- */
-
-/**
- *  \page installWinLibs (Windows) Download and install SFML, wxWidgets and Boost
- *
- * GDevelop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of GDevelop and
- * the extensions, GDevelop require the extensions to use the same version of the libraries.
- * \section download Download
-
- * You can download the specific versions of the libraries used by the current version of GDevelop using these links:<br>
- * - http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
- * - http://www.compilgames.net/code/GameDevelopSDK/wxwidgets.7z
- * - http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z
- *
- * They are already built for windows, and for an use with the TDM-GCC compiler.
- *
- * \section uncompress Uncompress
- * By default, GDevelop projects search the libraries in the ExtLibs
- * (located at the root of the SDK) directory ( ExtLibs/SFML, ExtLibs/wxWidgets... ).<br>
- * Uncompress the libraries in this directory.
  */
 
 /**
@@ -80,7 +61,9 @@
  *
  * \section installWinCompiler_download Download
  *
- * The current version of the compiler used by GDevelop can be found and downloaded on the website : http://www.compilgames.net
+ * Download the current version of the compiler used by GDevelop on Windows here:
+ *
+ * &http://www.compilgames.net/code/GameDevelopSDK/tdm-gcc-4.5.2.exe
  *
  * \section installWinCompiler_install Installation
  *
@@ -103,13 +86,13 @@
  */
 
 /**
- *  \page installAndUseCMake (All) Install and use Cmake
+ *  \page installAndUseCMake (All) Install CMake & launch the build
  *
- * Building is done using CMake: It is an open-source build system that can generate build files for lots of IDE and build tools ( Makefiles... ).
+ * Building is done using CMake: It is an open-source build system that can generate build files for lots of IDE and build tools (Makefiles...).
  *
  * \section installAndUseCMake_download Download and install CMake
  *
- * First, install CMake: <br>
+ * First, install CMake:
  * Download it [here](http://www.cmake.org/cmake/resources/software.html) or get it using your package manager if you're
  * using a Linux distribution.
  *
@@ -117,7 +100,7 @@
  *
  * \subsection installAndUseCMake_use_gui Using the GUI
  *
- * - Start the CMake user interface ( _cmake-gui_ ). Choose the GD root directory as the source directory, and Binaries/.build as the directory where to build the binaries:
+ * - Start the CMake user interface (_cmake-gui_). Choose the GD root directory as the source directory, and Binaries/.build as the directory where to build the binaries:
 
  \image html usecmake1.png
 
@@ -126,14 +109,13 @@
 
   \image html usecmake2.png
 
- * - When you click on Finish, CMake do a first configuration. Adjust any variable if necessary (no changes is needed by default), then click on Generate.
+ * - When you click on Finish, CMake do a first configuration. If **errors occurred*, make sure that you have download all required development libraries.
+ * - Adjust any variable if necessary (no changes is needed by default), then click on Generate.
 
   \image html usecmake3.png
 
- * - You can then launch a terminal/command prompt, go to the *.build* folder ( `cd GDRootFolder/Binaries/.build` ) and launch the build
+ * - You can then launch a terminal/command prompt, go to the .build folder ( `cd GDRootFolder/Binaries/.build` ) and launch the build
  * using the generator you've choosen: `mingw32-make`, or `make` on Linux.
- *
- * Binaries are created into *Binaries/Output/Release_{OS}* folder, where {OS} can be Windows or Linux for example.
  *
  * \subsection installAndUseCMake_use_cmd Using the command line
  *
@@ -156,79 +138,24 @@
  * ninja
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * Binaries are of course also created into *Binaries/Output/Release_{OS}* folder.
+ * \section installAndUseCMake_launch Launch GDevelop
+ *
+ * Binaries are created into *Binaries/Output/Release_{OS}* folder.
+ *
+ * To launch GDevelop in Windows, double click on **GDIDE**. For Linux, launch **StartGDevelop.sh**.
+ *
+ * If the build failed, check that you've properly installed wxWidgets and that you have installed any required
+ * development library.
  */
 
 /**
- *  \page installLinux (Linux) Install development files
+ *  \page installLinuxLib (Linux) Install development files
  *
- * \section downloadGD Download and extract GDevelop for Linux
- *
- * If you didn't already downloaded GDevelop for Linux, do it now from [the official website](http://www.compilgames.net/).
- *
- * Then extract all the files inside the <b>GameDevelop</b> folder inside the *Binaries/Output/Release_Linux/ * folder
- * of the SDK. ( You should have files like libGDCore.so now present in Binaries/Output/Release_Linux )
- *
- * \section download Download, (build) and install libraries
+ * \section installLibs Install development libraries
  *
  * GDevelop is compiled with gcc under Linux.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by GDevelop and
- * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of gcc.<br>
- *
- * \subsection sfml SFML
- *
- * GDevelop may uses some specific version of SFML library. You can download the version used here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
- *
- * The archive contains a precompiled version of SFML, compiled **for Ubuntu**, and only for the version for which GDevelop is distributed officially:
- *  - If you compile GD on **this** version of Ubuntu, just extract the archive inside the folder ExtLibs.
- *  - If you compile GD for another version of Ubuntu or a different distro, extract the archive inside the folder ExtLibs, and *recompile* SFML using CMake into
- *  a folder called **build-linux**. It's easy, just follow [this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php). Again, be sure
- *  to build the binaries into **ExtLibs/SFML/build-linux**. If you have difficulties, read this page: \subpage buildSFML, it details the dependencies you need
- *  to install.
- *
- * \subsection boost Boost
-
- * Boost version used by GDevelop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_55_0.7z <br>
- * Just extract the archive inside the folder ExtLibs (located at the root of the SDK).
- * \subsection wxWidgets wxWidgets
-
- * wxWidgets version used by GDevelop can be downloaded here: https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2 <br>
- * First extract the archive inside the folder ExtLibs.
- *
- * Be sure to have GTK+ 3.0 and WebKitGTK development files installed:
- * \code
- * sudo apt-get install libgtk-3-dev
- * sudo apt-get install libwebkitgtk-3.0-dev
- * \endcode
- *
- * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
- * \code
- * ./configure --enable-ribbon --enable-webview
- * make
- * sudo make install
- * \endcode
- *
- * \subsection installcmake Install CMake
- * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
- */
-
-/**
- * \page buildSFML (Linux) Manually build SFML
- *
- * If you're compiling GDevelop for another distro that is the not the distro for which GDevelop is officially distributed
- * (i.e: The latest Ubuntu), you have to recompile SFML.
- *
- * \section downloadSFML Download SFML
- *
- * Download the SFML archive from this page: \ref installLinux
- *
- * Extract it in ExtLibs folder. Go in the SFML directory that was created, and delete **build-linux** folder (it's the
- * folder where SFML was built for Ubuntu).
- *
- * \section installDep Install dependencies and build SFML
- *
- * You'll surely have to install dependencies so that SFML can be built. On Ubuntu, here are the commands to be launched
- * to install all dependencies:
+ * You need to have some packages to be installed before starting to build GD. These packages can vary according to the distribution you use.
+ * On Ubuntu, you may want to install these packages:
 \code
 sudo apt-get install libopenal-dev
 sudo apt-get install libjpeg-dev
@@ -240,22 +167,15 @@ sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 \endcode
  *
- * Then, use CMake to build SFML: Follow **[this tutorial](http://www.sfml-dev.org/tutorials/2.1/compile-with-cmake.php)** from the
- * official SFML website. Just be sure to build SFML into a folder called **build-linux**.
+ * \subsection wxWidgets Install wxWidgets development libraries
  *
- * Most of the time, you just have to launch CMake in the build-linux folder:
- * \code
- * cd ExtLibs/SFML
- * mkdir build-linux
- * cd build-linux
- * cmake ..
- * make
- * \endcode
+ * Most distributions have wxWidgets 3 development libraries available: install them using your package manager. On Ubuntu:
+\code
+sudo apt-get install libwxgtk3.0-dev
+\endcode
  *
- * Remember that it is mandatory to have this **build-linux** folder as GDevelop will use the libraries created into this folder.
- * Pay attention to it if you use the GUI version of CMake.
- *
- * If you have errors when launching cmake, make sure you have installed all dependencies.²
+ * \subsection installcmake Install CMake
+ * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
  */
 
 /**
@@ -398,9 +318,8 @@ sudo apt-get install libfreetype6-dev
  * \subsection extensionloading Extensions loading
  *
  * A single dynamic library file can contains an extension for more than one platform:<br>
- * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a pair of creation/destruction functions for each platform
- * (the names of these functions can vary. The C++ platform
- * expects functions called *CreateGDExtension* and *DestroyGDExtension* while JS Platform search for functions called *CreateGDJSExtension* and *DestroyGDJSExtension*).
+ * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a creation function for each platform
+ * (The C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
  *
  * \subsection extensionexample Edit or write a new extension
  *
@@ -414,7 +333,7 @@ sudo apt-get install libfreetype6-dev
  *
  * \section writeANewExtension_createNewExtension Create a new extension
  *
- * Creation of a new extension can be made by following these steps :<br>
+ * Creation of a new extension can be made by following these steps:<br>
  *
  * - Copy the directory of an extension and rename it:
  * \image html createnew1.png
@@ -427,16 +346,8 @@ sudo apt-get install libfreetype6-dev
  * If your extension is fairly simple, you can create it from the AES Extension. <br>
  * If your extension need an object, you can use for instance the TextObject Extension as a starting point.<br>
  * <br>
- * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake).
+ * - You can compile your extension by relaunching CMake like described [here](\ref installAndUseCMake). After doing that, just compile as usual.
  *
- * \section writeANewExtension_installExtension Use the extension with GDevelop
- *
- * To make your extension usable with GDevelop, you have to:
- * -# **Copy the files** generated in *Binaries/Output/Release_{OS}* into your *GDevelop folder*.
- * -# For the C++ platform, copy **all needed include file** (.h files) inside a folder with the name of your extension located into <i>(GDevelop folder)/CppPlatform/Extensions/include</i>.<br>
- *  You can use a *small script* (batch file on Windows) to copy all the needed includes files in a single click.<br>
- * -# For the JS platform, there is a script in *GDJS/scripts* called **CopyRuntimeToGD**. Launch it to automatically copy the .js files of your extension into *Binaries/Output/Release_{OS}/JsPlatform/...*.
- * -# <b>Translations catalog files</b> (.po/.mo files) must be put into xxxPlatform/Extensions/locale/<b>language</b>/myExtension.mo (Example : CppPlatform/Extensions/locale/fr_FR/myExtension.mo)
  */
 
 /**
@@ -459,7 +370,7 @@ sudo apt-get install libfreetype6-dev
                                   _("Text object"),
                                   _("Extension allowing to use an object displaying a text."),
                                   "Florian Rival",
-                                  "zlib/libpng License (Open Source)");
+                                  "Open Source (MIT License)");
  * \endcode
 
 The first parameter is the name of the extension. Choose carefully the name of the extension, as projects are directly referring to it.
@@ -502,36 +413,27 @@ Actions are declared like this :
         gd::ObjectMetadata & obj = AddObject("Name",
                            _("Name displayed to users"),
                            _("Description"),
-                           "path-to-an-32-by-32-icon.png",
-                           &FunctionForCreatingTheObject,
-                           &FunctionForDestroyingTheObject);
-
-        //Extra function to call for the C++ platform:
-        AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName, DestroyRuntimeObjectName);
+                           "path-to-a-32-by-32-icon.png",
+                           &FunctionForCreatingTheObject);
  * \endcode
  *
- * *FunctionForCreatingTheObject* and *FunctionForDestroyingTheObject* are two functions that must be provided with the object,
- * the first one to create an object and the second to delete an object previously created. They are similar to the functions
- * used to create and destroy a platform. They should look just like this:
+ * *FunctionForCreatingTheObject* is a function that must just create the object. It should look like this:
  *
  * \code
-void DestroyTextObject(gd::Object * object)
-{
-    delete object;
-}
-
 gd::Object * CreateTextObject(std::string name)
 {
     return new TextObject(name);
 }
  * \endcode
  *
- * The *C++ platform* also requires that you call *AddRuntimeObject* to declares the RuntimeObject class associated to the object being declared:<br>
- * You must pass as parameter the name of the class inheriting from RuntimeObject and two functions used to create and destroy an instance of the
+ * The *C++ platform* also requires that you call *AddRuntimeObject* to declare the RuntimeObject class associated to the object being declared:<br>
+ * You must pass as parameter the name of the class inheriting from RuntimeObject and a function used to create an instance of the
  * RuntimeObject.
  *
- * You will also want to specify where the object is located using gd::ObjectMetadata::SetIncludeFile. For example:
+ * You will also want to specify the .h file associated to the object using gd::ObjectMetadata::SetIncludeFile. For example:
  * \code
+//obj is the gd::ObjectMetadata returned when you called AddObject.
+AddRuntimeObject(obj, "RuntimeTextObject", CreateRuntimeTextObject);
 obj.SetIncludeFile("TextObject/TextObject.h");
  * \endcode
  *
@@ -542,25 +444,25 @@ obj.SetIncludeFile("TextObject/TextObject.h");
  *
  * Events are declared like this :
  * \code
-    AddEvent("Name",
-                  _("Name displayed to users"),
-                  "Description",
-                  "Group",
-                  "path-to-a-16-by-16-icon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new EventClassName))
+AddEvent("Name",
+         _("Name displayed to users"),
+         "Description",
+         "Group",
+         "path-to-a-16-by-16-icon.png",
+         boost::shared_ptr<gd::BaseEvent>(new EventClassName))
  * \endcode
  *
  * The event must be able to generate its code when events are being translated to C++ or Javascript:<br>
  * This is done by calling SetCodeGenerator. For example:
  *
  * \code
-        AddEvent("Standard",
-                  _("Standard event"),
-                  _("Standard event: Actions are run if conditions are fulfilled."),
-                  "",
-                  "res/eventaddicon.png",
-                  boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+AddEvent("Standard",
+         _("Standard event"),
+         _("Standard event: Actions are run if conditions are fulfilled."),
+         "",
+         "res/eventaddicon.png",
+         boost::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
+	.SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
  * \section automatismsDeclaration Declaring the automatisms
@@ -569,15 +471,15 @@ Automatisms are declared like objects:
 
 
  * \code
-        gd::AutomatismMetadata & aut = AddAutomatism("Name",
-                          _("Name displayed to users"),
-                          _("DefaultNameUsedInEditor"),
-                          _("Description."),
-                          "Group",
-                          "path-to-a-32-by-32-icon.png",
-                          "AutomatismClassName",
-                          boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
-                          boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+gd::AutomatismMetadata & aut = AddAutomatism("Name",
+	_("Name displayed to users"),
+	_("DefaultNameUsedInEditor"),
+	_("Description."),
+	"Group",
+	"path-to-a-32-by-32-icon.png",
+	"AutomatismClassName",
+	boost::shared_ptr<gd::Automatism>(new AutomatismClassName),
+	boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
  * \endcode
  * The last line can be replaced by <code>boost::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
  *
@@ -613,10 +515,9 @@ public:
                        _("Description"),
                        "CppPlatform/Extensions/myicon.png",
                        &CreateMyObject,
-                       &DestroyMyObject,
-                       "ObjectClassName");
+                       &DestroyMyObject);
 
-            AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName, DestroyRuntimeObjectName);
+            AddRuntimeObject(obj, "RuntimeObjectName", CreateRuntimeObjectName);
 
             #if defined(GD_IDE_ONLY)
             obj.SetIncludeFile("MyExtension/MyIncludeFile.h");
@@ -658,12 +559,6 @@ public:
 // -- Do not need to be modified. --
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
-}
-
-// Used by GDevelop to destroy the extension class
-// -- Do not need to be modified. --
-extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
-    delete p;
 }
  * \endcode
  */

@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -62,7 +62,8 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
         return;
     }
 
-    TiXmlDocument doc( wxFileName::GetTempDir()+"/GDTemporaries/"+"updateinfo.xml" );
+	std::string updateInfoFileName = wxFileName::GetTempDir().ToStdString()+"/GDTemporaries/updateinfo.xml";
+    TiXmlDocument doc( updateInfoFileName.c_str() );
     if ( !doc.LoadFile() )
     {
         gd::LogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );

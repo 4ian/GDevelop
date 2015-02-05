@@ -1,6 +1,6 @@
 /**
 GDevelop - Draggable Automatism Extension
-Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2013-2015 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
@@ -32,6 +32,7 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
 
     //Begin drag ?
     if ( !this._dragged && runtimeScene.getGame().isMouseButtonPressed(0) &&
+         !gdjs.DraggableRuntimeAutomatism.leftPressedLastFrame &&
          !gdjs.DraggableRuntimeAutomatism.draggingSomething ) {
 
         mousePos = runtimeScene.getLayer(this.owner.getLayer()).convertCoords(
@@ -67,10 +68,14 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
                 runtimeScene.getGame().getMouseY());
         }
 
-        this.owner.setX(mousePos[0]-this._xOffset);
-        this.owner.setY(mousePos[1]-this._yOffset);
-
+        this.owner.setX(mousePos[0] - this._xOffset);
+        this.owner.setY(mousePos[1] - this._yOffset);
     }
+};
+
+gdjs.DraggableRuntimeAutomatism.prototype.doStepPostEvents = function(runtimeScene) {
+    gdjs.DraggableRuntimeAutomatism.leftPressedLastFrame =
+        runtimeScene.getGame().isMouseButtonPressed(0);
 };
 
 gdjs.DraggableRuntimeAutomatism.prototype.isDragged = function(runtimeScene) {
@@ -79,3 +84,6 @@ gdjs.DraggableRuntimeAutomatism.prototype.isDragged = function(runtimeScene) {
 
 //Static property used to avoid start dragging an object while another is dragged.
 gdjs.DraggableRuntimeAutomatism.draggingSomething = false;
+
+//Static property used to only start dragging when clicking.
+gdjs.DraggableRuntimeAutomatism.leftPressedLastFrame = false;

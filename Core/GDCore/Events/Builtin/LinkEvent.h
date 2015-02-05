@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef GDCORE_LINKEVENT_H
 #define GDCORE_LINKEVENT_H
@@ -20,7 +20,7 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent
 public:
     LinkEvent() : BaseEvent(), includeAll(true), includeStart(std::string::npos), includeEnd(std::string::npos), linkWasInvalid(false) {};
     virtual ~LinkEvent();
-    virtual gd::BaseEvent * Clone() const { return new LinkEvent(*this);}
+    virtual gd::LinkEvent * Clone() const { return new LinkEvent(*this);}
 
     /**
      * Get the link target ( i.e. the scene or external events the link refers to )

@@ -2,31 +2,12 @@
 
 Sound Object Extension
 Copyright (c) 2011-2012 Thomas Flecy
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+This project is released under the MIT License.
 */
 #include "SoundWrapperBase.h"
 
 #include "GDCpp/Project.h"
-#include "GDCpp/RessourcesLoader.h"
+#include "GDCpp/ResourcesLoader.h"
 
 ///////////////// SoundWrapperBase /////////////////
 
@@ -158,10 +139,10 @@ float SoundWrapper::GetPitch() const
 bool SoundWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene)
 {
     #if !defined(GD_IDE_ONLY)
-    if(gd::RessourcesLoader::Get()->HasFile(filename))
+    if(gd::ResourcesLoader::Get()->HasFile(filename))
     {
-        if(m_buffer.loadFromMemory(gd::RessourcesLoader::Get()->LoadBinaryFile(filename),
-                                   gd::RessourcesLoader::Get()->GetBinaryFileSize(filename)))
+        if(m_buffer.loadFromMemory(gd::ResourcesLoader::Get()->LoadBinaryFile(filename),
+                                   gd::ResourcesLoader::Get()->GetBinaryFileSize(filename)))
         {
             m_sound.setBuffer(m_buffer);
             return true;
@@ -284,10 +265,10 @@ float MusicWrapper::GetPitch() const
 bool MusicWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene)
 {
     #if !defined(GD_IDE_ONLY)
-    if(gd::RessourcesLoader::Get()->HasFile(filename))
+    if(gd::ResourcesLoader::Get()->HasFile(filename))
     {
-        if(m_music.openFromMemory(gd::RessourcesLoader::Get()->LoadBinaryFile(filename),
-                                  gd::RessourcesLoader::Get()->GetBinaryFileSize(filename)))
+        if(m_music.openFromMemory(gd::ResourcesLoader::Get()->LoadBinaryFile(filename),
+                                  gd::ResourcesLoader::Get()->GetBinaryFileSize(filename)))
         {
             return true;
         }

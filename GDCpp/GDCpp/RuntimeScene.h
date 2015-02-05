@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef RUNTIMESCENE_H
 #define RUNTIMESCENE_H
@@ -14,6 +14,10 @@
 #include <SFML/System.hpp>
 #include <boost/shared_ptr.hpp>
 #include "GDCpp/ObjInstancesHolder.h"
+#include "GDCpp/RuntimeLayer.h"
+#include "GDCpp/Text.h"
+#include "GDCpp/ManualTimer.h"
+#include "GDCpp/AutomatismsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
 namespace gd { class Project; }
@@ -26,7 +30,6 @@ class AutomatismsRuntimeSharedData;
 class ExtensionBase;
 class Text;
 class CodeExecutionEngine;
-class ManualTimer;
 #undef GetObject //Disable an annoying macro
 
 #if defined(GD_IDE_ONLY)
@@ -49,11 +52,8 @@ public:
     RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
     virtual ~RuntimeScene();
 
-    RuntimeScene& operator=(const RuntimeScene & scene);
-    RuntimeScene(const RuntimeScene & scene);
-
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display.
-    RuntimeGame *                       game; ///< Pointer to the game the scene is linked to.
+    RuntimeGame *                           game; ///< Pointer to the game the scene is linked to.
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
@@ -72,7 +72,7 @@ public:
     inline RuntimeVariablesContainer & GetVariables() { return variables; }
 
     /**
-     * \brief Shortcut for game.GetImageManager()
+     * \brief Shortcut for game->GetImageManager()
      * \return The image manager of the game.
      */
     boost::shared_ptr<gd::ImageManager> GetImageManager() const;
@@ -89,10 +89,11 @@ public:
     void DisplayText(Text & text);
 
     /**
-     * Get the AutomatismsRuntimeSharedData associated with automatism.
-     * Be careful, no check is made to ensure that the shared data exist.
+     * \brief Return the shared data for an automatism.
+     * \warning Be careful, no check is made to ensure that the shared data exist.
+     * \param name The name of the automatism for which shared data must be fetched.
      */
-    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
+    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -147,6 +148,11 @@ public:
     void GotoSceneWhenEventsAreFinished(int scene);
 
     /**
+     * \brief Return the key code (see sf::Keyboard::Key) of the latest pressed key.
+     */
+    int GetLastPressedKey() { return lastPressedKey; }
+
+    /**
      * Render and play the scene one frame.
      * \return -1 for doing nothing, -2 to quit the game, another number to change the scene
      */
@@ -183,17 +189,10 @@ public:
     inline bool IsFirstLoop() const { return firstLoop; };
 
     /**
-     * Notify the scene that something ( Like an open file dialog ) stopped scene rendering for a certain amount of time.
+     * Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
      * \param pauseTime_ Pause duration, in microseconds.
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
-
-    void ManageRenderTargetEvents();
-
-    /**
-     * Order an object list according to object's Z coordinate.
-     */
-    bool OrderObjectsByZOrder( RuntimeObjList & objList );
 
     /**
      * Get a read-only list of SFML events managed by the render target.
@@ -232,16 +231,39 @@ public:
 protected:
 
     /**
-     * Render a frame in the window
+     * \brief Handle the events made on the scene's window
+     */
+    void ManageRenderTargetEvents();
+
+    /**
+     * \brief Order an object list according to object's Z coordinate.
+     */
+    bool OrderObjectsByZOrder( RuntimeObjList & objList );
+
+    /**
+     * \brief Render a frame in the window
      */
     void Render();
+
+    /**
+     * \brief To be called once during a step, to launch automatisms pre-events steps.
+     */
     void ManageObjectsBeforeEvents();
+
+    /**
+     * \brief To be called once during a step, to remove objects marked as deleted in events,
+     * and to update objects position, forces and automatisms.
+     */
     void ManageObjectsAfterEvents();
+
     bool UpdateTime();
+
+    bool DisplayLegacyTexts(std::string layer = "");
 
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     std::vector<sf::Event>                  renderTargetEvents;
+    int                                     lastPressedKey;
     signed int                              realElapsedTime; ///< Elapsed time since last frame, in microseconds, without taking time scale in account.
     signed int                              elapsedTime; ///< Elapsed time since last frame, in microseconds ( elapsedTime = realElapsedTime*timeScale ).
     double                                  timeScale; ///< Time scale
@@ -252,15 +274,10 @@ protected:
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
-    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
-    CppPlatform *                           platform;
-
-    std::vector < Text >                    textes; ///<Deprecated way of displaying a text
-    bool DisplayLegacyTexts(std::string layer = "");
-
-    void Init(const RuntimeScene & scene);
+    std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.
 };

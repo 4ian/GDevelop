@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -151,6 +151,7 @@ ChooseObjectTypeDialog::~ChooseObjectTypeDialog()
 
 void ChooseObjectTypeDialog::RefreshList()
 {
+    selectedObjectType = "";
     objectsList->DeleteAllItems();
 
     wxImageList * imageList = new wxImageList(32,32);
@@ -187,6 +188,10 @@ void ChooseObjectTypeDialog::RefreshList()
                 objectsList->SetItemPtrData(index, wxPtrToUInt(associatedData));
                 if ( !extensionEnabled ) objectsList->SetItemTextColour(index, wxColor(128,128,128));
 
+                //Ensure the selected object type is the focused element (focused element is not considered
+                //as selected with wxGTK).
+                selectedObjectType = selectedObjectType.empty() || extensionEnabled ?
+                    objectsTypes[j] : selectedObjectType;
 	        }
 	    }
 	}

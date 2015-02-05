@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef EXPORTER_H
 #define EXPORTER_H
@@ -53,7 +53,7 @@ public:
      * Called by ShowProjectExportDialog if the user clicked on Ok.
      */
     bool ExportWholeProject(gd::Project & project, std::string exportDir,
-        bool minify, bool exportForGDShare, bool exportForCocoonJS, bool exportForIntelXDK);
+        bool minify, bool exportForCocoonJS, bool exportForIntelXDK);
 
     /**
      * \brief Return the error that occurred during the last export.
@@ -119,6 +119,18 @@ private:
     bool ExportEventsCode(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles);
 
     /**
+     * \brief Copy the external source files used by the game into the export directory, and add them into files
+     * to be included.
+     *
+     * Files are named "ext-codeX.js", X being the number of the layout in the project.
+     * \param project The project with resources to be exported.
+     * \param outputDir The directory where the events code must be generated.
+     * \param includesFiles A reference to a vector that will be filled with JS files to be exported along with the project.
+     * ( including "ext-codeX.js" files ).
+     */
+    bool ExportExternalSourceFiles(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles);
+
+    /**
      * \brief Generate the standard index file and save it to the export directory.
      *
      * The includes files must be relative to the export directory.
@@ -153,18 +165,6 @@ private:
      * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC" surrounded by comments marks will be replaced by the content of the string.
      */
     bool CompleteIndexFile(std::string & indexFileContent, std::string customCss, std::string customHtml, std::string exportDir, const std::vector<std::string> & includesFiles, std::string additionalSpec);
-
-    /**
-     * \brief Generate the metadata file and save it to the export directory.
-     * The metadata is used for the online game sharing service.
-     *
-     * The includes files must be relative to the export directory.
-     *
-     * \param project The project with layouts to be exported.
-     * \param exportDir The directory where the preview/export must be done.
-     * \param includesFiles The JS files to be included in the metadata
-     */
-    bool ExportMetadataFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles);
 
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     std::string lastError; ///< The last error that occurred.

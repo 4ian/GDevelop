@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -102,14 +102,11 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
 
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
-            vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), *i));
+            if (!game.HasSourceFile(*i, "C++")) continue;
+            const gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
-            if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
-            {
-                std::cout << "Added GD" << gd::ToString((*sourceFile).get()) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
-                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
-            }
+            std::cout << "Added GD" << gd::ToString(&sourceFile) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
+            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&sourceFile)+"RuntimeObjectFile.o"));
         }
     }
     for (unsigned int l= 0;l<game.GetExternalEventsCount();++l)
@@ -291,8 +288,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Encrypt the source file.
     {
-        ifstream ifile(tempDir+"/GDProjectSrcFile.gdg",ios_base::binary);
-        ofstream ofile(tempDir+"/src",ios_base::binary);
+		std::string ifileName = tempDir.ToStdString() + "/GDProjectSrcFile.gdg";
+		std::string ofileName = tempDir.ToStdString() + "/src";
+
+        ifstream ifile(ifileName.c_str(), ios_base::binary);
+        ofstream ofile(ofileName.c_str(), ios_base::binary);
 
         // get file size
         ifile.seekg(0,ios_base::end);
@@ -449,7 +449,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             }
         }
     }
-    if ( game.useExternalSourceFiles )
+    if ( game.UseExternalSourceFiles() )
     {
         if ( wxCopyFile( "dynext.dxgd", tempDir + "/" + "dynext.dxgd", true ) == false )
             diagnosticManager.AddError(gd::ToString(_( "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n" )));

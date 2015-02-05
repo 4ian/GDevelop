@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "CommonInstructionsExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -39,7 +39,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                           _("Standard events"),
                           _("Built-in extension providing standard events."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     {
         class CodeGen : public gd::EventMetadata::CodeGenerator
@@ -547,82 +547,70 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         GetAllEvents()["BuiltinCommonInstructions::ForEach"].codeGeneration = boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen);
     }
 
-    {/*
+    {
+        class CodeGen : public gd::EventMetadata::CodeGenerator
+        {
+            virtual std::string Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            {
+                return codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+            }
+        };
+        gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
+
+        GetAllEvents()["BuiltinCommonInstructions::Group"]
+            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+    }
+
+    {
         class CodeGen : public gd::EventMetadata::CodeGenerator
         {
             virtual std::string Generate(gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
-                CppCodeEvent & event = dynamic_cast<CppCodeEvent&>(event_);
-
-                const gd::Project & project = codeGenerator.GetProject();
+                JsCodeEvent & event = dynamic_cast<JsCodeEvent&>(event_);
                 const gd::Layout & scene = codeGenerator.GetLayout();
 
-                //Generate the code to call the associated source file
-                std::string functionPrototype = "void "+event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "RuntimeScene & scene" :"")
-                                                + ((event.GetPassSceneAsParameter() && event.GetPassObjectListAsParameter()) ? ", ":"")
-                                                + (event.GetPassObjectListAsParameter() ? "std::vector<RuntimeObject*> objectsList" :"") + ");";
-                codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
+                string functionName = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.userFunc"
+                    + gd::ToString(&event);
+                std::string callArguments = "runtimeScene";
+                if (!event.GetParameterObjects().empty()) callArguments += ", objects";
 
-                std::string outputCode;
-                outputCode += "{";
+                //Generate the function code
+                std::string functionCode;
+                functionCode += functionName + " = function("+callArguments+") {\n";
+                functionCode += event.GetInlineCode();
+                functionCode += "\n};\n";
+                codeGenerator.AddCustomCodeOutsideMain(functionCode);
 
-                //Prepare objects list if needed
-                if ( event.GetPassObjectListAsParameter() )
+                //Generate the code to call the function
+                std::string callingCode;
+                if (!event.GetParameterObjects().empty())
                 {
-                    std::string objectToPassAsParameter = event.GetObjectToPassAsParameter();
+                    std::vector<std::string> realObjects =
+                        codeGenerator.ExpandObjectsName(event.GetParameterObjects(), parentContext);
 
-                    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(),
-                                                                                    project.GetObjectGroups().end(),
-                                                                                    bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
-                    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(),
-                                                                                   scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(),
-                                                                                                                          objectToPassAsParameter));
-
-                    std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-                    if ( globalGroup != project.GetObjectGroups().end() )
-                        realObjects = (*globalGroup).GetAllObjectsNames();
-                    else if ( sceneGroup != scene.GetObjectGroups().end() )
-                        realObjects = (*sceneGroup).GetAllObjectsNames();
-                    else
-                        realObjects.push_back(objectToPassAsParameter);
-
-                    //Ensure that all returned objects actually exists.
-                    for (unsigned int i = 0; i < realObjects.size();)
-                    {
-                        if ( !codeGenerator.GetLayout().HasObjectNamed(realObjects[i]) && !codeGenerator.GetProject().HasObjectNamed(realObjects[i]) )
-                            realObjects.erase(realObjects.begin()+i);
-                        else
-                            ++i;
-                    }
-
-                    if ( realObjects.empty() ) return "";
-
-                    outputCode += "std::vector<RuntimeObject*> functionObjects;";
+                    callingCode += "var objects = [];\n";
                     for (unsigned int i = 0;i<realObjects.size();++i)
                     {
                         parentContext.ObjectsListNeeded(realObjects[i]);
-                        outputCode += "functionObjects.insert("+ string(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
+                        callingCode += "objects.push.apply(objects,"
+                            + codeGenerator.GetObjectListName(realObjects[i], parentContext)+");\n";
                     }
                 }
 
-                std::string functionCall = event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "*runtimeContext->scene" :"")
-                                           +((event.GetPassSceneAsParameter() && event.GetPassObjectListAsParameter()) ? ", ":"")
-                                           +(event.GetPassObjectListAsParameter() ? "functionObjects" :"") + ");";
-                outputCode += ""+functionCall+"\n";
 
-                outputCode += "}";
-                return outputCode;
+                callingCode += functionName + "(" + callArguments + ");\n";
+                return callingCode;
             }
         };
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         AddEvent("JsCode",
                   _("Javascript code (Web platform only)"),
-                  _("Execute Javascript code"),
+                  _("Insert some Javascript code into events"),
                   "",
                   "res/source_cpp16.png",
                   boost::shared_ptr<gd::BaseEvent>(new JsCodeEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));*/
+                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 }
 

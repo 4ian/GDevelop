@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef FONTMANAGER_H
 #define FONTMANAGER_H
@@ -20,6 +20,8 @@ public:
 
     /**
      * \brief Return a pointer to an SFML font.
+     *
+     * The font is stored in the font manager.
      *
      * Example :
      * \code
@@ -56,6 +58,7 @@ private:
     void EnsureDefaultFontIsLoaded();
 
     std::map < std::string, sf::Font* > fonts; ///< The font being loaded.
+    std::map < std::string, char* > fontsBuffer; ///< The buffer associated to each font, if any.
     sf::Font * defaultFont; ///< The default font used when no font is specified. Initialized at first use.
 
     FontManager() : defaultFont(NULL) {};

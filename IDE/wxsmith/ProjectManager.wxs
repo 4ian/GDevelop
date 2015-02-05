@@ -199,11 +199,11 @@
 		</object>
 		<object class="wxMenu" variable="sourceFilesContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM18" variable="MenuItem14" member="yes">
-				<label>Create a new C++ file</label>
+				<label>Create a new source file</label>
 				<handler function="OnCreateNewCppFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem10" member="yes">
-				<label>Add an already existing C++ file</label>
+				<label>Add an already existing source file</label>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddCppSourceFileSelected" entry="EVT_MENU" />
 			</object>
@@ -223,11 +223,11 @@
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">
-				<label>Create a new C++ file</label>
+				<label>Create a new source file</label>
 				<handler function="OnCreateNewCppFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM17" variable="MenuItem13" member="yes">
-				<label>Add an already existing C++ file</label>
+				<label>Add an already existing source file</label>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddCppSourceFileSelected" entry="EVT_MENU" />
 			</object>

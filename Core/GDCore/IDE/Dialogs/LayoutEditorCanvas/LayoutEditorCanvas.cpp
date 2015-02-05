@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LayoutEditorCanvas.h"
@@ -95,6 +95,7 @@ const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM50 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM25 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM10 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM5 = wxNewId();
+wxRibbonButtonBar * LayoutEditorCanvas::modeRibbonBar = NULL;
 
 LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, LayoutEditorCanvasOptions & options_, gd::MainFrameWrapper & mainFrameWrapper_) :
     project(project_),
@@ -161,7 +162,8 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
 	Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftUp);
 	Connect(wxEVT_LEFT_DCLICK,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftDClick);
 	Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnRightUp);
-	Connect(wxEVT_MIDDLE_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleDown);
+    Connect(wxEVT_MIDDLE_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleDown);
+	Connect(wxEVT_MIDDLE_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleUp);
 	Connect(wxEVT_MOTION,(wxObjectEventFunction)&LayoutEditorCanvas::OnMotion);
 	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnKey);
 	Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnKeyUp);
@@ -297,6 +299,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     setFramerateLimit(30);
     editionView.setCenter( (project.GetMainWindowDefaultWidth()/2),(project.GetMainWindowDefaultHeight()/2));
     RecreateRibbonToolbar();
+    UpdateModeButtonsState();
 }
 
 LayoutEditorCanvas::~LayoutEditorCanvas()
@@ -416,6 +419,14 @@ void LayoutEditorCanvas::OnPreviewForPlatformSelected( wxCommandEvent & event )
     OnPreviewBtClick(useless);
 }
 
+void LayoutEditorCanvas::UpdateModeButtonsState()
+{
+    if (!modeRibbonBar) return;
+
+    modeRibbonBar->EnableButton(idRibbonEditMode, !editing);
+    modeRibbonBar->EnableButton(idRibbonPreviewMode, editing);
+}
+
 /**
  * Go in preview mode
  */
@@ -441,6 +452,7 @@ void LayoutEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
 
     std::cout << "Switching to preview mode..." << std::endl;
 
+    UpdateModeButtonsState();
     UpdateSize();
     UpdateScrollbars();
 
@@ -475,6 +487,7 @@ void LayoutEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
     if ( currentPreviewer ) currentPreviewer->StopPreview();
 
     //Let the IDE go back to edition state
+    UpdateModeButtonsState();
     UpdateSize();
     UpdateScrollbars();
     ReloadResources();
@@ -497,9 +510,9 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
 
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
-        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
+        modeRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
+        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -959,6 +972,8 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
 void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
 {
+    if (!editing) return;
+
     //First check if we're using a resize button
     if ( currentDraggableBt.substr(0,6) == "resize")
     {
@@ -1026,6 +1041,8 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
             float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
             it->first->SetAngle(newAngle);
         }
+
+        UpdateMouseResizeCursor(currentDraggableBt);
     }
     else //No buttons being used
     {
@@ -1040,19 +1057,22 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
         double mouseX = GetMouseXOnLayout();
         double mouseY = GetMouseYOnLayout();
 
-        if ( !editing )
-            gd::LogStatus( gd::ToString(wxString::Format( wxString(_( "Position %f;%f (Base layer, camera 0)." )),
-                mouseX, mouseY )) );
-        else
-            gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
-                mouseX, mouseY )) );
+        gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
+            mouseX, mouseY )) );
 
         //Check if there is a gui element hovered inside the layout
+        bool hoveringSomething = false;
         for (unsigned int i = 0;i<guiElements.size();++i)
         {
-            if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) )
+            if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) ) {
                 OnGuiElementHovered(guiElements[i]);
+                hoveringSomething = true;
+            }
         }
+
+        //Ensure cursor returns to the default cursor on wxGTK
+        if (!hoveringSomething && !isMovingView)
+            SetCursor(wxNullCursor);
 
         if ( isMovingInstance )
         {
@@ -1089,22 +1109,19 @@ void LayoutEditorCanvas::OnMiddleDown( wxMouseEvent &event )
     if ( !editing ) return;
 
     //User can move the view thanks to middle click
-    if ( !isMovingView )
-    {
-        isMovingView = true;
-        movingViewMouseStartPosition = sf::Vector2f(sf::Mouse::getPosition(*this));
-        movingViewStartPosition = getView().getCenter();
-        SetCursor( wxCursor( wxCURSOR_SIZING ) );
-
-        return;
-    }
-    else
-    {
-        isMovingView = false;
-        SetCursor( wxNullCursor );
-    }
+    isMovingView = true;
+    movingViewMouseStartPosition = sf::Vector2f(sf::Mouse::getPosition(*this));
+    movingViewStartPosition = getView().getCenter();
+    SetCursor(wxCursor(wxCURSOR_SIZING));
 }
 
+void LayoutEditorCanvas::OnMiddleUp(wxMouseEvent & event)
+{
+    if ( !editing ) return;
+
+    isMovingView = false;
+    SetCursor(wxNullCursor);
+}
 
 void LayoutEditorCanvas::OnLeftDClick( wxMouseEvent &event )
 {
@@ -1411,13 +1428,15 @@ gd::Object * LayoutEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialIns
 void LayoutEditorCanvas::UpdateMouseResizeCursor(const std::string & currentDraggableBt)
 {
     if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeDown"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZENS));
-    if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeRight"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZEWE));
-    if ( currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightDown"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZENWSE));
-    if ( currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeLeftDown"  )
-        wxSetCursor(wxCursor(wxCURSOR_SIZENESW));
+        SetCursor(wxCursor(wxCURSOR_SIZENS));
+    else if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeRight"  )
+        SetCursor(wxCursor(wxCURSOR_SIZEWE));
+    else if ( currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightDown"  )
+        SetCursor(wxCursor(wxCURSOR_SIZENWSE));
+    else if ( currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeLeftDown"  )
+        SetCursor(wxCursor(wxCURSOR_SIZENESW));
+    else if ( currentDraggableBt == "angle" )
+        SetCursor(wxCursor(wxCURSOR_HAND));
 }
 
 bool LayoutEditorCanvas::PreviewPaused() const

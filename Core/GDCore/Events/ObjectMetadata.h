@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef OBJECTMETADATA_H
 #define OBJECTMETADATA_H
@@ -17,14 +17,14 @@ namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
 class wxBitmap;
 
-typedef void (*DestroyFunPtr)(gd::Object*);
 typedef gd::Object * (*CreateFunPtr)(std::string name);
 
 namespace gd
 {
 
 /**
- * \brief Contains user-friendly information about an object type
+ * \brief Contains user-friendly information about an object type, and a
+ * function to create a new gd::Object of this type.
  *
  * \ingroup Events
  */
@@ -36,9 +36,8 @@ public:
                    const std::string & fullname_,
                    const std::string & informations_,
                    const std::string & icon24x24_,
-                   CreateFunPtr createFunPtrP,
-                   DestroyFunPtr destroyFunPtrP);
-    ObjectMetadata() : createFunPtr(NULL), destroyFunPtr(NULL) {}
+                   CreateFunPtr createFunPtrP);
+    ObjectMetadata() : createFunPtr(NULL) {}
     virtual ~ObjectMetadata() {};
 
     /**
@@ -133,7 +132,7 @@ public:
     std::string className;
 #endif
     CreateFunPtr createFunPtr;
-    DestroyFunPtr destroyFunPtr;
+
 private:
     std::string extensionNamespace;
     std::string name;

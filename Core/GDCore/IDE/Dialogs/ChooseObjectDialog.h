@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -99,7 +99,6 @@ private:
     void OnObjetsListSelectionChanged(wxTreeEvent& event);
     void OnChoisirBtClick(wxCommandEvent& event);
     void OnAnnulerBtClick(wxCommandEvent& event);
-    void OnAucunBtClick(wxCommandEvent& event);
     void OnObjetsListItemRightClick(wxTreeEvent& event);
     void OnGroupesListSelectionChanged(wxTreeEvent& event);
     void OnObjetsListItemActivated(wxTreeEvent& event);
@@ -119,10 +118,7 @@ private:
      */
     void Refresh();
 
-    wxTreeItemId item;
-    wxTreeItemId itemGroups;
-    wxTreeItemId itemGlobal;
-    wxTreeItemId itemGlobalGroups;
+    wxTreeItemId item; ///< The selected item in the tree.
 
     Project & project;
     gd::Layout & layout;

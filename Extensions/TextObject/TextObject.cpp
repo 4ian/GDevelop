@@ -1,27 +1,8 @@
 /**
 
 GDevelop - Text Object Extension
-Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
 */
 
 #if defined(GD_IDE_ONLY)
@@ -29,7 +10,7 @@ freely, subject to the following restrictions:
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Object.h"
-
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/FontManager.h"
@@ -145,15 +126,19 @@ void TextObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool TextObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/texticon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void TextObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     TextObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
+#endif
 }
 #endif
 
@@ -397,30 +382,12 @@ unsigned int RuntimeTextObject::GetNumberOfProperties() const
 }
 #endif
 
-void DestroyRuntimeTextObject(RuntimeObject * object)
-{
-    delete object;
-}
 
 RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeTextObject(scene, object);
 }
 
-/**
- * Function destroying an extension Object.
- * GDevelop does not delete directly extension object
- * to avoid overloaded new/delete conflicts.
- */
-void DestroyTextObject(gd::Object * object)
-{
-    delete object;
-}
-
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
 gd::Object * CreateTextObject(std::string name)
 {
     return new TextObject(name);

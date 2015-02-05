@@ -1,27 +1,8 @@
 /**
 
 GDevelop - Tile Map Extension
-Copyright (c) 2014 Victor Levasseur (victorlevasseur52@gmail.com)
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+Copyright (c) 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com)
+This project is released under the MIT License.
 */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -43,13 +24,13 @@ freely, subject to the following restrictions:
 class ChangeTileCommand : public wxCommand
 {
 public:
-    ChangeTileCommand(TileMap &tileMap, int layer, int col, int row, int newTileId) : 
-        wxCommand(true), m_tileMap(tileMap), m_layer(layer), m_row(row), m_col(col), m_endCol(col), m_endRow(row), m_newTileId(newTileId) 
+    ChangeTileCommand(TileMap &tileMap, int layer, int col, int row, int newTileId) :
+        wxCommand(true), m_tileMap(tileMap), m_layer(layer), m_row(row), m_col(col), m_endCol(col), m_endRow(row), m_newTileId(newTileId)
     {
         m_oldTileId.resize(1);
     };
 
-    ChangeTileCommand(TileMap &tileMap, int layer, int col, int row, int endCol, int endRow, int newTileId) : 
+    ChangeTileCommand(TileMap &tileMap, int layer, int col, int row, int endCol, int endRow, int newTileId) :
         wxCommand(true), m_tileMap(tileMap), m_layer(layer), m_row(row), m_col(col), m_endCol(endCol), m_endRow(endRow), m_newTileId(newTileId)
     {
         m_oldTileId.resize((m_endCol - m_col + 1) * (m_endRow - m_row + 1));
@@ -108,10 +89,14 @@ public:
 
     virtual bool Do()
     {
+        if (m_col < 0 || m_col >= m_tileMap.GetColumnsCount() || m_row < 0 || m_row >= m_tileMap.GetRowsCount())
+            return true; //Out of bound position.
+
         m_tileChanged.clear();
         m_oldTileId = m_tileMap.GetTile(m_layer, m_col, m_row);
 
-        FloodFill(m_col, m_row);
+        if (m_newTileId != m_oldTileId) //Beware, flood fill will loop forever if replacing a tile with the same!
+            FloodFill(m_col, m_row);
 
         return true;
     }

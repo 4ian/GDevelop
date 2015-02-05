@@ -27,5 +27,5 @@ or any pull request so as to add a nice feature, do not hesitate to get in touch
 License
 -------
 
-GDevelop C++ Platform is distributed under the GNU LGPL license: See license.txt for
+GDevelop C++ Platform is distributed under the MIT license: See license.txt for
 more information.

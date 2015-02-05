@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                           _("Window features"),
                           _("Built-in extension allowing to manipulate the game's window"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("EcrireTexte",
@@ -26,6 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    _("Scene"),
                    "res/actions/texte24.png",
                    "res/actions/texte.png")
+        .SetHidden() //Deprecated
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Text"), "",false)
         .AddParameter("expression", _("X position"), "",false)
@@ -91,16 +92,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("New title"), "",false);
 
-    extension.AddExpression("SceneWindowWidth", _("Width of the scene's window"), _("Width of the scene's window"), _("Screen"), "res/window.png")
+    extension.AddExpression("SceneWindowWidth", _("Width of the scene window"), _("Width of the scene window (or scene canvas for HTML5 games)"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "");
 
-    extension.AddExpression("SceneWindowHeight", _("Height of the scene's window"), _("Height of the scene's window"), _("Screen"), "res/window.png")
+    extension.AddExpression("SceneWindowHeight", _("Height of the scene window"), _("Height of the scene window (or scene canvas for HTML5 games)"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "");
 
+    extension.AddExpression("ScreenWidth", _("Width of the screen/page"), _("Width of the screen (or the page for HTML5 games in browser)"), _("Screen"), "res/display16.png");
 
-    extension.AddExpression("ScreenWidth", _("Width of the current resolution"), _("Width of the current resolution"), _("Screen"), "res/display16.png");
-
-    extension.AddExpression("ScreenHeight", _("Height of the current resolution"), _("Height of the current resolution"), _("Screen"), "res/display16.png");
+    extension.AddExpression("ScreenHeight", _("Height of the screen/page"), _("Height of the screen (or the page for HTML5 games in browser)"), _("Screen"), "res/display16.png");
 
     extension.AddExpression("ColorDepth", _("Color depth"), _("Color depth"), _("Screen"), "res/display16.png");
 

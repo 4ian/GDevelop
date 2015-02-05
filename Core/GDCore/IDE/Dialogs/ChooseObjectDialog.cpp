@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -19,6 +19,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
 namespace gd
 {
@@ -113,6 +114,7 @@ canSelectGroup(canSelectGroup_)
         objectsList->SetWindowStyleFlag(objectsList->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
     }
 
+	ChoisirBt->SetMinSize(wxSize(-1, 25)); //Ensure the choose button is not hidden.
     SetSize(400, 500);
 	Refresh();
 }
@@ -148,15 +150,14 @@ void ChooseObjectDialog::OnAnnulerBtClick(wxCommandEvent& event)
     EndModal(0);
 }
 
-void ChooseObjectDialog::OnAucunBtClick(wxCommandEvent& event)
-{
-    objectChosen.clear();
-    EndModal(1);
-}
-
 void ChooseObjectDialog::OnObjetsListSelectionChanged(wxTreeEvent& event)
 {
     item = event.GetItem();
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    if(!data)
+    	ChoisirBt->Disable();
+    else
+    	ChoisirBt->Enable();
 }
 
 void ChooseObjectDialog::OnObjetsListItemRightClick(wxTreeEvent& event)
@@ -168,61 +169,13 @@ void ChooseObjectDialog::OnObjetsListItemRightClick(wxTreeEvent& event)
 void ChooseObjectDialog::OnObjetsListItemActivated(wxTreeEvent& event)
 {
     item = event.GetItem();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    if(!data)
+    	return;
+
     wxCommandEvent uselessEvent;
     OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnGroupesListSelectionChanged(wxTreeEvent& event)
-{
-    itemGroups = event.GetItem();
-}
-void ChooseObjectDialog::OnGroupesListItemRightClick(wxTreeEvent& event)
-{
-    itemGroups = event.GetItem();
-    PopupMenu(&Menu2);
-}
-
-void ChooseObjectDialog::OnGroupesListItemActivated(wxTreeEvent& event)
-{
-    itemGroups = event.GetItem();
-    wxCommandEvent uselessEvent;
-    OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnglobalObjectsListSelectionChanged(wxTreeEvent& event)
-{
-    itemGlobal = event.GetItem();
-}
-
-void ChooseObjectDialog::OnglobalObjectsListItemRightClick(wxTreeEvent& event)
-{
-    itemGlobal = event.GetItem();
-    PopupMenu(&Menu1);
-}
-
-void ChooseObjectDialog::OnglobalObjectGroupsSelectionChanged(wxTreeEvent& event)
-{
-    itemGlobalGroups = event.GetItem();
-}
-
-void ChooseObjectDialog::OnglobalObjectsListItemActivated(wxTreeEvent& event)
-{
-    itemGlobal = event.GetItem();
-    wxCommandEvent uselessEvent;
-    OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnglobalObjectGroupsItemActivated(wxTreeEvent& event)
-{
-    itemGlobalGroups = event.GetItem();
-    wxCommandEvent uselessEvent;
-    OnChoisirBtClick(uselessEvent);
-}
-
-void ChooseObjectDialog::OnglobalObjectGroupsItemRightClick(wxTreeEvent& event)
-{
-    itemGlobalGroups = event.GetItem();
-    PopupMenu(&Menu2);
 }
 
 void ChooseObjectDialog::OnsearchCtrlText(wxCommandEvent& event)

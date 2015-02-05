@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef EXPRESSIONMETADATA_H
 #define EXPRESSIONMETADATA_H
@@ -142,6 +142,7 @@ public:
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDescription() const { return description; }
     const std::string & GetGroup() const { return group; }
+    const std::string & GetSmallIconFilename() const { return smallIconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif

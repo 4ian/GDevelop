@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -16,7 +16,7 @@ SpriteExtension::SpriteExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension(*this);
 
     gd::ObjectMetadata & obj = GetObjectMetadata("Sprite");
-    AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject, &DestroyRuntimeSpriteObject);
+    AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject);
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("GDCpp/RuntimeSpriteObject.h");

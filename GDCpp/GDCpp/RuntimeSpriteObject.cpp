@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -138,7 +138,7 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
  */
 float RuntimeSpriteObject::GetDrawableX() const
 {
-    return X - GetCurrentSprite().GetOrigine().GetX()*fabs(scaleX);
+    return X - GetCurrentSprite().GetOrigin().GetX()*fabs(scaleX);
 }
 
 /**
@@ -146,7 +146,7 @@ float RuntimeSpriteObject::GetDrawableX() const
  */
 float RuntimeSpriteObject::GetDrawableY() const
 {
-    return Y - GetCurrentSprite().GetOrigine().GetY()*fabs(scaleY);
+    return Y - GetCurrentSprite().GetOrigin().GetY()*fabs(scaleY);
 }
 
 /**
@@ -198,7 +198,7 @@ void RuntimeSpriteObject::SetOriginalSize()
 float RuntimeSpriteObject::GetCenterX() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSprite().GetCentre().GetX()*fabs(scaleX);
+    return GetCurrentSprite().GetCenter().GetX()*fabs(scaleX);
 }
 
 /**
@@ -207,7 +207,7 @@ float RuntimeSpriteObject::GetCenterX() const
 float RuntimeSpriteObject::GetCenterY() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSprite().GetCentre().GetY()*fabs(scaleY);
+    return GetCurrentSprite().GetCenter().GetY()*fabs(scaleY);
 }
 
 float RuntimeSpriteObject::GetPointX(const std::string & name) const
@@ -299,8 +299,7 @@ void RuntimeSpriteObject::MakeColorTransparent( const std::string & colorStr )
 void RuntimeSpriteObject::SetColor(const std::string & colorStr)
 {
     std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
-
-    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+    if ( colors.size() < 3 ) return; //Color is not valid
 
     SetColor(  ToInt(colors[0]),
                ToInt(colors[1]),
@@ -333,12 +332,12 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
         }
     }
 
-    ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCentre().GetX(), ptrToCurrentSprite->GetCentre().GetY() ); ;
+    ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCenter().GetX(), ptrToCurrentSprite->GetCenter().GetY() ); ;
     ptrToCurrentSprite->GetSFMLSprite().setRotation( multipleDirections ? 0 : currentAngle );
-    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCentre().GetX() - ptrToCurrentSprite->GetOrigine().GetX())*fabs(scaleX),
-                                                     Y + (ptrToCurrentSprite->GetCentre().GetY() - ptrToCurrentSprite->GetOrigine().GetY())*fabs(scaleY) );
-    if ( isFlippedX ) ptrToCurrentSprite->GetSFMLSprite().move((ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width/2-ptrToCurrentSprite->GetCentre().GetX())*fabs(scaleX)*2,0 );
-    if ( isFlippedY ) ptrToCurrentSprite->GetSFMLSprite().move(0, (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height/2-ptrToCurrentSprite->GetCentre().GetY())*fabs(scaleY)*2);
+    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCenter().GetX() - ptrToCurrentSprite->GetOrigin().GetX())*fabs(scaleX),
+                                                     Y + (ptrToCurrentSprite->GetCenter().GetY() - ptrToCurrentSprite->GetOrigin().GetY())*fabs(scaleY) );
+    if ( isFlippedX ) ptrToCurrentSprite->GetSFMLSprite().move((ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width/2-ptrToCurrentSprite->GetCenter().GetX())*fabs(scaleX)*2,0 );
+    if ( isFlippedY ) ptrToCurrentSprite->GetSFMLSprite().move(0, (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height/2-ptrToCurrentSprite->GetCenter().GetY())*fabs(scaleY)*2);
     ptrToCurrentSprite->GetSFMLSprite().setScale( scaleX, scaleY );
     ptrToCurrentSprite->GetSFMLSprite().setColor( sf::Color( colorR, colorV, colorB, opacity ) );
 
@@ -685,12 +684,6 @@ AnimationProxy & AnimationProxy::operator=(const AnimationProxy & rhs)
     *animation = gd::Animation(rhs.Get());
 
     return *this;
-}
-
-
-void DestroyRuntimeSpriteObject(RuntimeObject * object)
-{
-    delete object;
 }
 
 RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)

@@ -203,7 +203,7 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem6" member="yes">
 				<label>Add a folder</label>
-				<bitmap>res/dossier.png</bitmap>
+				<bitmap>res/foldericon.png</bitmap>
 				<handler function="OnAddFolderSelected" entry="EVT_MENU" />
 			</object>
 		</object>
@@ -229,7 +229,7 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem5" member="yes">
 				<label>Add a folder</label>
-				<bitmap>res/dossier.png</bitmap>
+				<bitmap>res/foldericon.png</bitmap>
 				<handler function="OnAddFolderSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />

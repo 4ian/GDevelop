@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -37,7 +37,7 @@ class GD_CORE_API ChooseAutomatismDialog: public wxDialog
 public:
 
     /**
-     * Default constructor
+     * \brief Default constructor
      *
      * \param parent The wxWidgets parent window
      * \param project Project
@@ -49,10 +49,18 @@ public:
     virtual ~ChooseAutomatismDialog();
 
     /**
-     * Return the chosen automatism name
+     * \brief Automatically choose the automatism if there is only
+     * a single automatism to be chosen.
+     * \return true if an automatism (or none) was chosen. false if there are two automatisms or more.
+     */
+    bool DeduceAutomatism();
+
+    /**
+     * \brief Return the chosen automatism name
      */
     const std::string & GetChosenAutomatism() const { return automatismChosen; }
 
+protected:
     //(*Declarations(ChooseAutomatismDialog)
     wxSearchCtrl* searchCtrl;
     wxButton* ChoisirBt;
@@ -64,7 +72,6 @@ public:
     wxStaticBitmap* StaticBitmap3;
     //*)
 
-protected:
 
     //(*Identifiers(ChooseAutomatismDialog)
     static const long ID_STATICBITMAP3;

@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2013-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 /**
@@ -597,13 +597,13 @@ gdjs.SpriteRuntimeObject.prototype.setAngle = function(angle) {
 
 gdjs.SpriteRuntimeObject.prototype.getAngle = function(angle) {
     if ( this._currentAnimation >= this._animations.length ) {
-        return;
+        return 0;
     }
 
     if ( !this._animations[this._currentAnimation].hasMultipleDirections )
         return this.angle;
     else
-        return this._currentDirection*45;
+        return this._currentDirection * 45;
 };
 
 //Visibility and display :
@@ -635,7 +635,7 @@ gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
     this.hidden = enable;
     this._sprite.visible = !enable;
     //TODO: Workaround a not working property in PIXI.js:
-    this._sprite.alpha = this._sprite.visible ? this.opacity/255 : 0;
+    this._sprite.alpha = this._sprite.visible ? this.opacity / 255 : 0;
 };
 
 gdjs.SpriteRuntimeObject.prototype.setLayer = function(name) {
@@ -646,8 +646,20 @@ gdjs.SpriteRuntimeObject.prototype.setLayer = function(name) {
     this._runtimeScene.getLayer(this.layer).addChildToPIXIContainer(this._sprite, this.zOrder);
 };
 
+/**
+ * Change the tint of the sprite object.
+ *
+ * \param {String} The color, in RGB format ("128;200;255").
+ */
+gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
+    var colors = rgbColor.split(";");
+    if ( colors.length < 3 ) return;
+
+    this._sprite.tint = gdjs.rgbToHex(colors[0], colors[1], colors[2]);
+};
+
 gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {
-    if ( enable != this._flippedX ) {
+    if ( enable !== this._flippedX ) {
         this._scaleX *= -1;
         this._spriteDirty = true;
         this._flippedX = enable;
@@ -655,7 +667,7 @@ gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {
 };
 
 gdjs.SpriteRuntimeObject.prototype.flipY = function(enable) {
-    if ( enable != this._flippedY ) {
+    if ( enable !== this._flippedY ) {
         this._scaleY *= -1;
         this._spriteDirty = true;
         this._flippedY = enable;
@@ -746,7 +758,7 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
  * @param z {Number} The new Z order position of the object
  */
 gdjs.SpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z != this.zOrder ) {
+    if ( z !== this.zOrder ) {
         //TODO: Pass the runtimeScene as parameter ?
         this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._sprite, z);
         this.zOrder = z;

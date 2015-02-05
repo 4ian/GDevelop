@@ -21,17 +21,7 @@ set(GDCORE_include_dir ${GD_base_dir}/Core)
 set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
 set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-set(boost_include_dir ${GD_base_dir}/ExtLibs/boost)
-set(sfml_include_dir ${GD_base_dir}/ExtLibs/SFML/include)
-IF(WIN32)
-	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(sfml_lib_dir ${GD_base_dir}/ExtLibs/SFML/build-mingw-debug/lib)
-	ELSE()
-		set(sfml_lib_dir ${GD_base_dir}/ExtLibs/SFML/build-mingw-release/lib)
-	ENDIF()
-ELSE()
-	set(sfml_lib_dir ${GD_base_dir}/ExtLibs/SFML/build-linux/lib)
-ENDIF()
+
 IF(WIN32) #Special case for wxWidgets on Windows
 	set(wxwidgets_include_dir ${GD_base_dir}/ExtLibs/wxwidgets/include)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -51,12 +41,10 @@ include_directories(${GDCpp_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
 ELSE()
-	find_package(wxWidgets COMPONENTS core base adv net ribbon webview stc aui propgrid richtext html xrc REQUIRED)
+	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-	include_directories(${GTK3_INCLUDE_DIRS})
-	link_directories(${GTK3_LIBRARY_DIRS})
+	include_directories(${GTK_INCLUDE_DIRS})
+	link_directories(${GTK_LIBRARY_DIRS})
 ENDIF(WIN32)
 
 #Defines
@@ -87,7 +75,7 @@ ELSE()
 	add_definitions( -DLINUX )
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK3_CFLAGS_OTHER})
+	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 
@@ -121,9 +109,9 @@ ENDIF(WIN32)
 target_link_libraries(GDIDE GDCore)
 target_link_libraries(GDIDE GDCpp)
 IF(WIN32)
-	target_link_libraries(GDIDE ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/libsfml-graphics.a ${sfml_lib_dir}/libsfml-window.a ${sfml_lib_dir}/libsfml-network.a ${sfml_lib_dir}/libsfml-system.a)
-	target_link_libraries(GDIDE_exe ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/libsfml-graphics.a ${sfml_lib_dir}/libsfml-window.a ${sfml_lib_dir}/libsfml-network.a ${sfml_lib_dir}/libsfml-system.a)
-	target_link_libraries(GDIDE_dev_exe ${sfml_lib_dir}/libsfml-audio.a ${sfml_lib_dir}/libsfml-graphics.a ${sfml_lib_dir}/libsfml-window.a ${sfml_lib_dir}/libsfml-network.a ${sfml_lib_dir}/libsfml-system.a)
+	target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+	target_link_libraries(GDIDE_exe sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+	target_link_libraries(GDIDE_dev_exe sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 		target_link_libraries(GDIDE ${wxwidgets_lib_dir}/libwxmsw29ud_stc.a ${wxwidgets_lib_dir}/libwxmsw29ud_webview.a ${wxwidgets_lib_dir}/libwxmsw29ud_xrc.a ${wxwidgets_lib_dir}/libwxmsw29ud_stc.a ${wxwidgets_lib_dir}/libwxmsw29ud_richtext.a ${wxwidgets_lib_dir}/libwxmsw29ud_propgrid.a ${wxwidgets_lib_dir}/libwxmsw29ud_ribbon.a ${wxwidgets_lib_dir}/libwxmsw29ud_aui.a ${wxwidgets_lib_dir}/libwxmsw29ud_adv.a ${wxwidgets_lib_dir}/libwxmsw29ud_html.a ${wxwidgets_lib_dir}/libwxmsw29ud_core.a ${wxwidgets_lib_dir}/libwxbase29ud_xml.a ${wxwidgets_lib_dir}/libwxbase29ud_net.a ${wxwidgets_lib_dir}/libwxexpatd.a ${wxwidgets_lib_dir}/libwxbase29ud.a ${wxwidgets_lib_dir}/libwxpngd.a ${wxwidgets_lib_dir}/libwxjpegd.a ${wxwidgets_lib_dir}/libwxzlibd.a ${wxwidgets_lib_dir}/libwxtiffd.a)
 	ELSE()
@@ -134,12 +122,18 @@ IF(WIN32)
 	target_link_libraries(GDIDE_exe ws2_32 user32 opengl32 glu32)
 	target_link_libraries(GDIDE_dev_exe ws2_32 user32 opengl32 glu32)
 ELSE()
-	target_link_libraries(GDIDE ${sfml_lib_dir}/libsfml-audio.so ${sfml_lib_dir}/libsfml-graphics.so ${sfml_lib_dir}/libsfml-window.so ${sfml_lib_dir}/libsfml-network.so ${sfml_lib_dir}/libsfml-system.so)
+	target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	target_link_libraries(GDIDE ${wxWidgets_LIBRARIES})
-	target_link_libraries(GDIDE ${GTK3_LIBRARIES})
+	target_link_libraries(GDIDE ${GTK_LIBRARIES})
 	target_link_libraries(GDIDE GLU GL)
 ENDIF(WIN32)
 
+#Pre build tasks
+###
+IF(NOT WIN32 AND NOT EMSCRIPTEN)
+	execute_process(COMMAND sh cleanLinuxLibraries.sh ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+		WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+ENDIF()
 
 #Post build tasks
 ###
@@ -147,16 +141,33 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 
-	#Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
-	#output directory, and need to be copied.
-	IF(NOT WIN32)
+	IF(WIN32)
+        add_custom_command(TARGET GDIDE
+			POST_BUILD
+			COMMAND "${GD_base_dir}/IDE/scripts/copyWindowsLibraries.bat" "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}" "${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib"
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+    ELSE()
+        #Extra files (icons, examples, game templates, translations...) are stored in the Release_Windows
+        #output directory, and need to be copied.
 		add_custom_command(TARGET GDIDE
 			POST_BUILD
 			COMMAND sh "CopyWindowsToLinuxReleaseFiles.sh" ${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}
 			WORKING_DIRECTORY ${GD_base_dir}/scripts)
 		add_custom_command(TARGET GDIDE
 			POST_BUILD
-			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib
 			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
 	ENDIF()
+ENDIF()
+
+#Installation (Linux only)
+###
+IF(NOT WIN32)
+	install(DIRECTORY ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ DESTINATION "${GD_INSTALL_PREFIX}")
+	install(FILES ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/GDIDE DESTINATION "${GD_INSTALL_PREFIX}" PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ )
+	
+	install(FILES ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/share/applications/gdevelop.desktop DESTINATION /usr/share/applications/ PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ )
+	install(DIRECTORY ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/share/icons/ DESTINATION /usr/share/icons/)
+	install(DIRECTORY ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/share/mime/ DESTINATION /usr/share/mime/)
+	install(FILES ${GD_base_dir}/Binaries/Packaging/linux-extra-files/usr/bin/gdevelop DESTINATION /usr/bin/ PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ )
 ENDIF()

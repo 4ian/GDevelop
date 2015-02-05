@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
@@ -48,8 +48,8 @@ void Sprite::DelPoint( const std::string & name )
 
 bool Sprite::HasPoint( const std::string & name ) const
 {
-    if ( name == "Origin") return true;
-    if ( name == "Centre") return true;
+    if (name == "Origin") return true;
+    if (name == "Centre" || name == "Center") return true;
 
     for (unsigned int i = 0;i<points.size();++i)
     {
@@ -62,8 +62,8 @@ bool Sprite::HasPoint( const std::string & name ) const
 
 const Point & Sprite::GetPoint( const std::string & name) const
 {
-    if ( name == "Origin") return origine;
-    if ( name == "Centre") return centre;
+    if (name == "Origin") return origine;
+    if (name == "Centre" || name == "Center") return centre;
 
     for (unsigned int i = 0;i<points.size();++i)
     {
@@ -76,8 +76,8 @@ const Point & Sprite::GetPoint( const std::string & name) const
 
 Point & Sprite::GetPoint(const std::string & name)
 {
-    if ( name == "Origin") return origine;
-    if ( name == "Centre") return centre;
+    if (name == "Origin") return origine;
+    if (name == "Centre" || name == "Center") return centre;
 
     for (unsigned int i = 0;i<points.size();++i)
     {
@@ -89,7 +89,7 @@ Point & Sprite::GetPoint(const std::string & name)
 }
 
 
-bool Sprite::SetCentreAutomatic(bool enabled)
+bool Sprite::SetDefaultCenterPoint(bool enabled)
 {
     automaticCentre = enabled;
 

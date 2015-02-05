@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -14,10 +14,14 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include "GDCore/Tools/Log.h"
 #include <boost/algorithm/string.hpp>
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/IDE/MetadataProvider.h"
 
 namespace gd
 {
@@ -99,6 +103,33 @@ ChooseAutomatismDialog::~ChooseAutomatismDialog()
 {
 	//(*Destroy(ChooseAutomatismDialog)
 	//*)
+}
+
+bool ChooseAutomatismDialog::DeduceAutomatism()
+{
+	if (automatismsList->GetCount() == 1)
+	{
+    	automatismChosen = automatismsList->GetString(0);
+    	return true;
+	}
+	else if (automatismsList->GetCount() == 0)
+	{
+		const AutomatismMetadata & metadata =
+			MetadataProvider::GetAutomatismMetadata(project.GetCurrentPlatform(), automatismTypeAllowed);
+
+		if (metadata.GetFullName().empty())
+			gd::LogMessage(_("This object doesn't have the appropriate automatism attached to it.\nCheck that you selected the right object or add the automatism in the object properties."));
+		else
+		{
+			gd::LogMessage(gd::ToString(
+				wxString::Format(wxString(_("This object doesn't have automatism \"%s\" attached to it.\nCheck that you selected the right object or add this automatism in the object properties.")),
+            	metadata.GetFullName().c_str())));
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 void ChooseAutomatismDialog::RefreshList()

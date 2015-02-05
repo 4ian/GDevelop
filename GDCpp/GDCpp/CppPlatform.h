@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #ifndef PLATFORM_H
@@ -31,7 +31,7 @@ public:
 
     virtual std::string GetName() const { return "GDevelop C++ platform"; }
     #if defined(GD_IDE_ONLY)
-    virtual std::string GetFullName() const { return ToString(_("Native platform")); }
+    virtual std::string GetFullName() const { return ToString(_("Native (Windows or Linux games)")); }
     virtual std::string GetSubtitle() const { return ToString(_("C++ and OpenGL based games for Windows or Linux.")); }
     virtual std::string GetDescription() const;
     #endif
@@ -53,10 +53,6 @@ public:
     /** \brief The name of the function searched in an extension file to create the extension
      */
     virtual std::string GetExtensionCreateFunctionName() { return "CreateGDExtension"; }
-
-    /** \brief The name of the function searched in an extension file to destroy the extension
-     */
-    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDExtension"; }
 
 #if defined(GD_IDE_ONLY)
     virtual std::string GetIcon() const { return "CppPlatform/icon32.png"; }
@@ -101,7 +97,6 @@ public:
 private:
 
     std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
-    std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable; ///< The C++ Platform also need to store functions to destroy runtime objects.
 #if defined(GD_IDE_ONLY)
     static ChangesNotifier changesNotifier;
 #if !defined(GD_NO_WX_GUI)

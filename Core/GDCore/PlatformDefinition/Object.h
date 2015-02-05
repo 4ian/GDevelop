@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
@@ -310,7 +310,6 @@ typedef std::vector < boost::shared_ptr<gd::Object> > ObjList;
  */
 typedef boost::shared_ptr<gd::Object> ObjSPtr;
 
-void GD_CORE_API DestroyBaseObject(gd::Object * object);
 gd::Object * GD_CORE_API CreateBaseObject(std::string name);
 
 #endif // GDCORE_OBJECT_H

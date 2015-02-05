@@ -17,6 +17,7 @@
         "no-console": 0,
         "curly": 0,
         "no-redeclare": 0,
-        "no-underscore-dangle": 0
+        "no-underscore-dangle": 0,
+        "strict": 0
     }
 }

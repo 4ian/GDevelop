@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include "GDCore/Serialization/SerializerElement.h"
@@ -65,8 +65,6 @@ void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlElement)
 {
 	if(!xmlElement) return;
-
-	element.HideWarnings();
 
 	const TiXmlAttribute * attr = xmlElement->FirstAttribute();
 	while(attr)

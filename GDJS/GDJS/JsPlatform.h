@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef JSPLATFORM_H
 #define JSPLATFORM_H
@@ -30,18 +30,14 @@ class GD_API JsPlatform : public gd::Platform
 public:
 
     virtual std::string GetName() const { return "GDevelop JS platform"; }
-    virtual std::string GetFullName() const { return gd::ToString(_("Web platform")); }
+    virtual std::string GetFullName() const { return gd::ToString(_("HTML5 (Web and Android games)")); }
     virtual std::string GetSubtitle() const { return gd::ToString(_("HTML5 and javascript based games for web browsers.")); }
-    virtual std::string GetDescription() const { return gd::ToString(_("Allows to create 2D games which can be played in a web browser.")); }
+    virtual std::string GetDescription() const { return gd::ToString(_("2D games which can be played in a web browser or exported to Android with third-party tools.")); }
     virtual std::string GetIcon() const { return "JsPlatform/icon32.png"; }
 
     /** \brief The name of the function searched in an extension file to create the extension
      */
     virtual std::string GetExtensionCreateFunctionName() { return "CreateGDJSExtension"; }
-
-    /** \brief The name of the function searched in an extension file to destroy the extension
-     */
-    virtual std::string GetExtensionDestroyFunctionName() { return "DestroyGDJSExtension"; }
 
     #if !defined(GD_NO_WX_GUI)
     /**

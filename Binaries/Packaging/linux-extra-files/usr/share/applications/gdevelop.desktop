@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=GDevelop
+GenericName=Game creator IDE
+Comment=HTML5 and native game development software
+Exec=sh -c "gdevelop %F"
+MimeType=application/x-gdevelop-project;
+Icon=GDevelop
+Terminal=false
+Type=Application
+Categories=Development;IDE;

@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #ifndef GDCORE_PLATFORM_H
@@ -79,18 +79,8 @@ public:
      *
      * For example, GD C++ Platform uses "CreateGDExtension" and GD JS Platform "CreateGDJSExtension".
      * \see gd::ExtensionsLoader
-     * \see GetExtensionDestroyFunctionName
      */
     virtual std::string GetExtensionCreateFunctionName() { return ""; }
-
-    /**
-     * \brief Must return the name of the function that is used to create an extension for this platform.
-     *
-     * For example, GD C++ Platform uses "CreateGDExtension" and GD JS Platform "CreateGDJSExtension".
-     * \see gd::ExtensionsLoader
-     * \see GetExtensionDestroyFunctionName
-     */
-    virtual std::string GetExtensionDestroyFunctionName() { return ""; }
 
     /**
      * \brief Add an extension to the manager.
@@ -200,10 +190,8 @@ public:
     #endif
 
 private:
-
-    std::vector < boost::shared_ptr<PlatformExtension> >    extensionsLoaded; ///< Extensions of the platform
-    std::map < std::string, CreateFunPtr >                  creationFunctionTable; ///< Creation functions for objects
-    std::map < std::string, DestroyFunPtr >                 destroyFunctionTable; ///< Destroy functions for objects
+    std::vector < boost::shared_ptr<PlatformExtension> > extensionsLoaded; ///< Extensions of the platform
+    std::map < std::string, CreateFunPtr > creationFunctionTable; ///< Creation functions for objects
 
     #if defined(GD_IDE_ONLY)
     static ChangesNotifier defaultEmptyChangesNotifier;

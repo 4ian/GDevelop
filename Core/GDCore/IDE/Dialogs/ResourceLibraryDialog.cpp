@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -104,7 +104,7 @@ ResourceLibraryDialog::ResourceLibraryDialog(wxWindow* parent,wxWindowID id,cons
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ResourceLibraryDialog::OncloseBtClick);
 	//*)
 
-    currentDir = wxGetCwd()+"/Ressources";
+    currentDir = wxGetCwd()+"/Free resources";
     ConstructList();
 }
 
@@ -158,7 +158,7 @@ void ResourceLibraryDialog::ConstructList()
     //If we are in the root path, do not display Parent folder item
     wxFileName currentDirPath(currentDir);
     currentDirPath.Normalize();
-    wxFileName rootPath(wxGetCwd()+"/Ressources/");
+    wxFileName rootPath(wxGetCwd()+"/Free resources/");
     rootPath.Normalize();
     if ( currentDirPath.GetFullPath() != rootPath.GetFullPath() )
         listCtrl->InsertItem(0, _("Parent folder"), 0);

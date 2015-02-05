@@ -8,8 +8,7 @@ namespace gd
 SerializerElement SerializerElement::nullElement;
 
 SerializerElement::SerializerElement() :
-	valueUndefined(true),
-	hideWarning(false)
+	valueUndefined(true)
 {
 }
 
@@ -26,60 +25,30 @@ const SerializerValue & SerializerElement::GetValue() const
 
 SerializerElement & SerializerElement::SetAttribute(const std::string & name, bool value)
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Setting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	attributes[name].SetBool(value);
 	return *this;
 }
 
 SerializerElement & SerializerElement::SetAttribute(const std::string & name, const std::string & value)
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Setting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	attributes[name].SetString(value);
 	return *this;
 }
 
 SerializerElement & SerializerElement::SetAttribute(const std::string & name, int value)
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Setting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	attributes[name].SetInt(value);
 	return *this;
 }
 
 SerializerElement & SerializerElement::SetAttribute(const std::string & name, double value)
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Setting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	attributes[name].SetDouble(value);
 	return *this;
 }
 
 bool SerializerElement::GetBoolAttribute(const std::string & name, bool defaultValue, std::string deprecatedName) const
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Getting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	if (attributes.find(name) != attributes.end()) {
 		return attributes.find(name)->second.GetBool();
 	}
@@ -100,12 +69,6 @@ bool SerializerElement::GetBoolAttribute(const std::string & name, bool defaultV
 
 std::string SerializerElement::GetStringAttribute(const std::string & name, std::string defaultValue, std::string deprecatedName) const
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Getting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	if (attributes.find(name) != attributes.end())
 		return attributes.find(name)->second.GetString();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
@@ -123,12 +86,6 @@ std::string SerializerElement::GetStringAttribute(const std::string & name, std:
 
 int SerializerElement::GetIntAttribute(const std::string & name, int defaultValue, std::string deprecatedName) const
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Getting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	if (attributes.find(name) != attributes.end())
 		return attributes.find(name)->second.GetInt();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
@@ -146,12 +103,6 @@ int SerializerElement::GetIntAttribute(const std::string & name, int defaultValu
 
 double SerializerElement::GetDoubleAttribute(const std::string & name, double defaultValue, std::string deprecatedName) const
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Getting an attribute with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	if (attributes.find(name) != attributes.end())
 		return attributes.find(name)->second.GetDouble();
 	else if (!deprecatedName.empty() && attributes.find(deprecatedName) != attributes.end())
@@ -174,12 +125,6 @@ bool SerializerElement::HasAttribute(const std::string & name)
 
 SerializerElement & SerializerElement::AddChild(std::string name)
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Adding a child with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	if ( !arrayOf.empty() )
 	{
 		if ( name != arrayOf )
@@ -225,12 +170,6 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 
 SerializerElement & SerializerElement::GetChild(std::string name, unsigned int index, std::string deprecatedName) const
 {
-	if (!hideWarning && !name.empty())
-	{
-		if ( boost::to_upper_copy(name.substr(0,1)) == name.substr(0,1) )
-			std::cout << "WARNING: Getting a child with a name (" << name << ") which begins with a capital" << std::endl;
-	}
-
 	if ( !arrayOf.empty() )
 	{
 		if ( name != arrayOf )

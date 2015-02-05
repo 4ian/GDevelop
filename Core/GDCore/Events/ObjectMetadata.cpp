@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include <iostream>
 #include "ObjectMetadata.h"
@@ -22,8 +22,7 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
                    const std::string & fullname_,
                    const std::string & informations_,
                    const std::string & icon24x24,
-                   CreateFunPtr createFunPtrP,
-                   DestroyFunPtr destroyFunPtrP) :
+                   CreateFunPtr createFunPtrP) :
     extensionNamespace(extensionNamespace_)
 {
     name = name_;
@@ -45,7 +44,6 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 #endif
 #endif
     createFunPtr = createFunPtrP;
-    destroyFunPtr = destroyFunPtrP;
 }
 
 gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,

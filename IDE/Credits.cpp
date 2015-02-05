@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -126,7 +126,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("GDevelop is an open source software:\n\n  * The IDE is distributed under the GPL v3 license.\n  * The Core library, the native and HTML5 platforms are distributed under the LGPL v3 license.\n  * Extensions are distributed under the zlib/libpng license.\n  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.\n\nAbout games created with GDevelop\n\nGames exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the LPGL v3 license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source."), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("GDevelop is an open source software:\n\n  * The Core library, the native and HTML5 platforms and all extensions (respectively Core, GDCpp, GDJS and Extensions folders) are under the MIT license.\n  * The IDE (in the IDE folder) is licensed with GPL v3.\n  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.\n\nAbout games created with GDevelop\n\nGames exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the MIT license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source."), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer11->Add(TextCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer11);
 	FlexGridSizer11->Fit(Panel2);

@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -219,7 +219,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
         }
     }
     if ( rapport == "" )
-        rapport = "Pas de rapport d'erreur de GDevelop";
+        rapport = "No GDevelop error report";
 
     wxString report;
     report += "GD Error report:\n\n";

@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 #include "ProjectPropertiesPnl.h"
@@ -76,10 +76,11 @@ void ProjectPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 {
     if (project) project->OnChangeInPropertyGrid(propertyGrid, event);
 
+    //Handle some special properties:
     if ( event.GetPropertyName() == _("Name of the project") && associatedTree != NULL)
         associatedTree->SetItemText(associatedTreeItem, event.GetProperty()->GetValue());
 
-    if ( event.GetPropertyName() == _("Activate the use of C++ source files") && associatedProjectManager != NULL)
+    if ( event.GetPropertyName() == _("Activate the use of C++/JS source files") && associatedProjectManager != NULL)
         associatedProjectManager->Refresh();
 
     if (project) project->SetDirty();

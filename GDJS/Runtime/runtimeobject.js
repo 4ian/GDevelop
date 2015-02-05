@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2013-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 /**
@@ -99,10 +99,10 @@ gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avo
  * Called each time the scene is rendered.
  *
  * @method updateTime
- * @param elapsedTime {Number} The time elapsedTime since the last frame, in <b>seconds</b>.
+ * @param elapsedTime {Number} The time elapsedTime since the last frame, in **seconds**.
  */
 gdjs.RuntimeObject.prototype.updateTime = function(elapsedTime) {
-    //Update the forces
+    //Nothing to do.
 };
 
 /**
@@ -161,7 +161,7 @@ gdjs.RuntimeObject.prototype.getNameId = function() {
 /**
  * Get the unique identifier of the object.<br>
  * The identifier is set by the runtimeScene owning the object.<br>
- * You can also use the id property ( this._bject.id ) for increased efficiency instead of
+ * You can also use the id property (this._object.id) for increased efficiency instead of
  * calling this method.
  *
  * @method getUniqueId
@@ -169,8 +169,8 @@ gdjs.RuntimeObject.prototype.getNameId = function() {
  */
 gdjs.RuntimeObject.prototype.getUniqueId = function() {
     return this.id;
-};
-
+}
+;
 /**
  * Set the position of the object.
  *
@@ -324,7 +324,7 @@ gdjs.RuntimeObject.prototype.setAngle = function(angle) {
  */
 gdjs.RuntimeObject.prototype.getAngle = function() {
     return this.angle;
-}
+};
 
 /**
  * Set the layer of the object.
@@ -778,7 +778,7 @@ gdjs.RuntimeObject.prototype.hasAutomatism = function(name) {
 };
 
 /**
- * De/activate an automatism of the object.<br>
+ * De/activate an automatism of the object.
  *
  * @method activateAutomatism
  * @param name {String} The automatism name.
@@ -791,13 +791,13 @@ gdjs.RuntimeObject.prototype.activateAutomatism = function(name, enable) {
 };
 
 /**
- * De/activate an automatism of the object.<br>
+ * Check if an automatism is activated
  *
- * @method activateAutomatism
+ * @method automatismActivated
  * @param name {String} The automatism name.
  * @return true if the automatism is activated.
  */
-gdjs.RuntimeObject.prototype.automatismActivated = function(name, enable) {
+gdjs.RuntimeObject.prototype.automatismActivated = function(name) {
     if ( this._automatismsTable.containsKey(name) ) {
         this._automatismsTable.get(name).activated();
     }
@@ -811,6 +811,7 @@ gdjs.RuntimeObject.prototype.automatismActivated = function(name, enable) {
  * Separate the object from others objects, using their hitboxes.
  * @method separateFromObjects
  * @param objectsLists Tables of objects
+ * @return true if the object was moved
  */
 gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
 
@@ -821,6 +822,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
         objects.push.apply(objects, lists[i]);
     }
 
+    var moved = false;
     var xMove = 0; var yMove = 0;
     var hitBoxes = this.getHitBoxes();
 
@@ -835,6 +837,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
                     if ( result.collision ) {
                         xMove += result.move_axis[0];
                         yMove += result.move_axis[1];
+                        moved = true;
                     }
                 }
             }
@@ -843,6 +846,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
 
     //Move according to the results returned by the collision algorithm.
     this.setPosition(this.getX()+xMove, this.getY()+yMove);
+    return moved;
 };
 
 gdjs.RuntimeObject.prototype.getDistanceFrom = function(otherObject) {

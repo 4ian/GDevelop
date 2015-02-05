@@ -109,6 +109,7 @@ protected:
     static const long ID_MENUITEM6;
     //*)
     static const long idRibbonAdd;
+    static const long idRibbonAddGroup;
     static const long idRibbonDel;
     static const long idRibbonUp;
     static const long idRibbonDown;
@@ -177,9 +178,16 @@ private:
     void OnHelpSelected(wxCommandEvent& event);
     wxTreeItemId AddObjectsToList(gd::ClassWithObjects & objects, bool globalObject);
     wxTreeItemId AddGroupsToList(std::vector <gd::ObjectGroup> & groups, bool globalGroup);
+    void UpdateGroup(wxTreeItemId groupItem);
     gd::Object * GetSelectedObject();
     gd::ObjectGroup * GetSelectedGroup();
     void UpdateAssociatedPropertiesPanel();
+    void SelectItem(wxTreeItemId parent, std::string name, std::string dataStr1, std::string dataStr2);
+
+    wxTreeItemId GetLastLayoutObjectItem() const;
+    wxTreeItemId GetLastGlobalObjectItem() const;
+    wxTreeItemId GetLastLayoutGroupItem() const;
+    wxTreeItemId GetLastGlobalGroupItem() const;
 
     //Tools functions
     bool HasGroupNamed(std::string name, std::vector<gd::ObjectGroup> & groups);
@@ -192,17 +200,18 @@ private:
     gd::Layout * layout; ///< Layout edited. Can be NULL.
     gd::MainFrameWrapper & mainFrameWrapper;
 
+    static wxRibbonButtonBar * objectsRibbonBar;
+    static wxRibbonButtonBar * selectionRibbonBar;
+    static wxRibbonButtonBar * clipboardRibbonBar;
+
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;
 
+    wxTreeItemId objectsRootItem;
+    wxTreeItemId groupsRootItem;
+
     std::string renamedItemOldName;
     wxTreeItemId lastSelectedItem;
-    wxTreeItemId latestObjItem;
-    wxTreeItemId latestGlobalObjItem;
-    wxTreeItemId latestGroupItem;
-    wxTreeItemId latestGlobalGroupItem;
-    wxTreeItemId substituteObjItem;
-    wxTreeItemId substituteGroupItem;
 
     DECLARE_EVENT_TABLE()
 };

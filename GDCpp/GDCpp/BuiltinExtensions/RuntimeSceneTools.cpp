@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h> //Must be placed first
@@ -24,7 +24,7 @@
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {
-    return scene.GetLayer(layer).GetVisibility();
+    return scene.GetRuntimeLayer(layer).GetVisibility();
 }
 
 void GD_API ShowLayer( RuntimeScene & scene, const std::string & layer )

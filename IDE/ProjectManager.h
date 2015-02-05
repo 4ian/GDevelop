@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 #ifndef PROJECTMANAGER_H
@@ -56,6 +56,11 @@ public:
      * Close current game
      */
 	void OnRibbonCloseSelected(wxRibbonButtonBarEvent& event);
+
+    /**
+     * Close the specified game
+     */
+	void CloseGame(gd::Project * project);
 
 	MainFrame & mainEditor;
 
@@ -233,7 +238,6 @@ private:
 	void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
 	void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 	void EditExtensionsOfGame(gd::Project & project);
-	void CloseGame(gd::Project * project);
 	void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
 	void AddLayoutToProject(gd::Project * project, unsigned int position);
 	void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
@@ -243,6 +247,7 @@ private:
 	void OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event);
 	void AddExternalLayoutToGame(gd::Project * project);
 	void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
+	std::string AutodetectFileLanguage(wxString filename);
 
     wxTreeItemId selectedItem;
     std::string itemTextBeforeEditing;

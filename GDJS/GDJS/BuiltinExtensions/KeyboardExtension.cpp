@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "KeyboardExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -19,18 +19,14 @@ KeyboardExtension::KeyboardExtension()
 {
     gd::BuiltinExtensionsImplementer::ImplementsKeyboardExtension(*this);
 
-    SetExtensionInformation("BuiltinKeyboard",
-                          _("Keyboard features"),
-                          _("Built-in extensions allowing to use keyboard"),
-                          "Florian Rival",
-                          "Open source (LGPL)");
-
     GetAllConditions()["KeyPressed"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
     GetAllConditions()["KeyFromTextPressed"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
     GetAllConditions()["AnyKeyPressed"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.anyKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllStrExpressions()["LastPressedKey"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.lastPressedKey").SetIncludeFile("inputtools.js");
 }
 
 }

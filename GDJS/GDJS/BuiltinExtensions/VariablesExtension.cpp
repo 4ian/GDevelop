@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "GDJS/BuiltinExtensions/VariablesExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -28,7 +28,7 @@ VariablesExtension::VariablesExtension()
                           _("Variable features"),
                           _("Built-in extension allowing to manipulate variables"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllConditions()["VarScene"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableNumber");
     GetAllConditions()["VarSceneTxt"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableString");

@@ -1,8 +1,8 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * Copyright 2014 Victor Levasseur (victorlevasseur52@gmail.com).
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com).
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -30,8 +30,8 @@ const long LayersEditorPanel::idMenuDel = wxNewId();
 const long LayersEditorPanel::idMenuUp = wxNewId();
 const long LayersEditorPanel::idMenuDown = wxNewId();
 
-LayersEditorPanel::LayersEditorPanel(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper) : 
-LayersEditorPanelBase(parent), 
+LayersEditorPanel::LayersEditorPanel(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper) :
+LayersEditorPanelBase(parent),
 gd::LayoutEditorCanvasAssociatedEditor(),
 m_imageList(new wxImageList(16, 16, 1)),
 m_project(project),
@@ -89,7 +89,7 @@ m_mainFrameWrapper(mainFrameWrapper)
 
 LayersEditorPanel::~LayersEditorPanel()
 {
-    
+
 }
 
 void LayersEditorPanel::Refresh()
@@ -117,7 +117,7 @@ void LayersEditorPanel::Refresh()
 
 void LayersEditorPanel::UpdateSelectedLayerIcon()
 {
-    if ( !m_layoutCanvas ) 
+    if ( !m_layoutCanvas )
         return;
 
     for (unsigned int i = 0; i<m_layout.GetLayersCount(); ++i)

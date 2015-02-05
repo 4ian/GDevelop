@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -20,12 +20,12 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/NewProjectDialog.h"
+#include "Dialogs/StartHerePage.h"
 #include "BuildMessagesPnl.h"
 #include "MainFrame.h"
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
 #include "ProjectManager.h"
-#include "StartHerePage.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 
 using namespace gd;
@@ -70,7 +70,7 @@ void MainFrame::CreateNewProject()
 
             newProject->SetProjectFile(dialog.GetChosenFilename());
             newProject->AddPlatform(*associatedPlatform);
-            newProject->SaveToFile(newProject->GetProjectFile());
+            Save(*newProject, newProject->GetProjectFile());
 
             games.push_back(newProject);
             SetCurrentGame(games.size()-1);
@@ -110,7 +110,7 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     wxString oldWorkingDir = wxGetCwd();
-    wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "\"GDevelop\" Project(*.gdg)|*.gdg|\"GDevelop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
+    wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json|GDevelop Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
@@ -132,7 +132,7 @@ void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
     #endif
 
     wxString oldWorkingDir = wxGetCwd();
-    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"GDevelop\" Project (*.gdg)|*.gdg" );
+    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json" );
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
@@ -267,7 +267,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-            wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+            wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
             fileDialog.ShowModal();
 
             std::string path = gd::ToString(fileDialog.GetPath());
@@ -327,7 +327,7 @@ void MainFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Display dialog box
-    wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
     fileDialog.ShowModal();
 
     std::string file = gd::ToString(fileDialog.GetPath());

@@ -12,7 +12,7 @@ BaseObjectExtension::BaseObjectExtension()
     gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(*this);
 
     gd::ObjectMetadata & obj = GetObjectMetadata("");
-    AddRuntimeObject(obj, "", &CreateBaseRuntimeObject, &DestroyBaseRuntimeObject);
+    AddRuntimeObject(obj, "", &CreateBaseRuntimeObject);
 
     #if defined(GD_IDE_ONLY)
     std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");

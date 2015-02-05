@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2013-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 /**
@@ -17,9 +17,9 @@ gdjs.evtTools.runtimeScene.sceneJustBegins = function(runtimeScene) {
     return runtimeScene.isFirstFrame();
 };
 
-gdjs.evtTools.runtimeScene.setBackgroundColor = function(runtimeScene, color) {
+gdjs.evtTools.runtimeScene.setBackgroundColor = function(runtimeScene, rgbColor) {
 
-    colors = color.split(";");
+    var colors = rgbColor.split(";");
     if ( colors.length < 3 ) return;
 
     runtimeScene.setBackgroundColor(parseInt(colors[0]),
@@ -28,7 +28,7 @@ gdjs.evtTools.runtimeScene.setBackgroundColor = function(runtimeScene, color) {
 };
 
 gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds = function(runtimeScene) {
-    return runtimeScene.getElapsedTime()/1000;
+    return runtimeScene.getElapsedTime() / 1000;
 };
 
 gdjs.evtTools.runtimeScene.setTimeScale = function(runtimeScene, timeScale) {
@@ -45,7 +45,7 @@ gdjs.evtTools.runtimeScene.timerElapsedTime = function(runtimeScene, timeInSecon
         return false;
     }
 
-    return runtimeScene.getTimer(timerName).getTime()/1000 >= timeInSeconds;
+    return runtimeScene.getTimer(timerName).getTime() / 1000 >= timeInSeconds;
 };
 
 gdjs.evtTools.runtimeScene.timerPaused = function(runtimeScene, timerName) {
@@ -80,11 +80,11 @@ gdjs.evtTools.runtimeScene.removeTimer = function(runtimeScene, timerName) {
 gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSeconds = function(runtimeScene, timerName) {
     if ( !runtimeScene.hasTimer(timerName) ) return 0;
 
-    return runtimeScene.getTimer(timerName).getTime()/1000;
+    return runtimeScene.getTimer(timerName).getTime() / 1000;
 };
 
 gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds = function(runtimeScene) {
-    return runtimeScene.getTimeFromStart()/1000;
+    return runtimeScene.getTimeFromStart() / 1000;
 };
 
 gdjs.evtTools.runtimeScene.getTime = function(runtimeScene, what) {
@@ -101,7 +101,7 @@ gdjs.evtTools.runtimeScene.getTime = function(runtimeScene, what) {
     else if ( what === "mon" )
         return now.getMonth();
     else if ( what === "year" )
-        return now.getFullYear()-1900; //Conform to the C way of returning years.
+        return now.getFullYear() - 1900; //Conform to the C way of returning years.
     else if ( what === "wday" )
         return now.getday();
     else if ( what === "yday" ) {

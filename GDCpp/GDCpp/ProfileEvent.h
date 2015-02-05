@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -22,7 +22,7 @@ public:
     virtual ~ProfileEvent();
 
     ProfileEvent& operator=(const ProfileEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new ProfileEvent(*this);}
+    virtual ProfileEvent * Clone() const { return new ProfileEvent(*this);}
 
     void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 

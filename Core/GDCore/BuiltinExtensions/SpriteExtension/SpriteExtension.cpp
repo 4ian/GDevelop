@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU Lesser General Public LicenFse.
  */
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -18,14 +18,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                           _("Sprite"),
                           _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("Sprite",
                _("Sprite"),
                _("Animated object which can be used for most elements of a game"),
                "CppPlatform/Extensions/spriteicon.png",
-               &CreateSpriteObject,
-               &DestroySpriteObject);
+               &CreateSpriteObject);
 
     #if defined(GD_IDE_ONLY)
     obj.AddAction("Opacity",

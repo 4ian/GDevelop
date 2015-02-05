@@ -1,9 +1,12 @@
 #Get the destination, or copy by default to release directory
 DESTINATION=../../Binaries/Output/Release_Linux/
-if [ ! $# -eq 0 ]; then
+if [ $# -ge 1 ]; then
 	DESTINATION=$1
 fi
 SFML_LIB_DIR=../../ExtLibs/SFML/build-linux/lib/
+if [ $# -ge 2 ]; then
+	SFML_LIB_DIR=$2
+fi
 WX_LIB_DIR=../../ExtLibs/wxWidgets/lib/
 SYS_LIB_DIR1=/usr/lib/x86_64-linux-gnu/
 SYS_LIB_DIR2=/lib/x86_64-linux-gnu/
@@ -60,7 +63,7 @@ if [ -d $WX_LIB_DIR ]; then
 	cp "$WX_LIB_DIR"/libwx_gtk3u_webview-3.0.so.0.1.0 "$DESTINATION"/libwx_gtk3u_webview-3.0.so.0
 	cp "$WX_LIB_DIR"/libwx_gtk3u_xrc-3.0.so.0.1.0 "$DESTINATION"/libwx_gtk3u_xrc-3.0.so.0
 else
-	echo "WxWidgets lib files not found in '$WX_LIB_DIR', skipping it..."
+	echo "WxWidgets lib files not found in '$WX_LIB_DIR', skipping it... (This is ok if you're using system-provided wxWidgets)"
 fi
 
 

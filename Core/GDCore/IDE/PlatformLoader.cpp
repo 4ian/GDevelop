@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include <string>
@@ -62,6 +62,7 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         boost::shared_ptr<gd::Platform> platform;
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
+        if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform, true);
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
         gd::LocaleManager::Get()->AddPath("./JsPlatform/Extensions/locale");
         #endif

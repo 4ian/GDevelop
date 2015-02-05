@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -551,7 +551,7 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
             if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "automatism")
             {
                 gd::ChooseAutomatismDialog dialog(this, project, layout, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
-                if ( dialog.ShowModal() == 1 )
+                if ( dialog.DeduceAutomatism() || dialog.ShowModal() == 1 )
                     automatismStr = dialog.GetChosenAutomatism()+"::";
             }
             else

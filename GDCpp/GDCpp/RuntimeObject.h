@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef RUNTIMEOBJECT_H
 #define RUNTIMEOBJECT_H
@@ -203,6 +203,15 @@ public:
     bool IsCollidingWith(RuntimeObject * other);
 
     /**
+     * \brief Check collision with each object of the list using their hitboxes, and move the object
+     * according to the sum of the move vector returned by each collision test.
+     * \note Bounding circles of objects are *not* checked.
+     * \param objects The vector of objects to be used.
+     * \return true if the object was moved.
+     */
+    bool SeparateFromObjects(const std::vector<RuntimeObject*> & objects);
+
+    /**
      * \brief Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
      * \note The default implementation does nothing.
      */
@@ -395,7 +404,7 @@ public:
     double GetSqDistanceWithObject( RuntimeObject * other );
     double GetDistanceWithObject( RuntimeObject * other );
 
-    void SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    bool SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
     /** \deprecated
      */
@@ -425,11 +434,6 @@ protected:
      */
     void Init(const RuntimeObject & object);
 };
-
-/**
- * As extensions, a function used to delete the object. ( Simply a "delete object;" )
- */
-void DestroyBaseRuntimeObject(RuntimeObject * object);
 
 /**
  * As extensions, a function used to create an object. ( Simply a "return new RuntimeObject(name);" )

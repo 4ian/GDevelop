@@ -1,27 +1,8 @@
 /**
 
 GDevelop - Function Extension
-Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
 */
 
 #if defined(GD_IDE_ONLY)
@@ -49,11 +30,8 @@ class GD_EXTENSION_API FunctionEvent : public gd::BaseEvent
 {
 public:
     FunctionEvent();
-    FunctionEvent(const FunctionEvent & event);
     virtual ~FunctionEvent() {};
-
-    FunctionEvent& operator=(const FunctionEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new FunctionEvent(*this);}
+    virtual FunctionEvent * Clone() const { return new FunctionEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
 
@@ -63,11 +41,9 @@ public:
 
     const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
     std::vector < gd::Instruction > & GetConditions() { return conditions; };
-    void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
     const std::vector < gd::Instruction > & GetActions() const { return actions; };
     std::vector < gd::Instruction > & GetActions() { return actions; };
-    void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
     std::string GetName() const { return name; };
     void SetName(std::string name_) { name = name_; };
@@ -111,8 +87,6 @@ public:
     static const FunctionEvent* SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName);
 
 private:
-    void Init(const FunctionEvent & event);
-
     std::string name;
     std::string objectsPassedAsArgument;
     std::vector < gd::Instruction > conditions;

@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if !defined(GD_NO_WX_GUI)
@@ -91,7 +91,7 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
     dc.SetPen(wxPen(wxColour(r/2, v/2, b/2), 1));
 
     //Draw the background
-    wxRect rectangle(x, y, width-1, text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation);
+    wxRect rectangle(x, y, width-2, text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation);
     dc.GradientFillLinear(rectangle, wxColour(r+20 > 255 ? 255 : r+20, v+20 > 255 ? 255 : v+20, b+20 > 255 ? 255 : b+20), wxColour(r, v, b), wxSOUTH);
     dc.DrawRectangle(rectangle);
 

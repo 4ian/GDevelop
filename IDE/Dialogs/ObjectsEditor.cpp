@@ -24,6 +24,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
@@ -46,6 +47,116 @@
 #endif
 
 using namespace std;
+
+namespace
+{
+    /**
+     * Allow to drop an object in a group.
+     */
+    class ObjectsListDnd : public wxTextDropTarget
+    {
+    public:
+        ObjectsListDnd(wxTreeCtrl *ctrl, wxTreeItemId groupsRootItem_, gd::Project & project_, gd::Layout * layout_)
+         : treeCtrl(ctrl), groupsRootItem(groupsRootItem_), project(project_), layout(layout_) {};
+
+        virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& text)
+        {
+            std::string objectName = text.ToStdString();
+
+            //Get the item under the mouse
+            int dropFlags;
+            wxTreeItemId itemUnderMouse = treeCtrl->HitTest(wxPoint(x, y), dropFlags);
+
+            if(!itemUnderMouse.IsOk())
+                return false; //If not on an item, stop.
+
+            //Find if the item is a group (global ? local ?)
+            gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(treeCtrl->GetItemData(itemUnderMouse));
+
+            if(data)
+            {
+                std::vector<gd::ObjectGroup> *groups = NULL;
+                if(data && data->GetString() == "LayoutGroup" && layout)
+                    groups = &layout->GetObjectGroups();
+                else if(data && data->GetString() == "GlobalGroup")
+                    groups = &project.GetObjectGroups();
+                else
+                    return false;
+
+                //Find the group
+                std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(),
+                                                                         bind2nd(gd::GroupHasTheSameName(), treeCtrl->GetItemText(itemUnderMouse)));
+                if ( group != groups->end() && !group->Find(objectName))
+                {
+                    //Add the object in the group
+                    group->AddObject(objectName);
+                }
+                else
+                {
+                    return false;
+                }
+
+                //Add the corresponding tree item into the group tree item
+                wxTreeItemId objectIntoGroupItem = treeCtrl->AppendItem(itemUnderMouse, objectName, 0);
+                treeCtrl->SetItemTextColour(objectIntoGroupItem, wxColour(128, 128, 128));
+                treeCtrl->SetItemData(objectIntoGroupItem, new gd::TreeItemStringData("ObjectInGroup"));
+
+                treeCtrl->Expand(itemUnderMouse);
+            }
+            else if(itemUnderMouse == groupsRootItem)
+            {
+                //Create a new group
+                gd::ObjectGroup newGroup;
+                newGroup.AddObject(gd::ToString(text));
+
+                std::vector<gd::ObjectGroup> & objectsGroups = !layout ? project.GetObjectGroups() : layout->GetObjectGroups();
+
+                std::string name = gd::ToString(text) + "Group";
+                for (unsigned int i = 2;
+                    std::find_if( objectsGroups.begin(), objectsGroups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
+                        != objectsGroups.end();
+                    ++i)
+                    name = gd::ToString(text) + "Group" + gd::ToString(i);
+
+                newGroup.SetName( name );
+
+                objectsGroups.push_back( newGroup );
+
+                //Add the group item
+                wxTreeItemId itemAdded = treeCtrl->AppendItem( groupsRootItem, name, 1 );
+                treeCtrl->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutGroup") );
+
+                //Add the object item into the group item
+                wxTreeItemId objectItem = treeCtrl->AppendItem( itemAdded, text, 0 );
+                treeCtrl->SetItemTextColour(objectItem, wxColour(128, 128, 128));
+                treeCtrl->SetItemData(objectItem, new gd::TreeItemStringData("ObjectInGroup"));
+
+                //Notify the game of the new group
+                for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                    project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, layout ? layout : NULL, name);
+                gd::LogStatus( _( "The group was correctly added." ) );
+
+                //Expand the new group item
+                treeCtrl->Expand(itemAdded);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        wxTreeCtrl *treeCtrl;
+        wxTreeItemId groupsRootItem;
+
+        gd::Project & project;
+        gd::Layout * layout;
+    };
+}
 
 namespace gd {
 
@@ -78,6 +189,7 @@ const long ObjectsEditor::ID_MENUITEM5 = wxNewId();
 const long ObjectsEditor::ID_MENUITEM6 = wxNewId();
 //*)
 const long ObjectsEditor::idRibbonAdd = wxNewId();
+const long ObjectsEditor::idRibbonAddGroup = wxNewId();
 const long ObjectsEditor::idRibbonDel = wxNewId();
 const long ObjectsEditor::idRibbonUp = wxNewId();
 const long ObjectsEditor::idRibbonDown = wxNewId();
@@ -89,9 +201,13 @@ const long ObjectsEditor::idRibbonPaste = wxNewId();
 const long ObjectsEditor::idRibbonHelp = wxNewId();
 const long ObjectsEditor::idRibbonRefresh = wxNewId();
 
+wxRibbonButtonBar *ObjectsEditor::objectsRibbonBar = NULL;
+wxRibbonButtonBar *ObjectsEditor::selectionRibbonBar = NULL;
+wxRibbonButtonBar *ObjectsEditor::clipboardRibbonBar = NULL;
+
 BEGIN_EVENT_TABLE(ObjectsEditor,wxPanel)
-	//(*EventTable(ObjectsEditor)
-	//*)
+    //(*EventTable(ObjectsEditor)
+    //*)
 END_EVENT_TABLE()
 
 ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_) :
@@ -101,135 +217,135 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
     propPnl(NULL),
     propPnlManager(NULL)
 {
-	//(*Initialize(ObjectsEditor)
-	wxMenuItem* delObjMenuI;
-	wxMenuItem* editNameMenuI;
-	wxMenuItem* editPropMenuItem;
-	wxMenuItem* editMenuI;
-	wxMenuItem* editMenuItem;
-	wxFlexGridSizer* FlexGridSizer1;
-	wxMenuItem* addObjMenuI;
+    //(*Initialize(ObjectsEditor)
+    wxMenuItem* delObjMenuI;
+    wxMenuItem* editNameMenuI;
+    wxMenuItem* editPropMenuItem;
+    wxMenuItem* editMenuI;
+    wxMenuItem* editMenuItem;
+    wxFlexGridSizer* FlexGridSizer1;
+    wxMenuItem* addObjMenuI;
 
-	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
-	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(0);
-	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_ROW_LINES|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-	FlexGridSizer1->Add(objectsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxNO_BORDER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	FlexGridSizer1->Add(searchCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	SetSizer(FlexGridSizer1);
-	editMenuI = new wxMenuItem((&contextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
-	contextMenu.Append(editMenuI);
-	MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add an automatism"), wxEmptyString, wxITEM_NORMAL);
-	contextMenu.Append(MenuItem13);
-	editPropMenuItem = new wxMenuItem((&contextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
-	editPropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
-	contextMenu.Append(editPropMenuItem);
-	contextMenu.AppendSeparator();
-	addObjMenuI = new wxMenuItem((&contextMenu), idMenuAddObj, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
-	addObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
-	contextMenu.Append(addObjMenuI);
-	delObjMenuI = new wxMenuItem((&contextMenu), idMenuDelObj, _("Delete\tDel"), wxEmptyString, wxITEM_NORMAL);
-	delObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
-	contextMenu.Append(delObjMenuI);
-	editNameMenuI = new wxMenuItem((&contextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
-	editNameMenuI->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
-	contextMenu.Append(editNameMenuI);
-	MenuItem11 = new wxMenuItem((&contextMenu), ID_SETGLOBALITEM, _("Set as global object"), wxEmptyString, wxITEM_NORMAL);
-	contextMenu.Append(MenuItem11);
-	contextMenu.AppendSeparator();
-	moveUpMenuI = new wxMenuItem((&contextMenu), idMoveUp, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
-	moveUpMenuI->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
-	contextMenu.Append(moveUpMenuI);
-	moveDownMenuI = new wxMenuItem((&contextMenu), idMoveDown, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
-	moveDownMenuI->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
-	contextMenu.Append(moveDownMenuI);
-	contextMenu.AppendSeparator();
-	copyMenuI = new wxMenuItem((&contextMenu), idMenuCopy, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
-	copyMenuI->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
-	contextMenu.Append(copyMenuI);
-	cutMenuI = new wxMenuItem((&contextMenu), idMenuCut, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
-	cutMenuI->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
-	contextMenu.Append(cutMenuI);
-	pasteMenuI = new wxMenuItem((&contextMenu), idMenuPaste, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
-	pasteMenuI->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
-	contextMenu.Append(pasteMenuI);
-	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete\tDEL"), _("Delete all selected items"), wxITEM_NORMAL);
-	MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
-	multipleContextMenu.Append(MenuItem2);
-	editMenuItem = new wxMenuItem((&groupContextMenu), IdGroupEdit, _("Edit"), wxEmptyString, wxITEM_NORMAL);
-	editMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
-	groupContextMenu.Append(editMenuItem);
-	MenuItem4 = new wxMenuItem((&groupContextMenu), idModName, _("Rename"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
-	groupContextMenu.Append(MenuItem4);
-	MenuItem12 = new wxMenuItem((&groupContextMenu), ID_MENUITEM8, _("Set as global group"), wxEmptyString, wxITEM_NORMAL);
-	groupContextMenu.Append(MenuItem12);
-	groupContextMenu.AppendSeparator();
-	MenuItem1 = new wxMenuItem((&groupContextMenu), idAddGroup, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
-	groupContextMenu.Append(MenuItem1);
-	MenuItem3 = new wxMenuItem((&groupContextMenu), idDelGroup, _("Delete"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
-	groupContextMenu.Append(MenuItem3);
-	groupContextMenu.AppendSeparator();
-	MenuItem5 = new wxMenuItem((&groupContextMenu), ID_MENUITEM1, _("Copy"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
-	groupContextMenu.Append(MenuItem5);
-	MenuItem6 = new wxMenuItem((&groupContextMenu), ID_MENUITEM2, _("Cut"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem6->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
-	groupContextMenu.Append(MenuItem6);
-	MenuItem7 = new wxMenuItem((&groupContextMenu), ID_MENUITEM3, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
-	groupContextMenu.Append(MenuItem7);
-	MenuItem8 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM4, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem8->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
-	emptyContextMenu.Append(MenuItem8);
-	MenuItem9 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM5, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
-	emptyContextMenu.Append(MenuItem9);
-	emptyContextMenu.AppendSeparator();
-	MenuItem10 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM6, _("Paste"), wxEmptyString, wxITEM_NORMAL);
-	MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
-	emptyContextMenu.Append(MenuItem10);
-	FlexGridSizer1->Fit(this);
-	FlexGridSizer1->SetSizeHints(this);
+    Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
+    FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer1->AddGrowableCol(0);
+    FlexGridSizer1->AddGrowableRow(0);
+    objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
+    FlexGridSizer1->Add(objectsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxNO_BORDER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    FlexGridSizer1->Add(searchCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    SetSizer(FlexGridSizer1);
+    editMenuI = new wxMenuItem((&contextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
+    contextMenu.Append(editMenuI);
+    MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add an automatism"), wxEmptyString, wxITEM_NORMAL);
+    contextMenu.Append(MenuItem13);
+    editPropMenuItem = new wxMenuItem((&contextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
+    editPropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
+    contextMenu.Append(editPropMenuItem);
+    contextMenu.AppendSeparator();
+    addObjMenuI = new wxMenuItem((&contextMenu), idMenuAddObj, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
+    addObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
+    contextMenu.Append(addObjMenuI);
+    delObjMenuI = new wxMenuItem((&contextMenu), idMenuDelObj, _("Delete\tDel"), wxEmptyString, wxITEM_NORMAL);
+    delObjMenuI->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
+    contextMenu.Append(delObjMenuI);
+    editNameMenuI = new wxMenuItem((&contextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
+    editNameMenuI->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
+    contextMenu.Append(editNameMenuI);
+    MenuItem11 = new wxMenuItem((&contextMenu), ID_SETGLOBALITEM, _("Set as global object"), wxEmptyString, wxITEM_NORMAL);
+    contextMenu.Append(MenuItem11);
+    contextMenu.AppendSeparator();
+    moveUpMenuI = new wxMenuItem((&contextMenu), idMoveUp, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
+    moveUpMenuI->SetBitmap(gd::SkinHelper::GetIcon("up", 16));
+    contextMenu.Append(moveUpMenuI);
+    moveDownMenuI = new wxMenuItem((&contextMenu), idMoveDown, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
+    moveDownMenuI->SetBitmap(gd::SkinHelper::GetIcon("down", 16));
+    contextMenu.Append(moveDownMenuI);
+    contextMenu.AppendSeparator();
+    copyMenuI = new wxMenuItem((&contextMenu), idMenuCopy, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
+    copyMenuI->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
+    contextMenu.Append(copyMenuI);
+    cutMenuI = new wxMenuItem((&contextMenu), idMenuCut, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
+    cutMenuI->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
+    contextMenu.Append(cutMenuI);
+    pasteMenuI = new wxMenuItem((&contextMenu), idMenuPaste, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
+    pasteMenuI->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
+    contextMenu.Append(pasteMenuI);
+    MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete\tDEL"), _("Delete all selected items"), wxITEM_NORMAL);
+    MenuItem2->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
+    multipleContextMenu.Append(MenuItem2);
+    editMenuItem = new wxMenuItem((&groupContextMenu), IdGroupEdit, _("Add object(s) to group"), wxEmptyString, wxITEM_NORMAL);
+    editMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
+    groupContextMenu.Append(editMenuItem);
+    MenuItem4 = new wxMenuItem((&groupContextMenu), idModName, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
+    groupContextMenu.Append(MenuItem4);
+    MenuItem12 = new wxMenuItem((&groupContextMenu), ID_MENUITEM8, _("Set as global group"), wxEmptyString, wxITEM_NORMAL);
+    groupContextMenu.Append(MenuItem12);
+    groupContextMenu.AppendSeparator();
+    MenuItem1 = new wxMenuItem((&groupContextMenu), idAddGroup, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
+    groupContextMenu.Append(MenuItem1);
+    MenuItem3 = new wxMenuItem((&groupContextMenu), idDelGroup, _("Delete"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
+    groupContextMenu.Append(MenuItem3);
+    groupContextMenu.AppendSeparator();
+    MenuItem5 = new wxMenuItem((&groupContextMenu), ID_MENUITEM1, _("Copy"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("copy", 16));
+    groupContextMenu.Append(MenuItem5);
+    MenuItem6 = new wxMenuItem((&groupContextMenu), ID_MENUITEM2, _("Cut"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem6->SetBitmap(gd::SkinHelper::GetIcon("cut", 16));
+    groupContextMenu.Append(MenuItem6);
+    MenuItem7 = new wxMenuItem((&groupContextMenu), ID_MENUITEM3, _("Paste"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
+    groupContextMenu.Append(MenuItem7);
+    MenuItem8 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM4, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem8->SetBitmap(gd::SkinHelper::GetIcon("add", 16));
+    emptyContextMenu.Append(MenuItem8);
+    MenuItem9 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM5, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
+    emptyContextMenu.Append(MenuItem9);
+    emptyContextMenu.AppendSeparator();
+    MenuItem10 = new wxMenuItem((&emptyContextMenu), ID_MENUITEM6, _("Paste"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem10->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
+    emptyContextMenu.Append(MenuItem10);
+    FlexGridSizer1->Fit(this);
+    FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListBeginDrag);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListBeginLabelEdit);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListEndLabelEdit);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemActivated);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemRightClick);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListSelectionChanged);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_KEY_DOWN,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListKeyDown);
-	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemMenu);
-	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ObjectsEditor::OnsearchCtrlText);
-	Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuEditObjectSelected);
-	Connect(idMenuAddAuto,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuAddAutomatismSelected);
-	Connect(idMenuProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuPropertiesSelected);
-	Connect(idMenuAddObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected);
-	Connect(idMenuDelObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
-	Connect(idMenuModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuRenameSelected);
-	Connect(ID_SETGLOBALITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnSetGlobalSelected);
-	Connect(idMoveUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMoveupSelected);
-	Connect(idMoveDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMoveDownSelected);
-	Connect(idMenuCopy,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCopySelected);
-	Connect(idMenuCut,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCutSelected);
-	Connect(idMenuPaste,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnPasteSelected);
-	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
-	Connect(IdGroupEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuEditObjectSelected);
-	Connect(idModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuRenameSelected);
-	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnSetGlobalSelected);
-	Connect(idAddGroup,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddGroupSelected);
-	Connect(idDelGroup,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
-	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCopySelected);
-	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCutSelected);
-	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnPasteSelected);
-	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected);
-	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddGroupSelected);
-	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnPasteSelected);
-	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&ObjectsEditor::OnSetFocus);
-	//*)
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListBeginDrag);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListBeginLabelEdit);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListEndLabelEdit);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemActivated);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemRightClick);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListSelectionChanged);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_KEY_DOWN,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListKeyDown);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemMenu);
+    Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ObjectsEditor::OnsearchCtrlText);
+    Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuEditObjectSelected);
+    Connect(idMenuAddAuto,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuAddAutomatismSelected);
+    Connect(idMenuProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuPropertiesSelected);
+    Connect(idMenuAddObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected);
+    Connect(idMenuDelObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
+    Connect(idMenuModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuRenameSelected);
+    Connect(ID_SETGLOBALITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnSetGlobalSelected);
+    Connect(idMoveUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMoveupSelected);
+    Connect(idMoveDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMoveDownSelected);
+    Connect(idMenuCopy,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCopySelected);
+    Connect(idMenuCut,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCutSelected);
+    Connect(idMenuPaste,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnPasteSelected);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
+    Connect(IdGroupEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuEditObjectSelected);
+    Connect(idModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuRenameSelected);
+    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnSetGlobalSelected);
+    Connect(idAddGroup,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddGroupSelected);
+    Connect(idDelGroup,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
+    Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCopySelected);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnCutSelected);
+    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnPasteSelected);
+    Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected);
+    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddGroupSelected);
+    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnPasteSelected);
+    Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&ObjectsEditor::OnSetFocus);
+    //*)
 
     #if defined(__WXMSW__) //Offer nice look to wxTreeCtrl
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
@@ -244,8 +360,8 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
 
 ObjectsEditor::~ObjectsEditor()
 {
-	//(*Destroy(ObjectsEditor)
-	//*)
+    //(*Destroy(ObjectsEditor)
+    //*)
 }
 
 void ObjectsEditor::SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl_, wxAuiManager * manager_)
@@ -264,25 +380,26 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object"));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects and groups"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        objectsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        objectsRibbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
+        objectsRibbonBar->AddButton(idRibbonAddGroup, !hideLabels ? _("Add a group") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new group to the scene"));
+        objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object or group"));
+        objectsRibbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
+        objectsRibbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
-        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected object"));
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selection"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        selectionRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
+        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected item"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
-        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
-        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
+        clipboardRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
+        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
+        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -300,6 +417,7 @@ void ObjectsEditor::OnHelpSelected( wxCommandEvent& event )
 void ObjectsEditor::ConnectEvents()
 {
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAddGroup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnAddGroupSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnMoveupSelected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ObjectsEditor::OnMoveDownSelected, NULL, this);
@@ -320,13 +438,18 @@ void ObjectsEditor::Refresh()
     objectsImagesList->Add(gd::SkinHelper::GetIcon("group", 24));
 
     objectsList->AddRoot( "Root", 0 );
+    objectsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Objects"), 0);
+    groupsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Groups"), 1);
 
-    if ( layout ) latestObjItem = AddObjectsToList(*layout, false);
-    if ( layout ) latestGroupItem = AddGroupsToList(layout->GetObjectGroups(), false);
-    latestGlobalObjItem = AddObjectsToList(project, true);
-    latestGlobalGroupItem = AddGroupsToList(project.GetObjectGroups(), true);
+    AddObjectsToList(*layout, false);
+    AddGroupsToList(layout->GetObjectGroups(), false);
+    AddObjectsToList(project, true);
+    AddGroupsToList(project.GetObjectGroups(), true);
 
-    objectsList->ExpandAll();
+    objectsList->Expand(objectsRootItem);
+    objectsList->Expand(groupsRootItem);
+
+    objectsList->SetDropTarget(new ObjectsListDnd(objectsList, groupsRootItem, project, layout));
 }
 
 wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, bool globalObjects)
@@ -350,20 +473,13 @@ wxTreeItemId ObjectsEditor::AddObjectsToList(gd::ClassWithObjects & objects, boo
                 thumbnailID = objectsImagesList->GetImageCount()-1;
             }
 
-            wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(),
+            wxTreeItemId item = objectsList->AppendItem( objectsRootItem,
                 objects.GetObject(i).GetName(), thumbnailID );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
-            if ( globalObjects ) objectsList->SetItemTextColour(item, wxColour(40,40,45));
+            if ( globalObjects ) objectsList->SetItemBold(item, true);
 
             lastAddedItem = item;
         }
-    }
-
-    if ( !globalObjects && objects.GetObjectsCount() == 0 )
-    {
-        wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), _("No objects"), 0 );
-        substituteObjItem = item;
-        lastAddedItem = item;
     }
 
     project.SetDirty();
@@ -380,23 +496,56 @@ wxTreeItemId ObjectsEditor::AddGroupsToList(std::vector <ObjectGroup> & groups, 
     {
         if ( ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
-            wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), groups[i].GetName(), 1 );
+            wxTreeItemId item = objectsList->AppendItem( groupsRootItem, groups[i].GetName(), 1 );
             objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
-            if ( globalGroup ) objectsList->SetItemTextColour(item, wxColour(40,40,45));
+            if ( globalGroup ) objectsList->SetItemBold(item, true);
+
+            UpdateGroup(item);
 
             lastAddedItem = item;
         }
     }
 
-    if ( !globalGroup && groups.empty() )
-    {
-        wxTreeItemId item = objectsList->AppendItem( objectsList->GetRootItem(), _("No groups"), 1 );
-        substituteGroupItem = item;
-        lastAddedItem = item;
-    }
-
     project.SetDirty();
     return lastAddedItem;
+}
+
+void ObjectsEditor::UpdateGroup(wxTreeItemId groupItem)
+{
+    if(!groupItem.IsOk())
+        return;
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(groupItem));
+    bool wasExpanded = objectsList->IsExpanded(groupItem);
+
+    if(!data || (data->GetString() != "LayoutGroup" && data->GetString() != "GlobalGroup"))
+        return;
+
+    //Clear the group item content
+    objectsList->DeleteChildren(groupItem);
+
+    std::vector<gd::ObjectGroup> & groups = (data->GetString() == "LayoutGroup") ? layout->GetObjectGroups() : project.GetObjectGroups();
+
+    //Find the group in the container
+    vector<gd::ObjectGroup>::iterator i = std::find_if( groups.begin(),
+                                                        groups.end(),
+                                                        std::bind2nd(gd::GroupHasTheSameName(), objectsList->GetItemText(groupItem).ToStdString()));
+
+    if ( i != groups.end() )
+    {
+        //Add all objects items into the group item
+        for(std::vector<std::string>::const_iterator it = i->GetAllObjectsNames().begin(); it != i->GetAllObjectsNames().end(); it++)
+        {
+            wxTreeItemId objectItem = objectsList->AppendItem( groupItem, *it, 0 );
+            objectsList->SetItemTextColour(objectItem, wxColour(128, 128, 128));
+            objectsList->SetItemData(objectItem, new gd::TreeItemStringData("ObjectInGroup"));
+        }
+    }
+    else
+    {
+        //If the group has not been found, we delete it from the tree
+        objectsList->Delete(groupItem);
+    }
 }
 
 void ObjectsEditor::OnobjectsListItemActivated(wxTreeEvent& event)
@@ -423,11 +572,11 @@ void ObjectsEditor::OnobjectsListItemMenu(wxTreeEvent& event)
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
     wxArrayTreeItemIds selection;
 
-    if ( objectsList->GetSelections(selection) > 1 )
+    if ( objectsList->GetSelections(selection) > 1 || (data && data->GetString() == "ObjectInGroup") )
     {
         PopupMenu( &multipleContextMenu );
     }
-    else if ( lastSelectedItem == substituteGroupItem || lastSelectedItem == substituteObjItem )
+    else if (lastSelectedItem == objectsRootItem || lastSelectedItem == groupsRootItem)
         PopupMenu( &emptyContextMenu );
     else if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
@@ -498,8 +647,17 @@ void ObjectsEditor::OnobjectsListKeyDown(wxTreeEvent& event)
 
 void ObjectsEditor::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
 {
-	if ( !event.GetLabel().empty() ) //event.GetLabel() is empty on linux.
-    	renamedItemOldName = gd::ToString(event.GetLabel());
+    if ( !event.GetLabel().empty() ) //event.GetLabel() is empty on linux.
+        renamedItemOldName = gd::ToString(event.GetLabel());
+
+    lastSelectedItem = event.GetItem();
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
+
+    if(!data || data->GetString() == "ObjectInGroup")
+    {
+        event.Veto();
+        return;
+    }
 }
 
 void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
@@ -511,10 +669,9 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 
     lastSelectedItem = event.GetItem();
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
-    if (!data) return;
 
     //Rename an object
-    if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
+    if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         bool globalObject = data->GetString() == "GlobalObject";
         gd::ClassWithObjects * objects = layout;
@@ -589,6 +746,13 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             //TODO: Factor this? And change the name in external events.
         }
 
+        //Update the groups items (without refreshing the entire tree control)
+        wxTreeItemIdValue cookie;
+        for(wxTreeItemId groupItem = objectsList->GetFirstChild(groupsRootItem, cookie); groupItem.IsOk(); groupItem = objectsList->GetNextChild(groupsRootItem, cookie))
+        {
+            UpdateGroup(groupItem);
+        }
+
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObject ? NULL : layout, objects->GetObject(newName), oldName);
     }
@@ -638,6 +802,14 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupRenamed(project, globalGroup ? NULL : layout, newName, oldName);
         }
     }
+    else
+    {
+        //Undo the item text change
+        event.Veto();
+        return;
+    }
+
+    renamedItemOldName = newName;
 
     project.SetDirty();
 }
@@ -650,30 +822,41 @@ void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
     mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 
-    //Get the selected item
+    //Get the selected item and update the ribbon
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
 
-    //Object clicked?
+    objectsRibbonBar->EnableButton(idRibbonUp, false);
+    objectsRibbonBar->EnableButton(idRibbonDown, false);
+    objectsRibbonBar->EnableButton(idRibbonDel, false);
+    clipboardRibbonBar->EnableButton(idRibbonCopy, false);
+    clipboardRibbonBar->EnableButton(idRibbonCut, false);
+    clipboardRibbonBar->EnableButton(idRibbonPaste, false);
+    selectionRibbonBar->EnableButton(idRibbonModProp, false);
+    selectionRibbonBar->EnableButton(idRibbonModName, false);
     if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         objectsList->SetToolTip( "" );
+        objectsRibbonBar->EnableButton(idRibbonUp, true);
+        objectsRibbonBar->EnableButton(idRibbonDown, true);
+        objectsRibbonBar->EnableButton(idRibbonDel, true);
+        clipboardRibbonBar->EnableButton(idRibbonCopy, true);
+        clipboardRibbonBar->EnableButton(idRibbonCut, true);
+        clipboardRibbonBar->EnableButton(idRibbonPaste, true);
+        selectionRibbonBar->EnableButton(idRibbonModProp, true);
+        selectionRibbonBar->EnableButton(idRibbonModName, true);
     }
     else if ( data && (data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup") )
     {
-        gd::ObjectGroup * group = GetSelectedGroup();
-        if ( !group ) return;
-
-        wxString tooltip = _("Contents of group \"");
-        tooltip += group->GetName();
-        tooltip += "\" :\n";
-        vector < string > allObjects = group->GetAllObjectsNames();
-        for (unsigned int j = 0;j< allObjects.size() && j < 10;++j)
-        {
-        	tooltip += allObjects.at(j)+"\n";
-        	if ( j == 9 ) tooltip += "...";
-        }
-        objectsList->SetToolTip( tooltip );
-
+        objectsList->SetToolTip(_("Unfold the group to see the objects inside it."));
+        objectsRibbonBar->EnableButton(idRibbonDel, true);
+        clipboardRibbonBar->EnableButton(idRibbonCopy, true);
+        clipboardRibbonBar->EnableButton(idRibbonCut, true);
+        clipboardRibbonBar->EnableButton(idRibbonPaste, true);
+        selectionRibbonBar->EnableButton(idRibbonModName, true);
+    }
+    else if ( data && (data->GetString() == "ObjectInGroup"))
+    {
+        objectsRibbonBar->EnableButton(idRibbonDel, true);
     }
 
     UpdateAssociatedPropertiesPanel();
@@ -724,8 +907,8 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : layout, *object);
 
-    	//TODO: Set dirty only if modified.
-    	project.SetDirty();
+        //TODO: Set dirty only if modified.
+        project.SetDirty();
 
         //Reload thumbnail
         int thumbnailID = -1;
@@ -756,28 +939,28 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
     {
         bool globalGroup = data->GetString() == "GlobalGroup";
         gd::ObjectGroup * group = GetSelectedGroup();
-        if (group && layout)
-        {
-            EditObjectGroup dialog(this, project, *layout, *group); //TODO: Layout is mandatory here
-            if ( dialog.ShowModal() == 1 )
-                *group = dialog.group;
+        objectsList->Expand(lastSelectedItem);
 
-            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupEdited(project, globalGroup ? NULL : layout, group->GetName());
-            return;
+        if (!group || !layout) return;
+
+        ChooseObjectDialog dialog(this, project, *layout, /*canSelectGroup=*/false, "", /*multipleSelection=*/true);
+        if (dialog.ShowModal() == 1) { //Add objects to the group
+            for(unsigned int i = 0;i < dialog.GetChosenObjects().size();++i)
+                group->AddObject(dialog.GetChosenObjects()[i]);
         }
+
+        UpdateGroup(lastSelectedItem);
     }
 
     mainFrameWrapper.GetMainEditor()->SetFocus();
 }
 
-
 void ObjectsEditor::OnMenuPropertiesSelected(wxCommandEvent& event)
 {
     if ( propPnl && propPnlManager ) {
-    	propPnlManager->GetPane("PROPERTIES").Show();
-    	propPnlManager->Update();
-	}
+        propPnlManager->GetPane("PROPERTIES").Show();
+        propPnlManager->Update();
+    }
 }
 
 void ObjectsEditor::OnMenuRenameSelected(wxCommandEvent& event)
@@ -802,9 +985,12 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     objects.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), ToString(name), objects.GetObjectsCount());
 
     //And to the TreeCtrl
-    wxTreeItemId previous = layout ? latestObjItem : latestGlobalObjItem;
-    wxTreeItemId itemAdded = objectsList->InsertItem( objectsList->GetRootItem(), previous, name );
-    if ( previous == substituteObjItem ) objectsList->Delete(substituteObjItem);
+    wxTreeItemId itemAdded;
+    wxTreeItemId lastLayoutObject = GetLastLayoutObjectItem();
+    if(lastLayoutObject.IsOk())
+        itemAdded = objectsList->InsertItem(objectsRootItem, lastLayoutObject, name);
+    else
+        itemAdded = objectsList->PrependItem(objectsRootItem, name);
 
     //Reload thumbnail
     int thumbnailID = -1;
@@ -818,7 +1004,6 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
 
     //Data
     objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutObject") );
-    latestObjItem = itemAdded;
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, layout, objects.GetObject(name));
@@ -827,12 +1012,12 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
 
     gd::LogStatus( _( "The object was correctly added" ) );
+    objectsList->Expand(objectsRootItem);
 }
 
 void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 {
     gd::ObjectGroup newGroup;
-    wxTreeItemId rootId = objectsList->GetRootItem();
 
     vector<gd::ObjectGroup> & objectsGroups = !layout ? project.GetObjectGroups() : layout->GetObjectGroups();
 
@@ -847,15 +1032,21 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     objectsGroups.push_back( newGroup );
 
-    wxTreeItemId previous = layout ? latestGroupItem : latestGlobalGroupItem;
-    wxTreeItemId itemAdded = objectsList->InsertItem( rootId, previous, name, 1 );
+    wxTreeItemId itemAdded;
+    wxTreeItemId lastLayoutItem = GetLastLayoutGroupItem();
+    if(lastLayoutItem.IsOk())
+        itemAdded = objectsList->InsertItem(groupsRootItem, lastLayoutItem, name, 1);
+    else
+        itemAdded = objectsList->PrependItem(groupsRootItem, name, 1);
+
     objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutGroup") );
-    if ( previous == substituteGroupItem ) objectsList->Delete(substituteGroupItem);
-    latestGroupItem = itemAdded;
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, layout ? layout : NULL, name);
     gd::LogStatus( _( "The group was correctly added." ) );
+
+    //Make sure that the group root item is expanded
+    objectsList->Expand(groupsRootItem);
 }
 
 
@@ -866,11 +1057,29 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
     std::vector < string > objectsDeleted;
     std::vector < string > gObjectsDeleted;
 
-    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )\?") :
-                                                             wxString::Format(wxString(_("Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )\?")), selection.GetCount()),
+    //Detect if only group's sub-objects have been selected (to avoid showing the next question)
+    int objectsInGroupCount = 0;
+    for(unsigned int i = 0;i<selection.GetCount();++i)
+    {
+        if (!selection[i].IsOk()) continue;
+        gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(selection[i]));
+        if (!data)
+            continue;
+
+        if(data->GetString() == "ObjectInGroup")
+            objectsInGroupCount++;
+    }
+
+    int answer = -1;
+
+    if(objectsInGroupCount != selection.GetCount())
+    {
+        answer = wxMessageBox(selection.GetCount() <= 1 ? wxString(_("Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )\?")) :
+                                                          wxString::Format(wxString(_("Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )\?")), selection.GetCount() - objectsInGroupCount),
                               _("Confirm deletion"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 
-    if ( answer == wxCANCEL ) return;
+        if ( answer == wxCANCEL ) return;
+    }
 
     //Removing objects
     for (unsigned int i = 0;i<selection.GetCount();++i)
@@ -937,6 +1146,42 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupDeleted(project, globalGroup ? NULL : layout, groupName);
         }
+        else if( data->GetString() == "ObjectInGroup")
+        {
+            //Remove the object from its group
+            std::string objectName = ToString(objectsList->GetItemText( selection[i] ));
+            wxTreeItemId groupItem = objectsList->GetItemParent(selection[i]);
+            if(!groupItem.IsOk())
+                continue;
+
+            gd::TreeItemStringData * groupData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(groupItem));
+            if (!groupData)
+                continue;
+
+            bool globalGroup = (groupData->GetString() == "GlobalGroup");
+            std::string groupName = ToString(objectsList->GetItemText( groupItem ));
+
+            std::vector<gd::ObjectGroup> & objectsGroups =
+                globalGroup || !layout ? project.GetObjectGroups() : layout->GetObjectGroups();
+
+            vector<gd::ObjectGroup>::iterator g = std::find_if( objectsGroups.begin(),
+                                                            objectsGroups.end(),
+                                                            std::bind2nd(gd::GroupHasTheSameName(), groupName));
+            if( g != objectsGroups.end() && g->Find(objectName))
+            {
+                g->RemoveObject(objectName);
+            }
+        }
+
+        //Delete the item from the tree control
+        objectsList->Delete(selection[i]);
+    }
+
+    //Update the groups items (without refreshing the entire tree control)
+    wxTreeItemIdValue cookie;
+    for(wxTreeItemId groupItem = objectsList->GetFirstChild(groupsRootItem, cookie); groupItem.IsOk(); groupItem = objectsList->GetNextChild(groupsRootItem, cookie))
+    {
+        UpdateGroup(groupItem);
     }
 
     //Call the notifiers
@@ -944,9 +1189,6 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, layout, objectsDeleted);
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, NULL, gObjectsDeleted);
-
-    //Remove the real items in the list
-    Refresh();
 }
 
 void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
@@ -972,23 +1214,7 @@ void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
     }
 
     Refresh();
-    //Select again the moved item
-    wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
-    while ( item.IsOk() )
-    {
-        gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
-        if (itemData)
-        {
-	        if (objectsList->GetItemText( item ) == name
-	            && itemData->GetString() == dataStr
-	            && itemData->GetSecondString() == dataStr2)
-	        {
-	            objectsList->SelectItem(item);
-	            return;
-	        }
-    	}
-	    item = objectsList->GetPrevSibling(item);
-    }
+    SelectItem(objectsRootItem, name, dataStr, dataStr2); //Select again the moved item
 }
 
 void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
@@ -1014,22 +1240,26 @@ void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
     }
 
     Refresh();
-    //Select again the moved item
-    wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
+    SelectItem(objectsRootItem, name, dataStr, dataStr2); //Select again the moved item
+}
+
+void ObjectsEditor::SelectItem(wxTreeItemId parent, std::string name, std::string dataStr1, std::string dataStr2)
+{
+    wxTreeItemId item = objectsList->GetLastChild(parent);
     while ( item.IsOk() )
     {
         gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
         if (itemData)
         {
-	        if (objectsList->GetItemText( item ) == name
-	            && itemData->GetString() == dataStr
-	            && itemData->GetSecondString() == dataStr2)
-	        {
-	            objectsList->SelectItem(item);
-	            return;
-	        }
+            if (objectsList->GetItemText( item ) == name
+                && itemData->GetString() == dataStr1
+                && itemData->GetSecondString() == dataStr2)
+            {
+                objectsList->SelectItem(item);
+                return;
+            }
         }
-	    item = objectsList->GetPrevSibling(item);
+        item = objectsList->GetPrevSibling(item);
     }
 }
 
@@ -1205,7 +1435,23 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, NULL, project.GetObject(objectName));
         }
 
-        Refresh();
+        //Delete the old item
+        int oldImage = objectsList->GetItemImage(lastSelectedItem);
+        objectsList->Delete(lastSelectedItem);
+
+        //Add the new item
+        wxTreeItemId newItem;
+        wxTreeItemId lastGlobalItem = GetLastGlobalObjectItem();
+        if(lastGlobalItem.IsOk())
+        {
+            newItem = objectsList->InsertItem(objectsRootItem, lastGlobalItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
+        }
+        else
+        {
+            newItem = objectsList->AppendItem(objectsRootItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
+        }
+        objectsList->SetItemBold(newItem, true);
+        objectsList->SelectItem(newItem);
     }
     //Group clicked?
     else if ( data->GetString() == "LayoutGroup" )
@@ -1228,7 +1474,27 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, NULL, groupName);
         }
 
-        Refresh();
+        //Add the item corresponding to the global group
+        bool wasExpanded = objectsList->IsExpanded(lastSelectedItem);
+        objectsList->Delete(lastSelectedItem);
+
+        wxTreeItemId newItem;
+        wxTreeItemId lastGlobalItem = GetLastGlobalGroupItem();
+        if(lastGlobalItem.IsOk())
+        {
+            newItem = objectsList->InsertItem(groupsRootItem, lastGlobalItem, groupName, 1, 1, new gd::TreeItemStringData("GlobalGroup"));
+        }
+        else
+        {
+            newItem = objectsList->AppendItem(groupsRootItem, groupName, 1, 1, new gd::TreeItemStringData("GlobalGroup"));
+        }
+        objectsList->SetItemBold(newItem, true);
+        objectsList->SelectItem(newItem);
+
+        UpdateGroup(newItem); //Update the group item content
+
+        if(wasExpanded) //Expand the group item if it was expanded before
+            objectsList->Expand(newItem);
     }
 }
 
@@ -1251,6 +1517,8 @@ void ObjectsEditor::OnobjectsListBeginDrag(wxTreeEvent& event)
 
     if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
     {
+        objectsList->SetItemText(groupsRootItem, _("Create a new group"));
+
         gd::Object * object = GetSelectedObject();
         if ( !object ) return;
 
@@ -1258,9 +1526,10 @@ void ObjectsEditor::OnobjectsListBeginDrag(wxTreeEvent& event)
         wxDropSource dragSource( this );
         dragSource.SetData( objectName );
         dragSource.DoDragDrop( true );
+
+        objectsList->SetItemText(groupsRootItem, _("Groups"));
     }
 }
-
 
 void ObjectsEditor::UpdateAssociatedPropertiesPanel()
 {
@@ -1292,6 +1561,114 @@ void ObjectsEditor::UpdateAssociatedPropertiesPanel()
     }
 }
 
+wxTreeItemId ObjectsEditor::GetLastLayoutObjectItem() const
+{
+    wxTreeItemIdValue cookie;
+
+    wxTreeItemId item = objectsList->GetFirstChild(objectsRootItem, cookie);
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+
+    while(item.IsOk() && (!data || data->GetString() == "LayoutObject"))
+    {
+        item = objectsList->GetNextSibling(item);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return objectsList->GetLastChild(objectsRootItem);
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
+}
+
+wxTreeItemId ObjectsEditor::GetLastGlobalObjectItem() const
+{
+    wxTreeItemIdValue cookie;
+
+    wxTreeItemId item;
+    wxTreeItemId lastLayoutItem = GetLastLayoutObjectItem();
+    if(!lastLayoutItem.IsOk())
+        item = objectsList->GetFirstChild(objectsRootItem, cookie);
+    else
+        item = objectsList->GetNextSibling(item);
+
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+
+    while(item.IsOk() && (!data || data->GetString() == "GlobalObject"))
+    {
+        item = objectsList->GetNextSibling(item);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return objectsList->GetLastChild(objectsRootItem);
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
+}
+
+wxTreeItemId ObjectsEditor::GetLastLayoutGroupItem() const
+{
+    wxTreeItemIdValue cookie;
+
+    wxTreeItemId item = objectsList->GetFirstChild(groupsRootItem, cookie);
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+
+    while(item.IsOk() && (!data || data->GetString() == "LayoutGroup"))
+    {
+        item = objectsList->GetNextSibling(item);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return objectsList->GetLastChild(groupsRootItem);
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
+}
+
+wxTreeItemId ObjectsEditor::GetLastGlobalGroupItem() const
+{
+    wxTreeItemIdValue cookie;
+
+    wxTreeItemId item;
+    wxTreeItemId lastLayoutItem = GetLastLayoutGroupItem();
+    if(!lastLayoutItem.IsOk())
+        item = objectsList->GetFirstChild(groupsRootItem, cookie);
+    else
+        item = objectsList->GetNextSibling(item);
+
+    if(!item.IsOk())
+        return wxTreeItemId();
+
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+
+    while(item.IsOk() && (!data || data->GetString() == "GlobalGroup"))
+    {
+        item = objectsList->GetNextSibling(item);
+        data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(item));
+    }
+
+    if(!data || !item.IsOk())
+        return objectsList->GetLastChild(groupsRootItem);
+
+    item = objectsList->GetPrevSibling(item);
+
+    return item;
+}
+
 bool ObjectsEditor::HasGroupNamed(std::string name, std::vector<gd::ObjectGroup> & groups)
 {
     return std::find_if( groups.begin(), groups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
@@ -1315,21 +1692,21 @@ void ObjectsEditor::OnMenuAddAutomatismSelected(wxCommandEvent& event)
 
     if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
     {
-	    bool globalObject = data->GetString() == "GlobalObject";
-	    gd::Object * object = GetSelectedObject();
-	    if ( !object ) return;
+        bool globalObject = data->GetString() == "GlobalObject";
+        gd::Object * object = GetSelectedObject();
+        if ( !object ) return;
 
-	    if ( gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
-	        object, layout, globalObject))
-	        UpdateAssociatedPropertiesPanel();
+        if ( gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
+            object, layout, globalObject))
+            UpdateAssociatedPropertiesPanel();
 
-	    //Show and update the properties panel.
-	    if ( propPnl && propPnlManager ) {
-	    	propPnlManager->GetPane("PROPERTIES").Show();
-	    	propPnlManager->Update();
-		}
-	}
-	/*else: No object is selected, do nothing.*/
+        //Show and update the properties panel.
+        if ( propPnl && propPnlManager ) {
+            propPnlManager->GetPane("PROPERTIES").Show();
+            propPnlManager->Update();
+        }
+    }
+    /*else: No object is selected, do nothing.*/
 }
 
 }

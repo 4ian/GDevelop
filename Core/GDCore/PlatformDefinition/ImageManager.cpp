@@ -1,11 +1,11 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/RessourcesLoader.h"
+#include "GDCore/PlatformDefinition/ResourcesLoader.h"
 #include "GDCore/Tools/InvalidImage.h"
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #undef LoadImage //thx windows.h
@@ -42,7 +42,7 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::st
     {
         ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(name));
 
-        boost::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(*RessourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
+        boost::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
         texture->texture.setSmooth(image.smooth);
 
         alreadyLoadedImages[name] = texture;
@@ -98,7 +98,7 @@ void ImageManager::ReloadImage(const std::string & name) const
 
         cout << "ImageManager: Reload " << name << endl;
 
-        oldTexture->texture = *RessourcesLoader::Get()->LoadSFMLTexture( image.GetFile() );
+        oldTexture->texture = ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() );
         oldTexture->texture.setSmooth(image.smooth);
         oldTexture->image = oldTexture->texture.copyToImage();
 
@@ -177,7 +177,7 @@ void ImageManager::EnableImagesUnloading()
 
 }
 
-SFMLTextureWrapper::SFMLTextureWrapper(sf::Texture & texture_) :
+SFMLTextureWrapper::SFMLTextureWrapper(const sf::Texture & texture_) :
     texture(texture_),
     image(texture.copyToImage())
 {

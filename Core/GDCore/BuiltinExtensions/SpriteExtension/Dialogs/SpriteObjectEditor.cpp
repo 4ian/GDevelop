@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/Tools/Localization.h"
@@ -674,11 +674,11 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
             int pointY = 0;
 
             if ( pointIndex == 0 )
-            { pointX = sprite.GetOrigine().GetX(); pointY = sprite.GetOrigine().GetY(); }
-            else if ( pointIndex == 1 && sprite.IsCentreAutomatic() )
+            { pointX = sprite.GetOrigin().GetX(); pointY = sprite.GetOrigin().GetY(); }
+            else if ( pointIndex == 1 && sprite.IsDefaultCenterPoint() )
             { pointX = bmp.GetWidth()/2; pointY = bmp.GetHeight()/2; }
-            else if ( pointIndex == 1 && !sprite.IsCentreAutomatic() )
-            { pointX = sprite.GetCentre().GetX(); pointY = sprite.GetCentre().GetY(); }
+            else if ( pointIndex == 1 && !sprite.IsDefaultCenterPoint() )
+            { pointX = sprite.GetCenter().GetX(); pointY = sprite.GetCenter().GetY(); }
             else if ( pointIndex != -1 )
             {
                 pointX = sprite.GetPoint(ToString(pointsList->GetItemText(pointIndex))).GetX();
@@ -749,19 +749,19 @@ void SpriteObjectEditor::RefreshPoints()
         wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
 
         pointsList->InsertItem(pointsList->GetItemCount(), "Origin", 0);
-        pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetOrigine().GetX()));
-        pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(sprite.GetOrigine().GetY()));
+        pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetOrigin().GetX()));
+        pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(sprite.GetOrigin().GetY()));
 
         pointsList->InsertItem(pointsList->GetItemCount(), "Centre", 0);
-        if ( sprite.IsCentreAutomatic() ) //Center point is a special case as most of the time it is automatically computed at runtime
+        if ( sprite.IsDefaultCenterPoint() ) //Center point is a special case as most of the time it is automatically computed at runtime
         {
             pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(bmp.GetWidth()/2));
             pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(bmp.GetHeight()/2));
         }
         else
         {
-            pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetCentre().GetX()));
-            pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(sprite.GetCentre().GetY()));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetCenter().GetX()));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(sprite.GetCenter().GetY()));
         }
 
         const std::vector<Point> & points = sprite.GetAllNonDefaultPoints();
@@ -1182,11 +1182,11 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
             long pointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 
             if ( pointIndex == 0 )
-                sprite.GetOrigine().SetXY(event.GetX() - spritePosX, event.GetY() - spritePosY);
+                sprite.GetOrigin().SetXY(event.GetX() - spritePosX, event.GetY() - spritePosY);
             else if ( pointIndex == 1 )
             {
-                sprite.SetCentreAutomatic(false);
-                sprite.GetCentre().SetXY(event.GetX() - spritePosX, event.GetY() - spritePosY);
+                sprite.SetDefaultCenterPoint(false);
+                sprite.GetCenter().SetXY(event.GetX() - spritePosX, event.GetY() - spritePosY);
             }
             else if ( pointIndex != -1 )
             {
@@ -1299,7 +1299,7 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
         if (wxMessageBox(_("The point \"Centre\" can be automatically placed by GDevelop at the center.\nDo you really want to modify the point\?\nClick on yes to modify it, click on no so as let GDevelop place it."),
                        _("Position of the point \"Centre\""), wxYES_NO ) == wxNO)
         {
-            for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetCentreAutomatic(true);
+            for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(true);
             RefreshPoints();
             imagePanel->Refresh();
             imagePanel->Update();
@@ -1742,13 +1742,14 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_MULTIPLE );
+        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE );
         wxString projectDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
 
         if ( FileDialog.ShowModal() == wxID_OK )
         {
             wxArrayString files;
-            FileDialog.GetPaths( files );
+            FileDialog.GetPaths(files);
+            files.Sort(true); //Ensure that the order of insertion is alphabetical.
 
             std::vector < std::string > filenames;
             for ( unsigned int i = 0; i < files.GetCount();++i )

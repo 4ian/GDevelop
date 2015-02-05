@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include <map>
@@ -50,7 +50,6 @@ namespace gd
 {
 
 Project::Project() :
-    useExternalSourceFiles(false),
     #if defined(GD_IDE_ONLY)
     name(_("Project")),
     #endif
@@ -63,7 +62,8 @@ Project::Project() :
     ,imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
     #endif
     #if defined(GD_IDE_ONLY)
-    ,currentPlatform(NULL),
+    ,useExternalSourceFiles(false),
+    currentPlatform(NULL),
     GDMajorVersion(gd::VersionWrapper::Major()),
     GDMinorVersion(gd::VersionWrapper::Minor()),
     dirty(false)
@@ -684,7 +684,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     externalSourceFilesElement.ConsiderAsArrayOf("sourceFile", "SourceFile");
     for(unsigned int i = 0;i<externalSourceFilesElement.GetChildrenCount();++i)
     {
-        const SerializerElement & sourceFileElement = externalLayoutsElement.GetChild(i);
+        const SerializerElement & sourceFileElement = externalSourceFilesElement.GetChild(i);
 
         boost::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
         newSourceFile->UnserializeFrom(sourceFileElement);
@@ -934,6 +934,54 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 }
 
+bool Project::HasSourceFile(std::string name, std::string language) const
+{
+    vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
+        find_if(externalSourceFiles.begin(), externalSourceFiles.end(),
+        bind2nd(gd::ExternalSourceFileHasName(), name));
+
+    if (sourceFile == externalSourceFiles.end())
+        return false;
+
+    return language.empty() || (*sourceFile)->GetLanguage() == language;
+}
+
+gd::SourceFile & Project::GetSourceFile(const std::string & name)
+{
+    return *(*find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name)));
+}
+
+const gd::SourceFile & Project::GetSourceFile(const std::string & name) const
+{
+    return *(*find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name)));
+}
+
+void Project::RemoveSourceFile(const std::string & name)
+{
+    std::vector< boost::shared_ptr<gd::SourceFile> >::iterator sourceFile =
+        find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name));
+    if ( sourceFile == externalSourceFiles.end() ) return;
+
+    externalSourceFiles.erase(sourceFile);
+}
+
+gd::SourceFile & Project::InsertNewSourceFile(const std::string & name, const std::string & language, unsigned int position)
+{
+    if (HasSourceFile(name, language))
+        return GetSourceFile(name);
+
+    boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+    newSourceFile->SetLanguage(language);
+    newSourceFile->SetFileName(name);
+
+    if (position<externalSourceFiles.size())
+        externalSourceFiles.insert(externalSourceFiles.begin()+position, newSourceFile);
+    else
+        externalSourceFiles.push_back(newSourceFile);
+
+    return *newSourceFile;
+}
+
 #if !defined(GD_NO_WX_GUI)
 void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
 {
@@ -970,7 +1018,7 @@ void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
     grid->Append( new wxStringProperty(_("Mac OS executable name"), wxPG_LABEL, macExecutableFilename) );
 
     grid->Append( new wxPropertyCategory(_("C++ features")) );
-    grid->Append( new wxBoolProperty(_("Activate the use of C++ source files"), wxPG_LABEL, useExternalSourceFiles) );
+    grid->Append( new wxBoolProperty(_("Activate the use of C++/JS source files"), wxPG_LABEL, useExternalSourceFiles) );
 }
 
 void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
@@ -1000,8 +1048,8 @@ void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
         linuxExecutableFilename = gd::ToString(grid->GetProperty(_("Linux executable name"))->GetValueAsString());
     if ( grid->GetProperty(_("Mac OS executable name")) != NULL)
         macExecutableFilename = gd::ToString(grid->GetProperty(_("Mac OS executable name"))->GetValueAsString());
-    if ( grid->GetProperty(_("Activate the use of C++ source files")) != NULL)
-        useExternalSourceFiles =grid->GetProperty(_("Activate the use of C++ source files"))->GetValue().GetBool();
+    if ( grid->GetProperty(_("Activate the use of C++/JS source files")) != NULL)
+        useExternalSourceFiles =grid->GetProperty(_("Activate the use of C++/JS source files"))->GetValue().GetBool();
 }
 
 void Project::OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event)
@@ -1058,7 +1106,6 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     author = game.author;
     latestCompilationDirectory = game.latestCompilationDirectory;
-    extensionsUsed = game.GetUsedExtensions();
     objectGroups = game.objectGroups;
 
     GDMajorVersion = game.GDMajorVersion;
@@ -1066,6 +1113,7 @@ void Project::Init(const gd::Project & game)
 
     currentPlatform = game.currentPlatform;
     #endif
+    extensionsUsed = game.extensionsUsed;
     platforms = game.platforms;
 
     //Resources
@@ -1093,9 +1141,9 @@ void Project::Init(const gd::Project & game)
     for (unsigned int i =0;i<game.externalLayouts.size();++i)
     	externalLayouts.push_back( boost::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
 
+    #if defined(GD_IDE_ONLY)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
-    #if defined(GD_IDE_ONLY)
     externalSourceFiles.clear();
     for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
     	externalSourceFiles.push_back( boost::shared_ptr<gd::SourceFile>(new gd::SourceFile(*game.externalSourceFiles[i])) );

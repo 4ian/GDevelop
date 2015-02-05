@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY)
@@ -29,46 +29,33 @@ namespace gd
 
 InstructionSentenceFormatter *InstructionSentenceFormatter::_singleton = NULL;
 
-/**
- * Generate the sentence describing an action.
- */
-string InstructionSentenceFormatter::Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos)
+string InstructionSentenceFormatter::Translate(const gd::Instruction & instr, const gd::InstructionMetadata & metadata)
 {
-    std::string trad = infos.GetSentence();
-    if ( trad.empty() ) trad = "   "; //Prevent empty sentences that could trigger graphical glitches.
+    std::string out = metadata.GetSentence();
+    if ( out.empty() ) out = "   "; //Prevent empty sentences that could trigger graphical glitches.
 
-    //Format special
-    /*if ( trad.substr(0, 3) == "Do " && infos.parameters.size() >  )
+    //Replace _PARAMx_ placeholders by their values
+    for (unsigned int i =0;i<metadata.parameters.size();++i)
     {
-
-    }*/
-
-    //Replace _PARAMx_ by values
-    for (unsigned int i =0;i<infos.parameters.size();++i)
-    {
-        while ( trad.find( "_PARAM"+ToString(i)+"_" ) != std::string::npos )
+        std::string placeholder = "_PARAM"+ToString(i)+"_";
+        while ( out.find( placeholder ) != std::string::npos )
         {
-            std::string parameter = action.GetParameter( i ).GetPlainString();
-
-            trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
-                            std::string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
-                            parameter );
+            std::string parameter = instr.GetParameter(i).GetPlainString();
+            out.replace(out.find(placeholder), placeholder.length(), parameter);
         }
     }
 
-    std::replace( trad.begin(), trad.end(), '\n', ' ');
+    std::replace( out.begin(), out.end(), '\n', ' ');
 
-    return trad;
+    return out;
 }
 
-/**
- * Create a formatted sentence from an action
- */
-std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFormatter::GetAsFormattedText(const Instruction & action, const gd::InstructionMetadata & infos)
+std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFormatter::GetAsFormattedText(
+    const Instruction & instr, const gd::InstructionMetadata & metadata)
 {
     std::vector< std::pair<std::string, gd::TextFormatting> > formattedStr;
 
-    std::string sentence = infos.GetSentence();
+    std::string sentence = metadata.GetSentence();
     std::replace( sentence.begin(), sentence.end(), '\n', ' ');
     bool parse = true;
 
@@ -78,7 +65,7 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
         parse = false;
         size_t firstParamPosition = std::string::npos;
         size_t firstParamIndex = std::string::npos;
-        for (unsigned int i =0;i<infos.parameters.size();++i)
+        for (unsigned int i =0;i<metadata.parameters.size();++i)
         {
             size_t paramPosition = sentence.find( "_PARAM"+ToString(i)+"_" );
             if ( paramPosition < firstParamPosition )
@@ -99,17 +86,17 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
             }
 
             //Add the parameter
-            TextFormatting format = GetFormattingFromType(infos.parameters[firstParamIndex].type);
+            TextFormatting format = GetFormattingFromType(metadata.parameters[firstParamIndex].type);
             format.userData = firstParamIndex;
 
-            std::string text = action.GetParameter( firstParamIndex ).GetPlainString();
+            std::string text = instr.GetParameter( firstParamIndex ).GetPlainString();
             std::replace( text.begin(), text.end(), '\n', ' ');
 
             formattedStr.push_back(std::make_pair(text, format));
 
             sentence = sentence.substr(firstParamPosition+ToString("_PARAM"+ToString(firstParamIndex)+"_").length());
         }
-        else if ( !sentence.empty() )//No more parameter found : Add the end of the sentence
+        else if ( !sentence.empty() )//No more parameter found: Add the end of the sentence
         {
             TextFormatting format;
             formattedStr.push_back(std::make_pair(sentence, format));
@@ -121,7 +108,8 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
 
 TextFormatting InstructionSentenceFormatter::GetFormattingFromType(const std::string & type)
 {
-    TextFormatting format;
+    if (gd::ParameterMetadata::IsObject(type))
+        return typesFormatting["object"];
 
     return typesFormatting[type];
 }
@@ -154,61 +142,44 @@ std::string InstructionSentenceFormatter::LabelFromType(const std::string & type
     return _("Unknown");
 }
 
-#if !defined(GD_NO_WX_GUI)
 void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
 {
+    //Load default configuration
+    typesFormatting.clear();
+    typesFormatting["expression"].SetColor(99, 0, 0).SetBold();
+    typesFormatting["object"].SetColor(19, 81, 0).SetBold();
+    typesFormatting["automatism"].SetColor(19, 81, 0).SetBold();
+    typesFormatting["operator"].SetColor(64, 81, 79).SetBold();
+    typesFormatting["objectvar"].SetColor(44, 69, 99).SetBold();
+    typesFormatting["scenevar"].SetColor(44, 69, 99).SetBold();
+    typesFormatting["globalvar"].SetColor(44, 69, 99).SetBold();
+
+    //Load any existing custom configuration
+    #if !defined(GD_NO_WX_GUI)
     wxConfigBase * config = wxConfigBase::Get();
 
-    typesFormatting.clear();
-
+    for(std::map<std::string, gd::TextFormatting>::iterator it = typesFormatting.begin(); it != typesFormatting.end();++it)
     {
-    typesFormatting["expression"].SetColor(config->ReadObject("EventsEditor/expressionColor", wxColour(99,0,0)));
-    typesFormatting["expression"].bold = config->ReadBool("EventsEditor/expressionBold", true);
-    typesFormatting["expression"].italic = config->ReadBool("EventsEditor/expressionItalic", false);
+        it->second.SetColor(config->ReadObject("EventsEditor/"+it->first+"Color", it->second.GetWxColor()));
+        it->second.bold = config->ReadBool("EventsEditor/"+it->first+"Bold", it->second.IsBold());
+        it->second.italic = config->ReadBool("EventsEditor/"+it->first+"Italic", it->second.IsItalic());
     }
-    {
-    typesFormatting["object"].SetColor(config->ReadObject("EventsEditor/objectColor", wxColour(19,81,0)));
-    typesFormatting["object"].bold = config->ReadBool("EventsEditor/objectBold", true);
-    typesFormatting["object"].italic = config->ReadBool("EventsEditor/objectItalic", false);
-    }
-    {
-    typesFormatting["automatism"].SetColor(config->ReadObject("EventsEditor/automatismColor", wxColour(19,81,0)));
-    typesFormatting["automatism"].bold = config->ReadBool("EventsEditor/automatismBold", true);
-    typesFormatting["automatism"].italic = config->ReadBool("EventsEditor/automatismItalic", false);
-    }
-    {
-    typesFormatting["operator"].SetColor(config->ReadObject("EventsEditor/operatorColor", wxColour(64,81,79)));
-    typesFormatting["operator"].bold = config->ReadBool("EventsEditor/operatorBold", true);
-    typesFormatting["operator"].italic = config->ReadBool("EventsEditor/operatorItalic", false);
-    }
-    {
-    typesFormatting["objectvar"].SetColor(config->ReadObject("EventsEditor/objectvarColor", wxColour(44,69,99)));
-    typesFormatting["objectvar"].bold = config->ReadBool("EventsEditor/objectvarBold", true);
-    typesFormatting["objectvar"].italic = config->ReadBool("EventsEditor/objectvarItalic", false);
-    }
-    {
-    typesFormatting["scenevar"].SetColor(config->ReadObject("EventsEditor/scenevarColor", wxColour(44,69,99)));
-    typesFormatting["scenevar"].bold = config->ReadBool("EventsEditor/scenevarBold", true);
-    typesFormatting["scenevar"].italic = config->ReadBool("EventsEditor/scenevarItalic", false);
-    }
-    {
-    typesFormatting["globalvar"].SetColor(config->ReadObject("EventsEditor/globalvarColor", wxColour(44,69,99)));
-    typesFormatting["globalvar"].bold = config->ReadBool("EventsEditor/globalvarBold", true);
-    typesFormatting["globalvar"].italic = config->ReadBool("EventsEditor/globalvarItalic", false);
-    }
+    #endif
 }
 
+#if !defined(GD_NO_WX_GUI)
 void InstructionSentenceFormatter::SaveTypesFormattingToConfig()
 {
     wxConfigBase * config = wxConfigBase::Get();
 
     for (std::map<std::string, TextFormatting>::iterator it = typesFormatting.begin();it!=typesFormatting.end();++it)
     {
-        config->Write("EventsEditor/"+it->first+"Color", typesFormatting[it->first].GetWxColor());
-        config->Write("EventsEditor/"+it->first+"Bold", typesFormatting[it->first].bold);
-        config->Write("EventsEditor/"+it->first+"Italic", typesFormatting[it->first].italic);
+        config->Write("EventsEditor/"+it->first+"Color", it->second.GetWxColor());
+        config->Write("EventsEditor/"+it->first+"Bold", it->second.bold);
+        config->Write("EventsEditor/"+it->first+"Italic", it->second.italic);
     }
 }
+
 wxBitmap InstructionSentenceFormatter::BitmapFromType(const std::string & type)
 {
     gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::Get();

@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #ifndef GDCORE_SERIALIZERELEMENT_H
@@ -200,12 +200,6 @@ public:
 	const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
     ///@}
 
-	/**
-	 * Hide any deprecated warning concerning how child and attributes are named.
-	 * Useful when unserializing from an old file.
-	 */
-    void HideWarnings() { hideWarning = true; };
-
 	static SerializerElement nullElement;
 private:
 
@@ -216,7 +210,6 @@ private:
 	std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > children;
 	mutable std::string arrayOf;
 	mutable std::string deprecatedArrayOf;
-	bool hideWarning;
 };
 
 }

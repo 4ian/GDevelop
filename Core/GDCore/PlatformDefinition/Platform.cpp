@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
@@ -45,7 +45,6 @@ bool Platform::AddExtension(boost::shared_ptr<gd::PlatformExtension> extension)
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
         creationFunctionTable[objectsTypes[i]] = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
-        destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
     }
 
     extensionsLoaded.push_back(extension);
@@ -91,7 +90,7 @@ boost::shared_ptr<gd::Object> Platform::CreateObject(std::string type, const std
     gd::Object * object = (creationFunctionTable.find(type)->second)(name);
     object->SetType(type);
 
-    return boost::shared_ptr<gd::Object> (object, destroyFunctionTable.find(type)->second);
+    return boost::shared_ptr<gd::Object> (object);
 }
 
 gd::Automatism* Platform::CreateAutomatism(const std::string & automatismType) const

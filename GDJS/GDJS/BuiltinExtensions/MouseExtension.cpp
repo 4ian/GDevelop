@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "MouseExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -23,7 +23,7 @@ MouseExtension::MouseExtension()
                           _("Mouse features"),
                           _("Built-in extensions allowing to use the mouse"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllConditions()["SourisX"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
@@ -59,9 +59,9 @@ MouseExtension::MouseExtension()
         .codeExtraInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
 
     AddAction("CentreSourisY",
-                   _("Center mouse verticaly"),
+                   _("Center mouse vertically"),
                    _("Put the cursor in the middle of the screen vertically."),
-                   _("Center mouse verticaly"),
+                   _("Center mouse vertically"),
                    _("Mouse"),
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")

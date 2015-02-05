@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "ExternalLayoutsExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -21,7 +21,7 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
                           _("External layouts"),
                           _("Built-in extension providing actions and conditions related to external layouts"),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllActions()["BuiltinExternalLayouts::CreateObjectsFromExternalLayout"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout");

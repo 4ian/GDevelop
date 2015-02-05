@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 #include "NewProjectDialog.h"
@@ -20,6 +20,7 @@
 #endif
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
+#include "GDCore/IDE/Analytics/AnalyticsSender.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/PlatformManager.h"
 
@@ -281,12 +282,19 @@ NewProjectDialog::~NewProjectDialog()
 void NewProjectDialog::OncreateProjectBtClick(wxCommandEvent& event)
 {
     chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    SendAnalyticsData();
     EndModal(1);
 }
 void NewProjectDialog::OntemplateListItemActivated(wxListEvent& event)
 {
     chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    SendAnalyticsData();
     EndModal(1);
+}
+
+void NewProjectDialog::SendAnalyticsData()
+{
+    gd::AnalyticsSender::Get()->SendNewGameCreated(chosenTemplatePlatform, chosenTemplateFile);
 }
 
 
@@ -319,7 +327,7 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
 
 void NewProjectDialog::OnbrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choose a file for the project" ), newProjectBaseFolder, _("Project.gdg"), "\"GDevelop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog dialog( this, _("Choose a file for the project"), newProjectBaseFolder, _("Project.gdg"), "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
 
     if ( dialog.ShowModal() != wxID_CANCEL )
     {

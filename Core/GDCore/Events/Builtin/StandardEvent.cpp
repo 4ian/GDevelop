@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include "StandardEvent.h"
@@ -120,41 +120,6 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Plat
 #else
     return 0;
 #endif
-}
-
-/**
- * Initialize from another StandardEvent.
- * Used by copy ctor and assignement operator
- */
-void StandardEvent::Init(const StandardEvent & event)
-{
-    events = event.events;
-
-    conditions = event.conditions;
-    actions = event.actions;
-}
-
-/**
- * Custom copy constructor
- */
-StandardEvent::StandardEvent(const StandardEvent & event) :
-BaseEvent(event)
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-StandardEvent& StandardEvent::operator=(const StandardEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
 }
 
 }

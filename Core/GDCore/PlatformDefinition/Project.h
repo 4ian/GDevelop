@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #ifndef GDCORE_PROJECT_H
@@ -650,27 +650,69 @@ public:
      * Default implementation check if objectName is only composed of a-z,A-Z,0-9 or _ characters an
      * if does not conflict with an expression.
      */
-    bool ValidateObjectName(const std::string & objectName);
+    static bool ValidateObjectName(const std::string & objectName);
 
     /**
      * Return a message that will be displayed when an invalid object name has been entered.
      *
      * \note This message will be displayed by the IDE into a tooltip.
      */
-    std::string GetBadObjectNameWarning();
+    static std::string GetBadObjectNameWarning();
 
     ///@}
 
-    //TODO: Put this in private part
-    bool useExternalSourceFiles; ///< True if game used external source files.
+    /** \name External source files
+     * To manage external C++ or Javascript source files used by the game
+     */
+    ///@{
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Return true if the game activated the use of external source files.
+     */
+    bool UseExternalSourceFiles() const { return useExternalSourceFiles; }
 
+    /**
+     * \brief Return a const reference to the vector containing all the source files used by
+     * the game.
+     */
+    const std::vector < boost::shared_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
+
+    /**
+     * \brief Return true if the source file with the specified name is used by the game.
+     * \param name The filename of the source file.
+     * \param language Optional. If specified, check that the source file that exists is in this language.
+     */
+    bool HasSourceFile(std::string name, std::string language = "") const;
+
+    /**
+     * Return a reference to the external source file with the given name.
+     */
+    SourceFile & GetSourceFile(const std::string & name);
+
+    /**
+     * Return a reference to the external source file with the given name.
+     */
+    const SourceFile & GetSourceFile(const std::string & name) const;
+
+    /**
+     * Remove the specified source file.
+     */
+    void RemoveSourceFile(const std::string & name);
+
+    /**
+     * Add a new source file the specified position in the external source files list.
+     */
+    gd::SourceFile & InsertNewSourceFile(const std::string & name, const std::string & language, unsigned int position = -1);
+    #endif
+    ///@}
+
+    //TODO: Put this in private part
     #if defined(GD_IDE_ONLY)
     std::vector < std::string > imagesChanged; ///< Images that have been changed and which have to be reloaded
     std::string winExecutableFilename; ///< Windows executable name
     std::string winExecutableIconFile; ///< Icon for Windows executable
     std::string linuxExecutableFilename;  ///< Linux executable name
     std::string macExecutableFilename;  ///< Mac executable name
-    std::vector < boost::shared_ptr<gd::SourceFile> > externalSourceFiles; ///< List of C++ source files used.
     #endif
 
 private:
@@ -701,6 +743,8 @@ private:
     std::vector < gd::Platform* >                       platforms; ///< Pointers to the platforms this project supports.
     std::string                                         firstLayout;
     #if defined(GD_IDE_ONLY)
+    bool                                                useExternalSourceFiles; ///< True if game used external source files.
+    std::vector < boost::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     std::string                                         author; ///< Game author name
     std::string                                         gameFile; ///< File of the game

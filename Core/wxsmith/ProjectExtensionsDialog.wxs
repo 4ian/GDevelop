@@ -127,6 +127,7 @@
 															<label></label>
 															<font>
 																<weight>bold</weight>
+																<sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
 															</font>
 														</object>
 														<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -154,6 +155,7 @@
 															<label></label>
 															<font>
 																<weight>bold</weight>
+																<sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
 															</font>
 														</object>
 														<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -303,6 +305,7 @@
 							<label>Close and reopen scene editors so as to take in account newly added extensions.</label>
 							<font>
 								<style>italic</style>
+								<sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
 							</font>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

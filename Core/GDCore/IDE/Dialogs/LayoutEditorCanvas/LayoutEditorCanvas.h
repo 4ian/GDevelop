@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef LAYOUTEDITORCANVAS_H
@@ -320,6 +320,7 @@ protected:
     virtual void OnKey( wxKeyEvent& evt );
     virtual void OnKeyUp( wxKeyEvent& evt );
     virtual void OnMiddleDown( wxMouseEvent &event );
+    virtual void OnMiddleUp( wxMouseEvent &event );
     virtual void OnMouseWheel( wxMouseEvent &event );
     virtual void OnRightUp( wxMouseEvent &event );
     virtual void OnMotion( wxMouseEvent &event );
@@ -397,7 +398,13 @@ protected:
      * Called when the ribbon buttons of edition mode must be created inside ribbonToolbar.
      * \see CreatePreviewRibbonTools
      */
-    virtual void CreateEditionRibbonTools();
+    void CreateEditionRibbonTools();
+
+    /**
+     * \brief Toggle the disabled state of the Edition and Preview button according
+     * to the state of the editor (editing or previewing).
+     */
+    void UpdateModeButtonsState();
 
     /**
      * Return a pointer to the smallest initial instance under the cursor.
@@ -425,12 +432,12 @@ protected:
     /**
      * Undo last changes.
      */
-    virtual void Undo(unsigned int times = 1);
+    void Undo(unsigned int times = 1);
 
     /**
      * Redo last changes.
      */
-    virtual void Redo(unsigned int times = 1);
+    void Redo(unsigned int times = 1);
 
     /**
      * Update the mouse according to the selected button
@@ -495,6 +502,7 @@ protected:
     wxMenu noObjectContextMenu;
     wxMenu zoomMenu;
     wxMenu platformsMenu;
+    static wxRibbonButtonBar * modeRibbonBar;
 
     DECLARE_EVENT_TABLE()
     friend class InstancesInAreaPicker;

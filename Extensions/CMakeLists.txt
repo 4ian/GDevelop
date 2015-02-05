@@ -1,5 +1,5 @@
 #This is the CMake file used to build the extensions.
-#For more information, see the Readme.txt file.
+#For more information, see the Readme.md file.
 
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)
@@ -36,7 +36,9 @@ IF (NOT EMSCRIPTEN)
 	ADD_SUBDIRECTORY(PrimitiveDrawing)
 	ADD_SUBDIRECTORY(SoundObject)
 	ADD_SUBDIRECTORY(TextEntryObject)
+ENDIF()
 	ADD_SUBDIRECTORY(TextObject)
+IF (NOT EMSCRIPTEN)
     ADD_SUBDIRECTORY(TileMapObject)
 ENDIF()
 ADD_SUBDIRECTORY(TiledSpriteObject)

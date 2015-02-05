@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "CommonConversionsExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -21,7 +21,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                           _("Standard Conversions"),
                           _("Built-in extension providing standard conversions expressions."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllExpressions()["ToNumber"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.common.toNumber").SetIncludeFile("commontools.js");

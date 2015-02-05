@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
@@ -213,11 +213,6 @@ void Object::SerializeTo(SerializerElement & element) const
 }
 #endif
 
-}
-
-void DestroyBaseObject(gd::Object * object)
-{
-    delete object;
 }
 
 gd::Object * CreateBaseObject(std::string name)

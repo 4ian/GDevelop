@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY)
@@ -174,44 +174,6 @@ gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::
 #endif
 
     return ChangesMade;
-}
-
-/**
- * Initialize from another WhileEvent.
- * Used by copy ctor and assignement operator
- */
-void WhileEvent::Init(const WhileEvent & event)
-{
-    events = event.events;
-
-    whileConditions = event.whileConditions;
-    conditions = event.conditions;
-    actions = event.actions;
-    infiniteLoopWarning = event.infiniteLoopWarning;
-    justCreatedByTheUser = event.justCreatedByTheUser;
-}
-
-/**
- * Custom copy operator
- */
-WhileEvent::WhileEvent(const WhileEvent & event) :
-BaseEvent(event)
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-WhileEvent& WhileEvent::operator=(const WhileEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
 }
 
 }

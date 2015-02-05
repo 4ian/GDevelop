@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2013-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 /**
@@ -79,7 +79,7 @@ gdjs.evtTools.sound.isMusicOnChannelStopped = function(runtimeScene, channel) {
 };
 
 gdjs.evtTools.sound.getMusicOnChannelVolume = function(runtimeScene, channel) {
-    runtimeScene.getSoundManager().getMusicOnChannelVolume(channel);
+    return runtimeScene.getSoundManager().getMusicOnChannelVolume(channel);
 };
 
 gdjs.evtTools.sound.setMusicOnChannelVolume = function(runtimeScene, channel, volume) {
@@ -87,7 +87,7 @@ gdjs.evtTools.sound.setMusicOnChannelVolume = function(runtimeScene, channel, vo
 };
 
 gdjs.evtTools.sound.getMusicOnChannelPlayingOffset = function(runtimeScene, channel) {
-    runtimeScene.getSoundManager().getMusicOnChannelPlayingOffset(channel);
+    return runtimeScene.getSoundManager().getMusicOnChannelPlayingOffset(channel);
 };
 
 gdjs.evtTools.sound.setMusicOnChannelPlayingOffset = function(runtimeScene, channel, playingOffset) {
@@ -95,7 +95,7 @@ gdjs.evtTools.sound.setMusicOnChannelPlayingOffset = function(runtimeScene, chan
 };
 
 gdjs.evtTools.sound.getSoundOnChannelVolume = function(runtimeScene, channel) {
-    runtimeScene.getSoundManager().getSoundOnChannelVolume(channel);
+    return runtimeScene.getSoundManager().getSoundOnChannelVolume(channel);
 };
 
 gdjs.evtTools.sound.setSoundOnChannelVolume = function(runtimeScene, channel, volume) {
@@ -103,7 +103,7 @@ gdjs.evtTools.sound.setSoundOnChannelVolume = function(runtimeScene, channel, vo
 };
 
 gdjs.evtTools.sound.getSoundOnChannelPlayingOffset = function(runtimeScene, channel) {
-    runtimeScene.getSoundManager().getSoundOnChannelPlayingOffset(channel);
+    return runtimeScene.getSoundManager().getSoundOnChannelPlayingOffset(channel);
 };
 
 gdjs.evtTools.sound.setSoundOnChannelPlayingOffset = function(runtimeScene, channel, playingOffset) {

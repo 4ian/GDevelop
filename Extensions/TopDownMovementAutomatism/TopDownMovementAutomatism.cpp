@@ -1,27 +1,8 @@
 /**
 
 GDevelop - Top-down movement Automatism Extension
-Copyright (c) 2010-2014 Florian Rival (Florian.Rival@gmail.com)
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
 */
 
 #include <boost/shared_ptr.hpp>
@@ -133,8 +114,8 @@ void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
         bool yVelocityWasPositive = yVelocity >= 0;
         xVelocity -= deceleration*timeDelta*cos(directionInRad);
         yVelocity -= deceleration*timeDelta*sin(directionInRad);
-        if ( xVelocity > 0 ^ xVelocityWasPositive ) xVelocity = 0;
-        if ( yVelocity > 0 ^ yVelocityWasPositive ) yVelocity = 0;
+        if ( (xVelocity > 0) ^ xVelocityWasPositive ) xVelocity = 0;
+        if ( (yVelocity > 0) ^ yVelocityWasPositive ) yVelocity = 0;
     }
 
     float speed = sqrt(xVelocity*xVelocity+yVelocity*yVelocity);
@@ -155,7 +136,7 @@ void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
         bool diffWasPositive = angularDiff >= 0;
 
         float newAngle = object->GetAngle()+(diffWasPositive ? -1.0 : 1.0)*angularSpeed*timeDelta;
-        if( GDpriv::MathematicalTools::angleDifference(newAngle, directionInDeg+angleOffset) > 0 ^ diffWasPositive)
+        if( (GDpriv::MathematicalTools::angleDifference(newAngle, directionInDeg+angleOffset) > 0) ^ diffWasPositive)
             newAngle = directionInDeg+angleOffset;
         object->SetAngle(newAngle);
 

@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY)
 
@@ -56,9 +56,9 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         {
             for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
             {
+                std::string type = allActionsVectors[i]->at( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
-                    std::string type = allActionsVectors[i]->at( k ).GetType();
                     bool extensionHasAction = false;
 
                     const std::map<string, gd::InstructionMetadata> & allActions = allGameExtensions[e]->GetAllActions();
@@ -96,9 +96,9 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         {
             for ( unsigned int k = 0;k < allConditionsVector[i]->size() ;k++ )
             {
+                std::string type = allConditionsVector[i]->at( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
-                    std::string type = allConditionsVector[i]->at( k ).GetType();
                     bool extensionHasCondition = false;
 
                     const std::map<string, gd::InstructionMetadata> & allConditions = allGameExtensions[e]->GetAllConditions();

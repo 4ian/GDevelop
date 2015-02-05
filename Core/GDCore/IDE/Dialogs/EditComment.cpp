@@ -114,10 +114,10 @@ void EditComment::OnColorBtClick(wxCommandEvent& event)
 {
     wxColourData cData;
     cData.SetColour(ColorBt->GetBackgroundColour());
-    wxColourDialog Dialog(this, &cData);
-    if ( Dialog.ShowModal() == wxID_OK)
+    wxColourDialog dialog(this, &cData);
+    if (dialog.ShowModal() == wxID_OK)
     {
-        cData = Dialog.GetColourData();
+        cData = dialog.GetColourData();
         ColorBt->SetBackgroundColour(cData.GetColour());
         ColorBt->Refresh();
     }

@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include <sstream>
 #include <fstream>
@@ -25,6 +25,7 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -32,7 +33,6 @@
 #include "GDJS/Exporter.h"
 #include "GDJS/EventsCodeGenerator.h"
 #include "GDJS/Dialogs/ProjectExportDialog.h"
-#include "GDJS/Dialogs/UploadOnlineDialog.h"
 #include "GDJS/Dialogs/CocoonJSUploadDialog.h"
 #include "GDJS/Dialogs/IntelXDKPackageDialog.h"
 #undef CopyFile //Disable an annoying macro
@@ -79,13 +79,20 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
 
     gd::Project exportedProject = project;
 
-    //Export resources ( *before* generating events as some resources filenames may be updated )
+    //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
     //Generate events code
     if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         return false;
 
-    //Strip the project ( *after* generating events as the events may use strioped things ( objects groups... ) )
+    //Export source files
+    if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    {
+        gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
+        return false;
+    }
+
+    //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
     gd::ProjectStripper::StripProject(exportedProject);
     exportedProject.SetFirstLayout(layout.GetName());
 
@@ -119,71 +126,6 @@ std::string Exporter::ExportToJSON(gd::AbstractFileSystem & fs, const gd::Projec
         return "Unable to write "+filename;
 
     return "";
-}
-
-bool Exporter::ExportMetadataFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles)
-{
-    #if !defined(GD_NO_WX_GUI)
-    std::string metadata = "{";
-
-    //Fonts metadata
-    metadata += "\"fonts\":[";
-    bool first = true;
-    wxString file = wxFindFirstFile( exportDir + "/*" );
-    while ( !file.empty() )
-    {
-        if ( file.Upper().EndsWith(".TTF") )
-        {
-            wxFileName relativeFile(file);
-            relativeFile.MakeRelativeTo(exportDir);
-
-            if ( !first ) metadata += ", ";
-            metadata += "{\"ffamilyname\":\"gdjs_font_"+gd::ToString(relativeFile.GetFullPath())+"\"";
-            metadata += ", \"filename\":\""+gd::ToString(relativeFile.GetFullPath())+"\", \"format\":\"truetype\"}";
-
-            first = false;
-        }
-
-        file = wxFindNextFile();
-    }
-
-    //Used scripts files
-    metadata += "],\"scripts\":[";
-    for (std::vector<std::string>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
-    {
-        if ( !fs.FileExists(exportDir+"/"+*it) )
-            continue;
-
-        if (it != includesFiles.begin()) metadata += ", ";
-
-        wxFileName relativeFile(exportDir+"/"+*it);
-        relativeFile.MakeRelativeTo(exportDir);
-        metadata += "\""+gd::ToString(relativeFile.GetFullPath(wxPATH_UNIX))+"\"";
-    }
-
-    //Other metadata
-    metadata += "], ";
-    metadata += "\"windowSize\":{\"w\": "+gd::ToString(project.GetMainWindowDefaultWidth())
-        +", \"h\": "+gd::ToString(project.GetMainWindowDefaultHeight())+"}";
-    metadata += "}";
-
-    {
-        std::ofstream file;
-        file.open ( std::string(exportDir+"/gd_metadata.json").c_str() );
-        if ( file.is_open() ) {
-            file << metadata;
-            file.close();
-        }
-        else {
-            lastError = "Unable to write the metadata file.";
-            return false;
-        }
-    }
-    #else
-    gd::LogWarning("BAD USE: Exporter::ExportMetadataFile is not available");
-    #endif
-
-    return true;
 }
 
 bool Exporter::ExportStandardIndexFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles, std::string additionalSpec)
@@ -404,6 +346,28 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     return true;
 }
 
+bool Exporter::ExportExternalSourceFiles(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles)
+{
+    const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = project.GetAllSourceFiles();
+    for (unsigned int i = 0;i<allFiles.size();++i)
+    {
+        if (allFiles[i] == boost::shared_ptr<gd::SourceFile>() ) continue;
+        if (allFiles[i]->GetLanguage() != "Javascript" ) continue;
+
+        gd::SourceFile & file = *allFiles[i];
+
+        std::string filename = file.GetFileName();
+        fs.MakeAbsolute(filename, fs.DirNameFrom(project.GetProjectFile()));
+        std::string outFilename = "ext-code"+gd::ToString(i)+".js";
+        if (!fs.CopyFile(filename, outputDir+outFilename))
+            gd::LogWarning(_("Could not copy external file") + filename);
+
+        InsertUnique(includesFiles, outputDir+outFilename);
+    }
+
+    return true;
+}
+
 bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, std::string exportDir, bool minify)
 {
     #if !defined(GD_NO_WX_GUI)
@@ -512,21 +476,20 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
     ProjectExportDialog dialog(NULL, project);
     if ( dialog.ShowModal() != 1 ) return;
 
-    bool exportForGDShare = dialog.GetExportType() == ProjectExportDialog::GameDevShare;
     bool exportForCocoonJS = dialog.GetExportType() == ProjectExportDialog::CocoonJS;
     bool exportForIntelXDK = dialog.GetExportType() == ProjectExportDialog::IntelXDK;
 
     ExportWholeProject(project, dialog.GetExportDir(), dialog.RequestMinify(),
-        exportForGDShare, exportForCocoonJS, exportForIntelXDK);
+        exportForCocoonJS, exportForIntelXDK);
     #else
     gd::LogError("BAD USE: Exporter::ShowProjectExportDialog is not available.");
     #endif
 }
 
 bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
-    bool minify, bool exportForGDShare, bool exportForCocoonJS, bool exportForIntelXDK)
+    bool minify, bool exportForCocoonJS, bool exportForIntelXDK)
 {
-    bool exportToZipFile = exportForGDShare || exportForCocoonJS;
+    bool exportToZipFile = exportForCocoonJS;
 
     {
         #if !defined(GD_NO_WX_GUI)
@@ -563,7 +526,14 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         //Export events
         if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         {
-            gd::LogError(_("Error during exporting: Unable to export events ( "+lastError+")."));
+            gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
+            return false;
+        }
+
+        //Export source files
+        if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+        {
+            gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
             return false;
         }
 
@@ -592,7 +562,6 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         ExportIncludesAndLibs(includesFiles, exportDir, minify);
         bool indexFile = false;
         if (exportForIntelXDK) indexFile = ExportIntelXDKIndexFile(exportedProject, exportDir, includesFiles, additionalSpec);
-        else if (exportForGDShare) indexFile = ExportMetadataFile(exportedProject, exportDir, includesFiles);
         else indexFile = ExportStandardIndexFile(exportedProject, exportDir, includesFiles, additionalSpec);
 
         if ( !indexFile)
@@ -644,12 +613,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
 
     //Finished!
     #if !defined(GD_NO_WX_GUI)
-    if ( exportForGDShare )
-    {
-        UploadOnlineDialog uploadDialog(NULL, project.GetName(), exportDir+wxFileName::GetPathSeparator()+"packaged_game.zip");
-        uploadDialog.ShowModal();
-    }
-    else if ( exportForCocoonJS )
+    if ( exportForCocoonJS )
     {
         CocoonJSUploadDialog uploadDialog(NULL, exportDir+wxFileName::GetPathSeparator()+"packaged_game.zip");
         uploadDialog.ShowModal();

@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -181,7 +181,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     emptyMenu.Append(MenuItem2);
     emptyMenu.AppendSeparator();
     MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
+    MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/foldericon.png"))));
     emptyMenu.Append(MenuItem6);
     MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(gd::SkinHelper::GetIcon("rename", 16));
@@ -195,7 +195,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     folderMenu.Append(MenuItem10);
     folderMenu.AppendSeparator();
     MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
+    MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/foldericon.png"))));
     folderMenu.Append(MenuItem5);
     folderMenu.AppendSeparator();
     MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _("Move up\tCtrl-J"), wxEmptyString, wxITEM_NORMAL);
@@ -348,7 +348,7 @@ wxTreeItemId ResourcesEditor::GetSelectedFolderItem()
  */
 void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 {
-    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE );
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {

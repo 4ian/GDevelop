@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -9,7 +9,6 @@
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "Dialogs/HelpViewerDlg.h"
 #include "Credits.h"
 #include "MAJ.h"
 

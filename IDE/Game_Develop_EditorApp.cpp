@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -36,10 +36,13 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/Analytics/AnalyticsSender.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
@@ -49,27 +52,15 @@
 #include "ConsoleManager.h"
 #include "BugReport.h"
 #include "CompilationChecker.h"
-#include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
-#include "Dialogs/HelpViewerDlg.h"
+#include "Dialogs/HelpProvider.h"
 #include "Dialogs/ReminderDialog.h"
+#include "Dialogs/ParameterEditorLauncher.h"
 
 using namespace gd;
 
 IMPLEMENT_APP(Game_Develop_EditorApp)
-
-void MessageLoading( string message, float avancement )
-{
-    // utiliser un flux de sortie pour créer la chaîne
-    std::ostringstream oss;
-    // écrire la valeur dans le flux
-    oss << avancement;
-    // renvoyer une string
-    string pourcent =  oss.str();
-
-    gd::LogStatus( gd::ToString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
-}
 
 /**
  * Program entry point
@@ -358,14 +349,14 @@ bool Game_Develop_EditorApp::OnInit()
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
     //Set help provider
-    {
-        gd::HelpFileAccess::Get()->SetHelpProvider(::HelpProvider::Get());
-        ::HelpProvider::Get()->SetParentWindow(mainEditor);
-    }
-    cout << "* Help provider set" << endl;
+    cout << "* Setting help provider" << endl;
+    gd::HelpFileAccess::Get()->SetHelpProvider(::HelpProvider::Get());
 
     cout << "* Loading events editor configuration" << endl;
     gd::InstructionSentenceFormatter::Get()->LoadTypesFormattingFromConfig();
+
+    cout << "* Connecting parameters editors" << endl;
+    gd::ParameterControlsHelper::SetEditParameterFunction(&ParameterEditorLauncher::LaunchEditor);
 
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;
@@ -404,7 +395,10 @@ bool Game_Develop_EditorApp::OnInit()
         mainEditor->RefreshNews();
     }
 
-    //Pay what you want reminder
+    //Notify opening of the program.
+    gd::AnalyticsSender::Get()->SendProgramOpening();
+
+    //Feedback reminder
     if (!recoveringFromBug)
     {
         int result = 3;
@@ -446,6 +440,8 @@ int Game_Develop_EditorApp::OnExit()
     cout << ".";
     gd::Clipboard::Get()->DestroySingleton();
     cout << ".";
+    ::HelpProvider::Get()->DestroySingleton();
+    cout << "." << endl;
     gd::HelpFileAccess::Get()->DestroySingleton();
     cout << "." << endl;
 

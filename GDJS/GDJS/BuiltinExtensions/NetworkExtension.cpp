@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "NetworkExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -21,7 +21,7 @@ NetworkExtension::NetworkExtension()
                           _("Basic internet features"),
                           _("Built-in extension providing network features."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     GetAllActions()["SendRequest"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.network.sendHttpRequest").SetIncludeFile("networktools.js");

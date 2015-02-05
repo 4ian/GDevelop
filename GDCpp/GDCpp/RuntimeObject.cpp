@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include <cstring>
 #include "GDCore/Tools/Localization.h"
@@ -255,7 +255,7 @@ double RuntimeObject::GetDistanceWithObject( RuntimeObject * other )
     return sqrt(GetSqDistanceWithObject(other));
 }
 
-void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects;
     for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
@@ -267,6 +267,12 @@ void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<Runti
         }
     }
 
+    return SeparateFromObjects(objects);
+}
+
+bool RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & objects)
+{
+    bool moved = false;
     sf::Vector2f moveVector;
     vector<Polygon2d> hitBoxes = GetHitBoxes();
     for (unsigned int j = 0;j<objects.size(); ++j)
@@ -282,6 +288,7 @@ void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<Runti
                     if ( result.collision )
                     {
                         moveVector += result.move_axis;
+                        moved = true;
                     }
                 }
             }
@@ -290,6 +297,7 @@ void RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<Runti
     }
     SetX(GetX()+moveVector.x);
     SetY(GetY()+moveVector.y);
+    return moved;
 }
 
 void RuntimeObject::RotateTowardPosition(float Xposition, float Yposition, float speed, RuntimeScene & scene)
@@ -629,11 +637,6 @@ bool RuntimeObject::VariableChildExists(const gd::Variable & variable, const std
 void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const std::string & childName)
 {
     variable.RemoveChild(childName);
-}
-
-void DestroyBaseRuntimeObject(RuntimeObject * object)
-{
-    delete object;
 }
 
 RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object)

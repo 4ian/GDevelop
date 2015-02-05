@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -92,6 +92,7 @@ private:
     void UpdateListColumnsWidth();
     void RefreshTemplateList();
     void RefreshPlatformList();
+    void SendAnalyticsData();
 
     wxString newProjectBaseFolder; ///< Computed in the constructor
 

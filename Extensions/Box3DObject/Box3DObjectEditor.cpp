@@ -1,27 +1,8 @@
 /**
 
 GDevelop - Box 3D Extension
-Copyright (c) 2008-2014 Florian Rival (Florian.Rival@gmail.com)
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-    distribution.
-
+Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
 */
 
 #if defined(GD_IDE_ONLY)
@@ -217,7 +198,7 @@ object(object_)
 	//Init wxAuiManager with two pane : the editor and the image bank editor
     m_mgr.SetManagedWindow( this );
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( resourcesEditor, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
+    m_mgr.AddPane( resourcesEditor, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _("Images Bank Editor") ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);

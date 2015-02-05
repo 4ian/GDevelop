@@ -26,9 +26,9 @@ Full and detailed instructions are in the getting started page of the [documenta
 Basically:
 
 * Install and launch [CMake].
-* Choose this directory as the source directory, and a hidden directory like Binaries/.build
+* Choose this directory as the source directory, and a new directory like Binaries/.build
 as the directory where to build. Files will be output in Binaries/Output anyway.
-* Be sure to have [3rd party libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) downloaded and extract in *ExtLibs* folder. On Windows, be sure to use the same version of [the compiler](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) for better compatibility.
+* On Linux, be sure to have [required development libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) installed. On Windows, be sure to use the same version of [the compiler](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) for better compatibility.
 * Generate the Makefile (or [Ninja] build file) and launch it.
 
 Documentation
@@ -41,17 +41,17 @@ Links
 
 * [GDevelop forums](http://forum.compilgames.net)
 * [GDevelop homepage](http://www.compilgames.net)
-* [GDevelop wiki](http://wiki.compilgames.net), and in particular [How to translate GD](http://www.wiki.compilgames.net/doku.php/en/game_develop/articles/translate_gd).
+* [GDevelop wiki](http://wiki.compilgames.net)
+* Help translate GD in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
 
 License
 -------
 
+* The Core library, the native and HTML5 platforms and all extensions (respectively *Core*, *GDCpp*, *GDJS* and *Extensions* folders) are under the MIT license.
 * The IDE (in the IDE folder) is licensed with GPL v3.
-* The Core library, the native and HTML5 platforms (respectively *Core*, *GDCpp* and *GDJS* folders) are LGPL v3.
-* Extensions (in the Extensions folder) are using zlib/libpng license.
 * The name, GDevelop, and its logo are the exclusive property of Florian Rival.
 
-Games exported with GDevelop are based on the native and/or HTML5 platforms (see *Core*, *GDCpp* and *GDJS* folders): these platforms are distributed under the LPGL v3 license, so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.
+Games exported with GDevelop are based on the native and/or HTML5 platforms (see *Core*, *GDCpp* and *GDJS* folders): these platforms are distributed under the MIT license, so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.
 
 
 [CMake]:http://www.cmake.org/

@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2013-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 /**
@@ -34,7 +34,7 @@ gdjs.RuntimeGame = function(data, spec)
     this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
 
     //Rendering (see createStandardCanvas method)
-    this._isFullscreen = false; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
+    this._isFullscreen = true; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
     this._forceFullscreen = spec.forceFullscreen || false; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
     this._renderer = null;
     this._canvasArea = null;
@@ -57,6 +57,7 @@ gdjs.RuntimeGame = function(data, spec)
 
     //Inputs :
     this._pressedKeys = new Hashtable();
+    this._lastPressedKey = 0;
     this._pressedMouseButtons = new Array(5);
     this._mouseX = 0;
     this._mouseY = 0;
@@ -161,6 +162,7 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
  */
 gdjs.RuntimeGame.prototype.onKeyPressed = function(keyCode) {
 	this._pressedKeys.put(keyCode, true);
+    this._lastPressedKey = keyCode;
 };
 
 /**
@@ -170,6 +172,15 @@ gdjs.RuntimeGame.prototype.onKeyPressed = function(keyCode) {
  */
 gdjs.RuntimeGame.prototype.onKeyReleased = function(keyCode) {
 	this._pressedKeys.put(keyCode, false);
+};
+
+/**
+ * Return the code of the last key that was pressed.
+ * @return {Number} The code of the last key pressed.
+ * @method getLastPressedKey
+ */
+gdjs.RuntimeGame.prototype.getLastPressedKey = function() {
+    return this._lastPressedKey;
 };
 
 /**
@@ -185,10 +196,10 @@ gdjs.RuntimeGame.prototype.isKeyPressed = function(keyCode) {
  * Return true if any key is pressed
  * @method anyKeyPressed
  */
-gdjs.RuntimeGame.prototype.anyKeyPressed = function(keyCode) {
+gdjs.RuntimeGame.prototype.anyKeyPressed = function() {
 	var allKeys = this._pressedKeys.entries();
 
-	for(var i = 0, len = allKeys.length;i<len;++i) {
+	for(var i = 0, len = allKeys.length;i < len;++i) {
 		if (allKeys[i][1]) {
 			return true;
 		}
@@ -229,11 +240,20 @@ gdjs.RuntimeGame.prototype.getMouseX = function() {
 gdjs.RuntimeGame.prototype.getMouseY = function() {
 	return this._mouseY;
 };
-
+/**
+ * Get the default width of the game: canvas is created with this width,
+ * and cameras are created using this width.
+ * @method getDefaultWidth
+ */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
     return this._defaultWidth;
 };
 
+/**
+ * Get the default height of the game: canvas is created with this height,
+ * and cameras are created using this height.
+ * @method getDefaultHeight
+ */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
     return this._defaultHeight;
 };
@@ -256,6 +276,23 @@ gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
  */
 gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
     this._defaultHeight = height;
+};
+
+
+/**
+ * Get the current width of the canvas.
+ * @method getCurrentWidth
+ */
+gdjs.RuntimeGame.prototype.getCurrentWidth = function() {
+    return this._currentWidth;
+};
+
+/**
+ * Get the current height of the canvas.
+ * @method getCurrentHeight
+ */
+gdjs.RuntimeGame.prototype.getCurrentHeight = function() {
+    return this._currentHeight;
 };
 
 /**
@@ -340,7 +377,6 @@ gdjs.RuntimeGame.prototype.bindStandardEvents = function(window, document) {
         return;
     }
 
-    var isMSIE = /*@cc_on!@*/0;
     this._renderer.view.style.cssText="idtkscale:'ScaleAspectFill';"; //CocoonJS support
 
     var game = this;
@@ -581,11 +617,8 @@ gdjs.RuntimeGame.prototype.createStandardCanvas = function(canvasArea) {
  * Resize the canvas, according to _isFullscreen, _forceFullscreen, _currentWidth,
  * _currentHeight, _marginTop, _marginLeft, _marginRight, _marginBottom, _keepRatio.
  *
- * If fullscreen is activated
- *
  * @method _resizeCanvas
  * @private
- * @static
  */
 gdjs.RuntimeGame.prototype._resizeCanvas = function() {
     var keepRatio = this._keepRatio;

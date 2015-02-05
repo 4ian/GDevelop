@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -120,6 +120,7 @@ gd::PlatformExtension * CreateGDJSDestroyOutsideAutomatismExtension();
 gd::PlatformExtension * CreateGDJSTiledSpriteObjectExtension();
 gd::PlatformExtension * CreateGDJSDraggableAutomatismExtension();
 gd::PlatformExtension * CreateGDJSTopDownMovementAutomatismExtension();
+gd::PlatformExtension * CreateGDJSTextObjectExtension();
 }
 #endif
 
@@ -149,33 +150,16 @@ JsPlatform::JsPlatform() :
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(new ExternalLayoutsExtension)); std::cout.flush();
     std::cout << "done." << std::endl;
 
-    //Add extensions adapted from GD C++ Platform:
-    #if !defined(EMSCRIPTEN) //except when compiling with emscripten
-    std::cout << "* Loading extensions based on GD C++ Platform... "; std::cout.flush();
-    #if defined(WINDOWS)
-    std::string extension = "xgdwe";
-    #elif defined(LINUX)
-    std::string extension = "xgdle";
-    #else
-    std::string extension = "xgde";
-    #endif
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/TextObject."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/DraggableAutomatism."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/DestroyOutsideAutomatism."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/PhysicsAutomatism."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/LinkedObjects."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/TiledSpriteObject."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/PlatformAutomatism."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/PathfindingAutomatism."+extension, *this); std::cout.flush();
-    gd::ExtensionsLoader::LoadExtension("CppPlatform/Extensions/TopDownMovementAutomatism."+extension, *this); std::cout.flush();
-    std::cout << "done." << std::endl;
-    #else
+    #if defined(EMSCRIPTEN) //When compiling with emscripten, hardcode extensions to load.
+    std::cout << "* Loading other extensions... "; std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableAutomatismExtension())); std::cout.flush();
     AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
+    AddExtension(boost::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     #endif
+    std::cout << "done." << std::endl;
 };
 
 JsPlatform & JsPlatform::Get()

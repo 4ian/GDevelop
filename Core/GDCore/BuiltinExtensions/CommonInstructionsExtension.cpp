@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -13,6 +13,7 @@
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
 #endif
 
 using namespace std;
@@ -25,7 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
                           _("Standard events"),
                           _("Built-in extension providing standard events."),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
 #if defined(GD_IDE_ONLY)
     extension.AddCondition("Or",
@@ -95,6 +96,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
               _("Repeat the event for each specified object."),
               "", "res/foreach.png",
               boost::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent));
+
+    extension.AddEvent("Group", _("Group"),
+              _("Group containing events"),
+              "", "res/foreach.png",
+              boost::shared_ptr<gd::BaseEvent>(new gd::GroupEvent));
 #endif
 }
 

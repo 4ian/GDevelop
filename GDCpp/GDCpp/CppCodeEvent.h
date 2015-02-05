@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY)
@@ -30,7 +30,7 @@ public:
     virtual ~CppCodeEvent() {};
 
     CppCodeEvent& operator=(const CppCodeEvent & event);
-    virtual gd::BaseEvent * Clone() const { return new CppCodeEvent(*this);}
+    virtual CppCodeEvent * Clone() const { return new CppCodeEvent(*this);}
 
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}

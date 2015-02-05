@@ -1,6 +1,6 @@
 /**
 GDevelop - Platform Automatism Extension
-Copyright (c) 2013-2014 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2013-2015 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
@@ -111,6 +111,11 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     if ( this._isOnFloor ) {
         requestedDeltaX += this._floorPlatform.owner.getX() - this._floorLastX;
         requestedDeltaY += this._floorPlatform.owner.getY() - this._floorLastY;
+    }
+
+    //Ensure the object is not stuck
+    if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
+        this._canJump = true; //After being unstuck, the object must be able to jump again.
     }
 
     //Move the object on x axis.
@@ -363,6 +368,32 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWith = function(can
     }
 
     return false;
+};
+
+/**
+ * Separate the object from all platforms passed in parameter.
+ * @param candidates The platform to be tested for collision
+ * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+ */
+gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = function(candidates, excludeJumpThrus)
+{
+    excludeJumpThrus = !!excludeJumpThrus;
+
+    var objects = [];
+    for (var k in candidates) {
+        if (candidates.hasOwnProperty(k)) {
+            var platform = candidates[k];
+
+            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+            if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
+
+            objects.push(platform.owner);
+        }
+    }
+
+    var objectsLists = new Hashtable();
+    objectsLists.put("", objects);
+    return this.owner.separateFromObjects(objectsLists);
 };
 
 /**

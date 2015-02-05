@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include "GDCpp/BuiltinExtensions/KeyboardExtension.h"
@@ -19,6 +19,7 @@ KeyboardExtension::KeyboardExtension()
     GetAllConditions()["KeyPressed"].codeExtraInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     GetAllConditions()["KeyFromTextPressed"].codeExtraInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     GetAllConditions()["AnyKeyPressed"].codeExtraInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllStrExpressions()["LastPressedKey"].codeExtraInformation.SetFunctionName("LastPressedKey").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     #endif
 }
 

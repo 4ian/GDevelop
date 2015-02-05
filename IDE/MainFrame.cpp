@@ -1,6 +1,6 @@
 /*
  * GDevelop IDE
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
 
@@ -33,6 +33,7 @@
 #include <wx/ribbon/buttonbar.h>
 
 #include "MainFrame.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
@@ -53,15 +54,13 @@
 #include "ConsoleManager.h"
 #include "ProjectManager.h"
 #include "LogFileManager.h"
-#include "StartHerePage.h"
 #include "BuildToolsPnl.h"
 #include "Preferences.h"
 #include "ExternalEventsEditor.h"
 #include "mp3ogg.h"
 #include "ImportImage.h"
-#include "Dialogs/HtmlViewerPnl.h"
+#include "Dialogs/StartHerePage.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
-#include "Dialogs/HelpViewerDlg.h"
 
 //(*IdInit(MainFrame)
 const long MainFrame::ID_AUINOTEBOOK1 = wxNewId();
@@ -504,10 +503,6 @@ MainFrame::~MainFrame()
 
     //Deinitialize the frame manager
     m_mgr.UnInit();
-
-    cout << "Destroying the help provider";
-    HelpProvider::Get()->DestroySingleton();
-    cout << "." << endl;
 }
 
 /** Change current project
@@ -615,12 +610,14 @@ void MainFrame::OnClose( wxCloseEvent& event )
 
             if (whatToDo == wxCANCEL) return;
             else if ( whatToDo == wxYES ) {
-                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) )
+                if (!Save(*games[i], games[i]->GetProjectFile()))
                     gd::LogError( _("Save failed!") );
                 else
                     gd::LogStatus( _("Project properly saved.") );
             }
         }
+
+        if (projectManager) projectManager->CloseGame(games[i].get());
     }
 
     wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );

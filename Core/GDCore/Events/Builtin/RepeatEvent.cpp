@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 
 #include "RepeatEvent.h"
@@ -158,43 +158,6 @@ gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, gd:
 #endif
 
     return ChangesMade;
-}
-
-/**
- * Initialize from another RepeatEvent.
- * Used by copy ctor and assignement operator
- */
-void RepeatEvent::Init(const RepeatEvent & event)
-{
-    events = event.events;
-
-    conditions = event.conditions;
-    actions = event.actions;
-    repeatNumberExpression = event.repeatNumberExpression;
-}
-
-/**
- * Custom copy operator
- */
-RepeatEvent::RepeatEvent(const RepeatEvent & event) :
-    BaseEvent(event),
-    repeatNumberExpression("")
-{
-    Init(event);
-}
-
-/**
- * Custom assignement operator
- */
-RepeatEvent& RepeatEvent::operator=(const RepeatEvent & event)
-{
-    if ( this != &event )
-    {
-        BaseEvent::operator=(event);
-        Init(event);
-    }
-
-    return *this;
 }
 
 }

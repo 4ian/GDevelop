@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include <iostream>
 #include <string>
@@ -111,9 +111,9 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
         sprite.SetImageName(spriteElement.GetStringAttribute("image"));
         OpenPointsSprites(sprite.GetAllNonDefaultPoints(), spriteElement.GetChild("points", 0, "Points"));
 
-        OpenPoint(sprite.GetOrigine(), spriteElement.GetChild("originPoint" , 0, "PointOrigine"));
-        OpenPoint(sprite.GetCentre(), spriteElement.GetChild("centerPoint" , 0, "PointCentre"));
-        sprite.SetCentreAutomatic(spriteElement.GetChild("centerPoint" , 0, "PointCentre").GetBoolAttribute("automatic", true));
+        OpenPoint(sprite.GetOrigin(), spriteElement.GetChild("originPoint" , 0, "PointOrigine"));
+        OpenPoint(sprite.GetCenter(), spriteElement.GetChild("centerPoint" , 0, "PointCentre"));
+        sprite.SetDefaultCenterPoint(spriteElement.GetChild("centerPoint" , 0, "PointCentre").GetBoolAttribute("automatic", true));
 
         if (spriteElement.HasChild("CustomCollisionMask"))
             sprite.SetCollisionMaskAutomatic(!spriteElement.GetChild("CustomCollisionMask").GetBoolAttribute("custom", false));
@@ -170,9 +170,9 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerEleme
         spriteElement.SetAttribute("image", sprites[i].GetImageName());
         SavePointsSprites(sprites[i].GetAllNonDefaultPoints(), spriteElement.AddChild("points"));
 
-        SavePoint(sprites[i].GetOrigine(), spriteElement.AddChild("originPoint"));
-        SavePoint(sprites[i].GetCentre(), spriteElement.AddChild("centerPoint"));
-        spriteElement.GetChild("centerPoint").SetAttribute("automatic", sprites[i].IsCentreAutomatic());
+        SavePoint(sprites[i].GetOrigin(), spriteElement.AddChild("originPoint"));
+        SavePoint(sprites[i].GetCenter(), spriteElement.AddChild("centerPoint"));
+        spriteElement.GetChild("centerPoint").SetAttribute("automatic", sprites[i].IsDefaultCenterPoint());
 
         spriteElement.SetAttribute("hasCustomCollisionMask", !sprites[i].IsCollisionMaskAutomatic());
 

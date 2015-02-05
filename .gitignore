@@ -28,8 +28,9 @@
 /Binaries/Releases/**/*.tar.lzma
 /Binaries/Releases/**/*.zip
 /Binaries/Releases/**/*.deb
-Binaries/Packaging/debian-package/opt/
-Binaries/Packaging/debian-package/debian
+Binaries/Packaging/debian-source-package/gdevelop/
+Binaries/Packaging/opensuse-build-service/gdevelop/
+Binaries/Packaging/opensuse-build-service/final/
 /WebIDE
 *.depend
 *.layout
@@ -63,3 +64,12 @@ Binaries/Packaging/debian-package/debian
 /WebIDE
 !/GDCpp/scripts/bcp.exe
 /GDJS/tests/node_modules
+!/scripts/libgettextlib-0-17.dll
+!/scripts/libgettextsrc-0-17.dll
+!/xgettext.exe
+!/Binaries/Output/Release_Windows/locale/libgettextlib-0-17.dll
+!/Binaries/Output/Release_Windows/locale/libgettextsrc-0-17.dll
+!/Binaries/Output/Release_Windows/locale/msgcat.exe
+!/Binaries/Output/Release_Windows/locale/msgfmt.exe
+!/ExtLibs/curl.exe
+!/ExtLibs/7za.exe

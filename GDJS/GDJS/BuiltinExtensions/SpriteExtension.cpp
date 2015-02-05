@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "GDJS/BuiltinExtensions/SpriteExtension.h"
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -19,7 +19,7 @@ SpriteExtension::SpriteExtension()
                           _("Sprite"),
                           _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
                           "Florian Rival",
-                          "Open source (LGPL)");
+                          "Open source (MIT License)");
 
     std::map<std::string, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
     std::map<std::string, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
@@ -68,6 +68,8 @@ SpriteExtension::SpriteExtension()
         SetFunctionName("rotateTowardPosition");
     spriteActions["TourneVers"].codeExtraInformation.
         SetFunctionName("turnTowardObject");
+    spriteActions["ChangeColor"].codeExtraInformation.
+        SetFunctionName("setColor");
     spriteActions["FlipX"].codeExtraInformation.
         SetFunctionName("flipX");
     spriteActions["FlipY"].codeExtraInformation.
@@ -113,19 +115,6 @@ SpriteExtension::SpriteExtension()
 /*
     //Objects instructions:
     {
-        obj.AddCondition("BlendMode",
-                       _("Blend mode"),
-                       _("Compare the number of the blend mode currently used by an object"),
-                       _("The number of the current blend mode of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _("Effects"),
-                       "res/conditions/opacity24.png",
-                       "res/conditions/opacity.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
-            .codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-
         obj.AddAction("CopyImageOnImageOfSprite",
                        _("Copy an image on the current one of an object"),
                        _("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
@@ -155,34 +144,6 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("color", _("Color to make transparent"), "",false)
             .codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-
-
-        obj.AddAction("ChangeColor",
-                       _("Change the global color"),
-                       _("Change the global color of an object. The default color is white."),
-                       _("Change color of _PARAM0_ to _PARAM1_"),
-                       _("Effects"),
-                       "res/actions/color24.png",
-                       "res/actions/color.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("color", _("Color"), "",false)
-            .codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-
-
-        obj.AddAction("ChangeBlendMode",
-                       _("Change Blend mode"),
-                       _("Change the number of the blend mode of an object.\nThe default blend mode is 0 ( Alpha )."),
-                       _("Change Blend mode of _PARAM0_ to _PARAM1_"),
-                       _("Effects"),
-                       "res/actions/color24.png",
-                       "res/actions/color.png")
-
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
-            .codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-        #endif
-
     }
 
 */

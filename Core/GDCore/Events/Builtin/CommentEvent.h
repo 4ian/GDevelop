@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #ifndef COMMENTEVENT_H
 #define COMMENTEVENT_H
@@ -27,7 +27,7 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent
 public:
     CommentEvent() : BaseEvent(), r(255), v(230), b(109), textR(0), textG(0), textB(0) {};
     virtual ~CommentEvent() {};
-    virtual gd::BaseEvent * Clone() const { return new CommentEvent(*this);}
+    virtual gd::CommentEvent * Clone() const { return new CommentEvent(*this);}
 
     virtual void SerializeTo(SerializerElement & element) const;
     virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);

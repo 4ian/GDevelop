@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2014 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU Lesser General Public License.
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                           _("Keyboard features"),
                           _("Built-in extensions allowing to use keyboard"),
                           "Florian Rival",
-                          "Freeware");
+                          "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("KeyPressed",
@@ -47,6 +47,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                    _("Keyboard"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
+        .AddCodeOnlyParameter("currentScene", "");
+
+    extension.AddStrExpression("LastPressedKey",
+                       _("Last pressed key"),
+                       _("Get the name of the latest key pressed on the keyboard"),
+                       _("Keyboard"),
+                       "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "");
     #endif
 }

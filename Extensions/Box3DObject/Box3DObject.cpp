@@ -113,7 +113,7 @@ bool RuntimeBox3DObject::Draw( sf::RenderTarget& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    window.popGLStates();
+    window.pushGLStates();
 
     float xView =  window.getView().getCenter().x*0.25f;
     float yView = -window.getView().getCenter().y*0.25f;
@@ -189,7 +189,7 @@ bool RuntimeBox3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   sizeHeight, sizeDepth);
     glEnd();
 
-    window.pushGLStates();
+    window.popGLStates();
 
     return true;
 }
@@ -230,7 +230,7 @@ void Box3DObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Render
 {
     if ( !topTexture || !bottomTexture || ! rightTexture || !leftTexture || !frontTexture || !backTexture ) return;
 
-    renderTarget.popGLStates();
+    renderTarget.pushGLStates();
 
     float width = instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultSize(instance, project, layout).x;
     float height = instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultSize(instance, project, layout).y;
@@ -320,7 +320,7 @@ void Box3DObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Render
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   sizeHeight, sizeDepth);
     glEnd();
 
-    renderTarget.pushGLStates();
+    renderTarget.popGLStates();
 }
 
 sf::Vector2f Box3DObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const

@@ -7,6 +7,8 @@
 #include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 
+#include <iostream>
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
 #endif
@@ -76,7 +78,7 @@ std::string GD_CORE_API FromWString( const std::wstring &wstr )
 std::string GD_CORE_API ReplaceInvalid( const std::string &utf8str )
 {
     std::string validStr;
-    
+
     try
     {
         ::utf8::replace_invalid(utf8str.begin(), utf8str.end(), std::back_inserter(validStr));

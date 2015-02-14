@@ -16,6 +16,16 @@
 namespace utf8
 {
 
+std::string GD_API FromLocaleString( const std::string &str )
+{
+    return FromSfString(sf::String(str));
+}
+
+std::string GD_API ToLocaleString( const std::string &utf8str )
+{
+    return ToSfString(utf8str).toAnsiString();
+}
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 std::string GD_API FromWxString( const wxString &str )
@@ -91,6 +101,50 @@ std::string GD_API ReplaceInvalid( const std::string &utf8str )
 std::size_t GD_API StrLength( const std::string &utf8str )
 {
     return ::utf8::distance(utf8str.begin(), utf8str.end());
+}
+
+std::string GD_API SubStr( const std::string &utf8str, std::size_t pos, std::size_t len )
+{
+    std::string::const_iterator it = utf8str.begin();
+
+    //Move to pos
+    int i = 0;
+    for(i = 0; i < pos && it != utf8str.end(); i++)
+    {
+        try
+        {
+            ::utf8::next(it, utf8str.end());
+        }
+        catch(const std::exception &exc)
+        {
+            std::cout << "[UTF8] SubStr : " << exc.what() << std::endl;
+        }
+    }
+    if(i != pos)
+    {
+        std::cout << "[UTF8] String is not long enough !" << std::endl;
+        return ""; //We can't go to pos as the string is not big enough
+    }
+
+    //Copy needed code points to the new string (temporary in UTF32)
+    std::basic_string<std::uint32_t> utf32substr;
+    for(i = 0; i < len && it != utf8str.end(); i++)
+    {
+        try
+        {
+            utf32substr.push_back(::utf8::next(it, utf8str.end()));
+        }
+        catch(const std::exception &exc)
+        {
+            std::cout << "[UTF8] SubStr : " << exc.what() << std::endl;
+        }
+    }
+
+    //Convert the UTF32 substr to UTF8
+    std::string utf8substr;
+    ::utf8::utf32to8(utf32substr.begin(), utf32substr.end(), std::back_inserter(utf8substr));
+
+    return utf8substr;
 }
 
 }

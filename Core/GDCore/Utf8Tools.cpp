@@ -19,6 +19,16 @@ namespace gd
 namespace utf8
 {
 
+std::string GD_API FromLocaleString( const std::string &str )
+{
+    return FromSfString(sf::String(str));
+}
+
+std::string GD_API ToLocaleString( const std::string &utf8str )
+{
+    return ToSfString(utf8str).toAnsiString();
+}
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 std::string GD_CORE_API FromWxString( const wxString &str )

@@ -124,8 +124,8 @@ public :
     virtual bool SetAngle(float newAngle) { angle = newAngle; text.setRotation(angle); return true;};
     virtual float GetAngle() const {return angle;};
 
-    inline void SetString(const std::string & str) { text.setString(str); text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); };
-    inline std::string GetString() const {return text.getString();};
+    void SetString(const std::string & str);
+    std::string GetString() const;
 
     inline void SetCharacterSize(float size) { text.setCharacterSize(size); text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); };
     inline float GetCharacterSize() const { return text.getCharacterSize(); };

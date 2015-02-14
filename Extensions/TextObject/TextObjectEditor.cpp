@@ -131,7 +131,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TextObjectEditor::OnokBtClick);
 	//*)
 
-	textEdit->ChangeValue(object.GetString());
+	textEdit->ChangeValue(gd::Utf8ToWxString(object.GetString()));
 	fontEdit->ChangeValue(object.GetFontFilename());
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
@@ -161,7 +161,7 @@ void TextObjectEditor::AdaptFontColor(wxButton *button)
 
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    object.SetString(gd::ToString(textEdit->GetValue()));
+    object.SetString(gd::ToUtf8String(textEdit->GetValue()));
     object.SetCharacterSize(sizeEdit->GetValue());
     object.SetSmooth(smoothCheck->GetValue());
     object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()),

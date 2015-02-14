@@ -361,7 +361,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	SetSize(580,500);
 	#endif
 
-	TexteEdit->SetText(expression);
+	TexteEdit->SetText(Utf8ToWxString(expression));
 	if ( expression.empty() ) TexteEdit->SetText("\"\"");
 }
 
@@ -399,7 +399,7 @@ void EditStrExpressionDialog::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditStrExpressionDialog::OnOkBtClick(wxCommandEvent& event)
 {
-    returnedExpression = ToString(TexteEdit->GetValue());
+    returnedExpression = ToUtf8String(TexteEdit->GetValue());
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(returnedExpression);

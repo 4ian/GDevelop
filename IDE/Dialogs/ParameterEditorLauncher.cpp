@@ -17,6 +17,7 @@
 #include <wx/msgdlg.h>
 #include <wx/config.h>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -67,10 +68,10 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "expression" )
     {
-        gd::EditExpressionDialog dialog(parent, gd::ToString( editCtrl->GetValue() ), project, layout);
+        gd::EditExpressionDialog dialog(parent, gd::utf8::FromWxString( editCtrl->GetValue() ), project, layout);
         if ( dialog.ShowModal() == 1 )
         {
-            editCtrl->ChangeValue(dialog.GetExpression());
+            editCtrl->ChangeValue(gd::utf8::ToWxString(dialog.GetExpression()));
         }
         return;
     }
@@ -94,10 +95,10 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "string" )
     {
-        gd::EditStrExpressionDialog dialog(parent, gd::ToString( editCtrl->GetValue() ), project, layout);
+        gd::EditStrExpressionDialog dialog(parent, gd::utf8::FromWxString( editCtrl->GetValue() ), project, layout);
         if ( dialog.ShowModal() == 1 )
         {
-            editCtrl->ChangeValue(dialog.GetExpression());
+            editCtrl->ChangeValue(gd::utf8::ToWxString(dialog.GetExpression()));
         }
         return;
     }
@@ -130,7 +131,9 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
             wxString v; v << static_cast<int>(color.Green());
             wxString b; b << static_cast<int>(color.Blue());
 
-            editCtrl->ChangeValue("\""+r+";"+v+";"+b+"\"");
+            wxString colorStr = "\""+r+";"+v+";"+b+"\"";
+
+            editCtrl->ChangeValue(colorStr);
         }
         return;
     }

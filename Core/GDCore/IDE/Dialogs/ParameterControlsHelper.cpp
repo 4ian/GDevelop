@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "ParameterControlsHelper.h"
@@ -107,7 +108,7 @@ void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const Param
     paramTexts.at(i)->SetLabel( metadata.GetDescription() + _(":") );
     paramBmpBts.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
     paramBmpBts.at(i)->SetToolTip( gd::InstructionSentenceFormatter::Get()->LabelFromType(type));
-    paramEdits.at(i)->SetValue(content);
+    paramEdits.at(i)->SetValue(gd::utf8::ToWxString(content));
 
     //De/activate widgets if parameter is optional
     bool disable = metadata.IsOptional() && !paramCheckboxes.at(i)->GetValue() && paramEdits.at(i)->GetValue().empty();

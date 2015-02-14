@@ -32,6 +32,7 @@
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -504,7 +505,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
         if ( ParaFac.at(i)->IsShown() && !ParaFac.at(i)->GetValue())
             Param.push_back(gd::Expression("")); //Optional parameter not filled stay empty.
         else
-            Param.push_back(gd::Expression(gd::ToString(ParaEdit.at(i)->GetValue())));
+            Param.push_back(gd::Expression(gd::utf8::FromWxString(ParaEdit.at(i)->GetValue())));
     }
 
     isInverted = editingAction ? false : invertedCheck->GetValue();

@@ -38,6 +38,7 @@
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "EditExpressionDialog.h"
 
 using namespace std;
@@ -358,7 +359,7 @@ lastErrorPos(std::string::npos)
     imageListVal->Add(( wxBitmap( "res/actions/uneaction.png", wxBITMAP_TYPE_ANY ) ) );
     ValList->AssignImageList( imageListVal );
 
-	ExpressionEdit->SetText(expression);
+	ExpressionEdit->SetText(gd::utf8::ToWxString(expression));
 	ExpressionEdit->SetLexer(wxSTC_LEX_CPP);
     #if defined(WINDOWS)
     wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
@@ -475,7 +476,7 @@ void EditExpressionDialog::UpdateTextCtrl(wxStyledTextEvent& event)
 void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
 {
     //Syntax checking
-    expression = ToString( ExpressionEdit->GetText() );
+    expression = gd::utf8::FromWxString( ExpressionEdit->GetText() );
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(expression);

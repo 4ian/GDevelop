@@ -83,9 +83,10 @@ class GD_CORE_API EventsRenderingHelper
 
         /**
          * Draw a text in dc at point, without taking more than widthAvailable.
+         * Set utf8 to true if you want to display an utf8 std::string (for parameters for instance).
          * \return X position of the last character and total height taken by the text
          */
-        wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point);
+        wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point, bool utf8 = false);
 
         /**
          * \return Height taken by the text

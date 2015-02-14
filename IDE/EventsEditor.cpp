@@ -36,6 +36,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "LogFileManager.h"
 #include "GDCpp/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
@@ -788,7 +789,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         if (liveEditedParameter.parameter == NULL ) return;
 
         liveEditingPanel->SetPosition(wxPoint(parameterArea.x+liveEditingPanel->GetSize().x < eventsPanel->GetSize().x ? parameterArea.x : (eventsPanel->GetSize().x-liveEditingPanel->GetSize().x), parameterArea.y));
-        liveEdit->SetValue(liveEditedParameter.parameter->GetPlainString());
+        liveEdit->SetValue(gd::utf8::ToWxString(liveEditedParameter.parameter->GetPlainString()));
         liveEditingPanel->Layout();
         liveEditingPanel->Show(true);
         liveEdit->SetFocus();
@@ -1145,7 +1146,7 @@ void EventsEditor::EndLiveEditing()
     }
 
     eventsPanel->SetFocus();
-    *liveEditedParameter.parameter = gd::Expression(ToString(liveEdit->GetValue()));
+    *liveEditedParameter.parameter = gd::Expression(gd::utf8::FromWxString(liveEdit->GetValue()));
     liveEditedParameter.event->eventHeightNeedUpdate = true;
     liveEditingPanel->Show(false);
 

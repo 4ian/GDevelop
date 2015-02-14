@@ -30,6 +30,7 @@ std::string GD_CORE_API FromWString( const std::wstring &wstr );
 std::string GD_CORE_API ReplaceInvalid( const std::string &utf8str );
 
 std::size_t GD_CORE_API StrLength( const std::string &utf8str );
+std::string GD_CORE_API SubStr( const std::string &utf8str, std::size_t pos, std::size_t len );
 
 }
 

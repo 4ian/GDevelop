@@ -515,7 +515,7 @@ void EditStrExpressionDialog::OnInsertBtClick(wxCommandEvent& event)
  */
 void EditStrExpressionDialog::TextModified(wxStyledTextEvent& event)
 {
-    std::string text = ToString(TexteEdit->GetValue());
+    std::string text = gd::utf8::FromWxString(TexteEdit->GetValue());
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(text);

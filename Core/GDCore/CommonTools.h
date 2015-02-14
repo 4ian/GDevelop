@@ -87,30 +87,6 @@ template<>
 std::string GD_CORE_API ToString( const wxString & value );
 
 /**
- * Convert an UTF8 string to a wxString
- * \ingroup CommonProgrammingTools
- */
-wxString GD_CORE_API Utf8ToWxString( const std::string &utf8Str );
-
-/**
- * Convert an UTF8 string to a sf::String
- * \ingroup CommonProgrammingTools
- */
-sf::String GD_CORE_API Utf8ToSfString( const std::string &utf8str );
-
-/**
- * Convert a wxString to an utf8 std::string
- * \ingroup CommonProgrammingTools
- */
-std::string GD_CORE_API ToUtf8String( const wxString & value );
-
-/**
- * Convert a sf::String to an utf8 std::string
- * \ingroup CommonProgrammingTools
- */
-std::string GD_CORE_API ToUtf8String( const sf::String &str );
-
-/**
  * Split a string into tokens stored in a vector, using the specified separator.
  * \param str String to split
  * \param separator Separator to use

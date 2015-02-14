@@ -10,6 +10,7 @@
 #include <string>
 #include <set>
 #include "GDCpp/CommonTools.h"
+#include "GDCpp/Utf8Tools.h"
 #include "GDCpp/ExtensionBase.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeGame.h"
@@ -177,7 +178,7 @@ void DebuggerGUI::UpdateGUI()
         it!=sceneVariables.end();++it, ++i)
     {
         m_generalList->SetItem(generalBaseItemCount+i, 0, it->first);
-        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
+        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : utf8::ToWxString(it->second->GetString()));
         m_generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -198,7 +199,7 @@ void DebuggerGUI::UpdateGUI()
         it!=gameVariables.end();++it, ++i)
     {
         m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, it->first);
-        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : utf8::ToWxString(it->second->GetString()));
         m_generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -329,7 +330,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, uselessName, value);
-        m_objectList->SetItem(currentLine, 1, value);
+        m_objectList->SetItem(currentLine, 1, utf8::ToWxString(value));
 
         currentLine++;
     }
@@ -340,7 +341,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
     {
         object->GetPropertyForDebugger(i, uselessName, value);
-        m_objectList->SetItem(currentLine, 1, value);
+        m_objectList->SetItem(currentLine, 1, utf8::ToWxString(value));
 
         currentLine++;
     }

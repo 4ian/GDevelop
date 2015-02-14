@@ -17,7 +17,7 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCore/CommonTools.h" //< TODO: Remove this one and add the function to GDCpp/CommonTools.h
+#include "GDCpp/Utf8Tools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "TextObject.h"
 
@@ -71,7 +71,7 @@ void TextObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerEl
 void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
     sf::Text sfText;
-    sfText.setString(gd::Utf8ToSfString(text));
+    sfText.setString(utf8::ToSfString(text));
     sfText.setCharacterSize(characterSize);
     sfText.setStyle((bold ? sf::Text::Bold : 0) |
                  (IsItalic() ? sf::Text::Italic : 0) |
@@ -89,7 +89,7 @@ void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderT
 sf::Vector2f TextObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     sf::Text sfText;
-    sfText.setString(gd::Utf8ToSfString(text));
+    sfText.setString(utf8::ToSfString(text));
     sfText.setCharacterSize(characterSize);
     sfText.setStyle((bold ? sf::Text::Bold : 0) |
                  (IsItalic() ? sf::Text::Italic : 0) |
@@ -232,13 +232,13 @@ float RuntimeTextObject::GetHeight() const
 
 void RuntimeTextObject::SetString(const std::string & str) 
 { 
-    text.setString(Utf8ToSfString(str)); 
+    text.setString(utf8::ToSfString(str)); 
     text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); 
 }
 
 std::string RuntimeTextObject::GetString() const 
 {
-    return ToUtf8String(text.getString());
+    return utf8::FromSfString(text.getString());
 }
 
 /**

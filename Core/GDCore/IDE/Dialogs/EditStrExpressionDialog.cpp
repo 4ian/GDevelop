@@ -32,6 +32,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "EditStrExpressionDialog.h"
 
@@ -361,7 +362,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	SetSize(580,500);
 	#endif
 
-	TexteEdit->SetText(Utf8ToWxString(expression));
+	TexteEdit->SetText(gd::utf8::ToWxString(expression));
 	if ( expression.empty() ) TexteEdit->SetText("\"\"");
 }
 
@@ -399,7 +400,7 @@ void EditStrExpressionDialog::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditStrExpressionDialog::OnOkBtClick(wxCommandEvent& event)
 {
-    returnedExpression = ToUtf8String(TexteEdit->GetValue());
+    returnedExpression = gd::utf8::FromWxString(TexteEdit->GetValue());
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(returnedExpression);

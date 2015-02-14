@@ -16,7 +16,7 @@ namespace gdjs
  * \brief A very simple web server.
  *
  * Basically a wrapper around mongoose ( https://github.com/valenok/mongoose ).
- */
+ */ 
 class HttpServer
 {
 public:

@@ -27,6 +27,8 @@ sf::String GD_CORE_API ToSfString( const std::string &utf8str );
 std::wstring GD_CORE_API ToWString( const std::string &utf8str );
 std::string GD_CORE_API FromWString( const std::wstring &wstr );
 
+std::string GD_CORE_API ReplaceInvalid( const std::string &utf8str );
+
 std::size_t GD_CORE_API StrLength( const std::string &utf8str );
 
 }

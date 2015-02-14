@@ -7,6 +7,8 @@
 #include "GDCpp/Utf8Tools.h"
 #include "GDCpp/Utf8/utf8.h"
 
+#include <iostream>
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
 #endif
@@ -68,6 +70,22 @@ std::string GD_API FromWString( const std::wstring &wstr )
     #endif
 
     return utf8str;
+}
+
+std::string GD_API ReplaceInvalid( const std::string &utf8str )
+{
+    std::string validStr;
+
+    try
+    {
+        ::utf8::replace_invalid(utf8str.begin(), utf8str.end(), std::back_inserter(validStr));
+    }
+    catch(const std::exception &exc)
+    {
+        std::cout << "[UTF8] invalid codepoint replacement warning : " << exc.what() << std::endl;
+    }
+
+    return validStr;
 }
 
 std::size_t GD_API StrLength( const std::string &utf8str )

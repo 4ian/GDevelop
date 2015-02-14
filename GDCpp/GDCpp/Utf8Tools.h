@@ -24,6 +24,8 @@ sf::String GD_API ToSfString( const std::string &utf8str );
 std::wstring GD_API ToWString( const std::string &utf8str );
 std::string GD_API FromWString( const std::wstring &wstr );
 
+std::string GD_API ReplaceInvalid( const std::string &utf8str );
+
 std::size_t GD_API StrLength( const std::string &utf8str );
 
 }

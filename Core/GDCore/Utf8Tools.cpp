@@ -73,6 +73,22 @@ std::string GD_CORE_API FromWString( const std::wstring &wstr )
     return utf8str;
 }
 
+std::string GD_CORE_API ReplaceInvalid( const std::string &utf8str )
+{
+    std::string validStr;
+    
+    try
+    {
+        ::utf8::replace_invalid(utf8str.begin(), utf8str.end(), std::back_inserter(validStr));
+    }
+    catch(const std::exception &exc)
+    {
+        std::cout << "[UTF8] invalid codepoint replacement warning : " << exc.what() << std::endl;
+    }
+
+    return validStr;
+}
+
 std::size_t GD_CORE_API StrLength( const std::string &utf8str )
 {
     return ::utf8::distance(utf8str.begin(), utf8str.end());

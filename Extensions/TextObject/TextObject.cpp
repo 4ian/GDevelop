@@ -53,7 +53,7 @@ TextObject::~TextObject()
 
 void TextObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    SetString(element.GetChild("string", 0,"String").GetValue().GetString());
+    SetString(utf8::ReplaceInvalid(element.GetChild("string", 0,"String").GetValue().GetString()));
     SetFontFilename(element.GetChild("font", 0,"Font").GetValue().GetString());
     SetCharacterSize(element.GetChild("characterSize", 0, "CharacterSize").GetValue().GetInt());
     SetColor(element.GetChild("color", 0,"Color").GetIntAttribute("r", 255),

@@ -402,7 +402,15 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         }
     }
     else
-        return gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, previousParameter, supplementaryParametersTypes);
+    {
+        if( !metadata.canUseUtf8 )
+            argOutput = "utf8::ToLocaleString("; //Add the conversion function for string parameters which doesn't support UTF8
+
+        argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, previousParameter, supplementaryParametersTypes);
+
+        if( !metadata.canUseUtf8 )
+            argOutput += ")"; //End of the conversion function
+    }
 
     return argOutput;
 }
@@ -422,7 +430,7 @@ string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & projec
 
     //Generate default code around events:
     //Includes
-    output += "#include <vector>\n#include <map>\n#include <string>\n#include <algorithm>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDCpp/RuntimeContext.h\"\n#include \"GDCpp/RuntimeObject.h\"\n";
+    output += "#include <vector>\n#include <map>\n#include <string>\n#include <algorithm>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDCpp/RuntimeContext.h\"\n#include \"GDCpp/Utf8Tools.h\"\n#include \"GDCpp/RuntimeObject.h\"\n";
     for ( set<string>::iterator include = codeGenerator.GetIncludeFiles().begin() ; include != codeGenerator.GetIncludeFiles().end(); ++include )
         output += "#include \""+*include+"\"\n";
 

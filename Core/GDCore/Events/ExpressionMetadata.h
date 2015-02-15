@@ -132,6 +132,27 @@ public:
         return *this;
     };
 
+    /**
+     * \brief Declare the last added paramete not able to receivre UTF8 strings.
+     *
+     * \see AddParameter
+     */
+    ExpressionMetadata & CantUseUtf8()
+    {
+        if ( !parameters.empty() ) parameters.back().canUseUtf8 = false;
+        return *this;
+    };
+
+    /**
+     * \brief Declare that the expression returns a locale string (not encoded in UTF8)
+     */
+    ExpressionMetadata & DontReturnUtf8()
+    {
+        returnUtf8 = false;
+        return *this;
+    };
+    bool returnUtf8;
+
     ExpressionCodeGenerationInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fullfil std::map requirements
@@ -152,6 +173,7 @@ private:
     std::string description;
     std::string group;
     bool shown;
+    
 #if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
 #endif

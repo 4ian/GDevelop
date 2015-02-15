@@ -54,6 +54,7 @@ usageComplexity(5)
 
 ParameterMetadata::ParameterMetadata() :
 optional(false),
+canUseUtf8(true),
 codeOnly(false)
 {
 }

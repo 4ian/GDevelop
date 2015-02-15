@@ -274,7 +274,7 @@ void RuntimeTextObject::ChangeFont(const std::string & fontName_)
 {
     if ( !text.getFont() || fontName_ != fontName )
     {
-        fontName = fontName_;
+        fontName = utf8::ToLocaleString(fontName_); ///< TODO : Remove and find a way to tell if instructions want locale strings or utf8 strings
         text.setFont(*FontManager::Get()->GetFont(fontName));
         text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2);
         OnPositionChanged();

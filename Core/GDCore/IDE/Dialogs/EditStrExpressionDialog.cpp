@@ -507,7 +507,7 @@ void EditStrExpressionDialog::OnInsertBtClick(wxCommandEvent& event)
     EditExpressionDialog dialog(this, "", project, layout);
     dialog.ShowModal();
 
-    TexteEdit->AddText("ToString("+dialog.GetExpression()+")");
+    TexteEdit->AddText("ToString("+gd::utf8::ToWxString(dialog.GetExpression())+")");
 }
 
 /**
@@ -565,7 +565,7 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         }
 
         if ( TexteEdit->GetText() == "\"\"" ) TexteEdit->SetText("");
-        TexteEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
+        TexteEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+gd::utf8::ToWxString(parametersStr)+")");
         return;
     }
 }
@@ -599,7 +599,7 @@ void EditStrExpressionDialog::OnAddFunctionBtClick(wxCommandEvent& event)
             if ( cancelled ) return;
         }
 
-        TexteEdit->AddText(infos->GetName()+"("+parametersStr+")");
+        TexteEdit->AddText(infos->GetName()+"("+gd::utf8::ToWxString(parametersStr)+")");
         return;
     }
 }

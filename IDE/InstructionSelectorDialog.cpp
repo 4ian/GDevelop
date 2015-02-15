@@ -469,7 +469,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
         {
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-            gd::ExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
+            gd::ExpressionParser expressionParser(gd::utf8::FromWxString(ParaEdit.at(i)->GetValue()));
 
             if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
                 ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))

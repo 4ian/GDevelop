@@ -794,7 +794,7 @@ void EditExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         }
 
         if ( ExpressionEdit->GetText() == "0" ) ExpressionEdit->SetText("");
-        ExpressionEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
+        ExpressionEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+gd::utf8::ToWxString(parametersStr)+")");
         return;
     }
 }
@@ -818,7 +818,7 @@ void EditExpressionDialog::OnAddValBtClick(wxCommandEvent& event)
         }
 
         if ( ExpressionEdit->GetText() == "0" ) ExpressionEdit->SetText("");
-        ExpressionEdit->AddText(infos->GetName()+"("+parametersStr+")");
+        ExpressionEdit->AddText(infos->GetName()+"("+gd::utf8::ToWxString(parametersStr)+")");
         return;
     }
 }

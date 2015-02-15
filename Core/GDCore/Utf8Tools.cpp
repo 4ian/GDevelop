@@ -19,12 +19,12 @@ namespace gd
 namespace utf8
 {
 
-std::string GD_API FromLocaleString( const std::string &str )
+std::string GD_CORE_API FromLocaleString( const std::string &str )
 {
     return FromSfString(sf::String(str));
 }
 
-std::string GD_API ToLocaleString( const std::string &utf8str )
+std::string GD_CORE_API ToLocaleString( const std::string &utf8str )
 {
     return ToSfString(utf8str).toAnsiString();
 }

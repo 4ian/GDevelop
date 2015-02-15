@@ -13,6 +13,7 @@
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 
@@ -93,19 +94,19 @@ void AdvancedTextEntryDialog::OnmoreBtClick(wxCommandEvent& event)
 {
     if ( moreButtonType == MathExpression && project && layout)
     {
-        EditExpressionDialog dialog(this, ToString( textEdit->GetValue() ), *project, *layout);
-        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(dialog.GetExpression());
+        EditExpressionDialog dialog(this, gd::utf8::FromWxString( textEdit->GetValue() ), *project, *layout);
+        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(gd::utf8::ToWxString(dialog.GetExpression()));
     }
     else if ( moreButtonType == TextExpression && project && layout)
     {
-        EditStrExpressionDialog dialog(this, ToString( textEdit->GetValue() ), *project, *layout);
-        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(dialog.GetExpression());
+        EditStrExpressionDialog dialog(this, gd::utf8::FromWxString( textEdit->GetValue() ), *project, *layout);
+        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(gd::utf8::ToWxString(dialog.GetExpression()));
     }
 }
 
 void AdvancedTextEntryDialog::OnokBtClick(wxCommandEvent& event)
 {
-    text = ToString( textEdit->GetValue() );
+    text = gd::utf8::FromWxString( textEdit->GetValue() );
 
     EndModal(wxOK);
 }

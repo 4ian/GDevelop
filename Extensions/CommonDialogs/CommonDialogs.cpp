@@ -15,6 +15,7 @@ This project is released under the MIT License.
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Variable.h"
+#include "GDCpp/Utf8Tools.h"
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)
@@ -47,10 +48,10 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
 
     //Display the box
     #if defined(WINDOWS)
-    MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONINFORMATION);
+    MessageBoxW(NULL, utf8::ToWString(message).c_str(), utf8::ToWString(title).c_str(), MB_ICONINFORMATION);
     #endif
     #if defined(LINUX) || defined(MAC)
-    nw::MsgBox msgBox(title, message);
+    nw::MsgBox msgBox(utf8::ToLocaleString(title), utf8::ToLocaleString(message));
     msgBox.wait_until_closed();
     #endif
 
@@ -72,25 +73,26 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variabl
     filters = filters+'\0';
     std::replace(filters.begin(), filters.end(), '|', '\0');
 
-    OPENFILENAME toGetFileName; //Struct for the dialog
-    char filePath[MAX_PATH];
-    getcwd(filePath, MAX_PATH);
+    OPENFILENAMEW toGetFileName; //Struct for the dialog
+    wchar_t filePath[MAX_PATH];
+    _wgetcwd(filePath, MAX_PATH);
 
-    ZeroMemory(&toGetFileName, sizeof(OPENFILENAME));
-    toGetFileName.lStructSize = sizeof(OPENFILENAME);
+    ZeroMemory(&toGetFileName, sizeof(OPENFILENAMEW));
+    toGetFileName.lStructSize = sizeof(OPENFILENAMEW);
     toGetFileName.hwndOwner = NULL;
     toGetFileName.lpstrFile = filePath;
     toGetFileName.nMaxFile = MAX_PATH;
-    toGetFileName.lpstrFilter = filters == "\0" ? NULL : filters.c_str();
+    toGetFileName.lpstrFilter = filters == "\0" ? NULL : utf8::ToWString(filters).c_str();
     toGetFileName.nFilterIndex = 1;
     toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 
-    if(GetOpenFileName(&toGetFileName) == TRUE)
-        result = filePath;
+    if(GetOpenFileNameW(&toGetFileName) == TRUE)
+        result = utf8::FromWString(filePath);
     #endif
     #if defined(LINUX) || defined(MAC)
-    nw::OpenFile * dialog = new nw::OpenFile(title, true, result);
+    nw::OpenFile * dialog = new nw::OpenFile(utf8::ToLocaleString(title), true, result);
     dialog->wait_until_closed();
+    result = utf8::FromLocaleString(result); //Convert the path to UTF8
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
@@ -110,20 +112,20 @@ void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & vari
 
     //Display the box
     #if defined(WINDOWS)
-    if( MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
+    if( MessageBoxW(NULL, utf8::ToWString(message).c_str(), utf8::ToWString(title).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
         result = "yes";
     else
         result = "no";
     #endif
     #if defined(LINUX) || defined(MAC)
-    nw::YesNoMsgBox dialog(title, message, result);
+    nw::YesNoMsgBox dialog(utf8::ToLocaleString(title), utf8::ToLocaleString(message), result);
     dialog.wait_until_closed();
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
 
     //Update the variable
-    variable.SetString(result);
+    variable.SetString(result); //Can only be "yes" or "no", no need to encode in UTF8
 }
 
 //Declaration and definition of a simple input box for windows
@@ -153,8 +155,8 @@ class CInputBox
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 public:
     // text from InputBox
-	LPTSTR Text;
-    BOOL DoModal(LPCTSTR szCaption, LPCTSTR szPrompt);
+	LPWSTR Text;
+    BOOL DoModal(LPCWSTR szCaption, LPCWSTR szPrompt);
 
 	CInputBox(HWND hWndParent);
 	virtual ~CInputBox();
@@ -339,13 +341,13 @@ Date        : 13.06.2002
 Description :
         Constructs InputBox window
 */
-BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
+BOOL CInputBox::DoModal(LPCWSTR szCaption, LPCWSTR szPrompt)
 {
 	RECT r;
 	GetWindowRect(GetDesktopWindow(), &r);
 
-	m_hWndInputBox = CreateWindowEx(WS_EX_TOOLWINDOW,
-                "InputBox",
+	m_hWndInputBox = CreateWindowExW(WS_EX_TOOLWINDOW,
+                L"InputBox",
                 szCaption,
                 WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP,
                 (r.right - INPUTBOX_WIDTH) / 2, (r.bottom - INPUTBOX_HEIGHT) / 2,
@@ -358,7 +360,7 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
         return FALSE;
 
 
-    SetWindowText(m_hWndPrompt, szPrompt);
+    SetWindowTextW(m_hWndPrompt, szPrompt);
 
     SetForegroundWindow(m_hWndInputBox);
     BringWindowToTop(m_hWndInputBox);
@@ -385,15 +387,15 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
             }
 			if (msg.wParam == VK_RETURN)
             {
-                int nCount = GetWindowTextLength(m_hWndEdit);
+                int nCount = GetWindowTextLengthW(m_hWndEdit);
                 nCount++;
                 if (Text)
                 {
                     delete[] Text;
                     Text = NULL;
                 }
-                Text = new TCHAR[nCount];
-                GetWindowText(m_hWndEdit, Text, nCount);
+                Text = new WCHAR[nCount];
+                GetWindowTextW(m_hWndEdit, Text, nCount);
 			    SendMessage(m_hWndInputBox, WM_DESTROY, 0, 0);
                 ret = 1;
             }
@@ -428,12 +430,13 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variab
     //Display the box
     #if defined(WINDOWS)
     CInputBox ibox(NULL);
-    if (ibox.DoModal(title.c_str(), message.c_str()))
-        result = ibox.Text;
+    if (ibox.DoModal(utf8::ToWString(title).c_str(), utf8::ToWString(message).c_str()))
+        result = utf8::FromWString(ibox.Text);
     #endif
     #if defined(LINUX) || defined(MAC)
     nw::TextInput dialog(title, message, result);
     dialog.wait_until_closed();
+    result = utf8::FromLocaleString(result); //Convert from locale
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.

@@ -33,3 +33,40 @@ std::size_t GD_API StrLength( const std::string &utf8str );
 std::string GD_API SubStr( const std::string &utf8str, std::size_t pos, std::size_t len );
 
 }
+
+/**
+ * \page utf8support UTF8 support
+ * String expressions (string entered by the user inside numerical/string expression editor) are stored inside
+ * std::string but encoded in UTF8.
+ *
+ * \section utf8encoded What is encoded in UTF8 ?
+ * Not all the strings used by GDevelop are encoded in UTF8. Here is the list of all UTF8 encoded strings :
+ * - string parameters passed to actions, conditions and expressions
+ * - return value of string expressions
+ * - string variable's content and variable's name
+ * - expressions entered by the user inside a numerical/string expression editor (but they are not used directly
+ * by extensions)
+ * - layers' names
+ * - scenes' names
+ * - debugger properties' values (names are not encoded in UTF8 as they come from a translation)
+ *
+ * \section notutf8encoded What is NOT encoded in UTF8 ?
+ * - Objects' names
+ * - Automatisms' names
+ * - Translations used by GDevelop for actions/conditions... (they depends on the current locale, e.g. a russian translation
+ * will not be shown correctly under an english computer)
+ *
+ * \section howtouseutf8 How to use UTF8 strings ?
+ * First, include this header :
+ * \code
+ * #include "GDCpp/Utf8Tools.h"
+ * \endcode
+ * Although UTF8 strings are stored inside std::string, some utility functions should be used instead of std::string methods.
+ * As UTF8 characters can be represented by a variable length array of char, the std::string::size() method is invalidated (it will return
+ * the amount of bytes representing the string) and utf8::StrLength should be used instead.
+ * Here is the list of changed functions
+ * - myString.size() becomes utf8::StrLength(myString);
+ * - myString.substr(i, len) becomes utf8::SubStr(myString, i, len)
+ *
+ * \note These functions are available in gd::utf8 namespace when using GDCore and utf8 namespace when using GDCpp
+ */

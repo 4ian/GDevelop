@@ -29,6 +29,7 @@
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Log.h"
@@ -728,6 +729,42 @@ bool Project::LoadFromFile(const std::string & filename)
     TiXmlHandle hdl( &doc );
     gd::SerializerElement rootElement;
 
+    //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.78 )
+    #if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
+    //Get the declaration element
+    TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
+    if(declXmlElement->Encoding() != "UTF-8")
+    {
+        std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
+        //The document is not encoded in UTF8, we need to convert the file first then reload it
+        std::string docStr;
+        FILE *docFile = fopen(filename.c_str(), "r");
+
+        while(!feof(docFile))
+        {
+            char buffer[20];
+            fgets(buffer, 20, docFile);
+            docStr += std::string(buffer);
+        }
+
+        fclose(docFile);
+
+        std::string newFilename = filename + ".utf8";
+        docFile = fopen(newFilename.c_str(), "w");
+        std::string convertedStr = gd::utf8::ReplaceInvalid(gd::utf8::FromLocaleString(docStr));
+
+        fputs(convertedStr.c_str() + '\0', docFile);
+
+        fclose(docFile);
+
+        doc.LoadFile(newFilename.c_str());
+        
+        std::cout << " -> Conversion ended !" << std::endl;
+    }
+    #endif
+    //END OF COMPATIBILITY CODE
+
+    //Load the root element
     TiXmlElement * rootXmlElement = hdl.FirstChildElement("project").ToElement();
     //Compatibility with GD <= 3.3
     if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Project").ToElement();
@@ -848,7 +885,7 @@ bool Project::SaveToFile(const std::string & filename)
 
     //Create the XML document structure...
     TiXmlDocument doc;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" );
     doc.LinkEndChild( decl );
 
     TiXmlElement * root = new TiXmlElement( "project" );

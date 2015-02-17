@@ -72,6 +72,14 @@
  * Shared pointers are used like raw pointers ( *myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object... ).
  * They doesn't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
  * Thus, scenes for instance don't have to manually delete the objects they own in their destructors.
+ *
+ * \section utf8section UTF8 strings
+ * 
+ * GDevelop uses UTF8 encoded std::string as string parameters passed to actions/conditions and expressions and as return value for string expressions.
+ * Your extension is free to take advantage of UTF8 or can use std::string encoded with the current locale (the default C++ behavior). GDCpp provides tools to work
+ * with UTF8 strings as some methods (like std::string::size()) are not valid anymore with them.
+ *
+ * For more information, see \ref utf8support 
  */
 
 //Group definitions:

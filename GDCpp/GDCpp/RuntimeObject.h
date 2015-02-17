@@ -340,7 +340,7 @@ public:
     ///@{
     /**
      * \brief Called by the debugger so as to get a property value and name.
-     *
+     * \warning value should be set to an UTF8 encoded string.
      * Implementation example:
      * \code
      * if      ( propertyNb == 0 ) {name = _("MyObjectProperty");      value = ToString(GetSomeProperty());}
@@ -351,6 +351,8 @@ public:
 
     /**
      * \brief Called by the debugger so as to update a property
+     * \param propertyNb the property number
+     * \param newValue the new value as an UTF8 string
      * \return true if property was changed, false if it not possible.
      *
      * Implementation example:

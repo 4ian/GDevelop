@@ -16,6 +16,7 @@
  * -# \subpage setupDevEnv
  * -# \ref overview
  * -# \ref writeANewExtension
+ * -# \ref utf8support
  *
  * You can also read \subpage recommendedToolsAndConventions.
  *
@@ -326,6 +327,13 @@ sudo apt-get install libwxgtk3.0-dev
  * Refer to these pages for more information about extensions:
  *  - \subpage AboutExtensionCpp
  *  - \subpage writeANewExtension
+ *
+ * \section utf8section UTF8 strings
+ *
+ * Parts of GDCore use UTF8 strings stored inside std::string. GDCore provides tools to work with these strings as some of the standard methods of std::string
+ * are invalidated (std::string::size() don't return the size of an UTF8 encoded string).
+ * 
+ * For more information, see \ref utf8support
  */
 
 /**

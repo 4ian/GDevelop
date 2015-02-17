@@ -712,7 +712,7 @@ bool Project::LoadFromFile(const std::string & filename)
 {
     //Load the XML document structure
     TiXmlDocument doc;
-    if ( !doc.LoadFile(filename.c_str()) )
+    if ( !doc.LoadFile(filename.c_str(), TIXML_ENCODING_UTF8) )
     {
         std::string errorTinyXmlDesc = doc.ErrorDesc();
         std::string error = gd::ToString(_( "Error while loading :" )) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
@@ -733,7 +733,8 @@ bool Project::LoadFromFile(const std::string & filename)
     #if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
     //Get the declaration element
     TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
-    if(declXmlElement->Encoding() != "UTF-8")
+    std::cout << declXmlElement->Encoding() << std::endl;
+    if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
     {
         std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
         //The document is not encoded in UTF8, we need to convert the file first then reload it
@@ -757,7 +758,7 @@ bool Project::LoadFromFile(const std::string & filename)
 
         fclose(docFile);
 
-        doc.LoadFile(newFilename.c_str());
+        doc.LoadFile(newFilename.c_str(), TIXML_ENCODING_UTF8);
         
         std::cout << " -> Conversion ended !" << std::endl;
     }

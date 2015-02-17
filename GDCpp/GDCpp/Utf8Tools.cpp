@@ -18,12 +18,20 @@ namespace utf8
 
 std::string GD_API FromLocaleString( const std::string &str )
 {
+    #if defined(WINDOWS)
     return FromSfString(sf::String(str));
+    #else
+    return str; //UTF8 is already the current locale on Linux
+    #endif
 }
 
 std::string GD_API ToLocaleString( const std::string &utf8str )
 {
+    #if defined(WINDOWS)
     return ToSfString(utf8str).toAnsiString();
+    #else
+    return utf8str; //UTF8 is already the current locale on Linux
+    #endif
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)

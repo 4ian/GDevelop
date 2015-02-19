@@ -68,7 +68,7 @@
  *
  * \section aboutBoostShared_ptr About Boost shared pointers
  *
- * GDevelop use shared pointers ( boost::shared_ptr ), for scenes or objects for example. <br>
+ * GDevelop use shared pointers ( std::shared_ptr ), for scenes or objects for example. <br>
  * Shared pointers are used like raw pointers ( *myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object... ).
  * They doesn't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
  * Thus, scenes for instance don't have to manually delete the objects they own in their destructors.

@@ -71,9 +71,9 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
     //Construct the list of the external shared libraries files to be used
     for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
-        if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension == std::shared_ptr<ExtensionBase>() ) continue;
 
         if ( wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") ||
              wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".dll.a"))
@@ -231,7 +231,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilerCall.inputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
         task.compilerCall.outputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
-        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
+        task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
         task.scene = &game.GetLayout(i);
 
         CodeCompiler::Get()->AddTask(task);
@@ -409,10 +409,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
     for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
-        if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
+        if ( extension == std::shared_ptr<ExtensionBase>() ) continue;
 
         if ( ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
             && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin

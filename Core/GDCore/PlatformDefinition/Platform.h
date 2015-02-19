@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_PLATFORM_H
 #define GDCORE_PLATFORM_H
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include <string>
 #include <map>
@@ -26,6 +26,8 @@ namespace gd { class ProjectExporter; }
 
 typedef void (*DestroyFunPtr)(gd::Object*);
 typedef gd::Object * (*CreateFunPtr)(std::string name);
+
+#undef CreateEvent
 
 namespace gd
 {
@@ -87,7 +89,7 @@ public:
      * \note This method is virtual and can be redefined by platforms if they want to do special work when an extension is loaded.
      * \see gd::ExtensionsLoader
      */
-    virtual bool AddExtension(boost::shared_ptr<PlatformExtension> extension);
+    virtual bool AddExtension(std::shared_ptr<PlatformExtension> extension);
 
     /**
      * \brief Return true if an extension with the specified name is loaded
@@ -98,13 +100,13 @@ public:
      * \brief Get an extension of the platform
      * @return Shared pointer to the extension
      */
-    boost::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const;
+    std::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const;
 
     /**
      * \brief Get all extensions loaded for the platform.
      * @return Vector of Shared pointer containing all extensions
      */
-    const std::vector < boost::shared_ptr<gd::PlatformExtension> > & GetAllPlatformExtensions() const { return extensionsLoaded; };
+    const std::vector < std::shared_ptr<gd::PlatformExtension> > & GetAllPlatformExtensions() const { return extensionsLoaded; };
 
     ///@}
 
@@ -116,7 +118,7 @@ public:
     /**
      * \brief Create an object of given type with the specified name.
      */
-    boost::shared_ptr<gd::Object> CreateObject(std::string type, const std::string & name) const;
+    std::shared_ptr<gd::Object> CreateObject(std::string type, const std::string & name) const;
 
     /**
      * \brief Create an automatism
@@ -126,13 +128,13 @@ public:
     /**
      * \brief Create an automatism shared data object.
      */
-    boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const;
+    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const;
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Create an event of given type
      */
-    boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
+    std::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
 
     ///@}
 
@@ -164,7 +166,7 @@ public:
      *
      * The default implementation simply return a gd::LayoutEditorPreviewer object doing nothing.
      */
-    virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+    virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
 
     /**
      * \brief Must provide a gd::ProjectExporter object that will be used
@@ -172,7 +174,7 @@ public:
      *
      * The default implementation simply return a gd::ProjectExporter object doing nothing.
      */
-    virtual boost::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+    virtual std::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
     #endif
     ///@}
 
@@ -190,7 +192,7 @@ public:
     #endif
 
 private:
-    std::vector < boost::shared_ptr<PlatformExtension> > extensionsLoaded; ///< Extensions of the platform
+    std::vector < std::shared_ptr<PlatformExtension> > extensionsLoaded; ///< Extensions of the platform
     std::map < std::string, CreateFunPtr > creationFunctionTable; ///< Creation functions for objects
 
     #if defined(GD_IDE_ONLY)

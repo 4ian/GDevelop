@@ -1,15 +1,16 @@
 #ifndef OBJINSTANCESHOLDER_H
 #define OBJINSTANCESHOLDER_H
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
-#include <boost/unordered_map.hpp>
+#include <memory>
+#include <unordered_map>
 class RuntimeObject;
 
-typedef std::vector < boost::shared_ptr<RuntimeObject> > RuntimeObjList;
-typedef boost::shared_ptr<RuntimeObject> RuntimeObjSPtr;
+typedef std::vector < std::shared_ptr<RuntimeObject> > RuntimeObjList;
+typedef std::shared_ptr<RuntimeObject> RuntimeObjSPtr;
 
 /**
  * \brief Contains lists of objects classified by the name of the objects.
@@ -66,7 +67,7 @@ public:
     {
         RuntimeObjList objList;
 
-        for (boost::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (std::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
             copy(it->second.begin(), it->second.end(), back_inserter(objList));
 
         return objList;
@@ -83,12 +84,12 @@ public:
      */
     inline void RemoveObject(const RuntimeObjSPtr & object)
     {
-        for (boost::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (std::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             RuntimeObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
         }
-        for (boost::unordered_map<std::string, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+        for (std::unordered_map<std::string, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
         {
             std::vector<RuntimeObject*> & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object.get()), associatedList.end());
@@ -122,8 +123,8 @@ public:
 private:
     void Init(const ObjInstancesHolder & other);
 
-    boost::unordered_map<std::string, RuntimeObjList > objectsInstances; ///< The list of all objects, classified by name
-    boost::unordered_map<std::string, std::vector<RuntimeObject*> > objectsRawPointersInstances; ///< Clones of the objectsInstances lists, but with raw pointers instead.
+    std::unordered_map<std::string, RuntimeObjList > objectsInstances; ///< The list of all objects, classified by name
+    std::unordered_map<std::string, std::vector<RuntimeObject*> > objectsRawPointersInstances; ///< Clones of the objectsInstances lists, but with raw pointers instead.
 };
 
 #endif // OBJINSTANCESHOLDER_H

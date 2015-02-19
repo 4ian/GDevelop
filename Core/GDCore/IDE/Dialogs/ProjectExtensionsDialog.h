@@ -22,7 +22,7 @@
 #include <wx/dialog.h>
 //*)
 #include <wx/htmllbox.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Project; }
 namespace gd { class Platform; }
 

@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/Events/ObjectMetadata.h"
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
@@ -50,8 +50,6 @@ class GD_CORE_API CompilationInfo
     int gccMinorVersion;
     int gccPatchLevel;
     #endif
-
-    int boostVersion;
 
     int sfmlMajorVersion;
     int sfmlMinorVersion;
@@ -175,8 +173,8 @@ public:
                                           const std::string & group_,
                                           const std::string & icon24x24_,
                                           const std::string & className_,
-                                          boost::shared_ptr<gd::Automatism> instance,
-                                          boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
+                                          std::shared_ptr<gd::Automatism> instance,
+                                          std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
 
     /**
      * \brief Declare a new event as being part of the extension.
@@ -187,7 +185,7 @@ public:
                                  const std::string & description_,
                                  const std::string & group_,
                                  const std::string & smallicon_,
-                                 boost::shared_ptr<gd::BaseEvent> instance);
+                                 std::shared_ptr<gd::BaseEvent> instance);
 
     /**
      * \brief Return the name extension user friendly name.
@@ -245,7 +243,7 @@ public:
      *
      * Return an empty pointer if \a eventType is not provided by the extension.
      */
-    boost::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
+    std::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
     /**
      * \brief Create an automatism
      *
@@ -258,7 +256,7 @@ public:
      *
      * Return NULL if \a automatismType is not provided by the extension.
      */
-    boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(std::string automatismType) const;
+    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(std::string automatismType) const;
 
     /**
      * \brief Return a reference to the ObjectMetadata object associated to \a objectType
@@ -427,7 +425,6 @@ private:
  * \see gd::CompilationInfo
  */
 #define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = false; \
-    compilationInfo.boostVersion = BOOST_VERSION; \
     compilationInfo.sfmlMajorVersion = 2; \
     compilationInfo.sfmlMinorVersion = 0; \
     compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
@@ -442,7 +439,6 @@ private:
  * \see gd::CompilationInfo
  */
 #define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = true;\
-    compilationInfo.boostVersion = BOOST_VERSION; \
     compilationInfo.sfmlMajorVersion = 2; \
     compilationInfo.sfmlMinorVersion = 0; \
     compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \

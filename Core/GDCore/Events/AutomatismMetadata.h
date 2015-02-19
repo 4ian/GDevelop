@@ -40,8 +40,8 @@ public:
                        const std::string & group_,
                        const std::string & icon24x24_,
                        const std::string & className_,
-                       boost::shared_ptr<gd::Automatism> instance,
-                       boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
+                       std::shared_ptr<gd::Automatism> instance,
+                       std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
     AutomatismMetadata() {};
     virtual ~AutomatismMetadata() {};
 
@@ -112,8 +112,8 @@ public:
     const wxBitmap & GetBitmapIcon() const { return icon; }
 #endif
 #endif
-    boost::shared_ptr<gd::Automatism> Get() const { return instance; }
-    boost::shared_ptr<gd::AutomatismsSharedData> GetSharedDataInstance() const { return sharedDatasInstance; }
+    std::shared_ptr<gd::Automatism> Get() const { return instance; }
+    std::shared_ptr<gd::AutomatismsSharedData> GetSharedDataInstance() const { return sharedDatasInstance; }
 
 #if defined(GD_IDE_ONLY)
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
@@ -137,8 +137,8 @@ private:
 #endif
 #endif
 
-    boost::shared_ptr<gd::Automatism> instance;
-    boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance;
+    std::shared_ptr<gd::Automatism> instance;
+    std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance;
 };
 
 }

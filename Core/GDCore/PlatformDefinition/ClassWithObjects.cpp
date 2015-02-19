@@ -3,6 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+#include <algorithm>
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -37,10 +38,10 @@ void ClassWithObjects::UnserializeObjectsFrom(gd::Project & project, const Seria
         const SerializerElement & objectElement = element.GetChild(i);
 
         std::string type = objectElement.GetStringAttribute("type");
-        boost::shared_ptr<gd::Object> newObject =
+        std::shared_ptr<gd::Object> newObject =
             project.CreateObject(type, objectElement.GetStringAttribute("name", "", "nom"));
 
-        if ( newObject != boost::shared_ptr<gd::Object>() )
+        if ( newObject != std::shared_ptr<gd::Object>() )
         {
             newObject->UnserializeFrom(project, objectElement);
             initialObjects.push_back( newObject );
@@ -85,7 +86,7 @@ unsigned int ClassWithObjects::GetObjectsCount() const
 #if defined(GD_IDE_ONLY)
 gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
+    std::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
     if (position<initialObjects.size())
         initialObjects.insert(initialObjects.begin()+position, newObject);
     else
@@ -97,7 +98,7 @@ gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const std:
 
 gd::Object & ClassWithObjects::InsertObject(const gd::Object & object, unsigned int position)
 {
-    boost::shared_ptr<gd::Object> newObject = boost::shared_ptr<gd::Object>(object.Clone());
+    std::shared_ptr<gd::Object> newObject = std::shared_ptr<gd::Object>(object.Clone());
     if (position<initialObjects.size())
         initialObjects.insert(initialObjects.begin()+position, newObject);
     else
@@ -111,14 +112,14 @@ void ClassWithObjects::SwapObjects(unsigned int firstObjectIndex, unsigned int s
     if ( firstObjectIndex >= initialObjects.size() || secondObjectIndex >= initialObjects.size() )
         return;
 
-    boost::shared_ptr<gd::Object> temp = initialObjects[firstObjectIndex];
+    std::shared_ptr<gd::Object> temp = initialObjects[firstObjectIndex];
     initialObjects[firstObjectIndex] = initialObjects[secondObjectIndex];
     initialObjects[secondObjectIndex] = temp;
 }
 
 void ClassWithObjects::RemoveObject(const std::string & name)
 {
-    std::vector< boost::shared_ptr<gd::Object> >::iterator object = find_if(initialObjects.begin(), initialObjects.end(), bind2nd(ObjectHasName(), name));
+    std::vector< std::shared_ptr<gd::Object> >::iterator object = find_if(initialObjects.begin(), initialObjects.end(), bind2nd(ObjectHasName(), name));
     if ( object == initialObjects.end() ) return;
 
     initialObjects.erase(object);

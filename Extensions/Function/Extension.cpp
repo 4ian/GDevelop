@@ -20,7 +20,7 @@ This project is released under the MIT License.
 #include "GDCore/Events/Instruction.h"
 #endif
 #include "FunctionEvent.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.
@@ -110,7 +110,7 @@ public:
                 .AddParameter("string", _("Parameter 5"), "", true)
                 .AddParameter("string", _("Parameter 6"), "", true)
                 .AddParameter("string", _("Parameter 7"), "", true)
-                .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+                .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
         }
 
         {
@@ -181,8 +181,8 @@ public:
                     _("Function event : An event which is launched only thanks to action \"Launch a function\""),
                     "",
                     "res/function.png",
-                    boost::shared_ptr<gd::BaseEvent>(new FunctionEvent))
-                .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                    std::shared_ptr<gd::BaseEvent>(new FunctionEvent))
+                .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
         }
 
         {
@@ -221,7 +221,7 @@ public:
                            _("Function"),
                            "res/function.png")
                 .AddParameter("expression", _("Index of the parameter (Parameters start at 0!)"))
-                .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>(codeGenerator));
+                .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>(codeGenerator));
         }
         #endif
 

@@ -18,13 +18,13 @@ namespace gd
 ImageManager::ImageManager() :
 game(NULL)
 {
-    badTexture = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+    badTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
     badTexture->texture.loadFromMemory(gd::InvalidImageData, sizeof(gd::InvalidImageData));
     badTexture->texture.setSmooth(false);
     badTexture->image = badTexture->texture.copyToImage();
 }
 
-boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::string & name) const
+std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::string & name) const
 {
     if ( !game )
     {
@@ -42,7 +42,7 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::st
     {
         ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(name));
 
-        boost::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
+        std::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
         texture->texture.setSmooth(image.smooth);
 
         alreadyLoadedImages[name] = texture;
@@ -69,7 +69,7 @@ bool ImageManager::HasLoadedSFMLTexture(const std::string & name) const
     return false;
 }
 
-void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const std::string & name, boost::shared_ptr<SFMLTextureWrapper> & texture) const
+void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const std::string & name, std::shared_ptr<SFMLTextureWrapper> & texture) const
 {
     if ( alreadyLoadedImages.find(name) == alreadyLoadedImages.end() || alreadyLoadedImages.find(name)->second.expired() )
         alreadyLoadedImages[name] = texture;
@@ -90,7 +90,7 @@ void ImageManager::ReloadImage(const std::string & name) const
     if ( alreadyLoadedImages.find(name) == alreadyLoadedImages.end() || alreadyLoadedImages.find(name)->second.expired() ) return;
 
     //Image still in memory, get it and update it.
-    boost::shared_ptr<SFMLTextureWrapper> oldTexture = alreadyLoadedImages.find(name)->second.lock();
+    std::shared_ptr<SFMLTextureWrapper> oldTexture = alreadyLoadedImages.find(name)->second.lock();
 
     try
     {
@@ -111,7 +111,7 @@ void ImageManager::ReloadImage(const std::string & name) const
     *oldTexture = *badTexture;
 }
 
-boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const std::string & name) const
+std::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const std::string & name) const
 {
     if ( !game )
     {
@@ -124,7 +124,7 @@ boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const std
 
     cout << "Load OpenGL Texture" << name << endl;
 
-    boost::shared_ptr<OpenGLTextureWrapper> texture = boost::shared_ptr<OpenGLTextureWrapper>(new OpenGLTextureWrapper(GetSFMLTexture(name)));
+    std::shared_ptr<OpenGLTextureWrapper> texture = std::shared_ptr<OpenGLTextureWrapper>(new OpenGLTextureWrapper(GetSFMLTexture(name)));
     alreadyLoadedOpenGLTextures[name] = texture;
     return texture;
 }
@@ -139,7 +139,7 @@ void ImageManager::LoadPermanentImages()
 
     //Create a new list of permanently loaded images but do not delete now the old list
     //so as not to unload images that could be still present.
-    map < string, boost::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
+    map < string, std::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
 
     std::vector<std::string> resources = game->GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i <resources.size();i++ )
@@ -161,10 +161,10 @@ void ImageManager::LoadPermanentImages()
 void ImageManager::PreventImagesUnloading()
 {
     preventUnloading = true;
-    for (map < string, boost::weak_ptr<SFMLTextureWrapper> >::const_iterator it = alreadyLoadedImages.begin();it != alreadyLoadedImages.end();++it)
+    for (map < string, std::weak_ptr<SFMLTextureWrapper> >::const_iterator it = alreadyLoadedImages.begin();it != alreadyLoadedImages.end();++it)
     {
-        boost::shared_ptr<SFMLTextureWrapper> image = (it->second).lock();
-        if ( image != boost::shared_ptr<SFMLTextureWrapper>() ) unloadingPreventer.push_back(image);
+        std::shared_ptr<SFMLTextureWrapper> image = (it->second).lock();
+        if ( image != std::shared_ptr<SFMLTextureWrapper>() ) unloadingPreventer.push_back(image);
     }
 }
 
@@ -191,7 +191,7 @@ SFMLTextureWrapper::~SFMLTextureWrapper()
 {
 }
 
-OpenGLTextureWrapper::OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper> sfmlTexture_)
+OpenGLTextureWrapper::OpenGLTextureWrapper(std::shared_ptr<SFMLTextureWrapper> sfmlTexture_)
 {
     sfmlTexture = sfmlTexture_;
 

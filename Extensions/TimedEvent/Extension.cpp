@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include "TimedEvent.h"
 #include "TimedEventsManager.h"
 #include "GDCpp/CommonTools.h"
@@ -110,8 +110,8 @@ public:
                           _("Event which launch its conditions and actions only after a amount of time is reached."),
                           "",
                           "CppPlatform/Extensions/timedevent16.png",
-                          boost::shared_ptr<gd::BaseEvent>(new TimedEvent))
-                .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                          std::shared_ptr<gd::BaseEvent>(new TimedEvent))
+                .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
         }
 
         {
@@ -138,7 +138,7 @@ public:
                            "CppPlatform/Extensions/timedevent16.png")
                 .AddCodeOnlyParameter("currentScene", "")
                 .AddParameter("", _("Name"))
-                .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+                .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
         }
 
         {
@@ -188,7 +188,7 @@ public:
                            "CppPlatform/Extensions/timedevent16.png")
 
                 .AddParameter("", _("Name"))
-                .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator))
+                .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator))
                 .SetIncludeFile("TimedEvent/TimedEventTools.h");
         }
         #endif

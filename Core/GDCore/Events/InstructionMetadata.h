@@ -9,7 +9,7 @@
 #if defined(GD_IDE_ONLY)
 #include <string>
 #include "GDCore/Events/Instruction.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -285,7 +285,7 @@ public:
             virtual std::string GenerateCode(Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
-        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
@@ -296,7 +296,7 @@ public:
         AccessType accessType;
         std::string optionalAssociatedInstruction;
         std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+        std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 

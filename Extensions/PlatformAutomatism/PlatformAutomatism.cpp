@@ -5,7 +5,7 @@ Copyright (c) 2014-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "PlatformAutomatism.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"

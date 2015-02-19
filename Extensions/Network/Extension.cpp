@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "GDCpp/CommonTools.h"
 #include "NetworkAutomatism.h"
 #include "NetworkManager.h"
-#include <boost/version.hpp>
+
 #include <SFML/Network.hpp>
 
 /**
@@ -174,8 +174,8 @@ public:
                   "",
                   "CppPlatform/Extensions/networkicon32.png",
                   "NetworkAutomatism",
-                  boost::shared_ptr<gd::Automatism>(new NetworkAutomatism),
-                  boost::shared_ptr<gd::AutomatismsSharedData>(new SceneNetworkDatas));
+                  std::shared_ptr<gd::Automatism>(new NetworkAutomatism),
+                  std::shared_ptr<gd::AutomatismsSharedData>(new SceneNetworkDatas));
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("Network/NetworkAutomatism.h");

@@ -4,7 +4,6 @@
  * This project is released under the MIT License.
  */
 
-#include <boost/version.hpp>
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/ExtensionsLoader.h"
@@ -255,9 +254,6 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
               extensionPtr->compilationInfo.sfmlMinorVersion != 0 )
         error += "Not the same SFML version.\n";
 
-    else if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
-        error += "Not the same Boost version.\n(Extension is using "+ToString(extensionPtr->compilationInfo.boostVersion)+", GDevelop is using "+ToString(BOOST_VERSION)+")\n";
-
     else if ( extensionPtr->compilationInfo.gdCoreVersion != GDCore_RC_FILEVERSION_STRING)
         error += "Not the same GDevelop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", GDevelop is using "+GDCore_RC_FILEVERSION_STRING+")\n";
 
@@ -288,7 +284,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         #endif
     }
 
-    boost::shared_ptr<gd::PlatformExtension> extension(extensionPtr);
+    std::shared_ptr<gd::PlatformExtension> extension(extensionPtr);
     platform.AddExtension(extension);
     return;
 }

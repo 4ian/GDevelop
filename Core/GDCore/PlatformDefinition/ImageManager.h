@@ -10,8 +10,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
+#include <memory>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
@@ -46,7 +46,7 @@ public:
     /**
      * \brief Get a shared pointer to an OpenGL texture. The shared pointer must be kept alive as long as the texture is used.
      */
-    boost::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(const std::string & name) const;
+    std::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(const std::string & name) const;
 
     /**
      * \brief Get a shared pointer to a SFML texture.  The shared pointer must be kept alive as long as the texture is used.
@@ -54,7 +54,7 @@ public:
      * For example, if the texture is used in an object, you should store the shared pointer in a member to make sure the texture
      * is available as long as the object is alive.
      */
-    boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(const std::string & name) const;
+    std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(const std::string & name) const;
 
     /**
      * \brief Set the project associated with the image manager.
@@ -77,7 +77,7 @@ public:
      * \brief Add the SFMLTextureWrapper to loaded images ( so that it can be accessed thanks to ImageManager::GetSFMLTexture ) with the specified name and
      * mark it as permanently loaded ( so that is is unloaded only when the layout is unloaded ).
      */
-    void SetSFMLTextureAsPermanentlyLoaded(const std::string & name, boost::shared_ptr<SFMLTextureWrapper> & texture) const;
+    void SetSFMLTextureAsPermanentlyLoaded(const std::string & name, std::shared_ptr<SFMLTextureWrapper> & texture) const;
 
     /**
      * \brief Reload a single image from the game resources
@@ -98,8 +98,8 @@ public:
     #endif
 
 private:
-    mutable std::map < std::string, boost::weak_ptr<SFMLTextureWrapper> > alreadyLoadedImages; ///< Reference all images loaded in memory.
-    mutable std::map < std::string, boost::shared_ptr<SFMLTextureWrapper> > permanentlyLoadedImages; ///< Contains (smart) pointers to images which should stay loaded even if they are not (currently) used.
+    mutable std::map < std::string, std::weak_ptr<SFMLTextureWrapper> > alreadyLoadedImages; ///< Reference all images loaded in memory.
+    mutable std::map < std::string, std::shared_ptr<SFMLTextureWrapper> > permanentlyLoadedImages; ///< Contains (smart) pointers to images which should stay loaded even if they are not (currently) used.
 
     #if defined(GD_IDE_ONLY)
 
@@ -110,14 +110,14 @@ private:
     * \see PreventImagesUnloading
     * \see EnableImagesUnloading
     */
-    mutable std::vector< boost::shared_ptr<SFMLTextureWrapper> > unloadingPreventer;
+    mutable std::vector< std::shared_ptr<SFMLTextureWrapper> > unloadingPreventer;
     bool preventUnloading; ///< True if no images must be currently unloaded.
     #endif
 
-    mutable std::map < std::string, boost::weak_ptr<OpenGLTextureWrapper> > alreadyLoadedOpenGLTextures; ///< Reference all OpenGL textures loaded in memory.
+    mutable std::map < std::string, std::weak_ptr<OpenGLTextureWrapper> > alreadyLoadedOpenGLTextures; ///< Reference all OpenGL textures loaded in memory.
 
-    mutable boost::shared_ptr<SFMLTextureWrapper> badTexture;
-    mutable boost::shared_ptr<OpenGLTextureWrapper> badOpenGLTexture;
+    mutable std::shared_ptr<SFMLTextureWrapper> badTexture;
+    mutable std::shared_ptr<OpenGLTextureWrapper> badOpenGLTexture;
 
     gd::Project * game;
 };
@@ -150,13 +150,13 @@ public :
 class GD_CORE_API OpenGLTextureWrapper
 {
 public :
-    OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper> sfmlTexture_);
+    OpenGLTextureWrapper(std::shared_ptr<SFMLTextureWrapper> sfmlTexture_);
     OpenGLTextureWrapper() : texture(0) {};
     ~OpenGLTextureWrapper();
     inline GLuint GetOpenGLTexture() const { return texture; }
 
 private :
-    boost::shared_ptr<SFMLTextureWrapper> sfmlTexture;
+    std::shared_ptr<SFMLTextureWrapper> sfmlTexture;
     GLuint texture;
 };
 

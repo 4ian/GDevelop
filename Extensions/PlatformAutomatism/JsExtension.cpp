@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Version.h"
 #include "GDCore/Tools/Localization.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension);

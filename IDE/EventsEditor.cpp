@@ -353,7 +353,7 @@ void EventsEditor::Init(wxWindow* parent)
 void EventsEditor::RecreateCustomEventsMenu()
 {
     //Adding events types
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Clear the menu
     for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
@@ -889,9 +889,9 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
     //Event selection?
     else if ( itemsAreas.IsOnEvent(event.GetX(), event.GetY()) )
     {
-        boost::shared_ptr<gd::BaseEvent> evt = itemsAreas.GetEventAt(event.GetX(), event.GetY()).event;
+        std::shared_ptr<gd::BaseEvent> evt = itemsAreas.GetEventAt(event.GetX(), event.GetY()).event;
 
-        if ( evt == boost::shared_ptr<gd::BaseEvent>() ) return;
+        if ( evt == std::shared_ptr<gd::BaseEvent>() ) return;
 
         gd::BaseEvent::EditEventReturnType returned = evt->EditEvent(this, game, scene, mainFrameWrapper);
 
@@ -1100,7 +1100,7 @@ void EventsEditor::DeleteSelection()
     std::vector<EventItem> eventsSelection = selection.GetAllSelectedEvents();
     for (unsigned int i = 0; i<eventsSelection.size();++i)
     {
-        if ( eventsSelection[i].event != boost::shared_ptr<gd::BaseEvent>() && eventsSelection[i].eventsList != NULL)
+        if ( eventsSelection[i].event != std::shared_ptr<gd::BaseEvent>() && eventsSelection[i].eventsList != NULL)
             eventsSelection[i].eventsList->RemoveEvent(*eventsSelection[i].event);
     }
 
@@ -1244,7 +1244,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 void EventsEditor::AddEvent(gd::EventItem & previousEventItem)
 {
     gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
-    if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
+    if ( eventToAdd != std::shared_ptr<gd::BaseEvent>() )
     {
         //Edit the event
         eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
@@ -1265,7 +1265,7 @@ void EventsEditor::AddEvent(gd::EventItem & previousEventItem)
 void EventsEditor::OnaddEventBtClick(wxCommandEvent& event)
 {
     gd::EventItem & highlightedEvent = selection.GetHighlightedEvent();
-    if ( highlightedEvent.event == boost::shared_ptr<gd::BaseEvent>() ) return;
+    if ( highlightedEvent.event == std::shared_ptr<gd::BaseEvent>() ) return;
 
     AddEvent(highlightedEvent);
 }
@@ -1273,7 +1273,7 @@ void EventsEditor::OnRibbonAddEventBtClick(wxRibbonButtonBarEvent& evt)
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
 
-    if ( !eventsSelected.empty() && eventsSelected[0].event != boost::shared_ptr<gd::BaseEvent>() )
+    if ( !eventsSelected.empty() && eventsSelected[0].event != std::shared_ptr<gd::BaseEvent>() )
         AddEvent(eventsSelected[0]);
     else
     {
@@ -1289,10 +1289,10 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
     EventItem previousEventItem;
-    if ( !eventsSelected.empty() && eventsSelected[0].event != boost::shared_ptr<gd::BaseEvent>() ) previousEventItem = eventsSelected[0];
+    if ( !eventsSelected.empty() && eventsSelected[0].event != std::shared_ptr<gd::BaseEvent>() ) previousEventItem = eventsSelected[0];
 
     gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Comment");
-    if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
+    if ( eventToAdd != std::shared_ptr<gd::BaseEvent>() )
     {
         if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
 
@@ -1315,7 +1315,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
 void EventsEditor::AddSubEvent(gd::EventItem & parentEventItem)
 {
     gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
-    if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
+    if ( eventToAdd != std::shared_ptr<gd::BaseEvent>() )
     {
         eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
 
@@ -1332,14 +1332,14 @@ void EventsEditor::AddSubEvent(gd::EventItem & parentEventItem)
 void EventsEditor::OnaddSubEventBtClick(wxCommandEvent& event)
 {
     gd::EventItem & highlightedEvent = selection.GetHighlightedEvent();
-    if ( highlightedEvent.event == boost::shared_ptr<gd::BaseEvent>() || !highlightedEvent.event->CanHaveSubEvents() ) return;
+    if ( highlightedEvent.event == std::shared_ptr<gd::BaseEvent>() || !highlightedEvent.event->CanHaveSubEvents() ) return;
 
     AddSubEvent(highlightedEvent);
 }
 void EventsEditor::OnRibbonAddSubEventSelected(wxRibbonButtonBarEvent& evt)
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
-    if ( eventsSelected.empty() || eventsSelected[0].event == boost::shared_ptr<gd::BaseEvent>() ) return;
+    if ( eventsSelected.empty() || eventsSelected[0].event == std::shared_ptr<gd::BaseEvent>() ) return;
 
     AddSubEvent(eventsSelected[0]);
 }
@@ -1394,7 +1394,7 @@ void EventsEditor::OnRibbonAddCustomEventFromMenu(wxRibbonButtonBarEvent& evt)
 void EventsEditor::OnaddMoreBtClick(wxCommandEvent& event)
 {
     selection.ClearSelection();
-    if ( selection.GetHighlightedEvent().event == boost::shared_ptr<gd::BaseEvent>() ) return;
+    if ( selection.GetHighlightedEvent().event == std::shared_ptr<gd::BaseEvent>() ) return;
     selection.AddEvent(selection.GetHighlightedEvent());
 
     PopupMenu(&eventTypesMenu);
@@ -1467,7 +1467,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
         gd::EventsList eventsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
-            if (itemsSelected[i].event != boost::shared_ptr<gd::BaseEvent>())
+            if (itemsSelected[i].event != std::shared_ptr<gd::BaseEvent>())
                 eventsToCopy.InsertEvent(*itemsSelected[i].event);
         }
 
@@ -1638,7 +1638,7 @@ void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
     CppLayoutPreviewer * sceneCanvas = dynamic_cast<CppLayoutPreviewer*>(layoutCanvas);
 
-    if (sceneCanvas && sceneCanvas->GetProfileDialog() != boost::shared_ptr<ProfileDlg>())
+    if (sceneCanvas && sceneCanvas->GetProfileDialog() != std::shared_ptr<ProfileDlg>())
     {
         if ( !profilingActivated && !sceneCanvas->GetProfileDialog()->profilingActivated)
         {
@@ -1687,7 +1687,7 @@ void EventsEditor::OntoggleActivationSelected(wxCommandEvent& event)
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
     for (unsigned int i = 0;i<eventsSelected.size();++i)
     {
-        if ( eventsSelected[i].event != boost::shared_ptr<gd::BaseEvent>())
+        if ( eventsSelected[i].event != std::shared_ptr<gd::BaseEvent>())
             eventsSelected[i].event->SetDisabled(!eventsSelected[i].event->IsDisabled());
     }
     ChangesMadeOnEvents();

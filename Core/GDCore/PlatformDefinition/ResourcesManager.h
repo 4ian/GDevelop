@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_RESOURCESMANAGER_H
 #define GDCORE_RESOURCESMANAGER_H
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 namespace gd { class Project; }
@@ -252,7 +252,7 @@ public:
     /**
      * \brief Create a new resource but does not add it to the list
      */
-    boost::shared_ptr<Resource> CreateResource(const std::string & kind);
+    std::shared_ptr<Resource> CreateResource(const std::string & kind);
 
     /**
      * \brief Get a list containing the name of all of the resources.
@@ -263,7 +263,7 @@ public:
     /**
      * \brief Return a (smart) pointer to a resource.
      */
-    boost::shared_ptr<gd::Resource> GetResourceSPtr(const std::string & name);
+    std::shared_ptr<gd::Resource> GetResourceSPtr(const std::string & name);
 
     /**
      * \brief Add an already constructed resource
@@ -350,7 +350,7 @@ public:
 private:
     void Init(const ResourcesManager & other);
 
-    std::vector< boost::shared_ptr<Resource> > resources;
+    std::vector< std::shared_ptr<Resource> > resources;
     #if defined(GD_IDE_ONLY)
     std::vector< ResourceFolder > folders;
     #endif
@@ -430,7 +430,7 @@ public:
 
 private:
     std::string name;
-    std::vector< boost::shared_ptr<Resource> > resources;
+    std::vector< std::shared_ptr<Resource> > resources;
 
     void Init(const ResourceFolder & other);
     static Resource badResource;

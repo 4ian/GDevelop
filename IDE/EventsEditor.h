@@ -21,7 +21,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"

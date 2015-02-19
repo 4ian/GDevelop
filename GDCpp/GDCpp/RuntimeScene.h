@@ -12,7 +12,7 @@
 #include <string>
 #include <map>
 #include <SFML/System.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/Text.h"
@@ -75,7 +75,7 @@ public:
      * \brief Shortcut for game->GetImageManager()
      * \return The image manager of the game.
      */
-    boost::shared_ptr<gd::ImageManager> GetImageManager() const;
+    std::shared_ptr<gd::ImageManager> GetImageManager() const;
 
     /**
      * Get the layer with specified name.
@@ -93,7 +93,7 @@ public:
      * \warning Be careful, no check is made to ensure that the shared data exist.
      * \param name The name of the automatism for which shared data must be fetched.
      */
-    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
+    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -117,9 +117,9 @@ public:
      * \param container The object containing the initial instances to be created
      * \param xOffset The offset on x axis to be applied to objects created
      * \param yOffset The offset on y axis to be applied to objects created
-     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
+     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
      */
-    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap = NULL);
+    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap = NULL);
 
     /**
      * Change the window used for rendering the scene
@@ -218,13 +218,13 @@ public:
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
-    boost::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
+    std::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
 
     /**
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
-    void SetCodeExecutionEngine(boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
+    void SetCodeExecutionEngine(std::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
     ///@}
 
 
@@ -276,7 +276,7 @@ protected:
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
     AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
-    boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
+    std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
     std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.

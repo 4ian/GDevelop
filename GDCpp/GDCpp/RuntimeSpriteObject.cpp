@@ -269,7 +269,7 @@ void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, 
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    boost::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
+    std::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     //Make sure the coordinates are correct.
     if ( xPosition < 0 || static_cast<unsigned>(xPosition) >= dest->texture.getSize().x) return;
@@ -285,7 +285,7 @@ void RuntimeSpriteObject::MakeColorTransparent( const std::string & colorStr )
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    boost::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
+    std::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     std::vector < std::string > colors = SplitString <std::string> (colorStr, ';');
 

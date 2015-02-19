@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "LightObstacleAutomatism.h"
 #include "LightObject.h"
 #include "SceneLightObstacleDatas.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.
@@ -227,8 +227,8 @@ public:
                       "",
                       "CppPlatform/Extensions/lightObstacleIcon32.png",
                       "LightObstacleAutomatism",
-                      boost::shared_ptr<gd::Automatism>(new LightObstacleAutomatism),
-                      boost::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas));
+                      std::shared_ptr<gd::Automatism>(new LightObstacleAutomatism),
+                      std::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas));
 
             };
 

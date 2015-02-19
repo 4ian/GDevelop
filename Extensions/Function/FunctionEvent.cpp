@@ -178,8 +178,8 @@ std::string FunctionEvent::MangleFunctionName(const gd::Layout & layout, const F
     //To generate a "unique" name for the function, the name is mangled and suffixed with the
     //pointer to the (original) event of the function.
     const gd::BaseEvent * ptr = &functionEvent;
-    boost::shared_ptr<gd::BaseEvent> originalEvent = functionEvent.originalEvent.lock();
-    if (originalEvent != boost::shared_ptr<gd::BaseEvent>()) {
+    std::shared_ptr<gd::BaseEvent> originalEvent = functionEvent.originalEvent.lock();
+    if (originalEvent != std::shared_ptr<gd::BaseEvent>()) {
         ptr = originalEvent.get();
     }
 

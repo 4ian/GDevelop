@@ -9,7 +9,7 @@
 #include <string>
 #include <set>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Layout; }
 
 namespace gd

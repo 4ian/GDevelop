@@ -20,7 +20,7 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd {class Layout;}
 namespace gd {class Project;}
@@ -101,10 +101,10 @@ private:
     wxAuiNotebook* notebook;
     wxScrollBar* vScrollbar;
     //*)
-    boost::shared_ptr<gd::ObjectsEditor> objectsEditor;
-    boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
-    boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
-    boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
+    std::shared_ptr<gd::ObjectsEditor> objectsEditor;
+    std::shared_ptr<gd::LayersEditorPanel> layersEditor;
+    std::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
+    std::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 
     gd::Project & project;
     gd::Layout & layout;

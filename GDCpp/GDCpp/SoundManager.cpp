@@ -38,22 +38,22 @@ void SoundManager::ManageGarbage()
     }
 }
 
-boost::shared_ptr<Music> & SoundManager::GetMusicOnChannel(int channel)
+std::shared_ptr<Music> & SoundManager::GetMusicOnChannel(int channel)
 {
     return musicsChannel[channel];
 }
 
-void SoundManager::SetMusicOnChannel(int channel, boost::shared_ptr<Music> music)
+void SoundManager::SetMusicOnChannel(int channel, std::shared_ptr<Music> music)
 {
     musicsChannel[channel] = music;
 }
 
-void SoundManager::SetSoundOnChannel(int channel, boost::shared_ptr<Sound> sound)
+void SoundManager::SetSoundOnChannel(int channel, std::shared_ptr<Sound> sound)
 {
     soundsChannel[channel] = sound;
 }
 
-boost::shared_ptr<Sound> & SoundManager::GetSoundOnChannel(int channel)
+std::shared_ptr<Sound> & SoundManager::GetSoundOnChannel(int channel)
 {
     return soundsChannel[channel];
 }
@@ -70,20 +70,20 @@ void SoundManager::SetGlobalVolume(float volume)
         globalVolume = 100.0;
 
     //Mise à jour des volumes des sons
-    for (std::map<unsigned int, boost::shared_ptr<Sound> >::iterator it = soundsChannel.begin();it != soundsChannel.end();++it)
+    for (std::map<unsigned int, std::shared_ptr<Sound> >::iterator it = soundsChannel.begin();it != soundsChannel.end();++it)
     {
-        if ( it->second != boost::shared_ptr<Sound>() ) (it->second)->UpdateVolume();
+        if ( it->second != std::shared_ptr<Sound>() ) (it->second)->UpdateVolume();
     }
-    for (std::map<unsigned int, boost::shared_ptr<Music> >::iterator it = musicsChannel.begin();it != musicsChannel.end();++it)
+    for (std::map<unsigned int, std::shared_ptr<Music> >::iterator it = musicsChannel.begin();it != musicsChannel.end();++it)
     {
-        if ( it->second != boost::shared_ptr<Music>() ) it->second->UpdateVolume();
+        if ( it->second != std::shared_ptr<Music>() ) it->second->UpdateVolume();
     }
     for (unsigned int i =0;i<sounds.size();++i)
     {
-        if ( sounds[i] != boost::shared_ptr<Sound>() ) sounds[i]->UpdateVolume();
+        if ( sounds[i] != std::shared_ptr<Sound>() ) sounds[i]->UpdateVolume();
     }
     for (unsigned int i =0;i<musics.size();++i)
     {
-        if ( musics[i] != boost::shared_ptr<Music>() ) musics[i]->UpdateVolume();
+        if ( musics[i] != std::shared_ptr<Music>() ) musics[i]->UpdateVolume();
     }
 }

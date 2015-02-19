@@ -20,7 +20,6 @@
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include <wx/config.h>
-#include <boost/algorithm/string.hpp>
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -277,8 +276,8 @@ bool InstructionSelectorDialog::MatchSearchCriteria(std::string search, const gd
 {
     if (search.empty()) return true;
 
-    return boost::to_upper_copy(instrMetadata.GetGroup()).find(search) != string::npos ||
-        boost::to_upper_copy(instrMetadata.GetFullName()).find(search) != string::npos;
+    return gd::StrUppercase(instrMetadata.GetGroup()).find(search) != string::npos ||
+        gd::StrUppercase(instrMetadata.GetFullName()).find(search) != string::npos;
 }
 
 /**
@@ -289,11 +288,11 @@ void InstructionSelectorDialog::RefreshList()
     instructionsTree->DeleteAllItems();
     instructionsTree->AddRoot(editingAction ? _("All actions") : _("All conditions"), 0);
 
-    std::string search = boost::to_upper_copy(gd::ToString(searchCtrl->GetValue()));
+    std::string search = gd::StrUppercase(gd::ToString(searchCtrl->GetValue()));
     bool searching = search.empty() ? false : true;
 
     //Insert extension instructions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
+    const vector < std::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
     for (unsigned int i = 0;i<extensions.size();++i)
     {
         //Verify if that extension is enabled

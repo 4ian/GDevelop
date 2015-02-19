@@ -5,7 +5,7 @@ Copyright (c) 2014-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "PlatformerObjectAutomatism.h"
 #include "PlatformAutomatism.h"
 #include "ScenePlatformObjectsManager.h"

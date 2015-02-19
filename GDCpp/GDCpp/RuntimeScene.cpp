@@ -72,9 +72,9 @@ RuntimeScene::~RuntimeScene()
 {
 	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
-        if ( extension != boost::shared_ptr<ExtensionBase>() )
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != std::shared_ptr<ExtensionBase>() )
             extension->SceneUnloaded(*this);
     }
 
@@ -82,7 +82,7 @@ RuntimeScene::~RuntimeScene()
                               //RuntimeScene members which so need to be destroyed AFTER objects.
 }
 
-boost::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
+std::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
 {
     return game->GetImageManager();
 }
@@ -428,7 +428,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 class ObjectsFromInitialInstanceCreator : public gd::InitialInstanceFunctor
 {
 public:
-    ObjectsFromInitialInstanceCreator(gd::Project & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap_) :
+    ObjectsFromInitialInstanceCreator(gd::Project & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap_) :
         game(game_),
         scene(scene_),
         xOffset(xOffset_),
@@ -443,14 +443,14 @@ public:
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
 
-        RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
+        RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
 
         if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
         else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
             newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-        if ( newObject != boost::shared_ptr<RuntimeObject> () )
+        if ( newObject != std::shared_ptr<RuntimeObject> () )
         {
             newObject->SetX( instance.GetX() + xOffset );
             newObject->SetY( instance.GetY() + yOffset );
@@ -481,10 +481,10 @@ private:
     RuntimeScene & scene;
     float xOffset;
     float yOffset;
-    std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap;
+    std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap;
 };
 
-void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap)
+void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap)
 {
     ObjectsFromInitialInstanceCreator func(*game, *this, xOffset, yOffset, optionalMap);
     const_cast<gd::InitialInstancesContainer&>(container).IterateOverInstances(func);
@@ -545,9 +545,9 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     //Extensions specific initialization
 	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
-        if ( extension != boost::shared_ptr<ExtensionBase>() )
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != std::shared_ptr<ExtensionBase>() )
         {
             extension->SceneLoaded(*this);
             if ( extension->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extension.get());

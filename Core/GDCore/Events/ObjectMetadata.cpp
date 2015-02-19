@@ -7,6 +7,7 @@
 #include "ObjectMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
+#include <algorithm>
 #include <iostream>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/SkinHelper.h"

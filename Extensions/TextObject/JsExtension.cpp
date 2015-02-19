@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Version.h"
 #include "TextObject.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 

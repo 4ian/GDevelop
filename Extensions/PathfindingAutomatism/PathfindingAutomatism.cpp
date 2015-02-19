@@ -5,8 +5,8 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include <boost/shared_ptr.hpp>
-#include <boost/unordered_map.hpp>
+#include <memory>
+#include <unordered_map>
 #include <iostream>
 #include <set>
 #include "PathfindingAutomatism.h"
@@ -29,8 +29,6 @@ This project is released under the MIT License.
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
 
-namespace
-{
 
 /**
  * \brief Internal tool class representing the position of a node when looking for a path.
@@ -42,20 +40,6 @@ public:
 
     int x;
     int y;
-
-    /**
-     * \brief Tool function used to store a NodePosition as key in boost::unordered_set.
-     */
-    struct NodePositionHash : std::unary_function<NodePosition, std::size_t>
-    {
-        std::size_t operator()(NodePosition const & n) const
-        {
-            std::size_t seed = 0;
-            boost::hash_combine(seed, n.x);
-            boost::hash_combine(seed, n.y);
-            return seed;
-        }
-    };
 };
 
 std::ostream& operator<<(std::ostream& stream, const NodePosition & nodePos)
@@ -64,6 +48,29 @@ std::ostream& operator<<(std::ostream& stream, const NodePosition & nodePos)
     return stream;
 }
 
+bool operator==(const NodePosition &a, const NodePosition &b)
+{
+    return ((a.x == b.y) && (a.y == b.y));
+}
+
+namespace std
+{
+/**
+ * \brief Tool function used to store a NodePosition as key in std::unordered_set.
+ */
+template<>
+struct hash<NodePosition>
+{
+    std::size_t operator()(NodePosition const & n) const
+    {
+        return (std::hash<int>()(n.x)) ^ (std::hash<int>()(n.y) << 1);
+    }
+};
+
+}
+
+namespace
+{
 /**
  * \brief Internal tool class representing a node when looking for a path
  */
@@ -357,7 +364,7 @@ private:
         }
     }
 
-    boost::unordered_map< NodePosition, Node, NodePosition::NodePositionHash > allNodes; ///< All the nodes
+    std::unordered_map< NodePosition, Node > allNodes; ///< All the nodes
     std::multiset<Node*, Node::NodeComparator> openNodes; ///< Only the open nodes (Such that Node::open == true)
     const ScenePathfindingObstaclesManager & obstacles; ///< A reference to all the obstacles of the scene
     Node * finalNode; //If computation succeeded, the final node is stored here.

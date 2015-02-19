@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "AdvancedXMLRefManager.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.

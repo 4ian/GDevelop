@@ -24,7 +24,7 @@ public:
     ProfileEvent& operator=(const ProfileEvent & event);
     virtual ProfileEvent * Clone() const { return new ProfileEvent(*this);}
 
-    void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
+    void SetPreviousProfileEvent( std::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 
     virtual bool IsExecutable() const {return true;}
     virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
@@ -34,7 +34,7 @@ public:
 private:
     void Init(const ProfileEvent & event);
 
-    boost::shared_ptr<ProfileEvent> previousProfileEvent;
+    std::shared_ptr<ProfileEvent> previousProfileEvent;
 };
 
 #endif // PROFILEEVENT_H

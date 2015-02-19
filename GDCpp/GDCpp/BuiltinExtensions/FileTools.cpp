@@ -3,7 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -26,7 +26,7 @@ bool GD_API FileExists( const std::string & file )
 
 bool GD_API GroupExists( const std::string & filename, const std::string & group )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
+    std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
@@ -117,7 +117,7 @@ void GD_API UnloadFileFromMemory( const std::string & filename )
 
 void GD_API DeleteGroupFromFile( const std::string & filename, const std::string & group )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
+    std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
@@ -156,7 +156,7 @@ void GD_API DeleteGroupFromFile( const std::string & filename, const std::string
 
 void GD_API WriteValueInFile( const std::string & filename, const std::string & group, double value )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
+    std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
@@ -212,7 +212,7 @@ void GD_API WriteValueInFile( const std::string & filename, const std::string & 
 
 void GD_API WriteStringInFile( const std::string & filename, const std::string & group, const std::string & str )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
+    std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
@@ -267,7 +267,7 @@ void GD_API WriteStringInFile( const std::string & filename, const std::string &
 
 void GD_API ReadValueFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
+    std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
@@ -303,7 +303,7 @@ void GD_API ReadValueFromFile( const std::string & filename, const std::string &
 
 void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
+    std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes

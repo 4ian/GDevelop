@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "PlatformerObjectAutomatism.h"
 #include "PlatformAutomatism.h"
 #include "ScenePlatformObjectsManager.h"
-#include <boost/version.hpp>
+
 
 void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
 {
@@ -28,8 +28,8 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
               "",
               "CppPlatform/Extensions/platformerobjecticon.png",
               "PlatformerObjectAutomatism",
-              boost::shared_ptr<gd::Automatism>(new PlatformerObjectAutomatism),
-              boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+              std::shared_ptr<gd::Automatism>(new PlatformerObjectAutomatism),
+              std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
         #if defined(GD_IDE_ONLY)
         aut.SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
@@ -407,8 +407,8 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
               "",
               "CppPlatform/Extensions/platformicon.png",
               "PlatformAutomatism",
-              boost::shared_ptr<gd::Automatism>(new PlatformAutomatism),
-              boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+              std::shared_ptr<gd::Automatism>(new PlatformAutomatism),
+              std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
         #if defined(GD_IDE_ONLY)
         aut.SetIncludeFile("PlatformAutomatism/PlatformAutomatism.h");

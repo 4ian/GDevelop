@@ -3,8 +3,9 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <boost/algorithm/string.hpp>
-#include <boost/weak_ptr.hpp>
+
+#include <memory>
+#include "GDCore/CommonTools.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/Events/ExpressionMetadata.h"
@@ -514,11 +515,11 @@ std::string ReplaceAllOccurences(string context, const string& from, const strin
 
 std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, const string& to)
 {
-    boost::to_upper(from);
+    from = gd::StrUppercase(from);
 
     size_t lookHere = 0;
     size_t foundHere;
-    while((foundHere = boost::to_upper_copy(context).find(from, lookHere)) != string::npos)
+    while((foundHere = gd::StrUppercase(context).find(from, lookHere)) != string::npos)
     {
           context.replace(foundHere, from.size(), to);
           lookHere = foundHere + to.size();
@@ -600,7 +601,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
             {
                 if (!eventAddedInResults && SearchStringInConditions(project, layout, *conditionsVectors[j], search, matchCase))
                 {
-                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
+                    results.push_back(EventsSearchResult(std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
                 }
             }
         }
@@ -612,7 +613,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
             {
                 if (!eventAddedInResults && SearchStringInActions(project, layout, *actionsVectors[j], search, matchCase))
                 {
-                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
+                    results.push_back(EventsSearchResult(std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)), &events, i));
                 }
             }
         }
@@ -629,14 +630,14 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 
 bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string search, bool matchCase)
 {
-    if ( !matchCase ) boost::to_upper(search);
+    if ( !matchCase ) search = gd::StrUppercase(search);
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
         for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? actions[aId].GetParameter(pNb).GetPlainString().find(search) :
-                                     boost::to_upper_copy(actions[aId].GetParameter(pNb).GetPlainString()).find(search);
+                                     gd::StrUppercase(actions[aId].GetParameter(pNb).GetPlainString()).find(search);
 
             if ( foundPosition != std::string::npos ) return true;
         }
@@ -650,14 +651,14 @@ bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout &
 
 bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string search, bool matchCase)
 {
-    if ( !matchCase ) boost::to_upper(search);
+    if ( !matchCase ) search = gd::StrUppercase(search);
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
         for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? conditions[cId].GetParameter(pNb).GetPlainString().find(search) :
-                                     boost::to_upper_copy(conditions[cId].GetParameter(pNb).GetPlainString()).find(search);
+                                     gd::StrUppercase(conditions[cId].GetParameter(pNb).GetPlainString()).find(search);
 
             if ( foundPosition != std::string::npos ) return true;
         }
@@ -669,7 +670,7 @@ bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layou
     return false;
 }
 
-EventsSearchResult::EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
+EventsSearchResult::EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)

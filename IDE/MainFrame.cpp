@@ -289,8 +289,8 @@ MainFrame::MainFrame( wxWindow* parent ) :
     //Update the file menu with exporting items
     for (unsigned int i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
     {
-        boost::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporter();
-        if ( exporter != boost::shared_ptr<gd::ProjectExporter>()
+        std::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporter();
+        if ( exporter != std::shared_ptr<gd::ProjectExporter>()
              && !exporter->GetProjectExportButtonLabel().empty() )
         {
             long id = wxNewId();

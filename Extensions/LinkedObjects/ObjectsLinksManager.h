@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #include <map>
 #include <vector>
 #include <set>
-#include <boost/weak_ptr.hpp>
+
 class RuntimeObject;
 class RuntimeScene;
 

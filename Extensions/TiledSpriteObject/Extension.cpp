@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Version.h"
 #include "TiledSpriteObject.h"
 #include <iostream>
-#include <boost/version.hpp>
+
 
 void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 {

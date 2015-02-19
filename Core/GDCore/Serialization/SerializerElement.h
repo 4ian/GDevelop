@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/Serialization/SerializerValue.h"
 
 namespace gd {
@@ -197,7 +197,7 @@ public:
     /**
      * \brief Return all the children of the element.
      */
-	const std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
+	const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
     ///@}
 
 	static SerializerElement nullElement;
@@ -207,7 +207,7 @@ private:
 	SerializerValue elementValue;
 
 	std::map< std::string, SerializerValue > attributes;
-	std::vector< std::pair<std::string, boost::shared_ptr<SerializerElement> > > children;
+	std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > children;
 	mutable std::string arrayOf;
 	mutable std::string deprecatedArrayOf;
 };

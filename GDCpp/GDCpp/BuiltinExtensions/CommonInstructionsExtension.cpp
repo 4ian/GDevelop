@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 
+#include <algorithm>
 #include <string>
 #include <set>
 #include "GDCore/BuiltinExtensions/AllBuiltinExtensions.h"
@@ -117,7 +118,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         GetAllConditions()["BuiltinCommonInstructions::Or"].codeExtraInformation
-            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
@@ -141,7 +142,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         GetAllConditions()["BuiltinCommonInstructions::And"].codeExtraInformation
-            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
@@ -184,7 +185,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         GetAllConditions()["BuiltinCommonInstructions::Not"]
-            .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+            .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
@@ -199,7 +200,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         GetAllConditions()["BuiltinCommonInstructions::Once"].codeExtraInformation
-            .SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
+            .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
@@ -237,7 +238,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::Standard"]
-            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+            .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -288,7 +289,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::Link"]
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -343,7 +344,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::While"]
-            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+            .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -402,7 +403,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::Repeat"]
-            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+            .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -534,7 +535,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::ForEach"]
-            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+            .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -548,7 +549,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         GetAllEvents()["BuiltinCommonInstructions::Group"]
-            .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+            .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     {
@@ -628,8 +629,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Execute C++ code"),
                   "",
                   "res/source_cpp16.png",
-                  boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent))
-                  .SetCodeGenerator(boost::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
+                  std::shared_ptr<gd::BaseEvent>(new CppCodeEvent))
+                  .SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
     }
 
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));

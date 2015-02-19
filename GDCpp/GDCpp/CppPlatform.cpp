@@ -80,32 +80,32 @@ CppPlatform::CppPlatform() :
 #endif
 
     std::cout << "* Loading builtin extensions... "; std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new MouseExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new MathematicalToolsExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension())); std::cout.flush();
-    AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new BaseObjectExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new SpriteExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new CommonInstructionsExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new CommonConversionsExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new VariablesExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new MouseExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new KeyboardExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new JoystickExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new SceneExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new TimeExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new MathematicalToolsExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new CameraExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new AudioExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new FileExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new NetworkExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new WindowExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new StringInstructionsExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new AdvancedExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension())); std::cout.flush();
     std::cout << "done." << std::endl;
 }
 
-bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension)
+bool CppPlatform::AddExtension(std::shared_ptr<gd::PlatformExtension> platformExtension)
 {
-    boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(platformExtension);
-    if (extension == boost::shared_ptr<ExtensionBase>())
+    std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(platformExtension);
+    if (extension == std::shared_ptr<ExtensionBase>())
     {
         std::cout << "ERROR: Tried to add an incompatible extension to C++ Platform" << std::endl;
         return false;
@@ -129,19 +129,19 @@ bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platform
     return true;
 }
 
-boost::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & scene, gd::Object & object)
+std::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & scene, gd::Object & object)
 {
     const std::string & type = object.GetType();
 
     if ( runtimeObjCreationFunctionTable.find(type) == runtimeObjCreationFunctionTable.end() )
     {
         std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
-        return boost::shared_ptr<RuntimeObject>();
+        return std::shared_ptr<RuntimeObject>();
     }
 
     //Create a new object with the type we want.
     RuntimeObject * newObject = runtimeObjCreationFunctionTable[type](scene, object);
-    return boost::shared_ptr<RuntimeObject>(newObject);
+    return std::shared_ptr<RuntimeObject>(newObject);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -151,14 +151,14 @@ std::string CppPlatform::GetDescription() const
 }
 
 #if !defined(GD_NO_WX_GUI)
-boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
+std::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
-    return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
+    return std::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
 }
 
-boost::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
+std::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
 {
-    return boost::shared_ptr<gd::ProjectExporter>(new Exporter);
+    return std::shared_ptr<gd::ProjectExporter>(new Exporter);
 }
 #endif
 

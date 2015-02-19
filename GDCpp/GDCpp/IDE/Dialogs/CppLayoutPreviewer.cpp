@@ -269,7 +269,7 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 
     //Create now the window if necessary (not done in the constructor because, on linux, the window was not hidden).
     if (!externalPreviewWindow)
-        externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
+        externalPreviewWindow = std::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
 
     externalPreviewWindow->Show(true);
     externalPreviewWindow->renderCanvas->setFramerateLimit( previewGame.GetMaximumFPS() );
@@ -351,7 +351,7 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
     {
         if ( !debugger )
         {
-            debugger = boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(editor.GetParentControl(), previewScene) );
+            debugger = std::shared_ptr<DebuggerGUI>(new DebuggerGUI(editor.GetParentControl(), previewScene) );
             if ( !parentAuiManager->GetPane("DBG").IsOk() )
                 parentAuiManager->AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
             else
@@ -359,7 +359,7 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
         }
         if ( !profiler )
         {
-            profiler = boost::shared_ptr<ProfileDlg>(new ProfileDlg(editor.GetParentControl(), *this));
+            profiler = std::shared_ptr<ProfileDlg>(new ProfileDlg(editor.GetParentControl(), *this));
             editor.GetLayout().SetProfiler(profiler.get());
             if ( !parentAuiManager->GetPane("PROFILER").IsOk() )
                 parentAuiManager->AddPane( profiler.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );

@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <stdexcept>
 #include <fstream>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/Tools/Localization.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>

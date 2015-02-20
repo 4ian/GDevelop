@@ -67,6 +67,9 @@ IMPLEMENT_APP(Game_Develop_EditorApp)
  */
 bool Game_Develop_EditorApp::OnInit()
 {
+    //Disable assertions
+    wxDisableAsserts();
+    
     //Setting up working directory:
 #ifdef LINUX
     string tmp; //Make sure current working directory is executable directory.

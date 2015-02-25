@@ -23,6 +23,7 @@ SceneExtension::SceneExtension()
 
     #if defined(GD_IDE_ONLY)
     GetAllExpressions()["Random"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllStrExpressions()["CurrentSceneName"].codeExtraInformation.SetFunctionName("GetSceneName").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllConditions()["DepartScene"].codeExtraInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["Scene"].codeExtraInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["Quit"].codeExtraInformation.SetFunctionName("StopGame").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");

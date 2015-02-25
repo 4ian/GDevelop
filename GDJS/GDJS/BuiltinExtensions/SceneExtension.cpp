@@ -27,6 +27,8 @@ SceneExtension::SceneExtension()
 
     GetAllExpressions()["Random"].codeExtraInformation
         .SetFunctionName("gdjs.random");
+    GetAllStrExpressions()["CurrentSceneName"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.runtimeScene.getSceneName");
 
     GetAllConditions()["DepartScene"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.runtimeScene.sceneJustBegins");

@@ -788,8 +788,8 @@ gdjs.SpriteRuntimeObject.prototype.turnTowardObject = function(obj, scene) {
  */
 gdjs.SpriteRuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
     var mousePos = runtimeScene.getLayer(this.layer).convertCoords(
-        runtimeScene.getGame().getMouseX(),
-        runtimeScene.getGame().getMouseY());
+        runtimeScene.getGame().getInputManager().getMouseX(),
+        runtimeScene.getGame().getInputManager().getMouseY());
 
     if (this.getDrawableX() <= mousePos[0]
         && this.getDrawableX() + this.getWidth() >= mousePos[0]

@@ -297,6 +297,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "commontools.js");
+    InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");
     InsertUnique(includesFiles, "runtimescene.js");
     InsertUnique(includesFiles, "polygon.js");

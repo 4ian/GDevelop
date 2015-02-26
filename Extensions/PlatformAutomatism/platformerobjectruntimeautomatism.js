@@ -68,8 +68,8 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     var requestedDeltaY = 0;
 
     //Change the speed according to the player's input.
-    this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(LEFTKEY);
-    this._rightKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(RIGHTKEY);
+    this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+    this._rightKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
     if ( this._leftKey ) this._currentSpeed -= this._acceleration*timeDelta;
     if ( this._rightKey ) this._currentSpeed += this._acceleration*timeDelta;
 
@@ -149,7 +149,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     //2) Y axis:
 
     //Go on a ladder
-    this._ladderKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(UPKEY);
+    this._ladderKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
     if (this._ladderKey && this._isOverlappingLadder()) {
         this._canJump = true;
         this._isOnFloor = false;
@@ -160,8 +160,8 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     }
 
     if ( this._isOnLadder ) {
-        this._upKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(UPKEY);
-        this._downKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(DOWNKEY);
+        this._upKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+        this._downKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
         if ( this._upKey )
             requestedDeltaY -= 150*timeDelta;
         if ( this._downKey )
@@ -183,7 +183,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     }
 
     //Jumping
-    this._jumpKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(SHIFTKEY);
+    this._jumpKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(SHIFTKEY);
     if ( this._canJump && this._jumpKey ) {
         this._jumping = true;
         this._canJump = false;

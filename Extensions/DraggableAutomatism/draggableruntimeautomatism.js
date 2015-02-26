@@ -31,13 +31,13 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
     var mousePos = null;
 
     //Begin drag ?
-    if ( !this._dragged && runtimeScene.getGame().isMouseButtonPressed(0) &&
+    if ( !this._dragged && runtimeScene.getGame().getInputManager().isMouseButtonPressed(0) &&
          !gdjs.DraggableRuntimeAutomatism.leftPressedLastFrame &&
          !gdjs.DraggableRuntimeAutomatism.draggingSomething ) {
 
         mousePos = runtimeScene.getLayer(this.owner.getLayer()).convertCoords(
-            runtimeScene.getGame().getMouseX(),
-            runtimeScene.getGame().getMouseY());
+            runtimeScene.getGame().getInputManager().getMouseX(),
+            runtimeScene.getGame().getInputManager().getMouseY());
 
         if (this.owner.getDrawableX() <= mousePos[0]
             && this.owner.getDrawableX() + this.owner.getWidth() >= mousePos[0]
@@ -45,8 +45,8 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
             && this.owner.getDrawableY() + this.owner.getHeight() >= mousePos[1] ) {
 
             mousePos = runtimeScene.getLayer(this.owner.getLayer()).convertCoords(
-                runtimeScene.getGame().getMouseX(),
-                runtimeScene.getGame().getMouseY());
+                runtimeScene.getGame().getInputManager().getMouseX(),
+                runtimeScene.getGame().getInputManager().getMouseY());
 
             this._dragged = true;
             gdjs.DraggableRuntimeAutomatism.draggingSomething = true;
@@ -55,7 +55,7 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
         }
     }
     //End dragging ?
-    else if ( !runtimeScene.getGame().isMouseButtonPressed(0) ) {
+    else if ( !runtimeScene.getGame().getInputManager().isMouseButtonPressed(0) ) {
         this._dragged = false;
         gdjs.DraggableRuntimeAutomatism.draggingSomething = false;
     }
@@ -64,8 +64,8 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
     if ( this._dragged ) {
         if ( mousePos === null ) {
             mousePos = runtimeScene.getLayer(this.owner.getLayer()).convertCoords(
-                runtimeScene.getGame().getMouseX(),
-                runtimeScene.getGame().getMouseY());
+                runtimeScene.getGame().getInputManager().getMouseX(),
+                runtimeScene.getGame().getInputManager().getMouseY());
         }
 
         this.owner.setX(mousePos[0] - this._xOffset);
@@ -75,7 +75,7 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
 
 gdjs.DraggableRuntimeAutomatism.prototype.doStepPostEvents = function(runtimeScene) {
     gdjs.DraggableRuntimeAutomatism.leftPressedLastFrame =
-        runtimeScene.getGame().isMouseButtonPressed(0);
+        runtimeScene.getGame().getInputManager().isMouseButtonPressed(0);
 };
 
 gdjs.DraggableRuntimeAutomatism.prototype.isDragged = function(runtimeScene) {

@@ -9,6 +9,7 @@
 #include <string>
 #include <fstream>
 #include <stdio.h>
+#include <SFML/System/Utf.hpp>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
@@ -734,7 +735,6 @@ bool Project::LoadFromFile(const std::string & filename)
     #if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
     //Get the declaration element
     TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
-    std::cout << declXmlElement->Encoding() << std::endl;
     if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
     {
         //The document is not encoded in UTF8, we need to convert the file first then reload it
@@ -750,38 +750,33 @@ bool Project::LoadFromFile(const std::string & filename)
 
         fclose(docFile);
 
-        /*if(!::utf8::is_valid(docStr.begin(), docStr.end())) //Even if the declaration is not UTF8, the project might have been saved in UTF8 (on Linux with UTF8 locale)
-        {*/
-        std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
-
-        std::string newFilename = filename + ".utf8";
-        docFile = fopen(newFilename.c_str(), "w");
-
-        std::string convertedStr;
-        try
+        if(!::utf8::is_valid(docStr.begin(), docStr.end())) //Even if the declaration is not UTF8, the project might have been saved in UTF8 (on Linux with UTF8 locale)
         {
-            #if defined(WINDOWS)
-            convertedStr = gd::utf8::ReplaceInvalid(gd::utf8::FromLocaleString(docStr));
-            #else
-            convertedStr = gd::utf8::ReplaceInvalid(docStr);
-            gd::LogWarning("The project file comes from an old Windows version and is not encoded in UTF8.\nPlease convert your project file to UTF8 using an external text editor or GDevelop on Windows before opening the project file.");
-            return false;
-            #endif
+            std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
+
+            std::string newFilename = filename + ".utf8";
+            docFile = fopen(newFilename.c_str(), "w");
+
+            std::string convertedStr;
+            try
+            {
+                //Convert the file from Latin1 (ISO-8859-1)
+                sf::Utf8::fromLatin1(docStr.begin(), docStr.end(), std::back_inserter(convertedStr));
+            }
+            catch(const std::exception &exc)
+            {
+                std::cout << "Can't convert to UTF8, use the old content with invalid codepoints removed !" << std::endl;
+                convertedStr = gd::utf8::ReplaceInvalid(docStr);
+            }
+
+            fputs(convertedStr.c_str() + '\0', docFile);
+
+            fclose(docFile);
+
+            doc.LoadFile(newFilename.c_str(), TIXML_ENCODING_UTF8);
+            
+            std::cout << " -> Conversion ended !" << std::endl;
         }
-        catch(const std::exception &exc)
-        {
-            std::cout << "Can't convert to UTF8, use the old content with invalid codepoints removed !" << std::endl;
-            convertedStr = gd::utf8::ReplaceInvalid(docStr);
-        }
-
-        fputs(convertedStr.c_str() + '\0', docFile);
-
-        fclose(docFile);
-
-        doc.LoadFile(newFilename.c_str(), TIXML_ENCODING_UTF8);
-        
-        std::cout << " -> Conversion ended !" << std::endl;
-        //}
     }
     #endif
     //END OF COMPATIBILITY CODE

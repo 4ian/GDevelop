@@ -635,7 +635,7 @@ void FullProjectCompilerConsoleDiagnosticManager::OnCompilationFailed()
 
 void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSuccessed()
 {
-    cout << _("Compilation successed.") << endl;
+    cout << _("Compilation succeeded.") << endl;
 }
 
 void FullProjectCompilerConsoleDiagnosticManager::OnMessage(std::string message, std::string message2)

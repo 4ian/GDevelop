@@ -16,6 +16,7 @@
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/Text.h"
+#include "GDCpp/InputManager.h"
 #include "GDCpp/ManualTimer.h"
 #include "GDCpp/AutomatismsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
@@ -78,6 +79,16 @@ public:
     std::shared_ptr<gd::ImageManager> GetImageManager() const;
 
     /**
+     * \brief Get the input manager used to handle mouse, keyboard and touches events.
+     */
+    const InputManager & GetInputManager() const { return inputManager; }
+
+    /**
+     * \brief Get the input manager used to handle mouse, keyboard and touches events.
+     */
+    InputManager & GetInputManager() { return inputManager; }
+
+    /**
      * Get the layer with specified name.
      */
     RuntimeLayer & GetRuntimeLayer(const std::string & name);
@@ -137,20 +148,10 @@ public:
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
     /**
-     * Return true if window has focus.
-     */
-    bool RenderWindowHasFocus() { return windowHasFocus; }
-
-    /**
      * After calling this method, RenderAndStep() will return the number passed as parameter.
      * \see RenderAndStep
      */
     void GotoSceneWhenEventsAreFinished(int scene);
-
-    /**
-     * \brief Return the key code (see sf::Keyboard::Key) of the latest pressed key.
-     */
-    int GetLastPressedKey() { return lastPressedKey; }
 
     /**
      * Render and play the scene one frame.
@@ -193,22 +194,6 @@ public:
      * \param pauseTime_ Pause duration, in microseconds.
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
-
-    /**
-     * Get a read-only list of SFML events managed by the render target.
-     */
-    const std::vector<sf::Event> & GetRenderTargetEvents() const { return renderTargetEvents; }
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Get a list, with read-write access, of SFML events managed by the render target.
-     * \note This method is used by the IDE ( class SceneEditorCanvas precisely ) to manually inject
-     * events not caught by SFML on linux when using a wxSFMLCanvas.
-     * \warning You should not rely on this method as it could be removed when this specific problem will be fixed
-     * ( but you can safely use the const version of this method )
-     */
-    std::vector<sf::Event> & GetRenderTargetEvents() { return renderTargetEvents; }
-    #endif
 
     /** \name Code execution engine
      * Functions members giving access to the code execution engine.
@@ -256,14 +241,18 @@ protected:
      */
     void ManageObjectsAfterEvents();
 
+    /**
+     * \brief Set the OpenGL projection according to the window size and OpenGL scene options.
+     */
+    void SetupOpenGLProjection();
+
     bool UpdateTime();
 
     bool DisplayLegacyTexts(std::string layer = "");
 
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
-    std::vector<sf::Event>                  renderTargetEvents;
-    int                                     lastPressedKey;
+    InputManager                            inputManager;
     signed int                              realElapsedTime; ///< Elapsed time since last frame, in microseconds, without taking time scale in account.
     signed int                              elapsedTime; ///< Elapsed time since last frame, in microseconds ( elapsedTime = realElapsedTime*timeScale ).
     double                                  timeScale; ///< Time scale
@@ -273,7 +262,6 @@ protected:
     RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
-    bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
     AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;

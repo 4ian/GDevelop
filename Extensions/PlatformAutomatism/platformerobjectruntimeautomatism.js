@@ -60,6 +60,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     var RIGHTKEY = 39;
     var DOWNKEY = 40;
     var SHIFTKEY = 16;
+    var SPACEKEY = 32;
     var object = this.owner;
     var timeDelta = runtimeScene.getElapsedTime()/1000;
 
@@ -183,7 +184,9 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     }
 
     //Jumping
-    this._jumpKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(SHIFTKEY);
+    this._jumpKey |= !this._ignoreDefaultControls &&
+        (runtimeScene.getGame().getInputManager().isKeyPressed(SHIFTKEY) ||
+        runtimeScene.getGame().getInputManager().isKeyPressed(SPACEKEY));
     if ( this._canJump && this._jumpKey ) {
         this._jumping = true;
         this._canJump = false;

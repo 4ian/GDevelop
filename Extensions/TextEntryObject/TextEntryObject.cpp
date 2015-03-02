@@ -48,19 +48,16 @@ void RuntimeTextEntryObject::UpdateTime(float)
     if (!activated || scene == NULL) return;
 
     //Retrieve text entered
-    const std::vector<sf::Event> & events = scene->GetRenderTargetEvents();
-    for (unsigned int i = 0;i<events.size();++i)
+    const auto & characters = scene->GetInputManager().GetCharactersEntered();
+    for (unsigned int i = 0;i<characters.size();++i)
     {
-        if (events[i].type == sf::Event::TextEntered )
+        //Skip some non displayable characters
+        if (characters[i] > 30 && (characters[i] < 127 || characters[i] > 159))
+            text += characters[i];
+        else if (characters[i] == 8)
         {
-            //Skip some non displayable characters
-            if (events[i].text.unicode > 30 && (events[i].text.unicode < 127 || events[i].text.unicode > 159))
-                text += events[i].text.unicode;
-            else if (events[i].text.unicode == 8)
-            {
-                //Backspace
-                if ( !text.empty() ) text.erase(text.end()-1);
-            }
+            //Backspace
+            if (!text.empty()) text.erase(text.end()-1);
         }
     }
 }

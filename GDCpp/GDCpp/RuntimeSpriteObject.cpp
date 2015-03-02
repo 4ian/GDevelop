@@ -596,7 +596,7 @@ bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 
     for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
-        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(sf::Mouse::getPosition(*scene.renderWindow),
+        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(scene.GetInputManager().GetMousePosition(),
                                                                   theLayer.GetCamera(cameraIndex).GetSFMLView());
 
         if  ( GetDrawableX() <= mousePos.x

@@ -53,7 +53,7 @@ TextObject::~TextObject()
 
 void TextObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    SetString(utf8::ReplaceInvalid(element.GetChild("string", 0,"String").GetValue().GetString()));
+    SetString(element.GetChild("string", 0,"String").GetValue().GetString());
     SetFontFilename(element.GetChild("font", 0,"Font").GetValue().GetString());
     SetCharacterSize(element.GetChild("characterSize", 0, "CharacterSize").GetValue().GetInt());
     SetColor(element.GetChild("color", 0,"Color").GetIntAttribute("r", 255),
@@ -71,7 +71,7 @@ void TextObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerEl
 void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
     sf::Text sfText;
-    sfText.setString(utf8::ToSfString(text));
+    sfText.setString(gd::utf8::ToSfString(text));
     sfText.setCharacterSize(characterSize);
     sfText.setStyle((bold ? sf::Text::Bold : 0) |
                  (IsItalic() ? sf::Text::Italic : 0) |
@@ -89,7 +89,7 @@ void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderT
 sf::Vector2f TextObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     sf::Text sfText;
-    sfText.setString(utf8::ToSfString(text));
+    sfText.setString(gd::utf8::ToSfString(text));
     sfText.setCharacterSize(characterSize);
     sfText.setStyle((bold ? sf::Text::Bold : 0) |
                  (IsItalic() ? sf::Text::Italic : 0) |
@@ -232,13 +232,13 @@ float RuntimeTextObject::GetHeight() const
 
 void RuntimeTextObject::SetString(const std::string & str) 
 { 
-    text.setString(utf8::ToSfString(str)); 
+    text.setString(gd::utf8::ToSfString(str)); 
     text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); 
 }
 
 std::string RuntimeTextObject::GetString() const 
 {
-    return utf8::FromSfString(text.getString());
+    return gd::utf8::FromSfString(text.getString());
 }
 
 /**

@@ -177,8 +177,8 @@ void DebuggerGUI::UpdateGUI()
     for (std::map < std::string, gd::Variable* >::const_iterator it = sceneVariables.begin();
         it!=sceneVariables.end();++it, ++i)
     {
-        m_generalList->SetItem(generalBaseItemCount+i, 0, utf8::ToWxString(it->first));
-        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : utf8::ToWxString(it->second->GetString()));
+        m_generalList->SetItem(generalBaseItemCount+i, 0, gd::utf8::ToWxString(it->first));
+        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::utf8::ToWxString(it->second->GetString()));
         m_generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -198,8 +198,8 @@ void DebuggerGUI::UpdateGUI()
     for (std::map < std::string, gd::Variable* >::const_iterator it = gameVariables.begin();
         it!=gameVariables.end();++it, ++i)
     {
-        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, utf8::ToWxString(it->first));
-        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : utf8::ToWxString(it->second->GetString()));
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, gd::utf8::ToWxString(it->first));
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::utf8::ToWxString(it->second->GetString()));
         m_generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -330,7 +330,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, uselessName, value);
-        m_objectList->SetItem(currentLine, 1, utf8::ToWxString(value));
+        m_objectList->SetItem(currentLine, 1, gd::utf8::ToWxString(value));
 
         currentLine++;
     }
@@ -341,7 +341,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
     {
         object->GetPropertyForDebugger(i, uselessName, value);
-        m_objectList->SetItem(currentLine, 1, utf8::ToWxString(value));
+        m_objectList->SetItem(currentLine, 1, gd::utf8::ToWxString(value));
 
         currentLine++;
     }
@@ -365,8 +365,8 @@ void DebuggerGUI::UpdateGUI()
     for (std::map < std::string, gd::Variable* >::const_iterator it = objectVariables.begin();
         it!=objectVariables.end();++it, ++i)
     {
-        m_objectList->SetItem(baseItemCount+i, 0, utf8::ToWxString(it->first));
-        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : utf8::ToWxString(it->second->GetString()));
+        m_objectList->SetItem(baseItemCount+i, 0, gd::utf8::ToWxString(it->first));
+        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::utf8::ToWxString(it->second->GetString()));
     }
 }
 
@@ -405,7 +405,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         std::string uselessName, oldValue;
         object->RuntimeObject::GetPropertyForDebugger(propNb, uselessName, oldValue);
-        std::string newValue = utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), utf8::ToWxString(oldValue)));
+        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), gd::utf8::ToWxString(oldValue)));
 
         if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
@@ -420,7 +420,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         std::string uselessName, oldValue;
         object->GetPropertyForDebugger(propNb, uselessName, oldValue);
-        std::string newValue = utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), utf8::ToWxString(oldValue)));
+        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), gd::utf8::ToWxString(oldValue)));
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
@@ -429,11 +429,11 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     }
     else //Or a variable
     {
-        std::string name = utf8::FromWxString(m_objectList->GetItemText(event.GetIndex()));
+        std::string name = gd::utf8::FromWxString(m_objectList->GetItemText(event.GetIndex()));
 
-        std::string newValue = utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
+        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
                                                                     _("Editing a variable"), 
-                                                                    utf8::ToWxString(object->GetVariables().Get(name).GetString())));
+                                                                    gd::utf8::ToWxString(object->GetVariables().Get(name).GetString())));
         object->GetVariables().Get(name).SetString(newValue);
     }
 }
@@ -445,20 +445,20 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
 {
     if ( event.GetIndex() < (generalBaseItemCount + scene.GetVariables().Count()))
     {
-        std::string name = utf8::FromWxString(m_generalList->GetItemText(event.GetIndex()));
+        std::string name = gd::utf8::FromWxString(m_generalList->GetItemText(event.GetIndex()));
 
-        std::string newValue = utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
+        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
                                                                     _("Editing a value"), 
-                                                                    utf8::ToWxString(scene.GetVariables().Get(name).GetString())));
+                                                                    gd::utf8::ToWxString(scene.GetVariables().Get(name).GetString())));
         scene.GetVariables().Get(name).SetString(newValue);
     }
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + scene.game->GetVariables().Count()) )
     {
-        std::string name = utf8::FromWxString(m_generalList->GetItemText(event.GetIndex()));
+        std::string name = gd::utf8::FromWxString(m_generalList->GetItemText(event.GetIndex()));
 
-        std::string newValue = utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
+        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
                                                                     _("Editing a value"), 
-                                                                    utf8::ToWxString(scene.game->GetVariables().Get(name).GetString())));
+                                                                    gd::utf8::ToWxString(scene.game->GetVariables().Get(name).GetString())));
         scene.game->GetVariables().Get(name).SetString(newValue);
     }
 }

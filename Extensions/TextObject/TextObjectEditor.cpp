@@ -21,7 +21,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/CommonTools.h"
-#include "GDCpp/Utf8Tools.h"
+#include "GDCore/Utf8Tools.h"
 #include "TextObject.h"
 
 //(*IdInit(TextObjectEditor)
@@ -132,7 +132,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TextObjectEditor::OnokBtClick);
 	//*)
 
-	textEdit->ChangeValue(utf8::ToWxString(object.GetString()));
+	textEdit->ChangeValue(gd::utf8::ToWxString(object.GetString()));
 	fontEdit->ChangeValue(object.GetFontFilename());
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
@@ -162,7 +162,7 @@ void TextObjectEditor::AdaptFontColor(wxButton *button)
 
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    object.SetString(utf8::FromWxString(textEdit->GetValue()));
+    object.SetString(gd::utf8::FromWxString(textEdit->GetValue()));
     object.SetCharacterSize(sizeEdit->GetValue());
     object.SetSmooth(smoothCheck->GetValue());
     object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()),

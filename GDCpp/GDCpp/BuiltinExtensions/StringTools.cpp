@@ -41,7 +41,7 @@ string GD_API StrAt(const std::string & str, size_t pos )
  */
 unsigned int GD_API StrLen(const std::string & str)
 {
-    return utf8::StrLength(str);
+    return gd::utf8::StrLength(str);
 }
 
 /**

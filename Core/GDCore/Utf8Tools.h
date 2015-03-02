@@ -47,8 +47,6 @@ class wxString;
  * - myString.size() becomes gd::utf8::StrLength(myString);
  * - myString.substr(i, len) becomes gd::utf8::SubStr(myString, i, len)
  *
- * \note These functions are available in gd::utf8 namespace when using GDCore and utf8 namespace when using GDCpp
- *
  */
 
 namespace gd

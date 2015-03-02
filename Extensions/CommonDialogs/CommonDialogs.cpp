@@ -48,10 +48,10 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
 
     //Display the box
     #if defined(WINDOWS)
-    MessageBoxW(NULL, utf8::ToWString(message).c_str(), utf8::ToWString(title).c_str(), MB_ICONINFORMATION);
+    MessageBoxW(NULL, gd::utf8::ToWString(message).c_str(), gd::utf8::ToWString(title).c_str(), MB_ICONINFORMATION);
     #endif
     #if defined(LINUX) || defined(MAC)
-    nw::MsgBox msgBox(utf8::ToLocaleString(title), utf8::ToLocaleString(message));
+    nw::MsgBox msgBox(gd::utf8::ToLocaleString(title), gd::utf8::ToLocaleString(message));
     msgBox.wait_until_closed();
     #endif
 
@@ -82,17 +82,17 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variabl
     toGetFileName.hwndOwner = NULL;
     toGetFileName.lpstrFile = filePath;
     toGetFileName.nMaxFile = MAX_PATH;
-    toGetFileName.lpstrFilter = filters == "\0" ? NULL : utf8::ToWString(filters).c_str();
+    toGetFileName.lpstrFilter = filters == "\0" ? NULL : gd::utf8::ToWString(filters).c_str();
     toGetFileName.nFilterIndex = 1;
     toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 
     if(GetOpenFileNameW(&toGetFileName) == TRUE)
-        result = utf8::FromWString(filePath);
+        result = gd::utf8::FromWString(filePath);
     #endif
     #if defined(LINUX) || defined(MAC)
-    nw::OpenFile * dialog = new nw::OpenFile(utf8::ToLocaleString(title), true, result);
+    nw::OpenFile * dialog = new nw::OpenFile(gd::utf8::ToLocaleString(title), true, result);
     dialog->wait_until_closed();
-    result = utf8::FromLocaleString(result); //Convert the path to UTF8
+    result = gd::utf8::FromLocaleString(result); //Convert the path to UTF8
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
@@ -112,13 +112,13 @@ void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & vari
 
     //Display the box
     #if defined(WINDOWS)
-    if( MessageBoxW(NULL, utf8::ToWString(message).c_str(), utf8::ToWString(title).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
+    if( MessageBoxW(NULL, gd::utf8::ToWString(message).c_str(), gd::utf8::ToWString(title).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
         result = "yes";
     else
         result = "no";
     #endif
     #if defined(LINUX) || defined(MAC)
-    nw::YesNoMsgBox dialog(utf8::ToLocaleString(title), utf8::ToLocaleString(message), result);
+    nw::YesNoMsgBox dialog(gd::utf8::ToLocaleString(title), gd::utf8::ToLocaleString(message), result);
     dialog.wait_until_closed();
     #endif
 
@@ -430,13 +430,13 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variab
     //Display the box
     #if defined(WINDOWS)
     CInputBox ibox(NULL);
-    if (ibox.DoModal(utf8::ToWString(title).c_str(), utf8::ToWString(message).c_str()))
-        result = utf8::FromWString(ibox.Text);
+    if (ibox.DoModal(gd::utf8::ToWString(title).c_str(), gd::utf8::ToWString(message).c_str()))
+        result = gd::utf8::FromWString(ibox.Text);
     #endif
     #if defined(LINUX) || defined(MAC)
     nw::TextInput dialog(title, message, result);
     dialog.wait_until_closed();
-    result = utf8::FromLocaleString(result); //Convert from locale
+    result = gd::utf8::FromLocaleString(result); //Convert from locale
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.

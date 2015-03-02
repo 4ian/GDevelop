@@ -739,7 +739,7 @@ bool Project::LoadFromFile(const std::string & filename)
     {
         //The document is not encoded in UTF8, we need to convert the file first then reload it
         std::string docStr;
-        FILE *docFile = fopen(filename.c_str(), "r");
+        FILE *docFile = fopen(filename.c_str(), "rb");
 
         while(!feof(docFile))
         {
@@ -755,22 +755,15 @@ bool Project::LoadFromFile(const std::string & filename)
             std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
 
             std::string newFilename = filename + ".utf8";
-            docFile = fopen(newFilename.c_str(), "w");
+            docFile = fopen(newFilename.c_str(), "wb");
 
             std::string convertedStr;
-            try
-            {
-                //Convert the file from Latin1 (ISO-8859-1)
-                sf::Utf8::fromLatin1(docStr.begin(), docStr.end(), std::back_inserter(convertedStr));
-            }
-            catch(const std::exception &exc)
-            {
-                std::cout << "Can't convert to UTF8, use the old content with invalid codepoints removed !" << std::endl;
-                convertedStr = gd::utf8::ReplaceInvalid(docStr);
-            }
+
+            //Convert the file from Latin1 (ISO-8859-1)
+            sf::Utf8::fromAnsi(docStr.begin(), docStr.end(), std::back_inserter(convertedStr));
+            convertedStr = gd::utf8::ReplaceInvalid(convertedStr);
 
             fputs(convertedStr.c_str() + '\0', docFile);
-
             fclose(docFile);
 
             doc.LoadFile(newFilename.c_str(), TIXML_ENCODING_UTF8);

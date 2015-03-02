@@ -80,18 +80,6 @@ std::string GD_API ToString( const wxString & value );
 #endif
 
 /**
- * Convert an UTF8 string to a sf::String
- * \ingroup CommonProgrammingTools
- */
-sf::String GD_API Utf8ToSfString( const std::string &utf8str );
-
-/**
- * Convert a sf::String to an UTF8 string
- * \ingroup CommonProgrammingTools
- */
-std::string GD_API ToUtf8String( const sf::String &str );
-
-/**
  * Split a string into tokens stored in a vector, using the specified separator.
  * \param str String to split
  * \param separator Separator to use

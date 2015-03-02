@@ -16,13 +16,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/CommonTools.h"
-
-#if defined RESOURCE_MANAGER_USED_IN_GDCPP
-#include "GDCpp/Utf8Tools.h" //Use GDCpp's utf8 tools when this file is compiled from GDCpp (GDCpp runtime only)
-#else
 #include "GDCore/Utf8Tools.h"
-#endif
-
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"

@@ -110,26 +110,6 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
                                                                (blendMode == 2 ? sf::BlendMultiply :
                                                                 sf::BlendNone))));
 
-    /*sf::RectangleShape rectangle(sf::Vector2f(GetWidth(), GetHeight()));
-    rectangle.setPosition(sf::Vector2f(GetDrawableX(), GetDrawableY()));
-    rectangle.setOutlineThickness(5);
-    rectangle.setOutlineColor(sf::Color(255,0,0));
-    renderTarget.draw(rectangle);*/
-
-    /*std::vector<Polygon2d> polygons = GetHitBoxes();
-    for (unsigned int i = 0;i<polygons.size();++i)
-    {
-        sf::ConvexShape shape;
-        shape.setOutlineThickness(5);
-        shape.setOutlineColor(sf::Color(255,0,0));
-
-        shape.setPointCount(polygons[i].vertices.size());
-        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
-            shape.setPoint(j, polygons[i].vertices[j]);
-
-        renderTarget.draw(shape);
-    }*/
-
     return true;
 }
 
@@ -590,24 +570,24 @@ void RuntimeSpriteObject::FlipY(bool flip)
     isFlippedY = flip;
 };
 
-bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
+bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 {
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
 
     for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
-        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(scene.GetInputManager().GetMousePosition(),
-                                                                  theLayer.GetCamera(cameraIndex).GetSFMLView());
+        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
+            scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
 
-        if  ( GetDrawableX() <= mousePos.x
-              && GetDrawableX() + GetWidth()  >= mousePos.x
-              && GetDrawableY() <= mousePos.y
-              && GetDrawableY() + GetHeight() >= mousePos.y )
+        if (GetDrawableX() <= mousePos.x
+            && GetDrawableX() + GetWidth()  >= mousePos.x
+            && GetDrawableY() <= mousePos.y
+            && GetDrawableY() + GetHeight() >= mousePos.y)
         {
-            int ClicX = static_cast<int>( mousePos.x - GetDrawableX() );
-            int ClicY = static_cast<int>( mousePos.y - GetDrawableY() );
+            int localX = static_cast<int>( mousePos.x - GetDrawableX() );
+            int localY = static_cast<int>( mousePos.y - GetDrawableY() );
 
-            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel( ClicX , ClicY ).a != 0 );
+            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel( localX , localY ).a != 0 );
         }
     }
 

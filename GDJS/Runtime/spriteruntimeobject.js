@@ -780,8 +780,7 @@ gdjs.SpriteRuntimeObject.prototype.turnTowardObject = function(obj, scene) {
 
 
 /**
- * Return true if the cursor is on the object.<br>
- * TODO : Support layer's camera rotation.
+ * Return true if the cursor is on the object.
  *
  * @method cursorOnObject
  * @return true if the cursor is on the object.

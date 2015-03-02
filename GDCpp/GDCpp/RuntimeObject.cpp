@@ -525,6 +525,27 @@ std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
     return mask;
 }
 
+bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
+{
+    RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
+
+    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    {
+        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
+            scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
+
+        if (GetDrawableX() <= mousePos.x
+            && GetDrawableX() + GetWidth()  >= mousePos.x
+            && GetDrawableY() <= mousePos.y
+            && GetDrawableY() + GetHeight() >= mousePos.y)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name)
 {
     return automatisms.find(name)->second;
@@ -544,17 +565,6 @@ bool RuntimeObject::ClearForce()
 
     return true;
 }
-
-/**
- * \brief Internal functor testing if a force's length is 0.
- */
-struct NullForce
-{
-    bool operator ()( const Force &A ) const
-    {
-        return A.GetLength() <= 0.001;
-    }
-};
 
 bool RuntimeObject::UpdateForce( float elapsedTime )
 {

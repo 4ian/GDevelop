@@ -131,7 +131,7 @@ public :
     unsigned int GetColorB() const;
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
-    bool CursorOnObject( RuntimeScene & scene, bool accurate );
+    virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
 
     void FlipX(bool flip = true);
     void FlipY(bool flip = true);

@@ -1,6 +1,7 @@
 #include "GDCpp/BuiltinExtensions/MouseTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeLayer.h"
+#include "GDCpp/ObjectsListsTools.h"
 #include <SFML/Graphics.hpp>
 
 void GD_API CenterCursor( RuntimeScene & scene )
@@ -61,4 +62,11 @@ bool GD_API MouseButtonPressed(RuntimeScene & scene, const std::string & button)
 int GD_API GetMouseWheelDelta(RuntimeScene & scene)
 {
     return scene.GetInputManager().GetMouseWheelDelta();
+}
+
+bool GD_API CursorOnObject(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists, RuntimeScene & scene, bool precise, bool conditionInverted)
+{
+    return PickObjectsIf(objectsLists, conditionInverted, [&scene, precise](RuntimeObject * obj) {
+        return obj->CursorOnObject(scene, precise);
+    });
 }

@@ -19,6 +19,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
+    extension.AddCondition("SourisSurObjet",
+                   _("The cursor/touch is on an object"),
+                   _("Test if the cursor is over an object, or if the object is being touched."),
+                   _("The cursor/touch is on _PARAM0_"),
+                   _("Mouse and touch"),
+                   "res/conditions/surObjet24.png",
+                   "res/conditions/surObjet.png")
+
+        .AddParameter("objectList", _("Object"))
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("yesorno", _("Accurate test (yes by default)"), "", true).SetDefaultValue("yes")
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .MarkAsSimple();
+
     extension.AddAction("CentreSourisX",
                    _("Center cursor horizontally"),
                    _("Put the cursor in the middle of the screen horizontally."),

@@ -36,6 +36,9 @@ MouseExtension::MouseExtension()
     GetAllActions()["MontreSouris"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.showCursor").SetIncludeFile("inputtools.js");
 
+    GetAllConditions()["SourisSurObjet"].codeExtraInformation.
+        SetFunctionName("gdjs.evtTools.input.cursorOnObject").SetIncludeFile("inputtools.js");
+
     GetAllExpressions()["MouseX"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
     GetAllExpressions()["SourisX"].codeExtraInformation

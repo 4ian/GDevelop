@@ -83,7 +83,7 @@ public:
 
                 obj.AddAction("Radius",
                                _("Radius"),
-                               _("Modify the radius of a liht"),
+                               _("Modify the radius of a light"),
                                _("Do _PARAM1__PARAM2_ to radius of _PARAM0_"),
                                _("Setup"),
                                "CppPlatform/Extensions/lightIcon24.png",

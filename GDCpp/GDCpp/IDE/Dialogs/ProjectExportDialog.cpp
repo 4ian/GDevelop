@@ -207,7 +207,7 @@ public:
         dialog.ShowModal();
     }
 
-    virtual void OnCompilationSuccessed()
+    virtual void OnCompilationSucceeded()
     {
         staticText1->SetLabel(_("Compilation finished")); staticText2->SetLabel(_("Compiled project is now available in the export folder."));
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"), _("Compilation finished"), wxYES_NO) == wxYES )

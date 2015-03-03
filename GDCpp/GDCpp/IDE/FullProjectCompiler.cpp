@@ -580,7 +580,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage(gd::ToString(_( "Compilation finished" )));
     diagnosticManager.OnPercentUpdate(100);
 
-    diagnosticManager.OnCompilationSuccessed();
+    diagnosticManager.OnCompilationSucceeded();
 #endif
 }
 
@@ -633,7 +633,7 @@ void FullProjectCompilerConsoleDiagnosticManager::OnCompilationFailed()
     cout << GetErrors();
 }
 
-void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSuccessed()
+void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSucceeded()
 {
     cout << _("Compilation succeeded.") << endl;
 }

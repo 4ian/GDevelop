@@ -48,54 +48,26 @@ MouseExtension::MouseExtension()
     GetAllExpressions()["SourisY"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js"); //Deprecated
 
+    GetAllConditions()["PopStartedTouch"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.popStartedTouch").SetIncludeFile("inputtools.js");
+    GetAllConditions()["PopEndedTouch"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.popEndedTouch").SetIncludeFile("inputtools.js");
+
+    GetAllConditions()["TouchX"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.getTouchX").SetIncludeFile("inputtools.js");
+    GetAllConditions()["TouchY"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.getTouchY").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["TouchX"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.getTouchX").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["TouchY"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.getTouchY").SetIncludeFile("inputtools.js");
+
+    GetAllExpressions()["LastTouchId"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.getLastTouchId").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["LastEndedTouchId"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.getLastEndedTouchId").SetIncludeFile("inputtools.js");
+
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
-    /*
-    AddAction("CentreSourisX",
-                   _("Center mouse horizontaly"),
-                   _("Put the cursor in the middle of the screen horizontally."),
-                   _("Center mouse horizontaly"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-
-    AddAction("CentreSourisY",
-                   _("Center mouse vertically"),
-                   _("Put the cursor in the middle of the screen vertically."),
-                   _("Center mouse vertically"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursorVertically").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-
-    AddAction("SetSourisXY",
-                   _("Position the cursor of the mouse"),
-                   _("Position the cursor to given coordinates."),
-                   _("Position cursor at _PARAM1_;_PARAM2_"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("X position"))
-        .AddParameter("expression", _("Y position"))
-        .codeExtraInformation.SetFunctionName("SetCursorPosition").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-
-    AddAction("CentreSouris",
-                   _("Center the mouse"),
-                   _("Center the mouse."),
-                   _("Center the mouse"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-*/
 }
 
 }

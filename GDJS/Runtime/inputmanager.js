@@ -9,7 +9,8 @@
  * and touches states.
  *
  * See **bindStandardEvents** method for connecting the input
- * manager to a canvas.
+ * manager to a canvas and **onFrameEnded** for signaling the
+ * end of a frame (necessary for proper touches events handling).
  *
  * @constructor
  * @namespace gdjs
@@ -23,6 +24,9 @@ gdjs.InputManager = function()
     this._mouseX = 0;
     this._mouseY = 0;
     this._mouseWheelDelta = 0;
+    this._touches = new Hashtable();
+    this._startedTouches = []; //Identifiers of the touches that started during/before the frame.
+    this._endedTouches = []; //Identifiers of the touches that ended during/before the frame.
 };
 
 /**
@@ -111,7 +115,6 @@ gdjs.InputManager.prototype.getMouseY = function() {
 	return this._mouseY;
 };
 
-
 /**
  * Should be called whenever a mouse button is pressed
  * @method onMouseButtonPressed
@@ -156,6 +159,62 @@ gdjs.InputManager.prototype.getMouseWheelDelta = function() {
 	return this._mouseWheelDelta;
 };
 
+/**
+ * Get a touch X position
+ *
+ * @method getTouchX
+ * @return the touch X position, relative to the game view.
+ */
+gdjs.InputManager.prototype.getTouchX = function(identifier) {
+    if (!this._touches.containsKey(identifier))
+        return 0;
+
+    return this._touches.get(identifier).x;
+};
+
+/**
+ * Get a touch Y position
+ *
+ * @method getTouchY
+ * @return the touch Y position, relative to the game view.
+ */
+gdjs.InputManager.prototype.getTouchY = function(identifier) {
+    if (!this._touches.containsKey(identifier))
+        return 0;
+
+    return this._touches.get(identifier).y;
+};
+
+gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
+    this._startedTouches.push(identifier);
+    this._touches.put(identifier, {x: x, y: y});
+};
+
+gdjs.InputManager.prototype.onTouchMove = function(identifier, x, y) {
+    var touch = this._touches.get(identifier);
+    if (!touch) return;
+
+    touch.x = x;
+    touch.y = y;
+};
+
+gdjs.InputManager.prototype.onTouchEnd = function(identifier, x, y) {
+    this._endedTouches.push(identifier);
+    this._touches.remove(identifier);
+};
+
+gdjs.InputManager.prototype.popStartedTouch = function() {
+    return this._startedTouches.shift();
+}
+
+gdjs.InputManager.prototype.popEndedTouch = function() {
+    return this._endedTouches.shift();
+}
+
+gdjs.InputManager.prototype.onFrameEnded = function() {
+    this._startedTouches.length = 0;
+    this._endedTouches.length = 0;
+}
 
 /**
  * Add the standard events handler.
@@ -163,14 +222,9 @@ gdjs.InputManager.prototype.getMouseWheelDelta = function() {
  */
 gdjs.InputManager.prototype.bindStandardEvents = function(window, document, game, renderer, canvasArea) {
 
-    var manager = this;
-    document.onkeydown = function(e) {
-        manager.onKeyPressed(e.keyCode);
-    };
-    document.onkeyup = function(e) {
-        manager.onKeyReleased(e.keyCode);
-    };
-    renderer.view.onmousemove = function(e){
+    //Translate an event (mouse or touch) made on the canvas on the page
+    //to game coordinates.
+    function getEventPosition(e) {
         var pos = [0,0];
         if (e.pageX) {
             pos[0] = e.pageX-canvasArea.offsetLeft;
@@ -184,6 +238,44 @@ gdjs.InputManager.prototype.bindStandardEvents = function(window, document, game
         pos[0] *= game.getDefaultWidth()/renderer.view.width;
         pos[1] *= game.getDefaultHeight()/renderer.view.height;
 
+        return pos;
+    }
+
+    //Some browsers lacks definition of some variables used to do calculations
+    //in getEventPosition. They are defined to 0 as they are useless.
+    (function ensureOffsetsExistence() {
+        if ( isNaN(canvasArea.offsetLeft) ) {
+            canvasArea.offsetLeft = 0;
+            canvasArea.offsetTop = 0;
+        }
+        if ( isNaN(document.body.scrollLeft) ) {
+            document.body.scrollLeft = 0;
+            document.body.scrollTop = 0;
+        }
+        if ( document.documentElement === undefined || document.documentElement === null ) {
+            document.documentElement = {};
+        }
+        if ( isNaN(document.documentElement.scrollLeft) ) {
+            document.documentElement.scrollLeft = 0;
+            document.documentElement.scrollTop = 0;
+        }
+        if ( isNaN(canvasArea.offsetLeft) ) {
+            canvasArea.offsetLeft = 0;
+            canvasArea.offsetTop = 0;
+        }
+    })();
+
+    var manager = this;
+    //Keyboard
+    document.onkeydown = function(e) {
+        manager.onKeyPressed(e.keyCode);
+    };
+    document.onkeyup = function(e) {
+        manager.onKeyReleased(e.keyCode);
+    };
+    //Mouse
+    renderer.view.onmousemove = function(e){
+        var pos = getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
     };
     renderer.view.onmousedown = function(e){
@@ -214,89 +306,41 @@ gdjs.InputManager.prototype.bindStandardEvents = function(window, document, game
     renderer.view.onmousewheel = function (event){
         manager.onMouseWheel(event.wheelDelta);
     };
-    //Simulate mouse events when receiving touch events
+    //Touches
+    //Also simulate mouse events when receiving touch events
     window.addEventListener('touchmove', function(e){
         e.preventDefault();
-        if ( e.touches && e.touches.length > 0 ) {
-            var pos = [0,0];
-            if (e.touches[0].pageX) {
-                pos[0] = e.touches[0].pageX-canvasArea.offsetLeft;
-                pos[1] = e.touches[0].pageY-canvasArea.offsetTop;
+        if (e.touches) {
+            for(var i = 0;i<e.touches.length;++i) {
+                var pos = getEventPosition(e.touches[i]);
+                manager.onTouchMove(e.touches[i].identifier, pos[0], pos[1]);
+                manager.onMouseMove(pos[0], pos[1]);
             }
-            else {
-                pos[0] = e.touches[0].clientX + document.body.scrollLeft + document.documentElement.scrollLeft-canvasArea.offsetLeft;
-                pos[1] = e.touches[0].clientY + document.body.scrollTop + document.documentElement.scrollTop-canvasArea.offsetTop;
-            }
-
-            //Handle the fact that the game is stretched to fill the canvas.
-            pos[0] *= game.getDefaultWidth()/renderer.view.width;
-            pos[1] *= game.getDefaultHeight()/renderer.view.height;
-
-            manager.onMouseMove(pos[0], pos[1]);
         }
     });
     window.addEventListener('touchstart', function(e){
         e.preventDefault();
-        if ( e.touches && e.touches.length > 0 ) {
-            var pos = [0,0];
-            if (e.touches[0].pageX) {
-                if ( isNaN(canvasArea.offsetLeft) ) {
-                    canvasArea.offsetLeft = 0;
-                    canvasArea.offsetTop = 0;
-                }
-
-                pos[0] = e.touches[0].pageX-canvasArea.offsetLeft;
-                pos[1] = e.touches[0].pageY-canvasArea.offsetTop;
+        if (e.touches) {
+            for(var i = 0;i<e.touches.length;++i) {
+                var pos = getEventPosition(e.touches[i]);
+                manager.onTouchStart(e.touches[i].identifier, pos[0], pos[1]);
+                manager.onMouseMove(pos[0], pos[1]);
             }
-            else {
-                if ( isNaN(document.body.scrollLeft) ) {
-                    document.body.scrollLeft = 0;
-                    document.body.scrollTop = 0;
-                }
-                if ( document.documentElement === undefined || document.documentElement === null ) {
-                    document.documentElement = {};
-                }
-                if ( isNaN(document.documentElement.scrollLeft) ) {
-                    document.documentElement.scrollLeft = 0;
-                    document.documentElement.scrollTop = 0;
-                }
-                if ( isNaN(canvasArea.offsetLeft) ) {
-                    canvasArea.offsetLeft = 0;
-                    canvasArea.offsetTop = 0;
-                }
-                pos[0] = e.touches[0].clientX + document.body.scrollLeft + document.documentElement.scrollLeft-canvasArea.offsetLeft;
-                pos[1] = e.touches[0].clientY + document.body.scrollTop + document.documentElement.scrollTop-canvasArea.offsetTop;
-            }
-
-            //Handle the fact that the game is stretched to fill the canvas.
-            pos[0] *= game.getDefaultWidth()/renderer.view.width;
-            pos[1] *= game.getDefaultHeight()/renderer.view.height;
-
-            manager.onMouseMove(pos[0], pos[1]);
         }
         manager.onMouseButtonPressed(0);
         return false;
     });
     window.addEventListener('touchend', function(e){
         e.preventDefault();
-        if ( e.touches && e.touches.length > 0 ) {
-            var pos = [0,0];
-            if (e.touches[0].pageX) {
-                pos[0] = e.touches[0].pageX-canvasArea.offsetLeft;
-                pos[1] = e.touches[0].pageY-canvasArea.offsetTop;
+        if (e.touches) {
+            for(var i = 0;i<e.touches.length;++i) {
+                var pos = getEventPosition(e.touches[i]);
+                manager.onTouchEnd(e.touches[i].identifier, pos[0], pos[1]);
+                manager.onMouseMove(pos[0], pos[1]);
             }
-            else {
-                pos[0] = e.touches[0].clientX + document.body.scrollLeft + document.documentElement.scrollLeft-canvasArea.offsetLeft;
-                pos[1] = e.touches[0].clientY + document.body.scrollTop + document.documentElement.scrollTop-canvasArea.offsetTop;
-            }
-
-            //Handle the fact that the game is stretched to fill the canvas.
-            pos[0] *= game.getDefaultWidth()/renderer.view.width;
-            pos[1] *= game.getDefaultHeight()/renderer.view.height;
-
-            manager.onMouseMove(pos[0], pos[1]);
         }
         manager.onMouseButtonReleased(0);
         return false;
     });
 };
+

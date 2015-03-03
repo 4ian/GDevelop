@@ -194,3 +194,45 @@ gdjs.evtTools.input.cursorOnObject = function(objectsLists, runtimeScene, accura
         return obj.cursorOnObject(runtimeScene);
     }, objectsLists, inverted);
 };
+
+gdjs.evtTools.input.getTouchX = function(runtimeScene, identifier, layer, camera) {
+    return runtimeScene.getLayer(layer).convertCoords(
+        runtimeScene.getGame().getInputManager().getTouchX(identifier),
+        runtimeScene.getGame().getInputManager().getTouchY(identifier))[0];
+};
+
+gdjs.evtTools.input.getTouchY = function(runtimeScene, identifier, layer, camera) {
+    return runtimeScene.getLayer(layer).convertCoords(
+        runtimeScene.getGame().getInputManager().getTouchX(identifier),
+        runtimeScene.getGame().getInputManager().getTouchY(identifier))[1];
+};
+
+gdjs.evtTools.input.getLastTouchId = function() {
+    return gdjs.evtTools.input.lastTouchId || 0;
+};
+
+gdjs.evtTools.input.getLastEndedTouchId = function() {
+    return gdjs.evtTools.input.lastEndedTouchId || 0;
+};
+
+gdjs.evtTools.input.popStartedTouch = function(runtimeScene) {
+    var startedTouchId = runtimeScene.getGame().getInputManager().popStartedTouch();
+
+    if (startedTouchId !== undefined) {
+        gdjs.evtTools.input.lastTouchId = startedTouchId;
+        return true;
+    }
+
+    return false;
+};
+
+gdjs.evtTools.input.popEndedTouch = function(runtimeScene) {
+    var endedTouchId = runtimeScene.getGame().getInputManager().popEndedTouch();
+
+    if (endedTouchId !== undefined) {
+        gdjs.evtTools.input.lastEndedTouchId = endedTouchId;
+        return true;
+    }
+
+    return false;
+};

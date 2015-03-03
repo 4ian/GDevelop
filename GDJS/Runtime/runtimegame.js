@@ -468,10 +468,12 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
                 currentScene = new gdjs.RuntimeScene(game, game._renderer);
                 currentScene.loadFromScene(game.getSceneData(nextSceneName));
                 requestAnimFrame( gameLoop );
+                game.getInputManager().onFrameEnded();
             }
         }
         else {
             requestAnimFrame( gameLoop );
+            game.getInputManager().onFrameEnded();
         }
     }
 };

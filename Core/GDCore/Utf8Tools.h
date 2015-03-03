@@ -1,3 +1,5 @@
+#ifndef GDCORE_UTF8TOOLS_H
+#define GDCORE_UTF8TOOLS_H
 /*
  * GDevelop Core
  * Copyright 2015 Victor Levasseur (victorlevasseur52@gmail.com).
@@ -83,6 +85,11 @@ std::string GD_CORE_API ReplaceInvalid( const std::string &utf8str );
 std::size_t GD_CORE_API StrLength( const std::string &utf8str );
 std::string GD_CORE_API SubStr( const std::string &utf8str, std::size_t pos, std::size_t len );
 
+std::size_t GD_CORE_API Find( const std::string &utf8str, const std::string &search, std::size_t pos = 0 );
+std::size_t GD_CORE_API RFind( const std::string &utf8str, const std::string &search, std::size_t pos = std::string::npos );
+
 }
 
 }
+
+#endif //GDCORE_UTF8TOOLS_H

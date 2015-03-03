@@ -116,7 +116,7 @@ std::size_t GD_CORE_API StrLength( const std::string &utf8str )
 
 std::string GD_CORE_API SubStr( const std::string &utf8str, std::size_t pos, std::size_t len )
 {
-    std::string::const_iterator it = utf8str.begin();
+    auto it = utf8str.begin();
 
     //Move to pos
     int i = 0;
@@ -156,6 +156,51 @@ std::string GD_CORE_API SubStr( const std::string &utf8str, std::size_t pos, std
     ::utf8::utf32to8(utf32substr.begin(), utf32substr.end(), std::back_inserter(utf8substr));
 
     return utf8substr;
+}
+
+std::size_t GD_CORE_API Find( const std::string &utf8str, const std::string &search, std::size_t pos )
+{
+    //Find where is really "pos" in the UTF8 string
+    auto it = utf8str.begin();
+    try
+    {
+        ::utf8::advance(it, pos, utf8str.end());
+    }
+    catch(const std::exception &exc)
+    {
+        return -1;
+    }
+
+    //Search using the standard method
+    std::size_t findPos = utf8str.find(search, std::distance(utf8str.begin(), it)); //Use the real distance in bytes in the standard find method
+
+    if(findPos != std::string::npos)
+        return ::utf8::distance(utf8str.begin(), utf8str.begin() + findPos); //Return the position (consider UTF8 multibyte char)
+    else
+        return std::string::npos;
+}
+
+std::size_t GD_CORE_API RFind( const std::string &utf8str, const std::string &search, std::size_t pos )
+{
+    //Find where is really "pos" in the UTF8 string
+    auto it = utf8str.begin();
+    try
+    {
+        ::utf8::advance(it, pos + 1, utf8str.end()); //We need to get to the next character (because it will be included in the search) 
+        it--; //Make it pointing to the end of the previous codepoint (that's why we needed the character next to "pos")
+    }
+    catch(const std::exception &exc)
+    {
+        return -1;
+    }
+
+    //Search using the standard method
+    std::size_t findPos = utf8str.rfind(search, std::distance(utf8str.begin(), it)); //Use the real distance in bytes in the standard rfind method
+
+    if(findPos != std::string::npos)
+        return ::utf8::distance(utf8str.begin(), utf8str.begin() + findPos); //Return the position (consider UTF8 multibyte char)
+    else
+        return std::string::npos;
 }
 
 }

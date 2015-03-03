@@ -15,10 +15,13 @@
 typedef std::map <std::string, std::vector<RuntimeObject*> *> RuntimeObjectsLists;
 
 /**
- * \brief Picks objects that fullfil the predicate
+ * \brief Filter objects to keep only the one that fullfil the predicate
  *
  * Objects that do not fullfil the predicate are removed from objects lists.
  *
+ * \param objectsLists The lists of objects to trim
+ * \param negatePredicate If set to true, the result of the predicate is negated.
+ * \param predicate The function applied to each object: must return true if the object fulfill the predicate.
  * \return true if at least one object fulfill the predicate.
  *
  * \ingroup GameEngine
@@ -176,7 +179,7 @@ bool GD_API TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
         }
     }
 
-    //Trim not picked objects from arrays.
+    //Trim not picked objects from lists.
     i = 0;
     for(RuntimeObjectsLists::const_iterator it = objectsLists1.begin();
         it != objectsLists1.end();++it, ++i)

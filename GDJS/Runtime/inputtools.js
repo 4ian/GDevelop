@@ -188,3 +188,9 @@ gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
         runtimeScene.getGame().getInputManager().getMouseX(),
         runtimeScene.getGame().getInputManager().getMouseY())[1];
 };
+
+gdjs.evtTools.input.cursorOnObject = function(objectsLists, runtimeScene, accurate, inverted) {
+    return gdjs.evtTools.object.PickObjectsIf(function(obj) {
+        return obj.cursorOnObject(runtimeScene);
+    }, objectsLists, inverted);
+};

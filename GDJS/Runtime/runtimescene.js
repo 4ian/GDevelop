@@ -41,7 +41,9 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    this.onCanvasResized();
+    if (this._pixiRenderer) {
+    	this.onCanvasResized();
+    }
 };
 
 /**

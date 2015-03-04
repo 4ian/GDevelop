@@ -63,3 +63,48 @@ describe('gdjs.evtTools.object.PickObjectsIf', function() {
 		expect(list1[0]).to.be(obj1A);
 	});
 });
+
+describe('gdjs.InputManager', function() {
+	var inputManager = new gdjs.InputManager();
+
+	it('should handle keyboards events', function(){
+		expect(inputManager.anyKeyPressed()).to.be(false);
+
+		inputManager.onKeyPressed(32);
+		expect(inputManager.getLastPressedKey()).to.be(32);
+		inputManager.onKeyPressed(33);
+		expect(inputManager.getLastPressedKey()).to.be(33);
+		expect(inputManager.isKeyPressed(32)).to.be(true);
+		expect(inputManager.isKeyPressed(30)).to.be(false);
+		inputManager.onKeyReleased(32);
+		expect(inputManager.isKeyPressed(32)).to.be(false);
+
+		expect(inputManager.anyKeyPressed()).to.be(true);
+	});
+
+	it('should handle mouse events', function(){
+		inputManager.onMouseMove(500, 600);
+		expect(inputManager.getMouseX()).to.be(500);
+		expect(inputManager.getMouseY()).to.be(600);
+
+		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+		inputManager.onMouseButtonPressed(0);
+		expect(inputManager.isMouseButtonPressed(0)).to.be(true);
+	});
+
+	it('should handle touch events', function(){
+		inputManager.onTouchStart(46, 510, 610);
+		inputManager.onTouchStart(10, 510, 610);
+		expect(inputManager.getTouchX(46)).to.be(510);
+		expect(inputManager.getTouchY(46)).to.be(610);
+
+		expect(inputManager.popStartedTouch()).to.be(46);
+		expect(inputManager.popStartedTouch()).to.be(10);
+		expect(inputManager.popEndedTouch()).to.be(undefined);
+
+		inputManager.onFrameEnded();
+		inputManager.onTouchEnd(10);
+		expect(inputManager.popStartedTouch()).to.be(undefined);
+		expect(inputManager.popEndedTouch()).to.be(10);
+	});
+})

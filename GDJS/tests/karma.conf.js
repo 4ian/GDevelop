@@ -16,6 +16,7 @@ module.exports = function(config) {
       '../Runtime/layer.js',
       '../Runtime/timer.js',
       '../Runtime/imagemanager.js',
+      '../Runtime/inputmanager.js',
       '../Runtime/runtimegame.js',
       '../Runtime/variable.js',
       '../Runtime/variablescontainer.js',

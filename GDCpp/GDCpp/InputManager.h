@@ -26,7 +26,15 @@ public:
      *
      * Call SetWindow to set the window for which events must be handled
      */
-    InputManager() {};
+    InputManager() :
+        window(nullptr),
+        lastPressedKey(0),
+        mouseWheelDelta(0),
+        keyWasPressed(false),
+        windowHasFocus(true),
+        disableInputWhenNotFocused(true)
+    {
+    }
 
     /**
      * @brief Constructor to specify a window to manage.
@@ -106,12 +114,12 @@ public:
     ///@}
 
 private:
-    sf::Window * window = nullptr;
-    int lastPressedKey = 0; ///< SFML key code of the last pressed key.
-    int mouseWheelDelta = 0;
-    bool keyWasPressed = false; ///< True if a key was pressed during the last step.
-    bool windowHasFocus = true; ///< True if the render target has the focus.
-    bool disableInputWhenNotFocused = true; ///< True if input should be ignored when focus is lost.
+    sf::Window * window;
+    int lastPressedKey; ///< SFML key code of the last pressed key.
+    int mouseWheelDelta;
+    bool keyWasPressed; ///< True if a key was pressed during the last step.
+    bool windowHasFocus; ///< True if the render target has the focus.
+    bool disableInputWhenNotFocused; ///< True if input should be ignored when focus is lost.
     std::vector<sf::Uint32> charactersEntered; ///< The characters entered during the last frame.
 };
 

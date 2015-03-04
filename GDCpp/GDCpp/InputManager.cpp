@@ -6,7 +6,12 @@
 #include "InputManager.h"
 
 InputManager::InputManager(sf::Window * win) :
-    window(win)
+    window(win),
+    lastPressedKey(0),
+    mouseWheelDelta(0),
+    keyWasPressed(false),
+    windowHasFocus(true),
+    disableInputWhenNotFocused(true)
 {
 }
 

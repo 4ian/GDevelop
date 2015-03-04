@@ -18,6 +18,8 @@ namespace gd {
  * \see Animation
  * \see Sprite
  * \ingroup SpriteObjectExtension
+ *
+ * \todo Support UTF8 (currently convert all loaded strings from UTF8 to the current locale)
  */
 class GD_CORE_API Direction
 {

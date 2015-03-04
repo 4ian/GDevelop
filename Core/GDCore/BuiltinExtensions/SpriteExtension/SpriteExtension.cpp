@@ -296,7 +296,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the source image"), "",false)
+        .AddParameter("string", _("Name of the source image"), "",false).CantUseUtf8()
         .AddParameter("expression", _("X position"), "",false)
         .AddParameter("expression", _("Y position"), "",false)
         .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false);
@@ -413,22 +413,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
         .SetHidden()
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("", _("Name of the point"), "", true);
+        .AddParameter("", _("Name of the point"), "", true).CantUseUtf8();
 
     obj.AddExpression("Y", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
         .SetHidden()
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("", _("Name of the point"), "", true);
+        .AddParameter("", _("Name of the point"), "", true).CantUseUtf8();
 
     obj.AddExpression("PointX", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
 
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("", _("Name of the point"), "",false);
+        .AddParameter("", _("Name of the point"), "",false).CantUseUtf8();
 
     obj.AddExpression("PointY", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
 
         .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("", _("Name of the point"), "",false);
+        .AddParameter("", _("Name of the point"), "",false).CantUseUtf8();
 
     obj.AddExpression("Direc", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
         .SetHidden()

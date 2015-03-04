@@ -10,6 +10,7 @@
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 
 using namespace std;
 
@@ -79,7 +80,7 @@ void Direction::RemoveAllSprites()
 
 void OpenPoint(Point & point, const gd::SerializerElement & element)
 {
-    point.SetName(element.GetStringAttribute("name", "", "nom"));
+    point.SetName(gd::utf8::ToLocaleString(element.GetStringAttribute("name", "", "nom")));
     point.SetX(element.GetDoubleAttribute("x", 0, "X"));
     point.SetY(element.GetDoubleAttribute("y", 0, "Y"));
 }
@@ -108,7 +109,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
         const gd::SerializerElement & spriteElement = spritesElement.GetChild(i);
         Sprite sprite;
 
-        sprite.SetImageName(spriteElement.GetStringAttribute("image"));
+        sprite.SetImageName(gd::utf8::ToLocaleString(spriteElement.GetStringAttribute("image")));
         OpenPointsSprites(sprite.GetAllNonDefaultPoints(), spriteElement.GetChild("points", 0, "Points"));
 
         OpenPoint(sprite.GetOrigin(), spriteElement.GetChild("originPoint" , 0, "PointOrigine"));
@@ -148,7 +149,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
 #if defined(GD_IDE_ONLY)
 void SavePoint(const Point & point, gd::SerializerElement & element)
 {
-    element.SetAttribute("name", point.GetName());
+    element.SetAttribute("name", gd::utf8::FromLocaleString(point.GetName()));
     element.SetAttribute("x", point.GetX());
     element.SetAttribute("y", point.GetY());
 }
@@ -167,7 +168,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerEleme
     {
         gd::SerializerElement & spriteElement = element.AddChild("sprite");
 
-        spriteElement.SetAttribute("image", sprites[i].GetImageName());
+        spriteElement.SetAttribute("image", gd::utf8::FromLocaleString(sprites[i].GetImageName()));
         SavePointsSprites(sprites[i].GetAllNonDefaultPoints(), spriteElement.AddChild("points"));
 
         SavePoint(sprites[i].GetOrigin(), spriteElement.AddChild("originPoint"));

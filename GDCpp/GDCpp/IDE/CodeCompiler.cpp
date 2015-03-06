@@ -85,7 +85,7 @@ std::string CodeCompilerCall::GetFullCall() const
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/i686-linux-gnu");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/backward");
-        #elif defined(MAC)
+        #elif defined(MACOS)
         #endif
 
         standardsIncludeDirs.push_back("CppPlatform/include/GDCpp");
@@ -118,7 +118,7 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-DGD_CORE_API= ");
         args.push_back("-DGD_API= ");
         args.push_back("-DGD_EXTENSION_API= ");
-        #elif defined(MAC)
+        #elif defined(MACOS)
         args.push_back("-DGD_CORE_API= ");
         args.push_back("-DGD_API= ");
         args.push_back("-DGD_EXTENSION_API= ");

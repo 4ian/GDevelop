@@ -452,7 +452,7 @@ int Game_Develop_EditorApp::OnExit()
     gd::PlatformManager::DestroySingleton();
 
     cout << "* Deleting single instance checker..." << endl;
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     if ( singleInstanceChecker ) delete singleInstanceChecker;
     singleInstanceChecker = NULL;
     #endif

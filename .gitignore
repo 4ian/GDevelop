@@ -1,4 +1,3 @@
-/GDSDK
 /docs/GDJS Runtime Documentation
 /docs/GDJS Documentation
 /docs/GDCpp Documentation
@@ -48,6 +47,8 @@ Binaries/Packaging/opensuse-build-service/final/
 *.debhelper.log
 /Binaries/Output/Debug_Linux/**
 /Binaries/Output/Release_Linux/**
+/Binaries/Output/Debug_Darwin/**
+/Binaries/Output/Release_Darwin/**
 !/Binaries/Output/Release_Linux/StartGDevelop.sh
 !/Binaries/Output/Release_Linux/CppPlatform/
 /Binaries/**/MinGW32
@@ -73,3 +74,4 @@ Binaries/Packaging/opensuse-build-service/final/
 !/Binaries/Output/Release_Windows/locale/msgfmt.exe
 !/ExtLibs/curl.exe
 !/ExtLibs/7za.exe
+**/.DS_Store

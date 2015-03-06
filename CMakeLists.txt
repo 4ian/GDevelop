@@ -29,15 +29,19 @@ ENDIF()
 
 project(GDevelop)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-IF(NOT WIN32 AND NOT BUILD_TESTS)
+IF(NOT WIN32 AND NOT APPLE AND NOT BUILD_TESTS)
 	SET(CMAKE_SKIP_BUILD_RPATH  TRUE) #Avoid errors when packaging for linux.
+ENDIF()
+IF(APPLE)
+	set(CMAKE_MACOSX_RPATH 1)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
 ENDIF()
 
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
 	set(CMAKE_BUILD_TYPE Release)
-	IF(NOT WIN32)
+	IF(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
 		SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
 	ENDIF()
 ENDIF()
@@ -46,6 +50,7 @@ IF (EMSCRIPTEN)
 	set(BUILD_GDCPP FALSE CACHE BOOL "" FORCE) #Force disable GDC++ when compiling with emscripten.
 	set(BUILD_IDE FALSE CACHE BOOL "" FORCE) #Force disable IDE when compiling with emscripten.
 ENDIF()
+
 
 #Activate C++11
 include(CheckCXXCompilerFlag)

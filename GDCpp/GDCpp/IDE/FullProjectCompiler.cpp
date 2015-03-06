@@ -140,7 +140,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         linuxTarget = true;
         macTarget = false;
         compressIfPossible = false;
-    #elif defined(MAC)
+    #elif defined(MACOS)
         windowsTarget = false;
         linuxTarget = true;
         macTarget = false;

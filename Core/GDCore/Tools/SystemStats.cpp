@@ -24,7 +24,7 @@ int parseLine(char* line){
 
 size_t SystemStats::GetUsedVirtualMemory()
 {
-#if defined(LINUX)
+#if defined(LINUX) || defined(MACOS)
     FILE* file = fopen("/proc/self/status", "r");
     int result = -1;
     char line[128];

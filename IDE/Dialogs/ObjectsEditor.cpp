@@ -83,7 +83,7 @@ namespace
 
                 //Find the group
                 std::vector< gd::ObjectGroup >::iterator group = find_if(groups->begin(), groups->end(),
-                                                                         bind2nd(gd::GroupHasTheSameName(), treeCtrl->GetItemText(itemUnderMouse)));
+                    bind2nd(gd::GroupHasTheSameName(), gd::ToString(treeCtrl->GetItemText(itemUnderMouse))));
                 if ( group != groups->end() && !group->Find(objectName))
                 {
                     //Add the object in the group
@@ -527,7 +527,7 @@ void ObjectsEditor::UpdateGroup(wxTreeItemId groupItem)
     //Find the group in the container
     vector<gd::ObjectGroup>::iterator i = std::find_if( groups.begin(),
                                                         groups.end(),
-                                                        std::bind2nd(gd::GroupHasTheSameName(), objectsList->GetItemText(groupItem).ToStdString()));
+                                                        std::bind2nd(gd::GroupHasTheSameName(), gd::ToString(objectsList->GetItemText(groupItem))));
 
     if ( i != groups.end() )
     {
@@ -761,9 +761,8 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         vector<gd::ObjectGroup> & objectsGroups =
             (globalGroup || !layout) ? project.GetObjectGroups() : layout->GetObjectGroups();
 
-        if ( std::find_if(  objectsGroups.begin(),
-                            objectsGroups.end(),
-                            std::bind2nd(gd::GroupHasTheSameName(), event.GetLabel())) != objectsGroups.end())
+        if (std::find_if(objectsGroups.begin(), objectsGroups.end(),
+            std::bind2nd(gd::GroupHasTheSameName(), gd::ToString(event.GetLabel()))) != objectsGroups.end())
         {
             gd::LogWarning( _( "Unable to rename the group: another group has already this name." ) );
 

@@ -24,7 +24,7 @@ This project is released under the MIT License.
 #endif
 
 //Linux build uses dlib for dialogs
-#if defined(LINUX) || defined(MAC)
+#if defined(LINUX) || defined(MACOS)
 #include "nwidgets/MessageBox.h"
 #include "nwidgets/YesNoMsgBox.h"
 #include "nwidgets/OpenFile.h"
@@ -49,7 +49,7 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
     #if defined(WINDOWS)
     MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONINFORMATION);
     #endif
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     nw::MsgBox msgBox(title, message);
     msgBox.wait_until_closed();
     #endif
@@ -88,7 +88,7 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variabl
     if(GetOpenFileName(&toGetFileName) == TRUE)
         result = filePath;
     #endif
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     nw::OpenFile * dialog = new nw::OpenFile(title, true, result);
     dialog->wait_until_closed();
     #endif
@@ -115,7 +115,7 @@ void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & vari
     else
         result = "no";
     #endif
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     nw::YesNoMsgBox dialog(title, message, result);
     dialog.wait_until_closed();
     #endif
@@ -431,7 +431,7 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variab
     if (ibox.DoModal(title.c_str(), message.c_str()))
         result = ibox.Text;
     #endif
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     nw::TextInput dialog(title, message, result);
     dialog.wait_until_closed();
     #endif

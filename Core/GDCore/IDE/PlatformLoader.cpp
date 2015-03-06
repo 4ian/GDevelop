@@ -42,6 +42,8 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("GDCpp.dll");
         #elif defined(LINUX)
         std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.so");
+        #elif defined(MACOS)
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.dylib");
         #else
         #warning Add the appropriate filename here for the C++ Platform!
         std::shared_ptr<gd::Platform> platform;
@@ -57,6 +59,8 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
         std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.dll");
         #elif defined(LINUX)
         std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/libGDJS.so");
+        #elif defined(MACOS)
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/libGDJS.dylib");
         #else
         #warning Add the appropriate filename here for the Js Platform!
         std::shared_ptr<gd::Platform> platform;

@@ -294,7 +294,7 @@ namespace SPK
 				int nb = (*it)->updateNumber(deltaTime);
 				if (nb > 0)
 				{
-					EmitterData data = {*it,nb};
+					EmitterData data = {*it,static_cast<unsigned int>(nb)};
 					activeEmitters.push_back(data);
 					nbAutoBorn += nb;
 				}

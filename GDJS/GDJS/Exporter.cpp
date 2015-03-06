@@ -634,7 +634,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
             wxExecute("explorer.exe \""+exportDir+"\"");
             #elif defined(LINUX)
             returnCode = system(std::string("xdg-open \""+exportDir+"\"").c_str());
-            #elif defined(MAC)
+            #elif defined(MACOS)
             returnCode = system(std::string("open \""+exportDir+"\"").c_str());
             #endif
 

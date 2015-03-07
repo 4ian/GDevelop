@@ -163,6 +163,8 @@ std::string CodeCompilerCall::GetFullCall() const
             args.push_back("-L\""+baseDir+"CppPlatform/Extensions/Runtime/\"");
             #if defined(WINDOWS)
             args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.dll.a\"");
+            #elif defined(MACOS)
+            args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.dylib\"");
             #else
             args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.so\"");
             #endif
@@ -177,6 +179,12 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-lsfml-graphics");
         args.push_back("-lsfml-window");
         args.push_back("-lsfml-system");
+        #elif defined(MACOS)
+        args.push_back("\""+baseDir+"libsfml-audio.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-network.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-graphics.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-window.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-system.dylib\"");
         #else
         args.push_back("\""+baseDir+"libsfml-audio.so.2\"");
         args.push_back("\""+baseDir+"libsfml-network.so.2\"");
@@ -191,6 +199,12 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-lsfml-graphics-d");
         args.push_back("-lsfml-window-d");
         args.push_back("-lsfml-system-d");
+        #elif defined(MACOS)
+        args.push_back("\""+baseDir+"libsfml-audio.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-network.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-graphics.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-window.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-system.dylib\"");
         #else
         args.push_back("\""+baseDir+"libsfml-audio-d.so.2\"");
         args.push_back("\""+baseDir+"libsfml-network-d.so.2\"");

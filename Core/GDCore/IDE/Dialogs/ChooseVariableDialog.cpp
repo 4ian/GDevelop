@@ -27,6 +27,7 @@
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 
 namespace gd
 {
@@ -198,14 +199,14 @@ ChooseVariableDialog::~ChooseVariableDialog()
 void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const std::string & name, const gd::Variable & variable)
 {
     //Update the name and remove children
-    variablesList->SetItemText(item, 0, name);
+    variablesList->SetItemText(item, 0, utf8::ToWxString(name));
     bool wasExpanded = variablesList->IsExpanded(item);
 
     if ( !variable.IsStructure() ) {
         while ( variablesList->GetFirstChild(item).IsOk() )
             variablesList->DeleteItem(variablesList->GetFirstChild(item));
 
-        variablesList->SetItemText(item, 1, variable.GetString());
+        variablesList->SetItemText(item, 1, utf8::ToWxString(variable.GetString()));
     }
     else
     {
@@ -292,7 +293,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
         tries++;
     }
 
-    newName = gd::ToString(wxGetTextFromUser(_("Please choose a new name for the new variable"), _("New variable name"), newName));
+    newName = utf8::FromWxString(wxGetTextFromUser(_("Please choose a new name for the new variable"), _("New variable name"), newName));
     if ( newName.empty() ) return;
 
     if ( temporaryContainer->Has(newName) )
@@ -422,7 +423,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
     wxArrayInt selection = dialog.GetSelections();
     for (unsigned int i = 0;i<selection.size();++i)
     {
-        temporaryContainer->InsertNew(ToString(variablesNotDeclared[selection[i]]),temporaryContainer->Count());
+        temporaryContainer->InsertNew(utf8::FromWxString(variablesNotDeclared[selection[i]]),temporaryContainer->Count());
         modificationCount++;
     }
 
@@ -454,7 +455,7 @@ void ChooseVariableDialog::OnEditValueSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if ( !selectedVariable || selectedVariable->IsStructure() ) return;
 
-    std::string value = ToString(wxGetTextFromUser(_("Enter the initial value of the variable"), _("Initial value"), selectedVariable->GetString()));
+    std::string value = utf8::FromWxString(wxGetTextFromUser(_("Enter the initial value of the variable"), _("Initial value"), utf8::ToWxString(selectedVariable->GetString())));
     selectedVariable->SetString(value);
     RefreshVariable(variablesList->GetSelection(), selectedVariableName, *selectedVariable);
 
@@ -466,7 +467,7 @@ void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if ( !selectedVariable ) return;
 
-    std::string newName = ToString(wxGetTextFromUser(_("Enter the new name of the variable"), _("New name"), selectedVariableName));
+    std::string newName = utf8::FromWxString(wxGetTextFromUser(_("Enter the new name of the variable"), _("New name"), selectedVariableName));
     if ( newName.empty() || newName == selectedVariableName ) return;
 
 
@@ -548,7 +549,7 @@ void ChooseVariableDialog::UpdateSelectedAndParentVariable()
         parentVariable = NULL;
     }
 
-    selectedVariableName = variablesList->GetItemText(selectedItem);
+    selectedVariableName = utf8::FromWxString(variablesList->GetItemText(selectedItem));
     wxTreeListItem parent = variablesList->GetItemParent(selectedItem);
     if ( parent == variablesList->GetRootItem()  )
     {
@@ -565,7 +566,7 @@ void ChooseVariableDialog::UpdateSelectedAndParentVariable()
         std::vector<std::string> parents;
         while(parent != variablesList->GetRootItem() && parent.IsOk() )
         {
-            parents.insert(parents.begin(), ToString(variablesList->GetItemText(parent)));
+            parents.insert(parents.begin(), utf8::FromWxString(variablesList->GetItemText(parent)));
             parent = variablesList->GetItemParent(parent);
         }
 

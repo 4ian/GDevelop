@@ -127,7 +127,10 @@ void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const Param
 
 void ParameterControlsHelper::OnOptionalCheckboxClick(wxCommandEvent& event)
 {
-    unsigned int i = gd::ToInt(gd::ToString(window->FindFocus()->GetName()));
+    wxWindow * control = dynamic_cast<wxWindow*>(event.GetEventObject());
+    if (!control) return;
+
+    unsigned int i = gd::ToInt(gd::ToString(control->GetName()));
     if (i >= paramCheckboxes.size()) return;
 
     bool enable = paramCheckboxes.at(i)->GetValue();
@@ -138,7 +141,10 @@ void ParameterControlsHelper::OnOptionalCheckboxClick(wxCommandEvent& event)
 
 void ParameterControlsHelper::OnParameterBtClick(wxCommandEvent& event)
 {
-    unsigned int i = ToInt(gd::ToString(wxWindow::FindFocus()->GetName()));
+    wxWindow * control = dynamic_cast<wxWindow*>(event.GetEventObject());
+    if (!control) return;
+
+    unsigned int i = ToInt(gd::ToString(control->GetName()));
     if (i >= paramMetadata.size() || i >= paramEdits.size()) return;
     if (!editionCallback || !editionCallbackProject || !editionCallbackLayout) return;
 

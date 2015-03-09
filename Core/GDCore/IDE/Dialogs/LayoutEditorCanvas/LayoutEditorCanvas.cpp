@@ -884,7 +884,7 @@ public:
     }
 
     std::vector<InitialInstance*> & GetSelectedList() { return selectedList; };
-    std::vector<InitialInstance*> & IgnoreLockedInstances() { ignoreLockedInstances = true; };
+    InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; };
 
 private:
     const LayoutEditorCanvas & editor;

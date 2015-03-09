@@ -23,7 +23,7 @@ class GD_CORE_API SafeYield
 public:
 
     /**
-     * Launch a yield to prevent the application to appear to be
+     * \brief Launch a yield to prevent the application to appear to be
      * frozen.
      */
     static void Do(wxWindow *win = NULL, bool onlyIfNeeded = false)

@@ -42,6 +42,7 @@
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Analytics/AnalyticsSender.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
@@ -343,6 +344,9 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Creating main window" << endl;
     mainEditor = new MainFrame( 0 );
     SetTopWindow( mainEditor );
+
+    cout << "* Setting GUI contents scale factor" << std::endl;
+    gd::GUIContentScaleFactor::Set(mainEditor->GetContentScaleFactor());
 
     //Open files
     for (unsigned int i = 0;i<filesToOpen.size();++i)

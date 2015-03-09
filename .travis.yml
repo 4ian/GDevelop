@@ -5,6 +5,14 @@ compiler:
 
 install:
   - sudo apt-get update
+#Use clang 3.5 for compilation
+  - sudo apt-add-repository "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu precise main" -y
+  - sudo apt-add-repository "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.5 main" -y
+  - sudo apt-get update
+  - sudo apt-get install clang-3.5 -y --force-yes
+  - export LD_LIBRARY_PATH=/usr/lib/llvm-3.5/lib/
+  - export PATH=/usr/lib/llvm-3.5/bin:$PATH
+  - clang --version
 #Download and compile dependencies
   - sudo apt-get install p7zip-full
     #SFML dependencies:

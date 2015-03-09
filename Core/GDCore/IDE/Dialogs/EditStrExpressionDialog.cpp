@@ -25,6 +25,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/AdvancedEntryDialog.h"
 #include "GDCore/IDE/wxTools/TreeItemExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/Object.h"
@@ -285,12 +286,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
     ValList->Expand(ValList->GetRootItem());
 
 	TexteEdit->SetLexer(wxSTC_LEX_CPP);
-    #if defined(WINDOWS)
-    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-    #else
-	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	#endif
-	TexteEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, font);
+    TexteEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
 	TexteEdit->StyleClearAll();
 
 	TexteEdit->StyleSetForeground(4, *wxBLACK); //Numbers

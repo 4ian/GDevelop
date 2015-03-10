@@ -1089,6 +1089,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Paths/Java", javaDirEdit->GetValue() );
 
+    pConfig->Flush(); //Write changes to disk, in case of an application crash.
     EndModal( 1 );
 }
 

@@ -46,7 +46,7 @@
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
-#include "Game_Develop_EditorApp.h"
+#include "GDevelopIDEApp.h"
 #include "UpdateChecker.h"
 #include "MAJ.h"
 #include "SplashScreen.h"
@@ -61,12 +61,12 @@
 
 using namespace gd;
 
-IMPLEMENT_APP(Game_Develop_EditorApp)
+IMPLEMENT_APP(GDevelopIDEApp)
 
 /**
  * Program entry point
  */
-bool Game_Develop_EditorApp::OnInit()
+bool GDevelopIDEApp::OnInit()
 {
     //Disable assertions
     wxDisableAsserts();
@@ -345,15 +345,12 @@ bool Game_Develop_EditorApp::OnInit()
     mainEditor = new MainFrame( 0 );
     SetTopWindow( mainEditor );
 
-    cout << "* Setting GUI contents scale factor" << std::endl;
-    gd::GUIContentScaleFactor::Set(mainEditor->GetContentScaleFactor());
-
     //Open files
     for (unsigned int i = 0;i<filesToOpen.size();++i)
         mainEditor->Open(filesToOpen[i]);
 
     cout << "* Connecting shortcuts" << endl;
-    Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
+    Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(GDevelopIDEApp::OnKeyPressed));
 
     //Set help provider
     cout << "* Setting help provider" << endl;
@@ -439,7 +436,7 @@ bool Game_Develop_EditorApp::OnInit()
 
 }
 
-int Game_Develop_EditorApp::OnExit()
+int GDevelopIDEApp::OnExit()
 {
     cout << "\nGDevelop shutdown started:" << endl;
     cout << "* Closing the configuration and destroying singletons";
@@ -472,7 +469,7 @@ int Game_Develop_EditorApp::OnExit()
 }
 
 #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
-void Game_Develop_EditorApp::OnUnhandledException()
+void GDevelopIDEApp::OnUnhandledException()
 {
     wxSafeShowMessage( "Fatal error", "A fatal error occurred (01).\nGDevelop has to be shutdown." );
 
@@ -494,7 +491,7 @@ void Game_Develop_EditorApp::OnUnhandledException()
 }
 #endif
 
-bool Game_Develop_EditorApp::OnExceptionInMainLoop()
+bool GDevelopIDEApp::OnExceptionInMainLoop()
 {
     #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
     wxSafeShowMessage( "Fatal error", "A fatal error occurred: (02) Segmentation Fault.\nGDevelop has to be shutdown." );

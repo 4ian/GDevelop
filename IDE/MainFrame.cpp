@@ -35,6 +35,7 @@
 #include "MainFrame.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
@@ -318,7 +319,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
 
     SetDropTarget(new DnDFileEditor(*this));
 
-    //Accès à la configuration
+    //Set the content scale factor, for "retina" screens support.
+    gd::GUIContentScaleFactor::Set(GetContentScaleFactor());
+
     wxConfigBase *pConfig = wxConfigBase::Get();
 
     //Deactivate menu
@@ -697,6 +700,9 @@ void MainFrame::RealizeRibbonCustomButtons()
 
     //The device context used to render the button in memory
     wxMemoryDC dc;
+    double scale = gd::GUIContentScaleFactor::Get();
+    dc.SetLogicalScale(scale, scale);
+    dc.SetUserScale(1.0/scale, 1.0/scale);
 
     //Compute width of the bitmap button
     int width; artProvider->GetBarTabWidth(dc, fakeRibbon, _("File"), wxNullBitmap, &width, NULL, NULL, NULL);

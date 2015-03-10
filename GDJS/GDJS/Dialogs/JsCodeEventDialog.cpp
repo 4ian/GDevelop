@@ -24,12 +24,6 @@ JsCodeEventDialog::JsCodeEventDialog(wxWindow* parent, gdjs::JsCodeEvent & event
 {
 	//Customize the code editor
 	codeEdit->SetLexer(wxSTC_LEX_ESCRIPT);
-    #if defined(WINDOWS)
-    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-    #else
-	wxFont font(wxFontInfo(11).Family(wxFONTFAMILY_TELETYPE));
-	#endif
-
     codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
     for(unsigned int i = 0;i<12;++i) codeEdit->StyleSetFont(i, font);
 	codeEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace

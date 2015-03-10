@@ -208,12 +208,6 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
 	Connect(ID_CUSTOM1, wxEVT_STC_UPDATEUI, (wxObjectEventFunction)&EditCppCodeEvent::UpdateTextCtrl);
 
 	codeEdit->SetLexer(wxSTC_LEX_CPP);
-    #if defined(WINDOWS)
-    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-    #else
-	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	#endif
-
     codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
 	codeEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
 	codeEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace

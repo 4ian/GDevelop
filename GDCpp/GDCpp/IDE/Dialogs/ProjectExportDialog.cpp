@@ -148,7 +148,7 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExportDialog::OnFermerBtClick);
     //*)
 
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     compressCheck->Disable();
     #endif
 
@@ -216,7 +216,7 @@ public:
             wxExecute("explorer.exe \""+string(destinationDirectory.mb_str())+"\"");
             #elif defined(LINUX)
             system(string("xdg-open \""+string(destinationDirectory.mb_str())+"\"").c_str());
-            #elif defined(MAC)
+            #elif defined(MACOS)
             system(string("open \""+string(destinationDirectory.mb_str())+"\"").c_str());
             #endif
         }

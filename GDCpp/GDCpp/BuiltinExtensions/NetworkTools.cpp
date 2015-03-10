@@ -61,7 +61,7 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
     system(call.c_str());
-#elif defined(MAC)
+#elif defined(MACOS)
     string call = "open \""+webpageurl+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+

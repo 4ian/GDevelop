@@ -1253,7 +1253,7 @@ void ProjectManager::OnOpenProjectFolderSelected(wxCommandEvent& event)
     wxExecute("explorer.exe \""+dir+"\"");
     #elif defined(LINUX)
     system(std::string("xdg-open \""+dir+"\"").c_str());
-    #elif defined(MAC)
+    #elif defined(MACOS)
     system(std::string("open \""+dir+"\"").c_str());
     #endif
 }

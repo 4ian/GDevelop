@@ -17,7 +17,7 @@ void GD_API GDLogBanner()
         std::string sys = "Target system : GNU/Linux, ";
     #elif defined(WINDOWS)
         std::string sys = "Target system : Windows, ";
-    #elif defined(MAC)
+    #elif defined(MACOS)
         std::string sys = "Target system : Mac OS, ";
     #else
         std::string sys = "Target system : Unknown, ";

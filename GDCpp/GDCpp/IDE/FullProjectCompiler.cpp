@@ -43,6 +43,7 @@
 #include "GDCpp/IDE/ExecutableIconChanger.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCpp/CppPlatform.h"
 
 using namespace std;
@@ -140,7 +141,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         linuxTarget = true;
         macTarget = false;
         compressIfPossible = false;
-    #elif defined(MAC)
+    #elif defined(MACOS)
         windowsTarget = false;
         linuxTarget = true;
         macTarget = false;
@@ -179,7 +180,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( yieldClock.Time() > 150 )
             {
-                wxSafeYield(NULL, true);
+                gd::SafeYield::Do(NULL, true);
                 yieldClock.Start();
             }
         }
@@ -241,7 +242,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( yieldClock.Time() > 150 )
             {
-                wxSafeYield(NULL, true);
+                gd::SafeYield::Do(NULL, true);
                 yieldClock.Start();
             }
         }
@@ -273,17 +274,17 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
         ++i;
         diagnosticManager.OnPercentUpdate( 50.0 + static_cast<float>(i) / static_cast<float>(resourcesNewFilename.size())*25.0 );
-        wxSafeYield();
+        gd::SafeYield::Do();
     }
 
-    wxSafeYield();
+    gd::SafeYield::Do();
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 1 out of 3" )));
     gd::Project strippedProject = game;
     gd::ProjectStripper::StripProject(strippedProject);
     strippedProject.SaveToFile(static_cast<string>( tempDir + "/GDProjectSrcFile.gdg" ));
     diagnosticManager.OnPercentUpdate(80);
 
-    wxSafeYield();
+    gd::SafeYield::Do();
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 2 out of 3" )));
 
     //Encrypt the source file.
@@ -328,7 +329,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Création du fichier gam.egd
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 3 out of 3" )));
-    wxSafeYield();
+    gd::SafeYield::Do();
 
     //On créé une liste avec tous les fichiers
     vector < string > files;
@@ -384,7 +385,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( yieldClock.Time() > 150 )
             {
-                wxSafeYield(NULL, true);
+                gd::SafeYield::Do(NULL, true);
                 yieldClock.Start();
             }
         }
@@ -403,7 +404,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     diagnosticManager.OnPercentUpdate(90);
     diagnosticManager.OnMessage(gd::ToString(_( "Exporting game..." )));
-    wxSafeYield();
+    gd::SafeYield::Do();
 
     //Copy extensions
     for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)

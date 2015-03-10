@@ -64,7 +64,7 @@ int main( int argc, char *p_argv[] )
     #elif defined(LINUX)
         std::string codeFileExtension = "so";
         chdir( executablePath.c_str() ); //For linux, make the executable dir the current working directory
-    #elif defined(MAC)
+    #elif defined(MACOS)
         std::string codeFileExtension = "dylib";
     #else
         #error Please update this part to support your target system.

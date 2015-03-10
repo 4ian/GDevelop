@@ -25,7 +25,7 @@ JsCodeEventDialog::JsCodeEventDialog(wxWindow* parent, gdjs::JsCodeEvent & event
 	//Customize the code editor
 	codeEdit->SetLexer(wxSTC_LEX_ESCRIPT);
     codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
-    for(unsigned int i = 0;i<12;++i) codeEdit->StyleSetFont(i, font);
+    for(unsigned int i = 0;i<12;++i) codeEdit->StyleSetFont(i, gd::EventsRenderingHelper::Get()->GetFont());
 	codeEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
 	codeEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
     codeEdit->StyleSetForeground(wxSTC_ESCRIPT_STRING, *wxBLUE);

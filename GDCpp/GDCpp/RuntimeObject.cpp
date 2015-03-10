@@ -323,11 +323,11 @@ void RuntimeObject::RotateTowardAngle(float angleInDegrees, float speed, Runtime
     bool diffWasPositive = angularDiff >= 0;
 
     float newAngle = GetAngle()+(diffWasPositive ? -1.0 : 1.0)*speed*timeDelta;
-    if( GDpriv::MathematicalTools::angleDifference(newAngle, angleInDegrees) > 0 ^ diffWasPositive)
+    if((GDpriv::MathematicalTools::angleDifference(newAngle, angleInDegrees) > 0) ^ diffWasPositive)
         newAngle = angleInDegrees;
     SetAngle(newAngle);
 
-    if ( GetAngle() != newAngle ) //Objects like sprite in 8 directions does not handle small increments...
+    if (GetAngle() != newAngle) //Objects like sprite in 8 directions does not handle small increments...
         SetAngle(angleInDegrees); //...so force them to be in the path angle anyway.
 }
 

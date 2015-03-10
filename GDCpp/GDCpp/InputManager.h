@@ -47,7 +47,7 @@ public:
     /**
      * \brief Set the window managed by the input manager.
      */
-    InputManager & SetWindow(sf::Window * win) { window = win; }
+    InputManager & SetWindow(sf::Window * win) { window = win; return *this; }
 
     /**
      * Set if the input must be disabled when window lose focus.

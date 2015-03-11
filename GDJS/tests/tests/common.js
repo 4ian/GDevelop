@@ -107,4 +107,37 @@ describe('gdjs.InputManager', function() {
 		expect(inputManager.popStartedTouch()).to.be(undefined);
 		expect(inputManager.popEndedTouch()).to.be(10);
 	});
-})
+});
+
+
+describe('gdjs.RuntimeObject.cursorOnObject', function() {
+	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
+	var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
+	runtimeScene.loadFromScene({
+		layers:[{name:"", visibility: true}],
+		variables: [],
+		automatismsSharedData: [],
+		objects: [],
+		instances: []
+	});
+
+	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	object.setPosition(450, 500);
+
+	it('should handle mouse', function() {
+		runtimeGame.getInputManager().onMouseMove(100, 100);
+		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		runtimeGame.getInputManager().onMouseMove(450, 500);
+		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+	});
+
+	it('should handle touch', function() {
+		runtimeGame.getInputManager().onMouseMove(0, 0);
+		runtimeGame.getInputManager().onTouchStart(0, 100, 100);
+		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		runtimeGame.getInputManager().onTouchStart(1, 450, 500);
+		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+		runtimeGame.getInputManager().onTouchEnd(1);
+		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+	});
+});

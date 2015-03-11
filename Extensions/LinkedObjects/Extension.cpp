@@ -81,7 +81,7 @@ public:
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("objectList", "Pick these objects...")
+            .AddParameter("objectList", _("Pick these objects..."))
             .AddParameter("objectPtr", _("...if they are linked to this object"))
 
             .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
@@ -96,7 +96,7 @@ public:
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("objectList", "Pick these objects...")
+            .AddParameter("objectList", _("Pick these objects..."))
             .AddParameter("objectPtr", _("...if they are linked to this object"))
 
             .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");

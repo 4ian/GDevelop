@@ -15,6 +15,8 @@
  */
 gdjs.RuntimeGame = function(data, spec)
 {
+    spec = spec || {};
+
     //Safety check: Do gdjs initialization if not already done
     if ( gdjs.objectsTypes.keys.length === 0)
         gdjs.registerObjects();
@@ -38,10 +40,10 @@ gdjs.RuntimeGame = function(data, spec)
     this._forceFullscreen = spec.forceFullscreen || false; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
     this._renderer = null;
     this._canvasArea = null;
-    this._defaultWidth = gdjs.projectData.properties.windowWidth; //Default size for scenes cameras
-    this._defaultHeight = gdjs.projectData.properties.windowHeight;
-    this._currentWidth = gdjs.projectData.properties.windowWidth; //Current size of the canvas
-    this._currentHeight = gdjs.projectData.properties.windowHeight;
+    this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
+    this._defaultHeight = data.properties.windowHeight;
+    this._currentWidth = data.properties.windowWidth; //Current size of the canvas
+    this._currentHeight = data.properties.windowHeight;
     this._keepRatio = true;
     this._reduceIfNeed = true;
     this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
@@ -156,7 +158,7 @@ gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
  * @return The data associated to the global objects.
  */
 gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
-	return this._data.objects;
+	return this._data.objects || [];
 };
 
 /**

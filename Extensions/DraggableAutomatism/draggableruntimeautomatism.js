@@ -39,15 +39,7 @@ gdjs.DraggableRuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScen
             runtimeScene.getGame().getInputManager().getMouseX(),
             runtimeScene.getGame().getInputManager().getMouseY());
 
-        if (this.owner.getDrawableX() <= mousePos[0]
-            && this.owner.getDrawableX() + this.owner.getWidth() >= mousePos[0]
-            && this.owner.getDrawableY() <= mousePos[1]
-            && this.owner.getDrawableY() + this.owner.getHeight() >= mousePos[1] ) {
-
-            mousePos = runtimeScene.getLayer(this.owner.getLayer()).convertCoords(
-                runtimeScene.getGame().getInputManager().getMouseX(),
-                runtimeScene.getGame().getInputManager().getMouseY());
-
+        if (this.owner.insideObject(mousePos[0], mousePos[1])) {
             this._dragged = true;
             gdjs.DraggableRuntimeAutomatism.draggingSomething = true;
             this._xOffset = mousePos[0] - this.owner.getX();

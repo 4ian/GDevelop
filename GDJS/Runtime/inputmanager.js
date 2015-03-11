@@ -185,6 +185,15 @@ gdjs.InputManager.prototype.getTouchY = function(identifier) {
     return this._touches.get(identifier).y;
 };
 
+/**
+ * Return an array containing the identifiers of all touches.
+ *
+ * @method getAllTouchIdentifiers
+ */
+gdjs.InputManager.prototype.getAllTouchIdentifiers = function() {
+    return this._touches.keys();
+};
+
 gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
     this._startedTouches.push(identifier);
     this._touches.put(identifier, {x: x, y: y});

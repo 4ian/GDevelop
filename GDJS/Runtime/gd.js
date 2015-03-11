@@ -91,7 +91,7 @@ gdjs.getDocWidth = function() {
  * @static
  */
 gdjs.iterateOverArray = function(array, func) {
-    if ( array.length === undefined || array.length === null ) {
+    if ( array === undefined || array.length === undefined || array.length === null ) {
         console.error("gdjs.iterateOverArray called with something which is not an array.");
         return;
     }

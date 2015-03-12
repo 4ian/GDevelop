@@ -511,8 +511,8 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         modeRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
-        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
+        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : "", SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
+        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

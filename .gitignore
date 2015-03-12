@@ -64,7 +64,6 @@ Binaries/Packaging/opensuse-build-service/final/
 /Binaries/Output/WebIDE/libGD.raw.js
 /WebIDE
 !/GDCpp/scripts/bcp.exe
-/GDJS/tests/node_modules
 !/scripts/libgettextlib-0-17.dll
 !/scripts/libgettextsrc-0-17.dll
 !/xgettext.exe
@@ -75,3 +74,4 @@ Binaries/Packaging/opensuse-build-service/final/
 !/ExtLibs/curl.exe
 !/ExtLibs/7za.exe
 **/.DS_Store
+**/node_modules/

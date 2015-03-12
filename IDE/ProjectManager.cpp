@@ -31,6 +31,7 @@
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Clipboard.h"
+#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/ExternalLayoutEditor.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
@@ -1103,10 +1104,10 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
+    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo("Please wait for the internal compiler to finish its job...") : NULL;
     while ( CodeCompiler::Get()->CompilationInProcess() )
     {
-        wxYield();
+        gd::SafeYield::Do();
     }
     if ( waitDialog ) delete waitDialog;
 
@@ -1174,7 +1175,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo(_("Please wait while the internal compilation of events is finishing...")) : NULL;
     while (CodeCompiler::Get()->CompilationInProcess())
     {
-        wxYield();
+        gd::SafeYield::Do();
     }
     if ( waitDialog ) delete waitDialog;
 
@@ -1366,7 +1367,7 @@ void ProjectManager::CloseGame(gd::Project * project)
     wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo(_("Please wait, the internal compilation of events must be finished before continuing...")) : NULL;
     while ( CodeCompiler::Get()->CompilationInProcess() )
     {
-        wxYield();
+        gd::SafeYield::Do();
     }
     if ( waitDialog ) delete waitDialog;
 

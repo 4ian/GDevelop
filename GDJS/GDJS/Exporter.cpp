@@ -674,7 +674,7 @@ std::string Exporter::GetNodeExecutablePath()
         #if defined(WINDOWS)
         guessPaths.push_back("C:/Program Files/nodejs/node.exe");
         guessPaths.push_back("C:/Program Files (x86)/nodejs/node.exe");
-        #elif defined(LINUX)
+        #elif defined(LINUX) || defined(MACOS)
         guessPaths.push_back("/usr/bin/env/nodejs");
         guessPaths.push_back("/usr/bin/nodejs");
         guessPaths.push_back("/usr/local/bin/nodejs");

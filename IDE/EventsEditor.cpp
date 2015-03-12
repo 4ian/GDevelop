@@ -436,7 +436,7 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : "", gd::SkinHelper::GetRibbonIcon("deleteselected"));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("History"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         undoRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"));
         undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
@@ -532,7 +532,7 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
     double scale = gd::GUIContentScaleFactor::Get();
     dc.SetLogicalScale(scale, scale);
     dc.SetUserScale(1.0/scale, 1.0/scale);
-    
+
     dc.SetPen(wxPen(wxColour(246, 246, 246)));
     dc.SetBrush(wxBrush(wxColour(246, 246, 246)));
     dc.DrawRectangle(0,0,eventsPanel->GetSize().x,eventsPanel->GetSize().y);

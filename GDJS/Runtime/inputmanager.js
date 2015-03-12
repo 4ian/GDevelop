@@ -191,7 +191,12 @@ gdjs.InputManager.prototype.getTouchY = function(identifier) {
  * @method getAllTouchIdentifiers
  */
 gdjs.InputManager.prototype.getAllTouchIdentifiers = function() {
-    return this._touches.keys();
+    var touchIds = this._touches.keys();
+    for(var i = 0;i<touchIds.length;++i) {
+        touchIds[i] = parseInt(touchIds[i], 10);
+    }
+
+    return touchIds;
 };
 
 gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
@@ -211,6 +216,10 @@ gdjs.InputManager.prototype.onTouchEnd = function(identifier, x, y) {
     this._endedTouches.push(identifier);
     this._touches.remove(identifier);
 };
+
+gdjs.InputManager.prototype.getStartedTouchIdentifiers = function() {
+    return this._startedTouches;
+}
 
 gdjs.InputManager.prototype.popStartedTouch = function() {
     return this._startedTouches.shift();

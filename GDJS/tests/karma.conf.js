@@ -4,6 +4,8 @@ module.exports = function(config) {
 
     files: [
       'node_modules/expect.js/index.js',
+
+      //GDJS game engine files: (Order is important)
       '../Runtime/libs/pixi.js',
       '../Runtime/libs/jshashtable.js',
       '../Runtime/gd.js',
@@ -34,6 +36,12 @@ module.exports = function(config) {
       '../Runtime/storagetools.js',
       '../Runtime/stringtools.js',
       '../Runtime/windowtools.js',
+
+      //Extensions:
+      '../../Extensions/DraggableAutomatism/draggableruntimeautomatism.js',
+
+      //All tests files:
+      '../../Extensions/**/tests/**.spec.js',
       'tests/**/*.js'
     ]
   });

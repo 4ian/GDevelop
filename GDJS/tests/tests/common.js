@@ -95,6 +95,7 @@ describe('gdjs.InputManager', function() {
 	it('should handle touch events', function(){
 		inputManager.onTouchStart(46, 510, 610);
 		inputManager.onTouchStart(10, 510, 610);
+		expect(inputManager.getStartedTouchIdentifiers()).to.have.length(2);
 		expect(inputManager.getTouchX(46)).to.be(510);
 		expect(inputManager.getTouchY(46)).to.be(610);
 
@@ -104,6 +105,7 @@ describe('gdjs.InputManager', function() {
 
 		inputManager.onFrameEnded();
 		inputManager.onTouchEnd(10);
+		expect(inputManager.getStartedTouchIdentifiers()).to.have.length(0);
 		expect(inputManager.popStartedTouch()).to.be(undefined);
 		expect(inputManager.popEndedTouch()).to.be(10);
 	});

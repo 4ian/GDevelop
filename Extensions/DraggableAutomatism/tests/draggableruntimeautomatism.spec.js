@@ -52,6 +52,7 @@ describe('gdjs.DraggableRuntimeAutomatism', function() {
 
 	});
 	it('should handle touches', function() {
+		runtimeGame.getInputManager().touchSimulateMouse(false);
 		object.setPosition(450, 500);
 
 		//Drag'n'drop
@@ -94,6 +95,7 @@ describe('gdjs.DraggableRuntimeAutomatism', function() {
 		expect(object.getY()).to.be(700);
 	});
 	it('should handle multitouch', function() {
+		runtimeGame.getInputManager().touchSimulateMouse(false);
 		object.setPosition(450, 500);
 		object2.setPosition(650, 600);
 

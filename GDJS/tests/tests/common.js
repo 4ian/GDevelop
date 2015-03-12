@@ -109,6 +109,25 @@ describe('gdjs.InputManager', function() {
 		expect(inputManager.popStartedTouch()).to.be(undefined);
 		expect(inputManager.popEndedTouch()).to.be(10);
 	});
+	it('should simulate (or not) mouse events', function(){
+		inputManager.touchSimulateMouse();
+		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+		inputManager.onTouchStart(46, 510, 610);
+		expect(inputManager.isMouseButtonPressed(0)).to.be(true);
+		expect(inputManager.getMouseX()).to.be(510);
+		expect(inputManager.getMouseY()).to.be(610);
+		inputManager.onTouchMove(46, 520, 620);
+		expect(inputManager.getMouseX()).to.be(520);
+		expect(inputManager.getMouseY()).to.be(620);
+		inputManager.onTouchEnd(46);
+		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+
+		inputManager.touchSimulateMouse(false);
+		inputManager.onTouchStart(46, 510, 610);
+		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+		expect(inputManager.getMouseX()).to.be(520);
+		expect(inputManager.getMouseY()).to.be(620);
+	});
 });
 
 
@@ -135,6 +154,8 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
 
 	it('should handle touch', function() {
 		runtimeGame.getInputManager().onMouseMove(0, 0);
+		runtimeGame.getInputManager().touchSimulateMouse(false);
+
 		runtimeGame.getInputManager().onTouchStart(0, 100, 100);
 		expect(object.cursorOnObject(runtimeScene)).to.be(false);
 		runtimeGame.getInputManager().onTouchStart(1, 450, 500);

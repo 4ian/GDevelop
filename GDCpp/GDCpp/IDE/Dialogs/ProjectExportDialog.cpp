@@ -30,6 +30,7 @@
 #include <fstream>
 
 #include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
@@ -212,13 +213,7 @@ public:
         staticText1->SetLabel(_("Compilation finished")); staticText2->SetLabel(_("Compiled project is now available in the export folder."));
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"), _("Compilation finished"), wxYES_NO) == wxYES )
         {
-            #if defined(WINDOWS)
-            wxExecute("explorer.exe \""+string(destinationDirectory.mb_str())+"\"");
-            #elif defined(LINUX)
-            system(string("xdg-open \""+string(destinationDirectory.mb_str())+"\"").c_str());
-            #elif defined(MACOS)
-            system(string("open \""+string(destinationDirectory.mb_str())+"\"").c_str());
-            #endif
+            gd::ShowFolder(gd::ToString(destinationDirectory));
         }
     }
     virtual void OnMessage(std::string message, std::string message2) { staticText1->SetLabel(message); staticText2->SetLabel(message2); };

@@ -20,6 +20,7 @@
 #include <wx/busyinfo.h>
 #include <fstream>
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -1274,14 +1275,7 @@ void ProjectManager::OnOpenProjectFolderSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    std::string dir = gd::ToString(wxFileName::FileName(game->GetProjectFile()).GetPath());
-    #if defined(WINDOWS)
-    wxExecute("explorer.exe \""+dir+"\"");
-    #elif defined(LINUX)
-    system(std::string("xdg-open \""+dir+"\"").c_str());
-    #elif defined(MACOS)
-    system(std::string("open \""+dir+"\"").c_str());
-    #endif
+    gd::ShowFolder(wxFileName::FileName(game->GetProjectFile()).GetPath());
 }
 
 /**

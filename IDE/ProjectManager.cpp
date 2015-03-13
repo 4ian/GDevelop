@@ -114,6 +114,10 @@ const long ProjectManager::idRibbonEncoder = wxNewId();
 const long ProjectManager::idRibbonProjectsManager = wxNewId();
 const long ProjectManager::idRibbonHelp = wxNewId();
 
+wxRibbonButtonBar * ProjectManager::projectRibbonBar = NULL;
+wxRibbonButtonBar * ProjectManager::operationsRibbonBar = NULL;
+
+
 BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
 	//(*EventTable(ProjectManager)
 	//*)
@@ -369,20 +373,20 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", SkinHelper::GetRibbonIcon("open"), _("Open a previously saved project"));
     }
     {
-        wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), SkinHelper::GetRibbonIcon("save"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
-        file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
-        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
-        file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), SkinHelper::GetRibbonIcon("save"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        projectRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        projectRibbonBar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
+        projectRibbonBar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
+        projectRibbonBar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
-        ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", SkinHelper::GetRibbonIcon("sceneadd"));
-        ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", SkinHelper::GetRibbonIcon("eventsadd"));
-        ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", SkinHelper::GetRibbonIcon("externallayoutadd"));
-        ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", SkinHelper::GetRibbonIcon("extension"));
+        operationsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        operationsRibbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
+        operationsRibbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", SkinHelper::GetRibbonIcon("sceneadd"));
+        operationsRibbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", SkinHelper::GetRibbonIcon("eventsadd"));
+        operationsRibbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", SkinHelper::GetRibbonIcon("externallayoutadd"));
+        operationsRibbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", SkinHelper::GetRibbonIcon("extension"));
     }
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), SkinHelper::GetRibbonIcon("image"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -402,6 +406,25 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"), _("Open the online help for GDevelop"));
     }
 
+}
+
+void ProjectManager::UpdateRibbonButtonsState()
+{
+	bool projectOpened = mainEditor.CurrentGameIsValid();
+	if (projectRibbonBar)
+	{
+	    projectRibbonBar->EnableButton(idRibbonSave, projectOpened);
+	    projectRibbonBar->EnableButton(idRibbonSaveAll, projectOpened);
+	    projectRibbonBar->EnableButton(idRibbonClose, projectOpened);
+	}
+	if (operationsRibbonBar)
+	{
+	    operationsRibbonBar->EnableButton(idRibbonEditImages, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonAddScene, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonAddExternalEvents, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonAddExternalLayout, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonExtensions, projectOpened);
+	}
 }
 
 void ProjectManager::ConnectEvents()
@@ -502,6 +525,8 @@ void ProjectManager::Refresh()
         projectsTree->SetToolTip(_("Double click to set the project as the current project.\nDouble click on an item to edit it, or use right\nclick to display more options."));
     else
         projectsTree->SetToolTip(_("Create or open a project using the ribbon."));
+
+    UpdateRibbonButtonsState();
 }
 
 /**
@@ -1379,6 +1404,7 @@ void ProjectManager::CloseGame(gd::Project * project)
 
     mainEditor.SetCurrentGame(mainEditor.games.size()-1, /*refreshProjectManager=*/false);
     mainEditor.UpdateOpenedProjectsLogFile();
+    UpdateRibbonButtonsState();
 }
 
 /**

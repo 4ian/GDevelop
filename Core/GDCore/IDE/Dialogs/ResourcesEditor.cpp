@@ -349,7 +349,7 @@ wxTreeItemId ResourcesEditor::GetSelectedFolderItem()
  */
 void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 {
-    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE|wxFD_PREVIEW );
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {

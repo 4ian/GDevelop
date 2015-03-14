@@ -500,7 +500,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
     bool exportToZipFile = exportForCocoonJS;
 
     {
-        #if !defined(GD_NO_WX_GUI)  && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+        #if !defined(GD_NO_WX_GUI)
         wxProgressDialog progressDialog(_("Export in progress ( 1/2 )"), _("Exporting the project..."));
         #endif
 
@@ -520,13 +520,13 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         gd::Project exportedProject = project;
 
         //Export the resources ( before generating events as some resources filenames may be updated )
-        #if !defined(GD_NO_WX_GUI)  && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+        #if !defined(GD_NO_WX_GUI)
         ExportResources(fs, exportedProject, exportDir, &progressDialog);
         #else
         ExportResources(fs, exportedProject, exportDir, NULL);
         #endif
 
-        #if !defined(GD_NO_WX_GUI)  && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+        #if !defined(GD_NO_WX_GUI)
         progressDialog.SetTitle(_("Export in progress ( 2/2 )"));
         progressDialog.Update(50, _("Exporting events..."));
         #endif
@@ -545,14 +545,14 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
             return false;
         }
 
-        #if !defined(GD_NO_WX_GUI)  && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+        #if !defined(GD_NO_WX_GUI)
         progressDialog.Update(60, _("Preparing the project..."));
         #endif
 
         //Strip the project (*after* generating events as the events may use stripped things like objects groups...)...
         gd::ProjectStripper::StripProject(exportedProject);
 
-        #if !defined(GD_NO_WX_GUI)  && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+        #if !defined(GD_NO_WX_GUI)
         progressDialog.Update(70, _("Exporting files..."));
         #endif
 
@@ -561,7 +561,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
                                           "gdjs.projectData", false);
         includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
-        #if !defined(GD_NO_WX_GUI)  && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+        #if !defined(GD_NO_WX_GUI)
         progressDialog.Update(80, minify ? _("Exporting files and minifying them...") : _("Exporting files..."));
         #endif
 
@@ -582,9 +582,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         if ( exportToZipFile )
         {
             #if !defined(GD_NO_WX_GUI)
-            #if !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
             progressDialog.Update(90, _("Creating the zip file..."));
-            #endif
 
             //Getting all the files to includes in the directory
             wxArrayString files;
@@ -609,9 +607,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
                 gd::LogWarning(_("Unable to finalize the creation of the zip file!\n\nThe exported project won't be put in a zip file."));
             else
             {
-                #if !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
                 progressDialog.Update(95, _("Cleaning files..."));
-                #endif
 
                 fs.ClearDir(exportDir);
                 fs.CopyFile(gd::ToString(zipTempName), exportDir+"/packaged_game.zip");

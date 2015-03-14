@@ -68,7 +68,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     {
         if ( !it->first.empty() )
         {
-            #if !defined(GD_NO_WX_GUI) && !defined(MACOS) //wxProgressDialog can freeze on MacOS with SFML running
+            #if !defined(GD_NO_WX_GUI)
             if ( optionalProgressDialog )
             {
                 if ( !optionalProgressDialog->Update(i/static_cast<float>(resourcesNewFilename.size())*100.0f, _("Exporting ")+it->second) )

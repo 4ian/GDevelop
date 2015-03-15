@@ -17,6 +17,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include <wx/help.h>
 
 namespace gd
@@ -124,7 +125,7 @@ game(game_)
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLink::OnAnnulerBtClick);
 	//*)
 
-	linkedNameEdit->ChangeValue(editedEvent.GetTarget());
+	linkedNameEdit->ChangeValue(gd::utf8::ToWxString(editedEvent.GetTarget()));
 	if ( !editedEvent.IncludeAllEvents() )
 	{
 	    OnlyEventsCheck->SetValue(true);
@@ -133,10 +134,10 @@ game(game_)
 	}
 
 	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
-        linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
+        linkedNameEdit->Append(gd::utf8::ToWxString(game.GetExternalEvents(i).GetName()));
 
     for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
-    	linkedNameEdit->Append(game.GetLayout(i).GetName());
+    	linkedNameEdit->Append(gd::utf8::ToWxString(game.GetLayout(i).GetName()));
 }
 
 EditLink::~EditLink()
@@ -164,7 +165,7 @@ void EditLink::OnAnnulerBtClick(wxCommandEvent& event)
  */
 void EditLink::OnOkBtClick(wxCommandEvent& event)
 {
-    editedEvent.SetTarget(ToString(linkedNameEdit->GetValue()));
+    editedEvent.SetTarget(gd::utf8::FromWxString(linkedNameEdit->GetValue()));
     if ( AllEventsCheck->GetValue() == true )
         editedEvent.SetIncludeAllEvents(true);
     else

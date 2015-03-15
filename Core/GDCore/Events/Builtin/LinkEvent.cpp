@@ -21,6 +21,7 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/IDE/Dialogs/EditLink.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 
 using namespace std;
 
@@ -147,8 +148,9 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     else
         dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
-    wxRect lien = dc.GetTextExtent(_("Link to ")+GetTarget());
+    wxString targetStr = _("Link to ")+gd::utf8::ToWxString(GetTarget());
+    dc.DrawText(targetStr , x+32, y + 3 );
+    wxRect lien = dc.GetTextExtent(targetStr);
 
     dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
     if ( IncludeAllEvents() )

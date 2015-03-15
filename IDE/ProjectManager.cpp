@@ -32,6 +32,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 #include "Dialogs/ExternalLayoutEditor.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
 #include "gdTreeItemProjectData.h"
@@ -435,7 +436,7 @@ void ProjectManager::Refresh()
     {
         wxString name = mainEditor.games[i]->GetName() == "" ?
                         _("(No name)") :
-                        mainEditor.games[i]->GetName();
+                        gd::utf8::ToWxString(mainEditor.games[i]->GetName());
 
         //Adding game's root
         gdTreeItemProjectData * gameItemData = new gdTreeItemProjectData("Root", "", mainEditor.games[i].get());
@@ -452,24 +453,25 @@ void ProjectManager::Refresh()
         for (unsigned int j = 0;j<mainEditor.games[i]->GetLayoutsCount();++j)
         {
             gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", mainEditor.games[i]->GetLayout(j).GetName(), mainEditor.games[i].get());
-            projectsTree->AppendItem(scenesItem, mainEditor.games[i]->GetLayout(j).GetName(), 1 ,1, sceneItemData);
+            projectsTree->AppendItem(scenesItem, gd::utf8::ToWxString(mainEditor.games[i]->GetLayout(j).GetName()), 1 ,1, sceneItemData);
         }
 
-        //Evenements externes
+        //External events
         gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEventsRoot", "", mainEditor.games[i].get());
         wxTreeItemId eventsItem = projectsTree->AppendItem(projectItem, _("External events"), 4 ,4, eventsItemData);
         for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalEventsCount();++j)
         {
             gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEvents", mainEditor.games[i]->GetExternalEvents(j).GetName(), mainEditor.games[i].get());
-            projectsTree->AppendItem(eventsItem, mainEditor.games[i]->GetExternalEvents(j).GetName(), 4 ,4, eventsItemData);
+            projectsTree->AppendItem(eventsItem, gd::utf8::ToWxString(mainEditor.games[i]->GetExternalEvents(j).GetName()), 4 ,4, eventsItemData);
         }
 
+        //External layouts
         gdTreeItemProjectData * externalLayoutsItemData = new gdTreeItemProjectData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
         wxTreeItemId externalayoutsItem = projectsTree->AppendItem(projectItem, _("External layouts"), 6 , 6, externalLayoutsItemData);
         for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalLayoutsCount();++j)
         {
             gdTreeItemProjectData * externalLayoutsItemData = new gdTreeItemProjectData("ExternalLayout", mainEditor.games[i]->GetExternalLayout(j).GetName(), mainEditor.games[i].get());
-            projectsTree->AppendItem(externalayoutsItem, mainEditor.games[i]->GetExternalLayout(j).GetName(), 6 , 6, externalLayoutsItemData);
+            projectsTree->AppendItem(externalayoutsItem, gd::utf8::ToWxString(mainEditor.games[i]->GetExternalLayout(j).GetName()), 6 , 6, externalLayoutsItemData);
         }
 
         std::shared_ptr<gd::Project> game = std::dynamic_pointer_cast<gd::Project>(mainEditor.games[i]);
@@ -757,11 +759,11 @@ void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
     {
         prefix = "["+project.GetName()+"] ";
         if ( project.GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+project.GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+            prefix = "["+gd::utf8::SubStr(project.GetName(), 0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), project, layout, mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+layout.GetName(), true, gd::SkinHelper::GetIcon("scene", 16)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, gd::utf8::ToWxString(prefix+layout.GetName()), true, gd::SkinHelper::GetIcon("scene", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }
@@ -854,7 +856,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     if ( event.IsEditCancelled() ) return;
 
     selectedItem = event.GetItem();
-    string newName = string(event.GetLabel().mb_str());
+    string newName = gd::utf8::FromWxString(event.GetLabel());
 
     gd::Project * game;
     gdTreeItemProjectData * data;
@@ -1005,11 +1007,11 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
     if ( !project ) return;
 
     //Finding a new, unique name for the scene
-    string newSceneName = string(_("New scene"));
+    string newSceneName = gd::utf8::FromLocaleString(_("New scene"));
     int i = 2;
     while(project->HasLayoutNamed(newSceneName))
     {
-        newSceneName = _("New scene") + " " + ToString(i);
+        newSceneName = gd::utf8::FromLocaleString(_("New scene")) + " " + ToString(i);
         ++i;
     }
 
@@ -1058,11 +1060,11 @@ void ProjectManager::EditResourcesOfProject(gd::Project * project)
     {
         prefix = "["+project->GetName()+"] ";
         if ( project->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+project->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+            prefix = "["+gd::utf8::SubStr(project->GetName(), 0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *project, mainEditor.GetMainFrameWrapper(), true);
-    mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Images bank"), true, gd::SkinHelper::GetIcon("image", 16));
+    mainEditor.GetEditorsNotebook()->AddPage(editorImages, gd::utf8::ToWxString(prefix+gd::utf8::FromLocaleString(_("Images bank"))), true, gd::SkinHelper::GetIcon("image", 16));
 }
 
 /**
@@ -1199,7 +1201,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasLayoutNamed(newLayoutName))
     {
-        newLayoutName = _("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+ToString(i));
+        newLayoutName = gd::utf8::FromLocaleString(_("Copy of")) + " " + newLayout.GetName() + (i == 1 ? "" : " "+ToString(i));
         ++i;
     }
 
@@ -1211,9 +1213,9 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     //Insert in tree
     gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", newLayoutName, game);
     if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newLayoutName, 1, 1, sceneItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), gd::utf8::ToWxString(newLayoutName), 1, 1, sceneItemData);
     else
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newLayoutName, 1, 1, sceneItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, gd::utf8::ToWxString(newLayoutName), 1, 1, sceneItemData);
 }
 
 /**
@@ -1463,11 +1465,11 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     {
         prefix = "["+game->GetName()+"] ";
         if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+            prefix = "["+gd::utf8::SubStr(game->GetName(), 0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("events", 16)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, gd::utf8::ToWxString(prefix+data->GetSecondString()), true, gd::SkinHelper::GetIcon("events", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }
@@ -1506,11 +1508,11 @@ void ProjectManager::OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& e
 void ProjectManager::AddExternalEventsToGame(gd::Project * project)
 {
     //Finding a new, unique name for the scene
-    string newName = string(_("External events"));
+    string newName = gd::utf8::FromLocaleString(_("External events"));
     int i = 2;
     while(project->HasExternalEventsNamed(newName))
     {
-        newName = _("External events") + " " + ToString(i);
+        newName = gd::utf8::FromLocaleString(_("External events")) + " " + ToString(i);
         ++i;
     }
 
@@ -1625,7 +1627,7 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasExternalEventsNamed(newName))
     {
-        newName = _("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : ToString(i));
+        newName = gd::utf8::FromLocaleString(_("Copy of")) + " " + newEvents.GetName() + " " + ( i==1 ? "" : ToString(i));
         ++i;
     }
 
@@ -1637,9 +1639,9 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     //Insert in tree
     gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEvents", newName, game);
     if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 4, 4, eventsItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), gd::utf8::ToWxString(newName), 4, 4, eventsItemData);
     else
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 4, 4, eventsItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, gd::utf8::ToWxString(newName), 4, 4, eventsItemData);
 }
 
 /**
@@ -1648,11 +1650,11 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
 void ProjectManager::AddExternalLayoutToGame(gd::Project * project)
 {
     //Finding a new, unique name for the scene
-    string newName = string(_("External layout"));
+    string newName = gd::utf8::FromLocaleString(_("External layout"));
     int i = 2;
     while(project->HasExternalLayoutNamed(newName))
     {
-        newName = _("External layout") + " " + ToString(i);
+        newName = gd::utf8::FromLocaleString(_("External layout")) + " " + ToString(i);
         ++i;
     }
 
@@ -1715,11 +1717,11 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
     {
         prefix = "["+game->GetName()+"] ";
         if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+            prefix = "["+gd::utf8::SubStr(game->GetName(), 0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("scene", 16)) )
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, gd::utf8::ToWxString(prefix+data->GetSecondString()), true, gd::SkinHelper::GetIcon("scene", 16)) )
     {
         gd::LogError(_("Unable to add a new tab !"));
     }
@@ -1831,7 +1833,7 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasExternalLayoutNamed(newName))
     {
-        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : ToString(i));
+        newName = gd::utf8::FromLocaleString(_("Copy of")) + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : ToString(i));
         ++i;
     }
 
@@ -1843,9 +1845,9 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     //Insert in tree
     gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalLayout", newName, game);
     if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 6, 6, eventsItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), gd::utf8::ToWxString(newName), 6, 6, eventsItemData);
     else
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 6, 6, eventsItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, gd::utf8::ToWxString(newName), 6, 6, eventsItemData);
 }
 
 void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
@@ -1993,7 +1995,7 @@ void ProjectManager::OnSceneMoveUpSelected(wxCommandEvent& event)
     game->SwapLayouts(index, index-1);
 
     //Update the tree
-    wxString nextName = data->GetSecondString();
+    wxString nextName = gd::utf8::ToWxString(data->GetSecondString());
     wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
     wxTreeItemId previous = GetPreviousSibling(projectsTree, selectedItem);
     wxString previousName = projectsTree->GetItemText(previous);
@@ -2020,7 +2022,7 @@ void ProjectManager::OnSceneMoveDownSelected(wxCommandEvent& event)
     game->SwapLayouts(index, index+1);
 
     //Update the tree
-    wxString previousName = data->GetSecondString();
+    wxString previousName = gd::utf8::ToWxString(data->GetSecondString());
     wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
     wxTreeItemId next = projectsTree->GetNextSibling(selectedItem);
     wxString nextName = projectsTree->GetItemText(next);
@@ -2047,7 +2049,7 @@ void ProjectManager::OnExternalLayoutMoveUpSelected(wxCommandEvent& event)
     game->SwapExternalLayouts(index, index-1);
 
     //Update the tree
-    wxString nextName = data->GetSecondString();
+    wxString nextName = gd::utf8::ToWxString(data->GetSecondString());
     wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
     wxTreeItemId previous = GetPreviousSibling(projectsTree, selectedItem);
     wxString previousName = projectsTree->GetItemText(previous);
@@ -2074,7 +2076,7 @@ void ProjectManager::OnExternalLayoutMoveDownSelected(wxCommandEvent& event)
     game->SwapExternalLayouts(index, index+1);
 
     //Update the tree
-    wxString previousName = data->GetSecondString();
+    wxString previousName = gd::utf8::ToWxString(data->GetSecondString());
     wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
     wxTreeItemId next = projectsTree->GetNextSibling(selectedItem);
     wxString nextName = projectsTree->GetItemText(next);
@@ -2101,7 +2103,7 @@ void ProjectManager::OnExternalEventsMoveUpSelected(wxCommandEvent& event)
     game->SwapExternalEvents(index, index-1);
 
     //Update the tree
-    wxString nextName = data->GetSecondString();
+    wxString nextName = gd::utf8::ToWxString(data->GetSecondString());
     wxTreeItemData* nextData = projectsTree->GetItemData(selectedItem);
     wxTreeItemId previous = GetPreviousSibling(projectsTree, selectedItem);
     wxString previousName = projectsTree->GetItemText(previous);
@@ -2128,7 +2130,7 @@ void ProjectManager::OnExternalEventsMoveDownSelected(wxCommandEvent& event)
     game->SwapExternalEvents(index, index+1);
 
     //Update the tree
-    wxString previousName = data->GetSecondString();
+    wxString previousName = gd::utf8::ToWxString(data->GetSecondString());
     wxTreeItemData* previousData = projectsTree->GetItemData(selectedItem);
     wxTreeItemId next = projectsTree->GetNextSibling(selectedItem);
     wxString nextName = projectsTree->GetItemText(next);

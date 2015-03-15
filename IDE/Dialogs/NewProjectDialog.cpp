@@ -117,6 +117,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
         if(theme) theme->SetWindowTheme((HWND) templateList->GetHWND(), L"EXPLORER", NULL);
     }
     #endif
+    templateList->SetMinSize(wxSize(150, -1));
 
     projectFileEdit->AutoCompleteDirectories();
 
@@ -140,7 +141,9 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     }
     projectFileEdit->SetValue(newProjectFile);
 
+    #if !defined(MACOS)
 	SetSize(640,480);
+    #endif
 
     platformList->InsertColumn(0,_("Platform"), wxLIST_FORMAT_LEFT, 640);
     templateList->InsertColumn(0,_("Template"), wxLIST_FORMAT_LEFT, 640);

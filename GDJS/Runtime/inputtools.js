@@ -236,3 +236,7 @@ gdjs.evtTools.input.popEndedTouch = function(runtimeScene) {
 
     return false;
 };
+
+gdjs.evtTools.input.touchSimulateMouse = function(runtimeScene, enable) {
+    runtimeScene.getGame().getInputManager().touchSimulateMouse(enable);
+};

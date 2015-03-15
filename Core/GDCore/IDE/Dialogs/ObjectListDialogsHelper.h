@@ -12,6 +12,7 @@
 #include <vector>
 namespace gd { class Project; }
 namespace gd { class Layout; }
+namespace gd { class Object; }
 namespace gd { class ClassWithObjects; }
 namespace gd { class ObjectGroup; }
 class wxTreeCtrl;
@@ -84,6 +85,20 @@ public:
     void RefreshList(wxTreeCtrl * objectsList, wxTreeItemId * objectsRootItem = NULL,
         wxTreeItemId * groupsRootItem = NULL);
 
+    /**
+     * \brief Format the specified wxTreeItemId for the object (label, thumbnail...).
+     */
+    void MakeObjectItem(wxTreeCtrl * objectsList, wxTreeItemId item, const gd::Object & object, bool globalObject);
+
+    /**
+     * \brief Format the specified wxTreeItemId for the group (label, thumbnail...).
+     */
+    void MakeGroupItem(wxTreeCtrl * objectsList, wxTreeItemId item, const gd::ObjectGroup & group, bool globalGroup);
+
+    /**
+     * \brief Set a callback that will be called whenever a group item is being rendered.
+     * \see gd::ObjectListDialogsHelper::MakeGroupItem
+     */
     void SetGroupExtraRendering(std::function<void(wxTreeItemId)> function)
     {
         hasGroupExtraRendering = true;
@@ -92,8 +107,18 @@ public:
     #endif
 
 private:
+    #if !defined(GD_NO_WX_GUI)
     wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects);
     wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const std::vector <gd::ObjectGroup> & groups, bool globalGroup);
+
+    /**
+     * \brief Generate the thumnail for the specified object, add it to the image list of the
+     * wxTreeCtrl and return the id on the thumbnail.
+     * \param objectsList the wxTreeCtrl containing the objects list.
+     * \param object The object for which thumbnail should be generated.
+     */
+    int MakeObjectItemThumbnail(wxTreeCtrl * objectsList, const gd::Object & object);
+    #endif
 
     const Project & project;
     const Layout & layout;

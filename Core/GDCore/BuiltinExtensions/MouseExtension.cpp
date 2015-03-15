@@ -33,6 +33,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple();
 
+    extension.AddAction("TouchSimulateMouse",
+                   _("De/activate moving mouse cursor with touches"),
+                   _("When activated, any touch made on a touchscreen will also move the mouse cursor. When deactivated, mouse and touch positions will be completely independant.\nBy default, this is activated so that you can simply use the mouse conditions to also support touchscreens. If you want to have multitouch and differentiate mouse and touches, just deactivate it with this action."),
+                   _("Move mouse cursor when touching screen: _PARAM1_"),
+                   _("Mouse and touch"),
+                   "res/conditions/touch24.png",
+                   "res/conditions/touch.png")
+
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("yesorno", _("Activate (yes by default when game is launched)")).SetDefaultValue("yes")
+        .MarkAsAdvanced();
+
     extension.AddAction("CentreSourisX",
                    _("Center cursor horizontally"),
                    _("Put the cursor in the middle of the screen horizontally."),
@@ -101,9 +113,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddCondition("SourisX",
-                   _("Cursor/touch X position"),
+                   _("Cursor X position"),
                    _("Compare the X position of the cursor or of a touch."),
-                   _("Cursor/touch X position is _PARAM1__PARAM2_"),
+                   _("Cursor X position is _PARAM1__PARAM2_"),
                    _("Mouse and touch"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
@@ -115,9 +127,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .SetManipulatedType("number");
 
     extension.AddCondition("SourisY",
-                   _("Cursor/touch Y position"),
+                   _("Cursor Y position"),
                    _("Compare the Y position of the cursor or of a touch."),
-                   _("Cursor/touch Y position is _PARAM1__PARAM2_"),
+                   _("Cursor Y position is _PARAM1__PARAM2_"),
                    _("Mouse and touch"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
@@ -187,30 +199,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
                    "res/conditions/touch.png")
         .AddCodeOnlyParameter("currentScene", "");
 
-    extension.AddExpression("MouseX", _("Cursor/touch X position"), _("Cursor/touch X position"), _("Mouse and touch"), "res/actions/mouse.png")
+    extension.AddExpression("MouseX", _("Cursor X position"), _("Cursor X position"), _("Mouse cursor"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
 
-    extension.AddExpression("SourisX", _("Cursor/touch X position"), _("Cursor/touch X position"), _("Mouse and touch"), "res/actions/mouse.png")
+    extension.AddExpression("SourisX", _("Cursor X position"), _("Cursor X position"), _("Mouse cursor"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0")
         .SetHidden();
 
-    extension.AddExpression("MouseY", _("Cursor/touch Y position"), _("Cursor/touch Y position"), _("Mouse and touch"), "res/actions/mouse.png")
+    extension.AddExpression("MouseY", _("Cursor Y position"), _("Cursor Y position"), _("Mouse cursor"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
 
 
-    extension.AddExpression("SourisY", _("Cursor/touch Y position"), _("Cursor/touch Y position"), _("Mouse and touch"), "res/actions/mouse.png")
+    extension.AddExpression("SourisY", _("Cursor Y position"), _("Cursor Y position"), _("Mouse cursor"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0")
         .SetHidden();
 
-    extension.AddExpression("MouseWheelDelta", _("Mouse wheel: Displacement"), _("Mouse wheel displacement"), _("Mouse and touch"), "res/actions/mouse.png")
+    extension.AddExpression("MouseWheelDelta", _("Mouse wheel: Displacement"), _("Mouse wheel displacement"), _("Mouse cursor"), "res/actions/mouse.png")
         .AddCodeOnlyParameter("currentScene", "");
 
     extension.AddExpression("TouchX", _("Touch X position"), _("Touch X position"), _("Multitouch"), "res/conditions/touch.png")

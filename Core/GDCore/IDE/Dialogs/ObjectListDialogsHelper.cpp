@@ -123,22 +123,8 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
         if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) &&
             ( !searching || (searching && gd::StrUppercase(name).find(searchText) != std::string::npos)) )
         {
-            wxLogNull noLogPlease; //Discard any warning when loading thumbnaiils.
-
-            int thumbnailID = -1;
-            wxBitmap thumbnail;
-            if (objectsList->GetImageList() &&
-                objects.GetObject(i).GenerateThumbnail(project, thumbnail) &&
-                thumbnail.IsOk() )
-            {
-                objectsList->GetImageList()->Add(thumbnail);
-                thumbnailID = objectsList->GetImageList()->GetImageCount()-1;
-            }
-
-            wxTreeItemId item = objectsList->AppendItem( rootItem,
-                objects.GetObject(i).GetName(), thumbnailID );
-            objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
-            if ( globalObjects ) objectsList->SetItemBold(item, true);
+            wxTreeItemId item = objectsList->AppendItem(rootItem, "theobject");
+            MakeObjectItem(objectsList, item, objects.GetObject(i), globalObjects);
 
             lastAddedItem = item;
         }
@@ -147,7 +133,7 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
     return lastAddedItem;
 }
 
-wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const std::vector <ObjectGroup> & groups, bool globalGroup)
+wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const std::vector <ObjectGroup> & groups, bool globalGroups)
 {
     bool searching = searchText.empty() ? false : true;
 
@@ -157,17 +143,49 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && gd::StrUppercase(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
-            wxTreeItemId item = objectsList->AppendItem( rootItem, groups[i].GetName(), 1 );
-            objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
-            if ( globalGroup ) objectsList->SetItemBold(item, true);
-
-            if (hasGroupExtraRendering) groupExtraRendering(item);
+            wxTreeItemId item = objectsList->AppendItem(rootItem, "thegroup");
+            MakeGroupItem(objectsList, item, groups[i], globalGroups);
 
             lastAddedItem = item;
         }
     }
 
     return lastAddedItem;
+}
+
+void ObjectListDialogsHelper::MakeGroupItem(wxTreeCtrl * objectsList, wxTreeItemId item, const gd::ObjectGroup & group, bool globalGroup)
+{
+    objectsList->SetItemText(item, group.GetName());
+    objectsList->SetItemImage(item, 1);
+    objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
+    if ( globalGroup ) objectsList->SetItemBold(item, true);
+
+    if (hasGroupExtraRendering) groupExtraRendering(item);
+}
+
+void ObjectListDialogsHelper::MakeObjectItem(wxTreeCtrl * objectsList, wxTreeItemId item, const gd::Object & object, bool globalObject)
+{
+    objectsList->SetItemText(item, object.GetName());
+    objectsList->SetItemImage(item, MakeObjectItemThumbnail(objectsList, object));
+    objectsList->SetItemData(item, new gd::TreeItemStringData(globalObject ? "GlobalObject" : "LayoutObject"));
+    if (globalObject) objectsList->SetItemBold(item, true);
+}
+
+int ObjectListDialogsHelper::MakeObjectItemThumbnail(wxTreeCtrl * objectsList, const gd::Object & object)
+{
+    wxLogNull noLogPlease; //Discard any warning when loading thumbnails.
+
+    int thumbnailID = -1;
+    wxBitmap thumbnail;
+    if (objectsList->GetImageList() &&
+        object.GenerateThumbnail(project, thumbnail) &&
+        thumbnail.IsOk() )
+    {
+        objectsList->GetImageList()->Add(thumbnail);
+        thumbnailID = objectsList->GetImageList()->GetImageCount()-1;
+    }
+
+    return thumbnailID;
 }
 #endif
 

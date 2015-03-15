@@ -831,19 +831,9 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : &layout, *object);
 
-        //TODO: Set dirty only if modified.
         project.SetDirty();
 
-        //Reload thumbnail
-        int thumbnailID = -1;
-        wxBitmap thumbnail;
-        if ( objectsList->GetImageList() && object->GenerateThumbnail(project, thumbnail) && thumbnail.IsOk() )
-        {
-            objectsList->GetImageList()->Add(thumbnail);
-            thumbnailID = objectsList->GetImageList()->GetImageCount()-1;
-        }
-
-        objectsList->SetItemImage( lastSelectedItem, thumbnailID );
+        listsHelper.MakeObjectItem(objectsList, lastSelectedItem, *object, globalObject);
 
         //Reload resources : Do not forget to switch the working directory.
         wxString oldWorkingDir = wxGetCwd();
@@ -869,7 +859,7 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
                 group->AddObject(dialog.GetChosenObjects()[i]);
         }
 
-        UpdateGroup(lastSelectedItem);
+        listsHelper.MakeGroupItem(objectsList, lastSelectedItem, *group, globalGroup);
     }
 
     mainFrameWrapper.GetMainEditor()->SetFocus();
@@ -900,7 +890,8 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
         name = _("NewObject")+ToString(i);
 
     //Add a new object of selected type to objects list
-    layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), ToString(name), layout.GetObjectsCount());
+    gd::Object & object = layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(),
+        ToString(name), layout.GetObjectsCount());
 
     //And to the TreeCtrl
     wxTreeItemId itemAdded;
@@ -910,21 +901,10 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     else
         itemAdded = objectsList->PrependItem(objectsRootItem, name);
 
-    //Reload thumbnail
-    int thumbnailID = -1;
-    wxBitmap thumbnail;
-    if ( objectsList->GetImageList() && layout.GetObject(layout.GetObjectsCount()-1).GenerateThumbnail(project, thumbnail) )
-    {
-        objectsList->GetImageList()->Add(thumbnail);
-        thumbnailID = objectsList->GetImageList()->GetImageCount()-1;
-    }
-    objectsList->SetItemImage( itemAdded, thumbnailID );
-
-    //Data
-    objectsList->SetItemData( itemAdded, new gd::TreeItemStringData("LayoutObject") );
+    listsHelper.MakeObjectItem(objectsList, itemAdded, object, false);
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, &layout, layout.GetObject(name));
+        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, &layout, object);
 
     objectsList->EditLabel(itemAdded);
     renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
@@ -1335,6 +1315,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
     {
         gd::Object * object = GetSelectedObject();
         if ( !object ) return;
+
         std::string objectName = object->GetName();
         if ( project.HasObjectNamed(objectName) )
         {
@@ -1354,21 +1335,17 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         }
 
         //Delete the old item
-        int oldImage = objectsList->GetItemImage(lastSelectedItem);
         objectsList->Delete(lastSelectedItem);
 
         //Add the new item
         wxTreeItemId newItem;
         wxTreeItemId lastGlobalItem = GetLastGlobalObjectItem();
         if(lastGlobalItem.IsOk())
-        {
-            newItem = objectsList->InsertItem(objectsRootItem, lastGlobalItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
-        }
+            newItem = objectsList->InsertItem(objectsRootItem, lastGlobalItem, objectName);
         else
-        {
-            newItem = objectsList->AppendItem(objectsRootItem, objectName, oldImage, oldImage, new gd::TreeItemStringData("GlobalObject"));
-        }
-        objectsList->SetItemBold(newItem, true);
+            newItem = objectsList->AppendItem(objectsRootItem, objectName);
+
+        listsHelper.MakeObjectItem(objectsList, newItem, project.GetObject(objectName), true);
         objectsList->SelectItem(newItem);
     }
     //Group clicked?
@@ -1383,6 +1360,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             gd::LogMessage(_("There is already a global object group with this name."));
             return;
         }
+
         project.GetObjectGroups().push_back(*group);
         RemoveGroup(groupName, layout.GetObjectGroups());
 
@@ -1399,17 +1377,13 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         wxTreeItemId newItem;
         wxTreeItemId lastGlobalItem = GetLastGlobalGroupItem();
         if(lastGlobalItem.IsOk())
-        {
-            newItem = objectsList->InsertItem(groupsRootItem, lastGlobalItem, groupName, 1, 1, new gd::TreeItemStringData("GlobalGroup"));
-        }
+            newItem = objectsList->InsertItem(groupsRootItem, lastGlobalItem, groupName);
         else
-        {
-            newItem = objectsList->AppendItem(groupsRootItem, groupName, 1, 1, new gd::TreeItemStringData("GlobalGroup"));
-        }
-        objectsList->SetItemBold(newItem, true);
-        objectsList->SelectItem(newItem);
+            newItem = objectsList->AppendItem(groupsRootItem, groupName);
 
-        UpdateGroup(newItem); //Update the group item content
+        auto it = std::find_if( project.GetObjectGroups().begin(), project.GetObjectGroups().end(), std::bind2nd(gd::GroupHasTheSameName(), groupName));
+        if (it != project.GetObjectGroups().end()) listsHelper.MakeGroupItem(objectsList, newItem, *it, true);
+        objectsList->SelectItem(newItem);
 
         if(wasExpanded) //Expand the group item if it was expanded before
             objectsList->Expand(newItem);

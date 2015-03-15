@@ -35,6 +35,8 @@ MouseExtension::MouseExtension()
         .SetFunctionName("gdjs.evtTools.input.hideCursor").SetIncludeFile("inputtools.js");
     GetAllActions()["MontreSouris"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.input.showCursor").SetIncludeFile("inputtools.js");
+    GetAllActions()["TouchSimulateMouse"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.input.touchSimulateMouse").SetIncludeFile("inputtools.js");
 
     GetAllConditions()["SourisSurObjet"].codeExtraInformation.
         SetFunctionName("gdjs.evtTools.input.cursorOnObject").SetIncludeFile("inputtools.js");

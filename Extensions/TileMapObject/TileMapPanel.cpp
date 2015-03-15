@@ -107,6 +107,10 @@ void TileMapPanel::OnTileSetSelectionChanged(TileSelectionEvent &event)
 
 void TileMapPanel::OnPaint(wxPaintEvent& event)
 {
+    wxBitmap btmp(m_tileset->GetWxBitmap());
+    wxMemoryDC tilesetDC;
+    tilesetDC.SelectObject(btmp);
+
     wxAutoBufferedPaintDC dc(this);
     DoPrepareDC(dc);
 
@@ -139,7 +143,16 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
                 if(m_tilemap->GetTile(layer, col, row) == -1)
                     continue;
 
-                dc.DrawBitmap(m_tileset->GetTileBitmap(m_tilemap->GetTile(layer, col, row)), GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y, true);
+                dc.Blit(GetPositionOfTile(col, row).x, 
+                        GetPositionOfTile(col, row).y,
+                        m_tileset->tileSize.x,
+                        m_tileset->tileSize.y,
+                        &tilesetDC,
+                        m_tileset->GetTileTextureCoords(m_tilemap->GetTile(layer, col, row)).topLeft.x,
+                        m_tileset->GetTileTextureCoords(m_tilemap->GetTile(layer, col, row)).topLeft.y,
+                        wxCOPY,
+                        true);
+                //dc.DrawBitmap(m_tileset->GetTileBitmap(m_tilemap->GetTile(layer, col, row)), GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y, true);
             }
         }
     }

@@ -66,7 +66,7 @@ void GD_API LaunchFile( const std::string & file )
     string appel = "xdg-open \""+file+"\"";
 
     system(appel.c_str());
-#elif defined(MAC)
+#elif defined(MACOS)
     string appel = "open \""+file+"\"";
 
     system(appel.c_str());

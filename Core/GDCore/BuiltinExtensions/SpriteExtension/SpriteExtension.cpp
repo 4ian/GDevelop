@@ -396,20 +396,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddCodeOnlyParameter("currentScene", "")
         .SetHidden(); //Deprecated
 
-
-    obj.AddCondition("SourisSurObjet",
-                   _("The cursor is on an object"),
-                   _("Test if the cursor is over a Sprite object. The test is accurate by default (check that the cursor is not on a transparent pixel)."),
-                   _("The cursor is on _PARAM0_"),
-                   _("Mouse"),
-                   "res/conditions/surObjet24.png",
-                   "res/conditions/surObjet.png")
-
-        .AddParameter("object", _("Object"), "Sprite", false)
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes")
-        .MarkAsSimple();
-
     obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
         .SetHidden()
         .AddParameter("object", _("Object"), "Sprite", false)

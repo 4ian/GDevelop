@@ -28,6 +28,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
+#include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/CommonTools.h"
@@ -80,11 +81,15 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
 
     gd::Project exportedProject = project;
 
+    std::cout << "a" << std::endl;
+
     //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
+    std::cout << "a2" << std::endl;
     //Generate events code
     if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         return false;
+    std::cout << "b" << std::endl;
 
     //Export source files
     if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
@@ -92,6 +97,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
         gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
         return false;
     }
+    std::cout << "c" << std::endl;
 
     //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
     gd::ProjectStripper::StripProject(exportedProject);
@@ -297,6 +303,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "commontools.js");
+    InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");
     InsertUnique(includesFiles, "runtimescene.js");
     InsertUnique(includesFiles, "polygon.js");
@@ -629,20 +636,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"),
                           _("Compilation finished"), wxYES_NO) == wxYES )
         {
-            int returnCode = 0;
-            #if defined(WINDOWS)
-            wxExecute("explorer.exe \""+exportDir+"\"");
-            #elif defined(LINUX)
-            returnCode = system(std::string("xdg-open \""+exportDir+"\"").c_str());
-            #elif defined(MAC)
-            returnCode = system(std::string("open \""+exportDir+"\"").c_str());
-            #endif
-
-            if (returnCode != 0) {
-                wxString error = _("Oops, it seems that the folder couldn't be displayed. Open your file explorer and go to:\n\n");
-                error += exportDir;
-                wxLogWarning(error);
-            }
+            gd::ShowFolder(exportDir);
         }
     }
     #endif
@@ -668,7 +662,7 @@ std::string Exporter::GetNodeExecutablePath()
         #if defined(WINDOWS)
         guessPaths.push_back("C:/Program Files/nodejs/node.exe");
         guessPaths.push_back("C:/Program Files (x86)/nodejs/node.exe");
-        #elif defined(LINUX)
+        #elif defined(LINUX) || defined(MACOS)
         guessPaths.push_back("/usr/bin/env/nodejs");
         guessPaths.push_back("/usr/bin/nodejs");
         guessPaths.push_back("/usr/local/bin/nodejs");

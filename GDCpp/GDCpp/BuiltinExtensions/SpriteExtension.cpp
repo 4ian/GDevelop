@@ -59,8 +59,6 @@ SpriteExtension::SpriteExtension()
 
     objectActions["TourneVers"].codeExtraInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
 
-    objectConditions["SourisSurObjet"].codeExtraInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
-
     objectExpressions["X"].codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectExpressions["Y"].codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectExpressions["PointX"].codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");

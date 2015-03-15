@@ -55,10 +55,10 @@ float TopDownMovementAutomatism::GetSpeed()
 void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     //Get the player input:
-    leftKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Left );
-    rightKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Right );
-    downKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Down );
-    upKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Up );
+    leftKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Left");
+    rightKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Right");
+    downKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
+    upKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
 
     int direction = -1;
     float directionInRad = 0;

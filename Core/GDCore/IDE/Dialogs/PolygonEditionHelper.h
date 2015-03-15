@@ -99,8 +99,8 @@ public:
     void SetSelectedPoint(unsigned int point) {selectedPolygonPoint = point;};
 
 private:
-    PolygonEditionHelper(const PolygonEditionHelper&) {};
-    PolygonEditionHelper& operator=(PolygonEditionHelper) {};
+    PolygonEditionHelper(const PolygonEditionHelper&);
+    PolygonEditionHelper& operator=(PolygonEditionHelper);
 
     bool movingPolygonPoint;
     unsigned int selectedPolygon;

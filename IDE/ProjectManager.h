@@ -248,9 +248,13 @@ private:
 	void AddExternalLayoutToGame(gd::Project * project);
 	void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
 	std::string AutodetectFileLanguage(wxString filename);
+    void UpdateRibbonButtonsState();
 
     wxTreeItemId selectedItem;
     std::string itemTextBeforeEditing;
+
+    static wxRibbonButtonBar * projectRibbonBar;
+    static wxRibbonButtonBar * operationsRibbonBar;
 
     static const unsigned int gameMaxCharDisplayedInEditor = 15;
 

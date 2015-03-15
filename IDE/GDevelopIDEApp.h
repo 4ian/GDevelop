@@ -20,7 +20,7 @@ class STServer;
 /**
  * \brief Class managing the application, e.g. its initialization, creation of the main window...
  */
-class Game_Develop_EditorApp : public wxApp
+class GDevelopIDEApp : public wxApp
 {
 public:
     virtual bool    OnInit();

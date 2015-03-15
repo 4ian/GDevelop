@@ -69,7 +69,11 @@ IF(WIN32)
 	add_definitions( -DwxUSE_UNICODE=1 )
 	add_definitions( -DWXUSINGDLL )
 ELSE()
+    IF(APPLE)
+    add_definitions( -DMACOS )
+    ELSE()
 	add_definitions( -DLINUX )
+	ENDIF()
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
 	add_definitions(${GTK_CFLAGS_OTHER})
@@ -122,14 +126,18 @@ ELSE()
 	target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	target_link_libraries(GDIDE ${wxWidgets_LIBRARIES})
 	target_link_libraries(GDIDE ${GTK_LIBRARIES})
-	target_link_libraries(GDIDE GLU GL)
+	IF (NOT APPLE)
+		target_link_libraries(GDIDE GLU GL)
+	ENDIF()
 ENDIF(WIN32)
 
 #Pre build tasks
 ###
 IF(NOT WIN32 AND NOT EMSCRIPTEN)
-	execute_process(COMMAND sh cleanLinuxLibraries.sh ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
-		WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+	IF (NOT APPLE)
+		execute_process(COMMAND sh cleanLinuxLibraries.sh ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/
+			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+	ENDIF()
 ENDIF()
 
 #Post build tasks
@@ -148,12 +156,20 @@ ELSE()
         #output directory, and need to be copied.
 		add_custom_command(TARGET GDIDE
 			POST_BUILD
-			COMMAND sh "CopyWindowsToLinuxReleaseFiles.sh" ${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}
+			COMMAND sh "CopyResourcesFromWindowsRelease.sh" ${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}
 			WORKING_DIRECTORY ${GD_base_dir}/scripts)
-		add_custom_command(TARGET GDIDE
-			POST_BUILD
-			COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib
-			WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+
+		IF (APPLE)
+			add_custom_command(TARGET GDIDE
+				POST_BUILD
+				COMMAND sh "copyMacOSLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib
+				WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+		ELSE()
+			add_custom_command(TARGET GDIDE
+				POST_BUILD
+				COMMAND sh "copyLinuxLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib
+				WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
+		ENDIF()
 	ENDIF()
 ENDIF()
 

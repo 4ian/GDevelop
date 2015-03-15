@@ -97,8 +97,8 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     double requestedDeltaY = 0;
 
     //Change the speed according to the player's input.
-    leftKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Left );
-    rightKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Right );
+    leftKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Left");
+    rightKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Right");
     if ( leftKey )
         currentSpeed -= acceleration*timeDelta;
     if ( rightKey )
@@ -186,7 +186,7 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     //2) Y axis:
 
     //Go on a ladder
-    ladderKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    ladderKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     if (ladderKey && IsOverlappingLadder(potentialObjects))
     {
         canJump = true;
@@ -199,8 +199,8 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     if ( isOnLadder )
     {
-        upKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-        downKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+        upKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
+        downKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
         if ( upKey )
             requestedDeltaY -= 150*timeDelta;
         if ( downKey )
@@ -224,7 +224,9 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //Jumping
-    jumpKey |= !ignoreDefaultControls && (sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ) );
+    jumpKey |= !ignoreDefaultControls &&
+        (scene.GetInputManager().IsKeyPressed("LShift") || scene.GetInputManager().IsKeyPressed("RShift") ||
+        scene.GetInputManager().IsKeyPressed("Space"));
     if ( canJump && jumpKey )
     {
         jumping = true;

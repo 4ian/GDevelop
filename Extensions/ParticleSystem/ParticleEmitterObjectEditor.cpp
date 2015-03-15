@@ -702,7 +702,7 @@ object(object_)
 	FlexGridSizer32->Add(StaticBoxSizer2, 1, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Miscellaneous"));
 	FlexGridSizer30 = new wxFlexGridSizer(0, 3, 0, 0);
-	destroyWhenNoParticlesCheck = new wxCheckBox(Core, ID_CHECKBOX2, _("Destroy the object when no more particles are spayed"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	destroyWhenNoParticlesCheck = new wxCheckBox(Core, ID_CHECKBOX2, _("Destroy the object when no more particles are sprayed"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	destroyWhenNoParticlesCheck->SetValue(false);
 	FlexGridSizer30->Add(destroyWhenNoParticlesCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

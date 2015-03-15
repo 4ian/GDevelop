@@ -68,7 +68,7 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
 
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     renderingHelper->GetHTMLRenderer().SetDC(&dc);
-    renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
+    renderingHelper->GetHTMLRenderer().SetStandardFonts(renderingHelper->GetNiceFont().GetPointSize());
 
     //Prepare HTML texts
     std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
@@ -122,7 +122,7 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platf
         dc.SelectObject(fakeBmp);
 
         renderingHelper->GetHTMLRenderer().SetDC(&dc);
-        renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
+        renderingHelper->GetHTMLRenderer().SetStandardFonts(renderingHelper->GetNiceFont().GetPointSize());
 
         std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
         std::string str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";

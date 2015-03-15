@@ -20,6 +20,7 @@
 #include <wx/busyinfo.h>
 #include <fstream>
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -31,6 +32,7 @@
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Clipboard.h"
+#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/ExternalLayoutEditor.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
@@ -112,6 +114,10 @@ const long ProjectManager::idRibbonImporter = wxNewId();
 const long ProjectManager::idRibbonEncoder = wxNewId();
 const long ProjectManager::idRibbonProjectsManager = wxNewId();
 const long ProjectManager::idRibbonHelp = wxNewId();
+
+wxRibbonButtonBar * ProjectManager::projectRibbonBar = NULL;
+wxRibbonButtonBar * ProjectManager::operationsRibbonBar = NULL;
+
 
 BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
 	//(*EventTable(ProjectManager)
@@ -368,20 +374,20 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", SkinHelper::GetRibbonIcon("open"), _("Open a previously saved project"));
     }
     {
-        wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), SkinHelper::GetRibbonIcon("save"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
-        file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
-        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
-        file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), SkinHelper::GetRibbonIcon("save"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        projectRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        projectRibbonBar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
+        projectRibbonBar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
+        projectRibbonBar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
-        ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", SkinHelper::GetRibbonIcon("sceneadd"));
-        ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", SkinHelper::GetRibbonIcon("eventsadd"));
-        ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", SkinHelper::GetRibbonIcon("externallayoutadd"));
-        ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", SkinHelper::GetRibbonIcon("extension"));
+        operationsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        operationsRibbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
+        operationsRibbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", SkinHelper::GetRibbonIcon("sceneadd"));
+        operationsRibbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", SkinHelper::GetRibbonIcon("eventsadd"));
+        operationsRibbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", SkinHelper::GetRibbonIcon("externallayoutadd"));
+        operationsRibbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", SkinHelper::GetRibbonIcon("extension"));
     }
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), SkinHelper::GetRibbonIcon("image"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -401,6 +407,25 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"), _("Open the online help for GDevelop"));
     }
 
+}
+
+void ProjectManager::UpdateRibbonButtonsState()
+{
+	bool projectOpened = mainEditor.CurrentGameIsValid();
+	if (projectRibbonBar)
+	{
+	    projectRibbonBar->EnableButton(idRibbonSave, projectOpened);
+	    projectRibbonBar->EnableButton(idRibbonSaveAll, projectOpened);
+	    projectRibbonBar->EnableButton(idRibbonClose, projectOpened);
+	}
+	if (operationsRibbonBar)
+	{
+	    operationsRibbonBar->EnableButton(idRibbonEditImages, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonAddScene, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonAddExternalEvents, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonAddExternalLayout, projectOpened);
+	    operationsRibbonBar->EnableButton(idRibbonExtensions, projectOpened);
+	}
 }
 
 void ProjectManager::ConnectEvents()
@@ -501,6 +526,8 @@ void ProjectManager::Refresh()
         projectsTree->SetToolTip(_("Double click to set the project as the current project.\nDouble click on an item to edit it, or use right\nclick to display more options."));
     else
         projectsTree->SetToolTip(_("Create or open a project using the ribbon."));
+
+    UpdateRibbonButtonsState();
 }
 
 /**
@@ -1103,10 +1130,10 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
+    wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo("Please wait for the internal compiler to finish its job...") : NULL;
     while ( CodeCompiler::Get()->CompilationInProcess() )
     {
-        wxYield();
+        gd::SafeYield::Do();
     }
     if ( waitDialog ) delete waitDialog;
 
@@ -1174,7 +1201,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo(_("Please wait while the internal compilation of events is finishing...")) : NULL;
     while (CodeCompiler::Get()->CompilationInProcess())
     {
-        wxYield();
+        gd::SafeYield::Do();
     }
     if ( waitDialog ) delete waitDialog;
 
@@ -1248,14 +1275,7 @@ void ProjectManager::OnOpenProjectFolderSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    std::string dir = gd::ToString(wxFileName::FileName(game->GetProjectFile()).GetPath());
-    #if defined(WINDOWS)
-    wxExecute("explorer.exe \""+dir+"\"");
-    #elif defined(LINUX)
-    system(std::string("xdg-open \""+dir+"\"").c_str());
-    #elif defined(MAC)
-    system(std::string("open \""+dir+"\"").c_str());
-    #endif
+    gd::ShowFolder(wxFileName::FileName(game->GetProjectFile()).GetPath());
 }
 
 /**
@@ -1366,7 +1386,7 @@ void ProjectManager::CloseGame(gd::Project * project)
     wxBusyInfo * waitDialog = CodeCompiler::Get()->CompilationInProcess() ? new wxBusyInfo(_("Please wait, the internal compilation of events must be finished before continuing...")) : NULL;
     while ( CodeCompiler::Get()->CompilationInProcess() )
     {
-        wxYield();
+        gd::SafeYield::Do();
     }
     if ( waitDialog ) delete waitDialog;
 
@@ -1378,6 +1398,7 @@ void ProjectManager::CloseGame(gd::Project * project)
 
     mainEditor.SetCurrentGame(mainEditor.games.size()-1, /*refreshProjectManager=*/false);
     mainEditor.UpdateOpenedProjectsLogFile();
+    UpdateRibbonButtonsState();
 }
 
 /**

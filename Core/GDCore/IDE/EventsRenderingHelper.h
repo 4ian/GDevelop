@@ -32,174 +32,174 @@ namespace gd
  */
 class GD_CORE_API EventsRenderingHelper
 {
-    public:
-        static EventsRenderingHelper * Get();
-        static void DestroySingleton();
+public:
+    static EventsRenderingHelper * Get();
+    static void DestroySingleton();
 
-        /**
-         * Draw a nice rectangle, often used as conditions background, on a wxDC.
-         */
-        void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
+    /**
+     * Draw a nice rectangle, often used as conditions background, on a wxDC.
+     */
+    void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
-        /**
-         * \brief Draw the specified condition list
-         * \param conditions Conditions to be rendered
-         * \param dc wxWidgets DC to be used
-         * \param x x position of the drawing
-         * \param y y position of the drawing
-         * \param width Width available for the drawing
-         * \param event Event owning the condition list
-         * \param areas EventsEditorItemsAreas object when drawn areas will be registered
-         * \param selection EventsEditorSelection object providing information about selection
-         * \param platform The platform currently used
-         * \return Height used for the drawing
-         */
-        int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
-                               gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
+    /**
+     * \brief Draw the specified condition list
+     * \param conditions Conditions to be rendered
+     * \param dc wxWidgets DC to be used
+     * \param x x position of the drawing
+     * \param y y position of the drawing
+     * \param width Width available for the drawing
+     * \param event Event owning the condition list
+     * \param areas EventsEditorItemsAreas object when drawn areas will be registered
+     * \param selection EventsEditorSelection object providing information about selection
+     * \param platform The platform currently used
+     * \return Height used for the drawing
+     */
+    int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+                           gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
-        /**
-         * \brief Draw the specified action list
-         * \see gd::EventsRenderingHelper::DrawConditionsList
-         */
-        int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
-                            gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
+    /**
+     * \brief Draw the specified action list
+     * \see gd::EventsRenderingHelper::DrawConditionsList
+     */
+    int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+                        gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
-        /**
-         * \brief Get the height taken by drawing a condition list
-         * \param conditions Conditions to be rendered
-         * \param width Width available for the drawing
-         * \param platform The platform currently used
-         * \return Height used for the drawing
-         */
-        unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, const gd::Platform & platform);
-        /**
-         * \brief Get the height taken by drawing a condition list
-         * \see gd::EventsRenderingHelper::GetRenderedConditionsListHeight
-         */
-        unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, const gd::Platform & platform);
+    /**
+     * \brief Get the height taken by drawing a condition list
+     * \param conditions Conditions to be rendered
+     * \param width Width available for the drawing
+     * \param platform The platform currently used
+     * \return Height used for the drawing
+     */
+    unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, const gd::Platform & platform);
+    /**
+     * \brief Get the height taken by drawing a condition list
+     * \see gd::EventsRenderingHelper::GetRenderedConditionsListHeight
+     */
+    unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, const gd::Platform & platform);
 
-        inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
-        inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
+    inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
+    inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
 
-        /**
-         * Draw a text in dc at point, without taking more than widthAvailable.
-         * \return X position of the last character and total height taken by the text
-         */
-        wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point);
+    /**
+     * Draw a text in dc at point, without taking more than widthAvailable.
+     * \return X position of the last character and total height taken by the text
+     */
+    wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point);
 
-        /**
-         * \return Height taken by the text
-         */
-        unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
+    /**
+     * \return Height taken by the text
+     */
+    unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
 
-        /**
-         * Draw a specific instruction
-         * \param instruction Instruction to be rendered
-         * \param instructionMetadata Instruction metadata
-         * \param isCondition true if the instruction is a condition
-         * \param dc The wxWidgets DC to be used for rendering
-         * \param point The drawing position
-         * \param freeWidth Width available
-         * \param event Event owning the condition list
-         * \param areas EventsEditorItemsAreas object when drawn areas will be registered
-         * \param selection EventsEditorSelection object providing information about selection
-         * \return Height used for the drawing
-         */
-        int DrawInstruction(gd::Instruction & instruction,
-                            const gd::InstructionMetadata & instructionMetadata,
-                            bool isCondition, wxDC & dc, wxPoint point, int freeWidth,
-                            gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection);
+    /**
+     * Draw a specific instruction
+     * \param instruction Instruction to be rendered
+     * \param instructionMetadata Instruction metadata
+     * \param isCondition true if the instruction is a condition
+     * \param dc The wxWidgets DC to be used for rendering
+     * \param point The drawing position
+     * \param freeWidth Width available
+     * \param event Event owning the condition list
+     * \param areas EventsEditorItemsAreas object when drawn areas will be registered
+     * \param selection EventsEditorSelection object providing information about selection
+     * \return Height used for the drawing
+     */
+    int DrawInstruction(gd::Instruction & instruction,
+                        const gd::InstructionMetadata & instructionMetadata,
+                        bool isCondition, wxDC & dc, wxPoint point, int freeWidth,
+                        gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection);
 
-        /**
-         * Change font. Only use a fixed width font.
-         */
-        void SetFont(const wxFont & font);
+    /**
+     * Change font. Only use a fixed width font.
+     */
+    void SetFont(const wxFont & font);
 
-        inline const wxFont & GetFont() const {return font;};
-        inline wxFont & GetFont() {return font;};
+    inline const wxFont & GetFont() const {return font;};
+    inline wxFont & GetFont() {return font;};
 
-        inline const wxFont & GetNiceFont() const {return niceFont;};
-        inline wxFont & GetNiceFont() {return niceFont;};
+    inline const wxFont & GetNiceFont() const {return niceFont;};
+    inline wxFont & GetNiceFont() {return niceFont;};
 
-        inline const wxHtmlDCRenderer & GetHTMLRenderer() const {return htmlRenderer;};
-        inline wxHtmlDCRenderer & GetHTMLRenderer() {return htmlRenderer;};
+    inline const wxHtmlDCRenderer & GetHTMLRenderer() const {return htmlRenderer;};
+    inline wxHtmlDCRenderer & GetHTMLRenderer() {return htmlRenderer;};
 
-        const wxBrush & GetSelectedRectangleFillBrush() const { return selectionRectangleFill; }
-        wxBrush & GetSelectedRectangleFillBrush() { return selectionRectangleFill; }
+    const wxBrush & GetSelectedRectangleFillBrush() const { return selectionRectangleFill; }
+    wxBrush & GetSelectedRectangleFillBrush() { return selectionRectangleFill; }
 
-        const wxPen & GetSelectedRectangleOutlinePen() const { return selectionRectangleOutline; }
-        wxPen & GetSelectedRectangleOutlinePen() { return selectionRectangleOutline; }
+    const wxPen & GetSelectedRectangleOutlinePen() const { return selectionRectangleOutline; }
+    wxPen & GetSelectedRectangleOutlinePen() { return selectionRectangleOutline; }
 
-        const wxBrush & GetHighlightedRectangleFillBrush() const { return highlightRectangleFill; }
-        wxBrush & GetHighlightedRectangleFillBrush() { return highlightRectangleFill; }
+    const wxBrush & GetHighlightedRectangleFillBrush() const { return highlightRectangleFill; }
+    wxBrush & GetHighlightedRectangleFillBrush() { return highlightRectangleFill; }
 
-        const wxPen & GetHighlightedRectangleOutlinePen() const { return highlightRectangleOutline; }
-        wxPen & GetHighlightedRectangleOutlinePen() { return highlightRectangleOutline; }
+    const wxPen & GetHighlightedRectangleOutlinePen() const { return highlightRectangleOutline; }
+    wxPen & GetHighlightedRectangleOutlinePen() { return highlightRectangleOutline; }
 
-        const wxPen & GetConditionsRectangleOutlinePen() const { return conditionsRectangleOutline; }
-        wxPen & GetConditionsRectangleOutlinePen() { return conditionsRectangleOutline; }
+    const wxPen & GetConditionsRectangleOutlinePen() const { return conditionsRectangleOutline; }
+    wxPen & GetConditionsRectangleOutlinePen() { return conditionsRectangleOutline; }
 
-        const wxPen & GetActionsRectangleOutlinePen() const { return actionsRectangleOutline; }
-        wxPen & GetActionsRectangleOutlinePen() { return actionsRectangleOutline; }
+    const wxPen & GetActionsRectangleOutlinePen() const { return actionsRectangleOutline; }
+    wxPen & GetActionsRectangleOutlinePen() { return actionsRectangleOutline; }
 
-        const wxBrush & GetConditionsRectangleFillBrush() const { return conditionsRectangleFill; }
-        wxBrush & GetConditionsRectangleFillBrush() { return conditionsRectangleFill; }
+    const wxBrush & GetConditionsRectangleFillBrush() const { return conditionsRectangleFill; }
+    wxBrush & GetConditionsRectangleFillBrush() { return conditionsRectangleFill; }
 
-        const wxBrush & GetActionsRectangleFillBrush() const { return actionsRectangleFill; }
-        wxBrush & GetActionsRectangleFillBrush() { return actionsRectangleFill; }
+    const wxBrush & GetActionsRectangleFillBrush() const { return actionsRectangleFill; }
+    wxBrush & GetActionsRectangleFillBrush() { return actionsRectangleFill; }
 
-        /**
-         * Make sure a text will be correctly display by replacing specials characters
-         * and inserting tags like <br>.
-         */
-        std::string GetHTMLText(std::string text);
+    /**
+     * Make sure a text will be correctly display by replacing specials characters
+     * and inserting tags like <br>.
+     */
+    std::string GetHTMLText(std::string text);
 
-        wxColor eventGradient1;
-        wxColor eventGradient2;
-        wxColor eventGradient3;
-        wxColor eventGradient4;
-        wxColor eventBorderColor;
-        wxColor eventConditionsGradient1;
-        wxColor eventConditionsGradient2;
-        wxColor eventConditionsGradient3;
-        wxColor eventConditionsGradient4;
-        wxColor eventConditionsBorderColor;
-        wxColor selectionColor;
-        wxColor disabledColor;
-        wxColor disabledColor2;
+    wxColor eventGradient1;
+    wxColor eventGradient2;
+    wxColor eventGradient3;
+    wxColor eventGradient4;
+    wxColor eventBorderColor;
+    wxColor eventConditionsGradient1;
+    wxColor eventConditionsGradient2;
+    wxColor eventConditionsGradient3;
+    wxColor eventConditionsGradient4;
+    wxColor eventConditionsBorderColor;
+    wxColor selectionColor;
+    wxColor disabledColor;
+    wxColor disabledColor2;
 
-        int instructionsListBorder;
-        int separationBetweenInstructions;
+    int instructionsListBorder;
+    int separationBetweenInstructions;
 
-    private:
-        EventsRenderingHelper();
-        virtual ~EventsRenderingHelper() {};
+private:
+    EventsRenderingHelper();
+    virtual ~EventsRenderingHelper() {};
 
-        unsigned int conditionsColumnWidth;
+    unsigned int conditionsColumnWidth;
 
-        wxPen selectionRectangleOutline;
-        wxBrush selectionRectangleFill;
-        wxPen highlightRectangleOutline;
-        wxBrush highlightRectangleFill;
+    wxPen selectionRectangleOutline;
+    wxBrush selectionRectangleFill;
+    wxPen highlightRectangleOutline;
+    wxBrush highlightRectangleFill;
 
-        wxPen niceRectangleOutline;
-        wxColour niceRectangleFill1;
-        wxColour niceRectangleFill2;
+    wxPen niceRectangleOutline;
+    wxColour niceRectangleFill1;
+    wxColour niceRectangleFill2;
 
-        wxPen actionsRectangleOutline;
-        wxPen conditionsRectangleOutline;
-        wxBrush actionsRectangleFill;
-        wxBrush conditionsRectangleFill;
+    wxPen actionsRectangleOutline;
+    wxPen conditionsRectangleOutline;
+    wxBrush actionsRectangleFill;
+    wxBrush conditionsRectangleFill;
 
-        wxFont font; ///< Fixed width font
-        float fontCharacterWidth;
+    wxFont font; ///< Fixed width font
+    float fontCharacterWidth;
 
-        wxFont niceFont;
+    wxFont niceFont;
 
-        wxHtmlDCRenderer htmlRenderer;
+    wxHtmlDCRenderer htmlRenderer;
 
-        static EventsRenderingHelper *singleton;
-        wxBitmap fakeBmp;
+    static EventsRenderingHelper *singleton;
+    wxBitmap fakeBmp;
 };
 
 }

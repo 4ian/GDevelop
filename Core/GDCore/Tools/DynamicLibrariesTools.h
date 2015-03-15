@@ -14,7 +14,7 @@
     typedef HINSTANCE__* HINSTANCE;
     #endif
     typedef HINSTANCE Handle;
-#elif defined(LINUX) || defined (MAC)
+#elif defined(LINUX) || defined (MACOS)
     typedef void* Handle;
 #else
     #warning system not supported for dynamic libraries loading
@@ -49,7 +49,7 @@ void GD_CORE_API CloseLibrary(Handle library);
  */
 std::string GD_CORE_API DynamicLibraryLastError();
 
-#if defined(LINUX) || defined (MAC)
+#if defined(LINUX) || defined (MACOS)
 /**
  * \brief Set all symbols from a raw C++ dynamic library available ( RTLD_GLOBAL )
  *

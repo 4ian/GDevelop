@@ -8,6 +8,7 @@
 #define GDCORE_OBJECTLISTDIALOGSHELPER_H
 
 #include <string>
+#include <functional>
 #include <vector>
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -38,17 +39,34 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) : project(project_), layout(layout_), groupsAllowed(true)
+    ObjectListDialogsHelper(const gd::Project & project_, const gd::Layout & layout_) :
+        project(project_),
+        layout(layout_),
+        groupsAllowed(true),
+        hasGroupExtraRendering(false)
     {
-        #if !defined(GD_NO_WX_GUI)
-        imageList = new wxImageList(24,24, true);
-        #endif
     };
 
     virtual ~ObjectListDialogsHelper() {};
 
+    /**
+     * \brief Specify the filter text: only objects and groups having a name
+     * containing this text will be shown when calling RefreshList.
+     * \param searchText The filter text
+     */
     void SetSearchText(std::string searchText_);
+
+    /**
+     * \brief Specify a type of object to display. Only objects of this type will
+     * be shown when calling RefreshList.
+     * \param allowedObjectType The type of objects. For example, "Sprite" or "TextObject::Text".
+     */
     void SetAllowedObjectType(std::string allowedObjectType_) { objectTypeAllowed = allowedObjectType_; }
+
+    /**
+     * \brief Set if groups of objects are displayed when calling RefreshList (true by default).
+     * \param canSelectGroup true to show groups, false to hide them.
+     */
     void SetGroupsAllowed(bool canSelectGroup) { groupsAllowed = canSelectGroup; }
 
     /**
@@ -58,33 +76,24 @@ public:
 
     #if !defined(GD_NO_WX_GUI)
     /**
-     * \brief Update tree controls with objects and objects groups from the project and layout
-     * \param sceneObjectsList The wxTreeCtrl which will contain the layout objects
-     * \param sceneGroupsList The wxTreeCtrl which will contain the layout groups
-     * \param globalObjectsList The wxTreeCtrl which will contain the project objects
-     * \param globalGroupsList The wxTreeCtrl which will contain the project groups
-     * \param objectTypeAllowed If not empty, only objects of this type will be displayed
-     * \param searchText The text in the search box, which is used to filter objects
-     */
-    void RefreshLists(wxTreeCtrl * sceneObjectsList,
-                      wxTreeCtrl * sceneGroupsList,
-                      wxTreeCtrl * globalObjectsList,
-                      wxTreeCtrl * globalGroupsList);
-
-    /**
      * \brief Update a tree control with all objects and objects groups from the project and layout
-     * \note The wxTreeCtrl must have an image list containing the object icon and the object group icon
-     * ( at index 0 and 1 )
      * \param objectsList The wxTreeCtrl which will contain the objects and groups
-     * \param objectTypeAllowed If not empty, only objects of this type will be displayed
-     * \param searchText The text in the search box, which is used to filter objects
+     * \aram objectsRootItem Optional pointer to a wxTreeItemId which will be filled with the item being the root item for objects.
+     * \aram groupsRootItem Optional pointer to a wxTreeItemId which will be filled with the item being the root item for groups.
      */
-    void RefreshList(wxTreeCtrl * objectsList);
+    void RefreshList(wxTreeCtrl * objectsList, wxTreeItemId * objectsRootItem = NULL,
+        wxTreeItemId * groupsRootItem = NULL);
+
+    void SetGroupExtraRendering(std::function<void(wxTreeItemId)> function)
+    {
+        hasGroupExtraRendering = true;
+        groupExtraRendering = function;
+    }
     #endif
 
 private:
-    wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty);
-    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const std::vector <gd::ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty);
+    wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects);
+    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const std::vector <gd::ObjectGroup> & groups, bool globalGroup);
 
     const Project & project;
     const Layout & layout;
@@ -92,9 +101,8 @@ private:
     std::string searchText;
     bool groupsAllowed;
 
-#if !defined(GD_NO_WX_GUI)
-    wxImageList *imageList;
-#endif
+    bool hasGroupExtraRendering;
+    std::function<void(wxTreeItemId)> groupExtraRendering;
 };
 
 }

@@ -221,7 +221,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
         //Creating external editors and linking them to the layout canvas
-        objectsEditor = std::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, &layout, mainFrameWrapper));
+        objectsEditor = std::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, layout, mainFrameWrapper));
         layersEditor = std::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
         propertiesPnl = std::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper) );
         initialInstancesBrowser = std::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );

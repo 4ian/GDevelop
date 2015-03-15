@@ -27,6 +27,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/Log.h"
@@ -113,6 +114,8 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     altPressed(false),
     shiftPressed(false),
     isMovingInstance(false),
+    gapBetweenButtonsAndRectangle(gd::GUIContentScaleFactor::Get() > 1 ? 12 : 5),
+    smallButtonSize(gd::GUIContentScaleFactor::Get() > 1 ? 12 : 5),
     firstRefresh(true),
     isSelecting(false),
     editing(true)
@@ -729,7 +732,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
     //Check if there is a click on a gui element inside the layout
     for (unsigned int i = 0;i<guiElements.size();++i)
     {
-        if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) )
+        if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
             OnGuiElementPressed(guiElements[i]);
             return ;
@@ -892,7 +895,7 @@ private:
     bool ignoreLockedInstances;
 };
 
-void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
+void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
 {
     if ( !editing ) return;
 
@@ -913,7 +916,7 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
     //Check if there is a click released on a gui element inside the layout
     for (unsigned int i = 0;i<guiElements.size();++i)
     {
-        if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) )
+        if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
             OnGuiElementReleased(guiElements[i]);
             return;
@@ -970,7 +973,7 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
     }
 }
 
-void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
+void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
 {
     if (!editing) return;
 
@@ -1064,7 +1067,7 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
         bool hoveringSomething = false;
         for (unsigned int i = 0;i<guiElements.size();++i)
         {
-            if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) ) {
+            if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) ) {
                 OnGuiElementHovered(guiElements[i]);
                 hoveringSomething = true;
             }
@@ -1104,7 +1107,7 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
     }
 }
 
-void LayoutEditorCanvas::OnMiddleDown( wxMouseEvent &event )
+void LayoutEditorCanvas::OnMiddleDown(wxMouseEvent &)
 {
     if ( !editing ) return;
 

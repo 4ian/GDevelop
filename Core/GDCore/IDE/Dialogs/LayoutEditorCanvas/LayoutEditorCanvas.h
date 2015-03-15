@@ -479,8 +479,10 @@ protected:
     double oldMouseX; ///< The mouse X position which was usually stored the last time a right click happened.
     double oldMouseY; ///< The mouse Y position which was usually stored the last time a right click happened.
     bool isMovingInstance;
-    static constexpr float gapBetweenButtonsAndRectangle = 5;
-    static constexpr float smallButtonSize = 5;
+
+    float gapBetweenButtonsAndRectangle;
+    float smallButtonSize;
+
     bool firstRefresh;
 
     bool isSelecting;

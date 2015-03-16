@@ -56,8 +56,11 @@
  *  \page installWinCompiler (Windows) Install TDM-GCC compiler
  *
  * GDevelop is compiled with TDM-GCC under Windows.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by GDevelop and
- * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of TDM-GCC.<br>
+ * So as to prevent incompatibilities between the compiler (and the standard C++ library provided with) used by GDevelop and
+ * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of TDM-GCC.
+ *
+ * While a recent GCC version should work, if you compile GDevelop for an "official" distribution it's better
+ * to use the specific version provided here.
  *
  * \section installWinCompiler_download Download
  *

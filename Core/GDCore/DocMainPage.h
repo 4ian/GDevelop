@@ -173,6 +173,12 @@ sudo apt-get install libfreetype6-dev
 \code
 sudo apt-get install libwxgtk3.0-dev
 \endcode
+
+You should also have GTK+ development libraries installed. For GTK+2:
+\code
+sudo apt-get install libgtk2.0-dev
+\endcode
+
  *
  * \subsection installcmake Install CMake
  * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.

@@ -21,7 +21,11 @@ gd_set_option(NO_GUI FALSE BOOL "TRUE to build without wxWidgets GUI")
 
 #Setting up installation directory, for Linux. (Has to be done before "project" command)
 IF(NOT WIN32)
+	if (NOT APPLE)
 	gd_set_option(GD_INSTALL_PREFIX "/opt/gdevelop/" STRING "The directory where GDevelop should be installed")
+	ELSE()
+	gd_set_option(GD_INSTALL_PREFIX "." STRING "The directory where GDevelop should be installed")
+	ENDIF()
 
 	#As we embed SFML, prevent it to be installed system-wide
 	set(CMAKE_INSTALL_PREFIX "${GD_INSTALL_PREFIX}/useless")
@@ -34,6 +38,9 @@ IF(NOT WIN32 AND NOT APPLE AND NOT BUILD_TESTS)
 ENDIF()
 IF(APPLE)
 	set(CMAKE_MACOSX_RPATH 1)
+	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+	set(CMAKE_INSTALL_RPATH ".")
+	set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
 ENDIF()
 
@@ -41,9 +48,6 @@ ENDIF()
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
 	set(CMAKE_BUILD_TYPE Release)
-	IF(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
-		SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
-	ENDIF()
 ENDIF()
 IF (EMSCRIPTEN)
 	set(NO_GUI TRUE CACHE BOOL "" FORCE) #Force disable gui when compiling with emscripten.
@@ -51,6 +55,13 @@ IF (EMSCRIPTEN)
 	set(BUILD_IDE FALSE CACHE BOOL "" FORCE) #Force disable IDE when compiling with emscripten.
 ENDIF()
 
+IF("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
+	SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
+ENDIF()
+
+if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --bind -Wno-warn-absolute-paths" )
+ENDIF()
 
 #Activate C++11
 include(CheckCXXCompilerFlag)

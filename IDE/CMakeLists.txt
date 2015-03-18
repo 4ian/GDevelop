@@ -3,16 +3,6 @@ cmake_policy(SET CMP0015 NEW)
 
 project(GDIDE)
 
-#Sanity checks and options
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
-	set(CMAKE_BUILD_TYPE Release)
-ENDIF()
-if(CMAKE_COMPILER_IS_GNUCXX)
-	IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
-    ENDIF()
-endif()
 
 #Common directories:
 ###
@@ -22,15 +12,6 @@ set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SY
 set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
 set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 
-IF(WIN32) #Special case for wxWidgets on Windows
-	set(wxwidgets_include_dir ${GD_base_dir}/ExtLibs/wxwidgets/include)
-	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(wxwidgets_include_dir ${wxwidgets_include_dir} ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswud)
-	ELSE()
-		set(wxwidgets_include_dir ${wxwidgets_include_dir} ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswu)
-	ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-	set(wxwidgets_lib_dir ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll)
-ENDIF(WIN32)
 
 #Dependencies on external libraries:
 ###
@@ -98,6 +79,7 @@ set_target_properties(GDIDE PROPERTIES PREFIX "")
 set_target_properties(GDIDE PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}")
 set_target_properties(GDIDE PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}")
 set_target_properties(GDIDE PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}")
+set_target_properties(GDIDE PROPERTIES MACOS_RPATH ".")
 IF(WIN32)
 set_target_properties(GDIDE_exe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
 set_target_properties(GDIDE_dev_exe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
@@ -162,7 +144,7 @@ ELSE()
 		IF (APPLE)
 			add_custom_command(TARGET GDIDE
 				POST_BUILD
-				COMMAND sh "copyMacOSLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib
+				COMMAND sh "copyMacOSLibraries.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib ${GD_base_dir}/ExtLibs/SFML
 				WORKING_DIRECTORY ${GD_base_dir}/IDE/scripts)
 		ELSE()
 			add_custom_command(TARGET GDIDE
@@ -175,7 +157,7 @@ ENDIF()
 
 #Installation (Linux only)
 ###
-IF(NOT WIN32)
+IF(NOT WIN32 AND NOT APPLE)
 	install(DIRECTORY ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/ DESTINATION "${GD_INSTALL_PREFIX}")
 	install(FILES ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/GDIDE DESTINATION "${GD_INSTALL_PREFIX}" PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ )
 

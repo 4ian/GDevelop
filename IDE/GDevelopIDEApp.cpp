@@ -70,7 +70,7 @@ bool GDevelopIDEApp::OnInit()
 {
     //Disable assertions
     wxDisableAsserts();
-    
+
     //Setting up working directory:
 #ifdef LINUX
     string tmp; //Make sure current working directory is executable directory.

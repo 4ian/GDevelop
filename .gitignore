@@ -49,6 +49,7 @@ Binaries/Packaging/opensuse-build-service/final/
 /Binaries/Output/Release_Linux/**
 /Binaries/Output/Debug_Darwin/**
 /Binaries/Output/Release_Darwin/**
+/Binaries/Output/Frameworks/
 !/Binaries/Output/Release_Linux/StartGDevelop.sh
 !/Binaries/Output/Release_Linux/CppPlatform/
 /Binaries/**/MinGW32

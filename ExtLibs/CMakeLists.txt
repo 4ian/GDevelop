@@ -22,6 +22,9 @@ IF(NOT NO_GUI)
 			message( "Extracting wxWidgets in ExtLibs/wxWidgets... (can take a bit of time, be patient)" )
 			execute_process(COMMAND 7za x -y wxwidgets.7z WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ OUTPUT_QUIET)
 		ENDIF()
+
+		set(wxwidgets_include_dir "${GD_base_dir}/ExtLibs/wxwidgets/include ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswu" PARENT_SCOPE)
+		set(wxwidgets_lib_dir "${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll" PARENT_SCOPE)
 	ELSE()
 		#Use wx-config on *nix:
 		find_package(wxWidgets REQUIRED)

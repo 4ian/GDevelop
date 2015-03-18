@@ -3,16 +3,6 @@ cmake_policy(SET CMP0015 NEW)
 
 project(Light)
 
-#Sanity checks and options
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
-	set(CMAKE_BUILD_TYPE Release)
-ENDIF()
-if(CMAKE_COMPILER_IS_GNUCXX)
-	IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
-    ENDIF()
-endif()
 
 #Common directories:
 ###
@@ -23,15 +13,6 @@ set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
 set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(GDCpp_Runtime_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Runtime)
 
-IF(WIN32) #Special case for wxWidgets on Windows
-	set(wxwidgets_include_dir ${GD_base_dir}/ExtLibs/wxwidgets/include)
-	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(wxwidgets_include_dir ${wxwidgets_include_dir} ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswud)
-	ELSE()
-		set(wxwidgets_include_dir ${wxwidgets_include_dir} ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswu)
-	ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-	set(wxwidgets_lib_dir ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll)
-ENDIF(WIN32)
 
 
 include_directories(${sfml_include_dir})

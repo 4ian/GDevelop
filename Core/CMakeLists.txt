@@ -8,16 +8,6 @@ SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1)
 SET(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES 1)
 SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 1)
 
-#Sanity checks
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
-	set(CMAKE_BUILD_TYPE Release)
-ENDIF()
-if(CMAKE_COMPILER_IS_GNUCXX)
-	IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
-    ENDIF()
-endif()
 if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
 	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths --bind" )
 ENDIF()
@@ -25,15 +15,6 @@ ENDIF()
 #Common directories:
 ###
 set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
-IF(WIN32) #Special case for wxWidgets on Windows
-	set(wxwidgets_include_dir ${GD_base_dir}/ExtLibs/wxwidgets/include)
-	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(wxwidgets_include_dir ${wxwidgets_include_dir} ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswud)
-	ELSE()
-		set(wxwidgets_include_dir ${wxwidgets_include_dir} ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll/mswu)
-	ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-	set(wxwidgets_lib_dir ${GD_base_dir}/ExtLibs/wxwidgets/lib/gcc_dll)
-ENDIF(WIN32)
 
 #Dependencies on external libraries:
 ###

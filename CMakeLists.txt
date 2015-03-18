@@ -75,6 +75,9 @@ else()
     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support (with GNU extensions). Please use a different C++ compiler.")
 endif()
 
+#Define common directories:
+set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR})
+
 #Add all the CMakeLists:
 ADD_SUBDIRECTORY(ExtLibs)
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Core/CMakeLists.txt" AND BUILD_CORE)

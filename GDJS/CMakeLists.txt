@@ -2,23 +2,10 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
 
 project(GDJS)
-
-
-#Common directories:
-###
-set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
-set(GDCORE_include_dir ${GD_base_dir}/Core)
-set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-
-
-
 #Dependencies on external libraries:
 ###
 include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
-IF(NOT TARGET GDCore) #Ensure that the build will work even when GDCore is not in the target list.
-link_directories(${GDCORE_lib_dir})
-ENDIF()
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
 ELSEIF (NOT EMSCRIPTEN)

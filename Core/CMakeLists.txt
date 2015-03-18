@@ -8,13 +8,9 @@ SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1)
 SET(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES 1)
 SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 1)
 
-if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
-	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths --bind" )
-ENDIF()
-
-#Common directories:
-###
-set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
+#Define common directories:
+set(GDCORE_include_dir ${GD_base_dir}/Core PARENT_SCOPE)
+set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME} PARENT_SCOPE)
 
 #Dependencies on external libraries:
 ###

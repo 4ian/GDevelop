@@ -6,9 +6,6 @@ project(GDIDE)
 
 #Common directories:
 ###
-set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
-set(GDCORE_include_dir ${GD_base_dir}/Core)
-set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
 set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 

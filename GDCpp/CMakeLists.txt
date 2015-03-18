@@ -4,11 +4,10 @@ cmake_policy(SET CMP0015 NEW)
 project(GDCpp)
 
 
-#Common directories:
-###
-set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
-set(GDCORE_include_dir ${GD_base_dir}/Core)
-set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
+#Define common directories:
+set(GDCpp_include_dir ${GD_base_dir}/GDCpp PARENT_SCOPE)
+set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME} PARENT_SCOPE)
+set(GDCpp_Runtime_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Runtime PARENT_SCOPE)
 
 
 #Dependencies on external libraries:

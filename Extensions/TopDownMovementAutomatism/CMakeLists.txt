@@ -3,18 +3,6 @@ cmake_policy(SET CMP0015 NEW)
 
 project(TopDownMovementAutomatism)
 
-
-#Common directories:
-###
-set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-set(GDCORE_include_dir ${GD_base_dir}/Core)
-set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
-set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-set(GDCpp_Runtime_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Runtime)
-
-
-
 include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 include_directories(${GDCpp_include_dir})
@@ -26,22 +14,6 @@ ELSEIF (NOT EMSCRIPTEN)
 	include_directories(${GTK_INCLUDE_DIRS})
 	link_directories(${GTK_LIBRARY_DIRS})
 ENDIF(WIN32)
-IF(NOT TARGET GDCore) #Ensure that the build will work even when GDCore is not in the target list.
-link_directories(${GDCORE_lib_dir})
-ENDIF()
-IF(NOT TARGET GDCpp) #Ensure that the build will work even when GDC++ is not in the target list.
-link_directories(${GDCpp_lib_dir})
-ENDIF()
-IF(NOT TARGET GDCpp_Runtime)
-	add_library(GDCpp_Runtime SHARED IMPORTED)
-	IF(WIN32)
-		set_property(TARGET GDCpp_Runtime PROPERTY IMPORTED_LOCATION ${GDCpp_Runtime_lib_dir}/GDCpp.dll)
-	 	set_property(TARGET GDCpp_Runtime PROPERTY IMPORTED_IMPLIB ${GDCpp_Runtime_lib_dir}/libGDCpp.dll.a)
-	ELSE()
-		set_property(TARGET GDCpp_Runtime PROPERTY IMPORTED_LOCATION ${GDCpp_Runtime_lib_dir}/libGDCpp.so)
-	 	#set_property(TARGET GDCpp_Runtime PROPERTY IMPORTED_IMPLIB ${GDCpp_Runtime_lib_dir}/libGDCpp.so.a)
-	ENDIF(WIN32)
-ENDIF()
 
 #Defines
 ###

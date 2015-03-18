@@ -90,37 +90,8 @@ ENDIF(WIN32)
 
 #Linker files for the IDE extension
 ###
-IF(EMSCRIPTEN)
-	#Nothing.
-ELSE()
-	target_link_libraries(TiledSpriteObject GDCore)
-	target_link_libraries(TiledSpriteObject GDCpp)
-	IF(WIN32)
-		target_link_libraries(TiledSpriteObject sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
-		IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-			target_link_libraries(TiledSpriteObject ${wxwidgets_lib_dir}/libwxmsw30ud_xrc.a ${wxwidgets_lib_dir}/libwxmsw30ud_stc.a ${wxwidgets_lib_dir}/libwxmsw30ud_richtext.a ${wxwidgets_lib_dir}/libwxmsw30ud_propgrid.a ${wxwidgets_lib_dir}/libwxmsw30ud_ribbon.a ${wxwidgets_lib_dir}/libwxmsw30ud_aui.a ${wxwidgets_lib_dir}/libwxmsw30ud_adv.a ${wxwidgets_lib_dir}/libwxmsw30ud_html.a ${wxwidgets_lib_dir}/libwxmsw30ud_core.a ${wxwidgets_lib_dir}/libwxbase30ud_xml.a ${wxwidgets_lib_dir}/libwxbase30ud_net.a ${wxwidgets_lib_dir}/libwxexpatd.a ${wxwidgets_lib_dir}/libwxbase30ud.a ${wxwidgets_lib_dir}/libwxpngd.a ${wxwidgets_lib_dir}/libwxjpegd.a ${wxwidgets_lib_dir}/libwxzlibd.a ${wxwidgets_lib_dir}/libwxtiffd.a)
-		ELSE()
-			target_link_libraries(TiledSpriteObject ${wxwidgets_lib_dir}/libwxmsw30u_xrc.a ${wxwidgets_lib_dir}/libwxmsw30u_stc.a ${wxwidgets_lib_dir}/libwxmsw30u_richtext.a ${wxwidgets_lib_dir}/libwxmsw30u_propgrid.a ${wxwidgets_lib_dir}/libwxmsw30u_ribbon.a ${wxwidgets_lib_dir}/libwxmsw30u_aui.a ${wxwidgets_lib_dir}/libwxmsw30u_adv.a ${wxwidgets_lib_dir}/libwxmsw30u_html.a ${wxwidgets_lib_dir}/libwxmsw30u_core.a ${wxwidgets_lib_dir}/libwxbase30u_xml.a ${wxwidgets_lib_dir}/libwxbase30u_net.a ${wxwidgets_lib_dir}/libwxexpat.a ${wxwidgets_lib_dir}/libwxbase30u.a ${wxwidgets_lib_dir}/libwxpng.a ${wxwidgets_lib_dir}/libwxjpeg.a ${wxwidgets_lib_dir}/libwxzlib.a ${wxwidgets_lib_dir}/libwxtiff.a)
-		ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-
-		target_link_libraries(TiledSpriteObject ws2_32 user32 opengl32 glu32)
-	ELSE()
-		target_link_libraries(TiledSpriteObject sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
-		target_link_libraries(TiledSpriteObject ${wxWidgets_LIBRARIES})
-		target_link_libraries(TiledSpriteObject ${GTK_LIBRARIES})
-	ENDIF(WIN32)
-ENDIF()
+gd_extension_link_libraries(TiledSpriteObject)
 
 #Linker files for the GD C++ Runtime extension
 ###
-IF(EMSCRIPTEN)
-	#Nothing.
-ELSE()
-	target_link_libraries(TiledSpriteObject_Runtime GDCpp_Runtime)
-	IF(WIN32)
-		target_link_libraries(TiledSpriteObject_Runtime sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
-		target_link_libraries(TiledSpriteObject_Runtime ws2_32 user32 opengl32 glu32)
-	ELSE()
-		target_link_libraries(TiledSpriteObject_Runtime sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
-	ENDIF(WIN32)
-ENDIF()
+gdcpp_runtime_extension_link_libraries(TiledSpriteObject_Runtime)

@@ -12,6 +12,35 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	set(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
+#Define macro to factor common tasks done in CMakeLists.txt of extensions:
+
+#Link default libraries with a target that is a GD extension
+function(gd_extension_link_libraries target_name)
+	IF(EMSCRIPTEN)
+		#Nothing.
+	ELSE()
+		target_link_libraries(${target_name} GDCore)
+		target_link_libraries(${target_name} GDCpp)
+		target_link_libraries(${target_name} sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+		target_link_libraries(${target_name} ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
+		target_link_libraries(${target_name} ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
+	ENDIF()
+endfunction()
+
+#Link default libraries with a target that is a GDC++ Runtime extension
+function(gdcpp_runtime_extension_link_libraries target_name)
+	IF(EMSCRIPTEN)
+		#Nothing.
+	ELSE()
+		target_link_libraries(${target_name} GDCpp_Runtime)
+		target_link_libraries(${target_name} sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+		IF(WIN32)
+			target_link_libraries(${target_name} ws2_32 user32 opengl32 glu32)
+		ENDIF(WIN32)
+	ENDIF()
+endfunction()
+
+#Add all the CMakeLists:
 IF (NOT EMSCRIPTEN) #Only add some extensions when compiling with emscripten.
 	ADD_SUBDIRECTORY(AdvancedXML)
 	ADD_SUBDIRECTORY(AES)

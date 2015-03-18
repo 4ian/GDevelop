@@ -14,17 +14,17 @@ type dylibbundler >/dev/null 2>&1 || { echo >&2 "Can't find dylibbundler, requir
 #the external libs we depend one (i.e: wxWidgets). It also copy these
 #libs into the 'libs' folder.
 cd GDevelop.app/Contents/Resources/
-echo . | dylibbundler -x GDIDE -b -cd -od -of -p '@executable_path/'
+echo . | dylibbundler -x GDIDE -b -cd -od -of -p '@executable_path/' > /dev/null
 mv libs/* .
 rm -rf libs
 
 #Do the same for GDCore and GDCpp.
 #We don't need -b flag anymore as all external libs have already being copied.
-echo . | dylibbundler -x libGDCpp.dylib -cd -od -of -p '@executable_path/'
-echo . | dylibbundler -x libGDCore.dylib -cd -od -of -p '@executable_path/'
+echo . | dylibbundler -x libGDCpp.dylib -cd -od -of -p '@executable_path/' > /dev/null
+echo . | dylibbundler -x libGDCore.dylib -cd -od -of -p '@executable_path/' > /dev/null
 
 #Do the same for GDJS
-cat <<EOF | dylibbundler -x JsPlatform/libGDJS.dylib -cd -od -of -p '@executable_path/'
+cat <<EOF | dylibbundler -x JsPlatform/libGDJS.dylib -cd -od -of -p '@executable_path/' > /dev/null
 JsPlatform
 .
 quit
@@ -33,7 +33,8 @@ EOF
 #Do the same for all extensions
 for file in `ls CppPlatform/Extensions/*.xgde`
 do
-	cat <<EOF | dylibbundler -x $file -cd -od -of -p '@executable_path/'
+	echo "Updating libraries for $file..."
+	cat <<EOF | dylibbundler -x $file -cd -od -of -p '@executable_path/' > /dev/null
 JsPlatform
 CppPlatform/Extensions/
 .

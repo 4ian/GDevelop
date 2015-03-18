@@ -52,7 +52,6 @@
 #include "EditorScene.h"
 #include "CodeEditor.h"
 #include "DnDFileEditor.h"
-#include "ConsoleManager.h"
 #include "ProjectManager.h"
 #include "LogFileManager.h"
 #include "BuildToolsPnl.h"
@@ -624,11 +623,6 @@ void MainFrame::OnClose( wxCloseEvent& event )
     }
 
     wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );
-
-    //Close the editor close the program.
-    //We have to destroy the other frames.
-    ConsoleManager * consoleManager = ConsoleManager::Get();
-    consoleManager->DestroySingleton();
 
     //Log the shutdown
     LogFileManager::Get()->WriteToLogFile("GDevelop shutting down");

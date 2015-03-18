@@ -50,7 +50,6 @@
 #include "UpdateChecker.h"
 #include "MAJ.h"
 #include "SplashScreen.h"
-#include "ConsoleManager.h"
 #include "BugReport.h"
 #include "CompilationChecker.h"
 #include "LogFileManager.h"
@@ -274,16 +273,6 @@ bool GDevelopIDEApp::OnInit()
     }
     #endif
     cout << "* Crash management ended" << endl;
-
-    //Creating the console Manager
-    /* Deactivated, as the compilation thread can output messages at any time, resulting in the wxTextCtrl of console frame to be updated at any time
-       which is dangerous ( GUI must be only updated from main thread )
-    #if defined(RELEASE) && defined(WINDOWS)
-    ConsoleManager * consoleManager;
-    consoleManager = ConsoleManager::Get();
-    cout << "ConsoleManager created" << endl;
-    #endif
-    */
 
     //Splash screen
     wxBitmap bitmap;

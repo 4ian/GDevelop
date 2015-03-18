@@ -3,13 +3,6 @@ cmake_policy(SET CMP0015 NEW)
 
 project(GDIDE)
 
-
-#Common directories:
-###
-set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
-set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-
-
 #Dependencies on external libraries:
 ###
 include_directories(${sfml_include_dir})
@@ -88,8 +81,8 @@ ENDIF(WIN32)
 ###
 target_link_libraries(GDIDE GDCore)
 target_link_libraries(GDIDE GDCpp)
+target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 IF(WIN32)
-	target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	target_link_libraries(GDIDE_exe sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	target_link_libraries(GDIDE_dev_exe sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -102,7 +95,6 @@ IF(WIN32)
 	target_link_libraries(GDIDE_exe ws2_32 user32 opengl32 glu32)
 	target_link_libraries(GDIDE_dev_exe ws2_32 user32 opengl32 glu32)
 ELSE()
-	target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	target_link_libraries(GDIDE ${wxWidgets_LIBRARIES})
 	target_link_libraries(GDIDE ${GTK_LIBRARIES})
 	IF (NOT APPLE)

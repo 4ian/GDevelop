@@ -88,18 +88,9 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 	target_link_libraries(GDJS GDCore)
-	IF(WIN32)
-		IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-			target_link_libraries(GDJS ${wxwidgets_lib_dir}/libwxmsw30ud_xrc.a ${wxwidgets_lib_dir}/libwxmsw30ud_stc.a ${wxwidgets_lib_dir}/libwxmsw30ud_webview.a ${wxwidgets_lib_dir}/libwxmsw30ud_richtext.a ${wxwidgets_lib_dir}/libwxmsw30ud_propgrid.a ${wxwidgets_lib_dir}/libwxmsw30ud_ribbon.a ${wxwidgets_lib_dir}/libwxmsw30ud_aui.a ${wxwidgets_lib_dir}/libwxmsw30ud_adv.a ${wxwidgets_lib_dir}/libwxmsw30ud_html.a ${wxwidgets_lib_dir}/libwxmsw30ud_core.a ${wxwidgets_lib_dir}/libwxbase30ud_xml.a ${wxwidgets_lib_dir}/libwxbase30ud_net.a ${wxwidgets_lib_dir}/libwxexpatd.a ${wxwidgets_lib_dir}/libwxbase30ud.a ${wxwidgets_lib_dir}/libwxpngd.a ${wxwidgets_lib_dir}/libwxjpegd.a ${wxwidgets_lib_dir}/libwxzlibd.a ${wxwidgets_lib_dir}/libwxtiffd.a)
-		ELSE()
-			target_link_libraries(GDJS ${wxwidgets_lib_dir}/libwxmsw30u_xrc.a ${wxwidgets_lib_dir}/libwxmsw30u_stc.a ${wxwidgets_lib_dir}/libwxmsw30u_webview.a ${wxwidgets_lib_dir}/libwxmsw30u_richtext.a ${wxwidgets_lib_dir}/libwxmsw30u_propgrid.a ${wxwidgets_lib_dir}/libwxmsw30u_ribbon.a ${wxwidgets_lib_dir}/libwxmsw30u_aui.a ${wxwidgets_lib_dir}/libwxmsw30u_adv.a ${wxwidgets_lib_dir}/libwxmsw30u_html.a ${wxwidgets_lib_dir}/libwxmsw30u_core.a ${wxwidgets_lib_dir}/libwxbase30u_xml.a ${wxwidgets_lib_dir}/libwxbase30u_net.a ${wxwidgets_lib_dir}/libwxexpat.a ${wxwidgets_lib_dir}/libwxbase30u.a ${wxwidgets_lib_dir}/libwxpng.a ${wxwidgets_lib_dir}/libwxjpeg.a ${wxwidgets_lib_dir}/libwxzlib.a ${wxwidgets_lib_dir}/libwxtiff.a)
-		ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-
-		target_link_libraries(GDJS ws2_32 user32)
-	ELSE()
-		target_link_libraries(GDJS ${wxWidgets_LIBRARIES})
-		target_link_libraries(GDJS ${GTK_LIBRARIES})
-	ENDIF(WIN32)
+	target_link_libraries(GDJS sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+	target_link_libraries(GDJS ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
+	target_link_libraries(GDJS ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
 ENDIF()
 
 #Post build tasks

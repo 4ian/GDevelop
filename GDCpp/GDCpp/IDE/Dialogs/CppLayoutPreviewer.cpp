@@ -351,6 +351,7 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
     {
         if ( !debugger )
         {
+            wxLogNull noLogPlease; //Avoid libpng warnings.
             debugger = std::shared_ptr<DebuggerGUI>(new DebuggerGUI(editor.GetParentControl(), previewScene) );
             if ( !parentAuiManager->GetPane("DBG").IsOk() )
                 parentAuiManager->AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );

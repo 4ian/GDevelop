@@ -12,7 +12,45 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	set(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
-#Define macro to factor common tasks done in CMakeLists.txt of extensions:
+#Functions to factor common tasks done in CMakeLists.txt of extensions:
+
+#Add a GD extension target
+function(gd_add_extension_target target_name source_files)
+	add_library(${target_name} SHARED ${source_files})
+	set_target_properties(${target_name} PROPERTIES PREFIX "")
+	set_target_properties(${target_name} PROPERTIES COMPILE_DEFINITIONS "${${target_name}_extra_definitions}")
+	set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
+	set_target_properties(${target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
+	set_target_properties(${target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
+	IF(WIN32) #GD extensions have special suffix in their filenames.
+		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgdwe")
+	ELSEIF(EMSCRIPTEN)
+		set_target_properties(${target_name} PROPERTIES SUFFIX ".bc")
+	ELSE()
+		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgde")
+	ENDIF()
+endfunction()
+
+#Add a GDC++ runtime extension target
+function(gdcpp_add_runtime_extension_target gdcpp_runtime_target_name source_files)
+	IF(NOT EMSCRIPTEN) #Also add a GDC++ extension target
+		set(${gdcpp_runtime_target_name} "${target_name}_Runtime")
+		add_library(${gdcpp_runtime_target_name} SHARED ${source_files})
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES COMPILE_DEFINITIONS "${${gdcpp_runtime_target_name}_extra_definitions}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES RUNTIME_OUTPUT_NAME "${target_name}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES LIBRARY_OUTPUT_NAME "${target_name}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES ARCHIVE_OUTPUT_NAME "${target_name}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES PREFIX "")
+		IF(WIN32) #GD extensions have special suffix in their filenames.
+			set_target_properties(${gdcpp_runtime_target_name} PROPERTIES SUFFIX ".xgdw")
+		ELSE()
+			set_target_properties(${gdcpp_runtime_target_name} PROPERTIES SUFFIX ".xgd")
+		ENDIF()
+	ENDIF()
+endfunction()
 
 #Link default libraries with a target that is a GD extension
 function(gd_extension_link_libraries target_name)

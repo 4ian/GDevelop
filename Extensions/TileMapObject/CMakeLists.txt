@@ -70,6 +70,7 @@ set(source_files
 	)
 
 set(gdide_source_files
+	${source_files}
 	TileMapObjectEditor.cpp
 	TileMapObjectEditorCommands.cpp
 	TileSetConfigurationEditor.cpp
@@ -81,32 +82,9 @@ set(gdide_source_files
 	TileMapDialogs.xrc
 	TileMapDialogs_wxsmith_bitmaps.cpp)
 
-add_library(TileMapObject SHARED ${source_files} ${gdide_source_files})
-set_target_properties(TileMapObject PROPERTIES COMPILE_DEFINITIONS "${TileMapObject_extra_definitions}")
-set_target_properties(TileMapObject PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
-set_target_properties(TileMapObject PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
-set_target_properties(TileMapObject PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
-set_target_properties(TileMapObject PROPERTIES PREFIX "")
-IF(NOT EMSCRIPTEN)
-	add_library(TileMapObject_Runtime SHARED ${source_files})
-	set_target_properties(TileMapObject_Runtime PROPERTIES COMPILE_DEFINITIONS "${TileMapObject_Runtime_extra_definitions}")
-	set_target_properties(TileMapObject_Runtime PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
-	set_target_properties(TileMapObject_Runtime PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
-	set_target_properties(TileMapObject_Runtime PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
-	set_target_properties(TileMapObject_Runtime PROPERTIES RUNTIME_OUTPUT_NAME "TileMapObject")
-	set_target_properties(TileMapObject_Runtime PROPERTIES LIBRARY_OUTPUT_NAME "TileMapObject")
-	set_target_properties(TileMapObject_Runtime PROPERTIES ARCHIVE_OUTPUT_NAME "TileMapObject")
-	set_target_properties(TileMapObject_Runtime PROPERTIES PREFIX "")
-ENDIF()
-IF(WIN32)
-	set_target_properties(TileMapObject PROPERTIES SUFFIX ".xgdwe")
-	set_target_properties(TileMapObject_Runtime PROPERTIES SUFFIX ".xgdw")
-ELSEIF(EMSCRIPTEN)
-	set_target_properties(TileMapObject PROPERTIES SUFFIX ".bc")
-ELSE()
-	set_target_properties(TileMapObject PROPERTIES SUFFIX ".xgde")
-	set_target_properties(TileMapObject_Runtime PROPERTIES SUFFIX ".xgd")
-ENDIF(WIN32)
+
+gd_add_extension_target(TileMapObject "${gdide_source_files}")
+gdcpp_add_runtime_extension_target(TileMapObject_Runtime "${source_files}")
 
 #Linker files for the IDE extension
 ###

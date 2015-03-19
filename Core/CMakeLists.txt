@@ -17,7 +17,7 @@ set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SY
 include_directories(${sfml_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
-ELSEIF (NOT NO_GUI)
+ELSEIF (NOT EMSCRIPTEN AND NOT NO_GUI)
 	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
 	include_directories(${GTK_INCLUDE_DIRS})

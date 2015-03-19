@@ -3,18 +3,7 @@ cmake_policy(SET CMP0015 NEW)
 
 project(ParticleSystem)
 
-include_directories(${sfml_include_dir})
-include_directories(${GDCORE_include_dir})
-include_directories(${GDCpp_include_dir})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/SPARK/include)
-IF(WIN32) #Special case for wxWidgets on Windows
-	include_directories(${wxwidgets_include_dir})
-ELSE()
-	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
-	include( "${wxWidgets_USE_FILE}" )
-	include_directories(${GTK_INCLUDE_DIRS})
-	link_directories(${GTK_LIBRARY_DIRS})
-ENDIF(WIN32)
+gd_add_extension_includes()
 
 #Defines
 ###
@@ -22,6 +11,7 @@ gd_add_extension_definitions(ParticleSystem)
 
 #The targets
 ###
+include_directories(./SPARK/include)
 include_directories(.)
 file(GLOB source_files * "SPARK/src/SPK_All.cpp" "SPARK/src/SPK_GL_All.cpp") #Also compiles the SPARK particle engine files.
 

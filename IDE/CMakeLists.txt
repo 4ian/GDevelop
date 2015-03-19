@@ -10,7 +10,7 @@ include_directories(${GDCORE_include_dir})
 include_directories(${GDCpp_include_dir})
 IF(WIN32) #Special case for wxWidgets on Windows
 	include_directories(${wxwidgets_include_dir})
-ELSE()
+ELSE(NOT EMSCRIPTEN AND NOT NO_GUI)
 	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
 	include( "${wxWidgets_USE_FILE}" )
 	include_directories(${GTK_INCLUDE_DIRS})
@@ -71,10 +71,10 @@ set_target_properties(GDIDE PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/
 set_target_properties(GDIDE PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}")
 set_target_properties(GDIDE PROPERTIES MACOS_RPATH ".")
 IF(WIN32)
-set_target_properties(GDIDE_exe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
-set_target_properties(GDIDE_dev_exe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
-set_target_properties(GDIDE_exe PROPERTIES RUNTIME_OUTPUT_NAME "GDIDE")
-set_target_properties(GDIDE_dev_exe PROPERTIES RUNTIME_OUTPUT_NAME "GDIDE_dev")
+	set_target_properties(GDIDE_exe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
+	set_target_properties(GDIDE_dev_exe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/")
+	set_target_properties(GDIDE_exe PROPERTIES RUNTIME_OUTPUT_NAME "GDIDE")
+	set_target_properties(GDIDE_dev_exe PROPERTIES RUNTIME_OUTPUT_NAME "GDIDE_dev")
 ENDIF(WIN32)
 
 #Linker files for GDIDE

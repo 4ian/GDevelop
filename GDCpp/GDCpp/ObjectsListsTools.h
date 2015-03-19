@@ -27,7 +27,7 @@ typedef std::map <std::string, std::vector<RuntimeObject*> *> RuntimeObjectsList
  * \ingroup GameEngine
  */
 template <typename Pred>
-bool GD_API PickObjectsIf(const RuntimeObjectsLists & pickedObjectsLists, bool negatePredicate, Pred predicate)
+bool PickObjectsIf(const RuntimeObjectsLists & pickedObjectsLists, bool negatePredicate, Pred predicate)
 {
 	bool isTrue = false;
 
@@ -110,7 +110,7 @@ bool GD_API PickObjectsIf(const RuntimeObjectsLists & pickedObjectsLists, bool n
  * \ingroup GameEngine
  */
 template <typename Pred>
-bool GD_API TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
+bool TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
                                RuntimeObjectsLists objectsLists2,
                                bool negatePredicate,
                                Pred predicate)

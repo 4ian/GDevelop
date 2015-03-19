@@ -168,6 +168,7 @@ if(BUILD_TESTS)
 	    tests/*
 	)
 	add_executable(GDCpp_tests ${test_source_files})
+	set_target_properties(GDCpp_tests PROPERTIES COMPILE_DEFINITIONS "${GDCpp_Runtime_exe_extra_definitions}")
 	target_link_libraries(GDCpp_tests GDCpp_Runtime)
 	target_link_libraries(GDCpp_tests ${sfml_LIBRARIES})
 endif()

@@ -81,15 +81,9 @@ ENDIF(WIN32)
 ###
 target_link_libraries(GDIDE GDCore)
 target_link_libraries(GDIDE GDCpp)
-target_link_libraries(GDIDE sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+target_link_libraries(GDIDE ${sfml_LIBRARIES})
 target_link_libraries(GDIDE ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
 target_link_libraries(GDIDE ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
-IF(WIN32)
-	target_link_libraries(GDIDE_exe ws2_32 user32 opengl32 glu32)
-	target_link_libraries(GDIDE_dev_exe ws2_32 user32 opengl32 glu32)
-ELSEIF(NOT APPLE)
-	target_link_libraries(GDIDE GLU GL)
-ENDIF(WIN32)
 
 #Pre build tasks
 ###

@@ -87,7 +87,7 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 	target_link_libraries(GDJS GDCore)
-	target_link_libraries(GDJS sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
+	target_link_libraries(GDJS ${sfml_LIBRARIES})
 	target_link_libraries(GDJS ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
 	target_link_libraries(GDJS ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
 ENDIF()

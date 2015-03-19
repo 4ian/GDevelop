@@ -6,16 +6,61 @@ cmake_policy(SET CMP0011 NEW)
 
 project(GD-Extensions)
 
-#Sanity checks
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
-	set(CMAKE_BUILD_TYPE Release)
-ENDIF()
-
 #Functions to factor common tasks done in CMakeLists.txt of extensions:
 
-#Add a GD extension target
+#Add common defines for a target that will be a GD extension
+function(gd_add_extension_definitions target_name)
+
+	#Define used in GD to check the build type
+	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+		add_definitions( -DDEBUG )
+	ELSEIF (CMAKE_BUILD_TYPE} MATCHES "Release")
+		add_definitions( -DRELEASE )
+	ELSE()
+		add_definitions( -DDEV )
+	ENDIF()
+
+	set(${target_name}_extra_definitions "${${target_name}_extra_definitions} GD_IDE_ONLY=1;" PARENT_SCOPE)
+
+	IF (NO_GUI) #Are we compiling without any GUI feature?
+		add_definitions( -DGD_NO_WX_GUI )
+	ENDIF()
+
+	#Defne used in GD to identify the environment
+	IF (EMSCRIPTEN)
+		add_definitions( -DEMSCRIPTEN )
+	ELSEIF(WIN32)
+		add_definitions( -DWINDOWS )
+    ELSEIF(APPLE)
+    	add_definitions( -DMACOS )
+    ELSE()
+		add_definitions( -DLINUX )
+	ENDIF()
+
+	IF(WIN32) #Windows specific defines
+		add_definitions( "-DGD_CORE_API=__declspec(dllimport)" )
+		add_definitions( "-DGD_API=__declspec(dllimport)" )
+		add_definitions( "-DGD_EXTENSION_API=__declspec(dllexport)" )
+
+		add_definitions( -D__GNUWIN32__ ) #wxWidgets Windows specific defines
+		add_definitions( -D__WXMSW__ )
+		add_definitions( -DwxUSE_UNICODE=1 )
+		add_definitions( -DWXUSINGDLL )
+	ELSE()
+
+		add_definitions( -DGD_API= )
+		add_definitions( -DGD_CORE_API= )
+		add_definitions( -DGD_EXTENSION_API= )
+		add_definitions(${GTK_CFLAGS_OTHER})
+	ENDIF(WIN32)
+endfunction()
+
+#Add a GD extension target, that will produce the final library file.
 function(gd_add_extension_target target_name source_files)
+	IF(target_name STREQUAL "")
+		MESSAGE(ERROR "You called gd_add_extension_target without specifying a target name")
+	ENDIF()
+
 	add_library(${target_name} SHARED ${source_files})
 	set_target_properties(${target_name} PROPERTIES PREFIX "")
 	set_target_properties(${target_name} PROPERTIES COMPILE_DEFINITIONS "${${target_name}_extra_definitions}")
@@ -31,8 +76,12 @@ function(gd_add_extension_target target_name source_files)
 	ENDIF()
 endfunction()
 
-#Add a GDC++ runtime extension target
+#Add a GDC++ runtime extension target, that will produce the final library file for runtime.
 function(gdcpp_add_runtime_extension_target gdcpp_runtime_target_name source_files)
+	IF(gdcpp_runtime_target_name STREQUAL "")
+		MESSAGE(ERROR "You called gdcpp_add_runtime_extension_target without specifying a target name")
+	ENDIF()
+
 	IF(NOT EMSCRIPTEN) #Also add a GDC++ extension target
 		set(${gdcpp_runtime_target_name} "${target_name}_Runtime")
 		add_library(${gdcpp_runtime_target_name} SHARED ${source_files})

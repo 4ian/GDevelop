@@ -17,44 +17,7 @@ ENDIF(WIN32)
 
 #Defines
 ###
-set(TopDownMovementAutomatism_extra_definitions "${TopDownMovementAutomatism_extra_definitions} GD_IDE_ONLY=1;")
-IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
-	add_definitions( -DGD_NO_WX_GUI )
-	add_definitions( -DEMSCRIPTEN )
-ENDIF()
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-	add_definitions( -DDEBUG )
-	IF(WIN32)
-		add_definitions( __WXDEBUG__ )
-	ENDIF(WIN32)
-ELSEIF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-	add_definitions( -DRELEASE )
-ELSE()
-	add_definitions( -DDEV )
-ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-
-IF(WIN32)
-	add_definitions( -DWINDOWS )
-	add_definitions( "-DGD_CORE_API=__declspec(dllimport)" )
-	add_definitions( "-DGD_API=__declspec(dllimport)" )
-	add_definitions( "-DGD_EXTENSION_API=__declspec(dllexport)" )
-
-	add_definitions( -D__GNUWIN32__ )
-	add_definitions( -D__WXMSW__ )
-	add_definitions( -DwxUSE_UNICODE=1 )
-	add_definitions( -DWXUSINGDLL )
-ELSE()
-    IF(APPLE)
-    add_definitions( -DMACOS )
-    ELSE()
-	add_definitions( -DLINUX )
-	ENDIF()
-	add_definitions( -DGD_API= )
-	add_definitions( -DGD_CORE_API= )
-	add_definitions( -DGD_EXTENSION_API= )
-	add_definitions(${GTK_CFLAGS_OTHER})
-ENDIF(WIN32)
-
+gd_add_extension_definitions(TopDownMovementAutomatism)
 
 #The targets
 ###

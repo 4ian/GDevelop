@@ -785,7 +785,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     extension.AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
                    _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
-                   _("_PARAM0_ is in collision with _PARAM1_ ( Collision masks )"),
+                   _("_PARAM0_ is in collision with _PARAM1_"),
                    _("Collision"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")

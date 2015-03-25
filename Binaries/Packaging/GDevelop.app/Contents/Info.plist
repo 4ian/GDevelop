@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleExecutable</key>
-    <string>GDIDE</string>
+    <string>GDIDE_launcher.sh</string>
     <key>CFBundleIconFile</key>
     <string>icon.ico</string>
     <key>CFBundleIdentifier</key>

@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <locale.h>
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/Tools/Log.h"
 

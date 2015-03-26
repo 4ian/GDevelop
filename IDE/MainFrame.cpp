@@ -35,6 +35,7 @@
 #include "MainFrame.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
@@ -51,7 +52,6 @@
 #include "EditorScene.h"
 #include "CodeEditor.h"
 #include "DnDFileEditor.h"
-#include "ConsoleManager.h"
 #include "ProjectManager.h"
 #include "LogFileManager.h"
 #include "BuildToolsPnl.h"
@@ -304,7 +304,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     wxIconBundle icons;
     icons.AddIcon("res/icon16.png");
     icons.AddIcon("res/icon24.png");
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     icons.AddIcon("res/icon32linux.png");
     icons.AddIcon("res/icon48linux.png");
     icons.AddIcon("res/icon64linux.png");
@@ -318,7 +318,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
 
     SetDropTarget(new DnDFileEditor(*this));
 
-    //Accès à la configuration
+    //Set the content scale factor, for "retina" screens support.
+    gd::GUIContentScaleFactor::Set(GetContentScaleFactor());
+
     wxConfigBase *pConfig = wxConfigBase::Get();
 
     //Deactivate menu
@@ -622,11 +624,6 @@ void MainFrame::OnClose( wxCloseEvent& event )
 
     wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );
 
-    //Close the editor close the program.
-    //We have to destroy the other frames.
-    ConsoleManager * consoleManager = ConsoleManager::Get();
-    consoleManager->DestroySingleton();
-
     //Log the shutdown
     LogFileManager::Get()->WriteToLogFile("GDevelop shutting down");
     Destroy();
@@ -697,6 +694,9 @@ void MainFrame::RealizeRibbonCustomButtons()
 
     //The device context used to render the button in memory
     wxMemoryDC dc;
+    double scale = gd::GUIContentScaleFactor::Get();
+    dc.SetLogicalScale(scale, scale);
+    dc.SetUserScale(1.0/scale, 1.0/scale);
 
     //Compute width of the bitmap button
     int width; artProvider->GetBarTabWidth(dc, fakeRibbon, _("File"), wxNullBitmap, &width, NULL, NULL, NULL);

@@ -306,7 +306,7 @@ private:
      */
     void SendCurrentProcessToGarbage();
 
-#if defined(LINUX)
+#if !defined(WINDOWS)
 public:
 #endif
     /**
@@ -316,7 +316,7 @@ public:
      * launch the next task if any.
      */
     void ProcessEndedWork(wxCommandEvent& event);
-#if defined(LINUX)
+#if !defined(WINDOWS)
 private:
 #endif
 

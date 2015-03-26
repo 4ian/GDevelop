@@ -1,7 +1,13 @@
+/*
+ * GDevelop JS Platform
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "JsCodeEventDialog.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDJS/JsCodeEvent.h"
 
 enum
@@ -18,14 +24,8 @@ JsCodeEventDialog::JsCodeEventDialog(wxWindow* parent, gdjs::JsCodeEvent & event
 {
 	//Customize the code editor
 	codeEdit->SetLexer(wxSTC_LEX_ESCRIPT);
-    #if defined(WINDOWS)
-    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-    #else
-	wxFont font(wxFontInfo(11).Family(wxFONTFAMILY_TELETYPE));
-	#endif
-
-	codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, font);
-    for(unsigned int i = 0;i<12;++i) codeEdit->StyleSetFont(i, font);
+    codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
+    for(unsigned int i = 0;i<12;++i) codeEdit->StyleSetFont(i, gd::EventsRenderingHelper::Get()->GetFont());
 	codeEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
 	codeEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
     codeEdit->StyleSetForeground(wxSTC_ESCRIPT_STRING, *wxBLUE);

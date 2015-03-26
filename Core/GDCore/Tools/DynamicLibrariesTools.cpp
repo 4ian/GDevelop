@@ -7,7 +7,7 @@
 #if defined(WINDOWS)
     #include <windows.h>
     #include "GDCore/CommonTools.h"
-#elif defined(LINUX) || defined (MAC)
+#elif defined(LINUX) || defined (MACOS)
     #include <dlfcn.h>
 #endif
 #include <string>
@@ -38,7 +38,7 @@ namespace gd
         std::string errorMsg = "Error ("+ToString(dw)+"): "+std::string(lpMsgBuf);
         return errorMsg;
     }
-#elif defined(LINUX) || defined (MAC)
+#elif defined(LINUX) || defined (MACOS)
     Handle OpenLibrary(const char* path) {return dlopen(path, RTLD_LAZY);}
     void* GetSymbol(Handle library, const char* name) { return dlsym(library, name);}
     void CloseLibrary(Handle library) {dlclose(library);}

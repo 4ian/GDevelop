@@ -56,13 +56,13 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     running(true),
     firstLoop(true),
     isFullScreen(false),
+    inputManager(renderWindow_),
     realElapsedTime(0),
     elapsedTime(0),
     timeScale(1),
     timeFromStart(0),
     pauseTime(0),
     specialAction(-1),
-    windowHasFocus(true),
     codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
@@ -90,15 +90,21 @@ std::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
 void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 {
     renderWindow = newWindow;
+    inputManager.SetWindow(newWindow);
 
     if (!renderWindow) return;
-    renderWindow->setTitle(GetWindowDefaultTitle());
 
+    renderWindow->setTitle(GetWindowDefaultTitle());
+    SetupOpenGLProjection();
+}
+
+void RuntimeScene::SetupOpenGLProjection()
+{
     glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_TRUE);
     glClearDepth(1.f);
 
-    // Setup a perspective projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
@@ -195,42 +201,29 @@ int RuntimeScene::RenderAndStep()
 
 void RuntimeScene::ManageRenderTargetEvents()
 {
-    renderTargetEvents.clear();
     if (!renderWindow) return;
+    inputManager.NextFrame();
 
     sf::Event event;
-    while ( renderWindow->pollEvent( event ) )
+    while (renderWindow->pollEvent(event))
     {
-        renderTargetEvents.push_back(event);
-
-        // Close window : exit
         if ( event.type == sf::Event::Closed )
         {
+            //Handle window closing
             running = false;
             renderWindow->close();
         }
-        else if ( event.type == sf::Event::KeyPressed )
-        {
-            lastPressedKey = event.key.code;
-        }
         else if (event.type == sf::Event::Resized)
         {
-            //Resetup OpenGL
-            glEnable(GL_DEPTH_TEST);
-            glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDepthMask(GL_TRUE);
-            glClearDepth(1.f);
-
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-
-            double windowRatio = static_cast<double>(event.size.width)/static_cast<double>(event.size.height);
-            gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
+            //Resetup OpenGL when window is resized
+            SetupOpenGLProjection();
         }
-        else if ( event.type == sf::Event::GainedFocus)
-            windowHasFocus = true;
-        else if ( event.type == sf::Event::LostFocus)
-            windowHasFocus = false;
+        else
+        {
+            //Most events will be input related and should be forwarded
+            //to the InputManager:
+            inputManager.HandleEvent(event);
+        }
     }
 }
 
@@ -291,9 +284,8 @@ void RuntimeScene::Render()
                 //Rendering all objects
                 for (unsigned int id = 0;id < allObjects.size();++id)
                 {
-                    //Affichage de l'objet si il appartient au calque
-                    if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
-                        allObjects[id]->Draw( *renderWindow );
+                    if (allObjects[id]->GetLayer() == layers[layerIndex].GetName())
+                        allObjects[id]->Draw(*renderWindow);
                 }
 
                 //Texts
@@ -521,6 +513,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     std::cout << ".";
     codeExecutionEngine->runtimeContext.scene = this;
+    inputManager.DisableInputWhenFocusIsLost(IsInputDisabledWhenFocusIsLost());
 
     //Initialize variables
     variables = scene.GetVariables();

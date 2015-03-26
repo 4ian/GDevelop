@@ -21,7 +21,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include <SFML/Graphics.hpp>
-#include "GDCore/Tools/Localization.h" 
+#include "GDCore/Tools/Localization.h"
 
 const long DebuggerGUI::ID_EXTLIST = wxNewId();
 
@@ -160,7 +160,7 @@ void DebuggerGUI::UpdateGUI()
     m_generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     //TODO //m_generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
     m_generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
-    m_generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
+    m_generalList->SetItem(5, 1, ToString(scene.GetInputManager().GetMousePosition().x)+";"+ToString(scene.GetInputManager().GetMousePosition().y));
     m_generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables

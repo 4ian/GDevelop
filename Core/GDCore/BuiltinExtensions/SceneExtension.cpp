@@ -23,6 +23,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
     extension.AddExpression("Random", _("Random value"), _("Random value"), _("Random"), "res/actions/position.png")
         .AddParameter("expression", _("Maximum value"));
 
+    extension.AddStrExpression("CurrentSceneName", _("Current scene name"), _("Name of the current scene"), _("Scene"), "res/actions/texte.png")
+        .AddCodeOnlyParameter("currentScene", "");
+
     extension.AddCondition("DepartScene",
                    _("At the beginning of the scene"),
                    _("Is true only when scene just begins."),
@@ -87,7 +90,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Expression 2"), "",false)
         .MarkAsAdvanced();
-
     #endif
 }
 

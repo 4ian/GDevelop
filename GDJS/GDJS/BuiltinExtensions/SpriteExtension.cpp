@@ -79,9 +79,6 @@ SpriteExtension::SpriteExtension()
     spriteConditions["FlippedY"].codeExtraInformation.
         SetFunctionName("isFlippedY");
 
-    spriteConditions["SourisSurObjet"].codeExtraInformation.
-        SetFunctionName("cursorOnObject");
-
     GetAllConditions()["Collision"]
         .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
         .codeExtraInformation //No pixel perfect collision for now on the JS platform.

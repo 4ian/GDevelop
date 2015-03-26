@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <ctime>
 #include "GDCore/Events/EventsList.h"
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }

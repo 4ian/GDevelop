@@ -29,6 +29,7 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
@@ -954,7 +955,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
             worker.ExposeResource(GetResourcesManager().GetResource(resources[i]));
     }
     #if !defined(GD_NO_WX_GUI)
-    wxSafeYield();
+    gd::SafeYield::Do();
     #endif
 
     //Add layouts resources
@@ -971,7 +972,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
         LaunchResourceWorkerOnEvents(*this, GetExternalEvents(s).GetEvents(), worker);
     }
     #if !defined(GD_NO_WX_GUI)
-    wxSafeYield();
+    gd::SafeYield::Do();
     #endif
 
     //Add global objects resources
@@ -979,7 +980,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
         GetObject(j).ExposeResources(worker);
 
     #if !defined(GD_NO_WX_GUI)
-    wxSafeYield();
+    gd::SafeYield::Do();
     #endif
 }
 

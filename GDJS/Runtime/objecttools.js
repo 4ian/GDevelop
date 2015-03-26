@@ -17,23 +17,24 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
  * Do a test on two tables of objects so as to pick only the pair of objects for which the test is true.
  * If inverted == true, only the objects of the first table are filtered.
  *
- * Note that the func method is not called stricly for each pair: When considering a pair of objects, if
- * these objects have already been marked as picked, the func method won't be called again.
+ * Note that the predicate method is not called stricly for each pair: When considering a pair of objects, if
+ * these objects have already been marked as picked, the predicate method won't be called again.
  *
- * Cost (Worst case, func being always false):
+ * Cost (Worst case, predicate being always false):
  *    Cost(Setting property 'picked' of NbObjList1+NbObjList2 objects to false)
- *  + Cost(functor)*NbObjList1*NbObjList2
+ *  + Cost(predicate)*NbObjList1*NbObjList2
  *  + Cost(Testing NbObjList1+NbObjList2 booleans)
  *  + Cost(Removing NbObjList1+NbObjList2 objects from all the lists)
  *
- * Cost (Best case, func being always true):
+ * Cost (Best case, predicate being always true):
  *    Cost(Setting property 'picked' of NbObjList1+NbObjList2 objects to false)
- *  + Cost(functor)*(NbObjList1+NbObjList2)
+ *  + Cost(predicate)*(NbObjList1+NbObjList2)
  *  + Cost(Testing NbObjList1+NbObjList2 booleans)
  *
  * @method TwoListsTest
+ * @static
  */
-gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2, inverted, extraParam) {
+gdjs.evtTools.object.TwoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraParam) {
 
     var isTrue = false;
     var objects1Values = objectsLists1.values();
@@ -64,9 +65,9 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
                 var arr2 = objects2Values[j];
 
                 for(var l = 0, lenl = arr2.length;l<lenl;++l) {
-                    if (arr1[k].pick && arr2[l].pick) continue; //Avoid unnecessary costly call to func.
+                    if (arr1[k].pick && arr2[l].pick) continue; //Avoid unnecessary costly call to predicate.
 
-                    if (arr1[k].id !== arr2[l].id && func(arr1[k], arr2[l], extraParam)) {
+                    if (arr1[k].id !== arr2[l].id && predicate(arr1[k], arr2[l], extraParam)) {
                         if ( !inverted ) {
                             isTrue = true;
 
@@ -88,7 +89,7 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
         }
     }
 
-    //Trim not picked objects from arrays.
+    //Trim not picked objects from lists.
     for(var i = 0, leni = objects1Values.length;i<leni;++i) {
         var arr = objects1Values[i];
         var finalSize = 0;
@@ -122,100 +123,67 @@ gdjs.evtTools.object.TwoListsTest = function(func, objectsLists1, objectsLists2,
     return isTrue;
 }
 
-gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
+/**
+ * @brief Filter objects to keep only the one that fullfil the predicate
+ *
+ * Objects that do not fullfil the predicate are removed from objects lists.
+ *
+ * @param predicate The function applied to each object: must return true if the object fulfill the predicate.
+ * @param objectsLists The lists of objects to trim
+ * @param negatePredicate If set to true, the result of the predicate is negated.
+ * @return true if at least one object fulfill the predicate.
+ *
+ * @method PickObjectsIf
+ * @static
+ */
+gdjs.evtTools.object.PickObjectsIf = function(predicate, objectsLists, negatePredicate) {
+    var isTrue = false;
+    var objectsValues = objectsLists.values();
 
-    //if ( inverted ) ( See below why it is commented )
+    //Create a boolean for each object
+    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
+        var arr = objectsValues[i];
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            arr[k].pick = false;
+        }
+    }
+
+    //Pick only objects that are fulfilling the predicate
+    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
+        var arr = objectsValues[i];
+
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            if (negatePredicate ^ predicate(arr[k])) {
+                isTrue = true;
+                arr[k].pick = true; //Pick the objects
+            }
+        }
+    }
+
+    //Trim not picked objects from lists.
+    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
+        var arr = objectsValues[i];
+        var finalSize = 0;
+
+        for(var k = 0, lenk = arr.length;k<lenk;++k) {
+            var obj = arr[k];
+            if ( arr[k].pick ) {
+                arr[finalSize] = obj;
+                finalSize++;
+            }
+        }
+        arr.length = finalSize;
+    }
+
+    return isTrue;
+}
+
+gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
     return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.collisionTest,
                                                  objectsLists1, objectsLists2, inverted);
-
-    //Using HSHG ( code below ) is *less* efficient in games like SoldierJS
-    //but more efficient when no collision is really involved ( For example, testing a collision
-    //with lots of objects which are very far ).
-    //For now, use of HSHG is deactivated ( TwoListsTest is always called above ) : The bottleneck
-    //must come from the fact this.HSHG performs collision test on all instances, and not on the
-    //picked one. ( getPotentialCollidingObjects method is using all the objects of the scene. )
-
-    /*var objects1 = [];
-    var objects2 = [];
-    var objects1NameId = [];
-    var objects2NameId = [];
-    var objects1Values = objectsLists1.values();
-    var objects2Values = objectsLists2.values();
-
-
-    //Check if we're dealing with the same lists of objects
-    var objects1Keys = objectsLists1.keys();
-    var objects2Keys = objectsLists2.keys();
-    var sameObjectLists = objects1Keys.length === objects2Keys.length;
-    if ( sameObjectLists ) {
-        for( var i = 0, len = objects1Keys.length;i<len;++i) {
-            if ( objects1Keys[i] !== objects2Keys[i] ) {
-                sameObjectLists = false;
-                break;
-            }
-        }
-    }
-
-    //Prepare list of objects to iterate over.
-    //And remove these objects from the original tables.
-    for(var i = 0, len = objects1Values.length;i<len;++i) {
-        if ( objects1Values[i].length !== 0 ) {
-            objects1.push.apply(objects1, objects1Values[i]);
-            objects1NameId.push(objects1Values[i][0].getNameId());
-            objects1Values[i].length = 0; //Be sure not to lose the reference to the original array
-        }
-    }
-
-    if (sameObjectLists) {
-        objects2 = objects1.slice(0);
-        objects2NameId = objects1NameId;
-    }
-    else
-    {
-        for(var i = 0, len = objects2Values.length;i<len;++i) {
-            if ( objects2Values[i].length !== 0 ) {
-                objects2.push.apply(objects2, objects2Values[i]);
-                objects2NameId.push(objects2Values[i][0].getNameId());
-                objects2Values[i].length = 0; //Be sure not to lose the reference to the original array
-            }
-        }
-    }
-
-    var isTrue = false;
-
-    //Search all the pairs colliding.
-    runtimeScene.updatePotentialCollidingObjects();
-    var pairs = runtimeScene.getPotentialCollidingObjects(objects1NameId, objects2NameId);
-
-    for(var i = 0, len = pairs.length;i<len;++i) {
-        if ( objects1.indexOf(pairs[i][0]) !== -1 && objects2.indexOf(pairs[i][1]) !== -1 ) {
-
-            var objList = objectsLists1.get(pairs[i][0].getName());
-            if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
-
-            objList = objectsLists2.get(pairs[i][1].getName());
-            if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
-
-            isTrue = true;
-        }
-        else if ( objects1.indexOf(pairs[i][1]) !== -1 && objects2.indexOf(pairs[i][0]) !== -1 ) {
-
-            var objList = objectsLists1.get(pairs[i][1].getName());
-            if ( objList.indexOf(pairs[i][1]) == -1) objList.push(pairs[i][1]);
-
-            objList = objectsLists2.get(pairs[i][0].getName());
-            if ( objList.indexOf(pairs[i][0]) == -1) objList.push(pairs[i][0]);
-
-            isTrue = true;
-        }
-    }
-
-    return isTrue;*/
-
 }
 
 gdjs.evtTools.object.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
-
     distance *= distance;
     return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.distanceTest, objectsLists1,
         objectsLists2, inverted, distance);

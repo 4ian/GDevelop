@@ -18,7 +18,7 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/PolygonCollision.h"
-#include "GDCpp/BuiltinExtensions/ObjectTools.h"
+#include "GDCpp/ObjectsListsTools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 
@@ -208,36 +208,26 @@ void RuntimeTileMapObject::ChangeTexture(const std::string &textureName, Runtime
     needGeneration = true;
 }
 
-namespace
+bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
+                         int layer,
+                         int column,
+                         int row,
+                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
+                         bool conditionInverted)
 {
-    /**
-     * Extra parameter struct for the TwoObjectListsTest.
-     */
-    struct TileExtraParameter : public ListsTestFuncExtraParameter
-    {
-        TileExtraParameter(int layer_, int column_, int row_) : ListsTestFuncExtraParameter(), layer(layer_), column(column_), row(row_) {};
-
-        int layer;
-        int column;
-        int row;
-    };
-
-    bool TileCollisionInnerTest(RuntimeObject *tileMapObject_, RuntimeObject *object, const ListsTestFuncExtraParameter &extraParameter)
-    {
+    return TwoObjectListsTest(tileMapList, objectLists, conditionInverted, [layer, column, row](RuntimeObject* tileMapObject_, RuntimeObject * object) {
         RuntimeTileMapObject *tileMapObject = dynamic_cast<RuntimeTileMapObject*>(tileMapObject_);
         if(!tileMapObject || tileMapObject->tileSet.Get().IsDirty())
             return false;
 
-        const TileExtraParameter &tileExtraParam = dynamic_cast<const TileExtraParameter&>(extraParameter);
-
         //Get the tile hitbox
-        int tileId = tileMapObject->tileMap.Get().GetTile(tileExtraParam.layer, tileExtraParam.column, tileExtraParam.row);
+        int tileId = tileMapObject->tileMap.Get().GetTile(layer, column, row);
         if(tileId < 0 || tileId >= tileMapObject->tileSet.Get().GetTilesCount())
             return false;
 
         Polygon2d tileHitbox = tileMapObject->tileSet.Get().GetTileHitbox(tileId).hitbox;
-        tileHitbox.Move(tileMapObject->GetX() + tileExtraParam.column * tileMapObject->tileSet.Get().tileSize.x,
-                        tileMapObject->GetY() + tileExtraParam.row * tileMapObject->tileSet.Get().tileSize.y);
+        tileHitbox.Move(tileMapObject->GetX() + column * tileMapObject->tileSet.Get().tileSize.x,
+                        tileMapObject->GetY() + row * tileMapObject->tileSet.Get().tileSize.y);
 
         //Get the object hitbox
         std::vector<Polygon2d> objectHitboxes = object->GetHitBoxes();
@@ -251,17 +241,7 @@ namespace
         }
 
         return false;
-    }
-}
-
-bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
-                         int layer,
-                         int column,
-                         int row,
-                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
-                         bool conditionInverted)
-{
-    return TwoObjectListsTest(tileMapList, objectLists, conditionInverted, &TileCollisionInnerTest, TileExtraParameter(layer, column, row));
+    });
 }
 
 RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object)

@@ -22,6 +22,11 @@
 #include "GDCpp/Text.h"
 #include "GDCpp/CppPlatform.h"
 
+std::string GD_API GetSceneName(RuntimeScene & scene)
+{
+    return scene.GetName();
+}
+
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {
     return scene.GetRuntimeLayer(layer).GetVisibility();

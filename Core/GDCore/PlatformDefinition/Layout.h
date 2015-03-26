@@ -262,7 +262,7 @@ public:
      */
     ///@{
     /**
-     * Set if the input must be disabled when window lost focus.
+     * Set if the input must be disabled when window lose focus.
      */
     void DisableInputWhenFocusIsLost(bool disable = true) { disableInputWhenNotFocused = disable; }
 

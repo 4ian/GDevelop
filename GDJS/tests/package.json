@@ -4,7 +4,7 @@
   "description": "Tests for the HTML5 engine of GDevelop",
   "main": "index.js",
   "scripts": {
-    "test": "karma start --browsers Firefox --single-run"
+    "test": "./node_modules/karma/bin/karma start --browsers PhantomJS --single-run"
   },
   "keywords": [
     "HTML5",
@@ -14,12 +14,12 @@
     "Develop"
   ],
   "author": "Florian Rival",
-  "license": "LPGL",
+  "license": "MIT",
   "dependencies": {
-    "mocha": "^1.21.4",
+    "expect.js": "^0.3.1",
     "karma": "^0.12.22",
     "karma-mocha": "^0.1.9",
-    "karma-firefox-launcher": "^0.1.3",
-    "expect.js": "^0.3.1"
+    "karma-phantomjs-launcher": "^0.1.4",
+    "mocha": "^1.21.4"
   }
 }

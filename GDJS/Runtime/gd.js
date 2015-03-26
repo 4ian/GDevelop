@@ -91,7 +91,7 @@ gdjs.getDocWidth = function() {
  * @static
  */
 gdjs.iterateOverArray = function(array, func) {
-    if ( array.length === undefined || array.length === null ) {
+    if ( array === undefined || array.length === undefined || array.length === null ) {
         console.error("gdjs.iterateOverArray called with something which is not an array.");
         return;
     }
@@ -113,6 +113,8 @@ gdjs.iterateOverArray = function(array, func) {
  * @static
  */
 gdjs.registerObjects = function() {
+    gdjs.objectsTypes.clear();
+
     for (var p in this) {
         if (this.hasOwnProperty(p)) {
             if ( gdjs[p].thisIsARuntimeObjectConstructor != undefined) {
@@ -134,6 +136,8 @@ gdjs.registerObjects = function() {
  * @static
  */
 gdjs.registerAutomatisms = function() {
+    gdjs.automatismsTypes.clear();
+
     for (var p in this) {
         if (this.hasOwnProperty(p)) {
             if ( gdjs[p].thisIsARuntimeAutomatismConstructor != undefined) {
@@ -154,6 +158,9 @@ gdjs.registerAutomatisms = function() {
  * @static
  */
 gdjs.registerGlobalCallbacks = function() {
+    gdjs.callbacksRuntimeSceneLoaded = [];
+    gdjs.callbacksRuntimeSceneUnloaded = [];
+    gdjs.callbacksObjectDeletedFromScene = [];
 
     var totalprop = 0;
 
@@ -180,7 +187,6 @@ gdjs.registerGlobalCallbacks = function() {
     };
 
     innerRegisterGlobalCallbacks(this, 0);
-    //console.log("totalprop:" + totalprop);
 };
 
 /**

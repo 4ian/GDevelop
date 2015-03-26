@@ -777,26 +777,3 @@ gdjs.SpriteRuntimeObject.prototype.turnTowardObject = function(obj, scene) {
     this.rotateTowardPosition(obj.getDrawableX()+obj.getCenterX(),
         obj.getDrawableY()+obj.getCenterY(), 0, scene);
 };
-
-
-/**
- * Return true if the cursor is on the object.<br>
- * TODO : Support layer's camera rotation.
- *
- * @method cursorOnObject
- * @return true if the cursor is on the object.
- */
-gdjs.SpriteRuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
-    var mousePos = runtimeScene.getLayer(this.layer).convertCoords(
-        runtimeScene.getGame().getMouseX(),
-        runtimeScene.getGame().getMouseY());
-
-    if (this.getDrawableX() <= mousePos[0]
-        && this.getDrawableX() + this.getWidth() >= mousePos[0]
-        && this.getDrawableY() <= mousePos[1]
-        && this.getDrawableY() + this.getHeight() >= mousePos[1] ) {
-        return true;
-    }
-
-    return false;
-};

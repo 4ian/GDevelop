@@ -28,6 +28,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
@@ -361,12 +362,7 @@ lastErrorPos(std::string::npos)
 
 	ExpressionEdit->SetText(gd::utf8::ToWxString(expression));
 	ExpressionEdit->SetLexer(wxSTC_LEX_CPP);
-    #if defined(WINDOWS)
-    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-    #else
-	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	#endif
-	ExpressionEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, font);
+	ExpressionEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
 	ExpressionEdit->StyleClearAll();
 
 	ExpressionEdit->StyleSetForeground(4, *wxBLACK); //Numbers

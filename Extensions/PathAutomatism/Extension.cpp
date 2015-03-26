@@ -329,7 +329,7 @@ public:
                 aut.AddAction("SetSpeed",
                                _("Change the speed"),
                                _("Change the speed of the object on the path."),
-                               _("Do _PARAM1__PARAM2_ to speed of of _PARAM0_ on the path"),
+                               _("Do _PARAM1__PARAM2_ to the speed of _PARAM0_ on the path"),
                                _("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")

@@ -19,6 +19,7 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/Events/Event.h"
 
 using namespace std;
@@ -124,14 +125,19 @@ niceRectangleOutline(wxPen(wxColour(205,205,246), 1)),
 actionsRectangleOutline(wxPen(wxColour(205,205,246))),
 conditionsRectangleOutline(wxPen(wxColour(185,185,247), 1)),
 actionsRectangleFill(*wxWHITE_BRUSH),
-conditionsRectangleFill(wxBrush(wxColour(252,252,255))),
-niceFont(wxFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL))
+conditionsRectangleFill(wxBrush(wxColour(252,252,255)))
 {
     fakeBmp.Create(10,10,-1);
+
+    //Setup fonts, with "retina" support.
+    int fontSize = gd::GUIContentScaleFactor::Get() > 1 ? 15 : 9;
+    int niceFontSize = gd::GUIContentScaleFactor::Get() > 1 ? 12 : 8;
+
+    niceFont = wxFont(niceFontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
     #if defined(WINDOWS)
-    SetFont(wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
+    SetFont(wxFont(fontSize, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
     #else
-    SetFont(wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
+    SetFont(wxFont(fontSize, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
     #endif
 }
 

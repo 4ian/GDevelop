@@ -276,8 +276,8 @@ void LayoutEditorCanvas::RenderEdittime()
     //Go back to "window" view before drawing GUI elements
     setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
 
-    RenderInitialWindowBorder();
     if ( options.grid ) RenderGrid();
+    RenderInitialWindowBorder();
 
     if ( renderer.drawResizeButtons )
     {
@@ -674,13 +674,18 @@ void LayoutEditorCanvas::UpdateSize()
         if ( parentControl->GetSize().GetWidth() <= 0 || parentControl->GetSize().GetHeight() <= 0)
             return;
 
+        unsigned int width = parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0);
+        unsigned int height = parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0);
+
+        #if defined(MACOS) //&& defined(RETINA)
+        width *= 2;
+        height *= 2;
+        #endif
+
         //Scene takes all the space available in edition mode.
-        Window::setSize(sf::Vector2u(
-            parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
-            parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0)));
+        Window::setSize(sf::Vector2u(width, height));
         wxWindowBase::SetPosition(wxPoint(0,0));
-        wxWindowBase::SetSize(parentControl->GetSize().GetWidth() - (vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
-                              parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0));
+        wxWindowBase::SetSize(width, height);
 
         UpdateViewAccordingToZoomFactor();
     }

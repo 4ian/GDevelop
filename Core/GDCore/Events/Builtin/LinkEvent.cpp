@@ -135,6 +135,8 @@ gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::P
 void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
 #if !defined(GD_NO_WX_GUI)
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
+
     dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
     dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
     wxRect rect(x+1, y, width-2, GetRenderedHeight(width, platform)-2);
@@ -147,16 +149,15 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
         dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     else
         dc.SetTextForeground( wxColour( 160, 160, 160 ) );
-    dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    wxString targetStr = _("Link to ")+gd::utf8::ToWxString(GetTarget());
-    dc.DrawText(targetStr , x+32, y + 3 );
-    wxRect lien = dc.GetTextExtent(targetStr);
 
-    dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    if ( IncludeAllEvents() )
-        dc.DrawText( _("Include all events"), x+lien.GetWidth()+32+10, y + 5 );
-    else
-        dc.DrawText( _("Include events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+32+10, y + 5 );
+    dc.SetFont(renderingHelper->GetNiceFont());
+    dc.DrawText( _("Link to ")+gd::utf8::ToWxString(GetTarget()), x+32, y + 3 );
+
+    if ( !IncludeAllEvents() ) 
+    {
+        wxRect textRect = dc.GetTextExtent(_("Link to ")+gd::utf8::ToWxString(GetTarget()));
+        dc.DrawText( _("Include only events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
+    }
 #endif
 }
 
@@ -168,11 +169,13 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform
 #if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
+
         wxMemoryDC dc;
         wxBitmap fakeBmp(1,1);
         dc.SelectObject(fakeBmp);
 
-        dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+        dc.SetFont(renderingHelper->GetNiceFont());
         wxRect lien = dc.GetTextExtent(_("Link to "));
 
         renderedHeight = lien.GetHeight()+10;

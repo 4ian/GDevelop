@@ -1026,6 +1026,50 @@ gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
 };
 
 /**
+ * Return true if the specified position is inside object bounding box.
+ *
+ * The position should be in "world" coordinates, i.e use gdjs.Layer.convertCoords
+ * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
+ *
+ * @method insideObject
+ */
+gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
+    return this.getDrawableX() <= x
+        && this.getDrawableX() + this.getWidth() >= x
+        && this.getDrawableY() <= y
+        && this.getDrawableY() + this.getHeight() >= y;
+}
+
+/**
+ * Return true if the cursor, or any touch, is on the object.
+ *
+ * @method cursorOnObject
+ * @return true if the cursor, or any touch, is on the object.
+ */
+gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
+    var inputManager = runtimeScene.getGame().getInputManager();
+    var layer = runtimeScene.getLayer(this.layer);
+
+    var mousePos = layer.convertCoords(inputManager.getMouseX(), inputManager.getMouseY());
+    if (this.insideObject(mousePos[0], mousePos[1])) {
+        return true;
+    }
+
+    var touchIds = inputManager.getAllTouchIdentifiers();
+    for(var i = 0;i<touchIds.length;++i) {
+        var touchPos = layer.convertCoords(inputManager.getTouchX(touchIds[i]),
+            inputManager.getTouchY(touchIds[i]));
+
+        if (this.insideObject(touchPos[0], touchPos[1])) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+
+/**
  * Get the identifier associated to an object name :<br>
  * Some features may want to compare objects name a large number of time. In this case,
  * it may be more efficient to compare objects name identifier ( see gdjs.RuntimeObject.getNameId ).

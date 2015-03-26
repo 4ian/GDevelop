@@ -38,12 +38,6 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 
     #if defined(WINDOWS)
         suffix += "w";
-    #elif defined(LINUX)
-        suffix += "l";
-    #elif defined(MAC)
-        suffix += "m";
-    #else
-        #warning No target system defined.
     #endif
 
     #if defined(GD_IDE_ONLY)
@@ -129,19 +123,13 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
 
     #if defined(WINDOWS)
         suffix += "w";
-    #elif defined(LINUX)
-        suffix += "l";
-    #elif defined(MAC)
-        suffix += "m";
-    #else
-        #warning No target system defined.
     #endif
 
     #if defined(GD_IDE_ONLY)
         suffix += "e";
     #endif
 
-    #if defined(LINUX) || defined (MAC)
+    #if defined(LINUX) || defined (MACOS)
 
     //List all extensions loaded
     struct dirent *lecture;

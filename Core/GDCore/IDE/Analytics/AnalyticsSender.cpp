@@ -5,6 +5,7 @@
  */
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/VersionWrapper.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
 #include "AnalyticsSender.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -53,6 +54,8 @@ void AnalyticsSender::SendData(std::string collection, SerializerElement & data)
 
     data.SetAttribute("gdVersion", VersionWrapper::FullString());
     data.SetAttribute("os", gd::ToString(wxGetOsDescription()));
+    data.SetAttribute("lang",
+        gd::ToString(wxLocale::GetLanguageCanonicalName(LocaleManager::Get()->GetLanguage())));
 
     // Create request
     std::cout << "Sending analytics data..."; std::cout.flush();

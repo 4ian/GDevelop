@@ -98,10 +98,10 @@ gdjs.TopDownMovementRuntimeAutomatism.prototype.doStepPreEvents = function(runti
     var timeDelta = runtimeScene.getElapsedTime()/1000;
 
     //Get the player input:
-    this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(LEFTKEY);
-    this._rightKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(RIGHTKEY);
-    this._downKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(DOWNKEY);
-    this._upKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(UPKEY);
+    this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+    this._rightKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
+    this._downKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
+    this._upKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
 
     var direction = -1;
     var directionInRad = 0;

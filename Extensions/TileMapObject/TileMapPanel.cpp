@@ -152,7 +152,6 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
                         m_tileset->GetTileTextureCoords(m_tilemap->GetTile(layer, col, row)).topLeft.y,
                         wxCOPY,
                         true);
-                //dc.DrawBitmap(m_tileset->GetTileBitmap(m_tilemap->GetTile(layer, col, row)), GetPositionOfTile(col, row).x, GetPositionOfTile(col, row).y, true);
             }
         }
     }

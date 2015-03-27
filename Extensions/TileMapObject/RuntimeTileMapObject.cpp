@@ -43,7 +43,7 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
 
     //Load the tileset and generate the vertex array
     tileSet.Get().LoadResources(*(scene.game));
-    tileSet.Get().Generate();
+    tileSet.Get().Generate(); //We don't need wxBitmaps
     vertexArray = TileMapExtension::GenerateVertexArray(tileSet.Get(), tileMap.Get());
     hitboxes = TileMapExtension::GenerateHitboxes(tileSet.Get(), tileMap.Get());
 }

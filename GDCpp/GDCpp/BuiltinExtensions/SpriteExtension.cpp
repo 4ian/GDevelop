@@ -32,6 +32,7 @@ SpriteExtension::SpriteExtension()
     objectActions["ChangeSprite"].codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["PauseAnimation"].codeExtraInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["PlayAnimation"].codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeAnimationSpeedScale"].codeExtraInformation.SetFunctionName("SetAnimationSpeedScale").SetAssociatedGetter("GetAnimationSpeedScale").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["TourneVersPos"].codeExtraInformation.SetFunctionName("RotateTowardPosition").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["ChangeScale"].codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectActions["ChangeScaleWidth"].codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
@@ -68,6 +69,7 @@ SpriteExtension::SpriteExtension()
     objectExpressions["Anim"].codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectExpressions["Animation"].codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectExpressions["Sprite"].codeExtraInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["AnimationSpeedScale"].codeExtraInformation.SetFunctionName("GetAnimationSpeedScale").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectExpressions["ScaleX"].codeExtraInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     objectExpressions["ScaleY"].codeExtraInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 

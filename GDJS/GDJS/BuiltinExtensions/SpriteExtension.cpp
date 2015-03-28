@@ -53,6 +53,9 @@ SpriteExtension::SpriteExtension()
         SetFunctionName("playAnimation");
     spriteConditions["AnimStopped"].codeExtraInformation.
         SetFunctionName("animationPaused");
+    spriteActions["ChangeAnimationSpeedScale"].codeExtraInformation.
+        SetFunctionName("setAnimationSpeedScale").SetAssociatedGetter("getAnimationSpeedScale").SetManipulatedType("number").SetIncludeFile("spriteruntimeobject.js");
+            
 
     spriteActions["ChangeScaleWidth"].codeExtraInformation.
         SetFunctionName("setScaleX").SetAssociatedGetter("getScaleX");
@@ -102,6 +105,8 @@ SpriteExtension::SpriteExtension()
         SetFunctionName("getAnimation");
     spriteExpressions["Sprite"].codeExtraInformation.
         SetFunctionName("getAnimationFrame");
+    spriteExpressions["AnimationSpeedScale"].codeExtraInformation.
+        SetFunctionName("getAnimationSpeedScale");
     spriteExpressions["ScaleX"].codeExtraInformation.
         SetFunctionName("getScaleX");
     spriteExpressions["ScaleY"].codeExtraInformation.

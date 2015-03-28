@@ -107,6 +107,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false)
         .MarkAsSimple();
 
+    obj.AddAction("ChangeAnimationSpeedScale",
+                   _("Change the animation speed scale"),
+                   _("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
+                   _("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
+                   _("Animations and images"),
+                   "res/actions/animation24.png",
+                   "res/actions/animation.png")
+
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
+        .MarkAsSimple()
+        .SetManipulatedType("number");
+
     obj.AddAction("TourneVersPos",
                    _("Rotate an object toward a position"),
                    _("Rotate an object towards a position."),
@@ -431,6 +445,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite", false);
 
     obj.AddExpression("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
+
+    obj.AddExpression("AnimationSpeedScale", _("Animation speed scale"), _("Animation speed scale"), _("Animations and images"), "res/actions/animation.png")
         .AddParameter("object", _("Object"), "Sprite", false);
 
     obj.AddExpression("ScaleX", _("Scale of the width of an object"), _("Scale of the width of an object"), _("Size"), "res/actions/scaleWidth.png")

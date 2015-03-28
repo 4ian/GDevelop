@@ -32,6 +32,7 @@
             <extension name="BuiltinExternalLayouts" />
             <extension name="TiledSpriteObject" />
             <extension name="PlatformAutomatism" />
+            <extension name="TextObject" />
         </extensions>
         <platforms>
             <platform name="GDevelop C++ platform" />
@@ -71,7 +72,7 @@
     <variables />
     <layouts>
         <layout b="252" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="201" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="233">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="70" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="70" snap="true" windowMask="false" zoomFactor="0.764706" />
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="70" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="70" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups />
             <variables />
             <instances>
@@ -186,6 +187,11 @@
                     <initialVariables />
                 </instance>
                 <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Jumpthru" width="0.000000" x="711.115356" y="420.307648" zOrder="22">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="Nouveau calque" locked="false" name="AnimationScaleText" width="0.000000" x="18.807678" y="14.923172" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
@@ -495,6 +501,14 @@
                         <automatism name="Platform" platformType="Ladder" type="PlatformAutomatism::PlatformAutomatism" />
                     </automatisms>
                 </object>
+                <object bold="true" italic="false" name="AnimationScaleText" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Text</string>
+                    <font></font>
+                    <characterSize>20</characterSize>
+                    <color b="0" g="0" r="0" />
+                </object>
             </objects>
             <events>
                 <event disabled="false" folded="false">
@@ -694,6 +708,12 @@
                             <events />
                         </event>
                         <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>We use a timer to know the time elasped since the beginning of the movement. Then, we use this time to determine the speed of the player (and update the animation speed scale to accelerate the animation)</comment>
+                            <comment2>On utilise un chronomètre pour connaître le temps écoulé depuis le début du mouvement du personnage. Ensuite, on utilise ce temps pour déterminer la vitesse du personnage (et mettre à jour l&apos;échelle de vitesse de l&apos;animation du personnage).</comment2>
+                        </event>
+                        <event disabled="false" folded="false">
                             <type>BuiltinCommonInstructions::Standard</type>
                             <conditions />
                             <actions>
@@ -814,6 +834,15 @@
                             </parameters>
                             <subActions />
                         </action>
+                        <action>
+                            <type inverted="false" value="TextObject::String" />
+                            <parameters>
+                                <parameter>AnimationScaleText</parameter>
+                                <parameter>=</parameter>
+                                <parameter>ToString(Player.AnimationSpeedScale())</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
                     </actions>
                     <events />
                 </event>
@@ -855,6 +884,11 @@
             </events>
             <layers>
                 <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+                <layer name="Nouveau calque" visibility="true">
                     <cameras>
                         <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
                     </cameras>

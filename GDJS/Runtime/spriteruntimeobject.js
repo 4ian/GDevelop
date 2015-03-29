@@ -155,6 +155,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._currentDirection = 0;
     this._currentFrame = 0;
     this._frameElapsedTime = 0;
+    this._animationSpeedScale = 1;
 	this._animationPaused = false;
     this._scaleX = 1;
     this._scaleY = 1;
@@ -275,7 +276,7 @@ gdjs.SpriteRuntimeObject.prototype._updatePIXITexture = function() {
  */
 gdjs.SpriteRuntimeObject.prototype.updateTime = function(elapsedTime) {
     var oldFrame = this._currentFrame;
-    this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime;
+    this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale;
 
     if ( this._currentAnimation >= this._animations.length ||
          this._currentDirection >= this._animations[this._currentAnimation].directions.length) {
@@ -457,6 +458,14 @@ gdjs.SpriteRuntimeObject.prototype.pauseAnimation = function() {
 
 gdjs.SpriteRuntimeObject.prototype.playAnimation = function() {
     this._animationPaused = false;
+};
+
+gdjs.SpriteRuntimeObject.prototype.getAnimationSpeedScale = function() {
+    return this._animationSpeedScale;
+};
+
+gdjs.SpriteRuntimeObject.prototype.setAnimationSpeedScale = function(ratio) {
+    this._animationSpeedScale = ratio
 };
 
 //Position :

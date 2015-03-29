@@ -106,6 +106,9 @@ public :
     bool SetDirection(float nb);
     inline unsigned int GetCurrentDirection() const { return currentDirection; }
 
+    float GetAnimationSpeedScale() const { return animationSpeedScale; }
+    void SetAnimationSpeedScale(float ratio) { animationSpeedScale = ratio; }
+
     /**
      * Return angle or direction, according to the current direction type.
      */
@@ -164,7 +167,9 @@ private:
     float currentAngle;
     unsigned int currentSprite;
     bool animationStopped;
+
     float timeElapsedOnCurrentSprite;
+    float animationSpeedScale;
 
     mutable gd::Sprite * ptrToCurrentSprite; //Pointer to the current sprite
     mutable bool needUpdateCurrentSprite;

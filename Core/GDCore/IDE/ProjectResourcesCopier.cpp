@@ -89,7 +89,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
                 //We can now copy the file
                 if ( !fs.CopyFile(it->first, destinationFile) )
                 {
-                    gd::LogWarning( gd::ToString(_( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile+_("\".")));
+                    gd::LogWarning( GD_T( "Unable to copy \"")+it->first+GD_T("\" to \"")+destinationFile+GD_T("\"."));
                 }
             }
         }

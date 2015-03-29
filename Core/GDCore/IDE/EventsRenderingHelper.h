@@ -85,7 +85,7 @@ public:
      * Draw a text in dc at point, without taking more than widthAvailable.
      * \return X position of the last character and total height taken by the text
      */
-    wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point, bool utf8 = false);
+    wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point);
 
     /**
      * \return Height taken by the text

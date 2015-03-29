@@ -29,7 +29,7 @@ namespace gd
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
-wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point, bool utf8)
+wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point)
 {
     if ( text.empty() || rect.width == 0) return point;
 
@@ -45,11 +45,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRec
     int charactersInALine = floor(static_cast<double>(rect.width)/static_cast<double>(fontCharacterWidth));
     if ( charactersInALine <= 0) charactersInALine = 1;
 
-    int textLength;
-    if(utf8)
-        textLength = gd::utf8::StrLength(text);
-    else
-        textLength = text.length();
+    int textLength = gd::utf8::StrLength(text);
 
     int cutCount = ceil(static_cast<double>(textLength)/static_cast<double>(charactersInALine));
     if ( cutCount <= 0 ) cutCount = 1;
@@ -64,10 +60,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRec
         try
         {
         #endif
-        if(utf8)
-            displayedText = gd::utf8::ToWxString(gd::utf8::SubStr(text, lastCutPosition, charactersInALine));
-        else
-            displayedText = text.substr(lastCutPosition, charactersInALine);
+        displayedText = gd::utf8::ToWxString(gd::utf8::SubStr(text, lastCutPosition, charactersInALine));
         #if defined(LINUX)
         }
         catch(...)
@@ -446,8 +439,7 @@ int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const 
         lastPos = DrawTextInArea(text, 
                                  dc, 
                                  wxRect(point.x, point.y, freeWidth, 0/*Useless*/), 
-                                 lastPos, 
-                                 (formattedStr[i].second.userData != std::string::npos)); //< Show as UTF8 for parameters only
+                                 lastPos); 
     }
 
     font.SetWeight(wxFONTWEIGHT_NORMAL);

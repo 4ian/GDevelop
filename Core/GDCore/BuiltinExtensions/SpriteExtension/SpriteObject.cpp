@@ -240,7 +240,7 @@ void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::Main
 std::map<std::string, gd::PropertyDescriptor> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
-    properties[ToString(_("Animation"))] = position.floatInfos.find("animation") != position.floatInfos.end() ?
+    properties[GD_T("Animation")] = position.floatInfos.find("animation") != position.floatInfos.end() ?
                                            ToString(position.floatInfos.find("animation")->second) :
                                            "0";
 
@@ -249,7 +249,7 @@ std::map<std::string, gd::PropertyDescriptor> SpriteObject::GetInitialInstancePr
 
 bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene)
 {
-    if ( name == _("Animation") ) position.floatInfos["animation"] = ToInt(value);
+    if ( name == GD_T("Animation") ) position.floatInfos["animation"] = ToInt(value);
 
     return true;
 }

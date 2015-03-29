@@ -164,9 +164,9 @@ bool ImageResource::EditProperty(gd::Project & project, const std::string & prop
 bool ImageResource::ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue)
 {
     if ( property == "smooth" )
-        smooth = (newValue == _("Yes"));
+        smooth = (newValue == GD_T("Yes"));
     else if ( property == "alwaysLoaded" )
-        alwaysLoaded = (newValue == _("Yes"));
+        alwaysLoaded = (newValue == GD_T("Yes"));
 
     return true;
 }
@@ -175,13 +175,13 @@ void ImageResource::GetPropertyInformation(gd::Project & project, const std::str
 {
     if ( property == "smooth" )
     {
-        userFriendlyName = _("Smooth the image");
-        description = _("Set this to \"Yes\" to set a smooth filter on the image");
+        userFriendlyName = GD_T("Smooth the image");
+        description = GD_T("Set this to \"Yes\" to set a smooth filter on the image");
     }
     else if ( property == "alwaysLoaded" )
     {
-        userFriendlyName = _("Always loaded in memory");
-        description = _("Set this to \"Yes\" to let the image always loaded in memory.\nUseful when the image is used by actions.");
+        userFriendlyName = GD_T("Always loaded in memory");
+        description = GD_T("Set this to \"Yes\" to let the image always loaded in memory.\nUseful when the image is used by actions.");
     }
 }
 
@@ -189,11 +189,11 @@ std::string ImageResource::GetProperty(gd::Project & project, const std::string 
 {
     if ( property == "smooth" )
     {
-        return ToString(smooth ? _("Yes") : _("No"));
+        return ToString(smooth ? GD_T("Yes") : GD_T("No"));
     }
     else if ( property == "alwaysLoaded" )
     {
-        return ToString(alwaysLoaded ? _("Yes") : _("No"));
+        return ToString(alwaysLoaded ? GD_T("Yes") : GD_T("No"));
     }
 
     return "";

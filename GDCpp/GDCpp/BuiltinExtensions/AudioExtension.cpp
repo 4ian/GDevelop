@@ -79,7 +79,7 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
 {
     if ( propertyNb == 0 )
     {
-        name = _("Global volume:");
+        name = GD_T("Global volume:");
         value = ToString(SoundManager::Get()->GetGlobalVolume());
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
@@ -92,23 +92,23 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
             sf::Sound::Status soundStatus = SoundManager::Get()->sounds[soundNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
-                name = _("Sound played:");
+                name = GD_T("Sound played:");
             else if ( soundStatus == sf::Sound::Stopped)
-                name = _("Sound stopped:");
+                name = GD_T("Sound stopped:");
             else if ( soundStatus == sf::Sound::Paused)
-                name = _("Paused sound:");
+                name = GD_T("Paused sound:");
 
             value = SoundManager::Get()->sounds[soundNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
-            name = _(" -Volume/Pitch:");
+            name = GD_T(" -Volume/Pitch:");
             value = ToString(SoundManager::Get()->sounds[soundNb]->GetVolume())
                     +"/"+ToString(SoundManager::Get()->sounds[soundNb]->GetPitch());
         }
         else
         {
-            name = _(" -Progress (seconds) :");
+            name = GD_T(" -Progress (seconds) :");
             value = ToString(SoundManager::Get()->sounds[soundNb]->GetPlayingOffset());
         }
 
@@ -123,23 +123,23 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
             sf::Sound::Status soundStatus = SoundManager::Get()->musics[musicNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
-                name = _("Played music:");
+                name = GD_T("Played music:");
             else if ( soundStatus == sf::Sound::Stopped)
-                name = _("Stopped music:");
+                name = GD_T("Stopped music:");
             else if ( soundStatus == sf::Sound::Paused)
-                name = _("Paused music:");
+                name = GD_T("Paused music:");
 
             value = SoundManager::Get()->musics[musicNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
-            name = _(" -Volume/Pitch:");
+            name = GD_T(" -Volume/Pitch:");
             value = ToString(SoundManager::Get()->musics[musicNb]->GetVolume())
                     +"/"+ToString(SoundManager::Get()->musics[musicNb]->GetPitch());
         }
         else
         {
-            name = _(" -Progress (seconds) :");
+            name = GD_T(" -Progress (seconds) :");
             value = ToString(SoundManager::Get()->musics[musicNb]->GetPlayingOffset());
         }
     }

@@ -338,7 +338,7 @@ void RuntimeSpriteObject::UpdateTime(float elapsedTime)
 
     float delay = direction.GetTimeBetweenFrames();
 
-    //On gère l'avancement du sprite actuel suivant le temps entre chaque sprite
+    //On gÃ¨re l'avancement du sprite actuel suivant le temps entre chaque sprite
     if ( timeElapsedOnCurrentSprite > delay )
     {
         if ( delay != 0 )

@@ -81,7 +81,7 @@ void RuntimeObject::Init(const RuntimeObject & object)
 void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = GD_T("Position");      value = ToString(GetX())+";"+ToString(GetY());}
-    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = ToString(GetAngle())+u8"°";}
+    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = ToString(GetAngle())+u8"Â°";}
     else if ( propertyNb == 2 ) {name = GD_T("Size");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
     else if ( propertyNb == 3 ) {name = GD_T("Visibility");    value = hidden ? GD_T("Hidden") : GD_T("Displayed");}
     else if ( propertyNb == 4 ) {name = GD_T("Layer");        value = layer;}
@@ -177,7 +177,7 @@ void RuntimeObject::AddForceTowardPosition( float positionX, float positionY, fl
 
 void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing )
 {
-    //Angle en degré entre les deux objets
+    //Angle en degrÃ© entre les deux objets
 
 	//Workaround Visual C++ internal error (!) by using temporary doubles.
 	double y = ( GetDrawableY() + GetCenterY()) - positionY;
@@ -185,11 +185,11 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
     float angle = atan2(y,x) * 180 / 3.14159f;
     float newangle = angle + angularVelocity;
 
-    //position actuelle de l'objet 1 par rapport à l'objet centre
+    //position actuelle de l'objet 1 par rapport Ã  l'objet centre
     int oldX = ( GetDrawableX() + GetCenterX() ) - positionX;
     int oldY = ( GetDrawableY() + GetCenterY() ) - positionY;
 
-    //nouvelle position à atteindre
+    //nouvelle position Ã  atteindre
     int newX = cos(newangle/180.f*3.14159f) * distance;
     int newY = sin(newangle/180.f*3.14159f) * distance;
 

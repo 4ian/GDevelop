@@ -27,8 +27,8 @@ public:
     TextEntryObjectJsExtension()
     {
         SetExtensionInformation("TextEntryObject",
-                              _("Text entry object"),
-                              _("Extension allowing to use an object capturing text entered with keyboard."),
+                              GD_T("Text entry object"),
+                              GD_T("Extension allowing to use an object capturing text entered with keyboard."),
                               "Florian Rival",
                               "Open source (MIT License)");
 

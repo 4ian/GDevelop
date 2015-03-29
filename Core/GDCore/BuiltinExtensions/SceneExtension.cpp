@@ -13,82 +13,82 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("BuiltinScene",
-                          _("Scene management features"),
-                          _("Built-in extension allowing to manipulate scenes"),
+                          GD_T("Scene management features"),
+                          GD_T("Built-in extension allowing to manipulate scenes"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
 
-    extension.AddExpression("Random", _("Random value"), _("Random value"), _("Random"), "res/actions/position.png")
-        .AddParameter("expression", _("Maximum value"));
+    extension.AddExpression("Random", GD_T("Random value"), GD_T("Random value"), GD_T("Random"), "res/actions/position.png")
+        .AddParameter("expression", GD_T("Maximum value"));
 
-    extension.AddStrExpression("CurrentSceneName", _("Current scene name"), _("Name of the current scene"), _("Scene"), "res/actions/texte.png")
+    extension.AddStrExpression("CurrentSceneName", GD_T("Current scene name"), GD_T("Name of the current scene"), GD_T("Scene"), "res/actions/texte.png")
         .AddCodeOnlyParameter("currentScene", "");
 
     extension.AddCondition("DepartScene",
-                   _("At the beginning of the scene"),
-                   _("Is true only when scene just begins."),
-                   _("At the beginning of the scene"),
-                   _("Scene"),
+                   GD_T("At the beginning of the scene"),
+                   GD_T("Is true only when scene just begins."),
+                   GD_T("At the beginning of the scene"),
+                   GD_T("Scene"),
                    "res/conditions/depart24.png",
                    "res/conditions/depart.png")
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsSimple();
 
     extension.AddAction("Scene",
-                   _("Go to a scene"),
-                   _("Change and start the specified scene."),
-                   _("Go to scene _PARAM1_"),
-                   _("Scene"),
+                   GD_T("Go to a scene"),
+                   GD_T("Change and start the specified scene."),
+                   GD_T("Go to scene _PARAM1_"),
+                   GD_T("Scene"),
                    "res/actions/goscene24.png",
                    "res/actions/goscene.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the scene"), "",false)
+        .AddParameter("string", GD_T("Name of the scene"), "",false)
         .MarkAsAdvanced();
 
     extension.AddAction("Quit",
-                   _("Quit the game"),
-                   _("Quit the game"),
-                   _("Quit the game"),
-                   _("Scene"),
+                   GD_T("Quit the game"),
+                   GD_T("Quit the game"),
+                   GD_T("Quit the game"),
+                   GD_T("Scene"),
                    "res/actions/quit24.png",
                    "res/actions/quit.png")
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsAdvanced();
 
     extension.AddAction("SceneBackground",
-                   _("Change background color"),
-                   _("Change the background color of the scene."),
-                   _("Set background color to _PARAM1_"),
-                   _("Scene"),
+                   GD_T("Change background color"),
+                   GD_T("Change the background color of the scene."),
+                   GD_T("Set background color to _PARAM1_"),
+                   GD_T("Scene"),
                    "res/actions/background24.png",
                    "res/actions/background.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("color", _("Color"), "",false)
+        .AddParameter("color", GD_T("Color"), "",false)
         .MarkAsAdvanced();
 
     extension.AddAction("DisableInputWhenFocusIsLost",
-                   _("Disable input when focus is lost"),
-                   _("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
-                   _("Disable input when focus is lost: _PARAM1_"),
-                   _("Scene"),
+                   GD_T("Disable input when focus is lost"),
+                   GD_T("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
+                   GD_T("Disable input when focus is lost: _PARAM1_"),
+                   GD_T("Scene"),
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Deactivate input when focus is lost"))
+        .AddParameter("yesorno", GD_T("Deactivate input when focus is lost"))
         .MarkAsAdvanced();
 
     extension.AddCondition("Egal",
-               _("Compare two expressions"),
-               _("Test the two expression"),
-               _("_PARAM0_ _PARAM1_ _PARAM2_"),
-               _("Other"),
+               GD_T("Compare two expressions"),
+               GD_T("Test the two expression"),
+               GD_T("_PARAM0_ _PARAM1_ _PARAM2_"),
+               GD_T("Other"),
                "res/conditions/egal24.png",
                "res/conditions/egal.png")
-        .AddParameter("expression", _("Expression 1"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Expression 2"), "",false)
+        .AddParameter("expression", GD_T("Expression 1"), "",false)
+        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
+        .AddParameter("expression", GD_T("Expression 2"), "",false)
         .MarkAsAdvanced();
     #endif
 }

@@ -20,8 +20,8 @@ SceneExtension::SceneExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSceneExtension(*this);
 
     SetExtensionInformation("BuiltinScene",
-                          _("Scene management features"),
-                          _("Built-in extension allowing to manipulate scenes"),
+                          GD_T("Scene management features"),
+                          GD_T("Built-in extension allowing to manipulate scenes"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -86,14 +86,14 @@ SceneExtension::SceneExtension()
         /*
 
     AddAction("DisableInputWhenFocusIsLost",
-                   _("Disable input when focus is lost"),
-                   _("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
-                   _("Disable input when focus is lost: _PARAM1_"),
-                   _("Scene"),
+                   GD_T("Disable input when focus is lost"),
+                   GD_T("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
+                   GD_T("Disable input when focus is lost: _PARAM1_"),
+                   GD_T("Scene"),
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Deactivate input when focus is lost"))
+        .AddParameter("yesorno", GD_T("Deactivate input when focus is lost"))
         .codeExtraInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
         */
 

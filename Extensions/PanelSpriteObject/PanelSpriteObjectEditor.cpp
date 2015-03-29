@@ -249,7 +249,7 @@ void PanelSpriteObjectEditor::OnfrontAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        gd::LogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
+        gd::LogMessage(GD_T("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 

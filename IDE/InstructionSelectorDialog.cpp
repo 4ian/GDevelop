@@ -453,7 +453,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        gd::LogWarning(_("The instruction has to many parameters. This can be a bug of GDevelop.\nRead Help to know how report a bug."));
+        gd::LogWarning(GD_T("The instruction has to many parameters. This can be a bug of GDevelop.\nRead Help to know how report a bug."));
         return;
     }
 
@@ -493,7 +493,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(wxString(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?")),
+        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?"),
             parameterDisplayIndex, message.c_str()), _("The instruction contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
@@ -521,8 +521,8 @@ void InstructionSelectorDialog::OnCancelBtClick(wxCommandEvent& event)
 void InstructionSelectorDialog::OnHelpBtClick(wxCommandEvent& event)
 {
     gd::HelpFileAccess::Get()->OpenURL(editingAction ?
-        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action") :
-        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
+        GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action") :
+        GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
 }
 
 void InstructionSelectorDialog::OnmoreBtClick(wxCommandEvent& event)

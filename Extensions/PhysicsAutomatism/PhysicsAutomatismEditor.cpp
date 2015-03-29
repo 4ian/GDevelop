@@ -243,7 +243,7 @@ scene(scene_)
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end())
 	{
-	    gd::LogError(_("Unable to access to shared datas."));
+	    gd::LogError(GD_T("Unable to access to shared datas."));
 	    return;
 	}
 
@@ -251,7 +251,7 @@ scene(scene_)
 
     if ( sharedDatas == std::shared_ptr<ScenePhysicsDatas>() )
     {
-	    gd::LogError(_("Unable to access to shared datas : Bad data type."));
+	    gd::LogError(GD_T("Unable to access to shared datas : Bad data type."));
 	    return;
     }
 

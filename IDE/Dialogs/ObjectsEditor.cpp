@@ -134,7 +134,7 @@ namespace
                 //Notify the game of the new group
                 for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                     project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, &layout, name);
-                gd::LogStatus( _( "The group was correctly added." ) );
+                gd::LogStatus( GD_T( "The group was correctly added." ) );
 
                 //Expand the new group item
                 treeCtrl->Expand(itemAdded);
@@ -606,7 +606,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         //Be sure there is not already another object with this name
         if ( objects.HasObjectNamed(newName) )
         {
-            gd::LogWarning( _( "Unable to rename the object : another object has already this name." ) );
+            gd::LogWarning( GD_T( "Unable to rename the object : another object has already this name." ) );
 
             event.Veto();
             return;
@@ -691,7 +691,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         if (std::find_if(objectsGroups.begin(), objectsGroups.end(),
             std::bind2nd(gd::GroupHasTheSameName(), gd::ToString(event.GetLabel()))) != objectsGroups.end())
         {
-            gd::LogWarning( _( "Unable to rename the group: another group has already this name." ) );
+            gd::LogWarning( GD_T( "Unable to rename the group: another group has already this name." ) );
 
             event.Veto();
             return;
@@ -885,9 +885,9 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
         return;
 
     //Find a new unique name for the object
-    std::string name = ToString(_("NewObject"));
+    std::string name = GD_T("NewObject");
     for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
-        name = _("NewObject")+ToString(i);
+        name = GD_T("NewObject")+ToString(i);
 
     //Add a new object of selected type to objects list
     gd::Object & object = layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(),
@@ -909,7 +909,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     objectsList->EditLabel(itemAdded);
     renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
 
-    gd::LogStatus( _( "The object was correctly added" ) );
+    gd::LogStatus( GD_T( "The object was correctly added" ) );
     objectsList->Expand(objectsRootItem);
 }
 
@@ -919,12 +919,12 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     vector<gd::ObjectGroup> & objectsGroups = layout.GetObjectGroups();
 
-    std::string name = ToString(_("NewGroup"));
+    std::string name = GD_T("NewGroup");
     for (unsigned int i = 2;
         std::find_if( objectsGroups.begin(), objectsGroups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
             != objectsGroups.end();
         ++i)
-        name = _("NewGroup")+ToString(i);
+        name = GD_T("NewGroup")+ToString(i);
 
     newGroup.SetName( name );
 
@@ -941,7 +941,7 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, &layout, name);
-    gd::LogStatus( _( "The group was correctly added." ) );
+    gd::LogStatus( GD_T( "The group was correctly added." ) );
 
     //Make sure that the group root item is expanded
     objectsList->Expand(groupsRootItem);
@@ -1319,7 +1319,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         std::string objectName = object->GetName();
         if ( project.HasObjectNamed(objectName) )
         {
-            gd::LogMessage(_("There is already a global object with this name."));
+            gd::LogMessage(GD_T("There is already a global object with this name."));
             return;
         }
 
@@ -1357,7 +1357,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
 
         if ( HasGroupNamed(groupName, project.GetObjectGroups()) )
         {
-            gd::LogMessage(_("There is already a global object group with this name."));
+            gd::LogMessage(GD_T("There is already a global object group with this name."));
             return;
         }
 

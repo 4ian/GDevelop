@@ -5,6 +5,7 @@
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/log.h>
+#include "GDCore/Utf8Tools.h"
 #else
 #include <iostream>
 #endif
@@ -18,7 +19,7 @@ namespace gd {
 void GD_CORE_API LogWarning(const std::string & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogWarning(wxString(msg));
+	wxLogWarning(utf8::ToWxString(msg));
 #else
 	std::cout << "WARNING: " << msg;
 #endif
@@ -31,7 +32,7 @@ void GD_CORE_API LogWarning(const std::string & msg)
 void GD_CORE_API LogError(const std::string & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogError(wxString(msg));
+	wxLogError(utf8::ToWxString(msg));
 #else
 	std::cout << "ERROR: " << msg;
 #endif
@@ -44,7 +45,7 @@ void GD_CORE_API LogError(const std::string & msg)
 void GD_CORE_API LogMessage(const std::string & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogMessage(wxString(msg));
+	wxLogMessage(utf8::ToWxString(msg));
 #else
 	std::cout << "MESSAGE: " << msg;
 #endif
@@ -56,7 +57,7 @@ void GD_CORE_API LogMessage(const std::string & msg)
 void GD_CORE_API LogStatus(const std::string & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogStatus(wxString(msg));
+	wxLogStatus(utf8::ToWxString(msg));
 #else
 	std::cout << "STATUS: " << msg;
 #endif

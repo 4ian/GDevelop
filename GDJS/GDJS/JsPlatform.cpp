@@ -71,15 +71,15 @@ public:
         Exporter exporter(gd::NativeFileSystem::Get());
         if ( !exporter.ExportLayoutForPreview(project, layout, exportDir) )
         {
-            gd::LogError(_("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
-                       +_("\n\nPlease report this error on the GDevelop website, or contact the extension developer if it seems related to a third party extension."));
+            gd::LogError(GD_T("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
+                       +GD_T("\n\nPlease report this error on the GDevelop website, or contact the extension developer if it seems related to a third party extension."));
         }
 
         //Without "http://", the function fails ( on Windows at least ).
         //The timestamp is here to prevent browsers caching contents.
         if ( !wxLaunchDefaultBrowser("http://localhost:2828?"+gd::ToString(wxGetLocalTime())) )
         {
-            gd::LogError(_("Unable to launch your browser :(\nOpen manually your browser and type \"localhost:2828\" in\nthe address bar ( without the quotes ) to launch the preview!"));
+            gd::LogError(GD_T("Unable to launch your browser :(\nOpen manually your browser and type \"localhost:2828\" in\nthe address bar ( without the quotes ) to launch the preview!"));
         }
 
         return false;

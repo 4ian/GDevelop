@@ -310,7 +310,7 @@ void CodeCompiler::StartTheNextTask()
     currentTaskProcess->Redirect();
     if ( wxExecute(currentTask.compilerCall.GetFullCall(), wxEXEC_ASYNC, currentTaskProcess) == 0 )
     {
-        gd::LogError(_("Unable to launch the internal compiler: Try to reinstall GDevelop to make sure that every needed file are present."));
+        gd::LogError(GD_T("Unable to launch the internal compiler: Try to reinstall GDevelop to make sure that every needed file are present."));
         delete currentTaskProcess;
         currentTaskProcess = NULL;
     }
@@ -573,7 +573,7 @@ void CodeCompiler::ClearOutputDirectory()
     while ( !file.empty() )
     {
         if ( !wxRemoveFile( file ) )
-            std::cout << _( "Unable to delete file" ) + file + _(" in compiler output directory.\n" );
+            std::cout << GD_T( "Unable to delete file" ) + file + GD_T(" in compiler output directory.\n" );
 
         file = wxFindNextFile();
     }

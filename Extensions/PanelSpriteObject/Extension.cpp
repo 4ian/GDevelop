@@ -17,14 +17,14 @@ This project is released under the MIT License.
 void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PanelSpriteObject",
-        _("Panel Sprite (9-patch) Object"),
-        _("Extension allowing to use panel sprite (\"9-patch\") objects."),
+        GD_T("Panel Sprite (9-patch) Object"),
+        GD_T("Extension allowing to use panel sprite (\"9-patch\") objects."),
         "Victor Levasseur and Florian Rival",
         "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("PanelSprite",
-        _("Panel Sprite (\"9-patch\")"),
-        _("An image with edges and corners that are stretched separately from the fill."),
+        GD_T("Panel Sprite (\"9-patch\")"),
+        GD_T("An image with edges and corners that are stretched separately from the fill."),
         "CppPlatform/Extensions/PanelSpriteIcon.png",
         &CreatePanelSpriteObject);
 
@@ -32,92 +32,92 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddAction("Width",
-                   _("Width"),
-                   _("Modify the width of a Panel Sprite."),
-                   _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
-                   _("Size and angle"),
+                   GD_T("Width"),
+                   GD_T("Modify the width of a Panel Sprite."),
+                   GD_T("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                   GD_T("Size and angle"),
                    "res/actions/scaleWidth24.png",
                    "res/actions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("operator", GD_T("Modification's sign"))
+        .AddParameter("expression", GD_T("Value"))
         .codeExtraInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddCondition("Width",
-                   _("Width"),
-                   _("Test the width of a Panel Sprite."),
-                   _("The width of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Size and angle"),
+                   GD_T("Width"),
+                   GD_T("Test the width of a Panel Sprite."),
+                   GD_T("The width of _PARAM0_ is _PARAM1__PARAM2_"),
+                   GD_T("Size and angle"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("relationalOperator", GD_T("Sign of the test"))
+        .AddParameter("expression", GD_T("Value to test"))
         .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddAction("Height",
-                   _("Height"),
-                   _("Modify the height of a Panel Sprite."),
-                   _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
-                   _("Size and angle"),
+                   GD_T("Height"),
+                   GD_T("Modify the height of a Panel Sprite."),
+                   GD_T("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                   GD_T("Size and angle"),
                    "res/actions/scaleHeight24.png",
                    "res/actions/scaleHeight.png")
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("operator", GD_T("Modification's sign"))
+        .AddParameter("expression", GD_T("Value"))
         .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddCondition("Height",
-                   _("Height"),
-                   _("Test the height of a Panel Sprite."),
-                   _("The height of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Size and angle"),
+                   GD_T("Height"),
+                   GD_T("Test the height of a Panel Sprite."),
+                   GD_T("The height of _PARAM0_ is _PARAM1__PARAM2_"),
+                   GD_T("Size and angle"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("relationalOperator", GD_T("Sign of the test"))
+        .AddParameter("expression", GD_T("Value to test"))
         .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddAction("Angle",
-                   _("Angle"),
-                   _("Modify the angle of a Panel Sprite."),
-                   _("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
-                   _("Size and angle"),
+                   GD_T("Angle"),
+                   GD_T("Modify the angle of a Panel Sprite."),
+                   GD_T("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
+                   GD_T("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
         .SetHidden() //Deprecated
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("operator", GD_T("Modification's sign"))
+        .AddParameter("expression", GD_T("Value"))
         .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddCondition("Angle",
-                   _("Angle"),
-                   _("Test the angle of a Panel Sprite."),
-                   _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _("Size and angle"),
+                   GD_T("Angle"),
+                   GD_T("Test the angle of a Panel Sprite."),
+                   GD_T("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
+                   GD_T("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
         .SetHidden() //Deprecated
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("relationalOperator", _("Sign of the test"))
-        .AddParameter("expression", _("Value to test"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("relationalOperator", GD_T("Sign of the test"))
+        .AddParameter("expression", GD_T("Value to test"))
         .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddAction("Image",
-                   _("Image name"),
-                   _("Change the image of a Panel Sprite."),
-                   _("Set image _PARAM1_ on _PARAM0_"),
-                   _("Image"),
+                   GD_T("Image name"),
+                   GD_T("Change the image of a Panel Sprite."),
+                   GD_T("Set image _PARAM1_ on _PARAM0_"),
+                   GD_T("Image"),
                    "res/imageicon24.png",
                    "res/imageicon.png")
-        .AddParameter("object", _("Object"), "PanelSprite", false)
-        .AddParameter("string", _("Image name"))
+        .AddParameter("object", GD_T("Object"), "PanelSprite", false)
+        .AddParameter("string", GD_T("Image name"))
         .AddCodeOnlyParameter("currentScene", "0")
         .codeExtraInformation.SetFunctionName("ChangeAndReloadImage").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
     #endif

@@ -18,8 +18,8 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(*this);
 
     SetExtensionInformation("BuiltinExternalLayouts",
-                          _("External layouts"),
-                          _("Built-in extension providing actions and conditions related to external layouts"),
+                          GD_T("External layouts"),
+                          GD_T("Built-in extension providing actions and conditions related to external layouts"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

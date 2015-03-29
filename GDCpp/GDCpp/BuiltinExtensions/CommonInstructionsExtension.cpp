@@ -625,8 +625,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         AddEvent("CppCode",
-                  _("C++ code ( Experimental )"),
-                  _("Execute C++ code"),
+                  GD_T("C++ code ( Experimental )"),
+                  GD_T("Execute C++ code"),
                   "",
                   "res/source_cpp16.png",
                   std::shared_ptr<gd::BaseEvent>(new CppCodeEvent))

@@ -22,6 +22,7 @@
 #include <vector>
 #include <algorithm>
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/SkinHelper.h"
@@ -436,7 +437,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     if(theme) theme->SetWindowTheme((HWND) imagesList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    statusTxt->SetLabel(_("Drag an image from the image bank to the area below to add it to the animation."));
+    statusTxt->SetLabel(GD_T("Drag an image from the image bank to the area below to add it to the animation."));
 
     imagesList->SetDropTarget(new DndTextSpriteObjectEditor(*this));
 
@@ -1133,7 +1134,7 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
         }
         else
         {
-            gd::LogMessage(_("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
+            gd::LogMessage(GD_T("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
             event.Veto();
         }
 
@@ -1798,12 +1799,12 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 {
-    gd::LogMessage(_("Drag images from the image bank to add them to the animation."));
+    gd::LogMessage(GD_T("Drag images from the image bank to add them to the animation."));
 }
 
 void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
+    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
 void SpriteObjectEditor::OnyScrollBarScroll(wxScrollEvent& event)

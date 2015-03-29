@@ -18,8 +18,8 @@ CommonConversionsExtension::CommonConversionsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(*this);
 
     SetExtensionInformation("BuiltinCommonConversions",
-                          _("Standard Conversions"),
-                          _("Built-in extension providing standard conversions expressions."),
+                          GD_T("Standard Conversions"),
+                          GD_T("Built-in extension providing standard conversions expressions."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

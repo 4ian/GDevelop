@@ -35,8 +35,8 @@ public:
     Extension()
     {
         SetExtensionInformation("Function",
-                              _("Function events"),
-                              _("Extension allowing to use events behaving as functions."),
+                              GD_T("Function events"),
+                              GD_T("Extension allowing to use events behaving as functions."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -95,21 +95,21 @@ public:
             gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddAction("LaunchFunction",
-                           _("Launch a function"),
-                           _("Launch a function"),
-                           _("Launch _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
-                           _("Functions"),
+                           GD_T("Launch a function"),
+                           GD_T("Launch a function"),
+                           GD_T("Launch _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
+                           GD_T("Functions"),
                            "res/actions/function24.png",
                            "res/actions/function.png")
 
-                .AddParameter("", _("Name of the function"))
-                .AddParameter("string", _("Parameter 1"), "", true)
-                .AddParameter("string", _("Parameter 2"), "", true)
-                .AddParameter("string", _("Parameter 3"), "", true)
-                .AddParameter("string", _("Parameter 4"), "", true)
-                .AddParameter("string", _("Parameter 5"), "", true)
-                .AddParameter("string", _("Parameter 6"), "", true)
-                .AddParameter("string", _("Parameter 7"), "", true)
+                .AddParameter("", GD_T("Name of the function"))
+                .AddParameter("string", GD_T("Parameter 1"), "", true)
+                .AddParameter("string", GD_T("Parameter 2"), "", true)
+                .AddParameter("string", GD_T("Parameter 3"), "", true)
+                .AddParameter("string", GD_T("Parameter 4"), "", true)
+                .AddParameter("string", GD_T("Parameter 5"), "", true)
+                .AddParameter("string", GD_T("Parameter 6"), "", true)
+                .AddParameter("string", GD_T("Parameter 7"), "", true)
                 .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
         }
 
@@ -177,8 +177,8 @@ public:
             gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
             AddEvent("Function",
-                    _("Function"),
-                    _("Function event : An event which is launched only thanks to action \"Launch a function\""),
+                    GD_T("Function"),
+                    GD_T("Function event : An event which is launched only thanks to action \"Launch a function\""),
                     "",
                     "res/function.png",
                     std::shared_ptr<gd::BaseEvent>(new FunctionEvent))
@@ -216,11 +216,11 @@ public:
             gd::ExpressionCodeGenerationInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddStrExpression("Parameter",
-                           _("Parameter of the current function"),
-                           _("Return the text contained in a parameter of the currently launched function"),
-                           _("Function"),
+                           GD_T("Parameter of the current function"),
+                           GD_T("Return the text contained in a parameter of the currently launched function"),
+                           GD_T("Function"),
                            "res/function.png")
-                .AddParameter("expression", _("Index of the parameter (Parameters start at 0!)"))
+                .AddParameter("expression", GD_T("Index of the parameter (Parameters start at 0!)"))
                 .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>(codeGenerator));
         }
         #endif

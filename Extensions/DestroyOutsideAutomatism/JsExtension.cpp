@@ -26,8 +26,8 @@ public:
     DestroyOutsideAutomatismJsExtension()
     {
         SetExtensionInformation("DestroyOutsideAutomatism",
-                              _("Destroy Outside Screen Automatism"),
-                              _("Automatism destroying object when they go outside the screen"),
+                              GD_T("Destroy Outside Screen Automatism"),
+                              GD_T("Automatism destroying object when they go outside the screen"),
                               "Florian Rival",
                               "Open source (MIT License)");
         DeclareDestroyOutsideAutomatismExtension(*this);

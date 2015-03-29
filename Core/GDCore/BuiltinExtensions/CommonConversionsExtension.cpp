@@ -13,48 +13,48 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("BuiltinCommonConversions",
-                          _("Standard Conversions"),
-                          _("Built-in extension providing standard conversions expressions."),
+                          GD_T("Standard Conversions"),
+                          GD_T("Built-in extension providing standard conversions expressions."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
 
     extension.AddExpression("ToNumber",
-                       _("Text > Number"),
-                       _("Convert the text to a number"),
-                       _("Conversion"),
+                       GD_T("Text > Number"),
+                       GD_T("Convert the text to a number"),
+                       GD_T("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("string", _("Text to convert in a number"), "",false);
+        .AddParameter("string", GD_T("Text to convert in a number"), "",false);
 
     extension.AddStrExpression("ToString",
-                       _("Number > Text"),
-                       _("Convert the result of the expression in a text"),
-                       _("Conversion"),
+                       GD_T("Number > Text"),
+                       GD_T("Convert the result of the expression in a text"),
+                       GD_T("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Expression to be converted to a text"), "",false);
+        .AddParameter("expression", GD_T("Expression to be converted to a text"), "",false);
 
     extension.AddStrExpression("LargeNumberToString",
-                       _("Number > Text ( without scientific notation )"),
-                       _("Convert the result of the expression in a text, without using the scientific notation"),
-                       _("Conversion"),
+                       GD_T("Number > Text ( without scientific notation )"),
+                       GD_T("Convert the result of the expression in a text, without using the scientific notation"),
+                       GD_T("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Expression to be converted to a text"), "",false);
+        .AddParameter("expression", GD_T("Expression to be converted to a text"), "",false);
 
     extension.AddExpression("ToRad",
-                       _("Degrees > Radians"),
-                       _("Converts the angle, expressed in degrees, into radians"),
-                       _("Conversion"),
+                       GD_T("Degrees > Radians"),
+                       GD_T("Converts the angle, expressed in degrees, into radians"),
+                       GD_T("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Angle, in degrees"), "",false);
+        .AddParameter("expression", GD_T("Angle, in degrees"), "",false);
 
 
     extension.AddExpression("ToDeg",
-                       _("Radians > Degrees"),
-                       _("Converts the angle, expressed in radians, into degrees"),
-                       _("Conversion"),
+                       GD_T("Radians > Degrees"),
+                       GD_T("Converts the angle, expressed in radians, into degrees"),
+                       GD_T("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Angle, in radians"), "",false);
+        .AddParameter("expression", GD_T("Angle, in radians"), "",false);
     #endif
 }
 

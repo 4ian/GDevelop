@@ -31,8 +31,8 @@ public:
     Extension()
     {
         SetExtensionInformation("TimedEvent",
-                              _("Timed events"),
-                              _("Event which launch its conditions and actions only after a amount of time is reached."),
+                              GD_T("Timed events"),
+                              GD_T("Event which launch its conditions and actions only after a amount of time is reached."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -106,8 +106,8 @@ public:
             gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
             AddEvent("TimedEvent",
-                          _("Timed event"),
-                          _("Event which launch its conditions and actions only after a amount of time is reached."),
+                          GD_T("Timed event"),
+                          GD_T("Event which launch its conditions and actions only after a amount of time is reached."),
                           "",
                           "CppPlatform/Extensions/timedevent16.png",
                           std::shared_ptr<gd::BaseEvent>(new TimedEvent))
@@ -130,14 +130,14 @@ public:
             gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddAction("ResetTimedEvent",
-                           _("Reset a timed event"),
-                           _("Reset a timed event"),
-                           _("Reset the timed event(s) called _PARAM1_"),
-                           _("Timed events"),
+                           GD_T("Reset a timed event"),
+                           GD_T("Reset a timed event"),
+                           GD_T("Reset the timed event(s) called _PARAM1_"),
+                           GD_T("Timed events"),
                            "CppPlatform/Extensions/timedevent24.png",
                            "CppPlatform/Extensions/timedevent16.png")
                 .AddCodeOnlyParameter("currentScene", "")
-                .AddParameter("", _("Name"))
+                .AddParameter("", GD_T("Name"))
                 .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
         }
 
@@ -180,14 +180,14 @@ public:
             gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddAction("ResetTimedEventAndSubs",
-                           _("Reset a timed event and sub events"),
-                           _("Reset a timed events, as well as all of its sub events."),
-                           _("Reset timed events called _PARAM1_ and their sub events"),
-                           _("Timed events"),
+                           GD_T("Reset a timed event and sub events"),
+                           GD_T("Reset a timed events, as well as all of its sub events."),
+                           GD_T("Reset timed events called _PARAM1_ and their sub events"),
+                           GD_T("Timed events"),
                            "CppPlatform/Extensions/timedevent24.png",
                            "CppPlatform/Extensions/timedevent16.png")
 
-                .AddParameter("", _("Name"))
+                .AddParameter("", GD_T("Name"))
                 .codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator))
                 .SetIncludeFile("TimedEvent/TimedEventTools.h");
         }
@@ -212,7 +212,7 @@ public:
                 if ( name.find("GDNamedTimedEvent_") == 0 && name.length() > 18 )
                     name = name.substr(18, name.length());
                 else
-                    name = _("No name");
+                    name = GD_T("No name");
 
                 value = ToString(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
 

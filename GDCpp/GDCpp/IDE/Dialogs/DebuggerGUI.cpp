@@ -409,7 +409,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
-            gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+            gd::LogWarning(GD_T("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     //A specific property
@@ -424,7 +424,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
-            gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+            gd::LogWarning(GD_T("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     else //Or a variable
@@ -491,7 +491,7 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
-        gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+        gd::LogWarning(GD_T("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
     }
 }
 
@@ -578,16 +578,16 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
  */
 void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 {
-    std::string variableName = std::string(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable")).mb_str());
+    std::string variableName = gd::utf8::FromWxString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable")).mb_str());
 
     if ( variableName == "" ) return;
     if ( scene.GetVariables().Has(variableName) )
     {
-        gd::LogMessage(_("A variable with this name already exists!"));
+        gd::LogMessage(GD_T("A variable with this name already exists!"));
         return;
     }
 
-    std::string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")));
+    std::string variableValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")));
 
     scene.GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -597,16 +597,16 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
  */
 void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 {
-    std::string variableName = ToString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")));
+    std::string variableName = gd::utf8::FromWxString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")));
 
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().Has(variableName) )
     {
-        gd::LogMessage(_("A variable with this name already exists!"));
+        gd::LogMessage(GD_T("A variable with this name already exists!"));
         return;
     }
 
-    std::string variableValue = ToString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")));
+    std::string variableValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")));
 
     scene.game->GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -630,7 +630,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     if ( newObject == std::shared_ptr<RuntimeObject> () )
     {
-        gd::LogWarning(_("Unable to create object."));
+        gd::LogWarning(GD_T("Unable to create object."));
         return;
     }
 

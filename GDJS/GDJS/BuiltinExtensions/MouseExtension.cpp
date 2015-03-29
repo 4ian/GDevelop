@@ -20,8 +20,8 @@ MouseExtension::MouseExtension()
     gd::BuiltinExtensionsImplementer::ImplementsMouseExtension(*this);
 
     SetExtensionInformation("BuiltinMouse",
-                          _("Mouse features"),
-                          _("Built-in extensions allowing to use the mouse"),
+                          GD_T("Mouse features"),
+                          GD_T("Built-in extensions allowing to use the mouse"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

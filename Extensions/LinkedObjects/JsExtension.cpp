@@ -24,8 +24,8 @@ public:
     JsExtension()
     {
         SetExtensionInformation("LinkedObjects",
-                              _("Linked objects"),
-                              _("Extension allowing to virtually link two objects."),
+                              GD_T("Linked objects"),
+                              GD_T("Extension allowing to virtually link two objects."),
                               "Florian Rival",
                               "Open source (MIT License)");
 

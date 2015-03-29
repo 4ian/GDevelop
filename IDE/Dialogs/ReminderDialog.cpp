@@ -154,7 +154,7 @@ void ReminderDialog::OpenLink(wxString link)
 
 void ReminderDialog::OnHyperlinkCtrl1Click(wxCommandEvent& event)
 {
-    wxString link = _("http://www.compilgames.net/donate.php");
+    wxString link = GD_T("http://www.compilgames.net/donate.php");
     if ( !link.StartsWith("http://www.compilgames.net/") ) link = "http://www.compilgames.net/donate.php";
 
     link += "?utm_source=GD&utm_medium=ReminderDialog&utm_campaign=donateorcontribute";
@@ -185,7 +185,7 @@ void ReminderDialog::OnClose(wxCloseEvent& event)
 void ReminderDialog::OnsendBtClick(wxCommandEvent& event)
 {
 	if (feedbackEdit->GetValue().empty() || !feedbackWritten ) {
-		gd::LogMessage(_("You didn't entered any feedback! :O"));
+		gd::LogMessage(GD_T("You didn't entered any feedback! :O"));
 		return;
 	}
     wxString report;
@@ -212,7 +212,7 @@ void ReminderDialog::OnsendBtClick(wxCommandEvent& event)
     if (response.getStatus() != sf::Http::Response::Ok)
         std::cout << "Unable to connect to the server for sending the feedback!" << std::endl;
     else {
-        gd::LogMessage(_("Thanks for your feedback!"));
+        gd::LogMessage(GD_T("Thanks for your feedback!"));
         sendBt->Disable();
     }
 }

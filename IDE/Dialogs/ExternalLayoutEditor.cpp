@@ -275,7 +275,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
         scene = &emptyLayout;
     else if ( scene == NULL)
     {
-        gd::LogWarning(_("Scene not found."));
+        gd::LogWarning(GD_T("Scene not found."));
         return;
     }
 

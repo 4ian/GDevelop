@@ -180,7 +180,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     {
         std::string file = openedFiles[i];
         if (!wxFileExists(file+".autosave"))
-            file += _(" (Autosave not found!)");
+            file += GD_T(" (Autosave not found!)");
         openedFilesEdit->AppendText(file+"\n");
     }
     if (openedFiles.empty()) {
@@ -189,7 +189,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     }
 
     CreateRapportBt->Disable();
-    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(gd::VersionWrapper::Major())+gd::ToString(gd::VersionWrapper::Minor())+gd::ToString(gd::VersionWrapper::Build()));
+    bugListBt->SetURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(gd::VersionWrapper::Major())+gd::ToString(gd::VersionWrapper::Minor())+gd::ToString(gd::VersionWrapper::Build()));
 }
 
 BugReport::~BugReport()
@@ -253,7 +253,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
     if (response.getStatus() != sf::Http::Response::Ok)
         std::cout << "Unable to connect to the server for sending the report!" << std::endl;
     else {
-        gd::LogMessage(_("Thanks for reporting the error!"));
+        gd::LogMessage(GD_T("Thanks for reporting the error!"));
         CreateRapportBt->Disable();
     }
 }

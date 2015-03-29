@@ -27,8 +27,8 @@ public:
     TextObjectJsExtension()
     {
         SetExtensionInformation("TextObject",
-                              _("Text object"),
-                              _("Extension allowing to use an object displaying a text."),
+                              GD_T("Text object"),
+                              GD_T("Extension allowing to use an object displaying a text."),
                               "Compil Games",
                               "Open source (MIT License)");
 

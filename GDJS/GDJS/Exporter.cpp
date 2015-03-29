@@ -94,7 +94,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     //Export source files
     if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
     {
-        gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
+        gd::LogError(GD_T("Error during exporting! Unable to export source files:\n")+lastError);
         return false;
     }
     std::cout << "c" << std::endl;
@@ -368,7 +368,7 @@ bool Exporter::ExportExternalSourceFiles(gd::Project & project, std::string outp
         fs.MakeAbsolute(filename, fs.DirNameFrom(project.GetProjectFile()));
         std::string outFilename = "ext-code"+gd::ToString(i)+".js";
         if (!fs.CopyFile(filename, outputDir+outFilename))
-            gd::LogWarning(_("Could not copy external file") + filename);
+            gd::LogWarning(GD_T("Could not copy external file") + filename);
 
         InsertUnique(includesFiles, outputDir+outFilename);
     }
@@ -386,7 +386,7 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
         if ( nodeExec.empty() || !fs.FileExists(nodeExec) )
         {
             std::cout << "Node.js executable not found." << std::endl;
-            gd::LogWarning(_("The exported script could not be minified: Please check that you installed Node.js on your system."));
+            gd::LogWarning(GD_T("The exported script could not be minified: Please check that you installed Node.js on your system."));
             minify = false;
         }
         else
@@ -421,7 +421,7 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
                 for (size_t i = 0;i<errors.size();++i)
                     std::cout << errors[i] << std::endl;
 
-                gd::LogWarning(_("The exported script could not be minified.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
+                gd::LogWarning(GD_T("The exported script could not be minified.\n\nMay be an extension is triggering this error: Try to contact the developer if you think it is the case."));
                 minify = false;
             }
             else
@@ -534,14 +534,14 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         //Export events
         if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         {
-            gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
+            gd::LogError(GD_T("Error during exporting! Unable to export events:\n")+lastError);
             return false;
         }
 
         //Export source files
         if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         {
-            gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
+            gd::LogError(GD_T("Error during exporting! Unable to export source files:\n")+lastError);
             return false;
         }
 
@@ -574,7 +574,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
 
         if ( !indexFile)
         {
-            gd::LogError(_("Error during export:\n")+lastError);
+            gd::LogError(GD_T("Error during export:\n")+lastError);
             return false;
         }
 
@@ -604,7 +604,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
             }
 
             if ( !zip.Close() || !out.Close() )
-                gd::LogWarning(_("Unable to finalize the creation of the zip file!\n\nThe exported project won't be put in a zip file."));
+                gd::LogWarning(GD_T("Unable to finalize the creation of the zip file!\n\nThe exported project won't be put in a zip file."));
             else
             {
                 progressDialog.Update(95, _("Cleaning files..."));
@@ -646,7 +646,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
 
 std::string Exporter::GetProjectExportButtonLabel()
 {
-    return gd::ToString(_("Export to the web"));
+    return GD_T("Export to the web");
 }
 
 #if !defined(GD_NO_WX_GUI)

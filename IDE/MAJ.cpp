@@ -179,7 +179,7 @@ void MAJ::OnLienBtClick(wxCommandEvent& event)
 {
     if ( linkCtrl->GetLabel() == _("No link"))
     {
-        gd::LogMessage(_("No download link is available.\nGo on our web site so as to download the last version of GDevelop."));
+        gd::LogMessage(GD_T("No download link is available.\nGo on our web site so as to download the last version of GDevelop."));
         return;
     }
 
@@ -249,7 +249,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     }
     else
     {
-        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
+        gd::LogWarning( GD_T( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
         return;
     }
 
@@ -260,5 +260,5 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
 
 void MAJ::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
+    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
 }

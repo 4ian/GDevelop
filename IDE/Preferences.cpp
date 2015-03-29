@@ -1037,7 +1037,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        gd::LogMessage(_("GDevelop must be relaunched to apply changes."));
+        gd::LogMessage(GD_T("GDevelop must be relaunched to apply changes."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
@@ -1709,7 +1709,7 @@ void Preferences::OneventsEditorFontBtClick(wxCommandEvent& event)
         eventsEditorFontDialog->GetFontData().GetChosenFont().GetFamily() != wxFONTFAMILY_MODERN )
     {
         eventsEditorFontDialog->GetFontData().GetChosenFont() = oldFont;
-        gd::LogWarning(_("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
+        gd::LogWarning(GD_T("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
     }
 }
 

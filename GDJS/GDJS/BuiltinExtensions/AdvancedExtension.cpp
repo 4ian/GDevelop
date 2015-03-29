@@ -17,8 +17,8 @@ AdvancedExtension::AdvancedExtension()
     gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
     SetExtensionInformation("BuiltinAdvanced",
-                          _("Advanced control features"),
-                          _("Built-in extension providing advanced control features."),
+                          GD_T("Advanced control features"),
+                          GD_T("Built-in extension providing advanced control features."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

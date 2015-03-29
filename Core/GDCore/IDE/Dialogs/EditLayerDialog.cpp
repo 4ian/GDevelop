@@ -216,7 +216,7 @@ void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
     //Obligation d'avoir un nom sauf pour le calque de base
     if ( nameEdit->GetValue() == "" && nameEdit->IsEditable() )
     {
-        gd::LogWarning(_("The name is incorrect"));
+        gd::LogWarning(GD_T("The name is incorrect"));
         return;
     }
 
@@ -404,7 +404,7 @@ void EditLayerDialog::OndeleteCameraBtClick(wxCommandEvent& event)
 
     if ( tempLayer.GetCameraCount() == 1 )
     {
-        gd::LogMessage(_("The layer must have at least one camera."));
+        gd::LogMessage(GD_T("The layer must have at least one camera."));
         return;
     }
 
@@ -418,7 +418,7 @@ void EditLayerDialog::OndeleteCameraBtClick(wxCommandEvent& event)
 
 void EditLayerDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
 }
 
 }

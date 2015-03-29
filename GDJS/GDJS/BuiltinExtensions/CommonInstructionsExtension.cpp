@@ -37,8 +37,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(*this);
 
     SetExtensionInformation("BuiltinCommonInstructions",
-                          _("Standard events"),
-                          _("Built-in extension providing standard events."),
+                          GD_T("Standard events"),
+                          GD_T("Built-in extension providing standard events."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -606,8 +606,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         AddEvent("JsCode",
-                  _("Javascript code (Web platform only)"),
-                  _("Insert some Javascript code into events"),
+                  GD_T("Javascript code (Web platform only)"),
+                  GD_T("Insert some Javascript code into events"),
                   "",
                   "res/source_cpp16.png",
                   std::shared_ptr<gd::BaseEvent>(new JsCodeEvent))

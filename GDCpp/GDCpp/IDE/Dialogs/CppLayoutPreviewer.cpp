@@ -21,6 +21,7 @@
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
+#include "GDCore/Utf8Tools.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"
@@ -65,7 +66,7 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
     reloadingIconImage.loadFromFile("res/compile128.png");
     reloadingIconSprite.setTexture(reloadingIconImage);
     reloadingText.setColor(sf::Color(0,0,0,128));
-    reloadingText.setString(_("Compiling..."));
+    reloadingText.setString(gd::utf8::ToSfString(GD_T("Compiling...")));
     reloadingText.setCharacterSize(40);
     reloadingText.setFont(*FontManager::Get()->GetFont(""));
 
@@ -223,7 +224,7 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
     if ( !previewScene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(editor.GetLayout().GetCompiledEventsFile(),
                                                                         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(editor.GetLayout().GetName())) )
     {
-        gd::LogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to GDevelop's developer, joining this file:\n")
+        gd::LogError(GD_T("Compilation of events failed, and scene cannot be previewed. Please report this problem to GDevelop's developer, joining this file:\n")
                    +CodeCompiler::Get()->GetOutputDirectory()+"LatestCompilationOutput.txt");
         editor.GoToEditingState();
 

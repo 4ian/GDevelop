@@ -20,8 +20,8 @@ BaseObjectExtension::BaseObjectExtension()
     gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(*this);
 
     SetExtensionInformation("BuiltinObject",
-                          _("Base object"),
-                          _("Base object"),
+                          GD_T("Base object"),
+                          GD_T("Base object"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -243,34 +243,34 @@ BaseObjectExtension::BaseObjectExtension()
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*
         obj.AddAction("AddForceTournePos",
-                       _("Add a force so as to move around a position"),
-                       _("Add a force to an object so as it rotates toward a position.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
-                       _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_�/sec and _PARAM4_ pixels away"),
-                       _("Displacement"),
+                       GD_T("Add a force so as to move around a position"),
+                       GD_T("Add a force to an object so as it rotates toward a position.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
+                       GD_T("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_�/sec and _PARAM4_ pixels away"),
+                       GD_T("Displacement"),
                        "res/actions/forceTourne24.png",
                        "res/actions/forceTourne.png")
 
-            .AddParameter("object", _("Object"))
-            .AddParameter("expression", _("X position of the center"))
-            .AddParameter("expression", _("Y position of the center"))
-            .AddParameter("expression", _("Speed ( in Degrees per seconds )"))
-            .AddParameter("expression", _("Distance ( in pixels )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("object", GD_T("Object"))
+            .AddParameter("expression", GD_T("X position of the center"))
+            .AddParameter("expression", GD_T("Y position of the center"))
+            .AddParameter("expression", GD_T("Speed ( in Degrees per seconds )"))
+            .AddParameter("expression", GD_T("Distance ( in pixels )"))
+            .AddParameter("expression", GD_T("Damping ( Default : 0 )"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAround");
 
         obj.AddAction("AddForceTourne",
-                       _("Add a force so as to move around an object"),
-                       _("Add a force to an object so as it rotates around another.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
-                       _("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_�/sec and _PARAM3_ pixels away"),
-                       _("Displacement"),
+                       GD_T("Add a force so as to move around an object"),
+                       GD_T("Add a force to an object so as it rotates around another.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
+                       GD_T("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_�/sec and _PARAM3_ pixels away"),
+                       GD_T("Displacement"),
                        "res/actions/forceTourne24.png",
                        "res/actions/forceTourne.png")
 
-            .AddParameter("object", _("Object"))
-            .AddParameter("objectPtr", _("Rotate around this object"))
-            .AddParameter("expression", _("Speed ( Degrees per second )"))
-            .AddParameter("expression", _("Distance ( in pixel )"))
-            .AddParameter("expression", _("Damping ( Default : 0 )"))
+            .AddParameter("object", GD_T("Object"))
+            .AddParameter("objectPtr", GD_T("Rotate around this object"))
+            .AddParameter("expression", GD_T("Speed ( Degrees per second )"))
+            .AddParameter("expression", GD_T("Distance ( in pixel )"))
+            .AddParameter("expression", GD_T("Damping ( Default : 0 )"))
             .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 */
 }

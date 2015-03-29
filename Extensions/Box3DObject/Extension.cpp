@@ -24,15 +24,15 @@ public:
     Extension()
     {
         SetExtensionInformation("Box3DObject",
-                              _("3D Box Object"),
-                              _("Extension allowing to use 3D Box objects."),
+                              GD_T("3D Box Object"),
+                              GD_T("Extension allowing to use 3D Box objects."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
         {
             gd::ObjectMetadata & obj = AddObject("Box3D",
-                       _("3D Box"),
-                       _("Displays a 3D Box"),
+                       GD_T("3D Box"),
+                       GD_T("Displays a 3D Box"),
                        "CppPlatform/Extensions/Box3Dicon.png",
                        &CreateBox3DObject);
 
@@ -43,203 +43,203 @@ public:
             obj.SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddAction("Width",
-                           _("Width"),
-                           _("Modify the width of a 3D Box."),
-                           _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
-                           _("Size"),
+                           GD_T("Width"),
+                           GD_T("Modify the width of a 3D Box."),
+                           GD_T("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                           GD_T("Size"),
                            "res/actions/scaleWidth24.png",
                            "res/actions/scaleWidth.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddCondition("Width",
-                           _("Width"),
-                           _("Compare the width of a 3D Box."),
-                           _("width of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Size"),
+                           GD_T("Width"),
+                           GD_T("Compare the width of a 3D Box."),
+                           GD_T("width of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Size"),
                            "res/conditions/scaleWidth24.png",
                            "res/conditions/scaleWidth.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Height",
-                           _("Height"),
-                           _("Modify the height of a 3D Box."),
-                           _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
-                           _("Size"),
+                           GD_T("Height"),
+                           GD_T("Modify the height of a 3D Box."),
+                           GD_T("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                           GD_T("Size"),
                            "res/actions/scaleHeight24.png",
                            "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Height",
-                           _("Height"),
-                           _("Compare the height of a 3D Box."),
-                           _("height of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Size"),
+                           GD_T("Height"),
+                           GD_T("Compare the height of a 3D Box."),
+                           GD_T("height of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Size"),
                            "res/conditions/scaleHeight24.png",
                            "res/conditions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Depth",
-                           _("Depth"),
-                           _("Modify the depth of a 3D Box."),
-                           _("Do _PARAM1__PARAM2_ to the depth of _PARAM0_"),
-                           _("Size"),
+                           GD_T("Depth"),
+                           GD_T("Modify the depth of a 3D Box."),
+                           GD_T("Do _PARAM1__PARAM2_ to the depth of _PARAM0_"),
+                           GD_T("Size"),
                            "res/actions/depth24.png",
                            "res/actions/depth.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetDepth").SetManipulatedType("number").SetAssociatedGetter("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Depth",
-                           _("Depth"),
-                           _("Compare the depth of a 3D Box."),
-                           _("depth of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Size"),
+                           GD_T("Depth"),
+                           GD_T("Compare the depth of a 3D Box."),
+                           GD_T("depth of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Size"),
                            "res/conditions/depth24.png",
                            "res/conditions/depth.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("GetDepth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("ZPosition",
-                           _("Z Position"),
-                           _("Modify the Z Position of a 3D Box."),
-                           _("Do _PARAM1__PARAM2_ to the Z position of _PARAM0_"),
+                           GD_T("Z Position"),
+                           GD_T("Modify the Z Position of a 3D Box."),
+                           GD_T("Do _PARAM1__PARAM2_ to the Z position of _PARAM0_"),
                            "",
                            "res/actions/position24.png",
                            "res/actions/position.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetZPosition").SetManipulatedType("number").SetAssociatedGetter("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("ZPosition",
-                           _("Z Position"),
-                           _("Compare Z position of a 3D Box."),
-                           _("Z position of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Z Position"),
+                           GD_T("Compare Z position of a 3D Box."),
+                           GD_T("Z position of _PARAM0_ is _PARAM1__PARAM2_"),
                            "",
                            "res/conditions/position24.png",
                            "res/conditions/position.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("GetZPosition").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Yaw",
-                           _("Yaw"),
-                           _("Modify Yaw of a 3D Box object."),
-                           _("Do _PARAM1__PARAM2_ to yaw of _PARAM0_"),
-                           _("Angle"),
+                           GD_T("Yaw"),
+                           GD_T("Modify Yaw of a 3D Box object."),
+                           GD_T("Do _PARAM1__PARAM2_ to yaw of _PARAM0_"),
+                           GD_T("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Yaw",
-                           _("Yaw"),
-                           _("Compare Yaw of a 3D Box object."),
-                           _("Yaw of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Angle"),
+                           GD_T("Yaw"),
+                           GD_T("Compare Yaw of a 3D Box object."),
+                           GD_T("Yaw of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Angle"),
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Pitch",
-                           _("Pitch"),
-                           _("Modify Pitch of a 3D Box object."),
-                           _("Do _PARAM1__PARAM2_ to pitch of _PARAM0_"),
-                           _("Angle"),
+                           GD_T("Pitch"),
+                           GD_T("Modify Pitch of a 3D Box object."),
+                           GD_T("Do _PARAM1__PARAM2_ to pitch of _PARAM0_"),
+                           GD_T("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetPitch").SetManipulatedType("number").SetAssociatedGetter("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Pitch",
-                           _("Pitch"),
-                           _("Compare Pitch of a 3D Box object."),
-                           _("Pitch of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Angle"),
+                           GD_T("Pitch"),
+                           GD_T("Compare Pitch of a 3D Box object."),
+                           GD_T("Pitch of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Angle"),
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("GetPitch").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Roll",
-                           _("Roll"),
-                           _("Modify Roll of a 3D Box object."),
-                           _("Do _PARAM1__PARAM2_ to roll of _PARAM0_"),
-                           _("Angle"),
+                           GD_T("Roll"),
+                           GD_T("Modify Roll of a 3D Box object."),
+                           GD_T("Do _PARAM1__PARAM2_ to roll of _PARAM0_"),
+                           GD_T("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("operator", _("Modification's sign"))
-                .AddParameter("expression", _("Value"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("operator", GD_T("Modification's sign"))
+                .AddParameter("expression", GD_T("Value"))
                 .codeExtraInformation.SetFunctionName("SetRoll").SetManipulatedType("number").SetAssociatedGetter("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Roll",
-                           _("Roll"),
-                           _("Compare Roll of a 3D Box object."),
-                           _("Roll of _PARAM0_ is _PARAM1__PARAM2_"),
-                           _("Angle"),
+                           GD_T("Roll"),
+                           GD_T("Compare Roll of a 3D Box object."),
+                           GD_T("Roll of _PARAM0_ is _PARAM1__PARAM2_"),
+                           GD_T("Angle"),
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
-                .AddParameter("relationalOperator", _("Sign of the test"))
-                .AddParameter("expression", _("Value to test"))
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
+                .AddParameter("relationalOperator", GD_T("Sign of the test"))
+                .AddParameter("expression", GD_T("Value to test"))
                 .codeExtraInformation.SetFunctionName("GetRoll").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
-            obj.AddExpression("Depth", _("Depth of the 3D Box"), _("Depth of the 3D Box"), _("Size"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+            obj.AddExpression("Depth", GD_T("Depth of the 3D Box"), GD_T("Depth of the 3D Box"), GD_T("Size"), "res/actions/scaleHeight.png")
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
                 .codeExtraInformation.SetFunctionName("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
-            obj.AddExpression("Z", _("Z Position"), _("Z Position"), _("Position"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+            obj.AddExpression("Z", GD_T("Z Position"), GD_T("Z Position"), GD_T("Position"), "res/actions/scaleHeight.png")
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
                 .codeExtraInformation.SetFunctionName("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
 
-            obj.AddExpression("Yaw", _("Yaw"), _("Yaw"), _("Angle"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+            obj.AddExpression("Yaw", GD_T("Yaw"), GD_T("Yaw"), GD_T("Angle"), "res/actions/scaleHeight.png")
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
                 .codeExtraInformation.SetFunctionName("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
 
-            obj.AddExpression("Pitch", _("Pitch"), _("Pitch"), _("Angle"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+            obj.AddExpression("Pitch", GD_T("Pitch"), GD_T("Pitch"), GD_T("Angle"), "res/actions/scaleHeight.png")
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
                 .codeExtraInformation.SetFunctionName("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
 
-            obj.AddExpression("Roll", _("Roll"), _("Roll"), _("Angle"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+            obj.AddExpression("Roll", GD_T("Roll"), GD_T("Roll"), GD_T("Angle"), "res/actions/scaleHeight.png")
+                .AddParameter("object", GD_T("Object"), "Box3D", false)
                 .codeExtraInformation.SetFunctionName("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             #endif

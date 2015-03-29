@@ -80,16 +80,16 @@ void RuntimeObject::Init(const RuntimeObject & object)
 #if defined(GD_IDE_ONLY)
 void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Position");      value = ToString(GetX())+";"+ToString(GetY());}
-    else if ( propertyNb == 1 ) {name = _("Angle");         value = ToString(GetAngle())+"°";}
-    else if ( propertyNb == 2 ) {name = _("Size");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
-    else if ( propertyNb == 3 ) {name = _("Visibility");    value = hidden ? _("Hidden") : _("Displayed");}
-    else if ( propertyNb == 4 ) {name = _("Layer");        value = layer;}
-    else if ( propertyNb == 5 ) {name = _("Z order");          value = ToString(zOrder);}
-    else if ( propertyNb == 6 ) {name = _("Speed");       value = ToString(TotalForceLength());}
-    else if ( propertyNb == 7 ) {name = _("Angle of moving"); value = ToString(TotalForceAngle());}
-    else if ( propertyNb == 8 ) {name = _("X coordinate of moving");     value = ToString(TotalForceX());}
-    else if ( propertyNb == 9 ) {name = _("Y coordinate of moving"); value = ToString(TotalForceY());}
+    if      ( propertyNb == 0 ) {name = GD_T("Position");      value = ToString(GetX())+";"+ToString(GetY());}
+    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = ToString(GetAngle())+"°";}
+    else if ( propertyNb == 2 ) {name = GD_T("Size");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
+    else if ( propertyNb == 3 ) {name = GD_T("Visibility");    value = hidden ? GD_T("Hidden") : GD_T("Displayed");}
+    else if ( propertyNb == 4 ) {name = GD_T("Layer");        value = layer;}
+    else if ( propertyNb == 5 ) {name = GD_T("Z order");          value = ToString(zOrder);}
+    else if ( propertyNb == 6 ) {name = GD_T("Speed");       value = ToString(TotalForceLength());}
+    else if ( propertyNb == 7 ) {name = GD_T("Angle of moving"); value = ToString(TotalForceAngle());}
+    else if ( propertyNb == 8 ) {name = GD_T("X coordinate of moving");     value = ToString(TotalForceX());}
+    else if ( propertyNb == 9 ) {name = GD_T("Y coordinate of moving"); value = ToString(TotalForceY());}
 }
 
 bool RuntimeObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -111,7 +111,7 @@ bool RuntimeObject::ChangeProperty(unsigned int propertyNb, string newValue)
     else if ( propertyNb == 2 ) {return false;}
     else if ( propertyNb == 3 )
     {
-        if ( newValue == _("Hidden") )
+        if ( newValue == GD_T("Hidden") )
         {
             SetHidden();
         }

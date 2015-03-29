@@ -10,6 +10,7 @@ This project is released under the MIT License.
 #endif
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/RuntimeGame.h"

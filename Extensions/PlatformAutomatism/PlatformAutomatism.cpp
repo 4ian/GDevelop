@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #include <memory>
 #include "PlatformAutomatism.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/XmlMacros.h"
@@ -17,7 +18,6 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include <iostream>
 #include <map>
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
 

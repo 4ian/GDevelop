@@ -21,6 +21,7 @@ This project is released under the MIT License.
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
+#include "GDCore/Tools/Localization.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"

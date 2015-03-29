@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"

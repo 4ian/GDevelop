@@ -17,6 +17,7 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
+#include "GDCore/Tools/Localization.h"
 #include "LightObject.h"
 #include "LightManager.h"
 

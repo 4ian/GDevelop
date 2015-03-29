@@ -9,6 +9,7 @@ This project is released under the MIT License.
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 
 #include "GDCpp/ImageManager.h"

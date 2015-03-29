@@ -14,7 +14,6 @@
 #include <memory>
 #include <memory>
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Tools/Localization.h"
 namespace gd { class EventsList; }
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }

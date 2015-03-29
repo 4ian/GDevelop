@@ -12,6 +12,7 @@ This project is released under the MIT License.
 #include "PathfindingAutomatism.h"
 #include "PathfindingObstacleAutomatism.h"
 #include "ScenePathfindingObstaclesManager.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/BuiltinExtensions/MathematicalTools.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"
@@ -25,7 +26,6 @@ This project is released under the MIT License.
 #include <algorithm>
 #if defined(GD_IDE_ONLY)
 #include <map>
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
 

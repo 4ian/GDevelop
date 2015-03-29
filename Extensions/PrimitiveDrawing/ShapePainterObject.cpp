@@ -10,6 +10,7 @@ This project is released under the MIT License.
 #endif
 #include "ShapePainterObject.h"
 #include <SFML/Graphics.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"

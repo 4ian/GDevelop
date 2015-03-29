@@ -19,6 +19,7 @@ This project is released under the MIT License.
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/Tools/Localization.h"
 #include "TimedEventEditorDlg.h"
 
 using namespace std;

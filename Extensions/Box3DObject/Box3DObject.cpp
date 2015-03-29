@@ -21,6 +21,7 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Localization.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCpp/CommonTools.h"

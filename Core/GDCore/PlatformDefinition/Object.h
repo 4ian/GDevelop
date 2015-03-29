@@ -10,7 +10,6 @@
 #include <vector>
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
-#include "GDCore/Tools/Localization.h"
 #include <SFML/System/Vector2.hpp>
 namespace gd { class PropertyDescriptor; }
 namespace gd { class Automatism; }

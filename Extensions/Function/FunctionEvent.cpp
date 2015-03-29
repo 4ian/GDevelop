@@ -21,6 +21,7 @@ This project is released under the MIT License.
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/Tools/Localization.h"
 #include "FunctionEventEditorDlg.h"
 #include <wx/textdlg.h>
 namespace gd { class Project; }

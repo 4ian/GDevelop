@@ -84,6 +84,10 @@ target_link_libraries(GDIDE GDCpp)
 target_link_libraries(GDIDE ${sfml_LIBRARIES})
 target_link_libraries(GDIDE ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
 target_link_libraries(GDIDE ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
+IF(WIN32)
+	target_link_libraries(GDIDE_exe ${sfml_LIBRARIES})
+	target_link_libraries(GDIDE_dev_exe ${sfml_LIBRARIES})
+ENDIF(WIN32)
 
 #Pre build tasks
 ###

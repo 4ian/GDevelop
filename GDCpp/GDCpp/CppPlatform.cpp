@@ -147,7 +147,7 @@ std::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & s
 #if defined(GD_IDE_ONLY)
 std::string CppPlatform::GetDescription() const
 {
-    return ToString(_("Allows to create 2D games which can be compiled and played on Windows or Linux."));
+    return GD_T("Allows to create 2D games which can be compiled and played on Windows or Linux.");
 }
 
 #if !defined(GD_NO_WX_GUI)

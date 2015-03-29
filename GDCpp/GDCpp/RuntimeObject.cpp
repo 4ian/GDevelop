@@ -81,7 +81,7 @@ void RuntimeObject::Init(const RuntimeObject & object)
 void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = GD_T("Position");      value = ToString(GetX())+";"+ToString(GetY());}
-    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = ToString(GetAngle())+"°";}
+    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = ToString(GetAngle())+u8"°";}
     else if ( propertyNb == 2 ) {name = GD_T("Size");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
     else if ( propertyNb == 3 ) {name = GD_T("Visibility");    value = hidden ? GD_T("Hidden") : GD_T("Displayed");}
     else if ( propertyNb == 4 ) {name = GD_T("Layer");        value = layer;}

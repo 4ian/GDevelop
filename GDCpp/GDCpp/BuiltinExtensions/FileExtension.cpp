@@ -36,7 +36,7 @@ void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
     {
         if ( propertyNb == i )
         {
-            name = _("Opened file:");
+            name = GD_T("Opened file:");
             value = iter->first;
 
             return;

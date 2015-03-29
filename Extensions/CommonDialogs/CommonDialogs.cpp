@@ -19,6 +19,7 @@ This project is released under the MIT License.
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)
+#define UNICODE
 #include <windows.h>
 #include <Commdlg.h>
 #include <unistd.h>
@@ -192,11 +193,11 @@ CInputBox::CInputBox(HWND hWndParent)
 {
 	HINSTANCE hInst = GetModuleHandle(NULL);
 
-	WNDCLASSEX wcex;
+	WNDCLASSEXW wcex;
 
-	if (!GetClassInfoEx(hInst, "InputBox", &wcex))
+	if (!GetClassInfoExW(hInst, L"InputBox", &wcex))
 	{
-		wcex.cbSize = sizeof(WNDCLASSEX);
+		wcex.cbSize = sizeof(WNDCLASSEXW);
 
 		wcex.style			= CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc	= (WNDPROC)WndProc;
@@ -207,11 +208,11 @@ CInputBox::CInputBox(HWND hWndParent)
 		wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW);
 		wcex.lpszMenuName	= NULL;
-		wcex.lpszClassName	= "InputBox";
+		wcex.lpszClassName	= L"InputBox";
 		wcex.hIconSm		= NULL;
 
-		if (RegisterClassEx(&wcex) == 0)
-			MessageBox(NULL, "Can't create CInputBox!", "Error", MB_OK);
+		if (RegisterClassExW(&wcex) == 0)
+			MessageBoxW(NULL, L"Can't create CInputBox!", L"Error", MB_OK);
 	}
 
     m_hWndParent = hWndParent;
@@ -232,14 +233,14 @@ Description : Window procedure
 */
 LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    LOGFONT lfont;
+    LOGFONTW lfont;
 
 	switch (message)
 	{
 		case WM_CREATE:
             // font
             memset(&lfont, 0, sizeof(lfont));
-            lstrcpy(lfont.lfFaceName, ("Arial"));
+            lstrcpy(lfont.lfFaceName, L"Arial");
             lfont.lfHeight = 16;
             lfont.lfWeight = FW_NORMAL;//FW_BOLD;
             lfont.lfItalic = FALSE;
@@ -248,13 +249,13 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
             lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
             lfont.lfQuality = DEFAULT_QUALITY;
             lfont.lfPitchAndFamily = DEFAULT_PITCH;
-	        m_hFont = CreateFontIndirect(&lfont);
+	        m_hFont = CreateFontIndirectW(&lfont);
 
 	        m_hInst = GetModuleHandle(NULL);
 
 			// creating Edit
-			m_hWndEdit = CreateWindowEx(WS_EX_STATICEDGE,
-				"edit","",
+			m_hWndEdit = CreateWindowExW(WS_EX_STATICEDGE,
+				L"edit",L"",
 				WS_VISIBLE | WS_CHILD  | WS_TABSTOP | ES_AUTOHSCROLL,
 				5, INPUTBOX_HEIGHT - 50, INPUTBOX_WIDTH - 16, 20,
 				hWnd,
@@ -266,8 +267,8 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 			SendMessage(m_hWndEdit, WM_SETFONT, (WPARAM)m_hFont, 0);
 
             // button OK
-			m_hWndOK = CreateWindowEx(WS_EX_STATICEDGE,
-				"button","OK",
+			m_hWndOK = CreateWindowExW(WS_EX_STATICEDGE,
+				L"button",L"OK",
 				WS_VISIBLE | WS_CHILD | WS_TABSTOP,
 				INPUTBOX_WIDTH - 100, 10, 90, 25,
 				hWnd,
@@ -279,8 +280,8 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
             SendMessage(m_hWndOK, WM_SETFONT, (WPARAM)m_hFont, 0);
 
             // button Cancel
-			m_hWndCancel = CreateWindowEx(WS_EX_STATICEDGE,
-				"button","Cancel",
+			m_hWndCancel = CreateWindowExW(WS_EX_STATICEDGE,
+				L"button",L"Cancel",
 				WS_VISIBLE | WS_CHILD | WS_TABSTOP,
 				INPUTBOX_WIDTH - 100, 40, 90, 25,
 				hWnd,
@@ -292,8 +293,8 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
             SendMessage(m_hWndCancel, WM_SETFONT, (WPARAM)m_hFont, 0);
 
             // static Propmpt
-			m_hWndPrompt = CreateWindowEx(WS_EX_STATICEDGE,
-				"static","",
+			m_hWndPrompt = CreateWindowExW(WS_EX_STATICEDGE,
+				L"static",L"",
 				WS_VISIBLE | WS_CHILD,
 				5, 10, INPUTBOX_WIDTH - 110, INPUTBOX_HEIGHT - 70,
 				hWnd,

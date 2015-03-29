@@ -346,7 +346,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
             InsertUnique(includesFiles, std::string(outputDir+"code"+gd::ToString(i)+".js"));
         }
         else {
-            lastError = gd::ToString(_("Unable to write ")+outputDir+"code"+gd::ToString(i)+".js");
+            lastError = GD_T("Unable to write ")+outputDir+"code"+gd::ToString(i)+".js";
             return false;
         }
     }

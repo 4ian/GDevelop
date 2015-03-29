@@ -99,8 +99,8 @@ void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Even
     //Name
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    wxString caption = _("Function") + " " + name;
-    if ( !objectsPassedAsArgument.empty() ) caption += " "+_("( Objects passed as parameters : ")+objectsPassedAsArgument+_(")");
+    wxString caption = GD_T("Function") + " " + name;
+    if ( !objectsPassedAsArgument.empty() ) caption += " "+GD_T("( Objects passed as parameters : ")+objectsPassedAsArgument+_(")");
     dc.DrawText( caption, x + 4, y + 3 );
 
     //Draw conditions rectangle

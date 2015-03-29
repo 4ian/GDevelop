@@ -354,15 +354,15 @@ void Box3DObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 std::map<std::string, gd::PropertyDescriptor> Box3DObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
-    properties[ToString(_("Z"))] = position.floatInfos.find("z") != position.floatInfos.end() ?
+    properties[GD_T("Z")] = position.floatInfos.find("z") != position.floatInfos.end() ?
                                    ToString(position.floatInfos.find("z")->second) :
                                    "0";
 
-    properties[ToString(_("Pitch"))] = position.floatInfos.find("pitch") != position.floatInfos.end() ?
+    properties[GD_T("Pitch")] = position.floatInfos.find("pitch") != position.floatInfos.end() ?
                                    ToString(position.floatInfos.find("pitch")->second) :
                                    "0";
 
-    properties[ToString(_("Roll"))] = position.floatInfos.find("roll") != position.floatInfos.end() ?
+    properties[GD_T("Roll")] = position.floatInfos.find("roll") != position.floatInfos.end() ?
                                    ToString(position.floatInfos.find("roll")->second) :
                                    "0";
 
@@ -371,22 +371,22 @@ std::map<std::string, gd::PropertyDescriptor> Box3DObject::GetInitialInstancePro
 
 bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene)
 {
-    if ( name == _("Z") ) position.floatInfos["z"] = ToFloat(value);
-    if ( name == _("Pitch") ) position.floatInfos["pitch"] = ToFloat(value);
-    if ( name == _("Roll") ) position.floatInfos["roll"] = ToFloat(value);
+    if ( name == GD_T("Z") ) position.floatInfos["z"] = ToFloat(value);
+    if ( name == GD_T("Pitch") ) position.floatInfos["pitch"] = ToFloat(value);
+    if ( name == GD_T("Roll") ) position.floatInfos["roll"] = ToFloat(value);
 
     return true;
 }
 
 void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Depth");    value = ToString(depth);}
-    else if ( propertyNb == 3 ) {name = _("Z Coordinate");  value = ToString(zPosition);}
-    else if ( propertyNb == 4 ) {name = _("Yaw");           value = ToString(yaw);}
-    else if ( propertyNb == 5 ) {name = _("Pitch");         value = ToString(pitch);}
-    else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
+    if      ( propertyNb == 0 ) {name = GD_T("Width");       value = ToString(width);}
+    else if ( propertyNb == 1 ) {name = GD_T("Height");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = GD_T("Depth");    value = ToString(depth);}
+    else if ( propertyNb == 3 ) {name = GD_T("Z Coordinate");  value = ToString(zPosition);}
+    else if ( propertyNb == 4 ) {name = GD_T("Yaw");           value = ToString(yaw);}
+    else if ( propertyNb == 5 ) {name = GD_T("Pitch");         value = ToString(pitch);}
+    else if ( propertyNb == 6 ) {name = GD_T("Roll");          value = ToString(roll);}
 }
 
 bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, string newValue)

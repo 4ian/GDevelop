@@ -153,7 +153,7 @@ void SoundObject::LoadEdittimeIcon()
 std::map<std::string, gd::PropertyDescriptor> SoundObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
-    properties[ToString(_("Z"))] = position.floatInfos.find("z") != position.floatInfos.end() ?
+    properties[GD_T("Z")] = position.floatInfos.find("z") != position.floatInfos.end() ?
                                    ToString(position.floatInfos.find("z")->second) :
                                    "0";
 
@@ -162,7 +162,7 @@ std::map<std::string, gd::PropertyDescriptor> SoundObject::GetInitialInstancePro
 
 bool SoundObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene)
 {
-    if ( name == _("Z") ) position.floatInfos["z"] = ToFloat(value);
+    if ( name == GD_T("Z") ) position.floatInfos["z"] = ToFloat(value);
 
     return true;
 }
@@ -186,11 +186,11 @@ void SoundObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 
 void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Sound level");                    value = ToString(GetVolume());}
-    else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = ToString(GetMinDistance());}
-    else if ( propertyNb == 2 ) {name = _("Attenuation");               value = ToString(GetAttenuation());}
-    else if ( propertyNb == 3 ) {name = _("Loop");                 value = IsLooping() ? _("Yes") : _("No");}
-    else if ( propertyNb == 4 ) {name = _("Z Position");                          value = ToString(GetZPos());}
+    if      ( propertyNb == 0 ) {name = GD_T("Sound level");                    value = ToString(GetVolume());}
+    else if ( propertyNb == 1 ) {name = GD_T("Minimal distance");         value = ToString(GetMinDistance());}
+    else if ( propertyNb == 2 ) {name = GD_T("Attenuation");               value = ToString(GetAttenuation());}
+    else if ( propertyNb == 3 ) {name = GD_T("Loop");                 value = IsLooping() ? GD_T("Yes") : GD_T("No");}
+    else if ( propertyNb == 4 ) {name = GD_T("Z Position");                          value = ToString(GetZPos());}
 }
 
 bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -198,7 +198,7 @@ bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, string newValue
     if(propertyNb == 0) {SetVolume(ToFloat(newValue));}
     else if (propertyNb == 1) {SetMinDistance(ToFloat(newValue));}
     else if (propertyNb == 2) {SetAttenuation(ToFloat(newValue));}
-    else if (propertyNb == 3) {SetLooping(!(newValue == _("No")));}
+    else if (propertyNb == 3) {SetLooping(!(newValue == GD_T("No")));}
     else if (propertyNb == 4) {SetZPos(ToFloat(newValue));}
     return true;
 }

@@ -562,40 +562,40 @@ std::map<std::string, gd::PropertyDescriptor> PlatformerObjectAutomatism::GetPro
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
 
-    properties[ToString(_("Gravity"))].SetValue(ToString(gravity));
-    properties[ToString(_("Jump speed"))].SetValue(ToString(jumpSpeed));
-    properties[ToString(_("Max. falling speed"))].SetValue(ToString(maxFallingSpeed));
-    properties[ToString(_("Acceleration"))].SetValue(ToString(acceleration));
-    properties[ToString(_("Deceleration"))].SetValue(ToString(deceleration));
-    properties[ToString(_("Max. speed"))].SetValue(ToString(maxSpeed));
-    properties[ToString(_("Default controls"))].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
-    properties[ToString(_("Slope max. angle"))].SetValue(ToString(slopeMaxAngle));
+    properties[GD_T("Gravity")].SetValue(ToString(gravity));
+    properties[GD_T("Jump speed")].SetValue(ToString(jumpSpeed));
+    properties[GD_T("Max. falling speed")].SetValue(ToString(maxFallingSpeed));
+    properties[GD_T("Acceleration")].SetValue(ToString(acceleration));
+    properties[GD_T("Deceleration")].SetValue(ToString(deceleration));
+    properties[GD_T("Max. speed")].SetValue(ToString(maxSpeed));
+    properties[GD_T("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
+    properties[GD_T("Slope max. angle")].SetValue(ToString(slopeMaxAngle));
 
     return properties;
 }
 
 bool PlatformerObjectAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
 {
-    if ( name == ToString(_("Default controls")) ) {
+    if ( name == GD_T("Default controls") ) {
         ignoreDefaultControls = (value == "0");
         return true;
     }
 
     if ( ToDouble(value) < 0 ) return false;
 
-    if ( name == ToString(_("Gravity")) )
+    if ( name == GD_T("Gravity") )
         gravity = ToDouble(value);
-    else if ( name == ToString(_("Max. falling speed")) )
+    else if ( name == GD_T("Max. falling speed") )
         maxFallingSpeed = ToDouble(value);
-    else if ( name == ToString(_("Acceleration")) )
+    else if ( name == GD_T("Acceleration") )
         acceleration = ToDouble(value);
-    else if ( name == ToString(_("Deceleration")) )
+    else if ( name == GD_T("Deceleration") )
         deceleration = ToDouble(value);
-    else if ( name == ToString(_("Max. speed")) )
+    else if ( name == GD_T("Max. speed") )
         maxSpeed = ToDouble(value);
-    else if ( name == ToString(_("Jump speed")) )
+    else if ( name == GD_T("Jump speed") )
         jumpSpeed = ToDouble(value);
-    else if ( name == ToString(_("Slope max. angle")) )
+    else if ( name == GD_T("Slope max. angle") )
         return SetSlopeMaxAngle(ToDouble(value));
     else
         return false;

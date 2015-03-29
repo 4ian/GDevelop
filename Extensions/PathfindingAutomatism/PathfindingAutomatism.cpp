@@ -631,47 +631,47 @@ std::map<std::string, gd::PropertyDescriptor> PathfindingAutomatism::GetProperti
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
 
-    properties[ToString(_("Allows diagonals"))].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
-    properties[ToString(_("Acceleration"))].SetValue(ToString(acceleration));
-    properties[ToString(_("Max. speed"))].SetValue(ToString(maxSpeed));
-    properties[ToString(_("Rotate speed"))].SetValue(ToString(angularMaxSpeed));
-    properties[ToString(_("Rotate object"))].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
-    properties[ToString(_("Angle offset"))].SetValue(ToString(angleOffset));
-    properties[ToString(_("Virtual cell width"))].SetValue(ToString(cellWidth));
-    properties[ToString(_("Virtual cell height"))].SetValue(ToString(cellHeight));
-    properties[ToString(_("Extra border size"))].SetValue(ToString(extraBorder));
+    properties[GD_T("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
+    properties[GD_T("Acceleration")].SetValue(ToString(acceleration));
+    properties[GD_T("Max. speed")].SetValue(ToString(maxSpeed));
+    properties[GD_T("Rotate speed")].SetValue(ToString(angularMaxSpeed));
+    properties[GD_T("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
+    properties[GD_T("Angle offset")].SetValue(ToString(angleOffset));
+    properties[GD_T("Virtual cell width")].SetValue(ToString(cellWidth));
+    properties[GD_T("Virtual cell height")].SetValue(ToString(cellHeight));
+    properties[GD_T("Extra border size")].SetValue(ToString(extraBorder));
 
     return properties;
 }
 
 bool PathfindingAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
 {
-    if ( name == ToString(_("Allows diagonals")) ) {
+    if ( name == GD_T("Allows diagonals") ) {
         allowDiagonals = (value != "0");
         return true;
     }
-    if ( name == ToString(_("Rotate object")) ) {
+    if ( name == GD_T("Rotate object") ) {
         rotateObject = (value != "0");
         return true;
     }
-    if ( name == ToString(_("Extra border size")) ) {
+    if ( name == GD_T("Extra border size") ) {
         extraBorder = ToDouble(value);
         return true;
     }
 
     if ( ToDouble(value) < 0 ) return false;
 
-    if ( name == ToString(_("Acceleration")) )
+    if ( name == GD_T("Acceleration") )
         acceleration = ToDouble(value);
-    else if ( name == ToString(_("Max. speed")) )
+    else if ( name == GD_T("Max. speed") )
         maxSpeed = ToDouble(value);
-    else if ( name == ToString(_("Rotate speed")) )
+    else if ( name == GD_T("Rotate speed") )
         angularMaxSpeed = ToDouble(value);
-    else if ( name == ToString(_("Angle offset")) )
+    else if ( name == GD_T("Angle offset") )
         angleOffset = ToDouble(value);
-    else if ( name == ToString(_("Virtual cell width")) )
+    else if ( name == GD_T("Virtual cell width") )
         cellWidth = ToInt(value);
-    else if ( name == ToString(_("Virtual cell height")) )
+    else if ( name == GD_T("Virtual cell height") )
         cellHeight = ToInt(value);
     else
         return false;

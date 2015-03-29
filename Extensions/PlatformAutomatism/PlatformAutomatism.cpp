@@ -113,29 +113,29 @@ std::map<std::string, gd::PropertyDescriptor> PlatformAutomatism::GetProperties(
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
 
-    std::string platformTypeStr = ToString(_("Platform"));
+    std::string platformTypeStr = GD_T("Platform");
     if ( platformType == Ladder)
-        platformTypeStr = ToString(_("Ladder"));
+        platformTypeStr = GD_T("Ladder");
     else if ( platformType == Jumpthru )
-        platformTypeStr = ToString(_("Jumpthru platform"));
+        platformTypeStr = GD_T("Jumpthru platform");
 
-    properties[ToString(_("Type"))]
+    properties[GD_T("Type")]
         .SetValue(platformTypeStr)
         .SetType("Choice")
-        .AddExtraInfo(ToString(_("Platform")))
-        .AddExtraInfo(ToString(_("Jumpthru platform")))
-        .AddExtraInfo(ToString(_("Ladder")));
+        .AddExtraInfo(GD_T("Platform"))
+        .AddExtraInfo(GD_T("Jumpthru platform"))
+        .AddExtraInfo(GD_T("Ladder"));
 
     return properties;
 }
 
 bool PlatformAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
 {
-    if ( name == ToString(_("Type")) )
+    if ( name == GD_T("Type") )
     {
-        if ( value == ToString(_("Jumpthru platform")) )
+        if ( value == GD_T("Jumpthru platform") )
             platformType = Jumpthru;
-        else if ( value == ToString(_("Ladder")) )
+        else if ( value == GD_T("Ladder") )
             platformType = Ladder;
         else
             platformType = NormalPlatform;

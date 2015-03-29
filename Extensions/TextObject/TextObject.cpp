@@ -344,12 +344,12 @@ void RuntimeTextObject::SetSmooth(bool smooth)
 #if defined(GD_IDE_ONLY)
 void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
-    else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
-    else if ( propertyNb == 2 ) {name = _("Font Size");      value = ToString(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = _("Color");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
-    else if ( propertyNb == 4 ) {name = _("Opacity");       value = ToString(GetOpacity());}
-    else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
+    if      ( propertyNb == 0 ) {name = GD_T("Text");                     value = GetString();}
+    else if ( propertyNb == 1 ) {name = GD_T("Font");                    value = GetFontFilename();}
+    else if ( propertyNb == 2 ) {name = GD_T("Font Size");      value = ToString(GetCharacterSize());}
+    else if ( propertyNb == 3 ) {name = GD_T("Color");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
+    else if ( propertyNb == 4 ) {name = GD_T("Opacity");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 5 ) {name = GD_T("Smoothing");       value = smoothed ? GD_T("Yes") : GD_T("No");}
 }
 
 bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -383,7 +383,7 @@ bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, string newValue)
         SetColor(ToInt(r), ToInt(g), ToInt(b));
     }
     else if ( propertyNb == 4 ) { SetOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("No"))); }
+    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == GD_T("No"))); }
 
     return true;
 }

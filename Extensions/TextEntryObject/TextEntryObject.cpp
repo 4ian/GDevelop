@@ -84,14 +84,14 @@ bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & 
 
 void RuntimeTextEntryObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Text in memory");    value = GetString();}
-    else if ( propertyNb == 1 ) {name = _("Activated \?");      value = activated ? _("Yes") : _("No");}
+    if      ( propertyNb == 0 ) {name = GD_T("Text in memory");    value = GetString();}
+    else if ( propertyNb == 1 ) {name = GD_T("Activated \?");      value = activated ? GD_T("Yes") : GD_T("No");}
 }
 
 bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
-    else if ( propertyNb == 1 ) { activated = (newValue != _("No")); return true; }
+    else if ( propertyNb == 1 ) { activated = (newValue != GD_T("No")); return true; }
 
     return true;
 }

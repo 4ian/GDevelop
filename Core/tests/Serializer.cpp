@@ -29,14 +29,8 @@ TEST_CASE( "Serializer", "[common]" ) {
         REQUIRE(element.GetChild("ok").GetValue().GetBool() == true);
         REQUIRE(element.GetChild("hello").GetValue().GetString() == "world");
 
-        SECTION("Multiple JSON un/serialization") {
-            std::string json = Serializer::ToJSON(element);
-            SerializerElement element2 = Serializer::FromJSON(json);
-            std::string json2 = Serializer::ToJSON(element2);
-
-            REQUIRE(json == originalJSON);
-            REQUIRE(json2 == originalJSON);
-        }
+        std::string json = Serializer::ToJSON(element);
+        REQUIRE(json == originalJSON);
     }
 
     SECTION("Quotes and special characters") {
@@ -46,13 +40,7 @@ TEST_CASE( "Serializer", "[common]" ) {
         REQUIRE(element.GetChild("\"hello\"").GetValue().GetString() == " \"quote\" ");
         REQUIRE(element.GetChild("special-\b\f\n\r\t\"").GetValue().GetString() == "\b\f\n\r\t");
 
-        SECTION("Multiple JSON un/serialization") {
-            std::string json = Serializer::ToJSON(element);
-            SerializerElement element2 = Serializer::FromJSON(json);
-            std::string json2 = Serializer::ToJSON(element2);
-
-            REQUIRE(json == originalJSON);
-            REQUIRE(json2 == originalJSON);
-        }
+        std::string json = Serializer::ToJSON(element);
+        REQUIRE(json == originalJSON);
     }
 }

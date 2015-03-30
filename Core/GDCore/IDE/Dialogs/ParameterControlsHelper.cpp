@@ -105,10 +105,10 @@ void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const Param
     paramEdits.at(i)->Show();
 
     paramCheckboxes.at(i)->SetValue(!paramEdits.at(i)->GetValue().empty());
-    paramTexts.at(i)->SetLabel( metadata.GetDescription() + _(":") );
+    paramTexts.at(i)->SetLabel( gd::utf8::ToWxString(metadata.GetDescription()) + _(":") );
     paramBmpBts.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
-    paramBmpBts.at(i)->SetToolTip( gd::InstructionSentenceFormatter::Get()->LabelFromType(type));
-    paramEdits.at(i)->SetValue(gd::utf8::ToWxString(content));
+    paramBmpBts.at(i)->SetToolTip( gd::utf8::ToWxString(gd::InstructionSentenceFormatter::Get()->LabelFromType(type)) );
+    paramEdits.at(i)->SetValue( gd::utf8::ToWxString(content) );
 
     //De/activate widgets if parameter is optional
     bool disable = metadata.IsOptional() && !paramCheckboxes.at(i)->GetValue() && paramEdits.at(i)->GetValue().empty();

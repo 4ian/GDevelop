@@ -229,13 +229,13 @@ wxTreeItemId InstructionSelectorDialog::GetGroupItem(wxTreeCtrl * treeCtrl, wxTr
         wxTreeItemIdValue cookie;
         wxTreeItemId groupItem = treeCtrl->GetFirstChild(parent, cookie);
         size_t latestGroupPos = 0;
-        while ( groupItem.IsOk() && treeCtrl->GetItemText(groupItem) != groups[i] )
+        while ( groupItem.IsOk() && gd::utf8::FromWxString(treeCtrl->GetItemText(groupItem)) != groups[i] )
         {
             if ( treeCtrl->HasChildren(groupItem) ) latestGroupPos++;
             groupItem = treeCtrl->GetNextSibling(groupItem);
         }
         if ( !groupItem.IsOk() && insertIfNotExist)
-            groupItem = treeCtrl->InsertItem(parent, latestGroupPos, groups[i], 0);
+            groupItem = treeCtrl->InsertItem(parent, latestGroupPos, gd::utf8::ToWxString(groups[i]), 0);
         else if( !groupItem.IsOk() && !insertIfNotExist)
         {
             return groupItem;
@@ -311,7 +311,7 @@ void InstructionSelectorDialog::RefreshList()
             if ( extensions[i]->GetName() == "BuiltinObject" )
                 extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), _("All objects"), 0);
             else
-                extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
+                extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), gd::utf8::ToWxString(extensions[i]->GetFullName()), 0);
         }
 
         for(unsigned int j = 0;j<objectsTypes.size();++j)
@@ -338,7 +338,7 @@ void InstructionSelectorDialog::RefreshList()
                 }
 
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-                instructionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
+                instructionsTree->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
             }
         }
 
@@ -366,7 +366,7 @@ void InstructionSelectorDialog::RefreshList()
                 }
 
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-                instructionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
+                instructionsTree->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
             }
         }
 
@@ -392,7 +392,7 @@ void InstructionSelectorDialog::RefreshList()
             }
 
             gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
-            instructionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
+            instructionsTree->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
         }
 
         if ( !instructionsTree->HasChildren(extensionItem) ) instructionsTree->Delete(extensionItem);
@@ -422,9 +422,9 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     SelectInstruction(instructionType, instructionsTree->GetRootItem());
 
     //Display instruction main properties
-    instructionNameTxt->SetLabel( instructionMetadata.GetFullName() );
+    instructionNameTxt->SetLabel( gd::utf8::ToWxString(instructionMetadata.GetFullName()) );
     instructionNameTxt->Wrap( 450 );
-    instructionDescriptionTxt->SetLabel( instructionMetadata.GetDescription() );
+    instructionDescriptionTxt->SetLabel( gd::utf8::ToWxString(instructionMetadata.GetDescription()) );
     instructionDescriptionTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapManager::Get()->unknownAction24);

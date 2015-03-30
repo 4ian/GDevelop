@@ -40,11 +40,11 @@ TEST_CASE( "Serializer", "[common]" ) {
     }
 
     SECTION("Quotes and special characters") {
-        std::string originalJSON = "{\"caret-prop\": true,\"hello\": \" \\\"quote\\\" \",\"special\": \"\\b\\f\\n\\r\\t\"}";
+        std::string originalJSON = "{\"\\\"hello\\\"\": \" \\\"quote\\\" \",\"caret-prop\": 1,\"special-\\b\\f\\n\\r\\t\\\"\": \"\\b\\f\\n\\r\\t\"}";
         SerializerElement element = Serializer::FromJSON(originalJSON);
         REQUIRE(element.GetChild("caret-prop").GetValue().GetBool() == true);
-        REQUIRE(element.GetChild("hello").GetValue().GetString() == " \"quote\" ");
-        REQUIRE(element.GetChild("special").GetValue().GetString() == "\b\f\n\r\t");
+        REQUIRE(element.GetChild("\"hello\"").GetValue().GetString() == " \"quote\" ");
+        REQUIRE(element.GetChild("special-\b\f\n\r\t\"").GetValue().GetString() == "\b\f\n\r\t");
 
         SECTION("Multiple JSON un/serialization") {
             std::string json = Serializer::ToJSON(element);
@@ -55,20 +55,4 @@ TEST_CASE( "Serializer", "[common]" ) {
             REQUIRE(json2 == originalJSON);
         }
     }
-
-    // SECTION("XML basics") {
-    //     std::string originalXML = "<root><ok>true</ok><hello></world></root>";
-    //     SerializerElement element = Serializer::FromXML(originalXML);
-    //     REQUIRE(element.GetChild("ok").GetValue().GetBool() == true);
-    //     REQUIRE(element.GetChild("hello").GetValue().GetString() == "world");
-
-    //     SECTION("Multiple XML un/serialization") {
-    //         std::string xml = Serializer::ToXML(element);
-    //         SerializerElement element2 = Serializer::FromXML(xml);
-    //         std::string xml2 = Serializer::ToXML(element2);
-
-    //         REQUIRE(xml == originalXML);
-    //         REQUIRE(json2 == originalXML);
-    //     }
-    // }
 }

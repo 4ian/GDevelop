@@ -169,6 +169,7 @@ if(BUILD_TESTS)
 	)
 	add_executable(GDCpp_tests ${test_source_files})
 	set_target_properties(GDCpp_tests PROPERTIES COMPILE_DEFINITIONS "${GDCpp_Runtime_exe_extra_definitions}")
+	set_target_properties(GDCpp_tests PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
 	target_link_libraries(GDCpp_tests GDCpp_Runtime)
 	target_link_libraries(GDCpp_tests ${sfml_LIBRARIES})
 endif()

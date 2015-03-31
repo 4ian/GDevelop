@@ -186,7 +186,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),0) ;
+                                            ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + gd::utf8::ToWxString(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName()),0) ;
 
             //Add each object expression
             std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
@@ -197,11 +197,11 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
                     wxTreeItemId groupItem = ObjList->GetFirstChild(objectTypeItem, cookie);
-                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup() )
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != gd::utf8::ToWxString(it->second.GetGroup()) )
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(objectTypeItem, gd::utf8::ToWxString(it->second.GetGroup()), 0);
 
                     //Add expression item
                     int IDimage = 0;
@@ -212,7 +212,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                     }
 
                     gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
-                    ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
+                    ObjList->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
                 }
             }
 	    }
@@ -221,7 +221,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	    {
             wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
+                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + gd::utf8::ToWxString(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName()),0) ;
 
             //Add each automatism expression
             std::map<string, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
@@ -232,11 +232,11 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
                     wxTreeItemId groupItem = ObjList->GetFirstChild(automatismTypeItem, cookie);
-                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup() )
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != gd::utf8::ToWxString(it->second.GetGroup()) )
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, gd::utf8::ToWxString(it->second.GetGroup()), 0);
 
                     //Add expression item
                     int IDimage = 0;
@@ -247,7 +247,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                     }
 
                     gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
-                    ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
+                    ObjList->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
                 }
             }
 	    }
@@ -263,11 +263,11 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ValList->GetFirstChild(extensionItem, cookie);
-                while ( groupItem.IsOk() && ValList->GetItemText(groupItem) != it->second.GetGroup() )
+                while ( groupItem.IsOk() && ValList->GetItemText(groupItem) != gd::utf8::ToWxString(it->second.GetGroup()) )
                 {
                     groupItem = ValList->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ValList->AppendItem(extensionItem, it->second.GetGroup(), 0);
+                if ( !groupItem.IsOk() ) groupItem = ValList->AppendItem(extensionItem, gd::utf8::ToWxString(it->second.GetGroup()), 0);
 
                 //Add expression item
                 int IDimage = 0;
@@ -278,7 +278,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
                 }
 
                 gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
-                ValList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
+                ValList->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
             }
         }
 	}
@@ -417,7 +417,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
 {
     if ( parameterMetadata.type == "expression" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Parameter")), parameterMetadata.description, "0", gd::AdvancedTextEntryDialog::MathExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, GD_T("Parameter"), parameterMetadata.description, "0", gd::AdvancedTextEntryDialog::MathExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -432,7 +432,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
     }
     else if ( parameterMetadata.type == "string" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Parameter")), parameterMetadata.description, "\"\"", gd::AdvancedTextEntryDialog::TextExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, GD_T("Parameter"), parameterMetadata.description, "\"\"", gd::AdvancedTextEntryDialog::TextExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -488,7 +488,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
     }
     else if ( parameterMetadata.type == "" )
     {
-        std::string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Parameter"), "", this));
+        std::string param = gd::utf8::FromWxString(wxGetTextFromUser(parameterMetadata.description, _("Parameter"), "", this));
         return param;
     }
 

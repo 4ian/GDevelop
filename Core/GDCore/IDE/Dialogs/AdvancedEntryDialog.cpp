@@ -73,9 +73,9 @@ AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, std::string c
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&AdvancedTextEntryDialog::OnokBtClick);
 	//*)
 
-	SetTitle(caption);
-	descriptionTxt->SetLabel(description);
-	textEdit->SetValue(defaultText);
+	SetTitle(gd::utf8::ToWxString(caption));
+	descriptionTxt->SetLabel(gd::utf8::ToWxString(description));
+	textEdit->SetValue(gd::utf8::ToWxString(defaultText));
 	if ( moreButtonType == None )
         moreBt->Show(false);
     else if ( moreButtonType == MathExpression )

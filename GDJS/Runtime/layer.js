@@ -5,14 +5,16 @@
  */
 
 /**
- * Represents a layer used to display objects.<br>
+ * Represents a layer used to display objects.
+ *
  * The layer connects its Pixi container to the Pixi stage during its construction,
  * but then it is objects responsibility to connect themselves to the layer's container
- * ( See addChildToPIXIContainer method ).<br>
+ * (see addChildToPIXIContainer method).
+ *
  * Layers do not provide direct access to their pixi container as they do some extra work
  * to ensure that z orders remains correct.
  *
- * <b>TODO:</b> Viewports and support for multiple cameras
+ * *Not yet implemented:* Viewports and support for multiple cameras
  *
  * @class Layer
  * @namespace gdjs

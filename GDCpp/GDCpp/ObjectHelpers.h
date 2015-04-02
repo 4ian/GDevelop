@@ -33,18 +33,5 @@ struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, 
     bool operator()(const std::shared_ptr<gd::Object> & object, const std::string & name) const { return object->GetName() == name; }
 };
 
-/**
- * \brief Functor for sorting an RuntimeObjList by ZOrder
- *
- * \see Object
- */
-struct SortByZOrder
-{
-   bool operator ()(RuntimeObjSPtr o1, RuntimeObjSPtr o2) const
-   {
-      return o1->GetZOrder() < o2->GetZOrder();
-   }
-};
-
 #endif // OBJECTHELPERS_H
 

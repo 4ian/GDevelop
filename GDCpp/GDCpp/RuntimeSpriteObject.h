@@ -22,8 +22,9 @@ class wxWindow;
 #endif
 
 /**
- * \brief Wrapper around a pointer to Animation. Used to reduce compile time.
- * Animation proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers
+ * \brief Wrapper around a pointer to Animation, used to reduce compile time.
+ *
+ * This proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers.
  */
 class GD_API AnimationProxy
 {

@@ -247,9 +247,9 @@ void RuntimeScene::Render()
 
     //Sort object by order to render them
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
-    OrderObjectsByZOrder( allObjects );
+    OrderObjectsByZOrder(allObjects);
 
-    //To allow using OpenGL to draw :
+    //To allow using OpenGL to draw:
     glClear(GL_DEPTH_BUFFER_BIT); // Clear the depth buffer
     renderWindow->pushGLStates();
     renderWindow->setActive();
@@ -335,12 +335,16 @@ bool RuntimeScene::UpdateTime()
     return true;
 }
 
-bool RuntimeScene::OrderObjectsByZOrder( RuntimeObjList & objList )
+bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjList & objList)
 {
     if ( StandardSortMethod() )
-        std::sort( objList.begin(), objList.end(), SortByZOrder() );
+        std::sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
+            return o1->GetZOrder() < o2->GetZOrder();
+        });
     else
-        std::stable_sort( objList.begin(), objList.end(), SortByZOrder() );
+        std::stable_sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
+            return o1->GetZOrder() < o2->GetZOrder();
+        });
 
     return true;
 }

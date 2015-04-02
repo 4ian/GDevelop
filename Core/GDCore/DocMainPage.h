@@ -37,9 +37,10 @@
  *
  * If you didn't already downloaded GDevelop, get and extract the source from [GitHub](https://github.com/4ian/GD).
  *
+ * Follow these steps to be able to compile GDevelop, it's super easy:
+ *
  * <b>Windows</b>
  *
- * Follow these three steps to be able to compile GDevelop and the extensions:
  * -# \subpage installWinCompiler
  * -# \ref installAndUseCMake
  * <br>
@@ -47,6 +48,10 @@
  * <b>GNU/Linux</b>
  * -# \subpage installLinuxLib
  * -# \subpage installAndUseCMake
+ *
+ * <b>OS X</b>
+ * -# \subpage installMacOSTools
+ * -# \ref installAndUseCMake
  *
  * See the recommended tools and conventions for working on GDevelop on this page:
  * \subpage recommendedToolsAndConventions
@@ -56,7 +61,7 @@
  *  \page installWinCompiler (Windows) Install TDM-GCC compiler
  *
  * GDevelop is compiled with TDM-GCC under Windows.<br>
- * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by GDevelop and
+ * So as to prevent incompatibilities between the compiler (and the standard C++ library provided with) used by GDevelop and
  * the compiler used by the extensions, GDevelop require the extensions and the platforms to use the same version of TDM-GCC.<br>
  *
  * \section installWinCompiler_download Download
@@ -88,24 +93,27 @@
 /**
  *  \page installAndUseCMake (All) Install CMake & launch the build
  *
- * Building is done using CMake: It is an open-source build system that can generate build files for lots of IDE and build tools (Makefiles...).
+ * Building is done using CMake: it is an open-source build system that can generate build files for lots of IDE and build tools (Makefiles...).
  *
  * \section installAndUseCMake_download Download and install CMake
  *
  * First, install CMake:
- * Download it [here](http://www.cmake.org/cmake/resources/software.html) or get it using your package manager if you're
- * using a Linux distribution.
+ * Download it [here](http://www.cmake.org/cmake/resources/software.html) for Windows, get it using your package manager if you're
+ * using a Linux distribution or using Homebrew for Mac OS X.
  *
  * \section installAndUseCMake_use Using CMake to generate the build files
+ * Using CMake is not difficult and require only a few clicks/commands to enter. Windows users may use
+ * the GUI as shown in the next section. Linux and Mac OS X users may prefer to use the command line as shown
+ * as the end of this page.
  *
  * \subsection installAndUseCMake_use_gui Using the GUI
  *
- * - Start the CMake user interface (_cmake-gui_). Choose the GD root directory as the source directory, and Binaries/.build as the directory where to build the binaries:
+ * - Start the CMake user interface (_cmake-gui_). Choose the GD root directory as the source directory, and Binaries/build as the directory where to build the binaries:
 
  \image html usecmake1.png
 
- * - Click on *Configure*. If asked to create the build directory, answer yes. Choose then your favorite generator: *MinGW Makefiles* (on Windows) or *Unix Makefiles* (on Linux) generate a traditional Makefile that can be built using the
- * *mingw32-make* (on Windows) or *make* (on Linux) command. You can also choose the *Ninja* generator to use the [Ninja build system](http://martine.github.io/ninja/).
+ * - Click on *Configure*. If asked to create the build directory, answer yes. Choose then your favorite generator: *MinGW Makefiles* (on Windows) or *Unix Makefiles* (on Linux/OS X) generate a traditional Makefile that can be built using the
+ * *mingw32-make* (on Windows) or *make* (on Linux/OS X) command. You can also choose the *Ninja* generator to use the [Ninja build system](http://martine.github.io/ninja/).
 
   \image html usecmake2.png
 
@@ -114,26 +122,28 @@
 
   \image html usecmake3.png
 
- * - You can then launch a terminal/command prompt, go to the .build folder ( `cd GDRootFolder/Binaries/.build` ) and launch the build
- * using the generator you've choosen: `mingw32-make`, or `make` on Linux.
+ * - You can then launch a terminal/command prompt, go to the build folder (`cd path/to/GD/Binaries/build`) and launch the build
+ * using the generator you've choosen: `mingw32-make`, or `make` on Linux/OS X.
  *
  * \subsection installAndUseCMake_use_cmd Using the command line
  *
  * Using the commandline with CMake is also easy:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
- * cd GDRootFolder/Binaries
- * mkdir .build
- * cd .build
- * cmake ../.. -G "MinGW Makefiles"
- * mingw32-make
+ * cd /path/to/GD/Binaries
+ * mkdir build
+ * cd build
+ * cmake ../..
+ * make
  * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * For Windows, replace `cmake ../..` by `cmake ../.. -G "MinGW Makefiles"` and `make` by `mingw32-make`.
  *
  * or using the fast [Ninja build system](http://martine.github.io/ninja/) :
  * ~~~~~~~~~~~~~~~~~~~~~
- * cd GDRootFolder/Binaries
- * mkdir .build
- * cd .build
+ * cd /path/to/GD/Binaries
+ * mkdir build
+ * cd build
  * cmake ../.. -G "Ninja"
  * ninja
  * ~~~~~~~~~~~~~~~~~~~~~
@@ -178,6 +188,40 @@ sudo apt-get install libwxgtk3.0-dev
  * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
  */
 
+ /**
+  *  \page installMacOSTools (Mac OS X) Install development tools
+  *
+  * Make sure that you have Apple Developer Tools installed (if you have Xcode and git, that should be the case).
+  *
+  * \section installTools Install development tools
+  *
+  * The simplest way of installing dependencies required by GDevelop is to use [Homebrew](http://brew.sh/). Install it
+  * and install these packages, using the terminal:
+\code
+brew install cmake
+brew install p7zip
+brew install pkgconfig
+brew install wxwidgets
+\endcode
+  * If you want to generate the documentation, install Doxygen:
+\code
+brew install doxygen
+\endcode
+  *
+  * \section launchCompilation Launch compilation
+  *
+  * You should be able to compile GD using CMake. Go with a terminal to the GD source folder:
+\code
+cd /path/to/GD
+mkdir build && cd build
+cmake ../..
+make -j4
+\endcode
+  *
+  * More information about compilation here: \ref installAndUseCMake
+  */
+
+
 /**
  * \page recommendedToolsAndConventions Recommended tools and advices to work with GD
  *
@@ -197,16 +241,9 @@ sudo apt-get install libwxgtk3.0-dev
  *
  * \section designers Visual designers for IDE or GDCore dialogs
  *
- * \subsection oldDesigner "Old" dialogs created with wxSmith
- * If you want to edit a dialog, first search if there is a file called *filename*.wxs in the folder *wxsmith* (in GDCore,
- * GDCpp or IDE). If it is present, the dialog was made using the wxSmith visual designer integrated into the Code::Blocks IDE:
- *  - Download [Code::Blocks](http://www.codeblocks.org/) and launch it.
- *  - Open the .cbp in GDCore, GDCpp or IDE folder.
- *  - In the tab "Resources", locate the dialog to edit.
- *
  * \subsection newDesigner "New" dialogs created with wxCrafter
  *
- * New dialogs are designed using [wxCrafter](wxcrafter.codelite.org/). Download and launch it.
+ * New dialogs are designed using [wxCrafter](http://wxcrafter.codelite.org/). Download and launch it.
  *
  * All dialogs of GDCore, GDCpp, GDJS or the IDE created using wxCrafter are stored into a single .wxcp file in
  * the wxsmith folder, next to files of dialogs created with wxSmith.<br>
@@ -216,6 +253,13 @@ sudo apt-get install libwxgtk3.0-dev
  *
  * wxCrafter creates base classes for dialog (their names start by *Base*), and any code must be inserted into
  * a derived class. See examples in *GDJS*.
+ *
+ * \subsection oldDesigner "Old" dialogs created with wxSmith
+ * If you want to edit a dialog, first search if there is a file called *filename*.wxs in the folder *wxsmith* (in GDCore,
+ * GDCpp or IDE). If it is present, the dialog was made using the wxSmith visual designer integrated into the Code::Blocks IDE:
+ *  - Download [Code::Blocks](http://www.codeblocks.org/) and launch it.
+ *  - Open the .cbp in GDCore, GDCpp or IDE folder.
+ *  - In the tab "Resources", locate the dialog to edit.
  *
  * ------
  *

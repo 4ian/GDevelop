@@ -221,12 +221,10 @@ namespace
             std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
             if ( extension == std::shared_ptr<ExtensionBase>() ) continue;
 
-            #if defined(MACOS)
             if ( wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".a") ||
                  wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".dll.a") ||
                  wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".dylib") )
                 task.compilerCall.extraLibFiles.push_back(extension->GetName());
-            #endif
 
             for (unsigned int j =0;j<extension->GetSupplementaryLibFiles().size();++j)
             {

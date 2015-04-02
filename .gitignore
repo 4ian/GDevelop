@@ -32,6 +32,7 @@ Binaries/Packaging/opensuse-build-service/gdevelop/
 Binaries/Packaging/opensuse-build-service/final/
 Binaries/Packaging/GDevelop.app/Contents/Frameworks
 Binaries/Packaging/GDevelop.app/Contents/Resources
+Binaries/Packaging/logs
 /WebIDE
 *.depend
 *.layout

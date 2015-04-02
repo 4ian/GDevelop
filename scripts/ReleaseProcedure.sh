@@ -6,7 +6,7 @@ DIRECTORY="../Binaries/build"
 fi
 if [ -d "$DIRECTORY" ]; then
 	cd "$DIRECTORY"
-	if [ -f "build.ninha" ]; then
+	if [ -f "build.ninja" ]; then
 		ninja
 	fi
 	if [ -f "Makefile" ]; then

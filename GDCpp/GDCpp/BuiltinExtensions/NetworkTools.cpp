@@ -228,7 +228,7 @@ std::string GD_API VariableStructureToJSON(const gd::Variable & variable)
         if ( variable.IsNumber() )
             return ToString(variable.GetValue());
         else
-            return "\""+StringToQuotedJSONString(variable.GetString().c_str())+"\"";
+            return StringToQuotedJSONString(variable.GetString().c_str());
     }
 
     std::string str = "{";
@@ -237,7 +237,7 @@ std::string GD_API VariableStructureToJSON(const gd::Variable & variable)
         i != variable.GetAllChildren().end();++i)
     {
         if ( !firstChild ) str += ",";
-        str += "\""+i->first+"\": "+VariableStructureToJSON(i->second);
+        str += StringToQuotedJSONString(i->first.c_str())+": "+VariableStructureToJSON(i->second);
 
         firstChild = false;
     }

@@ -256,7 +256,7 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 				it != attributes.end();++it)
 		    {
 		        if ( !firstChild ) str += ",";
-		        str += "\""+it->first+"\": "+ValueToJSON(it->second);
+		        str += StringToQuotedJSONString(it->first.c_str())+": "+ValueToJSON(it->second);
 
 		        firstChild = false;
 		    }
@@ -268,7 +268,7 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 					continue;
 
 		        if ( !firstChild ) str += ",";
-		        str += "\""+children[i].first+"\": "+ToJSON(*children[i].second);
+		        str += StringToQuotedJSONString(children[i].first.c_str())+": "+ToJSON(*children[i].second);
 
 		        firstChild = false;
 			}

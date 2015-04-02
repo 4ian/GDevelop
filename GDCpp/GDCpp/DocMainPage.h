@@ -4,7 +4,7 @@
  * \section welcome Welcome
  * This is the help file for the GDevelop C++ Platform, which contains a reference of all the features provided
  * by the C++ Platform and explains how to create extensions for this platform.<br>
- * Creating extensions need some knowledge in C++ language. GDevelop use mainly SFML, Boost and wxWidgets libraries.
+ * Creating extensions need some knowledge in C++ language. GDevelop use mainly SFML and wxWidgets libraries.
  *
  * ### GDevelop Core documentation
  * Some classes and features are provided by the *GDevelop Core library*: When you're working with a class in the <code>gd</code>
@@ -34,13 +34,13 @@
  * <br>
  * It is important to make the distinction between the classes used by the IDE or for storage only and the classes used by the game engine.<br>
  * When a game is being played, it is first loaded using the classes listed below. Then, in a second part, the game engine classes are initialized, most
- * of the time using their <i>edittime</i> class counterpart ( For example, a RuntimeScene can be loaded from a gd::Layout: See below ).<br>
+ * of the time using their <i>edittime</i> class counterpart (For example, a RuntimeScene can be loaded from a gd::Layout: See below).<br>
  * <br>
  * <i>Edittime</i> is often used to refer to a class being used for storage or by the IDE, while <i>Runtime</i> is used to refer to the class
  * belonging to the game engine.
  *
- * \subsection game gd::Project ( also named Game )
- * A game is represented by a gd::Project class. This class contains the scenes of the game ( see below ), as well as the images, the global objects and some information.<br>
+ * \subsection game gd::Project (also named Game)
+ * A game is represented by a gd::Project class. This class contains the scenes of the game (see below), as well as the images, the global objects and some game properties.<br>
  * When a game is played, the RuntimeScene being rendered contains a pointer to its parent gd::Project.
  *
  * \subsection scene gd::Layout
@@ -55,23 +55,24 @@
  *
  * \subsection automatism gd::Automatism
 
- * Each automatism is an instance of a class that derive from gd::Automatism.  Automatisms are linked to an object ( Thus, automatisms can access to their object by using their member object* ) and they are also managed by this object.<br>
+ * Each automatism is an instance of a class that derive from gd::Automatism.  Automatisms are linked to an object (thus, automatisms can access to their object by using their member `object`) and they are also managed by this object.<br>
  * gd::Automatism is the only exception to the rule explained below: Whereas the classes described in this section are used only for storage, this class
  * is used both for storage and by the game engine.
  *
  * \subsection event gd::BaseEvent
  * BaseEvent is the base class for all events.<br>
- * Each event type is represented by a class, which define how the event is rendered ( BaseEvent::Render ), how the code is generated ( BaseEvent::GenerateEventCode ), and various properties ( BaseEvent::CanHaveSubEvents for example )...<br>
+ * Each event type is represented by a class, which define how the event is rendered (BaseEvent::Render), how the code is generated (BaseEvent::GenerateEventCode), and various properties (BaseEvent::CanHaveSubEvents for example)...<br>
  * As the other classes list in this section, this class is only at <i>edittime</i> used by the IDE.
  *
  * The classes described in this section are not documented here: Please refer to the documentation of <b>GDevelop Core</b> if you need help using them.
  *
- * \section aboutBoostShared_ptr About Boost shared pointers
+ * \section aboutShared_ptr About shared pointers
  *
- * GDevelop use shared pointers ( std::shared_ptr ), for scenes or objects for example. <br>
- * Shared pointers are used like raw pointers ( *myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object... ).
- * They doesn't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
- * Thus, scenes for instance don't have to manually delete the objects they own in their destructors.
+ * GDevelop use shared pointers (`std::shared_ptr`), for managing lots of objects like scenes or objects.
+ *
+ * Shared pointers are used like raw pointers (*myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object...).
+ * They don't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
+ * For instance, scenes don't have to manually delete the objects they own in their destructors.
  */
 
 //Group definitions:

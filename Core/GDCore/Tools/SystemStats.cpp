@@ -42,7 +42,7 @@ size_t SystemStats::GetUsedVirtualMemory()
     PROCESS_MEMORY_COUNTERS_EX pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
     SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
-    return virtualMemUsedByMe;
+    return virtualMemUsedByMe/1024;
 #else
     #warning Memory consumption tracking is not available for your system.
     return 0;

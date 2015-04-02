@@ -1,0 +1,155 @@
+# This file contains functions that are used to build
+# the CMakeLists.txt for an extension:
+# Most of the time, an extension CMakeLists.txt should
+# consist in a few lines containing calls to these functions.
+
+macro(gd_add_extension_includes)
+	include_directories(${sfml_include_dir})
+	include_directories(${GDCORE_include_dir})
+	include_directories(${GDCpp_include_dir})
+	IF(WIN32) #Special case for wxWidgets on Windows
+		include_directories(${wxwidgets_include_dir})
+	ELSEIF (NOT EMSCRIPTEN AND NOT NO_GUI)
+		find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
+		include( "${wxWidgets_USE_FILE}" )
+		include_directories(${GTK_INCLUDE_DIRS})
+		link_directories(${GTK_LIBRARY_DIRS})
+	ENDIF(WIN32)
+endmacro()
+
+#Add common defines for a target that will be a GD extension
+function(gd_add_extension_definitions target_name)
+
+	#Define used in GD to check the build type
+	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+		add_definitions( -DDEBUG )
+	ELSEIF (CMAKE_BUILD_TYPE} MATCHES "Release")
+		add_definitions( -DRELEASE )
+	ELSE()
+		add_definitions( -DDEV )
+	ENDIF()
+
+	set(${target_name}_extra_definitions "${${target_name}_extra_definitions} GD_IDE_ONLY=1;" PARENT_SCOPE)
+
+	IF (NO_GUI) #Are we compiling without any GUI feature?
+		add_definitions( -DGD_NO_WX_GUI )
+	ENDIF()
+
+	#Defne used in GD to identify the environment
+	IF (EMSCRIPTEN)
+		add_definitions( -DEMSCRIPTEN )
+	ELSEIF(WIN32)
+		add_definitions( -DWINDOWS )
+    ELSEIF(APPLE)
+    	add_definitions( -DMACOS )
+    ELSE()
+		add_definitions( -DLINUX )
+	ENDIF()
+
+	IF(WIN32) #Windows specific defines
+		add_definitions( "-DGD_CORE_API=__declspec(dllimport)" )
+		add_definitions( "-DGD_API=__declspec(dllimport)" )
+		add_definitions( "-DGD_EXTENSION_API=__declspec(dllexport)" )
+
+		add_definitions( -D__GNUWIN32__ ) #wxWidgets Windows specific defines
+		add_definitions( -D__WXMSW__ )
+		add_definitions( -DwxUSE_UNICODE=1 )
+		add_definitions( -DWXUSINGDLL )
+	ELSE()
+
+		add_definitions( -DGD_API= )
+		add_definitions( -DGD_CORE_API= )
+		add_definitions( -DGD_EXTENSION_API= )
+		add_definitions(${GTK_CFLAGS_OTHER})
+	ENDIF(WIN32)
+endfunction()
+
+#Add a GD extension target, that will produce the final library file.
+function(gd_add_extension_target target_name source_files)
+	IF(target_name STREQUAL "")
+		MESSAGE(ERROR "You called gd_add_extension_target without specifying a target name")
+	ENDIF()
+
+	add_library(${target_name} SHARED ${source_files})
+	set_target_properties(${target_name} PROPERTIES PREFIX "")
+	set_target_properties(${target_name} PROPERTIES COMPILE_DEFINITIONS "${${target_name}_extra_definitions}")
+	set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
+	set_target_properties(${target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
+	set_target_properties(${target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions")
+	IF(WIN32) #GD extensions have special suffix in their filenames.
+		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgdwe")
+	ELSEIF(EMSCRIPTEN)
+		set_target_properties(${target_name} PROPERTIES SUFFIX ".bc")
+	ELSE()
+		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgde")
+	ENDIF()
+endfunction()
+
+#Add a GDC++ runtime extension target, that will produce the final library file for runtime.
+function(gdcpp_add_runtime_extension_target gdcpp_runtime_target_name source_files)
+	IF(NOT gdcpp_runtime_target_name MATCHES "_Runtime$")
+		MESSAGE(ERROR "You called gdcpp_add_runtime_extension_target with a target name not finishing with '_Runtime'")
+	ENDIF()
+	string(REGEX REPLACE "_Runtime" "" target_name ${gdcpp_runtime_target_name})
+
+	IF(NOT EMSCRIPTEN) #Also add a GDC++ extension target
+		add_library(${gdcpp_runtime_target_name} SHARED ${source_files})
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES COMPILE_DEFINITIONS "${${gdcpp_runtime_target_name}_extra_definitions}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES RUNTIME_OUTPUT_NAME "${target_name}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES LIBRARY_OUTPUT_NAME "${target_name}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES ARCHIVE_OUTPUT_NAME "${target_name}")
+		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES PREFIX "")
+		IF(WIN32) #GD extensions have special suffix in their filenames.
+			set_target_properties(${gdcpp_runtime_target_name} PROPERTIES SUFFIX ".xgdw")
+		ELSE()
+			set_target_properties(${gdcpp_runtime_target_name} PROPERTIES SUFFIX ".xgd")
+		ENDIF()
+	ENDIF()
+endfunction()
+
+#Link default libraries with a target that is a GD extension
+function(gd_extension_link_libraries target_name)
+	IF(EMSCRIPTEN)
+		#Nothing.
+	ELSE()
+		target_link_libraries(${target_name} GDCore)
+		target_link_libraries(${target_name} GDCpp)
+		target_link_libraries(${target_name} ${sfml_LIBRARIES})
+		target_link_libraries(${target_name} ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
+		target_link_libraries(${target_name} ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
+	ENDIF()
+endfunction()
+
+#Link default libraries with a target that is a GDC++ Runtime extension
+function(gdcpp_runtime_extension_link_libraries target_name)
+	IF(EMSCRIPTEN)
+		#Nothing.
+	ELSE()
+		target_link_libraries(${target_name} GDCpp_Runtime)
+		target_link_libraries(${target_name} ${sfml_LIBRARIES})
+		IF(WIN32)
+			target_link_libraries(${target_name} ws2_32 user32 opengl32 glu32)
+		ENDIF(WIN32)
+	ENDIF()
+endfunction()
+
+
+#Create a target for a test executable of a GDC++ Runtime extension
+function(gdcpp_add_tests_extension_target gdcpp_tests_target_name test_source_files)
+	IF(NOT gdcpp_tests_target_name MATCHES "_tests$")
+		MESSAGE(ERROR "You called gdcpp_add_tests_extension_target with a target name not finishing with '_tests'")
+	ENDIF()
+	string(REGEX REPLACE "_tests" "" target_name ${gdcpp_tests_target_name})
+
+	if(BUILD_TESTS)
+		add_executable(${gdcpp_tests_target_name} ${test_source_files})
+		target_link_libraries(${gdcpp_tests_target_name} GDCpp_Runtime)
+		target_link_libraries(${gdcpp_tests_target_name} ${target_name})
+		target_link_libraries(${gdcpp_tests_target_name} ${sfml_LIBRARIES})
+
+		set_target_properties(${gdcpp_tests_target_name} PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
+	endif()
+endfunction()

@@ -5,10 +5,12 @@
  */
 
 /**
- * RuntimeObject represents an object being used on a RuntimeScene.<br>
+ * RuntimeObject represents an object being used on a RuntimeScene.
+ *
  * The constructor can be called on an already existing RuntimeObject:
  * In this case, the constructor will try to reuse as much already existing members
- * as possible ( Recycling ).<br>
+ * as possible (recycling).
+ *
  * However, you should not be calling the constructor on an already existing object
  * which is not a RuntimeObject.
  *

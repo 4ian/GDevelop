@@ -122,7 +122,7 @@ public:
     gd::ExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
-     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     * Set the default value used in editor (or if an optional parameter is empty during code generation) for the latest added parameter.
      *
      * \see AddParameter
      */

@@ -105,8 +105,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanging);
 	//*)
-
-	//Prepare pane manager
+    //Prepare pane manager
     m_mgr.SetManagedWindow( this );
 
     layoutEditorCanvas->SetParentAuiManager(&m_mgr);

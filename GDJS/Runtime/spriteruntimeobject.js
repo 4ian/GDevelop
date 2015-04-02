@@ -141,8 +141,6 @@ gdjs.SpriteAnimation = function(imageManager, animData)
 /**
  * The SpriteRuntimeObject represents an object that can display images.
  *
- * <b>TODO:</b> custom collisions masks.
- *
  * @class SpriteRuntimeObject
  * @namespace gdjs
  * @extends runtimeObject

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <project firstLayout="">
-    <gdVersion build="78" major="3" minor="6" revision="0" />
+    <gdVersion build="79" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>slot_machine_example</name>
         <author></author>
@@ -34,9 +34,9 @@
             <extension name="Function" />
         </extensions>
         <platforms>
-            <platform name="GDevelop JS platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
-        <currentPlatform>GDevelop JS platform</currentPlatform>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
     <resources>
         <resources>

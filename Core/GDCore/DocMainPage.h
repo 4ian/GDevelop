@@ -212,9 +212,10 @@ brew install p7zip
 brew install pkgconfig
 brew install wxwidgets
 \endcode
-  * If you want to generate the documentation, install Doxygen:
+  * If you want to generate the documentation and translations, install Doxygen and Gettext:
 \code
 brew install doxygen
+brew install gettext
 \endcode
   *
   * \section launchCompilation Launch compilation

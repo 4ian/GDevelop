@@ -389,6 +389,7 @@ bool GDevelopIDEApp::OnInit()
     }
 
     //Notify opening of the program.
+    config->Write("Startup/OpeningCount", config->ReadDouble("Startup/OpeningCount", 0) + 1);
     gd::AnalyticsSender::Get()->SendProgramOpening();
 
     //Feedback reminder

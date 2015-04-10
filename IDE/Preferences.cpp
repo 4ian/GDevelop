@@ -1539,7 +1539,7 @@ void Preferences::OnbrowseJavaBtClick(wxCommandEvent& event)
 
 void Preferences::OnBrowseEditionImageClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choose a image editing software" ), "", "", "Programme (*.exe)|*.exe" );
+    wxFileDialog dialog( this, _( "Choose a image editing software" ), "", "", "Programme (*.exe)|*.exe|All Files (*.*)|*.*" );
     dialog.ShowModal();
 
     if ( !dialog.GetPath().empty() )

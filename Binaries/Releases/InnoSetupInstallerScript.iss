@@ -10,8 +10,8 @@ AppUpdatesURL=http://www.compilgames.net
 DefaultDirName={pf}/GDevelop
 DefaultGroupName=GDevelop
 AllowNoIcons=yes
-LicenseFile=..\Output\Release_Windows\License-fr.rtf
-InfoBeforeFile=..\Output\Release_Windows\Informations-fr.rtf
+LicenseFile=..\Output\Release_Windows\License-en.rtf
+InfoBeforeFile=..\Output\Release_Windows\Informations-en.rtf
 OutputDir=.\
 OutputBaseFilename=gd3678
 Compression=lzma
@@ -28,10 +28,12 @@ VersionInfoProductName=GDevelop
 VersionInfoProductVersion=3.6
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
+Name: "english"; MessagesFile: "compiler:Default.isl";
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"; LicenseFile: "..\Output\Release_Windows\License-fr.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-fr.rtf"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl";
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl";
+Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl";
+Name: "german"; MessagesFile: "compiler:Languages\German.isl";
 
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags:

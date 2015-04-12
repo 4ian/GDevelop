@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-07 21:01+1200\n"
+"POT-Creation-Date: 2015-04-12 17:28+1200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -988,11 +988,11 @@ msgstr ""
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:133
 #: ../IDE/Dialogs/NewProjectDialog.cpp:139
-#: ../IDE/Dialogs/NewProjectDialog.cpp:333
+#: ../IDE/Dialogs/NewProjectDialog.cpp:335
 msgid "Project.gdg"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:148
+#: ../IDE/Dialogs/NewProjectDialog.cpp:150
 #: ../Extensions//PlatformAutomatism/Extension.cpp:404
 #: ../Extensions//PlatformAutomatism/PlatformAutomatism.cpp:116
 #: ../Extensions//PlatformAutomatism/PlatformAutomatism.cpp:125
@@ -1000,26 +1000,26 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:149
+#: ../IDE/Dialogs/NewProjectDialog.cpp:151
 msgid "Template"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:150
+#: ../IDE/Dialogs/NewProjectDialog.cpp:152
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:123
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:123
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:233
 msgid "Description"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:256
+#: ../IDE/Dialogs/NewProjectDialog.cpp:258
 msgid "Empty project"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:257
+#: ../IDE/Dialogs/NewProjectDialog.cpp:259
 msgid "Create a new empty project"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:333
+#: ../IDE/Dialogs/NewProjectDialog.cpp:335
 msgid "Choose a file for the project"
 msgstr ""
 
@@ -2107,17 +2107,17 @@ msgstr ""
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:41
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:55
 #: ../Extensions//DraggableAutomatism/Extension.cpp:41
-#: ../Extensions//Light/Extension.cpp:53 ../Extensions//Light/Extension.cpp:65
-#: ../Extensions//Light/Extension.cpp:78 ../Extensions//Light/Extension.cpp:91
-#: ../Extensions//Light/Extension.cpp:104
-#: ../Extensions//Light/Extension.cpp:117
-#: ../Extensions//Light/Extension.cpp:130
-#: ../Extensions//Light/Extension.cpp:143
-#: ../Extensions//Light/Extension.cpp:155
-#: ../Extensions//Light/Extension.cpp:167
-#: ../Extensions//Light/Extension.cpp:201
-#: ../Extensions//Light/Extension.cpp:205
-#: ../Extensions//Light/Extension.cpp:209
+#: ../Extensions//Light/Extension.cpp:52 ../Extensions//Light/Extension.cpp:64
+#: ../Extensions//Light/Extension.cpp:77 ../Extensions//Light/Extension.cpp:90
+#: ../Extensions//Light/Extension.cpp:103
+#: ../Extensions//Light/Extension.cpp:116
+#: ../Extensions//Light/Extension.cpp:129
+#: ../Extensions//Light/Extension.cpp:142
+#: ../Extensions//Light/Extension.cpp:154
+#: ../Extensions//Light/Extension.cpp:166
+#: ../Extensions//Light/Extension.cpp:170
+#: ../Extensions//Light/Extension.cpp:174
+#: ../Extensions//Light/Extension.cpp:178
 #: ../Extensions//LinkedObjects/Extension.cpp:71
 #: ../Extensions//Network/Extension.cpp:163
 #: ../Extensions//Network/Extension.cpp:190
@@ -2436,21 +2436,21 @@ msgstr ""
 #: ../Extensions//TextObject/Extension.cpp:191
 #: ../Extensions//TextObject/Extension.cpp:201
 #: ../Extensions//TextObject/Extension.cpp:212
-#: ../Extensions//TextObject/Extension.cpp:222
-#: ../Extensions//TextObject/Extension.cpp:234
-#: ../Extensions//TextObject/Extension.cpp:240
-#: ../Extensions//TextObject/Extension.cpp:244
-#: ../Extensions//TextObject/Extension.cpp:248
+#: ../Extensions//TextObject/Extension.cpp:223
+#: ../Extensions//TextObject/Extension.cpp:236
+#: ../Extensions//TextObject/Extension.cpp:242
+#: ../Extensions//TextObject/Extension.cpp:247
+#: ../Extensions//TextObject/Extension.cpp:251
 #: ../Extensions//TiledSpriteObject/Extension.cpp:39
 #: ../Extensions//TiledSpriteObject/Extension.cpp:51
 #: ../Extensions//TiledSpriteObject/Extension.cpp:65
 #: ../Extensions//TiledSpriteObject/Extension.cpp:78
-#: ../Extensions//TiledSpriteObject/Extension.cpp:92
-#: ../Extensions//TiledSpriteObject/Extension.cpp:106
-#: ../Extensions//TiledSpriteObject/Extension.cpp:119
-#: ../Extensions//TiledSpriteObject/Extension.cpp:133
-#: ../Extensions//TiledSpriteObject/Extension.cpp:146
-#: ../Extensions//TiledSpriteObject/Extension.cpp:160
+#: ../Extensions//TiledSpriteObject/Extension.cpp:93
+#: ../Extensions//TiledSpriteObject/Extension.cpp:108
+#: ../Extensions//TiledSpriteObject/Extension.cpp:120
+#: ../Extensions//TiledSpriteObject/Extension.cpp:134
+#: ../Extensions//TiledSpriteObject/Extension.cpp:147
+#: ../Extensions//TiledSpriteObject/Extension.cpp:161
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:43
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:55
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:67
@@ -2639,10 +2639,10 @@ msgstr ""
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:266
 #: ../Extensions//TextEntryObject/TextEntryInitialPositionPanel.cpp:42
 #: ../Extensions//TextObject/Extension.cpp:216
-#: ../Extensions//TextObject/Extension.cpp:228
-#: ../Extensions//TextObject/Extension.cpp:243
+#: ../Extensions//TextObject/Extension.cpp:229
+#: ../Extensions//TextObject/Extension.cpp:245
 #: ../Extensions//TiledSpriteObject/Extension.cpp:86
-#: ../Extensions//TiledSpriteObject/Extension.cpp:100
+#: ../Extensions//TiledSpriteObject/Extension.cpp:101
 #: ../Extensions//TiledSpriteObject/TiledSpriteObject.cpp:182
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:116
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:119
@@ -2893,7 +2893,7 @@ msgstr ""
 msgid "Delete the selected resource"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:383 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:963
+#: ../IDE/MainFrame.cpp:383 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid "Remove useless resources"
 msgstr ""
 
@@ -3444,9 +3444,9 @@ msgstr ""
 msgid "File button"
 msgstr ""
 
-#: ../IDE/Preferences.cpp:411 ../Extensions//Light/Extension.cpp:47
-#: ../Extensions//Light/Extension.cpp:54
-#: ../Extensions//Light/Extension.cpp:144
+#: ../IDE/Preferences.cpp:411 ../Extensions//Light/Extension.cpp:46
+#: ../Extensions//Light/Extension.cpp:53
+#: ../Extensions//Light/Extension.cpp:143
 #: ../Extensions//Light/LightObject.cpp:226
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:351
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:92
@@ -4156,11 +4156,11 @@ msgstr ""
 msgid "Paused music:"
 msgstr ""
 
-#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:628
+#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:578
 msgid "C++ code ( Experimental )"
 msgstr ""
 
-#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:629
+#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:579
 msgid "Execute C++ code"
 msgstr ""
 
@@ -4329,8 +4329,8 @@ msgstr ""
 #: ../Extensions//Box3DObject/Extension.cpp:183
 #: ../Extensions//Box3DObject/Extension.cpp:209
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:58
-#: ../Extensions//Light/Extension.cpp:67 ../Extensions//Light/Extension.cpp:93
-#: ../Extensions//Light/Extension.cpp:119
+#: ../Extensions//Light/Extension.cpp:66 ../Extensions//Light/Extension.cpp:92
+#: ../Extensions//Light/Extension.cpp:118
 #: ../Extensions//Network/Extension.cpp:90
 #: ../Extensions//PanelSpriteObject/Extension.cpp:43
 #: ../Extensions//PanelSpriteObject/Extension.cpp:68
@@ -4413,12 +4413,12 @@ msgstr ""
 #: ../Extensions//SoundObject/Extension.cpp:388
 #: ../Extensions//TextObject/Extension.cpp:79
 #: ../Extensions//TextObject/Extension.cpp:114
-#: ../Extensions//TextObject/Extension.cpp:224
+#: ../Extensions//TextObject/Extension.cpp:225
 #: ../Extensions//TiledSpriteObject/Extension.cpp:41
 #: ../Extensions//TiledSpriteObject/Extension.cpp:67
-#: ../Extensions//TiledSpriteObject/Extension.cpp:94
-#: ../Extensions//TiledSpriteObject/Extension.cpp:121
-#: ../Extensions//TiledSpriteObject/Extension.cpp:148
+#: ../Extensions//TiledSpriteObject/Extension.cpp:95
+#: ../Extensions//TiledSpriteObject/Extension.cpp:122
+#: ../Extensions//TiledSpriteObject/Extension.cpp:149
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:131
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:145
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:159
@@ -5213,7 +5213,7 @@ msgstr ""
 #: ../GDCpp/GDCpp//RuntimeSpriteObject.cpp:612
 #: ../Extensions//TextObject/Extension.cpp:106
 #: ../Extensions//TextObject/Extension.cpp:118
-#: ../Extensions//TextObject/Extension.cpp:239
+#: ../Extensions//TextObject/Extension.cpp:241
 #: ../Extensions//TextObject/TextObject.cpp:339
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:276
 msgid "Opacity"
@@ -5304,11 +5304,11 @@ msgstr ""
 msgid "Built-in extension providing standard events."
 msgstr ""
 
-#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:609
+#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:586
 msgid "Javascript code (Web platform only)"
 msgstr ""
 
-#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:610
+#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:587
 msgid "Insert some Javascript code into events"
 msgstr ""
 
@@ -6413,8 +6413,8 @@ msgstr ""
 #: ../Extensions//Box3DObject/Extension.cpp:182
 #: ../Extensions//Box3DObject/Extension.cpp:208
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:57
-#: ../Extensions//Light/Extension.cpp:66 ../Extensions//Light/Extension.cpp:92
-#: ../Extensions//Light/Extension.cpp:118
+#: ../Extensions//Light/Extension.cpp:65 ../Extensions//Light/Extension.cpp:91
+#: ../Extensions//Light/Extension.cpp:117
 #: ../Extensions//PanelSpriteObject/Extension.cpp:42
 #: ../Extensions//PanelSpriteObject/Extension.cpp:67
 #: ../Extensions//PanelSpriteObject/Extension.cpp:94
@@ -6484,12 +6484,12 @@ msgstr ""
 #: ../Extensions//TextObject/Extension.cpp:43
 #: ../Extensions//TextObject/Extension.cpp:78
 #: ../Extensions//TextObject/Extension.cpp:113
-#: ../Extensions//TextObject/Extension.cpp:223
+#: ../Extensions//TextObject/Extension.cpp:224
 #: ../Extensions//TiledSpriteObject/Extension.cpp:40
 #: ../Extensions//TiledSpriteObject/Extension.cpp:66
-#: ../Extensions//TiledSpriteObject/Extension.cpp:93
-#: ../Extensions//TiledSpriteObject/Extension.cpp:120
-#: ../Extensions//TiledSpriteObject/Extension.cpp:147
+#: ../Extensions//TiledSpriteObject/Extension.cpp:94
+#: ../Extensions//TiledSpriteObject/Extension.cpp:121
+#: ../Extensions//TiledSpriteObject/Extension.cpp:148
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:130
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:158
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:186
@@ -6544,9 +6544,9 @@ msgstr ""
 #: ../Extensions//Box3DObject/Extension.cpp:195
 #: ../Extensions//Box3DObject/Extension.cpp:221
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:43
-#: ../Extensions//Light/Extension.cpp:79
-#: ../Extensions//Light/Extension.cpp:105
-#: ../Extensions//Light/Extension.cpp:131
+#: ../Extensions//Light/Extension.cpp:78
+#: ../Extensions//Light/Extension.cpp:104
+#: ../Extensions//Light/Extension.cpp:130
 #: ../Extensions//PanelSpriteObject/Extension.cpp:54
 #: ../Extensions//PanelSpriteObject/Extension.cpp:80
 #: ../Extensions//PanelSpriteObject/Extension.cpp:107
@@ -6610,12 +6610,12 @@ msgstr ""
 #: ../Extensions//TextObject/Extension.cpp:55
 #: ../Extensions//TextObject/Extension.cpp:90
 #: ../Extensions//TextObject/Extension.cpp:125
-#: ../Extensions//TextObject/Extension.cpp:235
+#: ../Extensions//TextObject/Extension.cpp:237
 #: ../Extensions//TiledSpriteObject/Extension.cpp:52
 #: ../Extensions//TiledSpriteObject/Extension.cpp:79
-#: ../Extensions//TiledSpriteObject/Extension.cpp:107
-#: ../Extensions//TiledSpriteObject/Extension.cpp:134
-#: ../Extensions//TiledSpriteObject/Extension.cpp:161
+#: ../Extensions//TiledSpriteObject/Extension.cpp:109
+#: ../Extensions//TiledSpriteObject/Extension.cpp:135
+#: ../Extensions//TiledSpriteObject/Extension.cpp:162
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:144
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:172
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:199
@@ -6671,9 +6671,9 @@ msgstr ""
 #: ../Extensions//Box3DObject/Extension.cpp:196
 #: ../Extensions//Box3DObject/Extension.cpp:222
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:44
-#: ../Extensions//Light/Extension.cpp:80
-#: ../Extensions//Light/Extension.cpp:106
-#: ../Extensions//Light/Extension.cpp:132
+#: ../Extensions//Light/Extension.cpp:79
+#: ../Extensions//Light/Extension.cpp:105
+#: ../Extensions//Light/Extension.cpp:131
 #: ../Extensions//PanelSpriteObject/Extension.cpp:55
 #: ../Extensions//PanelSpriteObject/Extension.cpp:81
 #: ../Extensions//PanelSpriteObject/Extension.cpp:108
@@ -6737,12 +6737,12 @@ msgstr ""
 #: ../Extensions//SoundObject/Extension.cpp:451
 #: ../Extensions//SoundObject/Extension.cpp:467
 #: ../Extensions//TextObject/Extension.cpp:126
-#: ../Extensions//TextObject/Extension.cpp:236
+#: ../Extensions//TextObject/Extension.cpp:238
 #: ../Extensions//TiledSpriteObject/Extension.cpp:53
 #: ../Extensions//TiledSpriteObject/Extension.cpp:80
-#: ../Extensions//TiledSpriteObject/Extension.cpp:108
-#: ../Extensions//TiledSpriteObject/Extension.cpp:135
-#: ../Extensions//TiledSpriteObject/Extension.cpp:162
+#: ../Extensions//TiledSpriteObject/Extension.cpp:110
+#: ../Extensions//TiledSpriteObject/Extension.cpp:136
+#: ../Extensions//TiledSpriteObject/Extension.cpp:163
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:462
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:781
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:31
@@ -7347,7 +7347,7 @@ msgid ""
 "be used in function using Function::GetParameter(x) )."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:28 ../Extensions//Light/Extension.cpp:35
+#: ../Extensions//Light/Extension.cpp:28 ../Extensions//Light/Extension.cpp:34
 msgid "Light"
 msgstr ""
 
@@ -7355,29 +7355,29 @@ msgstr ""
 msgid "Allow to display lights and use light obstacles."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:36
+#: ../Extensions//Light/Extension.cpp:35
 msgid "Emits light that can be stopped by objects"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:48
+#: ../Extensions//Light/Extension.cpp:47
 msgid "Change light color."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:49
+#: ../Extensions//Light/Extension.cpp:48
 #: ../Extensions//TextObject/Extension.cpp:97
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:333
 msgid "Change color of _PARAM0_ to _PARAM1_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:50 ../Extensions//Light/Extension.cpp:62
-#: ../Extensions//Light/Extension.cpp:75 ../Extensions//Light/Extension.cpp:88
-#: ../Extensions//Light/Extension.cpp:101
-#: ../Extensions//Light/Extension.cpp:114
-#: ../Extensions//Light/Extension.cpp:127
-#: ../Extensions//Light/Extension.cpp:140
-#: ../Extensions//Light/Extension.cpp:200
-#: ../Extensions//Light/Extension.cpp:204
-#: ../Extensions//Light/Extension.cpp:208
+#: ../Extensions//Light/Extension.cpp:49 ../Extensions//Light/Extension.cpp:61
+#: ../Extensions//Light/Extension.cpp:74 ../Extensions//Light/Extension.cpp:87
+#: ../Extensions//Light/Extension.cpp:100
+#: ../Extensions//Light/Extension.cpp:113
+#: ../Extensions//Light/Extension.cpp:126
+#: ../Extensions//Light/Extension.cpp:139
+#: ../Extensions//Light/Extension.cpp:169
+#: ../Extensions//Light/Extension.cpp:173
+#: ../Extensions//Light/Extension.cpp:177
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:23
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:34
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:47
@@ -7418,128 +7418,128 @@ msgstr ""
 msgid "Setup"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:59 ../Extensions//Light/Extension.cpp:72
-#: ../Extensions//Light/Extension.cpp:200
+#: ../Extensions//Light/Extension.cpp:58 ../Extensions//Light/Extension.cpp:71
+#: ../Extensions//Light/Extension.cpp:169
 #: ../Extensions//Light/LightObject.cpp:227
 msgid "Intensity"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:60
+#: ../Extensions//Light/Extension.cpp:59
 msgid "Modify the intensity of a light"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:61
+#: ../Extensions//Light/Extension.cpp:60
 msgid "Do _PARAM1__PARAM2_ to the intensity of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:73
+#: ../Extensions//Light/Extension.cpp:72
 msgid "Test the intensity of a light."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:74
+#: ../Extensions//Light/Extension.cpp:73
 msgid "Intensity of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:85 ../Extensions//Light/Extension.cpp:98
-#: ../Extensions//Light/Extension.cpp:204
+#: ../Extensions//Light/Extension.cpp:84 ../Extensions//Light/Extension.cpp:97
+#: ../Extensions//Light/Extension.cpp:173
 #: ../Extensions//Light/LightObject.cpp:228
 msgid "Radius"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:86
+#: ../Extensions//Light/Extension.cpp:85
 msgid "Modify the radius of a light"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:87
+#: ../Extensions//Light/Extension.cpp:86
 msgid "Do _PARAM1__PARAM2_ to radius of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:99
+#: ../Extensions//Light/Extension.cpp:98
 msgid "Test the radius of a light."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:100
+#: ../Extensions//Light/Extension.cpp:99
 msgid "The radius of _PARAM0_ is _PARAM2_ _PARAM1_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:111
-#: ../Extensions//Light/Extension.cpp:124
-#: ../Extensions//Light/Extension.cpp:208
+#: ../Extensions//Light/Extension.cpp:110
+#: ../Extensions//Light/Extension.cpp:123
+#: ../Extensions//Light/Extension.cpp:177
 #: ../Extensions//Light/LightObject.cpp:229
 msgid "Quality"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:112
+#: ../Extensions//Light/Extension.cpp:111
 msgid "Modify the quality of a light"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:113
+#: ../Extensions//Light/Extension.cpp:112
 msgid "Do _PARAM1__PARAM2_ to the quality of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:125
+#: ../Extensions//Light/Extension.cpp:124
 msgid "Test the quality of a light"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:126
+#: ../Extensions//Light/Extension.cpp:125
 msgid "The quality of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:137
+#: ../Extensions//Light/Extension.cpp:136
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:331
 msgid "Global color"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:138
+#: ../Extensions//Light/Extension.cpp:137
 msgid "Change scene color for a global light."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:139
+#: ../Extensions//Light/Extension.cpp:138
 msgid "Change scene global color of _PARAM0_ to _PARAM1_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:149
+#: ../Extensions//Light/Extension.cpp:148
 msgid "Make a light global"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:150
+#: ../Extensions//Light/Extension.cpp:149
 msgid "Make a light global or simple."
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:151
+#: ../Extensions//Light/Extension.cpp:150
 msgid "Make _PARAM0_ global : _PARAM1_"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:152
-#: ../Extensions//Light/Extension.cpp:164
+#: ../Extensions//Light/Extension.cpp:151
+#: ../Extensions//Light/Extension.cpp:163
 msgid "Light type"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:156
+#: ../Extensions//Light/Extension.cpp:155
 msgid "Make light global"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:161
+#: ../Extensions//Light/Extension.cpp:160
 msgid "A light is global"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:162
+#: ../Extensions//Light/Extension.cpp:161
 msgid "Return true if light is global"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:163
+#: ../Extensions//Light/Extension.cpp:162
 msgid "_PARAM0_ is a global light"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:224
+#: ../Extensions//Light/Extension.cpp:183
 msgid "Light obstacle"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:225
+#: ../Extensions//Light/Extension.cpp:184
 msgid "LightObstacle"
 msgstr ""
 
-#: ../Extensions//Light/Extension.cpp:226
+#: ../Extensions//Light/Extension.cpp:185
 msgid "Mark the objects as obstacles for Light objects."
 msgstr ""
 
@@ -7784,7 +7784,7 @@ msgstr ""
 #: ../Extensions//TextEntryObject/Extension.cpp:40
 #: ../Extensions//TextObject/Extension.cpp:27
 #: ../Extensions//TextObject/Extension.cpp:44
-#: ../Extensions//TextObject/Extension.cpp:247
+#: ../Extensions//TextObject/Extension.cpp:250
 #: ../Extensions//TextObject/TextObject.cpp:335
 #: ../Extensions//TextObject/TextObjectEditor.cpp:68
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:301
@@ -8091,7 +8091,7 @@ msgstr ""
 #: ../Extensions//TiledSpriteObject/Extension.cpp:62
 #: ../Extensions//TiledSpriteObject/Extension.cpp:75
 #: ../Extensions//TiledSpriteObject/Extension.cpp:89
-#: ../Extensions//TiledSpriteObject/Extension.cpp:103
+#: ../Extensions//TiledSpriteObject/Extension.cpp:104
 msgid "Size and angle"
 msgstr ""
 
@@ -8132,8 +8132,8 @@ msgid "Test the angle of a Panel Sprite."
 msgstr ""
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:101
-#: ../Extensions//TextObject/Extension.cpp:230
-#: ../Extensions//TiledSpriteObject/Extension.cpp:102
+#: ../Extensions//TextObject/Extension.cpp:231
+#: ../Extensions//TiledSpriteObject/Extension.cpp:103
 msgid "The angle of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
@@ -9194,7 +9194,7 @@ msgid "Points"
 msgstr ""
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:267
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:802
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:803
 msgid "Quad"
 msgstr ""
 
@@ -10738,8 +10738,8 @@ msgid "Coordinates must be entere with a clockwise wind."
 msgstr ""
 
 #: ../Extensions//PhysicsAutomatism/CustomPolygonDialog.cpp:102
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1555
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1556
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1557
 msgid "Positioning"
 msgstr ""
 
@@ -10945,8 +10945,8 @@ msgstr ""
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:547
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:559
 #: ../Extensions//TextObject/Extension.cpp:219
-#: ../Extensions//TextObject/Extension.cpp:231
-#: ../Extensions//TextObject/Extension.cpp:243
+#: ../Extensions//TextObject/Extension.cpp:232
+#: ../Extensions//TextObject/Extension.cpp:245
 msgid "Rotation"
 msgstr ""
 
@@ -11105,8 +11105,8 @@ msgstr ""
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:535
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:541
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:553
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1578
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1579
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1580
 msgid "Displacement"
 msgstr ""
 
@@ -13093,7 +13093,7 @@ msgstr ""
 msgid "Modify the angle of a Text object."
 msgstr ""
 
-#: ../Extensions//TextObject/Extension.cpp:229
+#: ../Extensions//TextObject/Extension.cpp:230
 msgid "Test the value of the angle of a text object."
 msgstr ""
 
@@ -13157,56 +13157,56 @@ msgstr ""
 msgid "Modify the angle of a Tiled Sprite."
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:101
+#: ../Extensions//TiledSpriteObject/Extension.cpp:102
 msgid "Test the angle of a Tiled Sprite."
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:113
-#: ../Extensions//TiledSpriteObject/Extension.cpp:127
+#: ../Extensions//TiledSpriteObject/Extension.cpp:114
+#: ../Extensions//TiledSpriteObject/Extension.cpp:128
 msgid "Image X Offset"
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:114
+#: ../Extensions//TiledSpriteObject/Extension.cpp:115
 msgid "Modify the offset used on the X axis when displaying the image."
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:115
+#: ../Extensions//TiledSpriteObject/Extension.cpp:116
 msgid "Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:116
-#: ../Extensions//TiledSpriteObject/Extension.cpp:130
-#: ../Extensions//TiledSpriteObject/Extension.cpp:143
-#: ../Extensions//TiledSpriteObject/Extension.cpp:157
+#: ../Extensions//TiledSpriteObject/Extension.cpp:117
+#: ../Extensions//TiledSpriteObject/Extension.cpp:131
+#: ../Extensions//TiledSpriteObject/Extension.cpp:144
+#: ../Extensions//TiledSpriteObject/Extension.cpp:158
 msgid "Image offset"
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:128
+#: ../Extensions//TiledSpriteObject/Extension.cpp:129
 msgid "Test the offset used on the X axis when displaying the image."
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:129
+#: ../Extensions//TiledSpriteObject/Extension.cpp:130
 msgid "The X offset of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:140
-#: ../Extensions//TiledSpriteObject/Extension.cpp:154
+#: ../Extensions//TiledSpriteObject/Extension.cpp:141
+#: ../Extensions//TiledSpriteObject/Extension.cpp:155
 msgid "Image Y Offset"
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:141
+#: ../Extensions//TiledSpriteObject/Extension.cpp:142
 msgid "Modify the offset used on the Y axis when displaying the image."
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:142
+#: ../Extensions//TiledSpriteObject/Extension.cpp:143
 msgid "Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:155
+#: ../Extensions//TiledSpriteObject/Extension.cpp:156
 msgid "Test the offset used on the Y axis when displaying the image."
 msgstr ""
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:156
+#: ../Extensions//TiledSpriteObject/Extension.cpp:157
 msgid "The Y offset of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
@@ -16469,8 +16469,8 @@ msgid "De/activate loop"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:223
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:927
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1665
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:928
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1666
 msgid "Time between each images"
 msgstr ""
 
@@ -16556,145 +16556,145 @@ msgstr ""
 msgid "Direction "
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:800
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:801
 msgid "Triangle"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:804
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:805
 msgid "Polygon"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:812
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:813
 msgid "( INVALID : The polygon is not convex )"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:817
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:818
 msgid "Vertice"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:830
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:831
 msgid "Default"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:934
-msgid "Time between each images:"
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:935
+msgid "Time between each images: "
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:934
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:935
 msgid "s"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1136
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1137
 msgid ""
 "One or more polygons from the collision mask are not convex ( They have a hole ).\n"
 "Please modify these polygons before continuing."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1271
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1275
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1272
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1276
 msgid "NewPoint"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1299
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1300
 msgid ""
 "The point \"Centre\" can be automatically placed by GDevelop at the center.\n"
 "Do you really want to modify the point?\n"
 "Click on yes to modify it, click on no so as let GDevelop place it."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1300
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1301
 msgid "Position of the point \"Centre\""
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1312
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1313
 msgid "Enter the X position of the point ( regarding the image )."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1313
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1314
 msgid "Enter the Y position of the point ( regarding the image )."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1394
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1395
 msgid "Enter the width of the rectangle"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1394
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1395
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1396
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1397
 msgid "New rectangle"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1395
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1396
 msgid "Enter the height of the rectangle"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1396
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1397
 msgid "Enter the angle of the rotation of the rectangle ( in degrees )"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1505
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1506
 msgid ""
 "A polygon can not have less than 3 vertices.\n"
 "Do you want to delete the entire polygon?"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1505
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1506
 msgid "Delete the polygon?"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1530
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1531
 msgid ""
 "Go back to the default mask will erase any custom hit boxes.\n"
 "Are you sure you want to continue?"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1531
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1532
 msgid "Caution"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1555
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1556
 msgid "Enter the X position of the vertice"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1556
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1557
 msgid "Enter the Y position of the vertice"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1578
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1579
 msgid "Enter the displacement offset on X axis."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1579
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1580
 msgid "Enter the displacement offset on Y axis."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1602
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1603
 msgid "Enter the angle of the rotation, in degrees"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1602
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1603
 msgid "Rotation of the polygon"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1664
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1665
 msgid "Enter time between each image ( in seconds )"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1745
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1746
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:352
 msgid "Choose one or more images to add"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1745
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1746
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:352
 msgid "Supported image files|*.jpg;*.png|All files|*.*"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1801
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1802
 msgid "Drag images from the image bank to add them to the animation."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1806
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1807
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"
 msgstr ""
 
@@ -16791,7 +16791,8 @@ msgid "Play the current animation of _PARAM0_"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:111
-msgid "Change the animation speed scale"
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:450
+msgid "Animation speed scale"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:112
@@ -17097,10 +17098,6 @@ msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:447
 msgid "Animation frame of the object"
-msgstr ""
-
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:450
-msgid "Animation speed scale"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:453
@@ -19166,45 +19163,45 @@ msgstr ""
 msgid "All images"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:963
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid ""
 "These resources seems to be useless:\n"
 "Check resources to delete."
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:992
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:989
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1019
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Choose the program for editing this kind of resource"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1019
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Programs (*.exe)|*.exe"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1045
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1048
 msgid ""
 "Choose a resource in the\n"
 "list to display it.\n"
 "\n"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1046
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid ""
 "You can add and\n"
 "modify resources using the ribbon."
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1046
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid ""
 "You can add and\n"
 "modify resources using the toolbar"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1224
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1228
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1227
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1231
 msgid "New folder"
 msgstr ""
 

@@ -589,6 +589,7 @@ wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resourc
 
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
+        	wxLogNull noLogPlease;
             wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
             return bmp;
         }

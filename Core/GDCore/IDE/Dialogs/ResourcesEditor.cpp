@@ -999,6 +999,12 @@ void ResourcesEditor::OnresourcesTreeItemActivated(wxTreeEvent& event)
 
     AuiManager1->GetPane(propertiesPanel).Show();
     AuiManager1->Update();
+
+    #if !defined(WINDOWS) //MacOS and wxGTK needs additional tweaks
+    AuiManager1->GetPane(propertiesPanel).Dock().Bottom(); //Ensure panel is docked otherwise it can't get focus.
+    AuiManager1->Update();
+    toolbar->Realize(); //Toolbar is emptied if not realized again after calling Update.
+    #endif
 }
 
 /**

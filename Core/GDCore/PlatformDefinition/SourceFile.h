@@ -70,7 +70,6 @@ public:
 private:
 
     std::string filename; ///< Filename
-    time_t lastBuildTimeStamp; ///< Time of the last build
     bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by GDevelop.
     std::string language; ///< String identifying the language of this source file (typically "C++ or "Javascript").
     std::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.

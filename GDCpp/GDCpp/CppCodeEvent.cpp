@@ -53,10 +53,10 @@ void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & project) c
     }
 
     //Then check if the associated source file is up to date
+    associatedGDManagedSourceFile = outputFile;
     if ( sourceFile->GetFileName() != outputFile )
     {
         sourceFile->SetFileName(outputFile);
-        associatedGDManagedSourceFile = outputFile;
     }
     else if ( wxFileExists(outputFile) )
     {

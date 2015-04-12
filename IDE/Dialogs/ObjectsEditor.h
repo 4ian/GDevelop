@@ -196,40 +196,7 @@ private:
     gd::ObjectGroup & GetGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
     void RemoveGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
 
-    /**
-     * An enum used by HasObjectOrGroupNamed() to tell where an object with the same name has been found.
-     */
-    enum HasSameName
-    {
-        No = 0,
-        AsObjectInLayout = 1,
-        AsGroupInLayout = 2,
-        AsGlobalObject = 4,
-        AsGlobalGroup = 8,
-        AsObjectInAnotherLayout = 16,
-        AsGroupInAnotherLayout = 32,
-
-        InLayout = AsObjectInLayout|AsGroupInLayout,
-        InGlobal = AsGlobalObject|AsGlobalGroup,
-        InAnotherLayout = AsObjectInAnotherLayout|AsGroupInAnotherLayout,
-
-        Yes = InLayout|InGlobal|InAnotherLayout
-    };
-
-    /**
-     * Return a flag (HasSameName) to tell if an object/group has the same name
-     * Note : with allLayouts set to true, it also test the local objects and groups of other layouts.
-     */
-    int HasObjectOrGroupNamed(const std::string &name, bool allLayouts = false, std::string *layoutWithSameObjectName = nullptr) const;
-
-    /**
-     * Generate a wxString with an error message telling where other occurences of the object's/group's name have been found.
-     * \param searchSameNameResult the flag returned by HasObjectOrGroupNamed
-     * \param layoutWithSameObjectName a string representing the layouts containing an object/group with the same name.
-     * \return a wxString containing the error message (can be used to display a warning to the user)
-     */
-    std::string GetExistingObjectsErrorMessage(int searchSameNameResult, const std::string &layoutWithSameObjectName) const;
-
+    std::string GetExistingObjectsErrorMessage(unsigned int nameCheckResult, const std::vector<std::string> &layoutsWithSameName) const;
 
     gd::Project & project;
     gd::Layout & layout;

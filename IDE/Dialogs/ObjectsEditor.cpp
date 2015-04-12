@@ -1629,7 +1629,7 @@ std::string ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheck
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGroupInAnotherLayout) != 0)
             errorMessage += ((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0) ? 
                 gd::ToString(_("/ groups")) : 
-                gd::ToString(_("groups"))) + gd::ToString(" ");
+                gd::ToString(_("groups")) + gd::ToString(" ");
 
         errorMessage += gd::ToString(_("with the same name exist in these scenes : "));
 

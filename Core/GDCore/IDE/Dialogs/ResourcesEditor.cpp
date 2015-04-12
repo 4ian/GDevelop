@@ -944,17 +944,14 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
-    std::cout << "hello" << std::endl;
     std::vector<std::string> unusedImages =
         gd::ProjectResourcesAdder::GetAllUselessResources(project);
-        std::cout << unusedImages.size()<< std::endl;
 
     //Construct corresponding wxArrayString with unused images
     wxArrayString imagesNotUsed;
     wxArrayInt initialSelection;
     for ( unsigned int i = 0;i < unusedImages.size() ;i++ )
     {
-        std::cout << unusedImages[i]<< std::endl;
         imagesNotUsed.push_back(unusedImages[i]);
         initialSelection.push_back(imagesNotUsed.size()-1);
     }

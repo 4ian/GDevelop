@@ -932,7 +932,7 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
                 animationsMenu.Enable(ID_MENULOOP, true);
                 animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, true);
                 animationsMenu.Check(ID_MENULOOP, direction.IsLooping());
-                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images:")+ToString(direction.GetTimeBetweenFrames())+_("s"));
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images: ")+ToString(direction.GetTimeBetweenFrames())+_("s"));
             }
         }
     }

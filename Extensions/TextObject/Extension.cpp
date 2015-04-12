@@ -219,6 +219,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    _("Rotation"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "Text", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
@@ -231,6 +232,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    _("Rotation"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "Text", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
@@ -241,6 +243,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .codeExtraInformation.SetFunctionName("GetOpacity").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddExpression("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "Text", false)
         .codeExtraInformation.SetFunctionName("GetAngle").SetIncludeFile("TextObject/TextObject.h");
 

@@ -89,6 +89,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "TiledSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
@@ -103,10 +104,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "TiledSprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .SetHidden() //Now available for all objects
         .codeExtraInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("XOffset",

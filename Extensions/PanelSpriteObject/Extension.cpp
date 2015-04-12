@@ -89,7 +89,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
-        .SetHidden() //Deprecated
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
@@ -102,7 +102,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
-        .SetHidden() //Deprecated
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))

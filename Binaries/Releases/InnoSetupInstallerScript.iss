@@ -64,6 +64,8 @@ Source: ..\Output\Release_Windows\SelectLanguage-en.cfg; DestDir: {userdocs}\..\
 Source: ..\Output\Release_Windows\SelectLanguage-fr.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: french ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-es.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: spanish ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-ru.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: russian ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-de.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: german ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-pt.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: portuguese ; Components: main
 
 [Icons]
 Name: {group}\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}

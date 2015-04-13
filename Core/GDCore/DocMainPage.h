@@ -202,39 +202,39 @@ sudo apt-get install libgtk2.0-dev
  * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
  */
 
- /**
-  *  \page installMacOSTools (Mac OS X) Install development tools
-  *
-  * Make sure that you have Apple Developer Tools installed (if you have Xcode and git, that should be the case).
-  *
-  * \section installTools Install development tools
-  *
-  * The simplest way of installing dependencies required by GDevelop is to use [Homebrew](http://brew.sh/). Install it
-  * and install these packages, using the terminal:
+/**
+ *  \page installMacOSTools (Mac OS X) Install development tools
+ *
+ * Make sure that you have Apple Developer Tools installed (if you have Xcode and git, that should be the case).
+ *
+ * \section installTools Install development tools
+ *
+ * The simplest way of installing dependencies required by GDevelop is to use [Homebrew](http://brew.sh/). Install it
+ * and install these packages, using the terminal:
 \code
 brew install cmake
 brew install p7zip
 brew install pkgconfig
 brew install wxwidgets
 \endcode
-  * If you want to generate the documentation and translations, install Doxygen and Gettext:
+ * If you want to generate the documentation and translations, install Doxygen and Gettext:
 \code
 brew install doxygen
 brew install gettext
 \endcode
-  *
-  * \section launchCompilation Launch compilation
-  *
-  * You should be able to compile GD using CMake. Go with a terminal to the GD source folder:
+ *
+ * \section launchCompilation Launch compilation
+ *
+ * You should be able to compile GD using CMake. Go with a terminal to the GD source folder:
 \code
 cd /path/to/GD
 mkdir build && cd build
 cmake ../..
 make -j4
 \endcode
-  *
-  * More information about compilation here: \ref installAndUseCMake
-  */
+ *
+ * More information about compilation here: \ref installAndUseCMake
+ */
 
 
 /**

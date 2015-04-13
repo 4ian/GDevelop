@@ -180,6 +180,11 @@ sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 \endcode
  *
+ * If you want to package the app, you can also install:
+\code
+sudo apt-get install devscripts
+\endcode
+ *
  * \subsection wxWidgets Install wxWidgets development libraries
  *
  * Most distributions have wxWidgets 3 development libraries available: install them using your package manager. On Ubuntu:

@@ -35,9 +35,9 @@ gdjs.PlatformerObjectRuntimeAutomatism = function(runtimeScene, automatismData, 
     this._upKey = false;
     this._downKey = false;
     this._jumpKey = false;
-    this._potentialCollidingObjects = {}; //Hashtable of platforms (Keys: Objects id, values: automatisms) near the object, updated with _updatePotentialCollidingObjects.
-    this._collidingObjects = {};
-    this._overlappedJumpThru = {};
+    this._potentialCollidingObjects = []; //Platforms near the object, updated with _updatePotentialCollidingObjects.
+    this._collidingObjects = [];
+    this._overlappedJumpThru =[];
     this._oldHeight = 0;//owner.getHeight(); //Be careful, object might not be initialized.
     this._hasReallyMoved = false;
     this.setSlopeMaxAngle(automatismData.slopeMaxAngle);
@@ -93,7 +93,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     this._updateOverlappedJumpThru();
 
     //Check that the floor object still exists and is near the object.
-    if ( this._isOnFloor && !this._potentialCollidingObjects.hasOwnProperty(this._floorPlatform.owner.id) ) {
+    if ( this._isOnFloor && !this._isIn(this._potentialCollidingObjects, this._floorPlatform.owner.id) ) {
         this._isOnFloor = false;
         this._floorPlatform = null;
     }
@@ -296,22 +296,20 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
             //Check if landing on a new floor: (Exclude already overlapped jump truh)
             this._updateCollidingObjects();
             var collidingWithAnObject = false;
-            for( var k in this._collidingObjects ) {
-                if ( this._collidingObjects.hasOwnProperty(k) ) {
-                    this._isOnFloor = true;
-                    this._canJump = true;
-                    this._jumping = false;
-                    this._currentJumpSpeed = 0;
-                    this._currentFallSpeed = 0;
+            for (var i = 0;i < this._collidingObjects.length;++i ) { //TODO: No loop needed
+                this._isOnFloor = true;
+                this._canJump = true;
+                this._jumping = false;
+                this._currentJumpSpeed = 0;
+                this._currentFallSpeed = 0;
 
-                    //Register one of the colliding platforms as the floor.
-                    this._floorPlatform = this._collidingObjects[k];
-                    this._floorLastX = this._floorPlatform.owner.getX();
-                    this._floorLastY = this._floorPlatform.owner.getY();
+                //Register one of the colliding platforms as the floor.
+                this._floorPlatform = this._collidingObjects[i];
+                this._floorLastX = this._floorPlatform.owner.getX();
+                this._floorLastY = this._floorPlatform.owner.getY();
 
-                    collidingWithAnObject = true;
-                    break;
-                }
+                collidingWithAnObject = true;
+                break;
             }
             if (!collidingWithAnObject) { //In the air
                 this._canJump = false;
@@ -357,17 +355,15 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWith = function(can
 {
     excludeJumpThrus = !!excludeJumpThrus;
 
-    for (var k in candidates) {
-        if (candidates.hasOwnProperty(k)) {
-            var platform = candidates[k];
+    for (var i = 0;i<candidates.length;++i) {
+        var platform = candidates[i];
 
-            if ( platform.owner.id === exceptThisOne ) continue;
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
+        if ( platform.owner.id === exceptThisOne ) continue;
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
 
-            if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
-                return true;
-        }
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+            return true;
     }
 
     return false;
@@ -383,15 +379,13 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = functi
     excludeJumpThrus = !!excludeJumpThrus;
 
     var objects = [];
-    for (var k in candidates) {
-        if (candidates.hasOwnProperty(k)) {
-            var platform = candidates[k];
+    for (var i = 0;i<candidates.length;++i) {
+        var platform = candidates[i];
 
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
 
-            objects.push(platform.owner);
-        }
+        objects.push(platform.owner);
     }
 
     var objectsLists = new Hashtable();
@@ -407,15 +401,13 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = functi
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWithExcluding = function(candidates, exceptTheseOnes)
 {
-    for (var k in candidates) {
-        if (candidates.hasOwnProperty(k)) {
-            var platform = candidates[k];
+    for (var i = 0;i<candidates.length;++i) {
+        var platform = candidates[i];
 
-            if ( exceptTheseOnes && exceptTheseOnes.hasOwnProperty(k) ) continue;
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
-                return true;
-        }
+        if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) continue;
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+            return true;
     }
 
     return false;
@@ -429,20 +421,15 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWithExcluding = fun
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateCollidingObjects = function()
 {
-    for (var k in this._potentialCollidingObjects) {
-        if (this._potentialCollidingObjects.hasOwnProperty(k)) {
-            var platform = this._potentialCollidingObjects[k];
+    //TODO: _collidingObjects seems useless, we just need one.
+    this._collidingObjects.length = 0;
+    for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
+        var platform = this._potentialCollidingObjects[i];
 
-            if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER
-                && !this._overlappedJumpThru.hasOwnProperty(k)
-                && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
-                if ( !this._collidingObjects.hasOwnProperty(k) )
-                    this._collidingObjects[k] = platform;
-            }
-            else {
-                if ( this._collidingObjects.hasOwnProperty(k) )
-                    delete this._collidingObjects[k];
-            }
+        if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER
+            && !this._isIn(this._overlappedJumpThru, platform.owner.id)
+            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
+                this._collidingObjects.push(platform);
         }
     }
 };
@@ -455,19 +442,13 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateCollidingObjects = funct
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateOverlappedJumpThru = function()
 {
-    for (var k in this._potentialCollidingObjects) {
-        if (this._potentialCollidingObjects.hasOwnProperty(k)) {
-            var platform = this._potentialCollidingObjects[k];
+    this._overlappedJumpThru.length = 0;
+    for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
+        var platform = this._potentialCollidingObjects[i];
 
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU
-                && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
-                if ( !this._overlappedJumpThru.hasOwnProperty(k) )
-                    this._overlappedJumpThru[k] = platform;
-            }
-            else {
-                if ( this._overlappedJumpThru.hasOwnProperty(k) )
-                    delete this._overlappedJumpThru[k];
-            }
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU
+            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
+                this._overlappedJumpThru.push(platform);
         }
     }
 };
@@ -478,18 +459,25 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateOverlappedJumpThru = fun
  * @private
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._isOverlappingLadder = function() {
-    for (var k in this._potentialCollidingObjects) {
-        if (this._potentialCollidingObjects.hasOwnProperty(k)) {
-            var platform = this._potentialCollidingObjects[k];
+    for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
+        var platform = this._potentialCollidingObjects[i];
 
-            if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
-                return true;
-        }
+        if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+            return true;
     }
 
     return false;
 };
+
+gdjs.PlatformerObjectRuntimeAutomatism.prototype._isIn = function(platformArray, id) {
+    for (var i = 0;i < platformArray.length;++i) {
+        if (platformArray[i].owner.id === id)
+            return true;
+    }
+
+    return false;
+}
 
 /**
  * Update _potentialCollidingObjects member with platforms near the object.
@@ -497,7 +485,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isOverlappingLadder = function
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._updatePotentialCollidingObjects = function(maxMovementLength)
 {
-    this._manager.getAllPlatformsAround(this.owner, maxMovementLength, this._potentialCollidingObjects);
+    this._potentialCollidingObjects = this._manager.getAllPlatformsAround(this.owner, maxMovementLength);
 
     //This is the naive implementation when the platforms manager is simply containing a list
     //of all existing platforms:

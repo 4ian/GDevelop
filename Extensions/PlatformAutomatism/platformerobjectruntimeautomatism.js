@@ -36,7 +36,6 @@ gdjs.PlatformerObjectRuntimeAutomatism = function(runtimeScene, automatismData, 
     this._downKey = false;
     this._jumpKey = false;
     this._potentialCollidingObjects = []; //Platforms near the object, updated with _updatePotentialCollidingObjects.
-    this._collidingObjects = [];
     this._overlappedJumpThru =[];
     this._oldHeight = 0;//owner.getHeight(); //Be careful, object might not be initialized.
     this._hasReallyMoved = false;
@@ -294,24 +293,19 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
         }
         else{
             //Check if landing on a new floor: (Exclude already overlapped jump truh)
-            this._updateCollidingObjects();
-            var collidingWithAnObject = false;
-            for (var i = 0;i < this._collidingObjects.length;++i ) { //TODO: No loop needed
+            var collidingPlatform = this._getCollidingPlatform();
+            if (collidingPlatform !== null) {
                 this._isOnFloor = true;
                 this._canJump = true;
                 this._jumping = false;
                 this._currentJumpSpeed = 0;
                 this._currentFallSpeed = 0;
 
-                //Register one of the colliding platforms as the floor.
-                this._floorPlatform = this._collidingObjects[i];
+                //Register the colliding platform as the floor.
+                this._floorPlatform = collidingPlatform;
                 this._floorLastX = this._floorPlatform.owner.getX();
                 this._floorLastY = this._floorPlatform.owner.getY();
-
-                collidingWithAnObject = true;
-                break;
-            }
-            if (!collidingWithAnObject) { //In the air
+            } else { //In the air
                 this._canJump = false;
                 this._isOnFloor = false;
                 this._floorPlatform = null;
@@ -414,24 +408,23 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWithExcluding = fun
 };
 
 /**
- * Update _collidingObjects member, so that it contains all the platforms which are colliding with
- * the automatism owner object. Overlapped jump thru are excluded.
- * Ladders are *always* excluded from the test.
- * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before
+ * Return (one of) the platform which is colliding with the automatism owner object.
+ * Overlapped jump thru and ladders are excluded.
+ * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before.
  */
-gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateCollidingObjects = function()
+gdjs.PlatformerObjectRuntimeAutomatism.prototype._getCollidingPlatform = function()
 {
-    //TODO: _collidingObjects seems useless, we just need one.
-    this._collidingObjects.length = 0;
     for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
         var platform = this._potentialCollidingObjects[i];
 
         if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER
             && !this._isIn(this._overlappedJumpThru, platform.owner.id)
             && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
-                this._collidingObjects.push(platform);
+                return platform;
         }
     }
+
+    return null; //Nothing is being colliding with the automatism object.
 };
 
 /**

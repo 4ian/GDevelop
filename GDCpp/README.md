@@ -1,7 +1,7 @@
-GDevelop C++ Platform
+GDevelop C++ Platform (Native game engine)
 =========================
 
-GDevelop C++ Platform (GDcpp) is a platform for developing native games with GDevelop.
+GDevelop C++ Platform (GDcpp) is a platform for developing *native games* with GDevelop.
 
 Getting started
 ---------------

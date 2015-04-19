@@ -64,8 +64,7 @@ gdjs.PlatformObjectsManager.Vertex.prototype.getAABB = function(){
  * Returns all the platforms around the specified object.
  * @param object {gdjs.RuntimeObject} The object
  * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
- * @param result If defined, the platforms near the object will be inserted into result ( Using the identifier of their owner object as key ).
- * @return If result is not defined, an array with all platforms near the object. Otherwise, nothing is returned.
+ * @return An array with all platforms near the object.
  * @method getAllPlatformsAround
  */
 gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, maxMovementLength, result) {
@@ -81,22 +80,7 @@ gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, m
     var platformsCollidingWithVertex = this._platformsHSHG.queryForCollisionWith(vertex);
     this._platformsHSHG.removeObject(vertex);
 
-    if ( result === undefined )
-        return platformsCollidingWithVertex;
-    else {
-        //Clean the result object
-        for(var k in result) {
-            if ( result.hasOwnProperty(k) )
-                delete result[k];
-        }
-
-        //Insert platforms
-        for(var i = 0; i < platformsCollidingWithVertex.length; ++i) {
-            result[platformsCollidingWithVertex[i].owner.id] = platformsCollidingWithVertex[i];
-        }
-
-        return;
-    }
+    return platformsCollidingWithVertex;
 };
 
 /**

@@ -176,18 +176,18 @@ gdjs.evtTools.object.PickObjectsIf = function(predicate, objectsLists, negatePre
     }
 
     return isTrue;
-}
+};
 
 gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
     return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.collisionTest,
                                                  objectsLists1, objectsLists2, inverted);
-}
+};
 
 gdjs.evtTools.object.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
     distance *= distance;
     return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.distanceTest, objectsLists1,
         objectsLists2, inverted, distance);
-}
+};
 
 
 gdjs.evtTools.object.movesTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
@@ -204,7 +204,7 @@ gdjs.evtTools.object.movesTowardTest = function( objectsLists1, objectsLists2, t
     }
 
     return gdjs.evtTools.object.TwoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
-}
+};
 
 gdjs.evtTools.object.turnedTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
 
@@ -218,7 +218,7 @@ gdjs.evtTools.object.turnedTowardTest = function( objectsLists1, objectsLists2, 
     };
 
     return gdjs.evtTools.object.TwoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
-}
+};
 
 gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
 
@@ -231,7 +231,7 @@ gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
     }
 
     return true;
-}
+};
 
 gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
 
@@ -245,13 +245,14 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
     }
 
     //Pick only one object
-    if ( objects.length !== 0 ) {
-        var id = Math.floor(Math.random()*objects.length);
-        if (id >= objects.length) id = objects.length-1; //Should never happen.
-        var theChosenOne = objects[id];
+    if ( objects.length === 0 )
+        return false;
 
-        objectsLists.get(theChosenOne.getName()).push(theChosenOne);
-    }
+    var id = Math.floor(Math.random()*objects.length);
+    if (id >= objects.length) id = objects.length-1; //Should never happen.
+    var theChosenOne = objects[id];
+
+    objectsLists.get(theChosenOne.getName()).push(theChosenOne);
 
     return true;
 };

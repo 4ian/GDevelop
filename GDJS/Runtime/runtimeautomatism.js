@@ -69,7 +69,7 @@ gdjs.RuntimeAutomatism.prototype.activate = function(enable) {
 		this._activated = true;
 		this.onActivate();
 	}
-	else if ( this.activated && !enable ) {
+	else if ( this._activated && !enable ) {
 		this._activated = false;
 		this.onDeActivate();
 	}

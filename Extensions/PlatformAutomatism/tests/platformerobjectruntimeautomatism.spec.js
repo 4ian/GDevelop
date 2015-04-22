@@ -1,17 +1,16 @@
 describe('gdjs.PlatformerObjectRuntimeAutomatism', function() {
-	var inputManager = new gdjs.InputManager();
 
 	it('test', function(){
 		var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
 		var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
 		runtimeScene.loadFromScene({
-			layers:[{name:"", visibility: true}],
+			layers: [{name: "", visibility: true}],
 			variables: [],
 			automatismsSharedData: [],
 			objects: [],
 			instances: []
 		});
-		runtimeScene.getElapsedTime = function() { return 1/60*1000; };
+		runtimeScene.getElapsedTime = function() { return 1 / 60 * 1000; };
 
 		//Put a platformer object in the air.
 		var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: [{
@@ -31,20 +30,20 @@ describe('gdjs.PlatformerObjectRuntimeAutomatism', function() {
 
 		//Put a platform
 		var object2 = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", automatisms: [{type: "PlatformAutomatism::PlatformAutomatism"}]});
-		object2.getWidth = function() { return 60; }
-		object2.getHeight = function() { return 32; }
+		object2.getWidth = function() { return 60; };
+		object2.getHeight = function() { return 32; };
 		runtimeScene.addObject(object2);
 		object2.setPosition(0, -10);
 
 
-		for(var i = 0;i<30;++i) {
+		for(var i = 0; i<30; ++i) {
 			runtimeScene.renderAndStep();
 		}
 
 		//Check the platform stopped the platformer object.
 		expect(object.getY()).to.be(-11);
 
-		for(var i = 0;i<35;++i) { //Check that the platformer object can fall.
+		for(var i = 0; i<35; ++i) { //Check that the platformer object can fall.
 			object.getAutomatism("auto1").simulateRightKey();
 			runtimeScene.renderAndStep();
 		}

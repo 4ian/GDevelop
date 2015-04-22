@@ -66,18 +66,18 @@ public:
     unsigned int GetCellHeight() { return cellHeight; };
     float GetExtraBorder() { return extraBorder; };
 
-    bool SetAllowDiagonals(bool allowDiagonals_) { allowDiagonals = allowDiagonals_; };
-    float SetAcceleration(float acceleration_) { acceleration = acceleration_; };
-    float SetMaxSpeed(float maxSpeed_) { maxSpeed = maxSpeed_; };
-    float SetAngularMaxSpeed(float angularMaxSpeed_) { angularMaxSpeed = angularMaxSpeed_; };
-    bool SetRotateObject(bool rotateObject_) { rotateObject = rotateObject_; };
-    float SetAngleOffset(float angleOffset_) { angleOffset = angleOffset_; };
-    unsigned int SetCellWidth(unsigned int cellWidth_) { cellWidth = cellWidth_; };
-    unsigned int SetCellHeight(unsigned int cellHeight_) { cellHeight = cellHeight_; };
-    float SetExtraBorder(float extraBorder_) { extraBorder = extraBorder_; };
+    void SetAllowDiagonals(bool allowDiagonals_) { allowDiagonals = allowDiagonals_; };
+    void SetAcceleration(float acceleration_) { acceleration = acceleration_; };
+    void SetMaxSpeed(float maxSpeed_) { maxSpeed = maxSpeed_; };
+    void SetAngularMaxSpeed(float angularMaxSpeed_) { angularMaxSpeed = angularMaxSpeed_; };
+    void SetRotateObject(bool rotateObject_) { rotateObject = rotateObject_; };
+    void SetAngleOffset(float angleOffset_) { angleOffset = angleOffset_; };
+    void SetCellWidth(unsigned int cellWidth_) { cellWidth = cellWidth_; };
+    void SetCellHeight(unsigned int cellHeight_) { cellHeight = cellHeight_; };
+    void SetExtraBorder(float extraBorder_) { extraBorder = extraBorder_; };
 
     float GetSpeed() { return speed; };
-    float SetSpeed(float speed_) { speed = speed_; };
+    void SetSpeed(float speed_) { speed = speed_; };
 
     /**
      * \brief Unserialize the automatism

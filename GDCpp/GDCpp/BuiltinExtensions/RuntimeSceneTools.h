@@ -73,9 +73,16 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
 /**
  * Only used internally by GD events generated code.
  *
- * \return true ( always )
+ * \return true if an object was picked, false otherwise
  */
 bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+
+/**
+ * Only used internally by GD events generated code.
+ *
+ * \return true if an object was picked, false otherwise
+ */
+bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted);
 
 /**
  * Only used internally by GD events generated code.

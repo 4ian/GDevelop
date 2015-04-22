@@ -99,6 +99,7 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllConditions()["Distance"].codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     GetAllConditions()["AjoutObjConcern"].codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllConditions()["AjoutHasard"].codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["PickNearest"].codeExtraInformation.SetFunctionName("PickNearestObject").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllConditions()["NbObjet"].codeExtraInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     GetAllConditions()["CollisionNP"].codeExtraInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     GetAllConditions()["EstTourne"].codeExtraInformation.SetFunctionName("ObjectsTurnedToward").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");

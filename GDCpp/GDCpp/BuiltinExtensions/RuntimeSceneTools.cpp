@@ -15,6 +15,7 @@
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CppPlatform.h"
 #include "GDCpp/ObjectHelpers.h"
+#include "GDCpp/ObjectsListsTools.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/profile.h"
 #include "GDCpp/CommonTools.h"
@@ -139,7 +140,7 @@ void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::st
 
 bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -156,29 +157,50 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool GD_API PickRandomObject(RuntimeScene &, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     //Create a list with all objects
     std::vector<RuntimeObject*> allObjects;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(allObjects));
     }
 
-    if ( !allObjects.empty() )
+    if ( allObjects.empty() )
+        return false;
+
+    unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
+    PickOnly(pickedObjectLists, allObjects[id]);
+    return true;
+}
+
+bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted)
+{
+    double best = 0;
+    bool first = true;
+    RuntimeObject * bestObject = NULL;
+    for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
-        RuntimeObject * theChosenOne = allObjects[id];
+        if ( it->second == NULL ) continue;
+        auto list = *it->second;
 
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+        for (unsigned int i = 0;i<list.size();++i)
         {
-            if ( it->second != NULL ) it->second->clear();
-        }
+            double value = list[i]->GetSqDistanceTo(x, y);
+            if (first || ((value < best) ^ inverted)) {
+                bestObject = list[i];
+                best = value;
+            }
 
-        if ( pickedObjectLists[theChosenOne->GetName()] != NULL ) pickedObjectLists[theChosenOne->GetName()]->push_back(theChosenOne);
+            first = false;
+        }
     }
 
+    if (!bestObject)
+        return false;
+
+    PickOnly(pickedObjectLists, bestObject);
     return true;
 }
 

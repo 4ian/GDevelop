@@ -20,7 +20,7 @@ namespace gd
 {
 
 /**
- * \brief Defines information about how generate code for an expression
+ * \brief Information about how generate code for an expression
  */
 class ExpressionCodeGenerationInformation
 {
@@ -30,10 +30,11 @@ public:
 
     /**
      * \brief Set the function name which will be used when generating the code.
+     * \param functionName the name of the function to call
      */
-    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & cppCallingName_)
+    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & functionName)
     {
-        functionCallName = cppCallingName_;
+        functionCallName = functionName;
         return *this;
     }
 
@@ -131,6 +132,17 @@ public:
         if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
         return *this;
     };
+
+    /**
+     * \brief Set the function that should be called when generating the source
+     * code from events.
+     * \param functionName the name of the function to call
+     * \note Shortcut for `codeExtraInformation.SetFunctionName`.
+     */
+    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & functionName)
+    {
+        return codeExtraInformation.SetFunctionName(functionName);
+    }
 
     ExpressionCodeGenerationInformation codeExtraInformation;
 

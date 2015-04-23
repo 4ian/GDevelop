@@ -448,7 +448,7 @@ Actions are declared like this :
                            "path-to-an-16-by-16-icon-file.png")
                 .AddParameter("theTypeOfTheParameter", _("Parameter1"))
                 .AddParameter("theTypeOfTheParameter", _("Parameter2"))
-                .codeExtraInformation.SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
+                .SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
 
  * \endcode
  * Declare conditions and expressions in a similar way.<br>
@@ -458,7 +458,7 @@ Actions are declared like this :
  * You can either do it after declaring the function, or later using this syntax:
  *
  * \code
-        GetAllActions()["ExtensionName::ActionName"].codeExtraInformation.SetFunctionName("MyFunctionName");
+        GetAllActions()["ExtensionName::ActionName"].SetFunctionName("MyFunctionName");
  * \endcode
  *
  * Both methods are ok, but the latest allows to use the same code to declare an extension for the C++ and JS platform,

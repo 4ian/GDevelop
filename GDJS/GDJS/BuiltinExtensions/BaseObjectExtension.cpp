@@ -30,136 +30,85 @@ BaseObjectExtension::BaseObjectExtension()
     std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
     std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
 
-    objectActions["MettreX"].codeExtraInformation
-        .SetFunctionName("setX").SetAssociatedGetter("getX").SetIncludeFile("runtimeobject.js");
-    objectActions["MettreY"].codeExtraInformation
-        .SetFunctionName("setY").SetAssociatedGetter("getY").SetIncludeFile("runtimeobject.js");
-    objectConditions["PosX"].codeExtraInformation
-        .SetFunctionName("getX").SetIncludeFile("runtimeobject.js");
-    objectConditions["PosY"].codeExtraInformation
-        .SetFunctionName("getY").SetIncludeFile("runtimeobject.js");
-    objectActions["SetAngle"].codeExtraInformation
-        .SetFunctionName("setAngle").SetAssociatedGetter("getAngle").SetIncludeFile("runtimeobject.js");
-    objectConditions["Angle"].codeExtraInformation
-        .SetFunctionName("getAngle").SetIncludeFile("runtimeobject.js");
-    objectActions["Rotate"].codeExtraInformation
-        .SetFunctionName("rotate").SetIncludeFile("runtimeobject.js");
-    objectActions["RotateTowardAngle"].codeExtraInformation
-        .SetFunctionName("rotateTowardAngle").SetIncludeFile("runtimeobject.js");
-    objectActions["RotateTowardPosition"].codeExtraInformation
-        .SetFunctionName("rotateTowardPosition").SetIncludeFile("runtimeobject.js");
-    objectActions["ChangeLayer"].codeExtraInformation
-        .SetFunctionName("setLayer").SetIncludeFile("runtimeobject.js");
-    objectConditions["Layer"].codeExtraInformation
-        .SetFunctionName("isOnLayer").SetIncludeFile("runtimeobject.js");
-    objectActions["ChangePlan"].codeExtraInformation
-        .SetFunctionName("setZOrder").SetAssociatedGetter("getZOrder").SetIncludeFile("runtimeobject.js");
-    objectConditions["Plan"].codeExtraInformation
-        .SetFunctionName("getZOrder").SetIncludeFile("runtimeobject.js");
-    objectActions["Cache"].codeExtraInformation
-        .SetFunctionName("hide").SetIncludeFile("runtimeobject.js");
-    objectActions["Montre"].codeExtraInformation
-        .SetFunctionName("hide").SetIncludeFile("runtimeobject.js");
-    objectConditions["Visible"].codeExtraInformation
-        .SetFunctionName("isVisible").SetIncludeFile("runtimeobject.js");
-    objectConditions["Invisible"].codeExtraInformation
-        .SetFunctionName("isHidden").SetIncludeFile("runtimeobject.js");
-    objectActions["Delete"].codeExtraInformation
-        .SetFunctionName("deleteFromScene");
-    objectActions["MettreAutourPos"].codeExtraInformation
-        .SetFunctionName("putAround");
-    objectActions["MettreAutour"].codeExtraInformation
-        .SetFunctionName("putAroundObject").SetIncludeFile("runtimeobject.js");
-    objectConditions["VarObjet"].codeExtraInformation
-        .SetFunctionName("getVariableNumber").SetIncludeFile("runtimeobject.js");
-    objectConditions["VarObjetTxt"].codeExtraInformation
-        .SetFunctionName("getVariableString").SetIncludeFile("runtimeobject.js");
-    objectConditions["VarObjetDef"].codeExtraInformation
-        .SetFunctionName("hasVariable").SetIncludeFile("runtimeobject.js");
-    objectActions["ModVarObjet"].codeExtraInformation
-        .SetFunctionName("setVariableNumber").SetManipulatedType("number").SetAssociatedGetter("getVariableNumber").SetIncludeFile("runtimeobject.js");
-    objectActions["ModVarObjetTxt"].codeExtraInformation
-        .SetFunctionName("setVariableString").SetManipulatedType("number").SetAssociatedGetter("getVariableString").SetIncludeFile("runtimeobject.js");
-    objectActions["AddForceXY"].codeExtraInformation
-        .SetFunctionName("addForce").SetIncludeFile("runtimeobject.js");
-    objectActions["AddForceAL"].codeExtraInformation
-        .SetFunctionName("addPolarForce").SetIncludeFile("runtimeobject.js");
-    objectActions["AddForceVersPos"].codeExtraInformation
-        .SetFunctionName("addForceTowardPosition").SetIncludeFile("runtimeobject.js");
-    objectActions["AddForceVers"].codeExtraInformation
-        .SetFunctionName("addForceTowardObject").SetIncludeFile("runtimeobject.js");
-    objectActions["Arreter"].codeExtraInformation
-        .SetFunctionName("clearForces").SetIncludeFile("runtimeobject.js");
-    objectConditions["Arret"].codeExtraInformation
-        .SetFunctionName("hasNoForces").SetIncludeFile("runtimeobject.js");
-    objectConditions["Vitesse"].codeExtraInformation
-        .SetFunctionName("getAverageForce().getLength").SetIncludeFile("runtimeobject.js");
-    objectConditions["AngleOfDisplacement"].codeExtraInformation
-        .SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
-    objectActions["SeparateFromObjects"].codeExtraInformation
-        .SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
+    objectActions["MettreX"].SetFunctionName("setX").SetGetter("getX").SetIncludeFile("runtimeobject.js");
+    objectActions["MettreY"].SetFunctionName("setY").SetGetter("getY").SetIncludeFile("runtimeobject.js");
+    objectConditions["PosX"].SetFunctionName("getX").SetIncludeFile("runtimeobject.js");
+    objectConditions["PosY"].SetFunctionName("getY").SetIncludeFile("runtimeobject.js");
+    objectActions["SetAngle"].SetFunctionName("setAngle").SetGetter("getAngle").SetIncludeFile("runtimeobject.js");
+    objectConditions["Angle"].SetFunctionName("getAngle").SetIncludeFile("runtimeobject.js");
+    objectActions["Rotate"].SetFunctionName("rotate").SetIncludeFile("runtimeobject.js");
+    objectActions["RotateTowardAngle"].SetFunctionName("rotateTowardAngle").SetIncludeFile("runtimeobject.js");
+    objectActions["RotateTowardPosition"].SetFunctionName("rotateTowardPosition").SetIncludeFile("runtimeobject.js");
+    objectActions["ChangeLayer"].SetFunctionName("setLayer").SetIncludeFile("runtimeobject.js");
+    objectConditions["Layer"].SetFunctionName("isOnLayer").SetIncludeFile("runtimeobject.js");
+    objectActions["ChangePlan"].SetFunctionName("setZOrder").SetGetter("getZOrder").SetIncludeFile("runtimeobject.js");
+    objectConditions["Plan"].SetFunctionName("getZOrder").SetIncludeFile("runtimeobject.js");
+    objectActions["Cache"].SetFunctionName("hide").SetIncludeFile("runtimeobject.js");
+    objectActions["Montre"].SetFunctionName("hide").SetIncludeFile("runtimeobject.js");
+    objectConditions["Visible"].SetFunctionName("isVisible").SetIncludeFile("runtimeobject.js");
+    objectConditions["Invisible"].SetFunctionName("isHidden").SetIncludeFile("runtimeobject.js");
+    objectActions["Delete"].SetFunctionName("deleteFromScene");
+    objectActions["MettreAutourPos"].SetFunctionName("putAround");
+    objectActions["MettreAutour"].SetFunctionName("putAroundObject").SetIncludeFile("runtimeobject.js");
+    objectConditions["VarObjet"].SetFunctionName("getVariableNumber").SetIncludeFile("runtimeobject.js");
+    objectConditions["VarObjetTxt"].SetFunctionName("getVariableString").SetIncludeFile("runtimeobject.js");
+    objectConditions["VarObjetDef"].SetFunctionName("hasVariable").SetIncludeFile("runtimeobject.js");
+    objectActions["ModVarObjet"].SetFunctionName("setVariableNumber").SetManipulatedType("number").SetGetter("getVariableNumber").SetIncludeFile("runtimeobject.js");
+    objectActions["ModVarObjetTxt"].SetFunctionName("setVariableString").SetManipulatedType("number").SetGetter("getVariableString").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceXY"].SetFunctionName("addForce").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceAL"].SetFunctionName("addPolarForce").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceVersPos"].SetFunctionName("addForceTowardPosition").SetIncludeFile("runtimeobject.js");
+    objectActions["AddForceVers"].SetFunctionName("addForceTowardObject").SetIncludeFile("runtimeobject.js");
+    objectActions["Arreter"].SetFunctionName("clearForces").SetIncludeFile("runtimeobject.js");
+    objectConditions["Arret"].SetFunctionName("hasNoForces").SetIncludeFile("runtimeobject.js");
+    objectConditions["Vitesse"].SetFunctionName("getAverageForce().getLength").SetIncludeFile("runtimeobject.js");
+    objectConditions["AngleOfDisplacement"].SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
+    objectActions["SeparateFromObjects"].SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
     objectActions["Ecarter"].codeExtraInformation //Deprecated
         .SetFunctionName("separateObjectsWithoutForces").SetIncludeFile("runtimeobject.js");
     objectActions["Rebondir"].codeExtraInformation //Deprecated
         .SetFunctionName("separateObjectsWithForces").SetIncludeFile("runtimeobject.js");
-    objectConditions["AutomatismActivated"].codeExtraInformation
-        .SetFunctionName("automatismActivated").SetIncludeFile("runtimeobject.js");
-    objectActions["ActivateAutomatism"].codeExtraInformation
-        .SetFunctionName("activateAutomatism").SetIncludeFile("runtimeobject.js");
-    objectConditions["ObjectVariableChildExists"].codeExtraInformation
-        .SetFunctionName("variableChildExists").SetIncludeFile("runtimeobject.js");
-    objectActions["ObjectVariableRemoveChild"].codeExtraInformation
-        .SetFunctionName("variableRemoveChild").SetIncludeFile("runtimeobject.js");
+    objectConditions["AutomatismActivated"].SetFunctionName("automatismActivated").SetIncludeFile("runtimeobject.js");
+    objectActions["ActivateAutomatism"].SetFunctionName("activateAutomatism").SetIncludeFile("runtimeobject.js");
+    objectConditions["ObjectVariableChildExists"].SetFunctionName("variableChildExists").SetIncludeFile("runtimeobject.js");
+    objectActions["ObjectVariableRemoveChild"].SetFunctionName("variableRemoveChild").SetIncludeFile("runtimeobject.js");
 
-    objectExpressions["X"].codeExtraInformation.SetFunctionName("getX");
-    objectExpressions["Y"].codeExtraInformation.SetFunctionName("getY");
-    objectExpressions["ZOrder"].codeExtraInformation.SetFunctionName("getZOrder");
-    objectExpressions["Plan"].codeExtraInformation.SetFunctionName("getZOrder"); //Deprecated
-    objectExpressions["Width"].codeExtraInformation.SetFunctionName("getWidth");
-    objectExpressions["Height"].codeExtraInformation.SetFunctionName("getHeight");
-    objectExpressions["Largeur"].codeExtraInformation.SetFunctionName("getWidth"); //Deprecated
-    objectExpressions["Hauteur"].codeExtraInformation.SetFunctionName("getHeight"); //Deprecated
-    objectExpressions["Variable"].codeExtraInformation.SetFunctionName("gdjs.RuntimeObject.getVariableNumber").SetStatic();
-    objectStrExpressions["VariableString"].codeExtraInformation.SetFunctionName("gdjs.RuntimeObject.getVariableString").SetStatic();
-    objectExpressions["ForceX"].codeExtraInformation.SetFunctionName("getAverageForce().getX");
-    objectExpressions["ForceY"].codeExtraInformation.SetFunctionName("getAverageForce().getY");
-    objectExpressions["ForceAngle"].codeExtraInformation.SetFunctionName("getAverageForce().getAngle");
-    objectExpressions["Angle"].codeExtraInformation.SetFunctionName("getAngle");
-    objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("getAverageForce().getLength");
-    objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("getAverageForce().getLength"); //Deprecated
-    objectExpressions["Distance"].codeExtraInformation.SetFunctionName("getDistanceToObject");
-    objectExpressions["SqDistance"].codeExtraInformation.SetFunctionName("getSqDistanceToObject");
+    objectExpressions["X"].SetFunctionName("getX");
+    objectExpressions["Y"].SetFunctionName("getY");
+    objectExpressions["ZOrder"].SetFunctionName("getZOrder");
+    objectExpressions["Plan"].SetFunctionName("getZOrder"); //Deprecated
+    objectExpressions["Width"].SetFunctionName("getWidth");
+    objectExpressions["Height"].SetFunctionName("getHeight");
+    objectExpressions["Largeur"].SetFunctionName("getWidth"); //Deprecated
+    objectExpressions["Hauteur"].SetFunctionName("getHeight"); //Deprecated
+    objectExpressions["Variable"].SetFunctionName("gdjs.RuntimeObject.getVariableNumber").SetStatic();
+    objectStrExpressions["VariableString"].SetFunctionName("gdjs.RuntimeObject.getVariableString").SetStatic();
+    objectExpressions["ForceX"].SetFunctionName("getAverageForce().getX");
+    objectExpressions["ForceY"].SetFunctionName("getAverageForce().getY");
+    objectExpressions["ForceAngle"].SetFunctionName("getAverageForce().getAngle");
+    objectExpressions["Angle"].SetFunctionName("getAngle");
+    objectExpressions["ForceLength"].SetFunctionName("getAverageForce().getLength");
+    objectExpressions["Longueur"].SetFunctionName("getAverageForce().getLength"); //Deprecated
+    objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
+    objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
 
 
-    GetAllActions()["Create"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.createObjectOnScene");
-    GetAllActions()["CreateByName"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.createObjectFromGroupOnScene");
-    GetAllExpressions()["Count"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickedObjectsCount");
-    GetAllConditions()["NbObjet"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickedObjectsCount");
+    GetAllActions()["Create"].SetFunctionName("gdjs.evtTools.object.createObjectOnScene");
+    GetAllActions()["CreateByName"].SetFunctionName("gdjs.evtTools.object.createObjectFromGroupOnScene");
+    GetAllExpressions()["Count"].SetFunctionName("gdjs.evtTools.object.pickedObjectsCount");
+    GetAllConditions()["NbObjet"].SetFunctionName("gdjs.evtTools.object.pickedObjectsCount");
     GetAllConditions()["CollisionNP"]
         .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
-        .codeExtraInformation
         .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
-    GetAllConditions()["Distance"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.distanceTest");
-    GetAllConditions()["SeDirige"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.movesTowardTest");
-    GetAllConditions()["EstTourne"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.turnedTowardTest");
+    GetAllConditions()["Distance"].SetFunctionName("gdjs.evtTools.object.distanceTest");
+    GetAllConditions()["SeDirige"].SetFunctionName("gdjs.evtTools.object.movesTowardTest");
+    GetAllConditions()["EstTourne"].SetFunctionName("gdjs.evtTools.object.turnedTowardTest");
 
-    GetAllActions()["AjoutObjConcern"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickAllObjects");
-    GetAllConditions()["AjoutObjConcern"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickAllObjects");
-    GetAllActions()["AjoutHasard"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickRandomObject");
-    GetAllConditions()["AjoutHasard"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickRandomObject");
-    GetAllConditions()["PickNearest"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.object.pickNearestObject");
+    GetAllActions()["AjoutObjConcern"].SetFunctionName("gdjs.evtTools.object.pickAllObjects");
+    GetAllConditions()["AjoutObjConcern"].SetFunctionName("gdjs.evtTools.object.pickAllObjects");
+    GetAllActions()["AjoutHasard"].SetFunctionName("gdjs.evtTools.object.pickRandomObject");
+    GetAllConditions()["AjoutHasard"].SetFunctionName("gdjs.evtTools.object.pickRandomObject");
+    GetAllConditions()["PickNearest"].SetFunctionName("gdjs.evtTools.object.pickNearestObject");
 
 
     {
@@ -258,7 +207,7 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Speed ( in Degrees per seconds )"))
             .AddParameter("expression", _("Distance ( in pixels )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForceToMoveAround");
+            .SetFunctionName("AddForceToMoveAround");
 
         obj.AddAction("AddForceTourne",
                        _("Add a force so as to move around an object"),
@@ -273,7 +222,7 @@ BaseObjectExtension::BaseObjectExtension()
             .AddParameter("expression", _("Speed ( Degrees per second )"))
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
+            .SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 */
 }
 

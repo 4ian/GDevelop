@@ -34,8 +34,7 @@ public:
         DeclareDraggableAutomatismExtension(*this);
 
         GetAutomatismMetadata("DraggableAutomatism::Draggable").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
-        GetAllConditionsForAutomatism("DraggableAutomatism::Draggable")["DraggableAutomatism::Dragged"].codeExtraInformation
-            .SetFunctionName("isDragged").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
+        GetAllConditionsForAutomatism("DraggableAutomatism::Draggable")["DraggableAutomatism::Dragged"].SetFunctionName("isDragged").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };

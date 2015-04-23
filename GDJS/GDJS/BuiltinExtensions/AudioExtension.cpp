@@ -23,73 +23,42 @@ AudioExtension::AudioExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllActions()["PlaySound"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.playSound");
-    GetAllActions()["PlaySoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.playSoundOnChannel");
-    GetAllActions()["PlayMusic"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.playMusic");
-    GetAllActions()["PlayMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.playMusicOnChannel");
-    GetAllActions()["StopSoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.stopSoundOnChannel");
-    GetAllActions()["PauseSoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.pauseSoundOnChannel");
-    GetAllActions()["RePlaySoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.continueSoundOnChannel");
-    GetAllActions()["StopMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.stopMusicOnChannel");
-    GetAllActions()["PauseMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.pauseMusicOnChannel");
-    GetAllActions()["RePlayMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.continueMusicOnChannel");
-    GetAllConditions()["MusicPlaying"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.isMusicOnChannelPlaying");
-    GetAllConditions()["MusicPaused"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.isMusicOnChannelPaused");
-    GetAllConditions()["MusicStopped"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.isMusicOnChannelStopped");
-    GetAllConditions()["SoundPlaying"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.isSoundOnChannelPlaying");
-    GetAllConditions()["SoundPaused"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.isSoundOnChannelPaused");
-    GetAllConditions()["SoundStopped"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.isSoundOnChannelStopped");
+    GetAllActions()["PlaySound"].SetFunctionName("gdjs.evtTools.sound.playSound");
+    GetAllActions()["PlaySoundCanal"].SetFunctionName("gdjs.evtTools.sound.playSoundOnChannel");
+    GetAllActions()["PlayMusic"].SetFunctionName("gdjs.evtTools.sound.playMusic");
+    GetAllActions()["PlayMusicCanal"].SetFunctionName("gdjs.evtTools.sound.playMusicOnChannel");
+    GetAllActions()["StopSoundCanal"].SetFunctionName("gdjs.evtTools.sound.stopSoundOnChannel");
+    GetAllActions()["PauseSoundCanal"].SetFunctionName("gdjs.evtTools.sound.pauseSoundOnChannel");
+    GetAllActions()["RePlaySoundCanal"].SetFunctionName("gdjs.evtTools.sound.continueSoundOnChannel");
+    GetAllActions()["StopMusicCanal"].SetFunctionName("gdjs.evtTools.sound.stopMusicOnChannel");
+    GetAllActions()["PauseMusicCanal"].SetFunctionName("gdjs.evtTools.sound.pauseMusicOnChannel");
+    GetAllActions()["RePlayMusicCanal"].SetFunctionName("gdjs.evtTools.sound.continueMusicOnChannel");
+    GetAllConditions()["MusicPlaying"].SetFunctionName("gdjs.evtTools.sound.isMusicOnChannelPlaying");
+    GetAllConditions()["MusicPaused"].SetFunctionName("gdjs.evtTools.sound.isMusicOnChannelPaused");
+    GetAllConditions()["MusicStopped"].SetFunctionName("gdjs.evtTools.sound.isMusicOnChannelStopped");
+    GetAllConditions()["SoundPlaying"].SetFunctionName("gdjs.evtTools.sound.isSoundOnChannelPlaying");
+    GetAllConditions()["SoundPaused"].SetFunctionName("gdjs.evtTools.sound.isSoundOnChannelPaused");
+    GetAllConditions()["SoundStopped"].SetFunctionName("gdjs.evtTools.sound.isSoundOnChannelStopped");
 
-    GetAllActions()["ModGlobalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.setGlobalVolume").SetAssociatedGetter("gdjs.evtTools.sound.getGlobalVolume");
-    GetAllConditions()["GlobalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getGlobalVolume");
-    GetAllExpressions()["GlobalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getGlobalVolume");
+    GetAllActions()["ModGlobalVolume"].SetFunctionName("gdjs.evtTools.sound.setGlobalVolume").SetGetter("gdjs.evtTools.sound.getGlobalVolume");
+    GetAllConditions()["GlobalVolume"].SetFunctionName("gdjs.evtTools.sound.getGlobalVolume");
+    GetAllExpressions()["GlobalVolume"].SetFunctionName("gdjs.evtTools.sound.getGlobalVolume");
 
-    GetAllActions()["ModVolumeSoundCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelVolume").SetAssociatedGetter("gdjs.evtTools.sound.getSoundOnChannelVolume");
-    GetAllActions()["ModVolumeMusicCanal"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelVolume").SetAssociatedGetter("gdjs.evtTools.sound.getMusicOnChannelVolume");
-    GetAllConditions()["SoundCanalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelVolume");
-    GetAllConditions()["MusicCanalVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelVolume");
+    GetAllActions()["ModVolumeSoundCanal"].SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelVolume").SetGetter("gdjs.evtTools.sound.getSoundOnChannelVolume");
+    GetAllActions()["ModVolumeMusicCanal"].SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelVolume").SetGetter("gdjs.evtTools.sound.getMusicOnChannelVolume");
+    GetAllConditions()["SoundCanalVolume"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelVolume");
+    GetAllConditions()["MusicCanalVolume"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelVolume");
 
-    GetAllActions()["ModPlayingOffsetSoundChannel"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPlayingOffset").SetAssociatedGetter("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
-    GetAllActions()["ModPlayingOffsetMusicChannel"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPlayingOffset").SetAssociatedGetter("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
-    GetAllConditions()["SoundChannelPlayingOffset"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
-    GetAllConditions()["MusicChannelPlayingOffset"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
+    GetAllActions()["ModPlayingOffsetSoundChannel"].SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPlayingOffset").SetGetter("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
+    GetAllActions()["ModPlayingOffsetMusicChannel"].SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPlayingOffset").SetGetter("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
+    GetAllConditions()["SoundChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
+    GetAllConditions()["MusicChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
 
-    GetAllExpressions()["SoundChannelVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelVolume");
-    GetAllExpressions()["MusicChannelVolume"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelVolume");
+    GetAllExpressions()["SoundChannelVolume"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelVolume");
+    GetAllExpressions()["MusicChannelVolume"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelVolume");
 
-    GetAllExpressions()["SoundChannelPlayingOffset"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
-    GetAllExpressions()["MusicChannelPlayingOffset"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
+    GetAllExpressions()["SoundChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
+    GetAllExpressions()["MusicChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
     /*
@@ -105,7 +74,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetSoundPitchOnChannel").SetAssociatedGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+        .SetFunctionName("SetSoundPitchOnChannel").SetGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
     AddAction("ModPitchMusicChannel",
@@ -119,7 +88,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("operator", _("Modification's sign"), "",false)
         .AddParameter("expression", _("Value"), "",false)
-        .codeExtraInformation.SetFunctionName("SetMusicPitchOnChannel").SetAssociatedGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+        .SetFunctionName("SetMusicPitchOnChannel").SetGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddCondition("SoundChannelPitch",
                    _("Pitch of the sound of a channel"),
@@ -132,7 +101,7 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Pitch to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+        .SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
 
 
@@ -147,17 +116,17 @@ AudioExtension::AudioExtension()
         .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Pitch to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+        .SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("SoundChannelPitch", _("Sound's pitch"), _("Sound's pitch"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+        .SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     AddExpression("MusicChannelPitch", _("Music's pitch"), _("Music's pitch"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"), "",false)
-        .codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+        .SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
     */
 }

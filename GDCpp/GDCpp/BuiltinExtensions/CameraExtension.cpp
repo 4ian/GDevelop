@@ -17,50 +17,50 @@ CameraExtension::CameraExtension()
 
     #if defined(GD_IDE_ONLY)
 
-    GetAllConditions()["CameraX"].codeExtraInformation.SetFunctionName("GetCameraX").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllConditions()["CameraY"].codeExtraInformation.SetFunctionName("GetCameraY").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllConditions()["CameraX"].SetFunctionName("GetCameraX").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllConditions()["CameraY"].SetFunctionName("GetCameraY").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["CameraX"].codeExtraInformation.SetFunctionName("SetCameraX").SetManipulatedType("number").SetAssociatedGetter("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllActions()["CameraY"].codeExtraInformation.SetFunctionName("SetCameraY").SetManipulatedType("number").SetAssociatedGetter("GetCameraY").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["CameraX"].SetFunctionName("SetCameraX").SetManipulatedType("number").SetGetter("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["CameraY"].SetFunctionName("SetCameraY").SetManipulatedType("number").SetGetter("GetCameraY").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllConditions()["CameraWidth"].codeExtraInformation.SetFunctionName("GetCameraWidth").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllConditions()["CameraHeight"].codeExtraInformation.SetFunctionName("GetCameraHeight").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllConditions()["CameraAngle"].codeExtraInformation.SetFunctionName("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllConditions()["CameraWidth"].SetFunctionName("GetCameraWidth").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllConditions()["CameraHeight"].SetFunctionName("GetCameraHeight").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllConditions()["CameraAngle"].SetFunctionName("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["RotateCamera"].codeExtraInformation.SetFunctionName("SetCameraAngle").SetAssociatedGetter("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["RotateCamera"].SetFunctionName("SetCameraAngle").SetGetter("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["AddCamera"].codeExtraInformation.SetFunctionName("AddCamera").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["AddCamera"].SetFunctionName("AddCamera").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["DeleteCamera"].codeExtraInformation.SetFunctionName("DeleteCamera").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["DeleteCamera"].SetFunctionName("DeleteCamera").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["CameraSize"].codeExtraInformation.SetFunctionName("SetCameraSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["CameraSize"].SetFunctionName("SetCameraSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["CameraViewport"].codeExtraInformation.SetFunctionName("SetCameraViewport").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["CameraViewport"].SetFunctionName("SetCameraViewport").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["ZoomCamera"].codeExtraInformation.SetFunctionName("SetCameraZoom").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["ZoomCamera"].SetFunctionName("SetCameraZoom").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["FixCamera"].codeExtraInformation.SetFunctionName("CenterCameraOnObjectWithLimits").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["FixCamera"].SetFunctionName("CenterCameraOnObjectWithLimits").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["CentreCamera"].codeExtraInformation.SetFunctionName("CenterCameraOnObject").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllActions()["CentreCamera"].SetFunctionName("CenterCameraOnObject").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
-    GetAllActions()["ShowLayer"].codeExtraInformation.SetFunctionName("ShowLayer").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["ShowLayer"].SetFunctionName("ShowLayer").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllActions()["HideLayer"].codeExtraInformation.SetFunctionName("HideLayer").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");;
+    GetAllActions()["HideLayer"].SetFunctionName("HideLayer").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");;
 
-    GetAllConditions()["LayerVisible"].codeExtraInformation.SetFunctionName("LayerVisible").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["LayerVisible"].SetFunctionName("LayerVisible").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllExpressions()["CameraWidth"].codeExtraInformation.SetFunctionName("GetCameraWidth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraHeight"].codeExtraInformation.SetFunctionName("GetCameraHeight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraViewportLeft"].codeExtraInformation.SetFunctionName("GetCameraViewportLeft").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraViewportTop"].codeExtraInformation.SetFunctionName("GetCameraViewportTop").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraViewportRight"].codeExtraInformation.SetFunctionName("GetCameraViewportRight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraViewportBottom"].codeExtraInformation.SetFunctionName("GetCameraViewportBottom").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraX"].codeExtraInformation.SetFunctionName("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["VueX"].codeExtraInformation.SetFunctionName("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraY"].codeExtraInformation.SetFunctionName("GetCameraY").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["VueY"].codeExtraInformation.SetFunctionName("GetCameraY").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["CameraRotation"].codeExtraInformation.SetFunctionName("GetCameraRotation").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
-    GetAllExpressions()["VueRotation"].codeExtraInformation.SetFunctionName("GetCameraRotation").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraWidth"].SetFunctionName("GetCameraWidth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraHeight"].SetFunctionName("GetCameraHeight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraViewportLeft"].SetFunctionName("GetCameraViewportLeft").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraViewportTop"].SetFunctionName("GetCameraViewportTop").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraViewportRight"].SetFunctionName("GetCameraViewportRight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraViewportBottom"].SetFunctionName("GetCameraViewportBottom").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraX"].SetFunctionName("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["VueX"].SetFunctionName("GetCameraX").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraY"].SetFunctionName("GetCameraY").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["VueY"].SetFunctionName("GetCameraY").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["CameraRotation"].SetFunctionName("GetCameraRotation").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["VueRotation"].SetFunctionName("GetCameraRotation").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     #endif
 }

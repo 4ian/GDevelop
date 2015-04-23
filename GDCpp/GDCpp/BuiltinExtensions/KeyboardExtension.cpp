@@ -16,10 +16,10 @@ KeyboardExtension::KeyboardExtension()
     gd::BuiltinExtensionsImplementer::ImplementsKeyboardExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllConditions()["KeyPressed"].codeExtraInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
-    GetAllConditions()["KeyFromTextPressed"].codeExtraInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
-    GetAllConditions()["AnyKeyPressed"].codeExtraInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
-    GetAllStrExpressions()["LastPressedKey"].codeExtraInformation.SetFunctionName("LastPressedKey").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllConditions()["KeyPressed"].SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllConditions()["KeyFromTextPressed"].SetFunctionName("IsKeyPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllConditions()["AnyKeyPressed"].SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
+    GetAllStrExpressions()["LastPressedKey"].SetFunctionName("LastPressedKey").SetIncludeFile("GDCpp/BuiltinExtensions/KeyboardTools.h");
     #endif
 }
 

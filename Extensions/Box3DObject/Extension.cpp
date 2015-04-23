@@ -52,7 +52,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddCondition("Width",
                            _("Width"),
@@ -64,7 +64,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Height",
@@ -77,7 +77,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Height",
@@ -90,7 +90,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Depth",
@@ -103,7 +103,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetDepth").SetManipulatedType("number").SetAssociatedGetter("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetDepth").SetManipulatedType("number").SetGetter("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Depth",
@@ -116,7 +116,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetDepth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetDepth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("ZPosition",
@@ -129,7 +129,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetZPosition").SetManipulatedType("number").SetAssociatedGetter("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetZPosition").SetManipulatedType("number").SetGetter("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("ZPosition",
@@ -142,7 +142,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetZPosition").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetZPosition").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Yaw",
@@ -155,7 +155,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Yaw",
@@ -168,7 +168,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Pitch",
@@ -181,7 +181,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetPitch").SetManipulatedType("number").SetAssociatedGetter("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetPitch").SetManipulatedType("number").SetGetter("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Pitch",
@@ -194,7 +194,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetPitch").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetPitch").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddAction("Roll",
@@ -207,7 +207,7 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
-                .codeExtraInformation.SetFunctionName("SetRoll").SetManipulatedType("number").SetAssociatedGetter("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("SetRoll").SetManipulatedType("number").SetGetter("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
 
 
             obj.AddCondition("Roll",
@@ -220,27 +220,27 @@ public:
                 .AddParameter("object", _("Object"), "Box3D", false)
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
-                .codeExtraInformation.SetFunctionName("GetRoll").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetRoll").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Depth", _("Depth of the 3D Box"), _("Depth of the 3D Box"), _("Size"), "res/actions/scaleHeight.png")
                 .AddParameter("object", _("Object"), "Box3D", false)
-                .codeExtraInformation.SetFunctionName("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Z", _("Z Position"), _("Z Position"), _("Position"), "res/actions/scaleHeight.png")
                 .AddParameter("object", _("Object"), "Box3D", false)
-                .codeExtraInformation.SetFunctionName("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Yaw", _("Yaw"), _("Yaw"), _("Angle"), "res/actions/scaleHeight.png")
                 .AddParameter("object", _("Object"), "Box3D", false)
-                .codeExtraInformation.SetFunctionName("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Pitch", _("Pitch"), _("Pitch"), _("Angle"), "res/actions/scaleHeight.png")
                 .AddParameter("object", _("Object"), "Box3D", false)
-                .codeExtraInformation.SetFunctionName("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Roll", _("Roll"), _("Roll"), _("Angle"), "res/actions/scaleHeight.png")
                 .AddParameter("object", _("Object"), "Box3D", false)
-                .codeExtraInformation.SetFunctionName("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
+                .SetFunctionName("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             #endif
 

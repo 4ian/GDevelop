@@ -25,7 +25,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter")
 
-        .codeExtraInformation.SetFunctionName("RecreateParticleSystem").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("RecreateParticleSystem").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddAction("RendererParam1",
                    _("Rendering first parameter"),
@@ -38,7 +38,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
 
-        .codeExtraInformation.SetFunctionName("SetRendererParam1").SetManipulatedType("number").SetAssociatedGetter("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("SetRendererParam1").SetManipulatedType("number").SetGetter("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("RendererParam1",
                    _("Direction of gravity on Z axis"),
@@ -50,7 +50,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .codeExtraInformation.SetFunctionName("GetRendererParam1").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetRendererParam1").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
     obj.AddAction("RendererParam2",
@@ -64,7 +64,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
 
-        .codeExtraInformation.SetFunctionName("SetRendererParam2").SetManipulatedType("number").SetAssociatedGetter("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("SetRendererParam2").SetManipulatedType("number").SetGetter("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("RendererParam2",
                    _("Rendering second parameter"),
@@ -77,7 +77,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
 
-        .codeExtraInformation.SetFunctionName("GetRendererParam2").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetRendererParam2").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
     obj.AddAction("Tank",
@@ -91,7 +91,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
 
-        .codeExtraInformation.SetFunctionName("SetTank").SetManipulatedType("number").SetAssociatedGetter("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("SetTank").SetManipulatedType("number").SetGetter("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("Tank",
                    _("Capacity"),
@@ -104,7 +104,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
 
-        .codeExtraInformation.SetFunctionName("GetTank").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetTank").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
     obj.AddAction("Flow",
@@ -118,7 +118,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
 
-        .codeExtraInformation.SetFunctionName("SetFlow").SetManipulatedType("number").SetAssociatedGetter("GetFlow").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("SetFlow").SetManipulatedType("number").SetGetter("GetFlow").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
     obj.AddCondition("Flow",
@@ -132,7 +132,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
 
-        .codeExtraInformation.SetFunctionName("GetFlow").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetFlow").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
     obj.AddAction("Texture",
@@ -145,7 +145,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("string", _("New image"))
 
-        .codeExtraInformation.SetFunctionName("SetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("SetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("Texture",
                    _("Image"),
@@ -158,122 +158,122 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("string", _("Text to test"))
 
-        .codeExtraInformation.SetFunctionName("GetTexture").SetManipulatedType("string").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetTexture").SetManipulatedType("string").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
     obj.AddStrExpression("Texture", _("Particles image"), _("Name of the image displayed by particles"), _("Particles"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("NbParticles", _("Particles number"), _("Particles number"), _("Particles"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetNbParticles").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetNbParticles").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("RendererParam1", _("Rendering first parameter"), _("Rendering first parameter"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("RendererParam2", _("Rendering second parameter"), _("Rendering second parameter"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("Tank", _("Capacity"), _("Capacity"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("Flow", _("Flow"), _("Flow"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetFlow").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetFlow").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("EmitterForceMin", _("Emission minimal force"), _("Emission minimal force"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterForceMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterForceMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("EmitterForceMax", _("Emission maximal force"), _("Emission maximal force"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterForceMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterForceMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddExpression("EmitterXDirection", _("Emission X direction"), _("Emission X direction"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterXDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterXDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("EmitterYDirection", _("Emission Y direction"), _("Emission Y direction"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterYDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterYDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("EmitterZDirection", _("Emission Z direction"), _("Emission Z direction"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterZDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterZDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("EmitterAngle", _("Emission angle"), _("Emission angle"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("EmitterAngleA", _("Emission angle A"), _("Emission angle A"), _("Advanced"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterAngleA").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterAngleA").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("EmitterAngleB", _("Emission angle B"), _("Emission angle B"), _("Advanced"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetEmitterAngleB").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetEmitterAngleB").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ZoneRadius", _("Radius of the emission zone"), _("Radius of the emission zone"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetZoneRadius").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetZoneRadius").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGravityX", _("X Gravity of particles"), _("X Gravity of particles"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGravityX").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGravityX").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGravityY", _("Y Gravity of particles"), _("Y Gravity of particles"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGravityY").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGravityY").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGravityZ", _("Z Gravity of particles"), _("Z Gravity of particles"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGravityZ").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGravityZ").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGravityAngle", _("Gravity angle"), _("Gravity angle"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGravityAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGravityAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGravityLength", _("Gravity"), _("Gravity value"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGravityLength").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGravityLength").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("Friction", _("Particles friction"), _("Particles friction"), _("Common"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetFriction").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetFriction").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleLifeTimeMin", _("Minimum lifetime of particles"), _("Minimum lifetime of particles"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleLifeTimeMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleLifeTimeMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleLifeTimeMax", _("Maximum lifetime of particles"), _("Maximum lifetime of particles"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleLifeTimeMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleLifeTimeMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleRed1", _("Parameter 1 of red color"), _("Parameter 1 of red color"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleRed1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleRed1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleRed2", _("Parameter 2 of red color"), _("Parameter 2 of red color"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleRed2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleRed2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleBlue1", _("Parameter 1 of blue color"), _("Parameter 1 of blue color"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleBlue1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleBlue1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleBlue2", _("Parameter 2 of blue color"), _("Parameter 2 of blue color"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleBlue2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleBlue2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGreen1", _("Parameter 1 of green color"), _("Parameter 1 of green color"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGreen1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGreen1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleGreen2", _("Parameter 2 of green color"), _("Parameter 2 of green color"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleGreen2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleGreen2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleAlpha1", _("Parameter 1 of transparency"), _("Parameter 1 of transparency"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleAlpha1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleAlpha1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleAlpha2", _("Parameter 2 of transparency"), _("Parameter 2 of transparency"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleAlpha2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleAlpha2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleSize1", _("Parameter 1 of size"), _("Parameter 1 of size"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleSize1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleSize1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleSize2", _("Parameter 2 of size"), _("Parameter 2 of size"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleSize2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleSize2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleAngle1", _("Parameter 1 of angle"), _("Parameter 1 of angle"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleAngle1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleAngle1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     obj.AddExpression("ParticleAngle2", _("Parameter 2 of angle"), _("Parameter 2 of angle"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
-        .codeExtraInformation.SetFunctionName("GetParticleAngle2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetFunctionName("GetParticleAngle2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     #endif
 }
 

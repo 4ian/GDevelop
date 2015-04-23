@@ -316,7 +316,7 @@ protected:
      * \code
         AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
         .AddParameter("objectList", _("Object"))
-        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
+        .SetFunctionName("PickedObjectsCount").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
 
      * \endcode
      * - objectListWithoutPicking : Same as objectList but do not pick object if they are not already picked.

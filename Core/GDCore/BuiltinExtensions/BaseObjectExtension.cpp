@@ -772,7 +772,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     extension.AddCondition("PickNearest",
                    _("Pick nearest object"),
                    _("Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."),
-                   _("Pick nearest _PARAM1_ "),
+                   _("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
                    _("Objects"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")

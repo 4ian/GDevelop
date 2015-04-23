@@ -106,7 +106,7 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 		obj1C.SetY(300);
 
 		REQUIRE(PickNearestObject(map, 100, 90, false) == true);
-		REQUIRE(list1.size() == 1); //All objects but obj1A and obj2C
+		REQUIRE(list1.size() == 1);
 		REQUIRE(list1[0] == &obj1A);
 
 		SECTION("Furthest") {
@@ -116,7 +116,7 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 
 
 			REQUIRE(PickNearestObject(map, 100, 90, true) == true);
-			REQUIRE(list1.size() == 1); //All objects but obj1A and obj2C
+			REQUIRE(list1.size() == 1);
 			REQUIRE(list1[0] == &obj1C);
 		}
 	}

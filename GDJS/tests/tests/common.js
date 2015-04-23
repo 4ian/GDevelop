@@ -68,3 +68,55 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 	});
 });
 
+describe('gdjs.evtTools.object.pickRandomObject', function() {
+	it('should pick only one object', function(){
+		var map1 = new Hashtable();
+
+		var runtimeScene = new gdjs.RuntimeScene(null, null);
+		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+
+		var list1 = [obj1A, obj1B, obj1C];
+		map1.put("obj1", list1);
+
+		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.be.ok();
+		expect(list1).to.have.length(1);
+		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.be.ok();
+		expect(list1).to.have.length(1);
+
+		list1.length = 0;
+		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.not.be.ok();
+	});
+});
+
+describe('gdjs.evtTools.object.pickNearestObject', function() {
+	var map1 = new Hashtable();
+
+	var runtimeScene = new gdjs.RuntimeScene(null, null);
+	var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	obj1A.setPosition(50, 50);
+	obj1B.setPosition(160, 160);
+	obj1C.setPosition(100, 300);
+
+	it('should pick nearest object', function(){
+		var list1 = [obj1A, obj1B, obj1C];
+		map1.put("obj1", list1);
+
+		expect(gdjs.evtTools.object.pickNearestObject(map1, 100, 90, false)).to.be(true);
+		expect(list1).to.have.length(1);
+		expect(list1[0]).to.be(obj1A);
+	});
+
+	it('should pick furthest object when inverted', function(){
+		var list1 = [obj1A, obj1B, obj1C];
+		map1.put("obj1", list1);
+
+		expect(gdjs.evtTools.object.pickNearestObject(map1, 100, 90, true)).to.be(true);
+		expect(list1).to.have.length(1);
+		expect(list1[0]).to.be(obj1C);
+	});
+});
+

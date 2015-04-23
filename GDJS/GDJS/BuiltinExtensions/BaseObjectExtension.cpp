@@ -127,8 +127,8 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Angle"].codeExtraInformation.SetFunctionName("getAngle");
     objectExpressions["ForceLength"].codeExtraInformation.SetFunctionName("getAverageForce().getLength");
     objectExpressions["Longueur"].codeExtraInformation.SetFunctionName("getAverageForce().getLength"); //Deprecated
-    objectExpressions["Distance"].codeExtraInformation.SetFunctionName("getDistanceFrom");
-    objectExpressions["SqDistance"].codeExtraInformation.SetFunctionName("getSqDistanceFrom");
+    objectExpressions["Distance"].codeExtraInformation.SetFunctionName("getDistanceToObject");
+    objectExpressions["SqDistance"].codeExtraInformation.SetFunctionName("getSqDistanceToObject");
 
 
     GetAllActions()["Create"].codeExtraInformation
@@ -158,6 +158,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("gdjs.evtTools.object.pickRandomObject");
     GetAllConditions()["AjoutHasard"].codeExtraInformation
         .SetFunctionName("gdjs.evtTools.object.pickRandomObject");
+    GetAllConditions()["PickNearest"].codeExtraInformation
+        .SetFunctionName("gdjs.evtTools.object.pickNearestObject");
 
 
     {

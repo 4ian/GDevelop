@@ -13,6 +13,23 @@
  */
 gdjs.evtTools.object = gdjs.evtTools.object || {};
 
+
+/**
+ * \brief Keep only the specified object in the lists of picked objects.
+ *
+ * @method pickOnly
+ * @param objectsLists The lists of objects to trim
+ * @param runtimeObject {gdjs.RuntimeObject} The object to keep in the lists
+ * @static
+ */
+gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
+    var values = objectsLists.values();
+    for(var i = 0, len = values.length;i<len;++i)
+        values[i].length = 0; //Be sure not to lose the reference to the original array
+
+    objectsLists.get(runtimeObject.getName()).push(runtimeObject);
+};
+
 /**
  * Do a test on two tables of objects so as to pick only the pair of objects for which the test is true.
  * If inverted == true, only the objects of the first table are filtered.
@@ -34,7 +51,7 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
  * @method TwoListsTest
  * @static
  */
-gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraParam) {
+gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted) {
 
     var isTrue = false;
     var objects1Values = objectsLists1.values();
@@ -67,7 +84,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
                 for(var l = 0, lenl = arr2.length;l<lenl;++l) {
                     if (arr1[k].pick && arr2[l].pick) continue; //Avoid unnecessary costly call to predicate.
 
-                    if (arr1[k].id !== arr2[l].id && predicate(arr1[k], arr2[l], extraParam)) {
+                    if (arr1[k].id !== arr2[l].id && predicate(arr1[k], arr2[l])) {
                         if ( !inverted ) {
                             isTrue = true;
 
@@ -178,19 +195,24 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     return isTrue;
 };
 
-gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
+gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene) {
     return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.collisionTest,
-                                                 objectsLists1, objectsLists2, inverted);
+        objectsLists1, objectsLists2, inverted);
 };
 
-gdjs.evtTools.object.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
+gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
     distance *= distance;
-    return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.distanceTest, objectsLists1,
-        objectsLists2, inverted, distance);
+
+    var distanceTestInner = function(obj1, obj2) {
+        return obj1.getSqDistanceToObject(obj2) <= distance;
+    };
+
+    return gdjs.evtTools.object.twoListsTest(distanceTestInner, objectsLists1,
+        objectsLists2, inverted);
 };
 
 
-gdjs.evtTools.object.movesTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
+gdjs.evtTools.object.movesTowardTest = function(objectsLists1, objectsLists2, tolerance, inverted) {
 
     var movesTowardTestInner = function(obj1, obj2) {
 
@@ -206,7 +228,7 @@ gdjs.evtTools.object.movesTowardTest = function( objectsLists1, objectsLists2, t
     return gdjs.evtTools.object.twoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
 };
 
-gdjs.evtTools.object.turnedTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
+gdjs.evtTools.object.turnedTowardTest = function(objectsLists1, objectsLists2, tolerance, inverted) {
 
     var turnedTowardTestInner = function(obj1, obj2) {
 
@@ -254,6 +276,33 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
 
     objectsLists.get(theChosenOne.getName()).push(theChosenOne);
 
+    return true;
+};
+
+gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) {
+    var bestObject = null;
+    var best = 0;
+    var first = true;
+    var values = objectsLists.values();
+    for(var i = 0, len = values.length;i<len;++i) {
+        var list = values[i];
+
+        for(var j = 0;j < list.length;++j) {
+            var object = list[j];
+            var distance = object.getSqDistanceTo(x, y);
+            if( first || (distance < best ^ inverted)) {
+                best = distance;
+                bestObject = object;
+            }
+
+            first = false;
+        }
+    }
+
+    if (!bestObject)
+        return false;
+
+    gdjs.evtTools.object.pickOnly(objectsLists, bestObject);
     return true;
 };
 

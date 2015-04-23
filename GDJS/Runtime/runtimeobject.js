@@ -851,15 +851,38 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
     return moved;
 };
 
-gdjs.RuntimeObject.prototype.getDistanceFrom = function(otherObject) {
-    return Math.sqrt(this.getSqDistanceFrom(otherObject));
+/**
+ * Get the distance, in pixels, to another object.
+ * @method getDistanceToObject
+ * @param otherObject The other object
+ */
+gdjs.RuntimeObject.prototype.getDistanceToObject = function(otherObject) {
+    return Math.sqrt(this.getSqDistanceToObject(otherObject));
 };
 
-gdjs.RuntimeObject.prototype.getSqDistanceFrom = function(otherObject) {
-    if ( otherObject == null ) return 0;
+/**
+ * Get the squared distance, in pixels, to another object.
+ * @method getSqDistanceToObject
+ * @param otherObject The other object
+ */
+gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
+    if ( otherObject === null ) return 0;
 
     var x = this.getX()+this.getCenterX() - (otherObject.getX()+otherObject.getCenterX());
     var y = this.getY()+this.getCenterY() - (otherObject.getY()+otherObject.getCenterY());
+
+    return x*x+y*y;
+};
+
+/**
+ * Get the squared distance, in pixels, to a position.
+ * @method getSqDistanceTo
+ * @param pointX {Number} X position
+ * @param pointY {Number} Y position
+ */
+gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
+    var x = this.getX()+this.getCenterX() - pointX;
+    var y = this.getY()+this.getCenterY() - pointY;
 
     return x*x+y*y;
 };
@@ -1021,10 +1044,7 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
  * @static
  */
 gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
-    var x = obj1.getDrawableX()+obj1.getCenterX()-(obj2.getDrawableX()+obj2.getCenterX());
-    var y = obj1.getDrawableY()+obj1.getCenterY()-(obj2.getDrawableY()+obj2.getCenterY());
-
-    return x*x+y*y <= distance;
+    return obj1.getSqDistanceToObject(obj2) <= distance;
 };
 
 /**

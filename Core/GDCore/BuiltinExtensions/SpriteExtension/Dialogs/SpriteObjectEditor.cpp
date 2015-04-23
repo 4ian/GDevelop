@@ -1726,6 +1726,7 @@ void SpriteObjectEditor::OnimagesListKeyDown(wxListEvent& event)
             OnMoveRightSelected(useless);
             break;
         }
+        case WXK_BACK:
         case WXK_DELETE:
         {
             wxCommandEvent useless;

@@ -1151,7 +1151,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
     if ( evt.GetKeyCode() == WXK_ALT )
         altPressed = true;
 
-    if ( evt.GetKeyCode() == WXK_DELETE )
+    if ( evt.GetKeyCode() == WXK_DELETE || evt.GetKeyCode() == WXK_BACK )
     {
         std::vector<InitialInstance*> instancesToDelete;
         for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)

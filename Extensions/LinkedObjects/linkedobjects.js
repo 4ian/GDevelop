@@ -101,7 +101,7 @@ gdjs.evtTools.linkedObjects.pickObjectsLinkedTo = function(runtimeScene, objects
     var linkedObjects =
 		gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).getObjectsLinkedWith(obj);
 
-	return gdjs.evtTools.object.PickObjectsIf(function(obj) {
+	return gdjs.evtTools.object.pickObjectsIf(function(obj) {
 		return linkedObjects.indexOf(obj) !== -1;
 	}, objectsLists, false);
 };

@@ -34,7 +34,7 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
  * @method TwoListsTest
  * @static
  */
-gdjs.evtTools.object.TwoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraParam) {
+gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraParam) {
 
     var isTrue = false;
     var objects1Values = objectsLists1.values();
@@ -136,7 +136,7 @@ gdjs.evtTools.object.TwoListsTest = function(predicate, objectsLists1, objectsLi
  * @method PickObjectsIf
  * @static
  */
-gdjs.evtTools.object.PickObjectsIf = function(predicate, objectsLists, negatePredicate) {
+gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate) {
     var isTrue = false;
     var objectsValues = objectsLists.values();
 
@@ -179,13 +179,13 @@ gdjs.evtTools.object.PickObjectsIf = function(predicate, objectsLists, negatePre
 };
 
 gdjs.evtTools.object.hitBoxesCollisionTest = function( objectsLists1, objectsLists2, inverted, runtimeScene) {
-    return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.collisionTest,
+    return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.collisionTest,
                                                  objectsLists1, objectsLists2, inverted);
 };
 
 gdjs.evtTools.object.distanceTest = function( objectsLists1, objectsLists2, distance, inverted) {
     distance *= distance;
-    return gdjs.evtTools.object.TwoListsTest(gdjs.RuntimeObject.distanceTest, objectsLists1,
+    return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.distanceTest, objectsLists1,
         objectsLists2, inverted, distance);
 };
 
@@ -201,9 +201,9 @@ gdjs.evtTools.object.movesTowardTest = function( objectsLists1, objectsLists2, t
         objAngle *= 180/3.14159;
 
         return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAverageForce().getAngle(), objAngle)) <= tolerance/2;
-    }
+    };
 
-    return gdjs.evtTools.object.TwoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
+    return gdjs.evtTools.object.twoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
 };
 
 gdjs.evtTools.object.turnedTowardTest = function( objectsLists1, objectsLists2, tolerance, inverted) {
@@ -217,7 +217,7 @@ gdjs.evtTools.object.turnedTowardTest = function( objectsLists1, objectsLists2, 
         return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAngle(), objAngle)) <= tolerance/2;
     };
 
-    return gdjs.evtTools.object.TwoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
+    return gdjs.evtTools.object.twoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
 };
 
 gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {

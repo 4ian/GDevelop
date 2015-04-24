@@ -185,12 +185,14 @@ void EditorScene::ForceRefreshRibbonAndConnect()
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
         layoutEditorCanvas->RecreateRibbonToolbar();
+        layoutEditorCanvas->EnableIdleEvents();
         mainFrameWrapper.GetRibbon()->SetActivePage(2);
         layoutEditorCanvas->ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Events") )
     {
         mainFrameWrapper.GetRibbon()->SetActivePage(3);
+        layoutEditorCanvas->EnableIdleEvents(false);
         eventsEditor->ConnectEvents();
     }
 }

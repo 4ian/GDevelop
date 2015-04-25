@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension);
@@ -34,10 +34,8 @@ public:
 
         GetAutomatismMetadata("DestroyOutsideAutomatism::DestroyOutside").SetIncludeFile("DestroyOutsideAutomatism/destroyoutsideruntimeautomatism.js");
 
-        GetAllConditionsForAutomatism("DestroyOutsideAutomatism::DestroyOutside")["DestroyOutsideAutomatism::ExtraBorder"].codeExtraInformation
-            .SetFunctionName("getExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/destroyoutsideruntimeautomatism.js");
-        GetAllActionsForAutomatism("DestroyOutsideAutomatism::DestroyOutside")["DestroyOutsideAutomatism::ExtraBorder"].codeExtraInformation
-            .SetFunctionName("setExtraBorder").SetAssociatedGetter("getExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/destroyoutsideruntimeautomatism.js");
+        GetAllConditionsForAutomatism("DestroyOutsideAutomatism::DestroyOutside")["DestroyOutsideAutomatism::ExtraBorder"].SetFunctionName("getExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/destroyoutsideruntimeautomatism.js");
+        GetAllActionsForAutomatism("DestroyOutsideAutomatism::DestroyOutside")["DestroyOutsideAutomatism::ExtraBorder"].SetFunctionName("setExtraBorder").SetGetter("getExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/destroyoutsideruntimeautomatism.js");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

@@ -110,7 +110,7 @@ SplashScreen::SplashScreen( wxBitmap &label, long timeout, wxWindow *parent, wxW
     wxIconBundle icons;
     icons.AddIcon("res/icon16.png");
     icons.AddIcon("res/icon24.png");
-    #if defined(LINUX) || defined(MAC)
+    #if defined(LINUX) || defined(MACOS)
     icons.AddIcon("res/icon32linux.png");
     icons.AddIcon("res/icon48linux.png");
     icons.AddIcon("res/icon64linux.png");

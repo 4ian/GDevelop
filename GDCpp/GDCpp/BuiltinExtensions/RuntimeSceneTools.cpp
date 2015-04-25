@@ -15,12 +15,18 @@
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CppPlatform.h"
 #include "GDCpp/ObjectHelpers.h"
+#include "GDCpp/ObjectsListsTools.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/profile.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Variable.h"
 #include "GDCpp/Text.h"
 #include "GDCpp/CppPlatform.h"
+
+std::string GD_API GetSceneName(RuntimeScene & scene)
+{
+    return scene.GetName();
+}
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {
@@ -95,14 +101,14 @@ void DoCreateObjectOnScene(RuntimeScene & scene, std::string objectName, std::ma
     std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
     std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
 
-    RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
+    RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
 
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
     else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-    if ( newObject == boost::shared_ptr<RuntimeObject> () )
+    if ( newObject == std::shared_ptr<RuntimeObject> () )
         return; //Unable to create the object
 
     //Set up the object
@@ -134,7 +140,7 @@ void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::st
 
 bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -151,29 +157,50 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool GD_API PickRandomObject(RuntimeScene &, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     //Create a list with all objects
     std::vector<RuntimeObject*> allObjects;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(allObjects));
     }
 
-    if ( !allObjects.empty() )
+    if ( allObjects.empty() )
+        return false;
+
+    unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
+    PickOnly(pickedObjectLists, allObjects[id]);
+    return true;
+}
+
+bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted)
+{
+    double best = 0;
+    bool first = true;
+    RuntimeObject * bestObject = NULL;
+    for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
-        RuntimeObject * theChosenOne = allObjects[id];
+        if ( it->second == NULL ) continue;
+        auto list = *it->second;
 
-        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+        for (unsigned int i = 0;i<list.size();++i)
         {
-            if ( it->second != NULL ) it->second->clear();
-        }
+            double value = list[i]->GetSqDistanceTo(x, y);
+            if (first || ((value < best) ^ inverted)) {
+                bestObject = list[i];
+                best = value;
+            }
 
-        if ( pickedObjectLists[theChosenOne->GetName()] != NULL ) pickedObjectLists[theChosenOne->GetName()]->push_back(theChosenOne);
+            first = false;
+        }
     }
 
+    if (!bestObject)
+        return false;
+
+    PickOnly(pickedObjectLists, bestObject);
     return true;
 }
 
@@ -215,8 +242,8 @@ const std::string& GD_API GetVariableString(const gd::Variable & variable)
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 {
     //Retrieve the image
-    boost::shared_ptr<SFMLTextureWrapper> image = scene.GetImageManager()->GetSFMLTexture(imageName);
-    if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
+    std::shared_ptr<SFMLTextureWrapper> image = scene.GetImageManager()->GetSFMLTexture(imageName);
+    if ( image == std::shared_ptr<SFMLTextureWrapper>() )
         return;
 
     scene.renderWindow->setIcon(image->image.getSize().x, image->image.getSize().y, image->image.getPixelsPtr());

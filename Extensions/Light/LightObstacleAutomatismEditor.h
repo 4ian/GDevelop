@@ -16,7 +16,7 @@ This project is released under the MIT License.
 #include <wx/sizer.h>
 #include <wx/dialog.h>
 //*)
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Project; }
 namespace gd { class MainFrameWrapper; }
 class LightObstacleAutomatism;
@@ -49,7 +49,7 @@ class LightObstacleAutomatismEditor: public wxDialog
 
 		gd::Project & game;
         gd::Layout * scene;
-        boost::shared_ptr<SceneLightObstacleDatas> sharedDatas;
+        std::shared_ptr<SceneLightObstacleDatas> sharedDatas;
 
 		DECLARE_EVENT_TABLE()
 };

@@ -8,7 +8,8 @@
 #define GDCORE_EXTERNALEVENTS_H
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
+#include <ctime>
 #include "GDCore/Events/EventsList.h"
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }
@@ -104,8 +105,8 @@ private:
 /**
  * \brief Functor testing ExternalEvents' name
  */
-struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<gd::ExternalEvents>, std::string, bool> {
-    bool operator()(const boost::shared_ptr<gd::ExternalEvents> & externalEvents, std::string name) const { return externalEvents->GetName() == name; }
+struct ExternalEventsHasName : public std::binary_function<std::shared_ptr<gd::ExternalEvents>, std::string, bool> {
+    bool operator()(const std::shared_ptr<gd::ExternalEvents> & externalEvents, std::string name) const { return externalEvents->GetName() == name; }
 };
 
 }

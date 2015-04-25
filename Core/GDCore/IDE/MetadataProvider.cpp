@@ -9,6 +9,7 @@
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
+#include <algorithm>
 #include <string>
 
 using namespace std;
@@ -61,7 +62,7 @@ const ObjectMetadata & MetadataProvider::GetObjectMetadata(const gd::Platform & 
 
 const gd::InstructionMetadata & MetadataProvider::GetActionMetadata(const gd::Platform & platform, string actionType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<string, gd::InstructionMetadata> & allActions = extensions[i]->GetAllActions();
@@ -90,7 +91,7 @@ const gd::InstructionMetadata & MetadataProvider::GetActionMetadata(const gd::Pl
 
 const gd::InstructionMetadata & MetadataProvider::GetConditionMetadata(const gd::Platform & platform, string conditionType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<string, gd::InstructionMetadata> & allConditions = extensions[i]->GetAllConditions();
@@ -119,7 +120,7 @@ const gd::InstructionMetadata & MetadataProvider::GetConditionMetadata(const gd:
 
 const gd::ExpressionMetadata & MetadataProvider::GetObjectExpressionMetadata(const gd::Platform & platform, string objectType, string exprType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const vector < string > & objects = extensions[i]->GetExtensionObjectsTypes();
@@ -144,7 +145,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetObjectExpressionMetadata(con
 
 const gd::ExpressionMetadata & MetadataProvider::GetAutomatismExpressionMetadata(const gd::Platform & platform, string autoType, string exprType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const vector < string > & autos = extensions[i]->GetAutomatismsTypes();
@@ -169,7 +170,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetAutomatismExpressionMetadata
 
 const gd::ExpressionMetadata & MetadataProvider::GetExpressionMetadata(const gd::Platform & platform, string exprType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<string, gd::ExpressionMetadata> & allExpr = extensions[i]->GetAllExpressions();
@@ -182,7 +183,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetExpressionMetadata(const gd:
 
 const gd::ExpressionMetadata & MetadataProvider::GetObjectStrExpressionMetadata(const gd::Platform & platform, string objectType, string exprType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const vector < string > & objects = extensions[i]->GetExtensionObjectsTypes();
@@ -207,7 +208,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetObjectStrExpressionMetadata(
 
 const gd::ExpressionMetadata & MetadataProvider::GetAutomatismStrExpressionMetadata(const gd::Platform & platform, string autoType, string exprType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const vector < string > & autos = extensions[i]->GetAutomatismsTypes();
@@ -232,7 +233,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetAutomatismStrExpressionMetad
 
 const gd::ExpressionMetadata & MetadataProvider::GetStrExpressionMetadata(const gd::Platform & platform, string exprType)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<string, gd::ExpressionMetadata> & allExpr = extensions[i]->GetAllStrExpressions();
@@ -245,7 +246,7 @@ const gd::ExpressionMetadata & MetadataProvider::GetStrExpressionMetadata(const 
 
 bool MetadataProvider::HasAction(const gd::Platform & platform, std::string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
 
     for (unsigned int i =0;i<extensions.size();++i)
     {
@@ -259,7 +260,7 @@ bool MetadataProvider::HasAction(const gd::Platform & platform, std::string name
 
 bool MetadataProvider::HasObjectAction(const gd::Platform & platform, std::string objectType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & actions = extensions[i]->GetAllActionsForObject(objectType);
@@ -280,7 +281,7 @@ bool MetadataProvider::HasObjectAction(const gd::Platform & platform, std::strin
 
 bool MetadataProvider::HasAutomatismAction(const gd::Platform & platform, std::string automatismType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & actions = extensions[i]->GetAllActionsForAutomatism(automatismType);
@@ -302,7 +303,7 @@ bool MetadataProvider::HasAutomatismAction(const gd::Platform & platform, std::s
 
 bool MetadataProvider::HasCondition(const gd::Platform & platform, std::string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & conditions = extensions[i]->GetAllConditions();
@@ -315,7 +316,7 @@ bool MetadataProvider::HasCondition(const gd::Platform & platform, std::string n
 
 bool MetadataProvider::HasObjectCondition(const gd::Platform & platform, std::string objectType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & conditions = extensions[i]->GetAllConditionsForObject(objectType);
@@ -336,7 +337,7 @@ bool MetadataProvider::HasObjectCondition(const gd::Platform & platform, std::st
 
 bool MetadataProvider::HasAutomatismCondition(const gd::Platform & platform, std::string automatismType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::InstructionMetadata > & conditions = extensions[i]->GetAllConditionsForAutomatism(automatismType);
@@ -357,7 +358,7 @@ bool MetadataProvider::HasAutomatismCondition(const gd::Platform & platform, std
 
 bool MetadataProvider::HasExpression(const gd::Platform & platform, std::string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllExpressions();
@@ -370,7 +371,7 @@ bool MetadataProvider::HasExpression(const gd::Platform & platform, std::string 
 
 bool MetadataProvider::HasObjectExpression(const gd::Platform & platform, std::string objectType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllExpressionsForObject(objectType);
@@ -391,7 +392,7 @@ bool MetadataProvider::HasObjectExpression(const gd::Platform & platform, std::s
 
 bool MetadataProvider::HasAutomatismExpression(const gd::Platform & platform, std::string automatismType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllExpressionsForAutomatism(automatismType);
@@ -413,7 +414,7 @@ bool MetadataProvider::HasAutomatismExpression(const gd::Platform & platform, st
 
 bool MetadataProvider::HasStrExpression(const gd::Platform & platform, std::string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressions();
@@ -426,7 +427,7 @@ bool MetadataProvider::HasStrExpression(const gd::Platform & platform, std::stri
 
 bool MetadataProvider::HasObjectStrExpression(const gd::Platform & platform, std::string objectType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForObject(objectType);
@@ -447,7 +448,7 @@ bool MetadataProvider::HasObjectStrExpression(const gd::Platform & platform, std
 
 bool MetadataProvider::HasAutomatismStrExpression(const gd::Platform & platform, std::string automatismType, string name)
 {
-    std::vector < boost::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
+    std::vector < std::shared_ptr<PlatformExtension> > extensions = platform.GetAllPlatformExtensions();
     for (unsigned int i =0;i<extensions.size();++i)
     {
         const std::map<std::string, gd::ExpressionMetadata > & expressions = extensions[i]->GetAllStrExpressionsForAutomatism(automatismType);

@@ -11,42 +11,47 @@ class RuntimeObject;
 /**
  * Only used internally by GD events generated code.
  */
-bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer );
+std::string GD_API GetSceneName(RuntimeScene & scene);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ShowLayer( RuntimeScene & scene, const std::string & layer );
+bool GD_API LayerVisible(RuntimeScene & scene, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API HideLayer( RuntimeScene & scene, const std::string & layer );
+void GD_API ShowLayer(RuntimeScene & scene, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API StopGame( RuntimeScene & scene );
+void GD_API HideLayer(RuntimeScene & scene, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ChangeScene( RuntimeScene & scene, std::string newSceneName );
+void GD_API StopGame(RuntimeScene & scene);
 
 /**
  * Only used internally by GD events generated code.
  */
-bool GD_API SceneJustBegins(RuntimeScene & scene );
+void GD_API ChangeScene(RuntimeScene & scene, std::string newSceneName);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API MoveObjects( RuntimeScene & scene );
+bool GD_API SceneJustBegins(RuntimeScene & scene);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable );
+void GD_API MoveObjects(RuntimeScene & scene);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API DisableInputWhenFocusIsLost(RuntimeScene & scene, bool disable);
 
 /**
  * Only used internally by GD events generated code.
@@ -68,14 +73,21 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
 /**
  * Only used internally by GD events generated code.
  *
- * \return true ( always )
+ * \return true if an object was picked, false otherwise
  */
 bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
 
 /**
  * Only used internally by GD events generated code.
+ *
+ * \return true if an object was picked, false otherwise
  */
-void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor );
+bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API ChangeSceneBackground(RuntimeScene & scene, std::string newColor);
 
 /**
  * Only used internally by GD events generated code.
@@ -164,7 +176,7 @@ unsigned int GD_API GetScreenColorDepth();
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer);
+void GD_API DisplayLegacyTextOnScene(RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer);
 
 #if defined(GD_IDE_ONLY)
 /**
@@ -175,7 +187,7 @@ void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & 
  *
  * \return true if scene must be stopped ( scene.running was set to false )
  */
-bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene );
+bool GD_API WarnAboutInfiniteLoop(RuntimeScene & scene);
 
 #endif
 

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.
@@ -40,7 +40,7 @@ public:
             .AddParameter("string", _("Message"))
             .AddParameter("string", _("Title"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowOpenFile",
                        _("Show a window to choose a file"),
@@ -55,7 +55,7 @@ public:
             .AddParameter("string", _("Title"))
             .AddParameter("string", _("Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windows only ) "))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowTextInput",
                        _("Show a window to enter a text"),
@@ -70,7 +70,7 @@ public:
             .AddParameter("string", _("Message"))
             .AddParameter("string", _("Title"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowYesNoMsgBox",
                        _("Display a Yes/No message box"),
@@ -85,7 +85,7 @@ public:
             .AddParameter("string", _("Message"))
             .AddParameter("string", _("Title"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         #endif
 

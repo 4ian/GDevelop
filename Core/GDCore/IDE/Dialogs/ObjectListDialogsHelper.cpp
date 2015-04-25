@@ -11,10 +11,11 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
-#include <boost/algorithm/string.hpp>
+
 #if !defined(GD_NO_WX_GUI)
 #include <wx/treectrl.h>
 #include <wx/bitmap.h>
+#include <wx/log.h>
 #endif
 
 namespace gd
@@ -23,7 +24,7 @@ namespace gd
 void ObjectListDialogsHelper::SetSearchText(std::string searchText_)
 {
     searchText = searchText_;
-    boost::to_upper(searchText);
+    searchText = gd::StrUppercase(searchText);
 }
 
 std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
@@ -37,7 +38,7 @@ std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
 
         //Only add the object if it has the correct type
         if ((objectTypeAllowed.empty() || project.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
+            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
         {
             results.push_back(name);
         }
@@ -48,7 +49,7 @@ std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
 
         //Only add the group if it has all objects of the correct type
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, project.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
+            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
         {
             results.push_back(name);
         }
@@ -59,7 +60,7 @@ std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
 
         //Only add the object if it has the correct type
         if (( objectTypeAllowed.empty() || layout.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
+            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
         {
             results.push_back(name);
         }
@@ -71,7 +72,7 @@ std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
 
         //Only add the group if it has all objects of the correct type
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, layout.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
+            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
         {
             results.push_back(name);
         }
@@ -81,101 +82,35 @@ std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
 }
 
 #if !defined(GD_NO_WX_GUI)
-void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTreeCtrl * sceneGroupsList, wxTreeCtrl * globalObjectsList, wxTreeCtrl * globalGroupsList)
-{
-    bool searching = searchText.empty() ? false : true;
-
-    sceneObjectsList->DeleteAllItems();
-    sceneObjectsList->AddRoot( _( "All objects groups of the scene" ) );
-
-    for ( unsigned int i = 0;i < layout.GetObjectsCount();i++ )
-    {
-        std::string name = layout.GetObject(i).GetName();
-
-        //Only add the object if it has the correct type
-        if (( objectTypeAllowed.empty() || layout.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
-        {
-            sceneObjectsList->AppendItem( sceneObjectsList->GetRootItem(), name );
-        }
-    }
-
-    sceneObjectsList->ExpandAll();
-
-    sceneGroupsList->DeleteAllItems();
-    sceneGroupsList->AddRoot( _( "All groups of the scene" ) );
-
-    for ( unsigned int i = 0;i < layout.GetObjectGroups().size();i++ )
-    {
-        std::string name = layout.GetObjectGroups()[i].GetName();
-
-        //Only add the group if it has all objects of the correct type
-        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, layout.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
-        {
-            sceneGroupsList->AppendItem( sceneGroupsList->GetRootItem(), name );
-        }
-    }
-
-    sceneGroupsList->ExpandAll();
-
-    globalObjectsList->DeleteAllItems();
-    globalObjectsList->AddRoot( _( "All globals objects" ) );
-
-    for ( unsigned int i = 0;i < project.GetObjectsCount();i++ )
-    {
-        std::string name = project.GetObject(i).GetName();
-
-        //Only add the object if it has the correct type
-        if ((objectTypeAllowed.empty() || project.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
-        {
-            globalObjectsList->AppendItem( globalObjectsList->GetRootItem(), name );
-        }
-    }
-
-    globalObjectsList->ExpandAll();
-
-    globalGroupsList->DeleteAllItems();
-    globalGroupsList->AddRoot( _( "All globals groups" ) );
-
-    for ( unsigned int i = 0;i < project.GetObjectGroups().size();i++ )
-    {
-        std::string name = project.GetObjectGroups()[i].GetName();
-
-        //Only add the group if it has all objects of the correct type
-        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, project.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
-        {
-            globalGroupsList->AppendItem( globalGroupsList->GetRootItem(), name );
-        }
-    }
-
-    globalGroupsList->ExpandAll();
-}
-
-void ObjectListDialogsHelper::RefreshList(wxTreeCtrl * objectsList)
+void ObjectListDialogsHelper::RefreshList(wxTreeCtrl * objectsList, wxTreeItemId * objectsRootItem_, wxTreeItemId * groupsRootItem_)
 {
     objectsList->DeleteAllItems();
-    objectsList->AssignImageList(imageList);
     objectsList->AddRoot( "Root" );
 
-    imageList->RemoveAll();
-    imageList->Add(gd::SkinHelper::GetIcon("object", 24));
-    imageList->Add(gd::SkinHelper::GetIcon("group", 24));
+    if (!objectsList->GetImageList())
+        objectsList->AssignImageList(new wxImageList(24,24, true));
+
+    objectsList->GetImageList()->RemoveAll();
+    objectsList->GetImageList()->Add(gd::SkinHelper::GetIcon("object", 24));
+    objectsList->GetImageList()->Add(gd::SkinHelper::GetIcon("group", 24));
 
     wxTreeItemId objectsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Objects"), 0);
     wxTreeItemId groupsRootItem = objectsList->AppendItem(objectsList->GetRootItem(), _("Groups"), 1);
 
-    AddObjectsToList(objectsList, objectsRootItem, layout, false, false);
-    if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, layout.GetObjectGroups(), false, false);
-    AddObjectsToList(objectsList, objectsRootItem, project, true, false);
-    if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, project.GetObjectGroups(), true, false);
+    AddObjectsToList(objectsList, objectsRootItem, layout, false);
+    if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, layout.GetObjectGroups(), false);
+    AddObjectsToList(objectsList, objectsRootItem, project, true);
+    if ( groupsAllowed ) AddGroupsToList(objectsList, groupsRootItem, project.GetObjectGroups(), true);
 
-    objectsList->ExpandAll();
+    objectsList->Expand(objectsRootItem);
+    objectsList->Expand(groupsRootItem);
+
+    //If asked, return the root items for the objects and groups.
+    if (objectsRootItem_) *objectsRootItem_ = objectsRootItem;
+    if (groupsRootItem_) *groupsRootItem_ = groupsRootItem;
 }
 
-wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects, bool substituteIfEmpty)
+wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects)
 {
     bool searching = searchText.empty() ? false : true;
 
@@ -186,20 +121,10 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
 
         //Only add objects if they match the search criteria
         if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
+            ( !searching || (searching && gd::StrUppercase(name).find(searchText) != std::string::npos)) )
         {
-            int thumbnailID = -1;
-            wxBitmap thumbnail;
-            if ( objects.GetObject(i).GenerateThumbnail(project, thumbnail)  && thumbnail.IsOk() )
-            {
-                imageList->Add(thumbnail);
-                thumbnailID = imageList->GetImageCount()-1;
-            }
-
-            wxTreeItemId item = objectsList->AppendItem( rootItem,
-                objects.GetObject(i).GetName(), thumbnailID );
-            objectsList->SetItemData(item, new gd::TreeItemStringData(globalObjects ? "GlobalObject" : "LayoutObject"));
-            if ( globalObjects ) objectsList->SetItemBold(item, true);
+            wxTreeItemId item = objectsList->AppendItem(rootItem, "theobject");
+            MakeObjectItem(objectsList, item, objects.GetObject(i), globalObjects);
 
             lastAddedItem = item;
         }
@@ -208,7 +133,7 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
     return lastAddedItem;
 }
 
-wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const std::vector <ObjectGroup> & groups, bool globalGroup, bool substituteIfEmpty)
+wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const std::vector <ObjectGroup> & groups, bool globalGroups)
 {
     bool searching = searchText.empty() ? false : true;
 
@@ -216,17 +141,51 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
     for (unsigned int i = 0;i<groups.size();++i)
     {
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && boost::to_upper_copy(groups[i].GetName()).find(searchText) != std::string::npos)) )
+            ( !searching || (searching && gd::StrUppercase(groups[i].GetName()).find(searchText) != std::string::npos)) )
         {
-            wxTreeItemId item = objectsList->AppendItem( rootItem, groups[i].GetName(), 1 );
-            objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
-            if ( globalGroup ) objectsList->SetItemBold(item, true);
+            wxTreeItemId item = objectsList->AppendItem(rootItem, "thegroup");
+            MakeGroupItem(objectsList, item, groups[i], globalGroups);
 
             lastAddedItem = item;
         }
     }
 
     return lastAddedItem;
+}
+
+void ObjectListDialogsHelper::MakeGroupItem(wxTreeCtrl * objectsList, wxTreeItemId item, const gd::ObjectGroup & group, bool globalGroup)
+{
+    objectsList->SetItemText(item, group.GetName());
+    objectsList->SetItemImage(item, 1);
+    objectsList->SetItemData(item, new gd::TreeItemStringData(globalGroup ? "GlobalGroup" : "LayoutGroup"));
+    if ( globalGroup ) objectsList->SetItemBold(item, true);
+
+    if (hasGroupExtraRendering) groupExtraRendering(item);
+}
+
+void ObjectListDialogsHelper::MakeObjectItem(wxTreeCtrl * objectsList, wxTreeItemId item, const gd::Object & object, bool globalObject)
+{
+    objectsList->SetItemText(item, object.GetName());
+    objectsList->SetItemImage(item, MakeObjectItemThumbnail(objectsList, object));
+    objectsList->SetItemData(item, new gd::TreeItemStringData(globalObject ? "GlobalObject" : "LayoutObject"));
+    if (globalObject) objectsList->SetItemBold(item, true);
+}
+
+int ObjectListDialogsHelper::MakeObjectItemThumbnail(wxTreeCtrl * objectsList, const gd::Object & object)
+{
+    wxLogNull noLogPlease; //Discard any warning when loading thumbnails.
+
+    int thumbnailID = -1;
+    wxBitmap thumbnail;
+    if (objectsList->GetImageList() &&
+        object.GenerateThumbnail(project, thumbnail) &&
+        thumbnail.IsOk() )
+    {
+        objectsList->GetImageList()->Add(thumbnail);
+        thumbnailID = objectsList->GetImageList()->GetImageCount()-1;
+    }
+
+    return thumbnailID;
 }
 #endif
 

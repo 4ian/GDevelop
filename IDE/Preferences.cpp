@@ -1089,6 +1089,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Paths/Java", javaDirEdit->GetValue() );
 
+    pConfig->Flush(); //Write changes to disk, in case of an application crash.
     EndModal( 1 );
 }
 
@@ -1538,7 +1539,7 @@ void Preferences::OnbrowseJavaBtClick(wxCommandEvent& event)
 
 void Preferences::OnBrowseEditionImageClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choose a image editing software" ), "", "", "Programme (*.exe)|*.exe" );
+    wxFileDialog dialog( this, _( "Choose a image editing software" ), "", "", "Programme (*.exe)|*.exe|All Files (*.*)|*.*" );
     dialog.ShowModal();
 
     if ( !dialog.GetPath().empty() )

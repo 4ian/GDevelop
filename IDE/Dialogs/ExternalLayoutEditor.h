@@ -95,10 +95,10 @@ private:
     gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* layoutPanel;
     //*)
-    boost::shared_ptr<gd::ObjectsEditor> objectsEditor;
-    boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
-    boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
-    boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
+    std::shared_ptr<gd::ObjectsEditor> objectsEditor;
+    std::shared_ptr<gd::LayersEditorPanel> layersEditor;
+    std::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
+    std::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 
     gd::Project & project;
     gd::ExternalLayout & externalLayout;

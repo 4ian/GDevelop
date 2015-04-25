@@ -10,9 +10,10 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
 #include "SFML/Network.hpp"
-#include <boost/algorithm/string.hpp>
+
 #include <wx/htmllbox.h>
 
 namespace gd
@@ -78,7 +79,7 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplate(std::string id)
     nameTxt->SetLabel("Loading the template...");
     descriptionEdit->SetValue("");
 
-    wxSafeYield();
+    gd::SafeYield::Do();
 
     // Create request
     sf::Http Http(host, port);
@@ -99,7 +100,7 @@ void EventStoreDialog::RefreshList()
 {
     templatesList->Clear();
     std::string searchText = gd::ToString(searchCtrl->GetValue());
-    boost::to_upper(searchText);
+    searchText = gd::StrUppercase(searchText);
     bool searching = searchText.empty() ? false : true;
 
     if (!templates) return;
@@ -109,8 +110,8 @@ void EventStoreDialog::RefreshList()
         std::string name = eventTemplate.GetChild("name").GetValue().GetString();
         std::string desc = eventTemplate.GetChild("description").GetValue().GetString();
 
-        if (!searching || boost::to_upper_copy(name).find(searchText) != std::string::npos
-            || boost::to_upper_copy(desc).find(searchText) != std::string::npos)
+        if (!searching || gd::StrUppercase(name).find(searchText) != std::string::npos
+            || gd::StrUppercase(desc).find(searchText) != std::string::npos)
         {
     		wxString id = eventTemplate.GetChild("_id").GetValue().GetString();
             if (desc.size() > 50) {

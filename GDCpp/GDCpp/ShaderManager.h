@@ -7,8 +7,8 @@
 #define SHADERMANAGER_H
 #include <map>
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
+
 #include <SFML/Graphics.hpp>
 namespace gd { class Project; }
 
@@ -26,10 +26,10 @@ public:
     virtual ~ShaderManager() {};
     void SetGame(gd::Project * game_) { game = game_; }
 
-    boost::shared_ptr<sf::Shader> GetSFMLShader(const std::vector<std::string> & shaders);
+    std::shared_ptr<sf::Shader> GetSFMLShader(const std::vector<std::string> & shaders);
 
 private:
-    mutable std::map < std::vector<std::string>, boost::weak_ptr<sf::Shader> > alreadyLoadedShader;
+    mutable std::map < std::vector<std::string>, std::weak_ptr<sf::Shader> > alreadyLoadedShader;
 
     gd::Project * game;
 };

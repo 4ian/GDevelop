@@ -21,16 +21,16 @@ public:
     {
     };
     virtual ~ScenePhysicsDatas() {};
-    virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new ScenePhysicsDatas(*this));}
+    virtual std::shared_ptr<gd::AutomatismsSharedData> Clone() const { return std::shared_ptr<gd::AutomatismsSharedData>(new ScenePhysicsDatas(*this));}
 
     float gravityX;
     float gravityY;
     float scaleX;
     float scaleY;
 
-    virtual boost::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
+    virtual std::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
     {
-        return boost::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePhysicsDatas(*this));
+        return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePhysicsDatas(*this));
     }
 
     #if defined(GD_IDE_ONLY)

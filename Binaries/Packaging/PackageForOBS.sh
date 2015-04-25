@@ -52,8 +52,7 @@ tar zxf gdevelop_$GD_VERSION.orig.tar.gz
 echo "[OK]"
 
 #We need to include ExtLibs/SFML.7z and ExtLibs/boost.7z because buildbot do not have access to internet
-printf " Copying SFML and Boost archives... "
-cp $GD_BASE_DIR/ExtLibs/boost.7z gdevelop-$GD_VERSION/ExtLibs/
+printf " Copying SFML archive... "
 cp $GD_BASE_DIR/ExtLibs/SFML.7z gdevelop-$GD_VERSION/ExtLibs/
 echo "[OK]"
 

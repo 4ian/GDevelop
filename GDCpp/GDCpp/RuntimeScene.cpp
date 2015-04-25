@@ -56,13 +56,13 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     running(true),
     firstLoop(true),
     isFullScreen(false),
+    inputManager(renderWindow_),
     realElapsedTime(0),
     elapsedTime(0),
     timeScale(1),
     timeFromStart(0),
     pauseTime(0),
     specialAction(-1),
-    windowHasFocus(true),
     codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
@@ -72,9 +72,9 @@ RuntimeScene::~RuntimeScene()
 {
 	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
-        if ( extension != boost::shared_ptr<ExtensionBase>() )
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != std::shared_ptr<ExtensionBase>() )
             extension->SceneUnloaded(*this);
     }
 
@@ -82,7 +82,7 @@ RuntimeScene::~RuntimeScene()
                               //RuntimeScene members which so need to be destroyed AFTER objects.
 }
 
-boost::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
+std::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
 {
     return game->GetImageManager();
 }
@@ -90,15 +90,21 @@ boost::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
 void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 {
     renderWindow = newWindow;
+    inputManager.SetWindow(newWindow);
 
     if (!renderWindow) return;
-    renderWindow->setTitle(GetWindowDefaultTitle());
 
+    renderWindow->setTitle(GetWindowDefaultTitle());
+    SetupOpenGLProjection();
+}
+
+void RuntimeScene::SetupOpenGLProjection()
+{
     glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_TRUE);
     glClearDepth(1.f);
 
-    // Setup a perspective projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
@@ -195,42 +201,29 @@ int RuntimeScene::RenderAndStep()
 
 void RuntimeScene::ManageRenderTargetEvents()
 {
-    renderTargetEvents.clear();
     if (!renderWindow) return;
+    inputManager.NextFrame();
 
     sf::Event event;
-    while ( renderWindow->pollEvent( event ) )
+    while (renderWindow->pollEvent(event))
     {
-        renderTargetEvents.push_back(event);
-
-        // Close window : exit
         if ( event.type == sf::Event::Closed )
         {
+            //Handle window closing
             running = false;
             renderWindow->close();
         }
-        else if ( event.type == sf::Event::KeyPressed )
-        {
-            lastPressedKey = event.key.code;
-        }
         else if (event.type == sf::Event::Resized)
         {
-            //Resetup OpenGL
-            glEnable(GL_DEPTH_TEST);
-            glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDepthMask(GL_TRUE);
-            glClearDepth(1.f);
-
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-
-            double windowRatio = static_cast<double>(event.size.width)/static_cast<double>(event.size.height);
-            gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
+            //Resetup OpenGL when window is resized
+            SetupOpenGLProjection();
         }
-        else if ( event.type == sf::Event::GainedFocus)
-            windowHasFocus = true;
-        else if ( event.type == sf::Event::LostFocus)
-            windowHasFocus = false;
+        else
+        {
+            //Most events will be input related and should be forwarded
+            //to the InputManager:
+            inputManager.HandleEvent(event);
+        }
     }
 }
 
@@ -254,9 +247,9 @@ void RuntimeScene::Render()
 
     //Sort object by order to render them
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
-    OrderObjectsByZOrder( allObjects );
+    OrderObjectsByZOrder(allObjects);
 
-    //To allow using OpenGL to draw :
+    //To allow using OpenGL to draw:
     glClear(GL_DEPTH_BUFFER_BIT); // Clear the depth buffer
     renderWindow->pushGLStates();
     renderWindow->setActive();
@@ -291,9 +284,8 @@ void RuntimeScene::Render()
                 //Rendering all objects
                 for (unsigned int id = 0;id < allObjects.size();++id)
                 {
-                    //Affichage de l'objet si il appartient au calque
-                    if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
-                        allObjects[id]->Draw( *renderWindow );
+                    if (allObjects[id]->GetLayer() == layers[layerIndex].GetName())
+                        allObjects[id]->Draw(*renderWindow);
                 }
 
                 //Texts
@@ -343,12 +335,16 @@ bool RuntimeScene::UpdateTime()
     return true;
 }
 
-bool RuntimeScene::OrderObjectsByZOrder( RuntimeObjList & objList )
+bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjList & objList)
 {
     if ( StandardSortMethod() )
-        std::sort( objList.begin(), objList.end(), SortByZOrder() );
+        std::sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
+            return o1->GetZOrder() < o2->GetZOrder();
+        });
     else
-        std::stable_sort( objList.begin(), objList.end(), SortByZOrder() );
+        std::stable_sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
+            return o1->GetZOrder() < o2->GetZOrder();
+        });
 
     return true;
 }
@@ -428,7 +424,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 class ObjectsFromInitialInstanceCreator : public gd::InitialInstanceFunctor
 {
 public:
-    ObjectsFromInitialInstanceCreator(gd::Project & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap_) :
+    ObjectsFromInitialInstanceCreator(gd::Project & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap_) :
         game(game_),
         scene(scene_),
         xOffset(xOffset_),
@@ -443,14 +439,14 @@ public:
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
 
-        RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
+        RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
 
         if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
         else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
             newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-        if ( newObject != boost::shared_ptr<RuntimeObject> () )
+        if ( newObject != std::shared_ptr<RuntimeObject> () )
         {
             newObject->SetX( instance.GetX() + xOffset );
             newObject->SetY( instance.GetY() + yOffset );
@@ -481,10 +477,10 @@ private:
     RuntimeScene & scene;
     float xOffset;
     float yOffset;
-    std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap;
+    std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap;
 };
 
-void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap)
+void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap)
 {
     ObjectsFromInitialInstanceCreator func(*game, *this, xOffset, yOffset, optionalMap);
     const_cast<gd::InitialInstancesContainer&>(container).IterateOverInstances(func);
@@ -521,6 +517,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     std::cout << ".";
     codeExecutionEngine->runtimeContext.scene = this;
+    inputManager.DisableInputWhenFocusIsLost(IsInputDisabledWhenFocusIsLost());
 
     //Initialize variables
     variables = scene.GetVariables();
@@ -545,9 +542,9 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     //Extensions specific initialization
 	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
-        if ( extension != boost::shared_ptr<ExtensionBase>() )
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != std::shared_ptr<ExtensionBase>() )
         {
             extension->SceneLoaded(*this);
             if ( extension->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extension.get());

@@ -12,7 +12,7 @@
 #include <vector>
 #include <set>
 #include <SFML/System.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <wx/event.h>
 #include <wx/process.h>
 #include <wx/thread.h>
@@ -81,8 +81,8 @@ public:
 
     bool emptyTask; ///< If set to true, this task will be skipped.
 
-    boost::shared_ptr<CodeCompilerExtraWork> postWork; ///< Post work that will be launched when the compilation of the task is over
-    boost::shared_ptr<CodeCompilerExtraWork> preWork;  ///< Pre work that will be launched before the compilation of the task is launched
+    std::shared_ptr<CodeCompilerExtraWork> postWork; ///< Post work that will be launched when the compilation of the task is over
+    std::shared_ptr<CodeCompilerExtraWork> preWork;  ///< Pre work that will be launched before the compilation of the task is launched
     CodeCompilerCall compilerCall; ///< The main work to be executed
 
     std::string userFriendlyName; ///< Task name displayed to the user
@@ -306,7 +306,7 @@ private:
      */
     void SendCurrentProcessToGarbage();
 
-#if defined(LINUX)
+#if !defined(WINDOWS)
 public:
 #endif
     /**
@@ -316,7 +316,7 @@ public:
      * launch the next task if any.
      */
     void ProcessEndedWork(wxCommandEvent& event);
-#if defined(LINUX)
+#if !defined(WINDOWS)
 private:
 #endif
 

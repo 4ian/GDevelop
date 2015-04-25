@@ -50,6 +50,7 @@ std::string CodeCompilerCall::GetFullCall() const
     std::string baseDir = CodeCompiler::Get()->GetBaseDirectory();
 
     std::vector<std::string> args;
+	args.push_back("-std=gnu++11");
     #if defined(WINDOWS)
     args.push_back("-m32");
     args.push_back("-nostdinc");
@@ -74,9 +75,9 @@ std::string CodeCompilerCall::GetFullCall() const
         std::vector<std::string> standardsIncludeDirs;
         #if defined(WINDOWS)
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include/c++");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include/c++/mingw32");
         #elif defined(LINUX)
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i686-linux-gnu/");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/lib/gcc/i686-linux-gnu/4.7/include");
@@ -84,12 +85,11 @@ std::string CodeCompilerCall::GetFullCall() const
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/i686-linux-gnu");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/backward");
-        #elif defined(MAC)
+        #elif defined(MACOS)
         #endif
 
         standardsIncludeDirs.push_back("CppPlatform/include/GDCpp");
         standardsIncludeDirs.push_back("CppPlatform/include/Core");
-        standardsIncludeDirs.push_back("CppPlatform/include/boost");
         standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
         standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
         standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
@@ -118,7 +118,7 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-DGD_CORE_API= ");
         args.push_back("-DGD_API= ");
         args.push_back("-DGD_EXTENSION_API= ");
-        #elif defined(MAC)
+        #elif defined(MACOS)
         args.push_back("-DGD_CORE_API= ");
         args.push_back("-DGD_API= ");
         args.push_back("-DGD_EXTENSION_API= ");
@@ -163,6 +163,8 @@ std::string CodeCompilerCall::GetFullCall() const
             args.push_back("-L\""+baseDir+"CppPlatform/Extensions/Runtime/\"");
             #if defined(WINDOWS)
             args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.dll.a\"");
+            #elif defined(MACOS)
+            args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.dylib\"");
             #else
             args.push_back("\""+baseDir+"CppPlatform/Runtime/libGDCpp.so\"");
             #endif
@@ -177,6 +179,12 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-lsfml-graphics");
         args.push_back("-lsfml-window");
         args.push_back("-lsfml-system");
+        #elif defined(MACOS)
+        args.push_back("\""+baseDir+"libsfml-audio.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-network.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-graphics.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-window.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-system.dylib\"");
         #else
         args.push_back("\""+baseDir+"libsfml-audio.so.2\"");
         args.push_back("\""+baseDir+"libsfml-network.so.2\"");
@@ -191,6 +199,12 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-lsfml-graphics-d");
         args.push_back("-lsfml-window-d");
         args.push_back("-lsfml-system-d");
+        #elif defined(MACOS)
+        args.push_back("\""+baseDir+"libsfml-audio.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-network.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-graphics.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-window.dylib\"");
+        args.push_back("\""+baseDir+"libsfml-system.dylib\"");
         #else
         args.push_back("\""+baseDir+"libsfml-audio-d.so.2\"");
         args.push_back("\""+baseDir+"libsfml-network-d.so.2\"");
@@ -257,7 +271,7 @@ void CodeCompiler::StartTheNextTask()
     NotifyControls();
     bool skip = false; //Set to true if the preworker of the task asked to relaunch the task later.
 
-    if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+    if ( currentTask.preWork != std::shared_ptr<CodeCompilerExtraWork>() )
     {
         std::cout << "Launching pre work..." << std::endl;
         bool result = currentTask.preWork->Execute();
@@ -377,7 +391,7 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
 
     //Now do post work and notify task has been done.
     {
-        if (currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+        if (currentTask.postWork != std::shared_ptr<CodeCompilerExtraWork>() )
         {
             std::cout << "Launching post task" << std::endl;
             currentTask.postWork->compilationSucceeded = compilationSucceeded;
@@ -420,7 +434,7 @@ void CodeCompiler::SendCurrentThreadToGarbage()
     garbageThreads.push_back(currentTaskThread);
     livingGarbageThreadsCount++; //We increment livingGarbageThreadsCount as the thread sent to garbageThreads was alive ( i.e. : doing work )
 
-    currentTaskThread = boost::shared_ptr<sf::Thread>();
+    currentTaskThread = std::shared_ptr<sf::Thread>();
     processLaunched = false;
 }*/
 

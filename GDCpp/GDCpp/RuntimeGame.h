@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /**
  * \brief Represents a game being played.

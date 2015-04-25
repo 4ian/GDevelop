@@ -12,10 +12,11 @@
 #include <string>
 #include <map>
 #include <SFML/System.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/Text.h"
+#include "GDCpp/InputManager.h"
 #include "GDCpp/ManualTimer.h"
 #include "GDCpp/AutomatismsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
@@ -75,7 +76,17 @@ public:
      * \brief Shortcut for game->GetImageManager()
      * \return The image manager of the game.
      */
-    boost::shared_ptr<gd::ImageManager> GetImageManager() const;
+    std::shared_ptr<gd::ImageManager> GetImageManager() const;
+
+    /**
+     * \brief Get the input manager used to handle mouse, keyboard and touches events.
+     */
+    const InputManager & GetInputManager() const { return inputManager; }
+
+    /**
+     * \brief Get the input manager used to handle mouse, keyboard and touches events.
+     */
+    InputManager & GetInputManager() { return inputManager; }
 
     /**
      * Get the layer with specified name.
@@ -93,7 +104,7 @@ public:
      * \warning Be careful, no check is made to ensure that the shared data exist.
      * \param name The name of the automatism for which shared data must be fetched.
      */
-    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
+    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -117,9 +128,9 @@ public:
      * \param container The object containing the initial instances to be created
      * \param xOffset The offset on x axis to be applied to objects created
      * \param yOffset The offset on y axis to be applied to objects created
-     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
+     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
      */
-    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap = NULL);
+    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap = NULL);
 
     /**
      * Change the window used for rendering the scene
@@ -137,20 +148,10 @@ public:
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
     /**
-     * Return true if window has focus.
-     */
-    bool RenderWindowHasFocus() { return windowHasFocus; }
-
-    /**
      * After calling this method, RenderAndStep() will return the number passed as parameter.
      * \see RenderAndStep
      */
     void GotoSceneWhenEventsAreFinished(int scene);
-
-    /**
-     * \brief Return the key code (see sf::Keyboard::Key) of the latest pressed key.
-     */
-    int GetLastPressedKey() { return lastPressedKey; }
 
     /**
      * Render and play the scene one frame.
@@ -194,22 +195,6 @@ public:
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
 
-    /**
-     * Get a read-only list of SFML events managed by the render target.
-     */
-    const std::vector<sf::Event> & GetRenderTargetEvents() const { return renderTargetEvents; }
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Get a list, with read-write access, of SFML events managed by the render target.
-     * \note This method is used by the IDE ( class SceneEditorCanvas precisely ) to manually inject
-     * events not caught by SFML on linux when using a wxSFMLCanvas.
-     * \warning You should not rely on this method as it could be removed when this specific problem will be fixed
-     * ( but you can safely use the const version of this method )
-     */
-    std::vector<sf::Event> & GetRenderTargetEvents() { return renderTargetEvents; }
-    #endif
-
     /** \name Code execution engine
      * Functions members giving access to the code execution engine.
      */
@@ -218,13 +203,13 @@ public:
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
-    boost::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
+    std::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
 
     /**
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
-    void SetCodeExecutionEngine(boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
+    void SetCodeExecutionEngine(std::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
     ///@}
 
 
@@ -256,14 +241,18 @@ protected:
      */
     void ManageObjectsAfterEvents();
 
+    /**
+     * \brief Set the OpenGL projection according to the window size and OpenGL scene options.
+     */
+    void SetupOpenGLProjection();
+
     bool UpdateTime();
 
     bool DisplayLegacyTexts(std::string layer = "");
 
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
-    std::vector<sf::Event>                  renderTargetEvents;
-    int                                     lastPressedKey;
+    InputManager                            inputManager;
     signed int                              realElapsedTime; ///< Elapsed time since last frame, in microseconds, without taking time scale in account.
     signed int                              elapsedTime; ///< Elapsed time since last frame, in microseconds ( elapsedTime = realElapsedTime*timeScale ).
     double                                  timeScale; ///< Time scale
@@ -273,10 +262,9 @@ protected:
     RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
-    bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
     AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
-    boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
+    std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
     std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.

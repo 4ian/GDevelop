@@ -80,10 +80,9 @@ void TileEditor::UpdateScrollbars()
         return;
 
     //Compute the virtual size and the default scroll position to have a centered tile.
-    wxBitmap tileBitmap = m_tileset->GetTileBitmap(m_currentTile);
 
-    int virtualWidth = std::max(m_tilePreviewPanel->GetClientSize().GetWidth(), tileBitmap.GetWidth());
-    int virtualHeight = std::max(m_tilePreviewPanel->GetClientSize().GetHeight(), tileBitmap.GetHeight());
+    int virtualWidth = std::max(m_tilePreviewPanel->GetClientSize().GetWidth(), (int)m_tileset->tileSize.x);
+    int virtualHeight = std::max(m_tilePreviewPanel->GetClientSize().GetHeight(), (int)m_tileset->tileSize.y);
 
     m_tilePreviewPanel->SetVirtualSize(virtualWidth, virtualHeight);
 
@@ -105,6 +104,11 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     wxAutoBufferedPaintDC dc(m_tilePreviewPanel);
     m_tilePreviewPanel->DoPrepareDC(dc);
 
+    //Load the tileset
+    wxBitmap btmp(m_tileset->GetWxBitmap());
+    wxMemoryDC tilesetDC;
+    tilesetDC.SelectObject(btmp);
+
     wxPoint minPos = m_tilePreviewPanel->GetViewStart();
     int width, height;
     m_tilePreviewPanel->GetClientSize(&width, &height);
@@ -118,10 +122,17 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
         return;
 
     //Draw the tile and compute the drawing offset
-    wxBitmap tileBitmap = m_tileset->GetTileBitmap(m_currentTile);
-    m_xOffset = width/2 - tileBitmap.GetWidth()/2;
-    m_yOffset = height/2 - tileBitmap.GetHeight()/2;
-    dc.DrawBitmap(tileBitmap, m_xOffset, m_yOffset, true);
+    m_xOffset = width/2 - m_tileset->tileSize.x/2;
+    m_yOffset = height/2 - m_tileset->tileSize.y/2;
+    dc.Blit(m_xOffset,
+            m_yOffset,
+            m_tileset->tileSize.x,
+            m_tileset->tileSize.y,
+            &tilesetDC,
+            m_tileset->GetTileTextureCoords(m_currentTile).topLeft.x,
+            m_tileset->GetTileTextureCoords(m_currentTile).topLeft.y,
+            wxCOPY,
+            true);
 
     //Draw the hitbox
     std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);

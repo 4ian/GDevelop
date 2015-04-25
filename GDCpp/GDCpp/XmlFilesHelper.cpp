@@ -6,4 +6,4 @@
 
 #include "XmlFilesHelper.h"
 
-std::map<std::string, boost::shared_ptr<XmlFile> > XmlFilesManager::openedFiles;
+std::map<std::string, std::shared_ptr<XmlFile> > XmlFilesManager::openedFiles;

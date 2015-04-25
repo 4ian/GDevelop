@@ -17,6 +17,10 @@ gdjs.evtTools.runtimeScene.sceneJustBegins = function(runtimeScene) {
     return runtimeScene.isFirstFrame();
 };
 
+gdjs.evtTools.runtimeScene.getSceneName = function(runtimeScene) {
+    return runtimeScene.getName();
+};
+
 gdjs.evtTools.runtimeScene.setBackgroundColor = function(runtimeScene, rgbColor) {
 
     var colors = rgbColor.split(";");

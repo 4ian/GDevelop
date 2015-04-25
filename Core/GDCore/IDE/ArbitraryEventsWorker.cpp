@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/ArbitraryEventsWorker.h"

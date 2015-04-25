@@ -7,8 +7,7 @@
 #define SOURCEFILE_H
 #include <ctime>
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 namespace gd { class SerializerElement; }
 class BaseEvent;
 
@@ -71,10 +70,9 @@ public:
 private:
 
     std::string filename; ///< Filename
-    time_t lastBuildTimeStamp; ///< Time of the last build
     bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by GDevelop.
     std::string language; ///< String identifying the language of this source file (typically "C++ or "Javascript").
-    boost::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.
+    std::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.
 };
 
 //"Tool" Functions
@@ -82,8 +80,8 @@ private:
 /**
  * Functor testing Source Files name
  */
-struct ExternalSourceFileHasName : public std::binary_function<boost::shared_ptr<SourceFile>, std::string, bool> {
-    bool operator()(const boost::shared_ptr<SourceFile> & externalEvents, std::string name) const { return externalEvents->GetFileName() == name; }
+struct ExternalSourceFileHasName : public std::binary_function<std::shared_ptr<SourceFile>, std::string, bool> {
+    bool operator()(const std::shared_ptr<SourceFile> & externalEvents, std::string name) const { return externalEvents->GetFileName() == name; }
 };
 
 }

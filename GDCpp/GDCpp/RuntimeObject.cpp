@@ -198,7 +198,7 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
 
 void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
-    boost::shared_ptr<RuntimeObject> newObject = boost::shared_ptr<RuntimeObject>(Clone());
+    std::shared_ptr<RuntimeObject> newObject = std::shared_ptr<RuntimeObject>(Clone());
 
     scene.objectsInstances.AddObject(newObject);
 
@@ -240,19 +240,26 @@ bool RuntimeObject::AutomatismActivated( const std::string & automatismName )
     return GetAutomatismRawPointer(automatismName)->Activated();
 }
 
-double RuntimeObject::GetSqDistanceWithObject( RuntimeObject * object )
+double RuntimeObject::GetSqDistanceTo(double pointX, double pointY)
+{
+    double x = GetDrawableX()+GetCenterX() - pointX;
+    double y = GetDrawableY()+GetCenterY() - pointY;
+
+    return x*x+y*y;
+}
+
+double RuntimeObject::GetSqDistanceWithObject(RuntimeObject * object)
 {
     if ( object == NULL ) return 0;
 
-    float x = GetDrawableX()+GetCenterX() - (object->GetDrawableX()+object->GetCenterX());
-    float y = GetDrawableY()+GetCenterY() - (object->GetDrawableY()+object->GetCenterY());
-
-    return x*x+y*y; // No square root here
+    return GetSqDistanceTo(
+        object->GetDrawableX()+object->GetCenterX(),
+        object->GetDrawableY()+object->GetCenterY());
 }
 
-double RuntimeObject::GetDistanceWithObject( RuntimeObject * other )
+double RuntimeObject::GetDistanceWithObject(RuntimeObject * object)
 {
-    return sqrt(GetSqDistanceWithObject(other));
+    return sqrt(GetSqDistanceWithObject(object));
 }
 
 bool RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
@@ -323,11 +330,11 @@ void RuntimeObject::RotateTowardAngle(float angleInDegrees, float speed, Runtime
     bool diffWasPositive = angularDiff >= 0;
 
     float newAngle = GetAngle()+(diffWasPositive ? -1.0 : 1.0)*speed*timeDelta;
-    if( GDpriv::MathematicalTools::angleDifference(newAngle, angleInDegrees) > 0 ^ diffWasPositive)
+    if((GDpriv::MathematicalTools::angleDifference(newAngle, angleInDegrees) > 0) ^ diffWasPositive)
         newAngle = angleInDegrees;
     SetAngle(newAngle);
 
-    if ( GetAngle() != newAngle ) //Objects like sprite in 8 directions does not handle small increments...
+    if (GetAngle() != newAngle) //Objects like sprite in 8 directions does not handle small increments...
         SetAngle(angleInDegrees); //...so force them to be in the path angle anyway.
 }
 
@@ -525,6 +532,27 @@ std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
     return mask;
 }
 
+bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
+{
+    RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
+
+    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    {
+        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
+            scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
+
+        if (GetDrawableX() <= mousePos.x
+            && GetDrawableX() + GetWidth()  >= mousePos.x
+            && GetDrawableY() <= mousePos.y
+            && GetDrawableY() + GetHeight() >= mousePos.y)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name)
 {
     return automatisms.find(name)->second;
@@ -544,17 +572,6 @@ bool RuntimeObject::ClearForce()
 
     return true;
 }
-
-/**
- * \brief Internal functor testing if a force's length is 0.
- */
-struct NullForce
-{
-    bool operator ()( const Force &A ) const
-    {
-        return A.GetLength() <= 0.001;
-    }
-};
 
 bool RuntimeObject::UpdateForce( float elapsedTime )
 {

@@ -5,18 +5,16 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)
 
 project(GD-Extensions)
+include(CMakeUtils.txt) #Functions to factor common tasks done in CMakeLists.txt of extensions
 
-#Sanity checks
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
-	set(CMAKE_BUILD_TYPE Release)
-ENDIF()
-
+#Add all the CMakeLists:
 IF (NOT EMSCRIPTEN) #Only add some extensions when compiling with emscripten.
 	ADD_SUBDIRECTORY(AdvancedXML)
 	ADD_SUBDIRECTORY(AES)
 	ADD_SUBDIRECTORY(Box3DObject)
-	ADD_SUBDIRECTORY(CommonDialogs)
+	IF (NOT APPLE)
+		ADD_SUBDIRECTORY(CommonDialogs)
+	ENDIF()
 ENDIF()
 ADD_SUBDIRECTORY(DestroyOutsideAutomatism)
 ADD_SUBDIRECTORY(DraggableAutomatism)

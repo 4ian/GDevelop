@@ -11,8 +11,8 @@
 #include <vector>
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
+#include <memory>
 #include "GDCore/Events/Instruction.h"
 namespace gd { class EventsList; }
 namespace gd { class MainFrameWrapper; }
@@ -32,7 +32,7 @@ namespace gd
 {
 
 class BaseEvent;
-typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
+typedef std::shared_ptr<BaseEvent> BaseEventSPtr;
 
 /**
  * \brief Base class defining an event.
@@ -244,7 +244,7 @@ public:
     bool            folded; ///< Here as it must be saved. Used by events editor
     mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
 
-    boost::weak_ptr<gd::BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
+    std::weak_ptr<gd::BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
     signed long long totalTimeDuringLastSession; ///< Total time, in microseconds, used by the event during the last run. Used for profiling.
     float percentDuringLastSession; ///< Total time used by the event during the last run. Used for profiling.
 

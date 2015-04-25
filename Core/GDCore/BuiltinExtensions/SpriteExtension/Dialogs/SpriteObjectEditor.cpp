@@ -589,6 +589,7 @@ wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resourc
 
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
+        	wxLogNull noLogPlease;
             wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
             return bmp;
         }
@@ -931,7 +932,7 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
                 animationsMenu.Enable(ID_MENULOOP, true);
                 animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, true);
                 animationsMenu.Check(ID_MENULOOP, direction.IsLooping());
-                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images:")+ToString(direction.GetTimeBetweenFrames())+_("s"));
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images: ")+ToString(direction.GetTimeBetweenFrames())+_("s"));
             }
         }
     }
@@ -1725,6 +1726,7 @@ void SpriteObjectEditor::OnimagesListKeyDown(wxListEvent& event)
             OnMoveRightSelected(useless);
             break;
         }
+        case WXK_BACK:
         case WXK_DELETE:
         {
             wxCommandEvent useless;
@@ -1742,7 +1744,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE );
+        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE|wxFD_PREVIEW );
         wxString projectDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
 
         if ( FileDialog.ShowModal() == wxID_OK )

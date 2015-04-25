@@ -5,7 +5,7 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <iostream>
 #include <set>
 #include "TopDownMovementAutomatism.h"
@@ -55,10 +55,10 @@ float TopDownMovementAutomatism::GetSpeed()
 void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     //Get the player input:
-    leftKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Left );
-    rightKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Right );
-    downKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Down );
-    upKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Up );
+    leftKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Left");
+    rightKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Right");
+    downKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
+    upKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
 
     int direction = -1;
     float directionInRad = 0;

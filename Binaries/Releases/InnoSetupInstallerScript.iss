@@ -10,8 +10,8 @@ AppUpdatesURL=http://www.compilgames.net
 DefaultDirName={pf}/GDevelop
 DefaultGroupName=GDevelop
 AllowNoIcons=yes
-LicenseFile=..\Output\Release_Windows\License-fr.rtf
-InfoBeforeFile=..\Output\Release_Windows\Informations-fr.rtf
+LicenseFile=..\Output\Release_Windows\License-en.rtf
+InfoBeforeFile=..\Output\Release_Windows\Informations-en.rtf
 OutputDir=.\
 OutputBaseFilename=gd3678
 Compression=lzma
@@ -28,10 +28,12 @@ VersionInfoProductName=GDevelop
 VersionInfoProductVersion=3.6
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "..\Output\Release_Windows\License-en.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-en.rtf"
+Name: "english"; MessagesFile: "compiler:Default.isl";
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"; LicenseFile: "..\Output\Release_Windows\License-fr.rtf"; InfoBeforeFile: "..\Output\Release_Windows\Informations-fr.rtf"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl";
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl";
+Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl";
+Name: "german"; MessagesFile: "compiler:Languages\German.isl";
 
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags:
@@ -62,6 +64,8 @@ Source: ..\Output\Release_Windows\SelectLanguage-en.cfg; DestDir: {userdocs}\..\
 Source: ..\Output\Release_Windows\SelectLanguage-fr.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: french ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-es.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: spanish ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-ru.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: russian ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-de.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: german ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-pt.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: portuguese ; Components: main
 
 [Icons]
 Name: {group}\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}

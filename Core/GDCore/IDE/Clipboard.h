@@ -74,8 +74,8 @@ public:
     bool HasObjectGroup() { return hasObjectGroup; };
     void ForgetObjectGroup() { hasObjectGroup = false; };
 
-    void SetInstances( std::vector < boost::shared_ptr<InitialInstance> > instances );
-    std::vector < boost::shared_ptr<InitialInstance> > Gets() { return instancesCopied; };
+    void SetInstances( std::vector < std::shared_ptr<InitialInstance> > instances );
+    std::vector < std::shared_ptr<InitialInstance> > Gets() { return instancesCopied; };
     bool HasInstances() { return hasInstances; };
 
 private:
@@ -104,7 +104,7 @@ private:
     gd::ObjectGroup objectGroupCopied;
     bool hasObjectGroup;
 
-    std::vector < boost::shared_ptr<gd::InitialInstance> > instancesCopied;
+    std::vector < std::shared_ptr<gd::InitialInstance> > instancesCopied;
     bool hasInstances;
 
     static Clipboard *singleton;

@@ -8,20 +8,20 @@
 #include "GDCpp/AutomatismsSharedData.h"
 #include <iostream>
 
-const boost::shared_ptr<AutomatismsRuntimeSharedData> & AutomatismsRuntimeSharedDataHolder::GetAutomatismSharedData(const std::string & automatismName) const
+const std::shared_ptr<AutomatismsRuntimeSharedData> & AutomatismsRuntimeSharedDataHolder::GetAutomatismSharedData(const std::string & automatismName) const
 {
 	return automatismsSharedDatas.find(automatismName)->second;
 }
 
-void AutomatismsRuntimeSharedDataHolder::LoadFrom(const std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> > & sharedData)
+void AutomatismsRuntimeSharedDataHolder::LoadFrom(const std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> > & sharedData)
 {
     automatismsSharedDatas.clear();
-    for(std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = sharedData.begin();
+    for(std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = sharedData.begin();
         it != sharedData.end();
         ++it)
     {
-    	if (it->second == boost::shared_ptr<gd::AutomatismsSharedData>()) continue;
-        boost::shared_ptr<AutomatismsRuntimeSharedData> data = it->second->CreateRuntimeSharedDatas();
+    	if (it->second == std::shared_ptr<gd::AutomatismsSharedData>()) continue;
+        std::shared_ptr<AutomatismsRuntimeSharedData> data = it->second->CreateRuntimeSharedDatas();
 
         if ( data )
             automatismsSharedDatas[it->first] = data;
@@ -46,7 +46,7 @@ AutomatismsRuntimeSharedDataHolder& AutomatismsRuntimeSharedDataHolder::operator
 void AutomatismsRuntimeSharedDataHolder::Init(const AutomatismsRuntimeSharedDataHolder & other)
 {
     automatismsSharedDatas.clear();
-    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = other.automatismsSharedDatas.begin();
+    for (std::map < std::string, std::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = other.automatismsSharedDatas.begin();
          it != other.automatismsSharedDatas.end();++it)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();

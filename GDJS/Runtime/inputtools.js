@@ -22,7 +22,7 @@ gdjs.evtTools.input = gdjs.evtTools.input || {};
  */
 gdjs.evtTools.input.isKeyPressed = function(runtimeScene, key) {
     if (gdjs.evtTools.input.keysNameToCode.hasOwnProperty(key)) {
-        return runtimeScene.getGame().isKeyPressed(gdjs.evtTools.input.keysNameToCode[key]);
+        return runtimeScene.getGame().getInputManager().isKeyPressed(gdjs.evtTools.input.keysNameToCode[key]);
     }
 
     return false;
@@ -45,7 +45,7 @@ gdjs.evtTools.input.lastPressedKey = function(runtimeScene) {
         }
     }
 
-    var keyCode = runtimeScene.getGame().getLastPressedKey();
+    var keyCode = runtimeScene.getGame().getInputManager().getLastPressedKey();
     if (gdjs.evtTools.input._keysCodeToName.hasOwnProperty(keyCode)) {
         return gdjs.evtTools.input._keysCodeToName[keyCode];
     }
@@ -56,7 +56,7 @@ gdjs.evtTools.input.lastPressedKey = function(runtimeScene) {
 /**
  * Hashmap associated each name of a key to its keyCode.
  * @namespace gdjs.evtTools
- * @property isKeyPressed
+ * @property keysNameToCode
  * @static
  */
 gdjs.evtTools.input.keysNameToCode = {
@@ -156,12 +156,12 @@ gdjs.evtTools.input.keysNameToCode = {
 };
 
 gdjs.evtTools.input.anyKeyPressed = function(runtimeScene) {
-    return runtimeScene.getGame().anyKeyPressed();
+    return runtimeScene.getGame().getInputManager().anyKeyPressed();
 };
 
 gdjs.evtTools.input.isMouseButtonPressed = function(runtimeScene, button) {
-    if ( button === "Left" ) return runtimeScene.getGame().isMouseButtonPressed(0);
-    if ( button === "Right" ) return runtimeScene.getGame().isMouseButtonPressed(1);
+    if ( button === "Left" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(0);
+    if ( button === "Right" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(1);
     return false;
 };
 
@@ -174,15 +174,69 @@ gdjs.evtTools.input.showCursor = function(runtimeScene) {
 };
 
 gdjs.evtTools.input.getMouseWheelDelta = function(runtimeScene) {
-    return runtimeScene.getGame().getMouseWheelDelta();
+    return runtimeScene.getGame().getInputManager().getMouseWheelDelta();
 };
 
 gdjs.evtTools.input.getMouseX = function(runtimeScene, layer, camera) {
-    return runtimeScene.getLayer(layer).convertCoords(runtimeScene.getGame().getMouseX(),
-        runtimeScene.getGame().getMouseY())[0];
+    return runtimeScene.getLayer(layer).convertCoords(
+        runtimeScene.getGame().getInputManager().getMouseX(),
+        runtimeScene.getGame().getInputManager().getMouseY())[0];
 };
 
 gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
-    return runtimeScene.getLayer(layer).convertCoords(runtimeScene.getGame().getMouseX(),
-        runtimeScene.getGame().getMouseY())[1];
+    return runtimeScene.getLayer(layer).convertCoords(
+        runtimeScene.getGame().getInputManager().getMouseX(),
+        runtimeScene.getGame().getInputManager().getMouseY())[1];
+};
+
+gdjs.evtTools.input.cursorOnObject = function(objectsLists, runtimeScene, accurate, inverted) {
+    return gdjs.evtTools.object.pickObjectsIf(function(obj) {
+        return obj.cursorOnObject(runtimeScene);
+    }, objectsLists, inverted);
+};
+
+gdjs.evtTools.input.getTouchX = function(runtimeScene, identifier, layer, camera) {
+    return runtimeScene.getLayer(layer).convertCoords(
+        runtimeScene.getGame().getInputManager().getTouchX(identifier),
+        runtimeScene.getGame().getInputManager().getTouchY(identifier))[0];
+};
+
+gdjs.evtTools.input.getTouchY = function(runtimeScene, identifier, layer, camera) {
+    return runtimeScene.getLayer(layer).convertCoords(
+        runtimeScene.getGame().getInputManager().getTouchX(identifier),
+        runtimeScene.getGame().getInputManager().getTouchY(identifier))[1];
+};
+
+gdjs.evtTools.input.getLastTouchId = function() {
+    return gdjs.evtTools.input.lastTouchId || 0;
+};
+
+gdjs.evtTools.input.getLastEndedTouchId = function() {
+    return gdjs.evtTools.input.lastEndedTouchId || 0;
+};
+
+gdjs.evtTools.input.popStartedTouch = function(runtimeScene) {
+    var startedTouchId = runtimeScene.getGame().getInputManager().popStartedTouch();
+
+    if (startedTouchId !== undefined) {
+        gdjs.evtTools.input.lastTouchId = startedTouchId;
+        return true;
+    }
+
+    return false;
+};
+
+gdjs.evtTools.input.popEndedTouch = function(runtimeScene) {
+    var endedTouchId = runtimeScene.getGame().getInputManager().popEndedTouch();
+
+    if (endedTouchId !== undefined) {
+        gdjs.evtTools.input.lastEndedTouchId = endedTouchId;
+        return true;
+    }
+
+    return false;
+};
+
+gdjs.evtTools.input.touchSimulateMouse = function(runtimeScene, enable) {
+    runtimeScene.getGame().getInputManager().touchSimulateMouse(enable);
 };

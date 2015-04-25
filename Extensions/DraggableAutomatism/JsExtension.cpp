@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension);
@@ -34,8 +34,7 @@ public:
         DeclareDraggableAutomatismExtension(*this);
 
         GetAutomatismMetadata("DraggableAutomatism::Draggable").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
-        GetAllConditionsForAutomatism("DraggableAutomatism::Draggable")["DraggableAutomatism::Dragged"].codeExtraInformation
-            .SetFunctionName("isDragged").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
+        GetAllConditionsForAutomatism("DraggableAutomatism::Draggable")["DraggableAutomatism::Dragged"].SetFunctionName("isDragged").SetIncludeFile("DraggableAutomatism/draggableruntimeautomatism.js");
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };

@@ -29,7 +29,7 @@ This project is released under the MIT License.
 
 using namespace std;
 
-std::map<const gd::Layout*, boost::weak_ptr<Light_Manager> >  RuntimeLightObject::lightManagersList;
+std::map<const gd::Layout*, std::weak_ptr<Light_Manager> >  RuntimeLightObject::lightManagersList;
 #if defined(GD_IDE_ONLY)
 sf::Texture LightObject::edittimeIconImage;
 sf::Sprite LightObject::edittimeIcon;
@@ -100,7 +100,7 @@ RuntimeLightObject::RuntimeLightObject(RuntimeScene & scene, const gd::Object & 
     //Get a manager for the scene
     if ( lightManagersList[&scene].expired() )
     {
-        manager = boost::shared_ptr<Light_Manager>(new Light_Manager);
+        manager = std::shared_ptr<Light_Manager>(new Light_Manager);
         lightManagersList[&scene] = manager;
     }
     else
@@ -124,7 +124,7 @@ void RuntimeLightObject::UpdateGlobalLightMembers()
     if ( globalLight )
     {
         //Create supplementary members for the global light
-        if ( !globalLightImage ) globalLightImage = boost::shared_ptr<sf::RenderTexture>(new sf::RenderTexture);
+        if ( !globalLightImage ) globalLightImage = std::shared_ptr<sf::RenderTexture>(new sf::RenderTexture);
     }
     else
     {

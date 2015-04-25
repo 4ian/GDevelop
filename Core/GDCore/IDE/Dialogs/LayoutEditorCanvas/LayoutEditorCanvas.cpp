@@ -27,6 +27,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/Log.h"
@@ -113,6 +114,8 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     altPressed(false),
     shiftPressed(false),
     isMovingInstance(false),
+    gapBetweenButtonsAndRectangle(gd::GUIContentScaleFactor::Get() > 1 ? 12 : 5),
+    smallButtonSize(gd::GUIContentScaleFactor::Get() > 1 ? 12 : 5),
     firstRefresh(true),
     isSelecting(false),
     editing(true)
@@ -195,7 +198,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     }
 
     //Prepare undo-related variables
-    latestState = boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
+    latestState = std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
 
     //Generate zoom menu
 	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM5, _("5%"), wxEmptyString, wxITEM_NORMAL);
@@ -271,7 +274,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     //Initialize previewers
     for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
     {
-        boost::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
+        std::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
         previewers[project.GetUsedPlatforms()[i]->GetName()] = previewer;
 
         long id = wxNewId();
@@ -312,8 +315,8 @@ void LayoutEditorCanvas::OnIdle(wxIdleEvent & event)
 {
     // Send a paint message when the control is idle, to ensure maximum framerate
     Refresh();
-    #if !defined(WINDOWS)
-    event.RequestMore(); //On linux, we need to specify that we want continuous idle events
+    #if defined(__WXGTK__)
+    event.RequestMore(); //On GTK, we need to specify that we want continuous idle events.
     #endif
 }
 
@@ -511,8 +514,8 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         modeRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", SkinHelper::GetRibbonIcon("edit"), _("Edit the layout"));
-        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview of the layout"), wxRIBBON_BUTTON_HYBRID);
+        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : "", SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
+        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -729,7 +732,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
     //Check if there is a click on a gui element inside the layout
     for (unsigned int i = 0;i<guiElements.size();++i)
     {
-        if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) )
+        if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
             OnGuiElementPressed(guiElements[i]);
             return ;
@@ -884,7 +887,7 @@ public:
     }
 
     std::vector<InitialInstance*> & GetSelectedList() { return selectedList; };
-    std::vector<InitialInstance*> & IgnoreLockedInstances() { ignoreLockedInstances = true; };
+    InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; };
 
 private:
     const LayoutEditorCanvas & editor;
@@ -892,7 +895,7 @@ private:
     bool ignoreLockedInstances;
 };
 
-void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
+void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
 {
     if ( !editing ) return;
 
@@ -913,7 +916,7 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
     //Check if there is a click released on a gui element inside the layout
     for (unsigned int i = 0;i<guiElements.size();++i)
     {
-        if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) )
+        if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
             OnGuiElementReleased(guiElements[i]);
             return;
@@ -970,7 +973,7 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
     }
 }
 
-void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
+void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
 {
     if (!editing) return;
 
@@ -1064,7 +1067,7 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
         bool hoveringSomething = false;
         for (unsigned int i = 0;i<guiElements.size();++i)
         {
-            if ( guiElements[i].area.Contains(event.GetX(), event.GetY()) ) {
+            if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) ) {
                 OnGuiElementHovered(guiElements[i]);
                 hoveringSomething = true;
             }
@@ -1104,7 +1107,7 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
     }
 }
 
-void LayoutEditorCanvas::OnMiddleDown( wxMouseEvent &event )
+void LayoutEditorCanvas::OnMiddleDown(wxMouseEvent &)
 {
     if ( !editing ) return;
 
@@ -1148,7 +1151,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
     if ( evt.GetKeyCode() == WXK_ALT )
         altPressed = true;
 
-    if ( evt.GetKeyCode() == WXK_DELETE )
+    if ( evt.GetKeyCode() == WXK_DELETE || evt.GetKeyCode() == WXK_BACK )
     {
         std::vector<InitialInstance*> instancesToDelete;
         for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
@@ -1217,7 +1220,7 @@ void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )
 
 void LayoutEditorCanvas::ChangesMade()
 {
-    history.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(latestState->Clone()));
+    history.push_back(std::shared_ptr<gd::InitialInstancesContainer>(latestState->Clone()));
     redoHistory.clear();
     latestState->Create(instances);
     project.SetDirty();
@@ -1340,17 +1343,17 @@ void LayoutEditorCanvas::Undo(unsigned int times)
     {
         if ( history.empty() ) return;
 
-        redoHistory.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
+        redoHistory.push_back(std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
         instances.Create(*history.back());
         history.pop_back();
 
-        latestState = boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
+        latestState = std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
     }
 }
 
 void LayoutEditorCanvas::OnClearHistorySelected(wxCommandEvent& event)
 {
-    if (wxMessageBox("Etes-vous sûr de vouloir supprimer l'historique des modifications ?", "Êtes vous sûr ?",wxYES_NO ) != wxYES)
+    if (wxMessageBox(_("Are you sure you want to clear the Undo History?"), "Clear the history",wxYES_NO ) != wxYES)
         return;
 
     history.clear();
@@ -1363,11 +1366,11 @@ void LayoutEditorCanvas::Redo( unsigned int times )
     {
         if ( redoHistory.empty() ) return;
 
-        history.push_back(boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
+        history.push_back(std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone()));
         instances.Create(*redoHistory.back());
         redoHistory.pop_back();
 
-        latestState = boost::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
+        latestState = std::shared_ptr<gd::InitialInstancesContainer>(instances.Clone());
     }
 }
 
@@ -1454,11 +1457,11 @@ void LayoutEditorCanvas::PausePreview()
 void LayoutEditorCanvas::SetParentAuiManager(wxAuiManager * parentAuiManager_)
 {
     parentAuiManager = parentAuiManager_;
-    for(std::map<std::string, boost::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
+    for(std::map<std::string, std::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
         it != previewers.end();
         ++it)
     {
-        if ( it->second != boost::shared_ptr<gd::LayoutEditorPreviewer>() ) { it->second->SetParentAuiManager(parentAuiManager_); }
+        if ( it->second != std::shared_ptr<gd::LayoutEditorPreviewer>() ) { it->second->SetParentAuiManager(parentAuiManager_); }
     }
 }
 

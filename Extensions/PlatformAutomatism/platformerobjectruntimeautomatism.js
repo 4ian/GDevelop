@@ -35,9 +35,8 @@ gdjs.PlatformerObjectRuntimeAutomatism = function(runtimeScene, automatismData, 
     this._upKey = false;
     this._downKey = false;
     this._jumpKey = false;
-    this._potentialCollidingObjects = {}; //Hashtable of platforms (Keys: Objects id, values: automatisms) near the object, updated with _updatePotentialCollidingObjects.
-    this._collidingObjects = {};
-    this._overlappedJumpThru = {};
+    this._potentialCollidingObjects = []; //Platforms near the object, updated with _updatePotentialCollidingObjects.
+    this._overlappedJumpThru =[];
     this._oldHeight = 0;//owner.getHeight(); //Be careful, object might not be initialized.
     this._hasReallyMoved = false;
     this.setSlopeMaxAngle(automatismData.slopeMaxAngle);
@@ -60,6 +59,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     var RIGHTKEY = 39;
     var DOWNKEY = 40;
     var SHIFTKEY = 16;
+    var SPACEKEY = 32;
     var object = this.owner;
     var timeDelta = runtimeScene.getElapsedTime()/1000;
 
@@ -68,8 +68,8 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     var requestedDeltaY = 0;
 
     //Change the speed according to the player's input.
-    this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(LEFTKEY);
-    this._rightKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(RIGHTKEY);
+    this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+    this._rightKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
     if ( this._leftKey ) this._currentSpeed -= this._acceleration*timeDelta;
     if ( this._rightKey ) this._currentSpeed += this._acceleration*timeDelta;
 
@@ -92,7 +92,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     this._updateOverlappedJumpThru();
 
     //Check that the floor object still exists and is near the object.
-    if ( this._isOnFloor && !this._potentialCollidingObjects.hasOwnProperty(this._floorPlatform.owner.id) ) {
+    if ( this._isOnFloor && !this._isIn(this._potentialCollidingObjects, this._floorPlatform.owner.id) ) {
         this._isOnFloor = false;
         this._floorPlatform = null;
     }
@@ -149,7 +149,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     //2) Y axis:
 
     //Go on a ladder
-    this._ladderKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(UPKEY);
+    this._ladderKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
     if (this._ladderKey && this._isOverlappingLadder()) {
         this._canJump = true;
         this._isOnFloor = false;
@@ -160,8 +160,8 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     }
 
     if ( this._isOnLadder ) {
-        this._upKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(UPKEY);
-        this._downKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(DOWNKEY);
+        this._upKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+        this._downKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
         if ( this._upKey )
             requestedDeltaY -= 150*timeDelta;
         if ( this._downKey )
@@ -183,7 +183,9 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
     }
 
     //Jumping
-    this._jumpKey |= !this._ignoreDefaultControls && runtimeScene.getGame().isKeyPressed(SHIFTKEY);
+    this._jumpKey |= !this._ignoreDefaultControls &&
+        (runtimeScene.getGame().getInputManager().isKeyPressed(SHIFTKEY) ||
+        runtimeScene.getGame().getInputManager().isKeyPressed(SPACEKEY));
     if ( this._canJump && this._jumpKey ) {
         this._jumping = true;
         this._canJump = false;
@@ -291,26 +293,19 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype.doStepPreEvents = function(runt
         }
         else{
             //Check if landing on a new floor: (Exclude already overlapped jump truh)
-            this._updateCollidingObjects();
-            var collidingWithAnObject = false;
-            for( var k in this._collidingObjects ) {
-                if ( this._collidingObjects.hasOwnProperty(k) ) {
-                    this._isOnFloor = true;
-                    this._canJump = true;
-                    this._jumping = false;
-                    this._currentJumpSpeed = 0;
-                    this._currentFallSpeed = 0;
+            var collidingPlatform = this._getCollidingPlatform();
+            if (collidingPlatform !== null) {
+                this._isOnFloor = true;
+                this._canJump = true;
+                this._jumping = false;
+                this._currentJumpSpeed = 0;
+                this._currentFallSpeed = 0;
 
-                    //Register one of the colliding platforms as the floor.
-                    this._floorPlatform = this._collidingObjects[k];
-                    this._floorLastX = this._floorPlatform.owner.getX();
-                    this._floorLastY = this._floorPlatform.owner.getY();
-
-                    collidingWithAnObject = true;
-                    break;
-                }
-            }
-            if (!collidingWithAnObject) { //In the air
+                //Register the colliding platform as the floor.
+                this._floorPlatform = collidingPlatform;
+                this._floorLastX = this._floorPlatform.owner.getX();
+                this._floorLastY = this._floorPlatform.owner.getY();
+            } else { //In the air
                 this._canJump = false;
                 this._isOnFloor = false;
                 this._floorPlatform = null;
@@ -354,17 +349,15 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWith = function(can
 {
     excludeJumpThrus = !!excludeJumpThrus;
 
-    for (var k in candidates) {
-        if (candidates.hasOwnProperty(k)) {
-            var platform = candidates[k];
+    for (var i = 0;i<candidates.length;++i) {
+        var platform = candidates[i];
 
-            if ( platform.owner.id === exceptThisOne ) continue;
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
+        if ( platform.owner.id === exceptThisOne ) continue;
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
 
-            if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
-                return true;
-        }
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+            return true;
     }
 
     return false;
@@ -380,15 +373,13 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = functi
     excludeJumpThrus = !!excludeJumpThrus;
 
     var objects = [];
-    for (var k in candidates) {
-        if (candidates.hasOwnProperty(k)) {
-            var platform = candidates[k];
+    for (var i = 0;i<candidates.length;++i) {
+        var platform = candidates[i];
 
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU ) continue;
 
-            objects.push(platform.owner);
-        }
+        objects.push(platform.owner);
     }
 
     var objectsLists = new Hashtable();
@@ -404,44 +395,36 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._separateFromPlatforms = functi
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._isCollidingWithExcluding = function(candidates, exceptTheseOnes)
 {
-    for (var k in candidates) {
-        if (candidates.hasOwnProperty(k)) {
-            var platform = candidates[k];
+    for (var i = 0;i<candidates.length;++i) {
+        var platform = candidates[i];
 
-            if ( exceptTheseOnes && exceptTheseOnes.hasOwnProperty(k) ) continue;
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
-                return true;
-        }
+        if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) continue;
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+            return true;
     }
 
     return false;
 };
 
 /**
- * Update _collidingObjects member, so that it contains all the platforms which are colliding with
- * the automatism owner object. Overlapped jump thru are excluded.
- * Ladders are *always* excluded from the test.
- * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before
+ * Return (one of) the platform which is colliding with the automatism owner object.
+ * Overlapped jump thru and ladders are excluded.
+ * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before.
  */
-gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateCollidingObjects = function()
+gdjs.PlatformerObjectRuntimeAutomatism.prototype._getCollidingPlatform = function()
 {
-    for (var k in this._potentialCollidingObjects) {
-        if (this._potentialCollidingObjects.hasOwnProperty(k)) {
-            var platform = this._potentialCollidingObjects[k];
+    for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
+        var platform = this._potentialCollidingObjects[i];
 
-            if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER
-                && !this._overlappedJumpThru.hasOwnProperty(k)
-                && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
-                if ( !this._collidingObjects.hasOwnProperty(k) )
-                    this._collidingObjects[k] = platform;
-            }
-            else {
-                if ( this._collidingObjects.hasOwnProperty(k) )
-                    delete this._collidingObjects[k];
-            }
+        if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER
+            && !this._isIn(this._overlappedJumpThru, platform.owner.id)
+            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
+                return platform;
         }
     }
+
+    return null; //Nothing is being colliding with the automatism object.
 };
 
 /**
@@ -452,19 +435,13 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateCollidingObjects = funct
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateOverlappedJumpThru = function()
 {
-    for (var k in this._potentialCollidingObjects) {
-        if (this._potentialCollidingObjects.hasOwnProperty(k)) {
-            var platform = this._potentialCollidingObjects[k];
+    this._overlappedJumpThru.length = 0;
+    for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
+        var platform = this._potentialCollidingObjects[i];
 
-            if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU
-                && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
-                if ( !this._overlappedJumpThru.hasOwnProperty(k) )
-                    this._overlappedJumpThru[k] = platform;
-            }
-            else {
-                if ( this._overlappedJumpThru.hasOwnProperty(k) )
-                    delete this._overlappedJumpThru[k];
-            }
+        if ( platform.getPlatformType() === gdjs.PlatformRuntimeAutomatism.JUMPTHRU
+            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
+                this._overlappedJumpThru.push(platform);
         }
     }
 };
@@ -475,18 +452,25 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._updateOverlappedJumpThru = fun
  * @private
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._isOverlappingLadder = function() {
-    for (var k in this._potentialCollidingObjects) {
-        if (this._potentialCollidingObjects.hasOwnProperty(k)) {
-            var platform = this._potentialCollidingObjects[k];
+    for (var i = 0;i < this._potentialCollidingObjects.length;++i) {
+        var platform = this._potentialCollidingObjects[i];
 
-            if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
-            if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
-                return true;
-        }
+        if ( platform.getPlatformType() !== gdjs.PlatformRuntimeAutomatism.LADDER ) continue;
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+            return true;
     }
 
     return false;
 };
+
+gdjs.PlatformerObjectRuntimeAutomatism.prototype._isIn = function(platformArray, id) {
+    for (var i = 0;i < platformArray.length;++i) {
+        if (platformArray[i].owner.id === id)
+            return true;
+    }
+
+    return false;
+}
 
 /**
  * Update _potentialCollidingObjects member with platforms near the object.
@@ -494,7 +478,7 @@ gdjs.PlatformerObjectRuntimeAutomatism.prototype._isOverlappingLadder = function
  */
 gdjs.PlatformerObjectRuntimeAutomatism.prototype._updatePotentialCollidingObjects = function(maxMovementLength)
 {
-    this._manager.getAllPlatformsAround(this.owner, maxMovementLength, this._potentialCollidingObjects);
+    this._potentialCollidingObjects = this._manager.getAllPlatformsAround(this.owner, maxMovementLength);
 
     //This is the naive implementation when the platforms manager is simply containing a list
     //of all existing platforms:

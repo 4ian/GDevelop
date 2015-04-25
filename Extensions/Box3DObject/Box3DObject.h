@@ -10,7 +10,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class SFMLTextureWrapper;
 class RuntimeScene;
 namespace gd { class Object; }
@@ -73,12 +73,12 @@ private:
     float height;
     float depth;
 
-    boost::shared_ptr<SFMLTextureWrapper> frontTexture;
-    boost::shared_ptr<SFMLTextureWrapper> topTexture;
-    boost::shared_ptr<SFMLTextureWrapper> bottomTexture;
-    boost::shared_ptr<SFMLTextureWrapper> leftTexture;
-    boost::shared_ptr<SFMLTextureWrapper> rightTexture;
-    boost::shared_ptr<SFMLTextureWrapper> backTexture;
+    std::shared_ptr<SFMLTextureWrapper> frontTexture;
+    std::shared_ptr<SFMLTextureWrapper> topTexture;
+    std::shared_ptr<SFMLTextureWrapper> bottomTexture;
+    std::shared_ptr<SFMLTextureWrapper> leftTexture;
+    std::shared_ptr<SFMLTextureWrapper> rightTexture;
+    std::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
 class GD_EXTENSION_API RuntimeBox3DObject : public RuntimeObject
@@ -134,12 +134,12 @@ private:
     float pitch;
     float roll;
 
-    boost::shared_ptr<SFMLTextureWrapper> frontTexture;
-    boost::shared_ptr<SFMLTextureWrapper> topTexture;
-    boost::shared_ptr<SFMLTextureWrapper> bottomTexture;
-    boost::shared_ptr<SFMLTextureWrapper> leftTexture;
-    boost::shared_ptr<SFMLTextureWrapper> rightTexture;
-    boost::shared_ptr<SFMLTextureWrapper> backTexture;
+    std::shared_ptr<SFMLTextureWrapper> frontTexture;
+    std::shared_ptr<SFMLTextureWrapper> topTexture;
+    std::shared_ptr<SFMLTextureWrapper> bottomTexture;
+    std::shared_ptr<SFMLTextureWrapper> leftTexture;
+    std::shared_ptr<SFMLTextureWrapper> rightTexture;
+    std::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
 RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);

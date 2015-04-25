@@ -21,6 +21,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 class LayoutEditorPropertiesPnl;
 
@@ -39,10 +40,11 @@ public:
      * \brief Default constructor
      * \param parent wxWidgets parent window
      * \param project The project being edited
-     * \param layout The layout being edited. Can be NULL.
+     * \param layout The layout being edited.
      * \param mainFrameWrapper gd::MainFrameWrapper object
      */
-    ObjectsEditor(wxWindow* parent, gd::Project & project, gd::Layout * layout, gd::MainFrameWrapper & mainFrameWrapper_);
+    ObjectsEditor(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper_);
+
     virtual ~ObjectsEditor();
 
     /**
@@ -194,10 +196,8 @@ private:
     gd::ObjectGroup & GetGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
     void RemoveGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
 
-    wxImageList* objectsImagesList;
-
     gd::Project & project;
-    gd::Layout * layout; ///< Layout edited. Can be NULL.
+    gd::Layout & layout;
     gd::MainFrameWrapper & mainFrameWrapper;
 
     static wxRibbonButtonBar * objectsRibbonBar;
@@ -207,6 +207,7 @@ private:
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;
 
+    ObjectListDialogsHelper listsHelper; ///< The helper used for rendering lists.
     wxTreeItemId objectsRootItem;
     wxTreeItemId groupsRootItem;
 

@@ -5,10 +5,12 @@
  */
 
 /**
- * RuntimeObject represents an object being used on a RuntimeScene.<br>
+ * RuntimeObject represents an object being used on a RuntimeScene.
+ *
  * The constructor can be called on an already existing RuntimeObject:
  * In this case, the constructor will try to reuse as much already existing members
- * as possible ( Recycling ).<br>
+ * as possible (recycling).
+ *
  * However, you should not be calling the constructor on an already existing object
  * which is not a RuntimeObject.
  *
@@ -849,15 +851,38 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
     return moved;
 };
 
-gdjs.RuntimeObject.prototype.getDistanceFrom = function(otherObject) {
-    return Math.sqrt(this.getSqDistanceFrom(otherObject));
+/**
+ * Get the distance, in pixels, to another object.
+ * @method getDistanceToObject
+ * @param otherObject The other object
+ */
+gdjs.RuntimeObject.prototype.getDistanceToObject = function(otherObject) {
+    return Math.sqrt(this.getSqDistanceToObject(otherObject));
 };
 
-gdjs.RuntimeObject.prototype.getSqDistanceFrom = function(otherObject) {
-    if ( otherObject == null ) return 0;
+/**
+ * Get the squared distance, in pixels, to another object.
+ * @method getSqDistanceToObject
+ * @param otherObject The other object
+ */
+gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
+    if ( otherObject === null ) return 0;
 
     var x = this.getX()+this.getCenterX() - (otherObject.getX()+otherObject.getCenterX());
     var y = this.getY()+this.getCenterY() - (otherObject.getY()+otherObject.getCenterY());
+
+    return x*x+y*y;
+};
+
+/**
+ * Get the squared distance, in pixels, to a position.
+ * @method getSqDistanceTo
+ * @param pointX {Number} X position
+ * @param pointY {Number} Y position
+ */
+gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
+    var x = this.getX()+this.getCenterX() - pointX;
+    var y = this.getY()+this.getCenterY() - pointY;
 
     return x*x+y*y;
 };
@@ -1019,11 +1044,52 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
  * @static
  */
 gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
-    var x = obj1.getDrawableX()+obj1.getCenterX()-(obj2.getDrawableX()+obj2.getCenterX());
-    var y = obj1.getDrawableY()+obj1.getCenterY()-(obj2.getDrawableY()+obj2.getCenterY());
-
-    return x*x+y*y <= distance;
+    return obj1.getSqDistanceToObject(obj2) <= distance;
 };
+
+/**
+ * Return true if the specified position is inside object bounding box.
+ *
+ * The position should be in "world" coordinates, i.e use gdjs.Layer.convertCoords
+ * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
+ *
+ * @method insideObject
+ */
+gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
+    return this.getDrawableX() <= x
+        && this.getDrawableX() + this.getWidth() >= x
+        && this.getDrawableY() <= y
+        && this.getDrawableY() + this.getHeight() >= y;
+}
+
+/**
+ * Return true if the cursor, or any touch, is on the object.
+ *
+ * @method cursorOnObject
+ * @return true if the cursor, or any touch, is on the object.
+ */
+gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
+    var inputManager = runtimeScene.getGame().getInputManager();
+    var layer = runtimeScene.getLayer(this.layer);
+
+    var mousePos = layer.convertCoords(inputManager.getMouseX(), inputManager.getMouseY());
+    if (this.insideObject(mousePos[0], mousePos[1])) {
+        return true;
+    }
+
+    var touchIds = inputManager.getAllTouchIdentifiers();
+    for(var i = 0;i<touchIds.length;++i) {
+        var touchPos = layer.convertCoords(inputManager.getTouchX(touchIds[i]),
+            inputManager.getTouchY(touchIds[i]));
+
+        if (this.insideObject(touchPos[0], touchPos[1])) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 
 /**
  * Get the identifier associated to an object name :<br>

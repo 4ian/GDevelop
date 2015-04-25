@@ -97,46 +97,11 @@ gdjs.evtTools.linkedObjects.removeAllLinksOf = function(runtimeScene, objA) {
 };
 
 gdjs.evtTools.linkedObjects.pickObjectsLinkedTo = function(runtimeScene, objectsLists, obj) {
-
 	if (obj === null) return false;
-    var isTrue = false;
-    var objectsValues = objectsLists.values();
-
-    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
-        var arr = objectsValues[i];
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            arr[k].pick = false;
-        }
-    }
-
-    //Pick only linked objects
     var linkedObjects =
 		gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).getObjectsLinkedWith(obj);
-    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
-        var arr = objectsValues[i];
 
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            if ( linkedObjects.indexOf(arr[k]) !== -1 ) { //The current object is linked to obj.
-				isTrue = true;
-                arr[k].pick = true; //Pick the objects
-            }
-        }
-    }
-
-    //Trim not picked objects from arrays.
-    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
-        var arr = objectsValues[i];
-        var finalSize = 0;
-
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            var obj = arr[k];
-            if ( arr[k].pick ) {
-                arr[finalSize] = obj;
-                finalSize++;
-            }
-        }
-        arr.length = finalSize;
-    }
-
-    return isTrue;
+	return gdjs.evtTools.object.pickObjectsIf(function(obj) {
+		return linkedObjects.indexOf(obj) !== -1;
+	}, objectsLists, false);
 };

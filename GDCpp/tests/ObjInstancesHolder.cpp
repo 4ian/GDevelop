@@ -24,13 +24,13 @@ TEST_CASE( "ObjInstancesHolder", "[common]" ) {
 		RuntimeGame game;
 		RuntimeScene scene(NULL, &game);
 
-		boost::shared_ptr<RuntimeObject> obj1A(new RuntimeObject(scene, obj1));
-		boost::shared_ptr<RuntimeObject> obj1B(new RuntimeObject(scene, obj1));
-		boost::shared_ptr<RuntimeObject> obj1C(new RuntimeObject(scene, obj1));
+		std::shared_ptr<RuntimeObject> obj1A(new RuntimeObject(scene, obj1));
+		std::shared_ptr<RuntimeObject> obj1B(new RuntimeObject(scene, obj1));
+		std::shared_ptr<RuntimeObject> obj1C(new RuntimeObject(scene, obj1));
 
-		boost::shared_ptr<RuntimeObject> obj2A(new RuntimeObject(scene, obj2));
-		boost::shared_ptr<RuntimeObject> obj2B(new RuntimeObject(scene, obj2));
-		boost::shared_ptr<RuntimeObject> obj2C(new RuntimeObject(scene, obj2));
+		std::shared_ptr<RuntimeObject> obj2A(new RuntimeObject(scene, obj2));
+		std::shared_ptr<RuntimeObject> obj2B(new RuntimeObject(scene, obj2));
+		std::shared_ptr<RuntimeObject> obj2C(new RuntimeObject(scene, obj2));
 
 		//Adding objects
 		ObjInstancesHolder container;

@@ -6,10 +6,12 @@
 
 #ifndef COMMONTOOLS_H
 #define COMMONTOOLS_H
+#include <algorithm>
+#include <cmath>
+#include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <cmath>
 class wxString;
 
 namespace gd
@@ -124,6 +126,19 @@ inline double Round( double d )
     return ( d >= 0 ? floor(d+0.5) : ceil(d-0.5) );
 }
 #endif
+
+/**
+ * Make the whole string uppercase.
+ * \ingroup CommonProgrammingTools
+ */
+inline std::string StrUppercase( const std::string& in )
+{
+    std::string out;
+
+    std::transform( in.begin(), in.end(), std::back_inserter( out ), ::toupper );
+    return out;
+}
+
 }
 
 #endif // COMMONTOOLS_H

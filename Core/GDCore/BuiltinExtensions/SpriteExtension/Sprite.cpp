@@ -128,7 +128,7 @@ void Sprite::SetCustomCollisionMask(const std::vector<Polygon2d> & collisionMask
 }
 
 #if !defined(EMSCRIPTEN)
-void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
+void Sprite::LoadImage(std::shared_ptr<SFMLTextureWrapper> image_)
 {
     sfmlImage = image_;
     sfmlSprite.setTexture(sfmlImage->texture, true);
@@ -140,9 +140,9 @@ void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
 
 void Sprite::MakeSpriteOwnsItsImage()
 {
-    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<SFMLTextureWrapper>() )
+    if ( !hasItsOwnImage || sfmlImage == std::shared_ptr<SFMLTextureWrapper>() )
     {
-        sfmlImage = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
+        sfmlImage = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
         sfmlSprite.setTexture(sfmlImage->texture);
         hasItsOwnImage = true;
     }

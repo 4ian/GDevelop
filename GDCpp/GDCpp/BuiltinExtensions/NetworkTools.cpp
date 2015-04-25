@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <fstream>
+#include <cstring>
 #include <string>
 #include <iomanip>
 #include <SFML/Network.hpp>
@@ -60,7 +61,7 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
     system(call.c_str());
-#elif defined(MAC)
+#elif defined(MACOS)
     string call = "open \""+webpageurl+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
@@ -227,7 +228,7 @@ std::string GD_API VariableStructureToJSON(const gd::Variable & variable)
         if ( variable.IsNumber() )
             return ToString(variable.GetValue());
         else
-            return "\""+StringToQuotedJSONString(variable.GetString().c_str())+"\"";
+            return StringToQuotedJSONString(variable.GetString().c_str());
     }
 
     std::string str = "{";
@@ -236,7 +237,7 @@ std::string GD_API VariableStructureToJSON(const gd::Variable & variable)
         i != variable.GetAllChildren().end();++i)
     {
         if ( !firstChild ) str += ",";
-        str += "\""+i->first+"\": "+VariableStructureToJSON(i->second);
+        str += StringToQuotedJSONString(i->first.c_str())+": "+VariableStructureToJSON(i->second);
 
         firstChild = false;
     }

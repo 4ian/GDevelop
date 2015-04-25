@@ -39,16 +39,23 @@ The documentation is available on http://4ian.github.io/GD-Documentation.
 Links
 -----
 
+### Community
+
 * [GDevelop forums](http://forum.compilgames.net)
 * [GDevelop homepage](http://www.compilgames.net)
 * [GDevelop wiki](http://wiki.compilgames.net)
 * Help translate GD in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
 
+### Development Roadmap
+
+* [GDevelop Roadmap on Trello.com](https://trello.com/b/qf0lM7k8/gdevelop-roadmap), for a global view of the features that could be added.
+* [GitHub issue page](https://github.com/4ian/GD/issues), for technical issues and bugs.
+
 License
 -------
 
-* The Core library, the native and HTML5 platforms and all extensions (respectively *Core*, *GDCpp*, *GDJS* and *Extensions* folders) are under the MIT license.
-* The IDE (in the IDE folder) is licensed with GPL v3.
+* The Core library, the native and HTML5 platforms and all extensions (respectively *Core*, *GDCpp*, *GDJS* and *Extensions* folders) are under the **MIT license**.
+* The IDE (in the IDE folder) is licensed with **GPL v3**.
 * The name, GDevelop, and its logo are the exclusive property of Florian Rival.
 
 Games exported with GDevelop are based on the native and/or HTML5 platforms (see *Core*, *GDCpp* and *GDJS* folders): these platforms are distributed under the MIT license, so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.

@@ -12,7 +12,5 @@ class RuntimeScene;
 bool IsKeyPressed(RuntimeScene & scene, std::string key);
 bool AnyKeyIsPressed(RuntimeScene & scene);
 std::string LastPressedKey(RuntimeScene & scene);
-const std::map<std::string, int> & GetKeyNameToSfKeyMap();
-const std::map<int, std::string> & GetSfKeyToKeyNameMap();
 
 #endif // KEYBOARDTOOLS_H

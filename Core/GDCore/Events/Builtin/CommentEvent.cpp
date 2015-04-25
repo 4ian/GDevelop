@@ -68,7 +68,7 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
 
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     renderingHelper->GetHTMLRenderer().SetDC(&dc);
-    renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
+    renderingHelper->GetHTMLRenderer().SetStandardFonts(renderingHelper->GetNiceFont().GetPointSize());
 
     //Prepare HTML texts
     std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
@@ -91,7 +91,9 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
     dc.SetPen(wxPen(wxColour(r/2, v/2, b/2), 1));
 
     //Draw the background
-    wxRect rectangle(x, y, width-2, text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation);
+    unsigned int height = std::max(text1Height, text2Height)+sideSeparation*2;
+    height = std::max(height, (unsigned int)15);
+    wxRect rectangle(x, y, width-2, height);
     dc.GradientFillLinear(rectangle, wxColour(r+20 > 255 ? 255 : r+20, v+20 > 255 ? 255 : v+20, b+20 > 255 ? 255 : b+20), wxColour(r, v, b), wxSOUTH);
     dc.DrawRectangle(rectangle);
 
@@ -122,7 +124,7 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platf
         dc.SelectObject(fakeBmp);
 
         renderingHelper->GetHTMLRenderer().SetDC(&dc);
-        renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
+        renderingHelper->GetHTMLRenderer().SetStandardFonts(renderingHelper->GetNiceFont().GetPointSize());
 
         std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
         std::string str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
@@ -139,7 +141,9 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platf
         renderingHelper->GetHTMLRenderer().SetHtmlText(str2);
         unsigned int text2Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
 
-        renderedHeight = text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation;
+        unsigned int height = std::max(text1Height, text2Height)+sideSeparation*2;
+        height = std::max(height, (unsigned int)15);
+        renderedHeight = height;
     }
 #endif
     return renderedHeight+2;//2 : 2 small borders

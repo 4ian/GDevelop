@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "DestroyOutsideAutomatism.h"
-#include <boost/version.hpp>
+
 
 void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
 {
@@ -25,8 +25,8 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
           "",
           "CppPlatform/Extensions/destroyoutsideicon.png",
           "DestroyOutsideAutomatism",
-          boost::shared_ptr<gd::Automatism>(new DestroyOutsideAutomatism),
-          boost::shared_ptr<gd::AutomatismsSharedData>());
+          std::shared_ptr<gd::Automatism>(new DestroyOutsideAutomatism),
+          std::shared_ptr<gd::AutomatismsSharedData>());
 
     #if defined(GD_IDE_ONLY)
     aut.SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
@@ -43,7 +43,7 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
+        .SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
 
     aut.AddAction("ExtraBorder",
                    _("Additional border"),
@@ -57,8 +57,8 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetExtraBorder").SetManipulatedType("number")
-        .SetAssociatedGetter("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
+        .SetFunctionName("SetExtraBorder").SetManipulatedType("number")
+        .SetGetter("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
     #endif
 
 }

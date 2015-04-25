@@ -9,7 +9,7 @@
 #if defined(GD_IDE_ONLY)
 #include <string>
 #include "GDCore/Events/Instruction.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -222,10 +222,11 @@ public:
 
         /**
          * Set the function name which will be used when generating the code.
+         * \param functionName the name of the function to call
          */
-        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & functionName_)
         {
-            functionCallName = cppCallingName_;
+            functionCallName = functionName_;
             return *this;
         }
 
@@ -255,13 +256,12 @@ public:
          *      .AddParameter("object", _("Object"), "Text", false)
          *      .AddParameter("operator", _("Modification operator"))
          *      .AddParameter("string", _("String"))
-         *
-         *      .codeExtraInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+         *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
          *
          *  DECLARE_END_OBJECT_ACTION()
          * \endcode
          */
-        ExtraInformation & SetAssociatedGetter(const std::string & getter)
+        ExtraInformation & SetGetter(const std::string & getter)
         {
             optionalAssociatedInstruction = getter;
             accessType = MutatorAndOrAccessor;
@@ -285,7 +285,7 @@ public:
             virtual std::string GenerateCode(Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
-        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
@@ -296,23 +296,33 @@ public:
         AccessType accessType;
         std::string optionalAssociatedInstruction;
         std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+        std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 
     /**
      * \brief Declare if the instruction being declared is somewhat manipulating in a standard way.
-     *
-     * Shortcut for "codeExtraInformation.SetManipulatedType(type)".
+     * \param type "number" or "string"
+     * \note Shortcut for `codeExtraInformation.SetManipulatedType(type)`.
      */
     ExtraInformation & SetManipulatedType(const std::string & type_)
     {
         return codeExtraInformation.SetManipulatedType(type_);
     }
 
+    /**
+     * \brief Set the function that should be called when generating the source
+     * code from events.
+     * \param functionName the name of the function to call
+     * \note Shortcut for `codeExtraInformation.SetFunctionName`.
+     */
+    ExtraInformation & SetFunctionName(const std::string & functionName)
+    {
+        return codeExtraInformation.SetFunctionName(functionName);
+    }
+
     /** \brief DefaultConstructor.
-     *
-     * Please do not use this constructor. Only here to fulfill std::map requirements
+     * \warning Please do not use this constructor. Only here to fulfill std::map requirements.
      */
     InstructionMetadata();
 

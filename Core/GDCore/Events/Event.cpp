@@ -41,7 +41,7 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
 
         //First try to guess the extension used
         std::string eventNamespace = type.substr(0, type.find("::"));
-        boost::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
+        std::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
         if ( guessedExtension )
         {
             std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
@@ -53,7 +53,7 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
         //Else make a search in all the extensions
         for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
         {
-            boost::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
+            std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
 
             std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
@@ -81,7 +81,7 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
 
         //First try to guess the extension used
         std::string eventNamespace = type.substr(0, type.find("::"));
-        boost::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
+        std::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
         if ( guessedExtension )
         {
             std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
@@ -93,7 +93,7 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
         //Else make a search in all the extensions
         for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
         {
-            boost::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
+            std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
 
             std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();

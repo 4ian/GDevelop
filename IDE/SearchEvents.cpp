@@ -257,7 +257,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
         std::vector < gd::EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
         for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
         {
-            if ( selectedEventsInfo[i].event != boost::shared_ptr<gd::BaseEvent>() )
+            if ( selectedEventsInfo[i].event != std::shared_ptr<gd::BaseEvent>() )
                 eventsToInspect.InsertEvent(selectedEventsInfo[i].event);
         }
     }
@@ -314,7 +314,7 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
 
     //Verify event still exists
     gd::BaseEventSPtr event = searchResults[currentResult].event.lock();
-    if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
+    if ( event == std::shared_ptr<gd::BaseEvent>() ) return;
 
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
     parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
@@ -333,7 +333,7 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
 
     //Verify event still exists
     gd::BaseEventSPtr event = searchResults[currentResult].event.lock();
-    if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
+    if ( event == std::shared_ptr<gd::BaseEvent>() ) return;
 
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
     parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));

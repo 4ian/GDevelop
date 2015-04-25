@@ -23,6 +23,7 @@
 #include "GDCpp/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/IDE/CodeCompiler.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 
 //(*IdInit(EditCppCodeEvent)
@@ -207,13 +208,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
 	Connect(ID_CUSTOM1, wxEVT_STC_UPDATEUI, (wxObjectEventFunction)&EditCppCodeEvent::UpdateTextCtrl);
 
 	codeEdit->SetLexer(wxSTC_LEX_CPP);
-    #if defined(WINDOWS)
-    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-    #else
-	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	#endif
-
-	codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, font);
+    codeEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
 	codeEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
 	codeEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
 	codeEdit->StyleSetForeground(wxSTC_C_STRING, *wxBLUE);
@@ -251,7 +246,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
     displayedNameEdit->SetValue(editedEvent.GetDisplayedName());
     displayCodeCheck->SetValue(editedEvent.IsCodeDisplayedInEditor());
 
-	const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
+	const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
     for (unsigned int i = 0;i<allFiles.size();++i)
     {
         if ( allFiles[i]->IsGDManaged() ) continue;
@@ -285,7 +280,7 @@ void EditCppCodeEvent::OnokBtClick(wxCommandEvent& event)
 
     std::vector<std::string> dependencies;
     unsigned int listIndex = 0;
-	const std::vector < boost::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
+	const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
     for (unsigned int i = 0;i<allFiles.size();++i)
     {
         if ( allFiles[i]->IsGDManaged() ) continue;

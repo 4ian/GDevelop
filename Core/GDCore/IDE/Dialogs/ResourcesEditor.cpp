@@ -15,7 +15,8 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
+
 #include <wx/choicdlg.h>
 #include <wx/toolbar.h>
 #include <wx/config.h>
@@ -348,7 +349,7 @@ wxTreeItemId ResourcesEditor::GetSelectedFolderItem()
  */
 void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 {
-    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.jpg;*.png|All files|*.*"), wxFD_MULTIPLE|wxFD_PREVIEW );
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {
@@ -903,7 +904,7 @@ void ResourcesEditor::Refresh()
     resourcesTree->AddRoot( "ImagesBank" );
 
     //Setup search
-    std::string search = boost::to_upper_copy(gd::ToString(searchCtrl->GetValue()));
+    std::string search = gd::StrUppercase(gd::ToString(searchCtrl->GetValue()));
     bool searching = search.empty() ? false : true;
 
     //Folders
@@ -918,7 +919,7 @@ void ResourcesEditor::Refresh()
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
 
-            if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == std::string::npos)
+            if ( searching && gd::StrUppercase(resource.GetName()).find(search) == std::string::npos)
                 continue;
 
             resourcesTree->AppendItem( folderItem, resource.GetName(), -1,-1, new gd::TreeItemStringData("Image", resource.GetName() ));
@@ -932,7 +933,7 @@ void ResourcesEditor::Refresh()
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);
 
-        if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == std::string::npos)
+        if ( searching && gd::StrUppercase(resource.GetName()).find(search) == std::string::npos)
             continue;
 
         resourcesTree->AppendItem( allImagesItem, resource.GetName(), -1, -1, new gd::TreeItemStringData("Image", resource.GetName() ));
@@ -943,17 +944,14 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
-    std::cout << "hello" << std::endl;
     std::vector<std::string> unusedImages =
         gd::ProjectResourcesAdder::GetAllUselessResources(project);
-        std::cout << unusedImages.size()<< std::endl;
 
     //Construct corresponding wxArrayString with unused images
     wxArrayString imagesNotUsed;
     wxArrayInt initialSelection;
     for ( unsigned int i = 0;i < unusedImages.size() ;i++ )
     {
-        std::cout << unusedImages[i]<< std::endl;
         imagesNotUsed.push_back(unusedImages[i]);
         initialSelection.push_back(imagesNotUsed.size()-1);
     }
@@ -998,6 +996,12 @@ void ResourcesEditor::OnresourcesTreeItemActivated(wxTreeEvent& event)
 
     AuiManager1->GetPane(propertiesPanel).Show();
     AuiManager1->Update();
+
+    #if !defined(WINDOWS) //MacOS and wxGTK needs additional tweaks
+    AuiManager1->GetPane(propertiesPanel).Dock().Bottom(); //Ensure panel is docked otherwise it can't get focus.
+    AuiManager1->Update();
+    toolbar->Realize(); //Toolbar is emptied if not realized again after calling Update.
+    #endif
 }
 
 /**

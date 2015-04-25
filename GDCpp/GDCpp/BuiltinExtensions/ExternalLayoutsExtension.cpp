@@ -10,7 +10,7 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllActions()["BuiltinExternalLayouts::CreateObjectsFromExternalLayout"].codeExtraInformation.SetFunctionName("ExternalLayoutsTools::CreateObjectsFromExternalLayout").SetIncludeFile("GDCpp/BuiltinExtensions/ExternalLayoutsTools.h");
+    GetAllActions()["BuiltinExternalLayouts::CreateObjectsFromExternalLayout"].SetFunctionName("ExternalLayoutsTools::CreateObjectsFromExternalLayout").SetIncludeFile("GDCpp/BuiltinExtensions/ExternalLayoutsTools.h");
     #endif
 }
 

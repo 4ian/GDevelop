@@ -25,74 +25,32 @@ MouseExtension::MouseExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllConditions()["SourisX"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
-    GetAllConditions()["SourisY"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
-    GetAllConditions()["SourisBouton"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.isMouseButtonPressed").SetIncludeFile("inputtools.js");
-    GetAllActions()["CacheSouris"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.hideCursor").SetIncludeFile("inputtools.js");
-    GetAllActions()["MontreSouris"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.showCursor").SetIncludeFile("inputtools.js");
+    GetAllConditions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
+    GetAllConditions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
+    GetAllConditions()["SourisBouton"].SetFunctionName("gdjs.evtTools.input.isMouseButtonPressed").SetIncludeFile("inputtools.js");
+    GetAllActions()["CacheSouris"].SetFunctionName("gdjs.evtTools.input.hideCursor").SetIncludeFile("inputtools.js");
+    GetAllActions()["MontreSouris"].SetFunctionName("gdjs.evtTools.input.showCursor").SetIncludeFile("inputtools.js");
+    GetAllActions()["TouchSimulateMouse"].SetFunctionName("gdjs.evtTools.input.touchSimulateMouse").SetIncludeFile("inputtools.js");
 
-    GetAllExpressions()["MouseX"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["SourisX"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js"); //Deprecated
-    GetAllExpressions()["MouseY"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["SourisY"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js"); //Deprecated
+    GetAllConditions()["SourisSurObjet"].SetFunctionName("gdjs.evtTools.input.cursorOnObject").SetIncludeFile("inputtools.js");
+
+    GetAllExpressions()["MouseX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js"); //Deprecated
+    GetAllExpressions()["MouseY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js"); //Deprecated
+
+    GetAllConditions()["PopStartedTouch"].SetFunctionName("gdjs.evtTools.input.popStartedTouch").SetIncludeFile("inputtools.js");
+    GetAllConditions()["PopEndedTouch"].SetFunctionName("gdjs.evtTools.input.popEndedTouch").SetIncludeFile("inputtools.js");
+
+    GetAllConditions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX").SetIncludeFile("inputtools.js");
+    GetAllConditions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY").SetIncludeFile("inputtools.js");
+
+    GetAllExpressions()["LastTouchId"].SetFunctionName("gdjs.evtTools.input.getLastTouchId").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["LastEndedTouchId"].SetFunctionName("gdjs.evtTools.input.getLastEndedTouchId").SetIncludeFile("inputtools.js");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
-    /*
-    AddAction("CentreSourisX",
-                   _("Center mouse horizontaly"),
-                   _("Put the cursor in the middle of the screen horizontally."),
-                   _("Center mouse horizontaly"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-
-    AddAction("CentreSourisY",
-                   _("Center mouse vertically"),
-                   _("Put the cursor in the middle of the screen vertically."),
-                   _("Center mouse vertically"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursorVertically").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-
-    AddAction("SetSourisXY",
-                   _("Position the cursor of the mouse"),
-                   _("Position the cursor to given coordinates."),
-                   _("Position cursor at _PARAM1_;_PARAM2_"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("X position"))
-        .AddParameter("expression", _("Y position"))
-        .codeExtraInformation.SetFunctionName("SetCursorPosition").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-
-    AddAction("CentreSouris",
-                   _("Center the mouse"),
-                   _("Center the mouse."),
-                   _("Center the mouse"),
-                   _("Mouse"),
-                   "res/actions/mouse24.png",
-                   "res/actions/mouse.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .codeExtraInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDCpp/BuiltinExtensions/MouseTools.h");
-*/
 }
 
 }

@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension);
@@ -28,28 +28,17 @@ public:
         DeclarePrimitiveDrawingExtension(*this);
         GetObjectMetadata("PrimitiveDrawing::Drawer").SetIncludeFile("PrimitiveDrawing/shapepainterruntimeobject.js");
 
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Rectangle"].codeExtraInformation
-            .SetFunctionName("drawRectangle");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"].codeExtraInformation
-            .SetFunctionName("drawCircle");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"].codeExtraInformation
-            .SetFunctionName("drawLine");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"].codeExtraInformation
-            .SetFunctionName("setFillColor");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineColor"].codeExtraInformation
-            .SetFunctionName("setOutlineColor");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"].codeExtraInformation
-            .SetFunctionName("setOutlineSize").SetAssociatedGetter("getOutlineSize");
-        GetAllConditionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"].codeExtraInformation
-            .SetFunctionName("getOutlineSize");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"].codeExtraInformation
-            .SetFunctionName("setFillOpacity").SetAssociatedGetter("getFillOpacity");
-        GetAllConditionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"].codeExtraInformation
-            .SetFunctionName("getFillOpacity");
-        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"].codeExtraInformation
-            .SetFunctionName("setOutlineOpacity").SetAssociatedGetter("getOutlineOpacity");
-        GetAllConditionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"].codeExtraInformation
-            .SetFunctionName("getOutlineOpacity");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Rectangle"].SetFunctionName("drawRectangle");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"].SetFunctionName("drawCircle");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"].SetFunctionName("drawLine");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"].SetFunctionName("setFillColor");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineColor"].SetFunctionName("setOutlineColor");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"].SetFunctionName("setOutlineSize").SetGetter("getOutlineSize");
+        GetAllConditionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"].SetFunctionName("getOutlineSize");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"].SetFunctionName("setFillOpacity").SetGetter("getFillOpacity");
+        GetAllConditionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"].SetFunctionName("getFillOpacity");
+        GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"].SetFunctionName("setOutlineOpacity").SetGetter("getOutlineOpacity");
+        GetAllConditionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"].SetFunctionName("getOutlineOpacity");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

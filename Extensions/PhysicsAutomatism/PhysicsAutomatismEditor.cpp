@@ -247,9 +247,9 @@ scene(scene_)
 	    return;
 	}
 
-	sharedDatas = boost::dynamic_pointer_cast<ScenePhysicsDatas>(scene->automatismsInitialSharedDatas[automatism.GetName()]);
+	sharedDatas = std::dynamic_pointer_cast<ScenePhysicsDatas>(scene->automatismsInitialSharedDatas[automatism.GetName()]);
 
-    if ( sharedDatas == boost::shared_ptr<ScenePhysicsDatas>() )
+    if ( sharedDatas == std::shared_ptr<ScenePhysicsDatas>() )
     {
 	    gd::LogError(_("Unable to access to shared datas : Bad data type."));
 	    return;
@@ -297,7 +297,7 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.polygonHeight = polygonHeight;
     automatism.SetAutomaticResizing(automaticResizing);
 
-    if ( sharedDatas != boost::shared_ptr<ScenePhysicsDatas>() )
+    if ( sharedDatas != std::shared_ptr<ScenePhysicsDatas>() )
     {
         sharedDatas->gravityX = ToFloat(string(gravityXEdit->GetValue().mb_str()));
         sharedDatas->gravityY = ToFloat(string(gravityYEdit->GetValue().mb_str()));

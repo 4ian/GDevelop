@@ -64,7 +64,7 @@ int main( int argc, char *p_argv[] )
     #elif defined(LINUX)
         std::string codeFileExtension = "so";
         chdir( executablePath.c_str() ); //For linux, make the executable dir the current working directory
-    #elif defined(MAC)
+    #elif defined(MACOS)
         std::string codeFileExtension = "dylib";
     #else
         #error Please update this part to support your target system.
@@ -163,7 +163,7 @@ int main( int argc, char *p_argv[] )
     if ( !scenePlayed.LoadFromScene( game.GetLayout(0) ) )
         return AbortWithMessage("Unable to load the first scene \"" + game.GetLayout(0).GetName() + "\". Aborting.");
 
-    if (scenePlayed.GetCodeExecutionEngine() == boost::shared_ptr<CodeExecutionEngine>() ||
+    if (scenePlayed.GetCodeExecutionEngine() == std::shared_ptr<CodeExecutionEngine>() ||
         !scenePlayed.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
                                                                                 "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scenePlayed.GetName())) )
     {

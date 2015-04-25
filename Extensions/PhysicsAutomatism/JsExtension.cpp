@@ -7,7 +7,7 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 
@@ -38,43 +38,43 @@ public:
         std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
         std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
 
-        autActions["PhysicsAutomatism::SetStatic"].codeExtraInformation.SetFunctionName("setStatic");
-        autActions["PhysicsAutomatism::SetDynamic"].codeExtraInformation.SetFunctionName("setDynamic");
-        autConditions["PhysicsAutomatism::SetDynamic"].codeExtraInformation.SetFunctionName("isDynamic");
-        autActions["PhysicsAutomatism::SetFixedRotation"].codeExtraInformation.SetFunctionName("setFixedRotation");
-        autActions["PhysicsAutomatism::SetFreeRotation"].codeExtraInformation.SetFunctionName("setFreeRotation");
-        autActions["PhysicsAutomatism::AddRevoluteJoint"].codeExtraInformation.SetFunctionName("addRevoluteJoint");
-        autActions["PhysicsAutomatism::AddRevoluteJointBetweenObjects"].codeExtraInformation.SetFunctionName("addRevoluteJointBetweenObjects");
-        autActions["PhysicsAutomatism::ActAddGearJointBetweenObjects"].codeExtraInformation.SetFunctionName("addGearJointBetweenObjects");
-        autConditions["PhysicsAutomatism::IsFixedRotation"].codeExtraInformation.SetFunctionName("isFixedRotation");
-        autActions["PhysicsAutomatism::SetAsBullet"].codeExtraInformation.SetFunctionName("setAsBullet");
-        autActions["PhysicsAutomatism::DontSetAsBullet"].codeExtraInformation.SetFunctionName("dontSetAsBullet");
-        autConditions["PhysicsAutomatism::IsBullet"].codeExtraInformation.SetFunctionName("isBullet");
-        autActions["PhysicsAutomatism::ApplyImpulse"].codeExtraInformation.SetFunctionName("applyImpulse");
-        autActions["PhysicsAutomatism::ApplyImpulseUsingPolarCoordinates"].codeExtraInformation.SetFunctionName("applyImpulseUsingPolarCoordinates");
-        autActions["PhysicsAutomatism::ApplyImpulseTowardPosition"].codeExtraInformation.SetFunctionName("applyImpulseTowardPosition");
-        autActions["PhysicsAutomatism::ApplyForce"].codeExtraInformation.SetFunctionName("applyForce");
-        autActions["PhysicsAutomatism::ApplyForceUsingPolarCoordinates"].codeExtraInformation.SetFunctionName("applyForceUsingPolarCoordinates");
-        autActions["PhysicsAutomatism::ApplyForceTowardPosition"].codeExtraInformation.SetFunctionName("applyForceTowardPosition");
-        autActions["PhysicsAutomatism::ApplyTorque"].codeExtraInformation.SetFunctionName("applyTorque");
-        autActions["PhysicsAutomatism::SetLinearVelocity"].codeExtraInformation.SetFunctionName("setLinearVelocity");
-        autConditions["PhysicsAutomatism::LinearVelocityX"].codeExtraInformation.SetFunctionName("getLinearVelocityX");
-        autConditions["PhysicsAutomatism::LinearVelocityY"].codeExtraInformation.SetFunctionName("getLinearVelocityY");
-        autConditions["PhysicsAutomatism::LinearVelocity"].codeExtraInformation.SetFunctionName("getLinearVelocity");
-        autActions["PhysicsAutomatism::SetAngularVelocity"].codeExtraInformation.SetFunctionName("setAngularVelocity");
-        autConditions["PhysicsAutomatism::AngularVelocity"].codeExtraInformation.SetFunctionName("getAngularVelocity");
-        autConditions["PhysicsAutomatism::CollisionWith"].codeExtraInformation.SetFunctionName("collisionWith");
-        autConditions["PhysicsAutomatism::LinearDamping"].codeExtraInformation.SetFunctionName("getLinearDamping");
-        autActions["PhysicsAutomatism::SetLinearDamping"].codeExtraInformation.SetFunctionName("setLinearDamping");
-        autConditions["PhysicsAutomatism::AngularDamping"].codeExtraInformation.SetFunctionName("getAngularDamping");
-        autActions["PhysicsAutomatism::SetAngularDamping"].codeExtraInformation.SetFunctionName("setAngularDamping");
-        autActions["PhysicsAutomatism::SetGravity"].codeExtraInformation.SetFunctionName("setGravity");
-        autExpressions["LinearVelocity"].codeExtraInformation.SetFunctionName("getLinearVelocity");
-        autExpressions["LinearVelocityX"].codeExtraInformation.SetFunctionName("getLinearVelocityX");
-        autExpressions["LinearVelocityY"].codeExtraInformation.SetFunctionName("getLinearVelocityY");
-        autExpressions["AngularVelocity"].codeExtraInformation.SetFunctionName("getAngularVelocity");
-        autExpressions["LinearDamping"].codeExtraInformation.SetFunctionName("getLinearDamping");
-        autExpressions["AngularDamping"].codeExtraInformation.SetFunctionName("getAngularDamping");
+        autActions["PhysicsAutomatism::SetStatic"].SetFunctionName("setStatic");
+        autActions["PhysicsAutomatism::SetDynamic"].SetFunctionName("setDynamic");
+        autConditions["PhysicsAutomatism::SetDynamic"].SetFunctionName("isDynamic");
+        autActions["PhysicsAutomatism::SetFixedRotation"].SetFunctionName("setFixedRotation");
+        autActions["PhysicsAutomatism::SetFreeRotation"].SetFunctionName("setFreeRotation");
+        autActions["PhysicsAutomatism::AddRevoluteJoint"].SetFunctionName("addRevoluteJoint");
+        autActions["PhysicsAutomatism::AddRevoluteJointBetweenObjects"].SetFunctionName("addRevoluteJointBetweenObjects");
+        autActions["PhysicsAutomatism::ActAddGearJointBetweenObjects"].SetFunctionName("addGearJointBetweenObjects");
+        autConditions["PhysicsAutomatism::IsFixedRotation"].SetFunctionName("isFixedRotation");
+        autActions["PhysicsAutomatism::SetAsBullet"].SetFunctionName("setAsBullet");
+        autActions["PhysicsAutomatism::DontSetAsBullet"].SetFunctionName("dontSetAsBullet");
+        autConditions["PhysicsAutomatism::IsBullet"].SetFunctionName("isBullet");
+        autActions["PhysicsAutomatism::ApplyImpulse"].SetFunctionName("applyImpulse");
+        autActions["PhysicsAutomatism::ApplyImpulseUsingPolarCoordinates"].SetFunctionName("applyImpulseUsingPolarCoordinates");
+        autActions["PhysicsAutomatism::ApplyImpulseTowardPosition"].SetFunctionName("applyImpulseTowardPosition");
+        autActions["PhysicsAutomatism::ApplyForce"].SetFunctionName("applyForce");
+        autActions["PhysicsAutomatism::ApplyForceUsingPolarCoordinates"].SetFunctionName("applyForceUsingPolarCoordinates");
+        autActions["PhysicsAutomatism::ApplyForceTowardPosition"].SetFunctionName("applyForceTowardPosition");
+        autActions["PhysicsAutomatism::ApplyTorque"].SetFunctionName("applyTorque");
+        autActions["PhysicsAutomatism::SetLinearVelocity"].SetFunctionName("setLinearVelocity");
+        autConditions["PhysicsAutomatism::LinearVelocityX"].SetFunctionName("getLinearVelocityX");
+        autConditions["PhysicsAutomatism::LinearVelocityY"].SetFunctionName("getLinearVelocityY");
+        autConditions["PhysicsAutomatism::LinearVelocity"].SetFunctionName("getLinearVelocity");
+        autActions["PhysicsAutomatism::SetAngularVelocity"].SetFunctionName("setAngularVelocity");
+        autConditions["PhysicsAutomatism::AngularVelocity"].SetFunctionName("getAngularVelocity");
+        autConditions["PhysicsAutomatism::CollisionWith"].SetFunctionName("collisionWith");
+        autConditions["PhysicsAutomatism::LinearDamping"].SetFunctionName("getLinearDamping");
+        autActions["PhysicsAutomatism::SetLinearDamping"].SetFunctionName("setLinearDamping");
+        autConditions["PhysicsAutomatism::AngularDamping"].SetFunctionName("getAngularDamping");
+        autActions["PhysicsAutomatism::SetAngularDamping"].SetFunctionName("setAngularDamping");
+        autActions["PhysicsAutomatism::SetGravity"].SetFunctionName("setGravity");
+        autExpressions["LinearVelocity"].SetFunctionName("getLinearVelocity");
+        autExpressions["LinearVelocityX"].SetFunctionName("getLinearVelocityX");
+        autExpressions["LinearVelocityY"].SetFunctionName("getLinearVelocityY");
+        autExpressions["AngularVelocity"].SetFunctionName("getAngularVelocity");
+        autExpressions["LinearDamping"].SetFunctionName("getLinearDamping");
+        autExpressions["AngularDamping"].SetFunctionName("getAngularDamping");
 
         /*
             aut.AddAction("SetPolygonScaleX",
@@ -88,7 +88,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Scale"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetPolygonScaleY",
                            _("Change collision polygon Y scale"),
@@ -101,7 +101,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Scale"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleX",
                            _("Collision polygon X scale"),
@@ -115,7 +115,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleY",
                            _("Collision polygon Y scale"),
@@ -129,19 +129,19 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("PolygonScaleX", _("Collision polygon X scale"), _("Collision polygon X scale"), _("Collision polygon"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("PolygonScaleY", _("Collision polygon Y scale"), _("Collision polygon Y scale"), _("Collision polygon"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 */
 
         StripUnimplementedInstructionsAndExpressions();

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 
 /**
  * \brief This class declares information about the extension.
@@ -41,7 +41,7 @@ public:
             .AddParameter("file", _("Destination file"))
             .AddParameter("string", _("Password ( 24 characters )"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
+            .SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
 
 
         AddAction("DecryptFile",
@@ -56,7 +56,7 @@ public:
             .AddParameter("file", _("Destination file"))
             .AddParameter("string", _("Password ( 24 characters )"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
+            .SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
 
         #endif
 

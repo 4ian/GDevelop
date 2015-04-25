@@ -117,6 +117,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
         if(theme) theme->SetWindowTheme((HWND) templateList->GetHWND(), L"EXPLORER", NULL);
     }
     #endif
+    templateList->SetMinSize(wxSize(150, -1));
 
     projectFileEdit->AutoCompleteDirectories();
 
@@ -140,7 +141,11 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     }
     projectFileEdit->SetValue(newProjectFile);
 
-	SetSize(640,480);
+    #if !defined(MACOS)
+    SetSize(640, 480);
+    #else
+	SetSize(-1, 480);
+    #endif
 
     platformList->InsertColumn(0,_("Platform"), wxLIST_FORMAT_LEFT, 640);
     templateList->InsertColumn(0,_("Template"), wxLIST_FORMAT_LEFT, 640);
@@ -157,7 +162,7 @@ void NewProjectDialog::RefreshPlatformList()
     imageList->Add(wxBitmap("res/icon32.png", wxBITMAP_TYPE_ANY));
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
+    const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         platformList->InsertItem(0, platforms[i]->GetFullName(), 0);

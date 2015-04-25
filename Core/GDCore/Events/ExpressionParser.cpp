@@ -12,6 +12,7 @@
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/CommonTools.h"
+#include <algorithm>
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 

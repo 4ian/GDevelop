@@ -22,8 +22,9 @@ class wxWindow;
 #endif
 
 /**
- * \brief Wrapper around a pointer to Animation. Used to reduce compile time.
- * Animation proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers
+ * \brief Wrapper around a pointer to Animation, used to reduce compile time.
+ *
+ * This proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers.
  */
 class GD_API AnimationProxy
 {
@@ -106,6 +107,9 @@ public :
     bool SetDirection(float nb);
     inline unsigned int GetCurrentDirection() const { return currentDirection; }
 
+    float GetAnimationSpeedScale() const { return animationSpeedScale; }
+    void SetAnimationSpeedScale(float ratio) { animationSpeedScale = ratio; }
+
     /**
      * Return angle or direction, according to the current direction type.
      */
@@ -131,7 +135,7 @@ public :
     unsigned int GetColorB() const;
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
-    bool CursorOnObject( RuntimeScene & scene, bool accurate );
+    virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
 
     void FlipX(bool flip = true);
     void FlipY(bool flip = true);
@@ -164,7 +168,9 @@ private:
     float currentAngle;
     unsigned int currentSprite;
     bool animationStopped;
+
     float timeElapsedOnCurrentSprite;
+    float animationSpeedScale;
 
     mutable gd::Sprite * ptrToCurrentSprite; //Pointer to the current sprite
     mutable bool needUpdateCurrentSprite;

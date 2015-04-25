@@ -7,11 +7,13 @@
 #ifndef GDCORE_EVENTSLIST_H
 #define GDCORE_EVENTSLIST_H
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Project; }
 namespace gd { class BaseEvent; }
 namespace gd { class SerializerElement; }
 class TiXmlElement;
+
+#undef CreateEvent
 
 namespace gd
 {
@@ -45,7 +47,7 @@ public:
      * \param event The smart pointer to the event that must be inserted into the list
      * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
      */
-    void InsertEvent(boost::shared_ptr<gd::BaseEvent> event, size_t position = (size_t)-1);
+    void InsertEvent(std::shared_ptr<gd::BaseEvent> event, size_t position = (size_t)-1);
 
     /**
      * \brief Insert a new event to the list.
@@ -69,7 +71,7 @@ public:
     /**
      * \brief Return the smart pointer to the event at position \a index in the events list.
      */
-    boost::shared_ptr<BaseEvent> GetEventSmartPtr(size_t index) { return events[index]; };
+    std::shared_ptr<BaseEvent> GetEventSmartPtr(size_t index) { return events[index]; };
 
     /**
      * \brief Return a reference to the event at position \a index in the events list.
@@ -155,7 +157,7 @@ public:
     ///@}
 
 private:
-	std::vector< boost::shared_ptr<BaseEvent> > events;
+	std::vector< std::shared_ptr<BaseEvent> > events;
 
     /**
      * Initialize from another list of events, copying events. Used by copy-ctor and assign-op.

@@ -43,6 +43,7 @@
 #include "GDCpp/IDE/ExecutableIconChanger.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCpp/CppPlatform.h"
 
 using namespace std;
@@ -71,9 +72,9 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
     //Construct the list of the external shared libraries files to be used
     for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
-        if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension == std::shared_ptr<ExtensionBase>() ) continue;
 
         if ( wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") ||
              wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".dll.a"))
@@ -140,7 +141,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         linuxTarget = true;
         macTarget = false;
         compressIfPossible = false;
-    #elif defined(MAC)
+    #elif defined(MACOS)
         windowsTarget = false;
         linuxTarget = true;
         macTarget = false;
@@ -179,7 +180,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( yieldClock.Time() > 150 )
             {
-                wxSafeYield(NULL, true);
+                gd::SafeYield::Do(NULL, true);
                 yieldClock.Start();
             }
         }
@@ -231,7 +232,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilerCall.inputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
         task.compilerCall.outputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
-        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
+        task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
         task.scene = &game.GetLayout(i);
 
         CodeCompiler::Get()->AddTask(task);
@@ -241,7 +242,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( yieldClock.Time() > 150 )
             {
-                wxSafeYield(NULL, true);
+                gd::SafeYield::Do(NULL, true);
                 yieldClock.Start();
             }
         }
@@ -273,17 +274,17 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
         ++i;
         diagnosticManager.OnPercentUpdate( 50.0 + static_cast<float>(i) / static_cast<float>(resourcesNewFilename.size())*25.0 );
-        wxSafeYield();
+        gd::SafeYield::Do();
     }
 
-    wxSafeYield();
+    gd::SafeYield::Do();
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 1 out of 3" )));
     gd::Project strippedProject = game;
     gd::ProjectStripper::StripProject(strippedProject);
     strippedProject.SaveToFile(static_cast<string>( tempDir + "/GDProjectSrcFile.gdg" ));
     diagnosticManager.OnPercentUpdate(80);
 
-    wxSafeYield();
+    gd::SafeYield::Do();
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 2 out of 3" )));
 
     //Encrypt the source file.
@@ -328,7 +329,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Création du fichier gam.egd
     diagnosticManager.OnMessage(gd::ToString(_( "Copying resources..." )), gd::ToString(_( "Step 3 out of 3" )));
-    wxSafeYield();
+    gd::SafeYield::Do();
 
     //On créé une liste avec tous les fichiers
     vector < string > files;
@@ -384,7 +385,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( yieldClock.Time() > 150 )
             {
-                wxSafeYield(NULL, true);
+                gd::SafeYield::Do(NULL, true);
                 yieldClock.Start();
             }
         }
@@ -403,16 +404,16 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     diagnosticManager.OnPercentUpdate(90);
     diagnosticManager.OnMessage(gd::ToString(_( "Exporting game..." )));
-    wxSafeYield();
+    gd::SafeYield::Do();
 
     //Copy extensions
     for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
-        if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
+        if ( extension == std::shared_ptr<ExtensionBase>() ) continue;
 
         if ( ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
             && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin
@@ -425,13 +426,13 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             if ( linuxTarget )
             {
-                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedExtensions()[i]+".xgdl", true ) == false )
+                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgd", tempDir + "/"+game.GetUsedExtensions()[i]+".xgd", true ) == false )
                     diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Linux in compilation directory.\n" )));
             }
 
             if ( macTarget )
             {
-                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedExtensions()[i]+".xgdm", true ) == false )
+                if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgd", tempDir + "/"+game.GetUsedExtensions()[i]+".xgd", true ) == false )
                     diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Mac OS in compilation directory.\n" )));
             }
         }
@@ -580,7 +581,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage(gd::ToString(_( "Compilation finished" )));
     diagnosticManager.OnPercentUpdate(100);
 
-    diagnosticManager.OnCompilationSuccessed();
+    diagnosticManager.OnCompilationSucceeded();
 #endif
 }
 
@@ -633,9 +634,9 @@ void FullProjectCompilerConsoleDiagnosticManager::OnCompilationFailed()
     cout << GetErrors();
 }
 
-void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSuccessed()
+void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSucceeded()
 {
-    cout << _("Compilation successed.") << endl;
+    cout << _("Compilation succeeded.") << endl;
 }
 
 void FullProjectCompilerConsoleDiagnosticManager::OnMessage(std::string message, std::string message2)

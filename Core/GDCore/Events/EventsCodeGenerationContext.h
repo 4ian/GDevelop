@@ -9,7 +9,7 @@
 #include <string>
 #include <set>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd { class Layout; }
 
 namespace gd
@@ -85,7 +85,7 @@ public:
     void EmptyObjectsListNeeded(const std::string & objectName);
 
     /**
-     * Return true if an object list has already been declared ( or is going to be declared ).
+     * Return true if an object list has already been declared (or is going to be declared).
      */
     bool ObjectAlreadyDeclared(const std::string & objectName) const { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end()); };
 

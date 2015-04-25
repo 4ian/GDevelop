@@ -9,7 +9,7 @@
 #include <string>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -20,7 +20,7 @@ namespace gd
 {
 
 /**
- * \brief Defines information about how generate code for an expression
+ * \brief Information about how generate code for an expression
  */
 class ExpressionCodeGenerationInformation
 {
@@ -30,10 +30,11 @@ public:
 
     /**
      * \brief Set the function name which will be used when generating the code.
+     * \param functionName the name of the function to call
      */
-    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & cppCallingName_)
+    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & functionName)
     {
-        functionCallName = cppCallingName_;
+        functionCallName = functionName;
         return *this;
     }
 
@@ -66,7 +67,7 @@ public:
     /**
      * \brief Set that the function must be generated using a custom code generator.
      */
-    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
     {
         optionalCustomCodeGenerator = codeGenerator;
         return *this;
@@ -75,7 +76,7 @@ public:
     bool staticFunction;
     std::string functionCallName;
     std::string optionalIncludeFile;
-    boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+    std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
 };
 
 /**
@@ -122,7 +123,7 @@ public:
     gd::ExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
-     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     * Set the default value used in editor (or if an optional parameter is empty during code generation) for the latest added parameter.
      *
      * \see AddParameter
      */
@@ -131,6 +132,17 @@ public:
         if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
         return *this;
     };
+
+    /**
+     * \brief Set the function that should be called when generating the source
+     * code from events.
+     * \param functionName the name of the function to call
+     * \note Shortcut for `codeExtraInformation.SetFunctionName`.
+     */
+    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & functionName)
+    {
+        return codeExtraInformation.SetFunctionName(functionName);
+    }
 
     ExpressionCodeGenerationInformation codeExtraInformation;
 

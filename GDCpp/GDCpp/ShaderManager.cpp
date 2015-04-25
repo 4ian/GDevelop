@@ -12,7 +12,7 @@ ShaderManager::ShaderManager() :
     //ctor
 }
 
-boost::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std::string> & shaders)
+std::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std::string> & shaders)
 {
     if ( alreadyLoadedShader.find(shaders) != alreadyLoadedShader.end())
         return alreadyLoadedShader[shaders].lock();
@@ -21,7 +21,7 @@ boost::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std
     std::vector<std::string> declarations;
     std::string mainFunctions;
 
-    boost::shared_ptr<sf::Shader> shader(new sf::Shader);
+    std::shared_ptr<sf::Shader> shader(new sf::Shader);
 
     for (unsigned int i = 0;i<shaders.size();++i)
     {

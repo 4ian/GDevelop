@@ -30,22 +30,22 @@ VariablesExtension::VariablesExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllConditions()["VarScene"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableNumber");
-    GetAllConditions()["VarSceneTxt"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableString");
-    GetAllConditions()["VarGlobal"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableNumber");
-    GetAllConditions()["VarGlobalTxt"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableString");
-    GetAllExpressions()["Variable"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableNumber");
-    GetAllStrExpressions()["VariableString"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableString");
-    GetAllExpressions()["GlobalVariable"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableNumber");
-    GetAllStrExpressions()["GlobalVariableString"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.getVariableString");
+    GetAllConditions()["VarScene"].SetFunctionName("gdjs.evtTools.common.getVariableNumber");
+    GetAllConditions()["VarSceneTxt"].SetFunctionName("gdjs.evtTools.common.getVariableString");
+    GetAllConditions()["VarGlobal"].SetFunctionName("gdjs.evtTools.common.getVariableNumber");
+    GetAllConditions()["VarGlobalTxt"].SetFunctionName("gdjs.evtTools.common.getVariableString");
+    GetAllExpressions()["Variable"].SetFunctionName("gdjs.evtTools.common.getVariableNumber");
+    GetAllStrExpressions()["VariableString"].SetFunctionName("gdjs.evtTools.common.getVariableString");
+    GetAllExpressions()["GlobalVariable"].SetFunctionName("gdjs.evtTools.common.getVariableNumber");
+    GetAllStrExpressions()["GlobalVariableString"].SetFunctionName("gdjs.evtTools.common.getVariableString");
 
-    GetAllConditions()["VarSceneDef"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.sceneVariableExists");
-    GetAllConditions()["VarGlobalDef"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.globalVariableExists");
+    GetAllConditions()["VarSceneDef"].SetFunctionName("gdjs.evtTools.common.sceneVariableExists");
+    GetAllConditions()["VarGlobalDef"].SetFunctionName("gdjs.evtTools.common.globalVariableExists");
 
-    GetAllConditions()["VariableChildExists"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.variableChildExists");
-    GetAllConditions()["GlobalVariableChildExists"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.variableChildExists");
-    GetAllActions()["VariableRemoveChild"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
-    GetAllActions()["GlobalVariableRemoveChild"].codeExtraInformation.SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
+    GetAllConditions()["VariableChildExists"].SetFunctionName("gdjs.evtTools.common.variableChildExists");
+    GetAllConditions()["GlobalVariableChildExists"].SetFunctionName("gdjs.evtTools.common.variableChildExists");
+    GetAllActions()["VariableRemoveChild"].SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
+    GetAllActions()["GlobalVariableRemoveChild"].SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -84,7 +84,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -118,7 +118,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -157,7 +157,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarGlobal"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarGlobal"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -191,7 +191,7 @@ VariablesExtension::VariablesExtension()
         };
 
         gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGen = new CodeGenerator;
-        GetAllActions()["ModVarGlobalTxt"].codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
+        GetAllActions()["ModVarGlobalTxt"].codeExtraInformation.SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGen));
     }
 }
 

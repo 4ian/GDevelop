@@ -19,7 +19,7 @@ PlatformManager::~PlatformManager()
 {
 }
 
-bool PlatformManager::AddPlatform(boost::shared_ptr<gd::Platform> newPlatform)
+bool PlatformManager::AddPlatform(std::shared_ptr<gd::Platform> newPlatform)
 {
     for (unsigned int i = 0;i<platformsLoaded.size();++i)
     {
@@ -46,7 +46,7 @@ void PlatformManager::NotifyPlatformIDEInitialized() const
 {
     for (unsigned int i = 0;i<platformsLoaded.size();++i)
     {
-        if ( platformsLoaded[i] != boost::shared_ptr<gd::Platform>() )
+        if ( platformsLoaded[i] != std::shared_ptr<gd::Platform>() )
             platformsLoaded[i]->OnIDEInitialized();
     }
 }

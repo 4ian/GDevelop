@@ -135,11 +135,6 @@ public:
      * Returns the tileset bitmap
      */
     const wxBitmap& GetWxBitmap() const;
-
-    /**
-     * Get a tile bitmap from its ID (only available in the IDE)
-     */
-    const wxBitmap& GetTileBitmap(int id) const;
 #endif
 
     /**
@@ -234,14 +229,13 @@ public:
 
 private:
 
-    boost::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
+    std::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
     std::vector<TileTextureCoords> m_coords; ///< The tileset coords
 
     std::vector<TileHitbox> m_hitboxes;
 
     #ifdef GD_IDE_ONLY
     wxBitmap m_tilesetBitmap; ///< The tileset texture
-    std::vector<wxBitmap> m_bitmaps;
     static wxBitmap m_invalidBitmap;
     #endif
 

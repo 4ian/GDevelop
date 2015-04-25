@@ -769,6 +769,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("objectList", _("Object"))
         .MarkAsSimple();
 
+    extension.AddCondition("PickNearest",
+                   _("Pick nearest object"),
+                   _("Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."),
+                   _("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
+                   _("Objects"),
+                   "res/conditions/distance24.png",
+                   "res/conditions/distance.png")
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .MarkAsSimple();
+
     extension.AddCondition("NbObjet",
                    _("Number of objects"),
                    _("Test the number of concerned objects."),
@@ -785,7 +798,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     extension.AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
                    _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
-                   _("_PARAM0_ is in collision with _PARAM1_ ( Collision masks )"),
+                   _("_PARAM0_ is in collision with _PARAM1_"),
                    _("Collision"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")

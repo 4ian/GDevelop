@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension);
@@ -29,16 +29,11 @@ public:
 
         GetObjectMetadata("PanelSpriteObject::PanelSprite").SetIncludeFile("PanelSpriteObject/panelspriteruntimeobject.js");
 
-        GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"].codeExtraInformation
-            .SetFunctionName("setWidth").SetAssociatedGetter("getWidth");
-        GetAllConditionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"].codeExtraInformation
-            .SetFunctionName("getWidth");
-        GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Height"].codeExtraInformation
-            .SetFunctionName("setHeight").SetAssociatedGetter("getHeight");
-        GetAllConditionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Height"].codeExtraInformation
-            .SetFunctionName("getHeight");
-        GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Image"].codeExtraInformation
-            .SetFunctionName("setTexture");
+        GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"].SetFunctionName("setWidth").SetGetter("getWidth");
+        GetAllConditionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"].SetFunctionName("getWidth");
+        GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Height"].SetFunctionName("setHeight").SetGetter("getHeight");
+        GetAllConditionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Height"].SetFunctionName("getHeight");
+        GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Image"].SetFunctionName("setTexture");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

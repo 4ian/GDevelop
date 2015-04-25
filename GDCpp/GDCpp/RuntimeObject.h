@@ -212,6 +212,16 @@ public:
     bool SeparateFromObjects(const std::vector<RuntimeObject*> & objects);
 
     /**
+     * \brief Return true if the cursor is on the object
+     * \param scene The scene the object belongs to.
+     * \param accurate If true, the test should be precise (depending on the object type). Otherwise,
+     * a simple bouding box test is made.
+     *
+     * \return bool if the cursor is on the object
+     */
+    virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
+
+    /**
      * \brief Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
      * \note The default implementation does nothing.
      */
@@ -307,6 +317,12 @@ public:
      */
     virtual float GetCenterY() const {return GetHeight()/2;};
 
+    /**
+     * \brief Get squared distance, in pixel, between the object and the specified position.
+     * \param x X coordinate of the point
+     * \param y Y coordinate of the point
+     */
+    double GetSqDistanceTo(double x, double y);
     ///@}
 
     /** \name Forces

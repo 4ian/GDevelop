@@ -15,12 +15,12 @@ NetworkExtension::NetworkExtension()
     gd::BuiltinExtensionsImplementer::ImplementsNetworkExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllActions()["EnvoiDataNet"].codeExtraInformation.SetFunctionName("SendDataToPhpWebPage").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
-    GetAllActions()["SendRequest"].codeExtraInformation.SetFunctionName("SendHttpRequest").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
-    GetAllActions()["DownloadFile"].codeExtraInformation.SetFunctionName("DownloadFile").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
-    GetAllActions()["JSONToVariableStructure"].codeExtraInformation.SetFunctionName("JSONToVariableStructure").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+    GetAllActions()["EnvoiDataNet"].SetFunctionName("SendDataToPhpWebPage").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+    GetAllActions()["SendRequest"].SetFunctionName("SendHttpRequest").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+    GetAllActions()["DownloadFile"].SetFunctionName("DownloadFile").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+    GetAllActions()["JSONToVariableStructure"].SetFunctionName("JSONToVariableStructure").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
 
-    GetAllStrExpressions()["ToJSON"].codeExtraInformation.SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
+    GetAllStrExpressions()["ToJSON"].SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/BuiltinExtensions/NetworkTools.h");
     #endif
 }
 

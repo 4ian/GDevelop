@@ -3,6 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+#include <algorithm>
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/InstructionMetadata.h"

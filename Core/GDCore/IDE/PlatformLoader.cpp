@@ -39,12 +39,14 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
 {
     {
         #if defined(WINDOWS)
-        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("GDCpp.dll");
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("GDCpp.dll");
         #elif defined(LINUX)
-        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.so");
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.so");
+        #elif defined(MACOS)
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("libGDCpp.dylib");
         #else
         #warning Add the appropriate filename here for the C++ Platform!
-        boost::shared_ptr<gd::Platform> platform;
+        std::shared_ptr<gd::Platform> platform;
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform);
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -54,12 +56,14 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
 
     {
         #if defined(WINDOWS)
-        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.dll");
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/GDJS.dll");
         #elif defined(LINUX)
-        boost::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/libGDJS.so");
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/libGDJS.so");
+        #elif defined(MACOS)
+        std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("./JsPlatform/libGDJS.dylib");
         #else
         #warning Add the appropriate filename here for the Js Platform!
-        boost::shared_ptr<gd::Platform> platform;
+        std::shared_ptr<gd::Platform> platform;
         #endif
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/", *platform);
         if (platform) gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/", *platform, true);
@@ -71,7 +75,7 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
     gd::ExtensionsLoader::ExtensionsLoadingDone("./CppPlatform/Extensions/");
 }
 
-boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string fullpath)
+std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string fullpath)
 {
     std::cout << "Loading platform " << fullpath << "..." << std::endl;
     Handle platformHdl = OpenLibrary(fullpath.c_str());
@@ -108,7 +112,7 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
             gd::LocaleManager::Get()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
             #endif
 
-            boost::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);
+            std::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);
             std::cout << "Loading of " << fullpath << " done." << std::endl;
 
             gd::PlatformManager::Get()->AddPlatform(platform);
@@ -117,7 +121,7 @@ boost::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::strin
         }
     }
 
-    return boost::shared_ptr<gd::Platform>();
+    return std::shared_ptr<gd::Platform>();
 }
 
 

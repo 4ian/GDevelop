@@ -31,6 +31,7 @@ namespace gd { class AutomatismsSharedData; }
 namespace gd { class BaseEvent; }
 namespace gd { class SerializerElement; }
 #undef GetObject //Disable an annoying macro
+#undef CreateEvent
 
 namespace gd
 {
@@ -207,7 +208,7 @@ public:
      * \param name The name of the object
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    boost::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name, const std::string & platformName = "");
+    std::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name, const std::string & platformName = "");
 
     /**
      * Create an automatism of the given type.
@@ -233,7 +234,7 @@ public:
      * \param type The type of automatism shared data
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName = "");
+    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName = "");
 
 #if defined(GD_IDE_ONLY)
     /**
@@ -247,7 +248,7 @@ public:
      * \param type The type of the event
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type, const std::string & platformName = "");
+    std::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type, const std::string & platformName = "");
     ///@}
 #endif
 
@@ -601,19 +602,19 @@ public:
      * \brief Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
      * IDE ( or at runtime for the GD C++ Platform ).
      */
-    const boost::shared_ptr<gd::ImageManager> & GetImageManager() const { return imageManager; }
+    const std::shared_ptr<gd::ImageManager> & GetImageManager() const { return imageManager; }
 
     /**
      * \brief Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
      * IDE ( or at runtime for the GD C++ Platform ).
      */
-    boost::shared_ptr<gd::ImageManager> & GetImageManager() { return imageManager; }
+    std::shared_ptr<gd::ImageManager> & GetImageManager() { return imageManager; }
 
     /**
      * \brief Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
      * IDE ( or at runtime for the GD C++ Platform ).
      */
-    void SetImageManager(boost::shared_ptr<gd::ImageManager> imageManager_) { imageManager = imageManager_; }
+    void SetImageManager(std::shared_ptr<gd::ImageManager> imageManager_) { imageManager = imageManager_; }
 
     /**
      * \brief Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
@@ -675,7 +676,7 @@ public:
      * \brief Return a const reference to the vector containing all the source files used by
      * the game.
      */
-    const std::vector < boost::shared_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
+    const std::vector < std::shared_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
 
     /**
      * \brief Return true if the source file with the specified name is used by the game.
@@ -734,23 +735,23 @@ private:
     int                                                 maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
     unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
     bool                                                verticalSync; ///< If true, must activate vertical synchronization.
-    std::vector < boost::shared_ptr<gd::Layout> >       scenes; ///< List of all scenes
+    std::vector < std::shared_ptr<gd::Layout> >       scenes; ///< List of all scenes
     gd::VariablesContainer                              variables; ///< Initial global variables
-    std::vector < boost::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
+    std::vector < std::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project
-    boost::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform projects.
+    std::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform projects.
     std::vector < std::string >                         extensionsUsed; ///< List of extensions used
     std::vector < gd::Platform* >                       platforms; ///< Pointers to the platforms this project supports.
     std::string                                         firstLayout;
     #if defined(GD_IDE_ONLY)
     bool                                                useExternalSourceFiles; ///< True if game used external source files.
-    std::vector < boost::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
+    std::vector < std::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     std::string                                         author; ///< Game author name
     std::string                                         gameFile; ///< File of the game
     std::string                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
-    std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
+    std::vector < std::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.
     mutable bool                                        dirty; ///< True to flag the project as being modified.

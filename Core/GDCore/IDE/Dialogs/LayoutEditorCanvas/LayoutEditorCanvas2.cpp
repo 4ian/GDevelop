@@ -77,10 +77,10 @@ void LayoutEditorCanvas::OnUpdate()
     }
 }
 
-void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
+void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
 {
     //Create the shapes
-    boost::shared_ptr<sf::Shape> selection = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    std::shared_ptr<sf::Shape> selection = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
     selection->setPosition(rectangle.left, rectangle.top);
     selection->setFillColor(sf::Color( 0, 0, 200, 40 ));
     selection->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
@@ -90,23 +90,23 @@ void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < boost::s
     target.push_back(selection);
 }
 
-void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle )
+void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle )
 {
     //Create the shapes
-    boost::shared_ptr<sf::Shape> centerShape = boost::shared_ptr<sf::Shape>(new sf::CircleShape(3));
+    std::shared_ptr<sf::Shape> centerShape = std::shared_ptr<sf::Shape>(new sf::CircleShape(3));
     centerShape->setPosition(position);
     centerShape->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
     centerShape->setOutlineThickness(1);
     centerShape->setFillColor(sf::Color( 0, 0, 200, 40 ));
     centerShape->setOrigin(sf::Vector2f(3,3));
 
-    boost::shared_ptr<sf::Shape> angleButton = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    std::shared_ptr<sf::Shape> angleButton = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
     angleButton->setPosition(position+sf::Vector2f(25.0*cos(angle/180.0*3.14159), 25.0*sin(angle/180.0*3.14159)));
     angleButton->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
     angleButton->setOutlineThickness(1);
     angleButton->setOrigin(sf::Vector2f(smallButtonSize/2.0, smallButtonSize/2.0));
 
-    boost::shared_ptr<sf::Shape> line = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(26, 1)));
+    std::shared_ptr<sf::Shape> line = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(26, 1)));
     line->setPosition(position+sf::Vector2f(3.0*cos(angle/180.0*3.14159), 3.0*sin(angle/180.0*3.14159)));
     line->setRotation(angle);
     line->setFillColor(sf::Color( 0, 0, 200, 128 ));
@@ -130,9 +130,9 @@ void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < boost::shared_p
     target.push_back(angleButton);
 }
 
-void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
+void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
 {
-    boost::shared_ptr<sf::Shape> highlight = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    std::shared_ptr<sf::Shape> highlight = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
     highlight->setPosition(rectangle.left, rectangle.top);
     highlight->setFillColor(sf::Color( 230, 230, 230, 20 ));
     highlight->setOutlineColor(sf::Color( 200, 200, 200, 70 ));
@@ -141,7 +141,7 @@ void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < boost::s
     target.push_back(highlight);
 }
 
-void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
+void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
 {
     //Declare the button as a gui element
     gd::LayoutEditorCanvasGuiElement guiElement;
@@ -150,7 +150,7 @@ void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_pt
     guiElements.push_back(guiElement);
 
     //Draw button
-    boost::shared_ptr<sf::Shape> button = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    std::shared_ptr<sf::Shape> button = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
     button->setPosition(position);
     button->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
     button->setOutlineThickness(1);
@@ -168,7 +168,7 @@ void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_pt
 class InstancesRenderer : public gd::InitialInstanceFunctor
 {
 public:
-    InstancesRenderer(LayoutEditorCanvas & editor_, gd::InitialInstance * highlightedInstance_, std::vector < boost::shared_ptr<sf::Shape> > & guiElementsShapes_) :
+    InstancesRenderer(LayoutEditorCanvas & editor_, gd::InitialInstance * highlightedInstance_, std::vector < std::shared_ptr<sf::Shape> > & guiElementsShapes_) :
         drawResizeButtons(false),
         resizeButtonsMaxX(0),
         resizeButtonsMinX(0),
@@ -237,7 +237,7 @@ public:
 private:
     LayoutEditorCanvas & editor;
     gd::InitialInstance * highlightedInstance;
-    std::vector < boost::shared_ptr<sf::Shape> > & guiElementsShapes;
+    std::vector < std::shared_ptr<sf::Shape> > & guiElementsShapes;
 };
 
 void LayoutEditorCanvas::RenderEdittime()
@@ -249,7 +249,7 @@ void LayoutEditorCanvas::RenderEdittime()
     pushGLStates(); //To allow using OpenGL to draw
 
     //Prepare GUI elements and the renderer
-    std::vector < boost::shared_ptr<sf::Shape> > guiElementsShapes;
+    std::vector < std::shared_ptr<sf::Shape> > guiElementsShapes;
     guiElements.clear();
     InstancesRenderer renderer(*this, GetInitialInstanceUnderCursor(), guiElementsShapes);
 
@@ -478,13 +478,13 @@ void LayoutEditorCanvas::OnUnLockSelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnCopySelected(wxCommandEvent & event)
 {
-    vector < boost::shared_ptr<gd::InitialInstance> > copiedPositions;
+    vector < std::shared_ptr<gd::InitialInstance> > copiedPositions;
 
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if ( it->first == NULL ) continue;
 
-        copiedPositions.push_back(boost::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.push_back(std::shared_ptr<gd::InitialInstance>(it->first->Clone()));
         copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
         copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
@@ -494,13 +494,13 @@ void LayoutEditorCanvas::OnCopySelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
 {
-    vector < boost::shared_ptr<gd::InitialInstance> > copiedPositions;
+    vector < std::shared_ptr<gd::InitialInstance> > copiedPositions;
 
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if ( it->first == NULL ) continue;
 
-        copiedPositions.push_back(boost::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.push_back(std::shared_ptr<gd::InitialInstance>(it->first->Clone()));
         copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
         copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
@@ -521,7 +521,7 @@ void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 {
     if ( !gd::Clipboard::Get()->HasInstances() ) return;
 
-    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
+    vector < std::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
 
     for (unsigned int i =0;i<pastedInstances.size();++i)
     {
@@ -538,15 +538,15 @@ void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
 {
     if ( !gd::Clipboard::Get()->HasInstances() ) return;
-    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
-    if ( pastedInstances.empty() || pastedInstances[0] == boost::shared_ptr<gd::InitialInstance>() ) return;
+    vector < std::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
+    if ( pastedInstances.empty() || pastedInstances[0] == std::shared_ptr<gd::InitialInstance>() ) return;
 
     gd::InstancesAdvancedPasteDialog dialog(this);
     dialog.SetStartX(oldMouseX);
     dialog.SetStartY(oldMouseY);
 
-    boost::shared_ptr<gd::InitialInstance> instance = boost::shared_ptr<gd::InitialInstance>(pastedInstances[0]->Clone());
-    if ( instance != boost::shared_ptr<gd::InitialInstance>() )
+    std::shared_ptr<gd::InitialInstance> instance = std::shared_ptr<gd::InitialInstance>(pastedInstances[0]->Clone());
+    if ( instance != std::shared_ptr<gd::InitialInstance>() )
     {
         sf::Vector2f size = GetInitialInstanceSize(*instance);
         dialog.SetXGap(size.x);
@@ -674,13 +674,18 @@ void LayoutEditorCanvas::UpdateSize()
         if ( parentControl->GetSize().GetWidth() <= 0 || parentControl->GetSize().GetHeight() <= 0)
             return;
 
+        unsigned int width = parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0);
+        unsigned int height = parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0);
+
+        #if defined(MACOS) //&& defined(RETINA)
+        width *= 2;
+        height *= 2;
+        #endif
+
         //Scene takes all the space available in edition mode.
-        Window::setSize(sf::Vector2u(
-            parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
-            parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0)));
+        Window::setSize(sf::Vector2u(width, height));
         wxWindowBase::SetPosition(wxPoint(0,0));
-        wxWindowBase::SetSize(parentControl->GetSize().GetWidth() - (vScrollbar ? vScrollbar->GetSize().GetWidth() : 0),
-                              parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0));
+        wxWindowBase::SetSize(width, height);
 
         UpdateViewAccordingToZoomFactor();
     }

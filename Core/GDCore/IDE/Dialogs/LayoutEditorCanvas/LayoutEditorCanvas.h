@@ -12,7 +12,7 @@
 #include <set>
 #include <map>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include <wx/menu.h>
 #include <wx/ribbon/buttonbar.h>
@@ -373,10 +373,10 @@ protected:
     void RenderGrid();
     void RenderWindowMask();
     void RenderInitialWindowBorder();
-    void AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
-    void DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
-    void DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle );
-    void DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
+    void AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
+    void DrawSelectionRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
+    void DrawAngleButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle );
+    void DrawHighlightRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
     sf::Vector2f ConvertToWindowCoordinates(float x, float y, const sf::View & view);
 
     /**
@@ -456,7 +456,7 @@ protected:
     LayoutEditorCanvasOptions & options;
     gd::MainFrameWrapper & mainFrameWrapper;
     std::set<LayoutEditorCanvasAssociatedEditor*> associatedEditors;
-    std::map<std::string, boost::shared_ptr<gd::LayoutEditorPreviewer> > previewers;
+    std::map<std::string, std::shared_ptr<gd::LayoutEditorPreviewer> > previewers;
     wxWindow * parentControl; ///< The wxWidgets control owning the editor ( probably a wxPanel )
     wxAuiManager * parentAuiManager; ///< Pointer to the wxAuiManager displayed the editor. Can be NULL.
     wxScrollBar * hScrollbar;
@@ -479,8 +479,10 @@ protected:
     double oldMouseX; ///< The mouse X position which was usually stored the last time a right click happened.
     double oldMouseY; ///< The mouse Y position which was usually stored the last time a right click happened.
     bool isMovingInstance;
-    static const float gapBetweenButtonsAndRectangle = 5;
-    static const float smallButtonSize = 5;
+
+    float gapBetweenButtonsAndRectangle;
+    float smallButtonSize;
+
     bool firstRefresh;
 
     bool isSelecting;
@@ -488,15 +490,15 @@ protected:
     std::map <InitialInstance*, wxRealPoint > selectedInstances;
     std::string currentLayer; ///< The layer where the new instance must be added.
 
-    std::vector < boost::shared_ptr<gd::InitialInstancesContainer> > history; ///< History of changes
-    std::vector < boost::shared_ptr<gd::InitialInstancesContainer> > redoHistory; ///< Histoy of changes so as to "redo"
-    boost::shared_ptr<gd::InitialInstancesContainer> latestState; ///< Necessary to keep track of what changed
+    std::vector < std::shared_ptr<gd::InitialInstancesContainer> > history; ///< History of changes
+    std::vector < std::shared_ptr<gd::InitialInstancesContainer> > redoHistory; ///< Histoy of changes so as to "redo"
+    std::shared_ptr<gd::InitialInstancesContainer> latestState; ///< Necessary to keep track of what changed
 
     std::vector<LayoutEditorCanvasGuiElement> guiElements;
 
     //State
     bool editing; ///< True if the layout is being edited, false if a preview is running.
-    boost::shared_ptr<gd::LayoutEditorPreviewer> currentPreviewer; ///< The previewer being used to preview the layout.
+    std::shared_ptr<gd::LayoutEditorPreviewer> currentPreviewer; ///< The previewer being used to preview the layout.
 
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;

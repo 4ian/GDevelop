@@ -7,7 +7,7 @@
 #include <wx/progdlg.h>
 #include <wx/richmsgdlg.h>
 #include <wx/filedlg.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/System.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -52,7 +52,7 @@ void MainFrame::CreateNewProject()
         gd::Platform* associatedPlatform = gd::PlatformManager::Get()->GetPlatform(dialog.GetChosenTemplatePlatform());
         if ( associatedPlatform != NULL )
         {
-            boost::shared_ptr<gd::Project> newProject(new gd::Project);
+            std::shared_ptr<gd::Project> newProject(new gd::Project);
 
             //Be sure that the directory of the target exists
             wxString targetDirectory = wxFileName::FileName(dialog.GetChosenFilename()).GetPath();
@@ -168,7 +168,7 @@ void MainFrame::Open( string file )
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
     bool isJSON = wxString(file).EndsWith(".json");
 
-    boost::shared_ptr<gd::Project> newProject(new gd::Project);
+    std::shared_ptr<gd::Project> newProject(new gd::Project);
     if ( (!isJSON && newProject->LoadFromFile(file)) ||
          (isJSON  && newProject->LoadFromJSONFile(file)) )
     {
@@ -195,7 +195,7 @@ void MainFrame::Open( string file )
             for(unsigned int p = 0;p<newProject->GetUsedPlatforms().size();++p)
             {
                 gd::Platform & platform = *newProject->GetUsedPlatforms()[p];
-                std::vector < boost::shared_ptr<gd::PlatformExtension> > allExtensions = platform.GetAllPlatformExtensions();
+                std::vector < std::shared_ptr<gd::PlatformExtension> > allExtensions = platform.GetAllPlatformExtensions();
                 for (unsigned int e = 0;e<allExtensions.size();++e)
                 {
                     if ( allExtensions[e]->GetName() == newProject->GetUsedExtensions()[i])
@@ -384,7 +384,7 @@ void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
     if ( idToPlatformExportMenuMap.find(id) == idToPlatformExportMenuMap.end() )
         return;
 
-    boost::shared_ptr<gd::ProjectExporter> exporter = idToPlatformExportMenuMap[id]->GetProjectExporter();
+    std::shared_ptr<gd::ProjectExporter> exporter = idToPlatformExportMenuMap[id]->GetProjectExporter();
     if ( !exporter ) return;
 
     exporter->ShowProjectExportDialog(*GetCurrentGame());

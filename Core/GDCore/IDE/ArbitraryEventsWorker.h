@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 namespace gd {class Instruction;}
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}

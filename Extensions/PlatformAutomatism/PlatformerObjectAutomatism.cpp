@@ -5,7 +5,7 @@ Copyright (c) 2014-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "PlatformerObjectAutomatism.h"
 #include "PlatformAutomatism.h"
 #include "ScenePlatformObjectsManager.h"
@@ -97,8 +97,8 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     double requestedDeltaY = 0;
 
     //Change the speed according to the player's input.
-    leftKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Left );
-    rightKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed( sf::Keyboard::Right );
+    leftKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Left");
+    rightKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Right");
     if ( leftKey )
         currentSpeed -= acceleration*timeDelta;
     if ( rightKey )
@@ -186,7 +186,7 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     //2) Y axis:
 
     //Go on a ladder
-    ladderKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    ladderKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     if (ladderKey && IsOverlappingLadder(potentialObjects))
     {
         canJump = true;
@@ -199,8 +199,8 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     if ( isOnLadder )
     {
-        upKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-        downKey |= !ignoreDefaultControls && sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+        upKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
+        downKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
         if ( upKey )
             requestedDeltaY -= 150*timeDelta;
         if ( downKey )
@@ -224,7 +224,9 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //Jumping
-    jumpKey |= !ignoreDefaultControls && (sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ) );
+    jumpKey |= !ignoreDefaultControls &&
+        (scene.GetInputManager().IsKeyPressed("LShift") || scene.GetInputManager().IsKeyPressed("RShift") ||
+        scene.GetInputManager().IsKeyPressed("Space"));
     if ( canJump && jumpKey )
     {
         jumping = true;
@@ -400,6 +402,7 @@ bool PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAu
 std::set<PlatformAutomatism*> PlatformerObjectAutomatism::GetPlatformsCollidingWith(const std::set<PlatformAutomatism*> & candidates,
     const std::set<PlatformAutomatism*> & exceptTheseOnes)
 {
+    //TODO: This function could be refactored to return only the first colliding platform.
     std::set<PlatformAutomatism*> result;
     for (std::set<PlatformAutomatism*>::iterator it = candidates.begin();
          it != candidates.end();

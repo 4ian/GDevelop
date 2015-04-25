@@ -3,8 +3,9 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <boost/algorithm/string.hpp>
-#include <boost/weak_ptr.hpp>
+
+#include <algorithm>
+#include <memory>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"

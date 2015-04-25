@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Version.h"
 #include "TiledSpriteObject.h"
 #include <iostream>
-#include <boost/version.hpp>
+
 
 void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 {
@@ -39,7 +39,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "TiledSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddCondition("Width",
                    _("Width"),
@@ -52,7 +52,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddAction("Height",
@@ -65,7 +65,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "TiledSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddCondition("Height",
@@ -79,7 +79,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddAction("Angle",
@@ -89,11 +89,12 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "TiledSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddCondition("Angle",
@@ -103,11 +104,11 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "TiledSprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .SetHidden() //Now available for all objects
-        .codeExtraInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("XOffset",
                    _("Image X Offset"),
@@ -120,7 +121,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetXOffset").SetManipulatedType("number").SetAssociatedGetter("GetXOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("SetXOffset").SetManipulatedType("number").SetGetter("GetXOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddCondition("XOffset",
@@ -134,7 +135,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("YOffset",
                    _("Image Y Offset"),
@@ -147,7 +148,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetYOffset").SetManipulatedType("number").SetAssociatedGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("SetYOffset").SetManipulatedType("number").SetGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddCondition("YOffset",
@@ -161,7 +162,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+        .SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
     #endif
 }
 

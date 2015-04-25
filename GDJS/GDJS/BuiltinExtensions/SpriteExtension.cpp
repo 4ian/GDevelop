@@ -24,91 +24,53 @@ SpriteExtension::SpriteExtension()
     std::map<std::string, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
     std::map<std::string, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
     std::map<std::string, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
-    spriteActions["ChangeBlendMode"].codeExtraInformation.
-        SetFunctionName("setBlendMode").SetIncludeFile("spriteruntimeobject.js");
-    spriteActions["Opacity"].codeExtraInformation.
-        SetFunctionName("setOpacity").SetAssociatedGetter("getOpacity").SetIncludeFile("spriteruntimeobject.js");
-    spriteConditions["BlendMode"].codeExtraInformation.
-        SetFunctionName("getBlendMode").SetIncludeFile("spriteruntimeobject.js");
-    spriteConditions["Opacity"].codeExtraInformation.
-        SetFunctionName("getOpacity").SetIncludeFile("spriteruntimeobject.js");
+    spriteActions["ChangeBlendMode"].SetFunctionName("setBlendMode").SetIncludeFile("spriteruntimeobject.js");
+    spriteActions["Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("spriteruntimeobject.js");
+    spriteConditions["BlendMode"].SetFunctionName("getBlendMode").SetIncludeFile("spriteruntimeobject.js");
+    spriteConditions["Opacity"].SetFunctionName("getOpacity").SetIncludeFile("spriteruntimeobject.js");
 
-    spriteActions["ChangeAnimation"].codeExtraInformation.
-        SetFunctionName("setAnimation").SetAssociatedGetter("getAnimation");
-    spriteActions["ChangeDirection"].codeExtraInformation.
-        SetFunctionName("setDirectionOrAngle").SetAssociatedGetter("getDirectionOrAngle");
-    spriteActions["ChangeSprite"].codeExtraInformation.
-        SetFunctionName("setAnimationFrame").SetAssociatedGetter("getAnimationFrame");
-    spriteConditions["Animation"].codeExtraInformation.
-        SetFunctionName("getAnimation");
-    spriteConditions["Direction"].codeExtraInformation.
-        SetFunctionName("getDirectionOrAngle");
-    spriteConditions["Sprite"].codeExtraInformation.
-        SetFunctionName("getAnimationFrame");
-    spriteConditions["AnimationEnded"].codeExtraInformation.
-        SetFunctionName("hasAnimationEnded");
-    spriteActions["PauseAnimation"].codeExtraInformation.
-        SetFunctionName("pauseAnimation");
-    spriteActions["PlayAnimation"].codeExtraInformation.
-        SetFunctionName("playAnimation");
-    spriteConditions["AnimStopped"].codeExtraInformation.
-        SetFunctionName("animationPaused");
+    spriteActions["ChangeAnimation"].SetFunctionName("setAnimation").SetGetter("getAnimation");
+    spriteActions["ChangeDirection"].SetFunctionName("setDirectionOrAngle").SetGetter("getDirectionOrAngle");
+    spriteActions["ChangeSprite"].SetFunctionName("setAnimationFrame").SetGetter("getAnimationFrame");
+    spriteConditions["Animation"].SetFunctionName("getAnimation");
+    spriteConditions["Direction"].SetFunctionName("getDirectionOrAngle");
+    spriteConditions["Sprite"].SetFunctionName("getAnimationFrame");
+    spriteConditions["AnimationEnded"].SetFunctionName("hasAnimationEnded");
+    spriteActions["PauseAnimation"].SetFunctionName("pauseAnimation");
+    spriteActions["PlayAnimation"].SetFunctionName("playAnimation");
+    spriteConditions["AnimStopped"].SetFunctionName("animationPaused");
+    spriteActions["ChangeAnimationSpeedScale"].SetFunctionName("setAnimationSpeedScale").SetGetter("getAnimationSpeedScale").SetManipulatedType("number").SetIncludeFile("spriteruntimeobject.js");
 
-    spriteActions["ChangeScaleWidth"].codeExtraInformation.
-        SetFunctionName("setScaleX").SetAssociatedGetter("getScaleX");
-    spriteActions["ChangeScaleHeight"].codeExtraInformation.
-        SetFunctionName("setScaleY").SetAssociatedGetter("getScaleY");
-    spriteActions["ChangeScale"].codeExtraInformation.
-        SetFunctionName("setScale").SetManipulatedType("number").SetAssociatedGetter("getScale");
-    spriteConditions["ScaleWidth"].codeExtraInformation
-        .SetFunctionName("getScaleX");
-    spriteConditions["ScaleHeight"].codeExtraInformation
-        .SetFunctionName("getScaleY");
-    spriteActions["TourneVersPos"].codeExtraInformation.
-        SetFunctionName("rotateTowardPosition");
-    spriteActions["TourneVers"].codeExtraInformation.
-        SetFunctionName("turnTowardObject");
-    spriteActions["ChangeColor"].codeExtraInformation.
-        SetFunctionName("setColor");
-    spriteActions["FlipX"].codeExtraInformation.
-        SetFunctionName("flipX");
-    spriteActions["FlipY"].codeExtraInformation.
-        SetFunctionName("flipY");
-    spriteConditions["FlippedX"].codeExtraInformation.
-        SetFunctionName("isFlippedX");
-    spriteConditions["FlippedY"].codeExtraInformation.
-        SetFunctionName("isFlippedY");
 
-    spriteConditions["SourisSurObjet"].codeExtraInformation.
-        SetFunctionName("cursorOnObject");
+    spriteActions["ChangeScaleWidth"].SetFunctionName("setScaleX").SetGetter("getScaleX");
+    spriteActions["ChangeScaleHeight"].SetFunctionName("setScaleY").SetGetter("getScaleY");
+    spriteActions["ChangeScale"].SetFunctionName("setScale").SetManipulatedType("number").SetGetter("getScale");
+    spriteConditions["ScaleWidth"].SetFunctionName("getScaleX");
+    spriteConditions["ScaleHeight"].SetFunctionName("getScaleY");
+    spriteActions["TourneVersPos"].SetFunctionName("rotateTowardPosition");
+    spriteActions["TourneVers"].SetFunctionName("turnTowardObject");
+    spriteActions["ChangeColor"].SetFunctionName("setColor");
+    spriteActions["FlipX"].SetFunctionName("flipX");
+    spriteActions["FlipY"].SetFunctionName("flipY");
+    spriteConditions["FlippedX"].SetFunctionName("isFlippedX");
+    spriteConditions["FlippedY"].SetFunctionName("isFlippedY");
 
     GetAllConditions()["Collision"]
         .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
-        .codeExtraInformation //No pixel perfect collision for now on the JS platform.
-        .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
+        .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest"); //No pixel perfect collision for now on the JS platform.
 
-    spriteExpressions["X"].codeExtraInformation.
-        SetFunctionName("getPointX");
-    spriteExpressions["Y"].codeExtraInformation.
-        SetFunctionName("getPointY");
-    spriteExpressions["PointX"].codeExtraInformation.
-        SetFunctionName("getPointX");
-    spriteExpressions["PointY"].codeExtraInformation.
-        SetFunctionName("getPointY");
-    spriteExpressions["Direc"].codeExtraInformation. //Deprecated
-        SetFunctionName("getDirectionOrAngle");
-    spriteExpressions["Direction"].codeExtraInformation.
-        SetFunctionName("getDirectionOrAngle");
-    spriteExpressions["Anim"].codeExtraInformation.  //Deprecated
-        SetFunctionName("getAnimation");
-    spriteExpressions["Animation"].codeExtraInformation.
-        SetFunctionName("getAnimation");
-    spriteExpressions["Sprite"].codeExtraInformation.
-        SetFunctionName("getAnimationFrame");
-    spriteExpressions["ScaleX"].codeExtraInformation.
-        SetFunctionName("getScaleX");
-    spriteExpressions["ScaleY"].codeExtraInformation.
-        SetFunctionName("getScaleY");
+    spriteExpressions["X"].SetFunctionName("getPointX");
+    spriteExpressions["Y"].SetFunctionName("getPointY");
+    spriteExpressions["PointX"].SetFunctionName("getPointX");
+    spriteExpressions["PointY"].SetFunctionName("getPointY");
+    spriteExpressions["Direc"].SetFunctionName("getDirectionOrAngle"); //Deprecated
+    spriteExpressions["Direction"].SetFunctionName("getDirectionOrAngle");
+    spriteExpressions["Anim"].SetFunctionName("getAnimation"); //Deprecated
+    spriteExpressions["Animation"].SetFunctionName("getAnimation");
+    spriteExpressions["Sprite"].SetFunctionName("getAnimationFrame");
+    spriteExpressions["AnimationSpeedScale"].SetFunctionName("getAnimationSpeedScale");
+    spriteExpressions["ScaleX"].SetFunctionName("getScaleX");
+    spriteExpressions["ScaleY"].SetFunctionName("getScaleY");
 
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
@@ -129,7 +91,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("expression", _("X position"), "",false)
             .AddParameter("expression", _("Y position"), "",false)
             .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
-            .codeExtraInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+            .SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
 
 
@@ -143,7 +105,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("color", _("Color to make transparent"), "",false)
-            .codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+            .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     }
 
 */

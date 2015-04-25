@@ -41,7 +41,9 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    this.onCanvasResized();
+    if (this._pixiRenderer) {
+    	this.onCanvasResized();
+    }
 };
 
 /**
@@ -125,7 +127,11 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
     //Set up the function to be executed at each tick
     var module = gdjs[sceneData.mangledName+"Code"];
-    if ( module && module.func ) this._eventsFunction = module.func;
+    if ( module && module.func )
+    	this._eventsFunction = module.func;
+    else
+    	this._eventsFunction = (function() {});
+
     this._eventsContext = new gdjs.EventsContext();
 
     //Call global callback
@@ -209,7 +215,9 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
  * Render the PIXI stage associated to the runtimeScene.
  * @method render
  */
-gdjs.RuntimeScene.prototype.render = function(){
+gdjs.RuntimeScene.prototype.render = function() {
+	if (!this._pixiRenderer) return;
+
 	// render the PIXI stage
 	this._pixiRenderer.render(this._pixiStage);
 };

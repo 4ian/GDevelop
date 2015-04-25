@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon2d.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 
 #include "TileMapProxies.h"
@@ -86,7 +86,7 @@ private:
 
     bool needGeneration;
 
-    boost::shared_ptr<SFMLTextureWrapper> texture;
+    std::shared_ptr<SFMLTextureWrapper> texture;
 
     float oldX;
     float oldY;

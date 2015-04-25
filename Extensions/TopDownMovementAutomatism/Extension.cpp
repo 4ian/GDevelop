@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include "GDCpp/AutomatismsSharedData.h"
 #include "GDCore/Tools/Version.h"
 #include "TopDownMovementAutomatism.h"
-#include <boost/version.hpp>
+
 
 void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension)
 {
@@ -26,8 +26,8 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
           "",
           "CppPlatform/Extensions/topdownmovementicon.png",
           "TopDownMovementAutomatism",
-          boost::shared_ptr<gd::Automatism>(new TopDownMovementAutomatism),
-          boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+          std::shared_ptr<gd::Automatism>(new TopDownMovementAutomatism),
+          std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
     #if defined(GD_IDE_ONLY)
 
@@ -43,7 +43,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SimulateLeftKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SimulateLeftKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateRightKey",
                    _("Simulate right key press"),
@@ -55,7 +55,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SimulateRightKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SimulateRightKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateUpKey",
                    _("Simulate up key press"),
@@ -67,7 +67,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SimulateUpKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SimulateUpKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateDownKey",
                    _("Simulate down key press"),
@@ -79,7 +79,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SimulateDownKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SimulateDownKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateControl",
                    _("Simulate control"),
@@ -92,7 +92,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .AddParameter("string", _("Key"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SimulateControl").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SimulateControl").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("IgnoreDefaultControls",
                    _("Ignore default controls"),
@@ -105,7 +105,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .AddParameter("yesorno", _("Ignore controls"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("IgnoreDefaultControls").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("IgnoreDefaultControls").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("IsMoving",
                    _("Is moving"),
@@ -116,7 +116,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("IsMoving").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("IsMoving").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("Acceleration",
                    _("Acceleration"),
@@ -130,7 +130,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetAcceleration").SetAssociatedGetter("GetAcceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetAcceleration").SetGetter("GetAcceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("Acceleration",
                    _("Acceleration"),
@@ -144,7 +144,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("Deceleration",
                    _("Deceleration"),
@@ -158,7 +158,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetDeceleration").SetAssociatedGetter("GetDeceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetDeceleration").SetGetter("GetDeceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("Deceleration",
                    _("Deceleration"),
@@ -172,7 +172,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetDeceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetDeceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("MaxSpeed",
                    _("Maximum speed"),
@@ -185,7 +185,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("SetMaxSpeed").SetAssociatedGetter("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetMaxSpeed").SetGetter("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("MaxSpeed",
                    _("Maximum speed"),
@@ -199,7 +199,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("Speed",
                    _("Speed"),
@@ -212,7 +212,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("AngularMaxSpeed",
                    _("Angular maximum speed"),
@@ -226,7 +226,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetAngularMaxSpeed").SetAssociatedGetter("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetAngularMaxSpeed").SetGetter("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("AngularMaxSpeed",
                    _("Angular maximum speed"),
@@ -240,7 +240,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("AngleOffset",
                    _("Rotation offset"),
@@ -254,7 +254,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetAngleOffset").SetAssociatedGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetAngleOffset").SetGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("AngleOffset",
                    _("Rotation offset"),
@@ -268,7 +268,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("AllowDiagonals",
                    _("Diagonals moves"),
@@ -280,7 +280,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .AddParameter("yesorno", _("Allow?"))
-        .codeExtraInformation.SetFunctionName("SetAllowDiagonals").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetAllowDiagonals").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("DiagonalsAllowed",
                    _("Diagonals moves"),
@@ -292,7 +292,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("DiagonalsAllowed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("DiagonalsAllowed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("RotateObject",
                    _("Rotate the object"),
@@ -305,7 +305,7 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .AddParameter("yesorno", _("Rotate object?"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetRotateObject").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("SetRotateObject").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("ObjectRotated",
                    _("Object rotated"),
@@ -317,37 +317,37 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("IsObjectRotated").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("IsObjectRotated").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddExpression("Acceleration", _("Acceleration"), _("Acceleration of the object"), _("Movement"), "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("GetAcceleration").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetAcceleration").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddExpression("Deceleration", _("Deceleration"), _("Deceleration of the object"), _("Movement"), "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("GetDeceleration").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetDeceleration").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddExpression("MaxSpeed", _("Maximum speed"), _("Maximum speed of the object"), _("Movement"), "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("GetMaxSpeed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetMaxSpeed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddExpression("Speed", _("Speed"), _("Speed of the object"), _("Movement"), "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("GetSpeed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetSpeed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddExpression("AngularMaxSpeed", _("Angular maximum speed"), _("Angular maximum speed of the object"), _("Movement"), "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("GetAngularMaxSpeed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetAngularMaxSpeed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddExpression("AngleOffset", _("Rotation offset"), _("Rotation offset applied to the object"), _("Movement"), "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("automatism", _("Automatism"), "TopDownMovementAutomatism", false)
-        .codeExtraInformation.SetFunctionName("GetAngleOffset").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
+        .SetFunctionName("GetAngleOffset").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
     #endif
 }
 

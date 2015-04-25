@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "ObjectsLinksManager.h"
 #include "GDCore/Tools/Version.h"
-#include <boost/version.hpp>
+
 #include <iostream>
 
 /**
@@ -43,7 +43,7 @@ public:
             .AddParameter("objectPtr", _("Object 1"))
             .AddParameter("objectPtr", _("Object 2"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::LinkObjects").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::LinkObjects").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddAction("RemoveLinkBetween",
                        _("Unlink two objects"),
@@ -57,7 +57,7 @@ public:
             .AddParameter("objectPtr", _("Object 1"))
             .AddParameter("objectPtr", _("Object 2"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddAction("RemoveAllLinksOf",
                        _("Unlink all objects from an object"),
@@ -70,7 +70,7 @@ public:
             .AddCodeOnlyParameter("currentScene", "")
             .AddParameter("objectPtr", _("Object"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddCondition("PickObjectsLinkedTo",
                        _("Take into account linked objects"),
@@ -81,10 +81,10 @@ public:
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("objectList", "Pick these objects...")
+            .AddParameter("objectList", _("Pick these objects..."))
             .AddParameter("objectPtr", _("...if they are linked to this object"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
 
         AddAction("PickObjectsLinkedTo",
@@ -96,10 +96,10 @@ public:
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("objectList", "Pick these objects...")
+            .AddParameter("objectList", _("Pick these objects..."))
             .AddParameter("objectPtr", _("...if they are linked to this object"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         #endif
 

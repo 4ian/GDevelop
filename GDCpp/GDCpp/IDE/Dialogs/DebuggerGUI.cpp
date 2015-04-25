@@ -3,9 +3,10 @@
 
 #include <wx/toolbar.h>
 #include <wx/image.h>
-#include <boost/weak_ptr.hpp>
+
 #include <wx/textdlg.h>
 #include "GDCore/Tools/Log.h"
+#include <algorithm>
 #include <string>
 #include <set>
 #include "GDCpp/CommonTools.h"
@@ -19,7 +20,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include <SFML/Graphics.hpp>
-#include "GDCore/Tools/Localization.h" 
+#include "GDCore/Tools/Localization.h"
 
 const long DebuggerGUI::ID_EXTLIST = wxNewId();
 
@@ -80,10 +81,10 @@ DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_)
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
-        if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
+        if ( extension != std::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
         {
             alreadyCreatedPanels.insert(extension->GetName());
             wxPanel * extPanel = new wxPanel(m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, extension->GetName());
@@ -158,7 +159,7 @@ void DebuggerGUI::UpdateGUI()
     m_generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     //TODO //m_generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
     m_generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
-    m_generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
+    m_generalList->SetItem(5, 1, ToString(scene.GetInputManager().GetMousePosition().x)+";"+ToString(scene.GetInputManager().GetMousePosition().y));
     m_generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables
@@ -205,10 +206,10 @@ void DebuggerGUI::UpdateGUI()
     unsigned int extListCtrlId = 0;
     for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
-        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
-        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
+        std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
-        if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
+        if ( extension != std::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
         {
             //Update items count
             while(static_cast<unsigned int>(extensionsListCtrls[extListCtrlId]->GetItemCount()) > extension->GetNumberOfProperties(scene))
@@ -258,7 +259,7 @@ void DebuggerGUI::UpdateGUI()
     RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
     for(unsigned int i = 0;i<allObjects.size();++i)
     {
-        boost::weak_ptr<RuntimeObject> weakPtrToObject = allObjects[i];
+        std::weak_ptr<RuntimeObject> weakPtrToObject = allObjects[i];
 
         //L'objet n'est pas dans l'arbre : on l'ajoute
         if ( objectsInTree.find(weakPtrToObject) == objectsInTree.end() )
@@ -281,9 +282,9 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    //Suppression des élements en trop
-    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
-    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
+    //Suppression des éléments en trop
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
     while(objectsInTreeIter != objectsInTreeEnd)
     {
@@ -301,9 +302,9 @@ void DebuggerGUI::UpdateGUI()
     if ( !m_objectsTree->GetSelection().IsOk() )
         return;
 
-    RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
-    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
@@ -312,7 +313,7 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    if ( object == boost::shared_ptr<RuntimeObject>() )
+    if ( object == std::shared_ptr<RuntimeObject>() )
         return;
 
     m_objectName->SetLabel(object->GetName());
@@ -382,9 +383,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
         return;
 
     //Obtain the shared_ptr to the object
-    RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
-    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
@@ -393,7 +394,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
         }
     }
 
-    if ( object == boost::shared_ptr<RuntimeObject>() )
+    if ( object == std::shared_ptr<RuntimeObject>() )
         return;
 
     //Check if we are trying to modify a "general" property
@@ -468,10 +469,10 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
         return;
     }
 
-    boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(std::string(list->GetName().mb_str()));
-    boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+    std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(std::string(list->GetName().mb_str()));
+    std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
-    if ( extension == boost::shared_ptr<ExtensionBase>() )
+    if ( extension == std::shared_ptr<ExtensionBase>() )
     {
         std::cout << "Unknown extension in debugger ( " << list->GetName() << " )" << std::endl;
         return;
@@ -552,9 +553,9 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
         return;
 
     //Obtain the shared_ptr to the object
-    RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
-    std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < boost::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
@@ -563,7 +564,7 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
         }
     }
 
-    if ( object != boost::shared_ptr<RuntimeObject>() ) object->DeleteFromScene(scene);
+    if ( object != std::shared_ptr<RuntimeObject>() ) object->DeleteFromScene(scene);
 }
 
 /**
@@ -613,7 +614,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-    RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
+    RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
 
     //Creation of the object
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
@@ -621,7 +622,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-    if ( newObject == boost::shared_ptr<RuntimeObject> () )
+    if ( newObject == std::shared_ptr<RuntimeObject> () )
     {
         gd::LogWarning(_("Unable to create object."));
         return;

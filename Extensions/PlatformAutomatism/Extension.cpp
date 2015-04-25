@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "PlatformerObjectAutomatism.h"
 #include "PlatformAutomatism.h"
 #include "ScenePlatformObjectsManager.h"
-#include <boost/version.hpp>
+
 
 void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
 {
@@ -28,8 +28,8 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
               "",
               "CppPlatform/Extensions/platformerobjecticon.png",
               "PlatformerObjectAutomatism",
-              boost::shared_ptr<gd::Automatism>(new PlatformerObjectAutomatism),
-              boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+              std::shared_ptr<gd::Automatism>(new PlatformerObjectAutomatism),
+              std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
         #if defined(GD_IDE_ONLY)
         aut.SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
@@ -44,7 +44,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsSimple()
-            .codeExtraInformation.SetFunctionName("IsMoving").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("IsMoving").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("IsOnFloor",
                        _("Is on floor"),
@@ -56,7 +56,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsSimple()
-            .codeExtraInformation.SetFunctionName("IsOnFloor").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("IsOnFloor").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("IsOnLadder",
                        _("Is on ladder"),
@@ -68,7 +68,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("IsOnLadder").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("IsOnLadder").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("IsJumping",
                        _("Is jumping"),
@@ -80,7 +80,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsSimple()
-            .codeExtraInformation.SetFunctionName("IsJumping").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("IsJumping").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("IsFalling",
                        _("Is falling"),
@@ -91,7 +91,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
                        "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("IsFalling").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("IsFalling").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("Gravity",
                        _("Gravity"),
@@ -105,7 +105,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("relationalOperator", _("Comparison sign"))
             .AddParameter("expression", _("Value to test"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("GetGravity").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetGravity").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("Gravity",
                        _("Gravity"),
@@ -119,7 +119,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SetGravity").SetManipulatedType("number").SetAssociatedGetter("GetGravity").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetGravity").SetManipulatedType("number").SetGetter("GetGravity").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("MaxFallingSpeed",
                        _("Maximum falling speed"),
@@ -133,7 +133,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("relationalOperator", _("Comparison sign"))
             .AddParameter("expression", _("Value to test"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("GetMaxFallingSpeed").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetMaxFallingSpeed").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("MaxFallingSpeed",
                        _("Maximum falling speed"),
@@ -147,7 +147,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SetMaxFallingSpeed").SetManipulatedType("number").SetAssociatedGetter("GetMaxFallingSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetMaxFallingSpeed").SetManipulatedType("number").SetGetter("GetMaxFallingSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("Acceleration",
                        _("Acceleration"),
@@ -161,7 +161,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("relationalOperator", _("Comparison sign"))
             .AddParameter("expression", _("Value to test"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("Acceleration",
                        _("Acceleration"),
@@ -175,7 +175,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SetAcceleration").SetManipulatedType("number").SetAssociatedGetter("GetAcceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetAcceleration").SetManipulatedType("number").SetGetter("GetAcceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("Deceleration",
                        _("Deceleration"),
@@ -189,7 +189,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("relationalOperator", _("Comparison sign"))
             .AddParameter("expression", _("Value to test"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("GetDeceleration").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetDeceleration").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("Deceleration",
                        _("Deceleration"),
@@ -203,7 +203,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SetDeceleration").SetManipulatedType("number").SetAssociatedGetter("GetDeceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetDeceleration").SetManipulatedType("number").SetGetter("GetDeceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("MaxSpeed",
                        _("Maximum speed"),
@@ -216,7 +216,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .AddParameter("relationalOperator", _("Comparison sign"))
             .AddParameter("expression", _("Value to test"))
-            .codeExtraInformation.SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("MaxSpeed",
                        _("Maximum speed"),
@@ -230,7 +230,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SetMaxSpeed").SetManipulatedType("number").SetAssociatedGetter("GetMaxSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetMaxSpeed").SetManipulatedType("number").SetGetter("GetMaxSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddCondition("JumpSpeed",
                        _("Jump speed"),
@@ -244,7 +244,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("relationalOperator", _("Comparison sign"))
             .AddParameter("expression", _("Value to test"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("GetJumpSpeed").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetJumpSpeed").SetManipulatedType("number").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("JumpSpeed",
                        _("Jump speed"),
@@ -257,7 +257,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
-            .codeExtraInformation.SetFunctionName("SetJumpSpeed").SetManipulatedType("number").SetAssociatedGetter("GetJumpSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetJumpSpeed").SetManipulatedType("number").SetGetter("GetJumpSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SetCanJump",
                        _("Allow again jumping"),
@@ -269,7 +269,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsSimple()
-            .codeExtraInformation.SetFunctionName("SetCanJump").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetCanJump").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateLeftKey",
                        _("Simulate left key press"),
@@ -281,7 +281,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SimulateLeftKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateLeftKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateRightKey",
                        _("Simulate right key press"),
@@ -293,7 +293,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SimulateRightKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateRightKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateUpKey",
                        _("Simulate up key press"),
@@ -305,7 +305,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SimulateUpKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateUpKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateDownKey",
                        _("Simulate down key press"),
@@ -317,7 +317,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SimulateDownKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateDownKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateLadderKey",
                        _("Simulate ladder key press"),
@@ -329,7 +329,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SimulateLadderKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateLadderKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateJumpKey",
                        _("Simulate jump key press"),
@@ -340,7 +340,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
                        "res/conditions/keyboard.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("SimulateJumpKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateJumpKey").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SimulateControl",
                        _("Simulate control"),
@@ -353,7 +353,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .AddParameter("string", _("Key"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("SimulateControl").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SimulateControl").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("IgnoreDefaultControls",
                        _("Ignore default controls"),
@@ -366,37 +366,37 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
             .AddParameter("yesorno", _("Ignore controls"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("IgnoreDefaultControls").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("IgnoreDefaultControls").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddExpression("Gravity", _("Gravity"), _("Get the gravity applied on the object"), _("Options"), "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("GetGravity").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetGravity").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddExpression("MaxFallingSpeed", _("Maximum falling speed"), _("Get the maximum falling speed"), _("Options"), "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("GetMaxFallingSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetMaxFallingSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddExpression("Acceleration", _("Acceleration"), _("Acceleration"), _("Options"), "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("GetAcceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetAcceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddExpression("Deceleration", _("Deceleration"), _("Deceleration"), _("Options"), "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("GetDeceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetDeceleration").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddExpression("MaxSpeed", _("Maximum speed"), _("Maximum speed"), _("Options"), "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("GetMaxSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetMaxSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddExpression("JumpSpeed", _("Jump speed"), _("Jump speed"), _("Options"), "CppPlatform/Extensions/platformerobjecticon16.png")
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"), "PlatformerObjectAutomatism")
-            .codeExtraInformation.SetFunctionName("GetJumpSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("GetJumpSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
         #endif
     }
     {
@@ -407,8 +407,8 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
               "",
               "CppPlatform/Extensions/platformicon.png",
               "PlatformAutomatism",
-              boost::shared_ptr<gd::Automatism>(new PlatformAutomatism),
-              boost::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
+              std::shared_ptr<gd::Automatism>(new PlatformAutomatism),
+              std::shared_ptr<gd::AutomatismsSharedData>(new gd::AutomatismsSharedData));
 
         #if defined(GD_IDE_ONLY)
         aut.SetIncludeFile("PlatformAutomatism/PlatformAutomatism.h");
@@ -424,7 +424,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("automatism", _("Automatism"), "PlatformAutomatism")
             .AddParameter("string", _("Platform type (\"Platform\", \"Jumpthru\" or \"Ladder\")"))
             .MarkAsAdvanced()
-            .codeExtraInformation.SetFunctionName("ChangePlatformType").SetIncludeFile("PlatformAutomatism/PlatformAutomatism.h");
+            .SetFunctionName("ChangePlatformType").SetIncludeFile("PlatformAutomatism/PlatformAutomatism.h");
         #endif
     }
 }

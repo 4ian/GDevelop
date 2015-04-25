@@ -66,7 +66,7 @@ class GD_API FullProjectCompilerDiagnosticManager
 {
 public:
     virtual void OnCompilationFailed() {};
-    virtual void OnCompilationSuccessed() {};
+    virtual void OnCompilationSucceeded() {};
     virtual void OnMessage(std::string message, std::string message2 = "") {};
     virtual void OnPercentUpdate(float percents) {};
 
@@ -84,7 +84,7 @@ class GD_API FullProjectCompilerConsoleDiagnosticManager : public FullProjectCom
 {
 public:
     virtual void OnCompilationFailed();
-    virtual void OnCompilationSuccessed();
+    virtual void OnCompilationSucceeded();
     virtual void OnMessage(std::string message, std::string message2 = "");
     virtual void OnPercentUpdate(float percents);
 };

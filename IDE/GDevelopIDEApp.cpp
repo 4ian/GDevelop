@@ -369,13 +369,14 @@ bool GDevelopIDEApp::OnInit()
 
     //Checking for updates
     {
-#ifndef GD_NO_UPDATE_CHECKER
+
         wxString result;
         config->Read( "Startup/CheckUpdate", &result );
         if ( result != "false" )
         {
             UpdateChecker * checker = UpdateChecker::Get();
             checker->DownloadInformation();
+#ifndef GD_NO_UPDATE_CHECKER
             if ( checker->newVersionAvailable )
             {
                 MAJ dialog(mainEditor, true);
@@ -385,8 +386,8 @@ bool GDevelopIDEApp::OnInit()
                     return true;
                 }
             }
-        }
 #endif
+        }
         mainEditor->RefreshNews();
     }
 

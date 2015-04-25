@@ -226,7 +226,7 @@ changesNeedRestart(false)
     FlexGridSizer14->AddGrowableCol(0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Startup"));
     FlexGridSizer39 = new wxFlexGridSizer(0, 1, 0, 0);
-    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Check for updates"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Check for updates and the news"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
     FlexGridSizer39->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     sendInfoCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Send anonymous statistics about GDevelop ( version, language used )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
@@ -627,9 +627,9 @@ changesNeedRestart(false)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
     //*)
 
-    //Hide the "Check update" item if GDevelop is compiled without the update checker
+    //If the update dialog is disabled, rename the checkbox to "Check for news"
 #ifdef GD_NO_UPDATE_CHECKER
-    MAJCheck->Hide();
+    MAJCheck->SetLabel(_("Check for the news"));
 #endif
 
     //Create the image list

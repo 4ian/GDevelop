@@ -196,7 +196,9 @@ public:
     void OnMenuItem23Selected(wxCommandEvent& event);
     void OnMenuForumSelected(wxCommandEvent& event);
     void OnMenuSiteSelected(wxCommandEvent& event);
+#ifndef GD_NO_UPDATE_CHECKER
     void OnMenuItem36Selected(wxCommandEvent& event);
+#endif
     void OnMenuTutoSelected(wxCommandEvent& event);
     void OnDecomposeGIFSelected(wxCommandEvent& event);
     void OnDecomposeRPGSelected(wxCommandEvent& event);

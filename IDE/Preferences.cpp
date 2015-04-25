@@ -627,6 +627,12 @@ changesNeedRestart(false)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
     //*)
 
+    //Hide the "Check update" item if GDevelop is compiled without the update checker
+#ifdef GD_NO_UPDATE_CHECKER
+    MAJCheck->Hide();
+#endif
+
+    //Create the image list
     wxImageList * imageList = new wxImageList( 24, 24 );
     imageList->Add(( wxBitmap( "res/pref24.png", wxBITMAP_TYPE_ANY ) ) );
     imageList->Add(( wxBitmap( "res/locale.png", wxBITMAP_TYPE_ANY ) ) );

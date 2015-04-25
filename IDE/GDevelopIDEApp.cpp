@@ -369,6 +369,7 @@ bool GDevelopIDEApp::OnInit()
 
     //Checking for updates
     {
+#ifndef GD_NO_UPDATE_CHECKER
         wxString result;
         config->Read( "Startup/CheckUpdate", &result );
         if ( result != "false" )
@@ -385,6 +386,7 @@ bool GDevelopIDEApp::OnInit()
                 }
             }
         }
+#endif
         mainEditor->RefreshNews();
     }
 

@@ -662,7 +662,7 @@ gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
     var colors = rgbColor.split(";");
     if ( colors.length < 3 ) return;
 
-    this._sprite.tint = gdjs.rgbToHex(colors[0], colors[1], colors[2]);
+    this._sprite.tint = "0x" + gdjs.rgbToHex(parseInt(colors[0]), parseInt(colors[1]), parseInt(colors[2]));
 };
 
 gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {

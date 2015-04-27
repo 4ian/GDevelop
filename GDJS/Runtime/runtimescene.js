@@ -314,8 +314,7 @@ gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 gdjs.RuntimeScene.prototype._updateObjects = function() {
 	this._cacheOrClearRemovedInstances();
 
-	var allObjectsLists = this._instances.entries();
-	this.updateObjectsForces(allObjectsLists);
+	this.updateObjectsForces();
 
 	//It is *mandatory* to create and iterate on a external list of all objects, as the automatisms
 	//may delete the objects.
@@ -348,8 +347,8 @@ gdjs.RuntimeScene.prototype.getName = function() {
  * Update the objects positions according to their forces
  * @method updateObjectsForces
  */
-gdjs.RuntimeScene.prototype.updateObjectsForces = function(objects) {
-	var allObjectsLists = objects ? objects : this._instances.entries();
+gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
+	var allObjectsLists = this._instances.entries();
 
 	for( var i = 0, len = allObjectsLists.length;i<len;++i) {
 		for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {

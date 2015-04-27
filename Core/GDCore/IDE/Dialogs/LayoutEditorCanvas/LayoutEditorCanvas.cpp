@@ -118,7 +118,8 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     smallButtonSize(gd::GUIContentScaleFactor::Get() > 1 ? 12 : 5),
     firstRefresh(true),
     isSelecting(false),
-    editing(true)
+    editing(true),
+    enableIdleEvents(true)
 {
 	//(*Initialize(LayoutEditorCanvas)
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS, _T("wxID_ANY"));
@@ -313,11 +314,14 @@ LayoutEditorCanvas::~LayoutEditorCanvas()
 
 void LayoutEditorCanvas::OnIdle(wxIdleEvent & event)
 {
-    // Send a paint message when the control is idle, to ensure maximum framerate
-    Refresh();
-    #if defined(__WXGTK__)
-    event.RequestMore(); //On GTK, we need to specify that we want continuous idle events.
-    #endif
+    if(enableIdleEvents)
+    {
+        // Send a paint message when the control is idle, to ensure maximum framerate
+        Refresh();
+        #if defined(__WXGTK__)
+        event.RequestMore(); //On GTK, we need to specify that we want continuous idle events.
+        #endif
+    }
 }
 
 void LayoutEditorCanvas::OnPaint(wxPaintEvent&)

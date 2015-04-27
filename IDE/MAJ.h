@@ -6,6 +6,8 @@
 #ifndef MAJ_H
 #define MAJ_H
 
+#ifndef GD_NO_UPDATE_CHECKER
+
 //(*Headers(MAJ)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -85,3 +87,4 @@ class MAJ: public wxDialog
 
 #endif
 
+#endif

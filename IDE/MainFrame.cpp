@@ -226,9 +226,11 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem19 = new wxMenuItem((&helpMenu), ID_MENUITEM23, _("Tutorial"), wxEmptyString, wxITEM_NORMAL);
     helpMenu.Append(MenuItem19);
     helpMenu.AppendSeparator();
+#ifndef GD_NO_UPDATE_CHECKER
     MenuItem21 = new wxMenuItem((&helpMenu), ID_MENUITEM25, _("Check for updates"), wxEmptyString, wxITEM_NORMAL);
     helpMenu.Append(MenuItem21);
     helpMenu.AppendSeparator();
+#endif
     MenuItem20 = new wxMenuItem((&helpMenu), ID_MENUITEM24, _("Official web site"), wxEmptyString, wxITEM_NORMAL);
     MenuItem20->SetBitmap(gd::SkinHelper::GetIcon("site", 16));
     helpMenu.Append(MenuItem20);
@@ -262,7 +264,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnQuit);
     Connect(ID_MENUITEM20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuAideSelected);
     Connect(ID_MENUITEM23,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuTutoSelected);
+#ifndef GD_NO_UPDATE_CHECKER
     Connect(ID_MENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuItem36Selected);
+#endif
     Connect(ID_MENUITEM24,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSiteSelected);
     Connect(ID_MENUITEM21,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnAbout);
     Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&MainFrame::OnClose);
@@ -279,7 +283,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuAideSelected );
     Connect( idRibbonTuto, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuTutoSelected );
     Connect( idRibbonForum, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuForumSelected );
+#ifndef GD_NO_UPDATE_CHECKER
     Connect( idRibbonUpdate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuItem36Selected );
+#endif
     Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuSiteSelected );
     Connect( idRibbonCredits, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnAbout );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_PAGE_CHANGING, ( wxObjectEventFunction )&MainFrame::OnRibbonPageChanging );

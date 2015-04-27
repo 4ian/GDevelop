@@ -10,10 +10,7 @@
 #include <wx/mimetype.h> // mimetype support
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "Credits.h"
-
-#ifndef GD_NO_UPDATE_CHECKER
 #include "MAJ.h"
-#endif
 
 /**
  * Display help
@@ -97,17 +94,17 @@ void MainFrame::OnMenuSiteSelected(wxCommandEvent& event)
     }
 }
 
-#ifndef GD_NO_UPDATE_CHECKER
 /**
  * Open update dialog
  */
 void MainFrame::OnMenuItem36Selected(wxCommandEvent& event)
 {
+    #ifndef GD_NO_UPDATE_CHECKER
     MAJ dialog(this);
     if ( dialog.ShowModal() == 2)
     {
         Destroy();
         wxExit();
     }
+    #endif
 }
-#endif

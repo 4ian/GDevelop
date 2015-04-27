@@ -627,10 +627,9 @@ changesNeedRestart(false)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
     //*)
 
-    //If the update dialog is disabled, rename the checkbox to "Check for news"
-#ifdef GD_NO_UPDATE_CHECKER
+    #ifdef GD_NO_UPDATE_CHECKER //If the update dialog is disabled, rename the checkbox to "Check for news"
     MAJCheck->SetLabel(_("Check for the news"));
-#endif
+    #endif
 
     //Create the image list
     wxImageList * imageList = new wxImageList( 24, 24 );

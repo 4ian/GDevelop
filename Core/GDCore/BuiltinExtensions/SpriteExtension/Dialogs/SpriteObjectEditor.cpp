@@ -1751,7 +1751,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
         {
             wxArrayString files;
             FileDialog.GetPaths(files);
-            files.Sort(true); //Ensure that the order of insertion is alphabetical.
+            files.Sort(); //Ensure that the order of insertion is alphabetical.
 
             std::vector < std::string > filenames;
             for ( unsigned int i = 0; i < files.GetCount();++i )

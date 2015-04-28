@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-07 21:01+1200\n"
-"PO-Revision-Date: 2015-04-07 05:36-0400\n"
+"POT-Creation-Date: 2015-04-12 17:28+1200\n"
+"PO-Revision-Date: 2015-04-12 01:44-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -554,7 +554,7 @@ msgstr "Portapapeles"
 
 #: ../IDE/CodeEditor.cpp:133 ../IDE/EventsEditor.cpp:439
 msgid "History"
-msgstr "History"
+msgstr "Historial"
 
 #: ../IDE/CodeEditor.cpp:139 ../IDE/EventsEditor.cpp:463
 #: ../IDE/ProjectManager.cpp:399
@@ -955,11 +955,11 @@ msgstr "Mi proyecto"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:133
 #: ../IDE/Dialogs/NewProjectDialog.cpp:139
-#: ../IDE/Dialogs/NewProjectDialog.cpp:333
+#: ../IDE/Dialogs/NewProjectDialog.cpp:335
 msgid "Project.gdg"
 msgstr "Proyecto.gdg"
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:148
+#: ../IDE/Dialogs/NewProjectDialog.cpp:150
 #: ../Extensions//PlatformAutomatism/Extension.cpp:404
 #: ../Extensions//PlatformAutomatism/PlatformAutomatism.cpp:116
 #: ../Extensions//PlatformAutomatism/PlatformAutomatism.cpp:125
@@ -967,26 +967,26 @@ msgstr "Proyecto.gdg"
 msgid "Platform"
 msgstr "Plataforma"
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:149
+#: ../IDE/Dialogs/NewProjectDialog.cpp:151
 msgid "Template"
 msgstr "Plantilla"
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:150
+#: ../IDE/Dialogs/NewProjectDialog.cpp:152
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:123
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:123
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:233
 msgid "Description"
 msgstr "Descripción"
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:256
+#: ../IDE/Dialogs/NewProjectDialog.cpp:258
 msgid "Empty project"
 msgstr "Proyecto vacío"
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:257
+#: ../IDE/Dialogs/NewProjectDialog.cpp:259
 msgid "Create a new empty project"
 msgstr "Crear un nuevo proyecto vacío"
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:333
+#: ../IDE/Dialogs/NewProjectDialog.cpp:335
 msgid "Choose a file for the project"
 msgstr "Selecciona un archivo para el proyecto"
 
@@ -2054,17 +2054,17 @@ msgstr "El espacio vertical es inválido ( debe ser mayor o igual a 0 )."
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:41
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:55
 #: ../Extensions//DraggableAutomatism/Extension.cpp:41
-#: ../Extensions//Light/Extension.cpp:53 ../Extensions//Light/Extension.cpp:65
-#: ../Extensions//Light/Extension.cpp:78 ../Extensions//Light/Extension.cpp:91
-#: ../Extensions//Light/Extension.cpp:104
-#: ../Extensions//Light/Extension.cpp:117
-#: ../Extensions//Light/Extension.cpp:130
-#: ../Extensions//Light/Extension.cpp:143
-#: ../Extensions//Light/Extension.cpp:155
-#: ../Extensions//Light/Extension.cpp:167
-#: ../Extensions//Light/Extension.cpp:201
-#: ../Extensions//Light/Extension.cpp:205
-#: ../Extensions//Light/Extension.cpp:209
+#: ../Extensions//Light/Extension.cpp:52 ../Extensions//Light/Extension.cpp:64
+#: ../Extensions//Light/Extension.cpp:77 ../Extensions//Light/Extension.cpp:90
+#: ../Extensions//Light/Extension.cpp:103
+#: ../Extensions//Light/Extension.cpp:116
+#: ../Extensions//Light/Extension.cpp:129
+#: ../Extensions//Light/Extension.cpp:142
+#: ../Extensions//Light/Extension.cpp:154
+#: ../Extensions//Light/Extension.cpp:166
+#: ../Extensions//Light/Extension.cpp:170
+#: ../Extensions//Light/Extension.cpp:174
+#: ../Extensions//Light/Extension.cpp:178
 #: ../Extensions//LinkedObjects/Extension.cpp:71
 #: ../Extensions//Network/Extension.cpp:163
 #: ../Extensions//Network/Extension.cpp:190
@@ -2383,21 +2383,21 @@ msgstr "El espacio vertical es inválido ( debe ser mayor o igual a 0 )."
 #: ../Extensions//TextObject/Extension.cpp:191
 #: ../Extensions//TextObject/Extension.cpp:201
 #: ../Extensions//TextObject/Extension.cpp:212
-#: ../Extensions//TextObject/Extension.cpp:222
-#: ../Extensions//TextObject/Extension.cpp:234
-#: ../Extensions//TextObject/Extension.cpp:240
-#: ../Extensions//TextObject/Extension.cpp:244
-#: ../Extensions//TextObject/Extension.cpp:248
+#: ../Extensions//TextObject/Extension.cpp:223
+#: ../Extensions//TextObject/Extension.cpp:236
+#: ../Extensions//TextObject/Extension.cpp:242
+#: ../Extensions//TextObject/Extension.cpp:247
+#: ../Extensions//TextObject/Extension.cpp:251
 #: ../Extensions//TiledSpriteObject/Extension.cpp:39
 #: ../Extensions//TiledSpriteObject/Extension.cpp:51
 #: ../Extensions//TiledSpriteObject/Extension.cpp:65
 #: ../Extensions//TiledSpriteObject/Extension.cpp:78
-#: ../Extensions//TiledSpriteObject/Extension.cpp:92
-#: ../Extensions//TiledSpriteObject/Extension.cpp:106
-#: ../Extensions//TiledSpriteObject/Extension.cpp:119
-#: ../Extensions//TiledSpriteObject/Extension.cpp:133
-#: ../Extensions//TiledSpriteObject/Extension.cpp:146
-#: ../Extensions//TiledSpriteObject/Extension.cpp:160
+#: ../Extensions//TiledSpriteObject/Extension.cpp:93
+#: ../Extensions//TiledSpriteObject/Extension.cpp:108
+#: ../Extensions//TiledSpriteObject/Extension.cpp:120
+#: ../Extensions//TiledSpriteObject/Extension.cpp:134
+#: ../Extensions//TiledSpriteObject/Extension.cpp:147
+#: ../Extensions//TiledSpriteObject/Extension.cpp:161
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:43
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:55
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:67
@@ -2586,10 +2586,10 @@ msgstr "Y"
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:266
 #: ../Extensions//TextEntryObject/TextEntryInitialPositionPanel.cpp:42
 #: ../Extensions//TextObject/Extension.cpp:216
-#: ../Extensions//TextObject/Extension.cpp:228
-#: ../Extensions//TextObject/Extension.cpp:243
+#: ../Extensions//TextObject/Extension.cpp:229
+#: ../Extensions//TextObject/Extension.cpp:245
 #: ../Extensions//TiledSpriteObject/Extension.cpp:86
-#: ../Extensions//TiledSpriteObject/Extension.cpp:100
+#: ../Extensions//TiledSpriteObject/Extension.cpp:101
 #: ../Extensions//TiledSpriteObject/TiledSpriteObject.cpp:182
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:116
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:119
@@ -2834,7 +2834,7 @@ msgstr "Gestión de lista"
 msgid "Delete the selected resource"
 msgstr "Eliminar el recurso seleccionado"
 
-#: ../IDE/MainFrame.cpp:383 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:963
+#: ../IDE/MainFrame.cpp:383 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid "Remove useless resources"
 msgstr "Eliminar los recursos no usados"
 
@@ -3347,9 +3347,9 @@ msgstr "Ocultar las pestañas de las páginas"
 msgid "File button"
 msgstr "Botón de archivo"
 
-#: ../IDE/Preferences.cpp:411 ../Extensions//Light/Extension.cpp:47
-#: ../Extensions//Light/Extension.cpp:54
-#: ../Extensions//Light/Extension.cpp:144
+#: ../IDE/Preferences.cpp:411 ../Extensions//Light/Extension.cpp:46
+#: ../Extensions//Light/Extension.cpp:53
+#: ../Extensions//Light/Extension.cpp:143
 #: ../Extensions//Light/LightObject.cpp:226
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:351
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:92
@@ -4041,11 +4041,11 @@ msgstr "Música detenida :"
 msgid "Paused music:"
 msgstr "Música en pausa :"
 
-#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:628
+#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:578
 msgid "C++ code ( Experimental )"
 msgstr "Código C++ ( Experimental )"
 
-#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:629
+#: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:579
 msgid "Execute C++ code"
 msgstr "Ejecuta código C++"
 
@@ -4193,8 +4193,8 @@ msgstr "Propiedad"
 #: ../Extensions//Box3DObject/Extension.cpp:183
 #: ../Extensions//Box3DObject/Extension.cpp:209
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:58
-#: ../Extensions//Light/Extension.cpp:67 ../Extensions//Light/Extension.cpp:93
-#: ../Extensions//Light/Extension.cpp:119
+#: ../Extensions//Light/Extension.cpp:66 ../Extensions//Light/Extension.cpp:92
+#: ../Extensions//Light/Extension.cpp:118
 #: ../Extensions//Network/Extension.cpp:90
 #: ../Extensions//PanelSpriteObject/Extension.cpp:43
 #: ../Extensions//PanelSpriteObject/Extension.cpp:68
@@ -4277,12 +4277,12 @@ msgstr "Propiedad"
 #: ../Extensions//SoundObject/Extension.cpp:388
 #: ../Extensions//TextObject/Extension.cpp:79
 #: ../Extensions//TextObject/Extension.cpp:114
-#: ../Extensions//TextObject/Extension.cpp:224
+#: ../Extensions//TextObject/Extension.cpp:225
 #: ../Extensions//TiledSpriteObject/Extension.cpp:41
 #: ../Extensions//TiledSpriteObject/Extension.cpp:67
-#: ../Extensions//TiledSpriteObject/Extension.cpp:94
-#: ../Extensions//TiledSpriteObject/Extension.cpp:121
-#: ../Extensions//TiledSpriteObject/Extension.cpp:148
+#: ../Extensions//TiledSpriteObject/Extension.cpp:95
+#: ../Extensions//TiledSpriteObject/Extension.cpp:122
+#: ../Extensions//TiledSpriteObject/Extension.cpp:149
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:131
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:145
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:159
@@ -4888,7 +4888,7 @@ msgstr "La compilación a fallado con estos errores :"
 
 #: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:639
 msgid "Compilation succeeded."
-msgstr "Compilation succeeded."
+msgstr "Compilación exitosa."
 
 #: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:652
 msgid "Progress:"
@@ -5062,7 +5062,7 @@ msgstr "Imagen"
 #: ../GDCpp/GDCpp//RuntimeSpriteObject.cpp:612
 #: ../Extensions//TextObject/Extension.cpp:106
 #: ../Extensions//TextObject/Extension.cpp:118
-#: ../Extensions//TextObject/Extension.cpp:239
+#: ../Extensions//TextObject/Extension.cpp:241
 #: ../Extensions//TextObject/TextObject.cpp:339
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:276
 msgid "Opacity"
@@ -5153,11 +5153,11 @@ msgstr "Eventos estándar"
 msgid "Built-in extension providing standard events."
 msgstr "Extensión integrada que provee eventos estándar."
 
-#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:609
+#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:586
 msgid "Javascript code (Web platform only)"
 msgstr "Código Javascript (sólo plataforma web)"
 
-#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:610
+#: ../GDJS/GDJS//BuiltinExtensions/CommonInstructionsExtension.cpp:587
 msgid "Insert some Javascript code into events"
 msgstr "Introducir código Javascript en los eventos"
 
@@ -6210,8 +6210,8 @@ msgstr "Hacer _PARAM1__PARAM2_ el ancho de _PARAM0_"
 #: ../Extensions//Box3DObject/Extension.cpp:182
 #: ../Extensions//Box3DObject/Extension.cpp:208
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:57
-#: ../Extensions//Light/Extension.cpp:66 ../Extensions//Light/Extension.cpp:92
-#: ../Extensions//Light/Extension.cpp:118
+#: ../Extensions//Light/Extension.cpp:65 ../Extensions//Light/Extension.cpp:91
+#: ../Extensions//Light/Extension.cpp:117
 #: ../Extensions//PanelSpriteObject/Extension.cpp:42
 #: ../Extensions//PanelSpriteObject/Extension.cpp:67
 #: ../Extensions//PanelSpriteObject/Extension.cpp:94
@@ -6281,12 +6281,12 @@ msgstr "Hacer _PARAM1__PARAM2_ el ancho de _PARAM0_"
 #: ../Extensions//TextObject/Extension.cpp:43
 #: ../Extensions//TextObject/Extension.cpp:78
 #: ../Extensions//TextObject/Extension.cpp:113
-#: ../Extensions//TextObject/Extension.cpp:223
+#: ../Extensions//TextObject/Extension.cpp:224
 #: ../Extensions//TiledSpriteObject/Extension.cpp:40
 #: ../Extensions//TiledSpriteObject/Extension.cpp:66
-#: ../Extensions//TiledSpriteObject/Extension.cpp:93
-#: ../Extensions//TiledSpriteObject/Extension.cpp:120
-#: ../Extensions//TiledSpriteObject/Extension.cpp:147
+#: ../Extensions//TiledSpriteObject/Extension.cpp:94
+#: ../Extensions//TiledSpriteObject/Extension.cpp:121
+#: ../Extensions//TiledSpriteObject/Extension.cpp:148
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:130
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:158
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:186
@@ -6341,9 +6341,9 @@ msgstr "El ancho de _PARAM0_ es _PARAM1_ a _PARAM2_"
 #: ../Extensions//Box3DObject/Extension.cpp:195
 #: ../Extensions//Box3DObject/Extension.cpp:221
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:43
-#: ../Extensions//Light/Extension.cpp:79
-#: ../Extensions//Light/Extension.cpp:105
-#: ../Extensions//Light/Extension.cpp:131
+#: ../Extensions//Light/Extension.cpp:78
+#: ../Extensions//Light/Extension.cpp:104
+#: ../Extensions//Light/Extension.cpp:130
 #: ../Extensions//PanelSpriteObject/Extension.cpp:54
 #: ../Extensions//PanelSpriteObject/Extension.cpp:80
 #: ../Extensions//PanelSpriteObject/Extension.cpp:107
@@ -6407,12 +6407,12 @@ msgstr "El ancho de _PARAM0_ es _PARAM1_ a _PARAM2_"
 #: ../Extensions//TextObject/Extension.cpp:55
 #: ../Extensions//TextObject/Extension.cpp:90
 #: ../Extensions//TextObject/Extension.cpp:125
-#: ../Extensions//TextObject/Extension.cpp:235
+#: ../Extensions//TextObject/Extension.cpp:237
 #: ../Extensions//TiledSpriteObject/Extension.cpp:52
 #: ../Extensions//TiledSpriteObject/Extension.cpp:79
-#: ../Extensions//TiledSpriteObject/Extension.cpp:107
-#: ../Extensions//TiledSpriteObject/Extension.cpp:134
-#: ../Extensions//TiledSpriteObject/Extension.cpp:161
+#: ../Extensions//TiledSpriteObject/Extension.cpp:109
+#: ../Extensions//TiledSpriteObject/Extension.cpp:135
+#: ../Extensions//TiledSpriteObject/Extension.cpp:162
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:144
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:172
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:199
@@ -6468,9 +6468,9 @@ msgstr "Signo de evaluación"
 #: ../Extensions//Box3DObject/Extension.cpp:196
 #: ../Extensions//Box3DObject/Extension.cpp:222
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:44
-#: ../Extensions//Light/Extension.cpp:80
-#: ../Extensions//Light/Extension.cpp:106
-#: ../Extensions//Light/Extension.cpp:132
+#: ../Extensions//Light/Extension.cpp:79
+#: ../Extensions//Light/Extension.cpp:105
+#: ../Extensions//Light/Extension.cpp:131
 #: ../Extensions//PanelSpriteObject/Extension.cpp:55
 #: ../Extensions//PanelSpriteObject/Extension.cpp:81
 #: ../Extensions//PanelSpriteObject/Extension.cpp:108
@@ -6534,12 +6534,12 @@ msgstr "Signo de evaluación"
 #: ../Extensions//SoundObject/Extension.cpp:451
 #: ../Extensions//SoundObject/Extension.cpp:467
 #: ../Extensions//TextObject/Extension.cpp:126
-#: ../Extensions//TextObject/Extension.cpp:236
+#: ../Extensions//TextObject/Extension.cpp:238
 #: ../Extensions//TiledSpriteObject/Extension.cpp:53
 #: ../Extensions//TiledSpriteObject/Extension.cpp:80
-#: ../Extensions//TiledSpriteObject/Extension.cpp:108
-#: ../Extensions//TiledSpriteObject/Extension.cpp:135
-#: ../Extensions//TiledSpriteObject/Extension.cpp:162
+#: ../Extensions//TiledSpriteObject/Extension.cpp:110
+#: ../Extensions//TiledSpriteObject/Extension.cpp:136
+#: ../Extensions//TiledSpriteObject/Extension.cpp:163
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:462
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:781
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:31
@@ -7129,7 +7129,7 @@ msgstr "Los objetos de este grupo que son concernientes de anteriores\ncondicion
 msgid "Others arguments can be passed as text\nwhen the function is called. ( And they can\nbe used in function using Function::GetParameter(x) )."
 msgstr "Otros argumentos pueden ser pasados como texto\ncuando la función es llamada. ( Y pueden ser usados\npor la función usando Function::GetParameter(x) )."
 
-#: ../Extensions//Light/Extension.cpp:28 ../Extensions//Light/Extension.cpp:35
+#: ../Extensions//Light/Extension.cpp:28 ../Extensions//Light/Extension.cpp:34
 msgid "Light"
 msgstr "Luz"
 
@@ -7137,29 +7137,29 @@ msgstr "Luz"
 msgid "Allow to display lights and use light obstacles."
 msgstr "Permite visualizar luces y usar obstáculos lumínicos."
 
-#: ../Extensions//Light/Extension.cpp:36
+#: ../Extensions//Light/Extension.cpp:35
 msgid "Emits light that can be stopped by objects"
 msgstr "Emite luz que puede ser obstaculizada por objetos"
 
-#: ../Extensions//Light/Extension.cpp:48
+#: ../Extensions//Light/Extension.cpp:47
 msgid "Change light color."
 msgstr "Cambia el color de una fuente de luz."
 
-#: ../Extensions//Light/Extension.cpp:49
+#: ../Extensions//Light/Extension.cpp:48
 #: ../Extensions//TextObject/Extension.cpp:97
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:333
 msgid "Change color of _PARAM0_ to _PARAM1_"
 msgstr "Cambiar el color de _PARAM0_ a _PARAM1_"
 
-#: ../Extensions//Light/Extension.cpp:50 ../Extensions//Light/Extension.cpp:62
-#: ../Extensions//Light/Extension.cpp:75 ../Extensions//Light/Extension.cpp:88
-#: ../Extensions//Light/Extension.cpp:101
-#: ../Extensions//Light/Extension.cpp:114
-#: ../Extensions//Light/Extension.cpp:127
-#: ../Extensions//Light/Extension.cpp:140
-#: ../Extensions//Light/Extension.cpp:200
-#: ../Extensions//Light/Extension.cpp:204
-#: ../Extensions//Light/Extension.cpp:208
+#: ../Extensions//Light/Extension.cpp:49 ../Extensions//Light/Extension.cpp:61
+#: ../Extensions//Light/Extension.cpp:74 ../Extensions//Light/Extension.cpp:87
+#: ../Extensions//Light/Extension.cpp:100
+#: ../Extensions//Light/Extension.cpp:113
+#: ../Extensions//Light/Extension.cpp:126
+#: ../Extensions//Light/Extension.cpp:139
+#: ../Extensions//Light/Extension.cpp:169
+#: ../Extensions//Light/Extension.cpp:173
+#: ../Extensions//Light/Extension.cpp:177
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:23
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:34
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:47
@@ -7200,128 +7200,128 @@ msgstr "Cambiar el color de _PARAM0_ a _PARAM1_"
 msgid "Setup"
 msgstr "Configuración"
 
-#: ../Extensions//Light/Extension.cpp:59 ../Extensions//Light/Extension.cpp:72
-#: ../Extensions//Light/Extension.cpp:200
+#: ../Extensions//Light/Extension.cpp:58 ../Extensions//Light/Extension.cpp:71
+#: ../Extensions//Light/Extension.cpp:169
 #: ../Extensions//Light/LightObject.cpp:227
 msgid "Intensity"
 msgstr "Intensidad"
 
-#: ../Extensions//Light/Extension.cpp:60
+#: ../Extensions//Light/Extension.cpp:59
 msgid "Modify the intensity of a light"
 msgstr "Modifica la intensidad de una fuente de luz"
 
-#: ../Extensions//Light/Extension.cpp:61
+#: ../Extensions//Light/Extension.cpp:60
 msgid "Do _PARAM1__PARAM2_ to the intensity of _PARAM0_"
 msgstr "Hacer _PARAM1__PARAM2_ la intensidad de _PARAM0_"
 
-#: ../Extensions//Light/Extension.cpp:73
+#: ../Extensions//Light/Extension.cpp:72
 msgid "Test the intensity of a light."
 msgstr "Evalúa la intensidad de una fuente de luz."
 
-#: ../Extensions//Light/Extension.cpp:74
+#: ../Extensions//Light/Extension.cpp:73
 msgid "Intensity of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "La intensidad de _PARAM0_ es _PARAM1_ a _PARAM2_"
 
-#: ../Extensions//Light/Extension.cpp:85 ../Extensions//Light/Extension.cpp:98
-#: ../Extensions//Light/Extension.cpp:204
+#: ../Extensions//Light/Extension.cpp:84 ../Extensions//Light/Extension.cpp:97
+#: ../Extensions//Light/Extension.cpp:173
 #: ../Extensions//Light/LightObject.cpp:228
 msgid "Radius"
 msgstr "Radio"
 
-#: ../Extensions//Light/Extension.cpp:86
+#: ../Extensions//Light/Extension.cpp:85
 msgid "Modify the radius of a light"
-msgstr "Modify the radius of a light"
+msgstr "Modifica el radio de una luz"
 
-#: ../Extensions//Light/Extension.cpp:87
+#: ../Extensions//Light/Extension.cpp:86
 msgid "Do _PARAM1__PARAM2_ to radius of _PARAM0_"
 msgstr "Hacer _PARAM1__PARAM2_ el radio de _PARAM0_"
 
-#: ../Extensions//Light/Extension.cpp:99
+#: ../Extensions//Light/Extension.cpp:98
 msgid "Test the radius of a light."
 msgstr "Evalúa el radio de una fuente de luz."
 
-#: ../Extensions//Light/Extension.cpp:100
+#: ../Extensions//Light/Extension.cpp:99
 msgid "The radius of _PARAM0_ is _PARAM2_ _PARAM1_"
 msgstr "El radio de _PARAM0_ es _PARAM1_ a _PARAM2_"
 
-#: ../Extensions//Light/Extension.cpp:111
-#: ../Extensions//Light/Extension.cpp:124
-#: ../Extensions//Light/Extension.cpp:208
+#: ../Extensions//Light/Extension.cpp:110
+#: ../Extensions//Light/Extension.cpp:123
+#: ../Extensions//Light/Extension.cpp:177
 #: ../Extensions//Light/LightObject.cpp:229
 msgid "Quality"
 msgstr "Calidad"
 
-#: ../Extensions//Light/Extension.cpp:112
+#: ../Extensions//Light/Extension.cpp:111
 msgid "Modify the quality of a light"
 msgstr "Modifica la calidad (cantidad de lados) de una fuente de luz"
 
-#: ../Extensions//Light/Extension.cpp:113
+#: ../Extensions//Light/Extension.cpp:112
 msgid "Do _PARAM1__PARAM2_ to the quality of _PARAM0_"
 msgstr "Hacer _PARAM1__PARAM2_ la calidad de _PARAM0_"
 
-#: ../Extensions//Light/Extension.cpp:125
+#: ../Extensions//Light/Extension.cpp:124
 msgid "Test the quality of a light"
 msgstr "Evalúa la calidad (cantidad de lados) de una fuente de luz."
 
-#: ../Extensions//Light/Extension.cpp:126
+#: ../Extensions//Light/Extension.cpp:125
 msgid "The quality of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "La calidad de _PARAM0_ es _PARAM1_ a _PARAM2_"
 
-#: ../Extensions//Light/Extension.cpp:137
+#: ../Extensions//Light/Extension.cpp:136
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:331
 msgid "Global color"
 msgstr "Color global"
 
-#: ../Extensions//Light/Extension.cpp:138
+#: ../Extensions//Light/Extension.cpp:137
 msgid "Change scene color for a global light."
 msgstr "Modifica el color de la escena para una luz global."
 
-#: ../Extensions//Light/Extension.cpp:139
+#: ../Extensions//Light/Extension.cpp:138
 msgid "Change scene global color of _PARAM0_ to _PARAM1_"
 msgstr "Cambiar el color global de la escena de _PARAM0_ a _PARAM1_"
 
-#: ../Extensions//Light/Extension.cpp:149
+#: ../Extensions//Light/Extension.cpp:148
 msgid "Make a light global"
 msgstr "Convertir una luz en global"
 
-#: ../Extensions//Light/Extension.cpp:150
+#: ../Extensions//Light/Extension.cpp:149
 msgid "Make a light global or simple."
 msgstr "Convierte una luz en global o simple."
 
-#: ../Extensions//Light/Extension.cpp:151
+#: ../Extensions//Light/Extension.cpp:150
 msgid "Make _PARAM0_ global : _PARAM1_"
 msgstr "Hacer _PARAM0_ global : _PARAM1_"
 
-#: ../Extensions//Light/Extension.cpp:152
-#: ../Extensions//Light/Extension.cpp:164
+#: ../Extensions//Light/Extension.cpp:151
+#: ../Extensions//Light/Extension.cpp:163
 msgid "Light type"
 msgstr "Tipo de luz"
 
-#: ../Extensions//Light/Extension.cpp:156
+#: ../Extensions//Light/Extension.cpp:155
 msgid "Make light global"
 msgstr "Convertir la luz en global"
 
-#: ../Extensions//Light/Extension.cpp:161
+#: ../Extensions//Light/Extension.cpp:160
 msgid "A light is global"
 msgstr "Una luz es global"
 
-#: ../Extensions//Light/Extension.cpp:162
+#: ../Extensions//Light/Extension.cpp:161
 msgid "Return true if light is global"
 msgstr "Retorna verdad si una luz es global."
 
-#: ../Extensions//Light/Extension.cpp:163
+#: ../Extensions//Light/Extension.cpp:162
 msgid "_PARAM0_ is a global light"
 msgstr "_PARAM0_ es una luz global"
 
-#: ../Extensions//Light/Extension.cpp:224
+#: ../Extensions//Light/Extension.cpp:183
 msgid "Light obstacle"
 msgstr "Obstáculo lumínico"
 
-#: ../Extensions//Light/Extension.cpp:225
+#: ../Extensions//Light/Extension.cpp:184
 msgid "LightObstacle"
 msgstr "ObstaculoLuminico"
 
-#: ../Extensions//Light/Extension.cpp:226
+#: ../Extensions//Light/Extension.cpp:185
 msgid "Mark the objects as obstacles for Light objects."
 msgstr "Marca los objetos como obstáculos para los objetos Luz."
 
@@ -7435,7 +7435,7 @@ msgstr "Tener en cuenta todos los objetos \"_PARAM1_\" enlazados _PARAM2_"
 #: ../Extensions//LinkedObjects/Extension.cpp:84
 #: ../Extensions//LinkedObjects/Extension.cpp:99
 msgid "Pick these objects..."
-msgstr "Pick these objects..."
+msgstr "Tomar estos objetos..."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:85
 #: ../Extensions//LinkedObjects/Extension.cpp:100
@@ -7564,7 +7564,7 @@ msgstr "Enviar el texto _PARAM1_ con el título _PARAM0_ a los destinatarios"
 #: ../Extensions//TextEntryObject/Extension.cpp:40
 #: ../Extensions//TextObject/Extension.cpp:27
 #: ../Extensions//TextObject/Extension.cpp:44
-#: ../Extensions//TextObject/Extension.cpp:247
+#: ../Extensions//TextObject/Extension.cpp:250
 #: ../Extensions//TextObject/TextObject.cpp:335
 #: ../Extensions//TextObject/TextObjectEditor.cpp:68
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:301
@@ -7860,7 +7860,7 @@ msgstr "Modifica el ancho del objeto Panel."
 #: ../Extensions//TiledSpriteObject/Extension.cpp:62
 #: ../Extensions//TiledSpriteObject/Extension.cpp:75
 #: ../Extensions//TiledSpriteObject/Extension.cpp:89
-#: ../Extensions//TiledSpriteObject/Extension.cpp:103
+#: ../Extensions//TiledSpriteObject/Extension.cpp:104
 msgid "Size and angle"
 msgstr "Tamaño y ángulo"
 
@@ -7901,8 +7901,8 @@ msgid "Test the angle of a Panel Sprite."
 msgstr "Evalúa el ángulo del objeto Panel."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:101
-#: ../Extensions//TextObject/Extension.cpp:230
-#: ../Extensions//TiledSpriteObject/Extension.cpp:102
+#: ../Extensions//TextObject/Extension.cpp:231
+#: ../Extensions//TiledSpriteObject/Extension.cpp:103
 msgid "The angle of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "El ángulo de _PARAM0_ es _PARAM1_ a _PARAM2_"
 
@@ -8953,7 +8953,7 @@ msgid "Points"
 msgstr "Puntos"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:267
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:802
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:803
 msgid "Quad"
 msgstr "Cuadrilátero"
 
@@ -9210,7 +9210,7 @@ msgstr "Gravedad en eje Y"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:705
 msgid "Destroy the object when no more particles are sprayed"
-msgstr "Destroy the object when no more particles are sprayed"
+msgstr "Destruir el objeto cuando no se emitan más partículas"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:717
 msgid "Show the images bank"
@@ -9653,7 +9653,7 @@ msgstr "Modifica la velocidad del objeto en la ruta."
 
 #: ../Extensions//PathAutomatism/Extension.cpp:332
 msgid "Do _PARAM1__PARAM2_ to the speed of _PARAM0_ on the path"
-msgstr "Do _PARAM1__PARAM2_ to the speed of _PARAM0_ on the path"
+msgstr "Hacer _PARAM1__PARAM2_ la velocidad de _PARAM0_ en la ruta"
 
 #: ../Extensions//PathAutomatism/Extension.cpp:342
 msgid "Moving speed on the path"
@@ -10483,8 +10483,8 @@ msgid "Coordinates must be entere with a clockwise wind."
 msgstr "Las coordenadas deben ser ingresadas en el sentido\nde las agujas del reloj."
 
 #: ../Extensions//PhysicsAutomatism/CustomPolygonDialog.cpp:102
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1555
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1556
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1557
 msgid "Positioning"
 msgstr "Posicionando"
 
@@ -10688,8 +10688,8 @@ msgstr "Fijar la rotación de _PARAM0_"
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:547
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:559
 #: ../Extensions//TextObject/Extension.cpp:219
-#: ../Extensions//TextObject/Extension.cpp:231
-#: ../Extensions//TextObject/Extension.cpp:243
+#: ../Extensions//TextObject/Extension.cpp:232
+#: ../Extensions//TextObject/Extension.cpp:245
 msgid "Rotation"
 msgstr "Rotación"
 
@@ -10846,8 +10846,8 @@ msgstr "Aplicar a _PARAM0_ un impulso de _PARAM2_;_PARAM3_"
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:535
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:541
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:553
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1578
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1579
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1580
 msgid "Displacement"
 msgstr "Desplazamiento"
 
@@ -12818,7 +12818,7 @@ msgstr "_PARAM0_ está subrayado"
 msgid "Modify the angle of a Text object."
 msgstr "Modifica el ángulo de un objeto Texto."
 
-#: ../Extensions//TextObject/Extension.cpp:229
+#: ../Extensions//TextObject/Extension.cpp:230
 msgid "Test the value of the angle of a text object."
 msgstr "Evalúa el ángulo de un objeto Texto."
 
@@ -12882,56 +12882,56 @@ msgstr "Evalúa el alto del objeto Mosaico."
 msgid "Modify the angle of a Tiled Sprite."
 msgstr "Modifica el ángulo del objeto Mosaico."
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:101
+#: ../Extensions//TiledSpriteObject/Extension.cpp:102
 msgid "Test the angle of a Tiled Sprite."
 msgstr "Evalúa el ángulo del objeto Mosaico."
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:113
-#: ../Extensions//TiledSpriteObject/Extension.cpp:127
+#: ../Extensions//TiledSpriteObject/Extension.cpp:114
+#: ../Extensions//TiledSpriteObject/Extension.cpp:128
 msgid "Image X Offset"
 msgstr "Desplazamiento en X de la imagen"
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:114
+#: ../Extensions//TiledSpriteObject/Extension.cpp:115
 msgid "Modify the offset used on the X axis when displaying the image."
 msgstr "Modifica el desplazamiento en el eje X usado cuando se visualiza la imagen."
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:115
+#: ../Extensions//TiledSpriteObject/Extension.cpp:116
 msgid "Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"
 msgstr "Hacer _PARAM1__PARAM2_ el desplazamiento en X de _PARAM0_"
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:116
-#: ../Extensions//TiledSpriteObject/Extension.cpp:130
-#: ../Extensions//TiledSpriteObject/Extension.cpp:143
-#: ../Extensions//TiledSpriteObject/Extension.cpp:157
+#: ../Extensions//TiledSpriteObject/Extension.cpp:117
+#: ../Extensions//TiledSpriteObject/Extension.cpp:131
+#: ../Extensions//TiledSpriteObject/Extension.cpp:144
+#: ../Extensions//TiledSpriteObject/Extension.cpp:158
 msgid "Image offset"
 msgstr "Desplazamiento de la imagen"
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:128
+#: ../Extensions//TiledSpriteObject/Extension.cpp:129
 msgid "Test the offset used on the X axis when displaying the image."
 msgstr "Evalúa el desplazamiento en el eje X usado cuando se visualiza la imagen."
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:129
+#: ../Extensions//TiledSpriteObject/Extension.cpp:130
 msgid "The X offset of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "El desplazamiento en X de _PARAM0_ es _PARAM1_ a _PARAM2_"
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:140
-#: ../Extensions//TiledSpriteObject/Extension.cpp:154
+#: ../Extensions//TiledSpriteObject/Extension.cpp:141
+#: ../Extensions//TiledSpriteObject/Extension.cpp:155
 msgid "Image Y Offset"
 msgstr "Desplazamiento en Y de la imagen"
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:141
+#: ../Extensions//TiledSpriteObject/Extension.cpp:142
 msgid "Modify the offset used on the Y axis when displaying the image."
 msgstr "Modifica el desplazamiento en el eje Y usado cuando se visualiza la imagen."
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:142
+#: ../Extensions//TiledSpriteObject/Extension.cpp:143
 msgid "Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"
 msgstr "Hacer _PARAM1__PARAM2_ el desplazamiento en Y de _PARAM0_"
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:155
+#: ../Extensions//TiledSpriteObject/Extension.cpp:156
 msgid "Test the offset used on the Y axis when displaying the image."
 msgstr "Evalúa el desplazamiento en el eje Y usado cuando se visualiza la imagen."
 
-#: ../Extensions//TiledSpriteObject/Extension.cpp:156
+#: ../Extensions//TiledSpriteObject/Extension.cpp:157
 msgid "The Y offset of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr "El desplazamiento en Y de _PARAM0_ es _PARAM1_ a _PARAM2_"
 
@@ -14491,7 +14491,7 @@ msgstr "Evalúa la colisión entre dos objetos utilizando sus máscaras de colis
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:788
 msgid "_PARAM0_ is in collision with _PARAM1_"
-msgstr "_PARAM0_ is in collision with _PARAM1_"
+msgstr "_PARAM0_ está en colisión con _PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:798
 msgid "An object is turned toward another"
@@ -15631,15 +15631,15 @@ msgstr "x (en a+(b-a)*x)"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:23
 msgid "The cursor/touch is on an object"
-msgstr "The cursor/touch is on an object"
+msgstr "El cursor/toque está sobre un objeto"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:24
 msgid "Test if the cursor is over an object, or if the object is being touched."
-msgstr "Test if the cursor is over an object, or if the object is being touched."
+msgstr "Evalúa si el cursor está sobre un objeto, o si el objeto está siendo tocado con el táctil."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:25
 msgid "The cursor/touch is on _PARAM0_"
-msgstr "The cursor/touch is on _PARAM0_"
+msgstr "El cursor/toque está sobre _PARAM0_"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:26
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:40
@@ -15657,23 +15657,23 @@ msgstr "Ratón y táctil"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:32
 msgid "Accurate test (yes by default)"
-msgstr "Accurate test (yes by default)"
+msgstr "Evaluación precisa (sí por defecto)"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:37
 msgid "De/activate moving mouse cursor with touches"
-msgstr "De/activate moving mouse cursor with touches"
+msgstr "Des/activar el movimiento del cursor con los toques táctiles"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:38
 msgid "When activated, any touch made on a touchscreen will also move the mouse cursor. When deactivated, mouse and touch positions will be completely independant.\nBy default, this is activated so that you can simply use the mouse conditions to also support touchscreens. If you want to have multitouch and differentiate mouse and touches, just deactivate it with this action."
-msgstr "When activated, any touch made on a touchscreen will also move the mouse cursor. When deactivated, mouse and touch positions will be completely independant.\nBy default, this is activated so that you can simply use the mouse conditions to also support touchscreens. If you want to have multitouch and differentiate mouse and touches, just deactivate it with this action."
+msgstr "Si está activado, cualquier toque en la pantalla táctil también moverá el cursor del ratón. Si está desactivado, las posiciones del cursor y los toques serán independientes.\nPor defecto, está activado así puedes usar las condiciones del ratón y dar soporte a pantallas táctiles. Si quieres usar multitáctil (multitouch) y diferenciar ratón y toques táctiles, simplemente desactiva la opción con esta acción."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:39
 msgid "Move mouse cursor when touching screen: _PARAM1_"
-msgstr "Move mouse cursor when touching screen: _PARAM1_"
+msgstr "Mover el cursor cuando se toca la pantalla táctil: _PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:45
 msgid "Activate (yes by default when game is launched)"
-msgstr "Activate (yes by default when game is launched)"
+msgstr "Activar (sí por defecto cuando el juego es ejecutado)"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:49
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:51
@@ -15736,7 +15736,7 @@ msgstr "Centra el cursor en la pantalla."
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:202
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:207
 msgid "Cursor X position"
-msgstr "Cursor X position"
+msgstr "Posición X del cursor"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:117
 msgid "Compare the X position of the cursor or of a touch."
@@ -15744,13 +15744,13 @@ msgstr "Evalúa la posición X del cursor o de un toque."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:118
 msgid "Cursor X position is _PARAM1__PARAM2_"
-msgstr "Cursor X position is _PARAM1__PARAM2_"
+msgstr "La posición X del cursor es _PARAM1_ a _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:130
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:213
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:219
 msgid "Cursor Y position"
-msgstr "Cursor Y position"
+msgstr "Posición Y del cursor"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:131
 msgid "Compare the Y position of the cursor or of a touch."
@@ -15758,7 +15758,7 @@ msgstr "Evalúa la posición Y del cursor o de un toque."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:132
 msgid "Cursor Y position is _PARAM1__PARAM2_"
-msgstr "Cursor Y position is _PARAM1__PARAM2_"
+msgstr "La posición Y del cursor es _PARAM1_ a _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:144
 msgid "Mouse button down or touch held"
@@ -15779,60 +15779,60 @@ msgstr "Botón a evaluar"
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:155
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:228
 msgid "Touch X position"
-msgstr "Touch X position"
+msgstr "Posición X del toque"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:156
 msgid "Compare the X position of a specific touch."
-msgstr "Compare the X position of a specific touch."
+msgstr "Evalúa la posición X de un toque específico."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:157
 msgid "Touch #_PARAM1_ X position is _PARAM2__PARAM3_"
-msgstr "Touch #_PARAM1_ X position is _PARAM2__PARAM3_"
+msgstr "La posición X del toque n°_PARAM1_ es _PARAM2_ a _PARAM3_"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:158
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:173
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:188
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:197
 msgid "Mouse and touch/Multitouch"
-msgstr "Mouse and touch/Multitouch"
+msgstr "Ratón y táctil/Multitáctil"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:162
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:177
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:230
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:236
 msgid "Touch identifier"
-msgstr "Touch identifier"
+msgstr "Identificador del toque"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:170
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:234
 msgid "Touch Y position"
-msgstr "Touch Y position"
+msgstr "Posición Y del toque"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:171
 msgid "Compare the Y position of a specific touch."
-msgstr "Compare the Y position of a specific touch."
+msgstr "Evalúa la posición Y de un toque específico."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:172
 msgid "Touch #_PARAM1_ Y position is _PARAM2__PARAM3_"
-msgstr "Touch #_PARAM1_ Y position is _PARAM2__PARAM3_"
+msgstr "La posición Y del toque n°_PARAM1_ es _PARAM2_ a _PARAM3_"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:185
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:187
 msgid "A new touch has started"
-msgstr "A new touch has started"
+msgstr "Un nuevo toque ha iniciado"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:186
 msgid "Return true if a touch has started. The touch identifier can be accessed using LastTouchId().\nAs more than one touch can have started, this condition is only true once for each touch: the next time you use it, it will be for a new touch or it will return false if there is no more touch that just started."
-msgstr "Return true if a touch has started. The touch identifier can be accessed using LastTouchId().\nAs more than one touch can have started, this condition is only true once for each touch: the next time you use it, it will be for a new touch or it will return false if there is no more touch that just started."
+msgstr "Retorna verdad si un toque táctil ha iniciado. El identificador del toque puede ser accedido usando LastTouchId().\nComo más de un toque pueden haber iniciado, esta condición es verdad sólo una vez por toque: la próxima vez que la uses, será para un nuevo toque o retornará falso si no han iniciado más toques."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:194
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:196
 msgid "A touch has ended"
-msgstr "A touch has ended"
+msgstr "Un toque ha finalizado"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:195
 msgid "Return true if a touch has ended. The touch identifier can be accessed using LastEndedTouchId().\nAs more than one touch can have ended, this condition is only true once for each touch: the next time you use it, it will be for a new touch or it will return false if there is no more touch that just ended."
-msgstr "Return true if a touch has ended. The touch identifier can be accessed using LastEndedTouchId().\nAs more than one touch can have ended, this condition is only true once for each touch: the next time you use it, it will be for a new touch or it will return false if there is no more touch that just ended."
+msgstr "Retorna verdad si un toque táctil ha finalizado. El identificador del toque puede ser accedido usando LastEndedTouchId().\nComo más de un toque pueden haber finalizado, esta condición es verdad sólo una vez por toque: la próxima vez que la uses, será para un nuevo toque o retornará falso si no han finalizado más toques."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:202
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:207
@@ -15840,7 +15840,7 @@ msgstr "Return true if a touch has ended. The touch identifier can be accessed u
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:219
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:225
 msgid "Mouse cursor"
-msgstr "Mouse cursor"
+msgstr "Cursor del ratón"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:225
 msgid "Mouse wheel: Displacement"
@@ -15855,15 +15855,15 @@ msgstr "Desplazamiento de la rueda del ratón"
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:240
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:243
 msgid "Multitouch"
-msgstr "Multitouch"
+msgstr "Multitáctil"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:240
 msgid "Identifier of the last touch"
-msgstr "Identifier of the last touch"
+msgstr "Identificador del último toque"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:243
 msgid "Identifier of the last ended touch"
-msgstr "Identifier of the last ended touch"
+msgstr "Identificador del último toque finalizado"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:23
 msgid "Send datas to a website"
@@ -16008,11 +16008,11 @@ msgstr "Valor máximo"
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:26
 msgid "Current scene name"
-msgstr "Current scene name"
+msgstr "Nombre de la escena actual"
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:26
 msgid "Name of the current scene"
-msgstr "Name of the current scene"
+msgstr "Nombre de la escena actual"
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:30
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:32
@@ -16127,8 +16127,8 @@ msgid "De/activate loop"
 msgstr "Des/activar bucle de animación"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:223
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:927
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1665
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:928
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1666
 msgid "Time between each images"
 msgstr "Tiempo entre cada imagen"
 
@@ -16214,136 +16214,136 @@ msgstr "Animación "
 msgid "Direction "
 msgstr "Dirección "
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:800
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:801
 msgid "Triangle"
 msgstr "Triángulo"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:804
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:805
 msgid "Polygon"
 msgstr "Polígono"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:812
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:813
 msgid "( INVALID : The polygon is not convex )"
 msgstr "( INVÁLIDO : El polígono no es convexo )"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:817
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:818
 msgid "Vertice"
 msgstr "Vértice"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:830
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:831
 msgid "Default"
 msgstr "Predeterminada"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:934
-msgid "Time between each images:"
-msgstr "Tiempo entre cada imagen : "
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:935
+msgid "Time between each images: "
+msgstr "Tiempo entre cada imagen: "
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:934
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:935
 msgid "s"
 msgstr "s"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1136
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1137
 msgid "One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."
 msgstr "Uno o más polígonos de las máscaras de colisión no son convexos ( Es decir, contienen un hueco ).\nPor favor modifica esos polígonos antes de continuar."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1271
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1275
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1272
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1276
 msgid "NewPoint"
 msgstr "NuevoPunto"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1299
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1300
 msgid "The point \"Centre\" can be automatically placed by GDevelop at the center.\nDo you really want to modify the point?\nClick on yes to modify it, click on no so as let GDevelop place it."
 msgstr "El punto \"Centre\" puede ser automáticamente ubicado por GDevelop en el centro.\n¿Realmente quieres modificar el punto?\nHaz clic en \"sí\" para modificarlo, o en \"no\" para que GDevelop lo ubique."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1300
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1301
 msgid "Position of the point \"Centre\""
 msgstr "Posición del punto \"Centro\""
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1312
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1313
 msgid "Enter the X position of the point ( regarding the image )."
 msgstr "Ingresa la posición X del punto ( respecto a la imagen )."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1313
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1314
 msgid "Enter the Y position of the point ( regarding the image )."
 msgstr "Ingresa la posición Y del punto ( respecto a la imagen )."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1394
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1395
 msgid "Enter the width of the rectangle"
 msgstr "Ingresa el ancho del rectángulo"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1394
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1395
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1396
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1397
 msgid "New rectangle"
 msgstr "Nuevo rectángulo"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1395
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1396
 msgid "Enter the height of the rectangle"
 msgstr "Ingresa el alto del rectángulo"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1396
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1397
 msgid "Enter the angle of the rotation of the rectangle ( in degrees )"
 msgstr "Ingresa el ángulo de rotación del rectángulo ( en grados )"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1505
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1506
 msgid "A polygon can not have less than 3 vertices.\nDo you want to delete the entire polygon?"
 msgstr "Un polígono no puede tener menos de 3 vértices.\n¿Quieres eliminar todo el polígono?"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1505
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1506
 msgid "Delete the polygon?"
 msgstr "¿Eliminar el polígono?"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1530
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1531
 msgid "Go back to the default mask will erase any custom hit boxes.\nAre you sure you want to continue?"
 msgstr "Revertir a la máscara por defecto borrará cualquier máscara personalizada.\n¿Estás seguro de querer continuar?"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1531
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1532
 msgid "Caution"
 msgstr "Atención"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1555
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1556
 msgid "Enter the X position of the vertice"
 msgstr "Ingresa la posición X del vértice"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1556
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1557
 msgid "Enter the Y position of the vertice"
 msgstr "Ingresa la posición Y del vértice"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1578
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1579
 msgid "Enter the displacement offset on X axis."
 msgstr "Ingresa el desplazamiento en el eje X."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1579
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1580
 msgid "Enter the displacement offset on Y axis."
 msgstr "Ingresa el desplazamiento en el eje Y."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1602
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1603
 msgid "Enter the angle of the rotation, in degrees"
 msgstr "Ingresa el ángulo de rotación, en grados"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1602
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1603
 msgid "Rotation of the polygon"
 msgstr "Rotación del polígono"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1664
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1665
 msgid "Enter time between each image ( in seconds )"
 msgstr "Ingresa el tiempo entre cada imagen ( en segundos )"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1745
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1746
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:352
 msgid "Choose one or more images to add"
 msgstr "Selecciona una o más imágenes a agregar"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1745
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1746
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:352
 msgid "Supported image files|*.jpg;*.png|All files|*.*"
 msgstr "Archivos de imagen soportados|*.jpg;*.png|Todos los archivos|*.*"
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1801
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1802
 msgid "Drag images from the image bank to add them to the animation."
 msgstr "Arrastra las imágenes desde el banco de imágenes para agregarlas a la animación."
 
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1806
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1807
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"
 msgstr "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"
 
@@ -16437,16 +16437,17 @@ msgid "Play the current animation of _PARAM0_"
 msgstr "Reproducir la animación actual de _PARAM0_"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:111
-msgid "Change the animation speed scale"
-msgstr "Change the animation speed scale"
+#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:450
+msgid "Animation speed scale"
+msgstr "Escala de la velocidad de animación"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:112
 msgid "Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."
-msgstr "Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."
+msgstr "Modifica la escala de la velocidad de animación (1 = velocidad por defecto, >1 = más rápido y <1 = más lento)."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:113
 msgid "Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"
+msgstr "Hacer _PARAM1_ a _PARAM2_ la escala de la velocidad de animación de _PARAM0_"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:125
 msgid "Rotate an object toward a position"
@@ -16740,10 +16741,6 @@ msgstr "Animación del objeto"
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:447
 msgid "Animation frame of the object"
 msgstr "Fotograma del objeto"
-
-#: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:450
-msgid "Animation speed scale"
-msgstr "Animation speed scale"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:453
 msgid "Scale of the width of an object"
@@ -17360,7 +17357,7 @@ msgstr "Enlazar con "
 
 #: ../Core/GDCore/Events/Builtin/LinkEvent.cpp:157
 msgid "Include only events "
-msgstr "Include only events "
+msgstr "Incluir solamente los eventos "
 
 #: ../Core/GDCore/Events/Builtin/LinkEvent.cpp:157
 msgid " to "
@@ -18396,15 +18393,15 @@ msgstr "Modo"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:517
 msgid "Stop the preview"
-msgstr "Stop the preview"
+msgstr "Detener la vista previa"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:517
 msgid "Stop the preview and go back to editing"
-msgstr "Stop the preview and go back to editing"
+msgstr "Detener la vista previa y volver a la edición"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:518
 msgid "Launch a preview"
-msgstr "Launch a preview"
+msgstr "Lanzar una vista previa"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:553
 msgid "Objects editor"
@@ -18478,7 +18475,7 @@ msgstr "Position %f;%f. SHIFT para selección múltiple, clic derecho para más 
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1356
 msgid "Are you sure you want to clear the Undo History?"
-msgstr "Are you sure you want to clear the Undo History?"
+msgstr "¿Estás seguro de querer limpiar el Historial de Acciones?"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:761
 msgid "http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"
@@ -18759,36 +18756,36 @@ msgstr "Imposible renombrar la carpeta: otra carpeta ya tiene este nombre."
 msgid "All images"
 msgstr "Todas las imágenes"
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:963
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid "These resources seems to be useless:\nCheck resources to delete."
 msgstr "Estas imágenes parecen no ser utilizadas:\nVerificar las imágenes a eliminar."
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:992
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:989
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"
 msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1019
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Choose the program for editing this kind of resource"
 msgstr "Selecciona el programa para editar este tipo de recurso"
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1019
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Programs (*.exe)|*.exe"
 msgstr "Programas (*.exe)|*.exe"
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1045
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1048
 msgid "Choose a resource in the\nlist to display it.\n\n"
 msgstr "Selecciona un recurso en\nla lista para visualizarlo.\n\n"
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1046
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid "You can add and\nmodify resources using the ribbon."
 msgstr "Puedes agregar y\nmodificar los recursos usando la cinta."
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1046
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid "You can add and\nmodify resources using the toolbar"
 msgstr "Puedes agregar y\nmodificar los recursos usando\nla barra de herramientas"
 
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1224
-#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1228
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1227
+#: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1231
 msgid "New folder"
 msgstr "Nueva carpeta"
 

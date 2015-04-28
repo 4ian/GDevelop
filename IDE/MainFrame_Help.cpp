@@ -99,10 +99,12 @@ void MainFrame::OnMenuSiteSelected(wxCommandEvent& event)
  */
 void MainFrame::OnMenuItem36Selected(wxCommandEvent& event)
 {
+    #ifndef GD_NO_UPDATE_CHECKER
     MAJ dialog(this);
     if ( dialog.ShowModal() == 2)
     {
         Destroy();
         wxExit();
     }
+    #endif
 }

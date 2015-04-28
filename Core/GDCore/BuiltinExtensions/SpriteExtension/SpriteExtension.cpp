@@ -108,7 +108,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .MarkAsSimple();
 
     obj.AddAction("ChangeAnimationSpeedScale",
-                   _("Change the animation speed scale"),
+                   _("Animation speed scale"),
                    _("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
                    _("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
                    _("Animations and images"),

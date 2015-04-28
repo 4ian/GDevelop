@@ -3,6 +3,8 @@ cmake_policy(SET CMP0015 NEW)
 
 project(GDIDE)
 
+gd_set_option(NO_UPDATE_CHECKER FALSE BOOL "TRUE to remove the integrated update dialog and checker (when building packages as GDevelop is automatically updated by its repository.")
+
 #Dependencies on external libraries:
 ###
 include_directories(${sfml_include_dir})
@@ -49,6 +51,10 @@ ELSE()
 	add_definitions( -DGD_CORE_API= )
 	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
+
+IF(NO_UPDATE_CHECKER)
+	add_definitions( -DGD_NO_UPDATE_CHECKER)
+ENDIF(NO_UPDATE_CHECKER)
 
 
 #The targets

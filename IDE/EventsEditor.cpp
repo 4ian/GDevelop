@@ -153,7 +153,7 @@ void EventsEditor::Init(wxWindow* parent)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	eventsPanel = new wxControl(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_PANEL1"));
+	eventsPanel = new wxControl(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_NONE, wxDefaultValidator, _T("ID_PANEL1"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	liveEditingPanel = new wxPanel(eventsPanel, ID_PANEL2, wxPoint(100,100), wxDefaultSize, wxSIMPLE_BORDER, _T("ID_PANEL2"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -1030,7 +1030,7 @@ void EventsEditor::OneventsPanelKeyDown(wxKeyEvent& event)
     {
         ctrlKeyDown = true;
     }
-    else if ( event.GetKeyCode() == WXK_DELETE )
+    else if ( event.GetKeyCode() == WXK_DELETE || event.GetKeyCode() == WXK_BACK )
     {
         DeleteSelection();
     }

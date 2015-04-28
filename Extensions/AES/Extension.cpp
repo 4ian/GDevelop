@@ -41,7 +41,7 @@ public:
             .AddParameter("file", _("Destination file"))
             .AddParameter("string", _("Password ( 24 characters )"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
+            .SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
 
 
         AddAction("DecryptFile",
@@ -56,7 +56,7 @@ public:
             .AddParameter("file", _("Destination file"))
             .AddParameter("string", _("Password ( 24 characters )"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
+            .SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
 
         #endif
 

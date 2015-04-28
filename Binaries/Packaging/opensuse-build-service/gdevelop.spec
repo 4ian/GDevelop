@@ -47,9 +47,9 @@ cd .build
 
 #Fedora's wx-config name contains the version (wx-config-3.0 instead of wx-config and wxrc-3.0 instead of wxrc-3.0)
 %if 0%{?fedora}
-cmake ../.. -DwxWidgets_CONFIG_EXECUTABLE=/usr/bin/wx-config-3.0 -DwxWidgets_wxrc_EXECUTABLE=/usr/bin/wxrc-3.0
+cmake -DNO_UPDATE_CHECKER=TRUE -DwxWidgets_CONFIG_EXECUTABLE=/usr/bin/wx-config-3.0 -DwxWidgets_wxrc_EXECUTABLE=/usr/bin/wxrc-3.0 ../..
 %else
-cmake ../..
+cmake -DNO_UPDATE_CHECKER=TRUE ../..
 %endif
 
 #Build the whole project

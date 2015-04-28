@@ -19,14 +19,10 @@ KeyboardExtension::KeyboardExtension()
 {
     gd::BuiltinExtensionsImplementer::ImplementsKeyboardExtension(*this);
 
-    GetAllConditions()["KeyPressed"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
-    GetAllConditions()["KeyFromTextPressed"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
-    GetAllConditions()["AnyKeyPressed"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.anyKeyPressed").SetIncludeFile("inputtools.js");
-    GetAllStrExpressions()["LastPressedKey"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.input.lastPressedKey").SetIncludeFile("inputtools.js");
+    GetAllConditions()["KeyPressed"].SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllConditions()["KeyFromTextPressed"].SetFunctionName("gdjs.evtTools.input.isKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllConditions()["AnyKeyPressed"].SetFunctionName("gdjs.evtTools.input.anyKeyPressed").SetIncludeFile("inputtools.js");
+    GetAllStrExpressions()["LastPressedKey"].SetFunctionName("gdjs.evtTools.input.lastPressedKey").SetIncludeFile("inputtools.js");
 }
 
 }

@@ -36,50 +36,31 @@ public:
 
         GetObjectMetadata("TextObject::Text").SetIncludeFile("TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::String"].codeExtraInformation
-            .SetFunctionName("setString").SetAssociatedGetter("getString").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::String"].codeExtraInformation
-            .SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllActionsForObject("TextObject::Text")["TextObject::Size"].codeExtraInformation
-            .SetFunctionName("setCharacterSize").SetAssociatedGetter("getCharacterSize").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::Size"].codeExtraInformation
-            .SetFunctionName("getCharacterSize").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllActionsForObject("TextObject::Text")["TextObject::Angle"].codeExtraInformation
-            .SetFunctionName("setAngle").SetAssociatedGetter("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::Angle"].codeExtraInformation
-            .SetFunctionName("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllActionsForObject("TextObject::Text")["TextObject::Opacity"].codeExtraInformation
-            .SetFunctionName("setOpacity").SetAssociatedGetter("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::Opacity"].codeExtraInformation
-            .SetFunctionName("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("setString").SetGetter("getString").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Size"].SetFunctionName("setCharacterSize").SetGetter("getCharacterSize").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Size"].SetFunctionName("getCharacterSize").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Angle"].SetFunctionName("setAngle").SetGetter("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Angle"].SetFunctionName("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Opacity"].SetFunctionName("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"].codeExtraInformation
-            .SetFunctionName("setBold").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::IsBold"].codeExtraInformation
-            .SetFunctionName("isBold").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"].SetFunctionName("setBold").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::IsBold"].SetFunctionName("isBold").SetIncludeFile("TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::SetItalic"].codeExtraInformation
-            .SetFunctionName("setItalic").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::IsItalic"].codeExtraInformation
-            .SetFunctionName("isItalic").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetItalic"].SetFunctionName("setItalic").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::IsItalic"].SetFunctionName("isItalic").SetIncludeFile("TextObject/textruntimeobject.js");
 
-        GetAllExpressionsForObject("TextObject::Text")["Opacity"].codeExtraInformation
-            .SetFunctionName("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllExpressionsForObject("TextObject::Text")["Angle"].codeExtraInformation
-            .SetFunctionName("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllStrExpressionsForObject("TextObject::Text")["String"].codeExtraInformation
-            .SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllExpressionsForObject("TextObject::Text")["Opacity"].SetFunctionName("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllExpressionsForObject("TextObject::Text")["Angle"].SetFunctionName("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllStrExpressionsForObject("TextObject::Text")["String"].SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"].codeExtraInformation
-            .SetFunctionName("setColor").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"].SetFunctionName("setColor").SetIncludeFile("TextObject/textruntimeobject.js");
 
         //Unimplemented actions and conditions:
-        GetAllActionsForObject("TextObject::Text")["TextObject::Font"].codeExtraInformation
-            .SetFunctionName("");
-        GetAllActionsForObject("TextObject::Text")["TextObject::SetUnderlined"].codeExtraInformation
-            .SetFunctionName("");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::IsUnderlined"].codeExtraInformation
-            .SetFunctionName("");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Font"].SetFunctionName("");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetUnderlined"].SetFunctionName("");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::IsUnderlined"].SetFunctionName("");
 
         StripUnimplementedInstructionsAndExpressions();
 

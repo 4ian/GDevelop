@@ -9,11 +9,11 @@ CommonConversionsExtension::CommonConversionsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllExpressions()["ToNumber"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToDouble").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
-    GetAllStrExpressions()["ToString"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToString").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
-    GetAllStrExpressions()["LargeNumberToString"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::LargeNumberToString").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
-    GetAllExpressions()["ToRad"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToRad").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
-    GetAllExpressions()["ToDeg"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToDeg").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllExpressions()["ToNumber"].SetFunctionName("GDpriv::CommonInstructions::ToDouble").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllStrExpressions()["ToString"].SetFunctionName("GDpriv::CommonInstructions::ToString").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllStrExpressions()["LargeNumberToString"].SetFunctionName("GDpriv::CommonInstructions::LargeNumberToString").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllExpressions()["ToRad"].SetFunctionName("GDpriv::CommonInstructions::ToRad").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllExpressions()["ToDeg"].SetFunctionName("GDpriv::CommonInstructions::ToDeg").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
     #endif
 }
 

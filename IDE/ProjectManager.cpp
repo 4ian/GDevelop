@@ -2235,6 +2235,7 @@ void ProjectManager::OnprojectsTreeKeyDown(wxTreeEvent& event)
                 projectsTree->EditLabel( selectedItem );
                 break;
             }
+            case WXK_BACK:
             case WXK_DELETE:
             {
                 gdTreeItemProjectData * data = dynamic_cast<gdTreeItemProjectData*>(projectsTree->GetItemData(selectedItem));

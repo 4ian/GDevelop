@@ -37,9 +37,9 @@ void FontManager::EnsureDefaultFontIsLoaded()
 {
     if ( !defaultFont )
     {
-        static const char data[] =
+        static const unsigned char data[] =
         {
-            #include "GDCpp/Arial.hpp"
+            #include "GDCpp/Liberation.hpp"
         };
 
         defaultFont = new sf::Font;

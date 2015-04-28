@@ -41,7 +41,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddCondition("Width",
                    _("Width"),
@@ -53,7 +53,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddAction("Height",
@@ -66,7 +66,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddCondition("Height",
@@ -79,7 +79,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .codeExtraInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddAction("Angle",
@@ -89,11 +89,11 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
-        .SetHidden() //Deprecated
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-        .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddCondition("Angle",
                    _("Angle"),
@@ -102,11 +102,11 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
-        .SetHidden() //Deprecated
+        .SetHidden() //Deprecated, now available for all objects
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .codeExtraInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
 
     obj.AddAction("Image",
@@ -119,7 +119,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "PanelSprite", false)
         .AddParameter("string", _("Image name"))
         .AddCodeOnlyParameter("currentScene", "0")
-        .codeExtraInformation.SetFunctionName("ChangeAndReloadImage").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
+        .SetFunctionName("ChangeAndReloadImage").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
     #endif
 }
 

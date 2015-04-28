@@ -151,7 +151,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     dc.SetFont(renderingHelper->GetNiceFont());
     dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
 
-    if ( !IncludeAllEvents() ) 
+    if ( !IncludeAllEvents() )
     {
         wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
         dc.DrawText( _("Include only events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
@@ -176,7 +176,7 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform
         dc.SetFont(renderingHelper->GetNiceFont());
         wxRect lien = dc.GetTextExtent(_("Link to "));
 
-        renderedHeight = lien.GetHeight()+10;
+        renderedHeight = lien.GetHeight()+15;
         eventHeightNeedUpdate = false;
     }
 

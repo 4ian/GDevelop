@@ -21,32 +21,32 @@ VariablesExtension::VariablesExtension()
     gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllConditions()["VarScene"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllConditions()["VarSceneTxt"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VarScene"].SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VarSceneTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllConditions()["VariableChildExists"].codeExtraInformation.SetFunctionName("VariableChildExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllConditions()["GlobalVariableChildExists"].codeExtraInformation.SetFunctionName("VariableChildExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VariableChildExists"].SetFunctionName("VariableChildExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["GlobalVariableChildExists"].SetFunctionName("VariableChildExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllConditions()["VarSceneDef"].codeExtraInformation.SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllConditions()["VarGlobalDef"].codeExtraInformation.SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VarSceneDef"].SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VarGlobalDef"].SetFunctionName("VariableExists").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllConditions()["VarGlobal"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllConditions()["VarGlobalTxt"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VarGlobal"].SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["VarGlobalTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllActions()["ModVarScene"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["ModVarScene"].SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["ModVarSceneTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllActions()["ModVarGlobal"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["ModVarGlobalTxt"].codeExtraInformation.SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["ModVarGlobal"].SetFunctionName("ReturnVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["ModVarGlobalTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllActions()["VariableRemoveChild"].codeExtraInformation.SetFunctionName("VariableRemoveChild").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["GlobalVariableRemoveChild"].codeExtraInformation.SetFunctionName("VariableRemoveChild").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["VariableRemoveChild"].SetFunctionName("VariableRemoveChild").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["GlobalVariableRemoveChild"].SetFunctionName("VariableRemoveChild").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllExpressions()["Variable"].codeExtraInformation.SetFunctionName("GetVariableValue").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllStrExpressions()["VariableString"].codeExtraInformation.SetFunctionName("GetVariableString").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["Variable"].SetFunctionName("GetVariableValue").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllStrExpressions()["VariableString"].SetFunctionName("GetVariableString").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllExpressions()["GlobalVariable"].codeExtraInformation.SetFunctionName("GetVariableValue").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllStrExpressions()["GlobalVariableString"].codeExtraInformation.SetFunctionName("GetVariableString").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["GlobalVariable"].SetFunctionName("GetVariableValue").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllStrExpressions()["GlobalVariableString"].SetFunctionName("GetVariableString").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     #endif
 }
 

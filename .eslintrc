@@ -7,6 +7,7 @@
         "module" : true,
         "process": false,
         "describe": false,
+        "expect": false,
         "it": false,
         "after": false,
         "gdjs": true

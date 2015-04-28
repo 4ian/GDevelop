@@ -3,6 +3,9 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the GNU General Public License.
  */
+
+#ifndef GD_NO_UPDATE_CHECKER
+
 #include "MAJ.h"
 
 //(*InternalHeaders(MAJ)
@@ -262,3 +265,5 @@ void MAJ::OnHelpBtClick(wxCommandEvent& event)
 {
     gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
 }
+
+#endif

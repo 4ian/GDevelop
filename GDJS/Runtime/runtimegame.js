@@ -449,7 +449,7 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
     currentScene.loadFromScene(firstsceneData);
 
     //Uncomment to profile the first x frames of the game.
-    /*var x = 500;
+    /*var x = 250;
     console.profile("Stepping for " + x + " frames")
     for(var i = 0; i < x; ++i) {
         currentScene.renderAndStep();

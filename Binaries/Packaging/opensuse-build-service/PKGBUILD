@@ -21,7 +21,7 @@ build() {
   rm -rf .build
   mkdir .build
   cd .build
-  cmake ../..
+  cmake -DNO_UPDATE_CHECKER=TRUE ../..
 
   #Build the whole project
   make -j4

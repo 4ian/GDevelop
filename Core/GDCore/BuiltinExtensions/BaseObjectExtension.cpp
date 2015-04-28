@@ -127,7 +127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("Rotate",
                    GD_T("Rotate"),
-                   GD_T("Rotate an object, clockwise if the angle if the speed is positive, counterclockwise otherwise."),
+                   GD_T("Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."),
                    GD_T("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
                    GD_T("Angle"),
                    "res/actions/direction24.png",

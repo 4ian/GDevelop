@@ -40,7 +40,7 @@ public:
             .AddParameter("string", GD_T("Message"))
             .AddParameter("string", GD_T("Title"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowOpenFile",
                        GD_T("Show a window to choose a file"),
@@ -55,7 +55,7 @@ public:
             .AddParameter("string", GD_T("Title"))
             .AddParameter("string", GD_T("Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windows only ) "))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowTextInput",
                        GD_T("Show a window to enter a text"),
@@ -70,7 +70,7 @@ public:
             .AddParameter("string", GD_T("Message"))
             .AddParameter("string", GD_T("Title"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowYesNoMsgBox",
                        GD_T("Display a Yes/No message box"),
@@ -85,7 +85,7 @@ public:
             .AddParameter("string", GD_T("Message"))
             .AddParameter("string", GD_T("Title"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
+            .SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         #endif
 

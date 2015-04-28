@@ -22,6 +22,7 @@
 #include "GDCpp/Scene.h"
 #include "GDCpp/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
+#include "GDCpp/Utf8Tools.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"

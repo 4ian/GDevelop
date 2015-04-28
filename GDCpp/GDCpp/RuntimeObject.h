@@ -317,6 +317,12 @@ public:
      */
     virtual float GetCenterY() const {return GetHeight()/2;};
 
+    /**
+     * \brief Get squared distance, in pixel, between the object and the specified position.
+     * \param x X coordinate of the point
+     * \param y Y coordinate of the point
+     */
+    double GetSqDistanceTo(double x, double y);
     ///@}
 
     /** \name Forces

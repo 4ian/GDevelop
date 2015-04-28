@@ -22,13 +22,13 @@ SceneExtension::SceneExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSceneExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllExpressions()["Random"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
-    GetAllStrExpressions()["CurrentSceneName"].codeExtraInformation.SetFunctionName("GetSceneName").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllConditions()["DepartScene"].codeExtraInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["Scene"].codeExtraInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["Quit"].codeExtraInformation.SetFunctionName("StopGame").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["SceneBackground"].codeExtraInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["DisableInputWhenFocusIsLost"].codeExtraInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["Random"].SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllStrExpressions()["CurrentSceneName"].SetFunctionName("GetSceneName").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllConditions()["DepartScene"].SetFunctionName("SceneJustBegins").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["Scene"].SetFunctionName("ChangeScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["Quit"].SetFunctionName("StopGame").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["SceneBackground"].SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["DisableInputWhenFocusIsLost"].SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator

@@ -26,81 +26,81 @@ MathematicalToolsExtension::MathematicalToolsExtension()
                           "Open source (MIT License)");
 
     GetAllExpressions()["cos"]
-        .codeExtraInformation.SetFunctionName("Math.cos");
+        .SetFunctionName("Math.cos");
     GetAllExpressions()["sin"]
-        .codeExtraInformation.SetFunctionName("Math.sin");
+        .SetFunctionName("Math.sin");
     GetAllExpressions()["tan"]
-        .codeExtraInformation.SetFunctionName("Math.tan");
+        .SetFunctionName("Math.tan");
     GetAllExpressions()["abs"]
-        .codeExtraInformation.SetFunctionName("Math.abs");
+        .SetFunctionName("Math.abs");
     GetAllExpressions()["min"]
-        .codeExtraInformation.SetFunctionName("Math.min");
+        .SetFunctionName("Math.min");
     GetAllExpressions()["max"]
-        .codeExtraInformation.SetFunctionName("Math.max");
+        .SetFunctionName("Math.max");
     GetAllExpressions()["sqrt"]
-        .codeExtraInformation.SetFunctionName("Math.sqrt");
+        .SetFunctionName("Math.sqrt");
     GetAllExpressions()["acos"]
-        .codeExtraInformation.SetFunctionName("Math.acos");
+        .SetFunctionName("Math.acos");
     GetAllExpressions()["acosh"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.acosh");
+        .SetFunctionName("gdjs.evtTools.common.acosh");
     GetAllExpressions()["asin"]
-        .codeExtraInformation.SetFunctionName("Math.asin");
+        .SetFunctionName("Math.asin");
     GetAllExpressions()["asinh"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.asinh");
+        .SetFunctionName("gdjs.evtTools.common.asinh");
     GetAllExpressions()["atan"]
-        .codeExtraInformation.SetFunctionName("Math.atan");
+        .SetFunctionName("Math.atan");
     GetAllExpressions()["atan2"]
-        .codeExtraInformation.SetFunctionName("Math.atan2");
+        .SetFunctionName("Math.atan2");
     GetAllExpressions()["atanh"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.atanh");
+        .SetFunctionName("gdjs.evtTools.common.atanh");
     GetAllExpressions()["cbrt"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.cbrt");
+        .SetFunctionName("gdjs.evtTools.common.cbrt");
     GetAllExpressions()["ceil"]
-        .codeExtraInformation.SetFunctionName("Math.ceil");
+        .SetFunctionName("Math.ceil");
     GetAllExpressions()["floor"]
-        .codeExtraInformation.SetFunctionName("Math.floor");
+        .SetFunctionName("Math.floor");
     GetAllExpressions()["cosh"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.cosh");
+        .SetFunctionName("gdjs.evtTools.common.cosh");
     GetAllExpressions()["sinh"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.sinh");
+        .SetFunctionName("gdjs.evtTools.common.sinh");
     GetAllExpressions()["tanh"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.tanh");
+        .SetFunctionName("gdjs.evtTools.common.tanh");
     GetAllExpressions()["cot"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.cot");
+        .SetFunctionName("gdjs.evtTools.common.cot");
     GetAllExpressions()["csc"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.csc");
+        .SetFunctionName("gdjs.evtTools.common.csc");
     GetAllExpressions()["sec"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.sec");
+        .SetFunctionName("gdjs.evtTools.common.sec");
     GetAllExpressions()["exp"]
-        .codeExtraInformation.SetFunctionName("Math.exp");
+        .SetFunctionName("Math.exp");
     GetAllExpressions()["log10"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.log10");
+        .SetFunctionName("gdjs.evtTools.common.log10");
     GetAllExpressions()["log2"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.log2");
+        .SetFunctionName("gdjs.evtTools.common.log2");
     GetAllExpressions()["log"]
-        .codeExtraInformation.SetFunctionName("Math.log");
+        .SetFunctionName("Math.log");
     GetAllExpressions()["ln"]
-        .codeExtraInformation.SetFunctionName("Math.ln");
+        .SetFunctionName("Math.ln");
     GetAllExpressions()["pow"]
-        .codeExtraInformation.SetFunctionName("Math.pow");
+        .SetFunctionName("Math.pow");
     GetAllExpressions()["nthroot"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.nthroot");
+        .SetFunctionName("gdjs.evtTools.common.nthroot");
     GetAllExpressions()["sign"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.sign");
+        .SetFunctionName("gdjs.evtTools.common.sign");
     GetAllExpressions()["mod"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.mod");
+        .SetFunctionName("gdjs.evtTools.common.mod");
     GetAllExpressions()["AngleDifference"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.angleDifference");
+        .SetFunctionName("gdjs.evtTools.common.angleDifference");
     GetAllExpressions()["int"]
-        .codeExtraInformation.SetFunctionName("Math.round");
+        .SetFunctionName("Math.round");
     GetAllExpressions()["rint"]
-        .codeExtraInformation.SetFunctionName("Math.round");
+        .SetFunctionName("Math.round");
     GetAllExpressions()["round"]
-        .codeExtraInformation.SetFunctionName("Math.round");
+        .SetFunctionName("Math.round");
     GetAllExpressions()["trunc"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.trunc");
+        .SetFunctionName("gdjs.evtTools.common.trunc");
     GetAllExpressions()["lerp"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.common.lerp");
+        .SetFunctionName("gdjs.evtTools.common.lerp");
 
     StripUnimplementedInstructionsAndExpressions();
 }

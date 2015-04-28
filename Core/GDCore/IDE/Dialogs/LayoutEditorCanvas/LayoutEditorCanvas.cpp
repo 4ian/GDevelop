@@ -580,7 +580,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
         string name = layout.GetLayer(lowestLayer+1).GetName();
         if ( name == "" ) name = _("Base layer");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
+        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + gd::utf8::ToWxString(name) +"\"");
     }
 
     //Can we send the objects on a lower layer ?
@@ -598,7 +598,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
         if ( name == "" ) name = _("Base layer");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + gd::utf8::ToWxString(name) +"\"");
     }
 }
 
@@ -1060,7 +1060,7 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         double mouseX = GetMouseXOnLayout();
         double mouseY = GetMouseYOnLayout();
 
-        gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
+        gd::LogStatus( gd::utf8::FromWxString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
             mouseX, mouseY )) );
 
         //Check if there is a gui element hovered inside the layout
@@ -1151,7 +1151,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
     if ( evt.GetKeyCode() == WXK_ALT )
         altPressed = true;
 
-    if ( evt.GetKeyCode() == WXK_DELETE )
+    if ( evt.GetKeyCode() == WXK_DELETE || evt.GetKeyCode() == WXK_BACK )
     {
         std::vector<InitialInstance*> instancesToDelete;
         for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)

@@ -55,10 +55,12 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("yesorno", GD_T("Activate"))
-                    .codeExtraInformation.SetFunctionName("SetReverseAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetReverseAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetStopAtEnd",
                                GD_T("De/activate the stop at the end of the path"),
@@ -67,10 +69,12 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("yesorno", GD_T("Activate"))
-                    .codeExtraInformation.SetFunctionName("SetStopAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetStopAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("ReverseAtEnd",
                                GD_T("Rounds"),
@@ -79,9 +83,11 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("ReverseAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("ReverseAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("StopAtEnd",
                                GD_T("Stop at the end of the path"),
@@ -90,9 +96,11 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("StopAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("StopAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("Reverse",
                                GD_T("Invert the movement on the path"),
@@ -101,9 +109,11 @@ public:
                                GD_T("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("Reverse").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("Reverse").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetSegment",
                                GD_T("Number of the segment on the path"),
@@ -112,11 +122,13 @@ public:
                                GD_T("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("EnterSegment",
                                GD_T("Position on the segment of a path"),
@@ -125,16 +137,18 @@ public:
                                GD_T("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("operator", GD_T("Modification sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("SetCurrentSegment").SetAssociatedGetter("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetCurrentSegment").SetGetter("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddExpression("Segment", GD_T("Current segment"), GD_T("Number of the current segment"), GD_T("Position"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetCurrentSegment").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetCurrentSegment").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetPosition",
                                GD_T("Position of the object on the segment"),
@@ -143,11 +157,13 @@ public:
                                GD_T("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("GetPositionOnSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetPositionOnSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetPosition",
                                GD_T("Put the object on a precise position of the current segment"),
@@ -156,16 +172,18 @@ public:
                                GD_T("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("operator", GD_T("Modification sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("SetPositionOnSegment").SetAssociatedGetter("GetPositionOnSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetPositionOnSegment").SetGetter("GetPositionOnSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddExpression("Position", GD_T("Position on the segment"), GD_T("Position on the segment ( value between 0 and 1 )"), GD_T("Position"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetPositionOnSegment").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetPositionOnSegment").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetPathName",
                                GD_T("Path name"),
@@ -174,11 +192,13 @@ public:
                                GD_T("Path"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("string", GD_T("Name"))
-                    .codeExtraInformation.SetFunctionName("GetCurrentPathName").SetManipulatedType("string").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetCurrentPathName").SetManipulatedType("string").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetPathName",
                                GD_T("Change the path"),
@@ -187,15 +207,17 @@ public:
                                GD_T("Path"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("string", GD_T("Name"))
-                    .codeExtraInformation.SetFunctionName("ChangeCurrentPath").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("ChangeCurrentPath").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddStrExpression("CurrentPathName", GD_T("Current path name"), GD_T("Current path name"), GD_T("Path"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetCurrentPathName").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetCurrentPathName").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetOffsetX",
                                GD_T("X position of the path"),
@@ -204,11 +226,13 @@ public:
                                GD_T("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("GetOffsetX").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetOffsetX").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetOffsetX",
                                GD_T("Modify the path X position"),
@@ -217,16 +241,18 @@ public:
                                GD_T("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("operator", GD_T("Modification sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("SetOffsetX").SetAssociatedGetter("GetOffsetX").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetOffsetX").SetGetter("GetOffsetX").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddExpression("PathX", GD_T("X position of the path"), GD_T("X position of the path"), GD_T("Path position"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetOffsetX").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetOffsetX").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetOffsetY",
                                GD_T("Path Y position"),
@@ -235,11 +261,13 @@ public:
                                GD_T("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("GetOffsetY").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetOffsetY").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetOffsetY",
                                GD_T("Modify the path Y position"),
@@ -248,16 +276,18 @@ public:
                                GD_T("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("operator", GD_T("Modification sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("SetOffsetY").SetAssociatedGetter("GetOffsetY").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetOffsetY").SetGetter("GetOffsetY").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddExpression("PathY", GD_T("Path Y position"), GD_T("Path Y position"), GD_T("Path position"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetOffsetY").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetOffsetY").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetFollowAngle",
                                GD_T("Automatic rotation"),
@@ -266,9 +296,11 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("FollowAngle").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("FollowAngle").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetFollowAngle",
                                GD_T("De/activate automatic rotation"),
@@ -277,10 +309,12 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("yesorno", GD_T("Activate \?"))
-                    .codeExtraInformation.SetFunctionName("SetFollowAngle").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetFollowAngle").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetAngleOffset",
                                GD_T("Angle offset"),
@@ -289,11 +323,13 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetAngleOffset",
                                GD_T("Change the angle offset"),
@@ -302,16 +338,18 @@ public:
                                GD_T("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("operator", GD_T("Modification sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("SetAngleOffset").SetAssociatedGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetAngleOffset").SetGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddExpression("AngleOffset", GD_T("Angle offset"), GD_T("Add an offset to the angle of the object"), GD_T("Options"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetAngleOffset").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetAngleOffset").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddCondition("GetSpeed",
                                GD_T("Speed"),
@@ -320,11 +358,13 @@ public:
                                GD_T("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("relationalOperator", GD_T("Comparison sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 aut.AddAction("SetSpeed",
                                GD_T("Change the speed"),
@@ -333,16 +373,18 @@ public:
                                GD_T("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
+
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
                     .AddParameter("operator", GD_T("Modification sign"))
                     .AddParameter("expression", GD_T("Value"))
-                    .codeExtraInformation.SetFunctionName("SetSpeed").SetAssociatedGetter("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("SetSpeed").SetGetter("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddExpression("Speed", GD_T("Speed"), GD_T("Moving speed on the path"), GD_T("Movement"), "CppPlatform/Extensions/pathicon16.png")
                     .AddParameter("object", GD_T("Object"))
                     .AddParameter("automatism", GD_T("Automatism"), "PathAutomatism", false)
-                    .codeExtraInformation.SetFunctionName("GetSpeed").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+                    .SetFunctionName("GetSpeed").SetIncludeFile("PathAutomatism/PathAutomatism.h");
+
 
                 #endif
 

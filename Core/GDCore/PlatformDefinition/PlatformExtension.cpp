@@ -395,19 +395,19 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
     if ( stripFunctionsNameAndCodeGeneration )
     {
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllActions().begin();it != GetAllActions().end();++it)
-            it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+            it->second.SetFunctionName("").SetGetter("")
                 .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
         for (std::map<std::string, gd::InstructionMetadata >::iterator it = GetAllConditions().begin();it != GetAllConditions().end();++it)
-            it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+            it->second.SetFunctionName("").SetGetter("")
                 .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = GetAllExpressions().begin();it != GetAllExpressions().end();++it)
-            it->second.codeExtraInformation.SetFunctionName("")
+            it->second.SetFunctionName("")
                 .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
         for (std::map<std::string, gd::ExpressionMetadata >::iterator it = GetAllStrExpressions().begin();it != GetAllStrExpressions().end();++it)
-            it->second.codeExtraInformation.SetFunctionName("")
+            it->second.SetFunctionName("")
                 .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
         for(std::map<std::string, gd::ObjectMetadata >::iterator objIt = objectsInfos.begin();objIt!=objectsInfos.end();++objIt)
@@ -415,19 +415,19 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
             gd::ObjectMetadata & obj = objIt->second;
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+                it->second.SetFunctionName("").SetGetter("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.conditionsInfos.begin();it != obj.conditionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+                it->second.SetFunctionName("").SetGetter("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.expressionsInfos.begin();it != obj.expressionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("")
+                it->second.SetFunctionName("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.strExpressionsInfos.begin();it != obj.strExpressionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("")
+                it->second.SetFunctionName("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
         }
 
@@ -436,19 +436,19 @@ void PlatformExtension::CloneExtension(const std::string & platformName, const s
             gd::AutomatismMetadata & obj = objIt->second;
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+                it->second.SetFunctionName("").SetGetter("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::InstructionMetadata >::iterator it = obj.conditionsInfos.begin();it != obj.conditionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("").SetAssociatedGetter("")
+                it->second.SetFunctionName("").SetGetter("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.expressionsInfos.begin();it != obj.expressionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("")
+                it->second.SetFunctionName("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
 
             for (std::map<std::string, gd::ExpressionMetadata >::iterator it = obj.strExpressionsInfos.begin();it != obj.strExpressionsInfos.end();++it)
-                it->second.codeExtraInformation.SetFunctionName("")
+                it->second.SetFunctionName("")
                     .SetCustomCodeGenerator(std::shared_ptr<gd::ExpressionCodeGenerationInformation::CustomCodeGenerator>());
         }
 

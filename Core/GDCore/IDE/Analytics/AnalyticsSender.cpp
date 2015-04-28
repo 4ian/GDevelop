@@ -56,6 +56,8 @@ void AnalyticsSender::SendData(std::string collection, SerializerElement & data)
     data.SetAttribute("os", gd::ToString(wxGetOsDescription()));
     data.SetAttribute("lang",
         gd::ToString(wxLocale::GetLanguageCanonicalName(LocaleManager::Get()->GetLanguage())));
+    if (wxConfig::Get())
+        data.SetAttribute("openingCount", wxConfig::Get()->ReadDouble("Startup/OpeningCount", 0));
 
     // Create request
     std::cout << "Sending analytics data..."; std::cout.flush();

@@ -38,7 +38,7 @@ JoystickExtension::JoystickExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", GD_T("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("expression", GD_T("Button"), "",false)
-        .codeExtraInformation.SetFunctionName("JoystickButtonDown").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+        .SetFunctionName("JoystickButtonDown").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
 
 
@@ -54,7 +54,7 @@ JoystickExtension::JoystickExtension()
         .AddParameter("joyaxis", GD_T("Axis"), "",false)
         .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
         .AddParameter("expression", GD_T("Value to test"), "",false)
-        .codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+        .SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
 
 
@@ -69,7 +69,7 @@ JoystickExtension::JoystickExtension()
         .AddParameter("expression", GD_T("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("joyaxis", GD_T("Axis"), "",false)
         .AddParameter("scenevar", GD_T("Save result to scene variable"), "",false)
-        .codeExtraInformation.SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+        .SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
     AddExpression("GetJoystickAxis",
                    GD_T("Joystick axis"),
@@ -80,7 +80,7 @@ JoystickExtension::JoystickExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", GD_T("Joystick number ( First joystick: 0 )"), "",false)
         .AddParameter("joyaxis", GD_T("Axis"), "",false)
-        .codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+        .SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
     */
 }

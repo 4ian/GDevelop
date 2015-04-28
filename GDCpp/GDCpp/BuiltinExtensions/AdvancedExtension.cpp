@@ -16,7 +16,7 @@ AdvancedExtension::AdvancedExtension()
     gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllConditions()["Toujours"].codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
+    GetAllConditions()["Toujours"].SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
     #endif
 }
 

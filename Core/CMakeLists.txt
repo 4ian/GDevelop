@@ -104,7 +104,9 @@ if(BUILD_TESTS)
 	    test_source_files
 	    tests/*
 	)
+
 	add_executable(GDCore_tests ${test_source_files})
+	set_target_properties(GDCore_tests PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
 	target_link_libraries(GDCore_tests GDCore)
 	target_link_libraries(GDCore_tests ${sfml_LIBRARIES})
 	target_link_libraries(GDCore_tests ${wxWidgets_LIBRARIES})

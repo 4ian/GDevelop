@@ -769,6 +769,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("objectList", GD_T("Object"))
         .MarkAsSimple();
 
+    extension.AddCondition("PickNearest",
+                   GD_T("Pick nearest object"),
+                   GD_T("Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."),
+                   GD_T("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
+                   GD_T("Objects"),
+                   "res/conditions/distance24.png",
+                   "res/conditions/distance.png")
+        .AddParameter("objectList", GD_T("Object"))
+        .AddParameter("expression", GD_T("X position"))
+        .AddParameter("expression", GD_T("Y position"))
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .MarkAsSimple();
+
     extension.AddCondition("NbObjet",
                    GD_T("Number of objects"),
                    GD_T("Test the number of concerned objects."),

@@ -1,7 +1,7 @@
 #!/bin/sh
 #Simply copy the entire GDevelop release directory into the bundle...
-rm -rf GDevelop.app/Contents/Resources
-mkdir -p GDevelop.app/Contents/Resources
+rm -rf GDevelop.app 2>&1 >/dev/null
+cp -r macos-bundle-skeleton GDevelop.app
 cp -r ../Output/Release_Darwin/ GDevelop.app/Contents/Resources/
 cp -rf ../../ExtLibs/SFML/extlibs/libs-osx/Frameworks GDevelop.app/Contents/
 

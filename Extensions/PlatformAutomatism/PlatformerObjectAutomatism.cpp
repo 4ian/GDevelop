@@ -402,6 +402,7 @@ bool PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAu
 std::set<PlatformAutomatism*> PlatformerObjectAutomatism::GetPlatformsCollidingWith(const std::set<PlatformAutomatism*> & candidates,
     const std::set<PlatformAutomatism*> & exceptTheseOnes)
 {
+    //TODO: This function could be refactored to return only the first colliding platform.
     std::set<PlatformAutomatism*> result;
     for (std::set<PlatformAutomatism*>::iterator it = candidates.begin();
          it != candidates.end();

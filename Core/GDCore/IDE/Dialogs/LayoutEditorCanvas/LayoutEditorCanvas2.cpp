@@ -425,9 +425,9 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
         return;
 
     //Find a new unique name for the object
-    std::string name = ToString(_("NewObject"));
+    std::string name = GD_T("NewObject");
     for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
-        name =  _("NewObject")+ToString(i);
+        name =  GD_T("NewObject")+ToString(i);
 
     //Add a new object of selected type to objects list
     layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, layout.GetObjectsCount());
@@ -758,7 +758,7 @@ void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 
 void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
+    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"));
 }
 
 

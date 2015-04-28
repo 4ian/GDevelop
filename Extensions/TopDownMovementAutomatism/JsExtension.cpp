@@ -34,38 +34,38 @@ public:
         std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
         std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
 
-        autConditions["TopDownMovementAutomatism::IsMoving"].codeExtraInformation.SetFunctionName("isMoving");
+        autConditions["TopDownMovementAutomatism::IsMoving"].SetFunctionName("isMoving");
 
-        autActions["TopDownMovementAutomatism::Acceleration"].codeExtraInformation.SetFunctionName("setAcceleration").SetAssociatedGetter("getAcceleration");
-        autConditions["TopDownMovementAutomatism::Acceleration"].codeExtraInformation.SetFunctionName("getAcceleration");
-        autActions["TopDownMovementAutomatism::Deceleration"].codeExtraInformation.SetFunctionName("setDeceleration").SetAssociatedGetter("getDeceleration");
-        autConditions["TopDownMovementAutomatism::Deceleration"].codeExtraInformation.SetFunctionName("getDeceleration");
-        autActions["TopDownMovementAutomatism::MaxSpeed"].codeExtraInformation.SetFunctionName("setMaxSpeed").SetAssociatedGetter("getMaxSpeed");
-        autConditions["TopDownMovementAutomatism::MaxSpeed"].codeExtraInformation.SetFunctionName("getMaxSpeed");
-        autConditions["TopDownMovementAutomatism::Speed"].codeExtraInformation.SetFunctionName("getSpeed");
-        autActions["TopDownMovementAutomatism::AngularMaxSpeed"].codeExtraInformation.SetFunctionName("setAngularMaxSpeed").SetAssociatedGetter("getAngularMaxSpeed");
-        autConditions["TopDownMovementAutomatism::AngularMaxSpeed"].codeExtraInformation.SetFunctionName("getAngularMaxSpeed");
-        autActions["TopDownMovementAutomatism::AngleOffset"].codeExtraInformation.SetFunctionName("setAngleOffset").SetAssociatedGetter("getAngleOffset");
-        autConditions["TopDownMovementAutomatism::AngleOffset"].codeExtraInformation.SetFunctionName("getAngleOffset");
+        autActions["TopDownMovementAutomatism::Acceleration"].SetFunctionName("setAcceleration").SetGetter("getAcceleration");
+        autConditions["TopDownMovementAutomatism::Acceleration"].SetFunctionName("getAcceleration");
+        autActions["TopDownMovementAutomatism::Deceleration"].SetFunctionName("setDeceleration").SetGetter("getDeceleration");
+        autConditions["TopDownMovementAutomatism::Deceleration"].SetFunctionName("getDeceleration");
+        autActions["TopDownMovementAutomatism::MaxSpeed"].SetFunctionName("setMaxSpeed").SetGetter("getMaxSpeed");
+        autConditions["TopDownMovementAutomatism::MaxSpeed"].SetFunctionName("getMaxSpeed");
+        autConditions["TopDownMovementAutomatism::Speed"].SetFunctionName("getSpeed");
+        autActions["TopDownMovementAutomatism::AngularMaxSpeed"].SetFunctionName("setAngularMaxSpeed").SetGetter("getAngularMaxSpeed");
+        autConditions["TopDownMovementAutomatism::AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
+        autActions["TopDownMovementAutomatism::AngleOffset"].SetFunctionName("setAngleOffset").SetGetter("getAngleOffset");
+        autConditions["TopDownMovementAutomatism::AngleOffset"].SetFunctionName("getAngleOffset");
 
-        autActions["TopDownMovementAutomatism::AllowDiagonals"].codeExtraInformation.SetFunctionName("allowDiagonals");
-        autConditions["TopDownMovementAutomatism::DiagonalsAllowed"].codeExtraInformation.SetFunctionName("diagonalsAllowed");
-        autActions["TopDownMovementAutomatism::RotateObject"].codeExtraInformation.SetFunctionName("setRotateObject");
-        autConditions["TopDownMovementAutomatism::ObjectRotated"].codeExtraInformation.SetFunctionName("isObjectRotated");
+        autActions["TopDownMovementAutomatism::AllowDiagonals"].SetFunctionName("allowDiagonals");
+        autConditions["TopDownMovementAutomatism::DiagonalsAllowed"].SetFunctionName("diagonalsAllowed");
+        autActions["TopDownMovementAutomatism::RotateObject"].SetFunctionName("setRotateObject");
+        autConditions["TopDownMovementAutomatism::ObjectRotated"].SetFunctionName("isObjectRotated");
 
-        autActions["TopDownMovementAutomatism::SimulateLeftKey"].codeExtraInformation.SetFunctionName("simulateLeftKey");
-        autActions["TopDownMovementAutomatism::SimulateRightKey"].codeExtraInformation.SetFunctionName("simulateRightKey");
-        autActions["TopDownMovementAutomatism::SimulateUpKey"].codeExtraInformation.SetFunctionName("simulateUpKey");
-        autActions["TopDownMovementAutomatism::SimulateDownKey"].codeExtraInformation.SetFunctionName("simulateDownKey");
-        autActions["TopDownMovementAutomatism::SimulateControl"].codeExtraInformation.SetFunctionName("simulateControl");
-        autActions["TopDownMovementAutomatism::IgnoreDefaultControls"].codeExtraInformation.SetFunctionName("ignoreDefaultControls");
+        autActions["TopDownMovementAutomatism::SimulateLeftKey"].SetFunctionName("simulateLeftKey");
+        autActions["TopDownMovementAutomatism::SimulateRightKey"].SetFunctionName("simulateRightKey");
+        autActions["TopDownMovementAutomatism::SimulateUpKey"].SetFunctionName("simulateUpKey");
+        autActions["TopDownMovementAutomatism::SimulateDownKey"].SetFunctionName("simulateDownKey");
+        autActions["TopDownMovementAutomatism::SimulateControl"].SetFunctionName("simulateControl");
+        autActions["TopDownMovementAutomatism::IgnoreDefaultControls"].SetFunctionName("ignoreDefaultControls");
 
-        autExpressions["Acceleration"].codeExtraInformation.SetFunctionName("getAcceleration");
-        autExpressions["Deceleration"].codeExtraInformation.SetFunctionName("getDeceleration");
-        autExpressions["MaxSpeed"].codeExtraInformation.SetFunctionName("getMaxSpeed");
-        autExpressions["Speed"].codeExtraInformation.SetFunctionName("getSpeed");
-        autExpressions["AngularMaxSpeed"].codeExtraInformation.SetFunctionName("getAngularMaxSpeed");
-        autExpressions["AngleOffset"].codeExtraInformation.SetFunctionName("getAngleOffset");
+        autExpressions["Acceleration"].SetFunctionName("getAcceleration");
+        autExpressions["Deceleration"].SetFunctionName("getDeceleration");
+        autExpressions["MaxSpeed"].SetFunctionName("getMaxSpeed");
+        autExpressions["Speed"].SetFunctionName("getSpeed");
+        autExpressions["AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
+        autExpressions["AngleOffset"].SetFunctionName("getAngleOffset");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

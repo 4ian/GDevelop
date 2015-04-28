@@ -18,25 +18,25 @@ TimeExtension::TimeExtension()
     gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllConditions()["Timer"].codeExtraInformation.SetFunctionName("TimerElapsedTime").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllConditions()["TimeScale"].codeExtraInformation.SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllConditions()["TimerPaused"].codeExtraInformation.SetFunctionName("TimerPaused").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllConditions()["Timer"].SetFunctionName("TimerElapsedTime").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllConditions()["TimeScale"].SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllConditions()["TimerPaused"].SetFunctionName("TimerPaused").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
 
-    GetAllActions()["ResetTimer"].codeExtraInformation.SetFunctionName("ResetTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllActions()["PauseTimer"].codeExtraInformation.SetFunctionName("PauseTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllActions()["UnPauseTimer"].codeExtraInformation.SetFunctionName("UnPauseTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllActions()["RemoveTimer"].codeExtraInformation.SetFunctionName("RemoveTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllActions()["ChangeTimeScale"].codeExtraInformation.SetFunctionName("SetTimeScale").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllActions()["ResetTimer"].SetFunctionName("ResetTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllActions()["PauseTimer"].SetFunctionName("PauseTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllActions()["UnPauseTimer"].SetFunctionName("UnPauseTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllActions()["RemoveTimer"].SetFunctionName("RemoveTimer").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllActions()["ChangeTimeScale"].SetFunctionName("SetTimeScale").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
 
-    GetAllExpressions()["TimeDelta"].codeExtraInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["TempsFrame"].codeExtraInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["ElapsedTime"].codeExtraInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["TimerElapsedTime"].codeExtraInformation.SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["TimeFromStart"].codeExtraInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["TempsDebut"].codeExtraInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["TimeScale"].codeExtraInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["TimeScale"].codeExtraInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
-    GetAllExpressions()["Time"].codeExtraInformation.SetFunctionName("GetTime").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TimeDelta"].SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TempsFrame"].SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["ElapsedTime"].SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TimerElapsedTime"].SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TimeFromStart"].SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TempsDebut"].SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TimeScale"].SetFunctionName("GetTimeScale").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["TimeScale"].SetFunctionName("GetTimeScale").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
+    GetAllExpressions()["Time"].SetFunctionName("GetTime").SetIncludeFile("GDCpp/BuiltinExtensions/TimeTools.h");
     #endif
 }
 

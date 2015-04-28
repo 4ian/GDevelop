@@ -1,8 +1,8 @@
-GDevelop Javascript Platform
+GDevelop Javascript Platform (HTML5 game engine)
 ================================
 
 GDevelop Javascript Platform (GDJS) is a platform for developing
-HTML5/Javascript based games with GDevelop 3 (Free game development software
+*HTML5/Javascript* based games with GDevelop 3 (Free game development software
 available on http://www.compilgames.net).
 
 Getting started

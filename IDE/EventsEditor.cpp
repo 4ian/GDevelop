@@ -1031,7 +1031,7 @@ void EventsEditor::OneventsPanelKeyDown(wxKeyEvent& event)
     {
         ctrlKeyDown = true;
     }
-    else if ( event.GetKeyCode() == WXK_DELETE )
+    else if ( event.GetKeyCode() == WXK_DELETE || event.GetKeyCode() == WXK_BACK )
     {
         DeleteSelection();
     }

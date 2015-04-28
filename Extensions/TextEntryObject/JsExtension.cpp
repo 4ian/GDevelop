@@ -36,17 +36,13 @@ public:
 
         GetObjectMetadata("TextEntryObject::TextEntry").SetIncludeFile("TextEntryObject/textentryruntimeobject.js");
 
-        GetAllActionsForObject("TextEntryObject::TextEntry")["TextEntryObject::String"].codeExtraInformation
-            .SetFunctionName("setString").SetAssociatedGetter("getString");
-        GetAllConditionsForObject("TextEntryObject::TextEntry")["TextEntryObject::String"].codeExtraInformation
-            .SetFunctionName("getString");
-        GetAllActionsForObject("TextEntryObject::TextEntry")["TextEntryObject::Activate"].codeExtraInformation
-            .SetFunctionName("activate");
-        GetAllConditionsForObject("TextEntryObject::TextEntry")["TextEntryObject::Activated"].codeExtraInformation
-            .SetFunctionName("isActivated");
+        GetAllActionsForObject("TextEntryObject::TextEntry")["TextEntryObject::String"].SetFunctionName("setString").SetGetter("getString");
+        GetAllConditionsForObject("TextEntryObject::TextEntry")["TextEntryObject::String"].SetFunctionName("getString");
+        GetAllActionsForObject("TextEntryObject::TextEntry")["TextEntryObject::Activate"].SetFunctionName("activate");
+        GetAllConditionsForObject("TextEntryObject::TextEntry")["TextEntryObject::Activated"].SetFunctionName("isActivated");
 
         GetAllStrExpressionsForObject("TextEntryObject::TextEntry")["String"]
-            .codeExtraInformation.SetFunctionName("getString");
+            .SetFunctionName("getString");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

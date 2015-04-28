@@ -55,9 +55,11 @@ public:
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddCodeOnlyParameter("currentScene", "")
+
                 .AddParameter("expression", GD_T("Destination X position"))
                 .AddParameter("expression", GD_T("Destination Y position"))
-                .codeExtraInformation.SetFunctionName("MoveTo").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("MoveTo").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("PathFound",
                            GD_T("Path found"),
@@ -66,9 +68,11 @@ public:
                            "",
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("PathFound").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("PathFound").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("DestinationReached",
                            GD_T("Destination reached"),
@@ -77,9 +81,11 @@ public:
                            "",
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("DestinationReached").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("DestinationReached").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("CellWidth",
                            GD_T("Width of the cells"),
@@ -88,11 +94,13 @@ public:
                            GD_T("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Width (pixels)"))
-                .codeExtraInformation.SetFunctionName("SetCellWidth").SetAssociatedGetter("GetCellWidth").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetCellWidth").SetGetter("GetCellWidth").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("CellWidth",
                            GD_T("Width of the virtual grid"),
@@ -101,11 +109,13 @@ public:
                            GD_T("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Width (pixels)"))
-                .codeExtraInformation.SetFunctionName("GetCellWidth").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetCellWidth").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("CellHeight",
                            GD_T("Height of the cells"),
@@ -114,11 +124,13 @@ public:
                            GD_T("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Height (pixels)"))
-                .codeExtraInformation.SetFunctionName("SetCellHeight").SetAssociatedGetter("GetCellHeight").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetCellHeight").SetGetter("GetCellHeight").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("CellHeight",
                            GD_T("Height of the virtual grid"),
@@ -127,11 +139,13 @@ public:
                            GD_T("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Height (pixels)"))
-                .codeExtraInformation.SetFunctionName("GetCellHeight").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetCellHeight").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("Acceleration",
                            GD_T("Acceleration"),
@@ -140,11 +154,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("SetAcceleration").SetAssociatedGetter("GetAcceleration").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetAcceleration").SetGetter("GetAcceleration").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("Acceleration",
                            GD_T("Acceleration"),
@@ -153,11 +169,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("MaxSpeed",
                            GD_T("Maximum speed"),
@@ -166,11 +184,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("SetMaxSpeed").SetAssociatedGetter("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetMaxSpeed").SetGetter("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("MaxSpeed",
                            GD_T("Maximum speed"),
@@ -179,11 +199,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("Speed",
                            GD_T("Speed"),
@@ -192,11 +214,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("SetSpeed").SetAssociatedGetter("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetSpeed").SetGetter("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("Speed",
                            GD_T("Speed"),
@@ -205,11 +229,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("AngularMaxSpeed",
                            GD_T("Angular maximum speed"),
@@ -218,11 +244,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("SetAngularMaxSpeed").SetAssociatedGetter("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetAngularMaxSpeed").SetGetter("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("AngularMaxSpeed",
                            GD_T("Angular maximum speed"),
@@ -231,11 +259,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("AngleOffset",
                            GD_T("Rotation offset"),
@@ -244,11 +274,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("SetAngleOffset").SetAssociatedGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetAngleOffset").SetGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("AngleOffset",
                            GD_T("Rotation offset"),
@@ -257,11 +289,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Value"))
-                .codeExtraInformation.SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("ExtraBorder",
                            GD_T("Extra border"),
@@ -270,11 +304,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Value (in pixels)"))
-                .codeExtraInformation.SetFunctionName("SetExtraBorder").SetAssociatedGetter("GetExtraBorder").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetExtraBorder").SetGetter("GetExtraBorder").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("ExtraBorder",
                            GD_T("Extra border"),
@@ -283,11 +319,13 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Value (in pixels)"))
-                .codeExtraInformation.SetFunctionName("GetExtraBorder").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetExtraBorder").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("AllowDiagonals",
                            GD_T("Diagonals moves"),
@@ -296,10 +334,12 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("yesorno", GD_T("Allow?"))
-                .codeExtraInformation.SetFunctionName("SetAllowDiagonals").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetAllowDiagonals").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("DiagonalsAllowed",
                            GD_T("Diagonals moves"),
@@ -308,9 +348,11 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("DiagonalsAllowed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("DiagonalsAllowed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddAction("RotateObject",
                            GD_T("Rotate the object"),
@@ -319,10 +361,12 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("yesorno", GD_T("Rotate object?"))
-                .codeExtraInformation.SetFunctionName("SetRotateObject").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("SetRotateObject").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
 
             aut.AddCondition("ObjectRotated",
                            GD_T("Object rotated"),
@@ -331,101 +375,103 @@ public:
                            GD_T("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("IsObjectRotated").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("IsObjectRotated").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("GetNodeX", GD_T("Get a waypoint X position"), GD_T("Get next waypoint X position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("expression", GD_T("Node index (start at 0!)"))
-                .codeExtraInformation.SetFunctionName("GetNodeX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetNodeX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("GetNodeY", GD_T("Get a waypoint Y position"), GD_T("Get next waypoint Y position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
                 .AddParameter("expression", GD_T("Node index (start at 0!)"))
-                .codeExtraInformation.SetFunctionName("GetNodeY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetNodeY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("NextNodeIndex", GD_T("Index of the next waypoint"), GD_T("Get the index of the next waypoint to reach"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetNextNodeIndex").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetNextNodeIndex").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("NodeCount", GD_T("Waypoint count"), GD_T("Get the number of waypoints on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetNodeCount").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetNodeCount").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("NextNodeX", GD_T("Get next waypoint X position"), GD_T("Get next waypoint X position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetNextNodeX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetNextNodeX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("NextNodeY", GD_T("Get next waypoint Y position"), GD_T("Get next waypoint Y position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetNextNodeY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetNextNodeY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("LastNodeX", GD_T("Last waypoint X position"), GD_T("Last waypoint X position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetLastNodeX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetLastNodeX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("LastNodeY", GD_T("Last waypoint Y position"), GD_T("Last waypoint Y position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetLastNodeY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetLastNodeY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("DestinationX", GD_T("Destination X position"), GD_T("Destination X position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetDestinationX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetDestinationX").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("DestinationY", GD_T("Destination Y position"), GD_T("Destination Y position"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetDestinationY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetDestinationY").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("Acceleration", GD_T("Acceleration"), GD_T("Acceleration of the object on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetAcceleration").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetAcceleration").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("MaxSpeed", GD_T("Maximum speed"), GD_T("Maximum speed of the object on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetMaxSpeed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetMaxSpeed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("Speed", GD_T("Speed"), GD_T("Speed of the object on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetSpeed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetSpeed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("AngularMaxSpeed", GD_T("Angular maximum speed"), GD_T("Angular maximum speed of the object on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetAngularMaxSpeed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetAngularMaxSpeed").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("AngleOffset", GD_T("Rotation offset"), GD_T("Rotation offset applied the object on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetAngleOffset").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetAngleOffset").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("ExtraBorder", GD_T("Extra border size"), GD_T("Extra border applied the object on the path"), GD_T("Path"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetExtraBorder").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetExtraBorder").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("CellWidth", GD_T("Width of a cell"), GD_T("Width of the virtual grid"), GD_T("Virtual grid"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetCellWidth").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetCellWidth").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddExpression("CellHeight", GD_T("Height of a cell"), GD_T("Height of the virtual grid"), GD_T("Virtual grid"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetCellHeight").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+                .SetFunctionName("GetCellHeight").SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
+
             #endif
 
         }
@@ -450,11 +496,13 @@ public:
                            GD_T("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingObstacleAutomatism", false)
                 .AddParameter("operator", GD_T("Modification's sign"))
                 .AddParameter("expression", GD_T("Difficulty"))
-                .codeExtraInformation.SetFunctionName("SetCost").SetAssociatedGetter("GetCost").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+                .SetFunctionName("SetCost").SetGetter("GetCost").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+
 
             aut.AddCondition("Cost",
                            GD_T("Cost"),
@@ -463,11 +511,13 @@ public:
                            GD_T("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingObstacleAutomatism", false)
                 .AddParameter("relationalOperator", GD_T("Sign of the test"))
                 .AddParameter("expression", GD_T("Difficulty"))
-                .codeExtraInformation.SetFunctionName("GetCost").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+                .SetFunctionName("GetCost").SetManipulatedType("number").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+
 
             aut.AddAction("SetImpassable",
                            GD_T("Set impassable"),
@@ -476,10 +526,12 @@ public:
                            GD_T("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingObstacleAutomatism", false)
                 .AddParameter("yesorno", GD_T("Impassable?"))
-                .codeExtraInformation.SetFunctionName("SetImpassable").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+                .SetFunctionName("SetImpassable").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+
 
             aut.AddCondition("IsImpassable",
                            GD_T("Is impassable"),
@@ -488,14 +540,16 @@ public:
                            GD_T("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingObstacleAutomatism", false)
-                .codeExtraInformation.SetFunctionName("IsImpassable").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+                .SetFunctionName("IsImpassable").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
 
             aut.AddExpression("Cost", GD_T("Cost"), GD_T("Obstacle cost"), GD_T("Obstacles"), "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "PathfindingObstacleAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetCost").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+                .SetFunctionName("GetCost").SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
+
             #endif
         }
 

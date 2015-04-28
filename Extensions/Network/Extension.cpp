@@ -44,7 +44,7 @@ public:
             .AddParameter("string", GD_T("Recipient IP address."))
             .AddParameter("expression", GD_T("Recipient port (Default : 50001)"), "", true)
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::AddRecipient").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::AddRecipient").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("RemoveAllRecipients",
                        GD_T("Delete all recipients"),
@@ -54,7 +54,7 @@ public:
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::RemoveAllRecipients").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::RemoveAllRecipients").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddAction("ListenToPort",
@@ -66,7 +66,7 @@ public:
                        "CppPlatform/Extensions/networkicon.png")
 
             .AddParameter("expression", GD_T("Listening port (Default : 50001)"), "", true).SetDefaultValue("50001")
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::ListenToPort").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::ListenToPort").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("StopListening",
                        GD_T("Stop data reception"),
@@ -76,7 +76,7 @@ public:
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::ActStopListening").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::ActStopListening").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("SendValue",
                        GD_T("Send a value"),
@@ -89,7 +89,7 @@ public:
             .AddParameter("string", GD_T("Group"))
             .AddParameter("expression", GD_T("Value"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::SendValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::SendValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("SendString",
                        GD_T("Send a text"),
@@ -102,7 +102,7 @@ public:
             .AddParameter("string", GD_T("Group"))
             .AddParameter("string", GD_T("Text"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::SendString").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::SendString").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("ReceivePackets",
                        GD_T("Receive waiting data"),
@@ -112,7 +112,7 @@ public:
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::ReceivePackets").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::ReceivePackets").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddAction("ResetReceivedData",
                        GD_T("Delete all received data stored in memory"),
@@ -122,34 +122,34 @@ public:
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::ResetReceivedData").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::ResetReceivedData").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
         AddStrExpression("GetReceivedDataString", GD_T("Get the text of a data"), GD_T("Get the text contained in a data"), GD_T("Network: Reception"), "CppPlatform/Extensions/networkicon.png")
             .AddParameter("string", GD_T("Name of the data containing the text to get"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataString").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataString").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddExpression("GetReceivedDataValue", GD_T("Get the value of a data"), GD_T("Get the value contained in a data"), GD_T("Network: Reception"), "CppPlatform/Extensions/networkicon.png")
             .AddParameter("string", GD_T("Name of the data containing the text to get"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddStrExpression("GetLastError", GD_T("Last error occured"), GD_T("Get the text describing the last error which occured."), GD_T("Network: Errors"), "res/error.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::GetLastError").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::GetLastError").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddStrExpression("GetPublicAddress", GD_T("IP address"), GD_T("Allow to get the public IP Address of the computer."), GD_T("Network"), "CppPlatform/Extensions/networkicon.png")
             .AddParameter("expression", GD_T("Maximum time to wait before getting the address ( in seconds ) ( 0 = no timeout )"), "", true)
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::GetPublicAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::GetPublicAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddStrExpression("GetLocalAddress", GD_T("Local IP address ( local/LAN )"), GD_T("Allow to get the public IP Address of the computer."), GD_T("Network"), "CppPlatform/Extensions/networkicon.png")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::NetworkExtension::GetLocalAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
+            .SetFunctionName("GDpriv::NetworkExtension::GetLocalAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddAction("GenerateObjectNetworkId",
@@ -162,7 +162,7 @@ public:
 
             .AddParameter("objectList", GD_T("Object"))
             .AddParameter("automatism", GD_T("Automatism"), "NetworkAutomatism", false)
-            .codeExtraInformation.SetFunctionName("NetworkAutomatism::GenerateObjectNetworkIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+            .SetFunctionName("NetworkAutomatism::GenerateObjectNetworkIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
         #endif
 
@@ -187,9 +187,10 @@ public:
                            GD_T("Automatism Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
                            "CppPlatform/Extensions/networkicon.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "NetworkAutomatism", false)
-                .codeExtraInformation.SetFunctionName("SetAsSender").SetIncludeFile("Network/NetworkAutomatism.h");
+                .SetFunctionName("SetAsSender").SetIncludeFile("Network/NetworkAutomatism.h");
 
             aut.AddAction("SetAsReceiver",
                            GD_T("Set to receive data"),
@@ -198,9 +199,10 @@ public:
                            GD_T("Automatism Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
                            "CppPlatform/Extensions/networkicon.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "NetworkAutomatism", false)
-                .codeExtraInformation.SetFunctionName("SetAsReceiver").SetIncludeFile("Network/NetworkAutomatism.h");
+                .SetFunctionName("SetAsReceiver").SetIncludeFile("Network/NetworkAutomatism.h");
 
             aut.AddAction("SetIdentifier",
                            GD_T("Change object's identifier"),
@@ -209,15 +211,17 @@ public:
                            GD_T("Automatism Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
                            "CppPlatform/Extensions/networkicon.png")
+
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "NetworkAutomatism", false)
                 .AddParameter("expression", GD_T("Identifier"))
-                .codeExtraInformation.SetFunctionName("SetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+                .SetFunctionName("SetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
             aut.AddExpression("GetIdentifier", GD_T("Get the identifier of the object"), GD_T("Get the identifier of the object"), GD_T("Automatism Automatic Network Updater"), "res/texteicon.png")
                 .AddParameter("object", GD_T("Object"))
                 .AddParameter("automatism", GD_T("Automatism"), "NetworkAutomatism", false)
-                .codeExtraInformation.SetFunctionName("GetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+                .SetFunctionName("GetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+
             #endif
         }
 

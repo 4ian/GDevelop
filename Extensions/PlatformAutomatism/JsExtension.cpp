@@ -46,45 +46,45 @@ public:
             std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
             std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
 
-            autConditions["PlatformAutomatism::IsMoving"].codeExtraInformation.SetFunctionName("isMoving");
-            autConditions["PlatformAutomatism::IsOnFloor"].codeExtraInformation.SetFunctionName("isOnFloor");
-            autConditions["PlatformAutomatism::IsOnLadder"].codeExtraInformation.SetFunctionName("isOnLadder");
-            autConditions["PlatformAutomatism::IsJumping"].codeExtraInformation.SetFunctionName("isJumping");
-            autConditions["PlatformAutomatism::IsFalling"].codeExtraInformation.SetFunctionName("isFalling");
+            autConditions["PlatformAutomatism::IsMoving"].SetFunctionName("isMoving");
+            autConditions["PlatformAutomatism::IsOnFloor"].SetFunctionName("isOnFloor");
+            autConditions["PlatformAutomatism::IsOnLadder"].SetFunctionName("isOnLadder");
+            autConditions["PlatformAutomatism::IsJumping"].SetFunctionName("isJumping");
+            autConditions["PlatformAutomatism::IsFalling"].SetFunctionName("isFalling");
 
-            autConditions["PlatformAutomatism::Gravity"].codeExtraInformation.SetFunctionName("getGravity");
-            autActions["PlatformAutomatism::Gravity"].codeExtraInformation.SetFunctionName("setGravity").SetAssociatedGetter("getGravity");
-            autExpressions["Gravity"].codeExtraInformation.SetFunctionName("getGravity");
-            autConditions["PlatformAutomatism::MaxFallingSpeed"].codeExtraInformation.SetFunctionName("getMaxFallingSpeed");
-            autActions["PlatformAutomatism::MaxFallingSpeed"].codeExtraInformation.SetFunctionName("setMaxFallingSpeed").SetAssociatedGetter("getMaxFallingSpeed");
-            autExpressions["MaxFallingSpeed"].codeExtraInformation.SetFunctionName("getMaxFallingSpeed");
-            autConditions["PlatformAutomatism::Acceleration"].codeExtraInformation.SetFunctionName("getAcceleration");
-            autActions["PlatformAutomatism::Acceleration"].codeExtraInformation.SetFunctionName("setAcceleration").SetAssociatedGetter("getAcceleration");
-            autExpressions["Acceleration"].codeExtraInformation.SetFunctionName("getAcceleration");
-            autConditions["PlatformAutomatism::Deceleration"].codeExtraInformation.SetFunctionName("getDeceleration");
-            autActions["PlatformAutomatism::Deceleration"].codeExtraInformation.SetFunctionName("setDeceleration").SetAssociatedGetter("getDeceleration");
-            autExpressions["Deceleration"].codeExtraInformation.SetFunctionName("getDeceleration");
-            autConditions["PlatformAutomatism::MaxSpeed"].codeExtraInformation.SetFunctionName("getMaxSpeed");
-            autActions["PlatformAutomatism::MaxSpeed"].codeExtraInformation.SetFunctionName("setMaxSpeed").SetAssociatedGetter("getMaxSpeed");
-            autExpressions["MaxSpeed"].codeExtraInformation.SetFunctionName("getMaxSpeed");
-            autConditions["PlatformAutomatism::JumpSpeed"].codeExtraInformation.SetFunctionName("getJumpSpeed");
-            autActions["PlatformAutomatism::JumpSpeed"].codeExtraInformation.SetFunctionName("setJumpSpeed").SetAssociatedGetter("getJumpSpeed");
-            autExpressions["JumpSpeed"].codeExtraInformation.SetFunctionName("getJumpSpeed");
+            autConditions["PlatformAutomatism::Gravity"].SetFunctionName("getGravity");
+            autActions["PlatformAutomatism::Gravity"].SetFunctionName("setGravity").SetGetter("getGravity");
+            autExpressions["Gravity"].SetFunctionName("getGravity");
+            autConditions["PlatformAutomatism::MaxFallingSpeed"].SetFunctionName("getMaxFallingSpeed");
+            autActions["PlatformAutomatism::MaxFallingSpeed"].SetFunctionName("setMaxFallingSpeed").SetGetter("getMaxFallingSpeed");
+            autExpressions["MaxFallingSpeed"].SetFunctionName("getMaxFallingSpeed");
+            autConditions["PlatformAutomatism::Acceleration"].SetFunctionName("getAcceleration");
+            autActions["PlatformAutomatism::Acceleration"].SetFunctionName("setAcceleration").SetGetter("getAcceleration");
+            autExpressions["Acceleration"].SetFunctionName("getAcceleration");
+            autConditions["PlatformAutomatism::Deceleration"].SetFunctionName("getDeceleration");
+            autActions["PlatformAutomatism::Deceleration"].SetFunctionName("setDeceleration").SetGetter("getDeceleration");
+            autExpressions["Deceleration"].SetFunctionName("getDeceleration");
+            autConditions["PlatformAutomatism::MaxSpeed"].SetFunctionName("getMaxSpeed");
+            autActions["PlatformAutomatism::MaxSpeed"].SetFunctionName("setMaxSpeed").SetGetter("getMaxSpeed");
+            autExpressions["MaxSpeed"].SetFunctionName("getMaxSpeed");
+            autConditions["PlatformAutomatism::JumpSpeed"].SetFunctionName("getJumpSpeed");
+            autActions["PlatformAutomatism::JumpSpeed"].SetFunctionName("setJumpSpeed").SetGetter("getJumpSpeed");
+            autExpressions["JumpSpeed"].SetFunctionName("getJumpSpeed");
 
-            autActions["PlatformAutomatism::SetCanJump"].codeExtraInformation.SetFunctionName("setCanJump");
-            autActions["PlatformAutomatism::SimulateLeftKey"].codeExtraInformation.SetFunctionName("simulateLeftKey");
-            autActions["PlatformAutomatism::SimulateRightKey"].codeExtraInformation.SetFunctionName("simulateRightKey");
-            autActions["PlatformAutomatism::SimulateUpKey"].codeExtraInformation.SetFunctionName("simulateUpKey");
-            autActions["PlatformAutomatism::SimulateDownKey"].codeExtraInformation.SetFunctionName("simulateDownKey");
-            autActions["PlatformAutomatism::SimulateLadderKey"].codeExtraInformation.SetFunctionName("simulateLadderKey");
-            autActions["PlatformAutomatism::SimulateJumpKey"].codeExtraInformation.SetFunctionName("simulateJumpKey");
-            autActions["PlatformAutomatism::SimulateControl"].codeExtraInformation.SetFunctionName("simulateControl");
-            autActions["PlatformAutomatism::IgnoreDefaultControls"].codeExtraInformation.SetFunctionName("ignoreDefaultControls");
+            autActions["PlatformAutomatism::SetCanJump"].SetFunctionName("setCanJump");
+            autActions["PlatformAutomatism::SimulateLeftKey"].SetFunctionName("simulateLeftKey");
+            autActions["PlatformAutomatism::SimulateRightKey"].SetFunctionName("simulateRightKey");
+            autActions["PlatformAutomatism::SimulateUpKey"].SetFunctionName("simulateUpKey");
+            autActions["PlatformAutomatism::SimulateDownKey"].SetFunctionName("simulateDownKey");
+            autActions["PlatformAutomatism::SimulateLadderKey"].SetFunctionName("simulateLadderKey");
+            autActions["PlatformAutomatism::SimulateJumpKey"].SetFunctionName("simulateJumpKey");
+            autActions["PlatformAutomatism::SimulateControl"].SetFunctionName("simulateControl");
+            autActions["PlatformAutomatism::IgnoreDefaultControls"].SetFunctionName("ignoreDefaultControls");
         }
         {
             std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PlatformAutomatism::PlatformAutomatism");
 
-            autActions["PlatformAutomatism::ChangePlatformType"].codeExtraInformation.SetFunctionName("changePlatformType");
+            autActions["PlatformAutomatism::ChangePlatformType"].SetFunctionName("changePlatformType");
         }
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

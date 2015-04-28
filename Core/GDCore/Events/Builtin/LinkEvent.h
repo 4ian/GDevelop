@@ -12,7 +12,7 @@ namespace gd
 {
 
 /**
- * \brief A link pointing to external events ( or events of another layout ) that should be included
+ * \brief A link pointing to external events (or events of another layout) that should be included
  * and run instead of the link.
  */
 class GD_CORE_API LinkEvent : public gd::BaseEvent
@@ -23,12 +23,12 @@ public:
     virtual gd::LinkEvent * Clone() const { return new LinkEvent(*this);}
 
     /**
-     * Get the link target ( i.e. the scene or external events the link refers to )
+     * Get the link target (i.e. the scene or external events the link refers to).
      */
     const std::string & GetTarget() const { return target; };
 
     /**
-     * Change the link target ( i.e. the scene or external events the link refers to )
+     * Change the link target (i.e. the scene or external events the link refers to).
      */
     void SetTarget(const std::string & target_) { target = target_; };
 
@@ -48,12 +48,12 @@ public:
     void SetIncludeStartAndEnd(unsigned int includeStart_, unsigned int includeEnd_) { includeStart = includeStart_; includeEnd = includeEnd_;  };
 
     /**
-     * Get the number of the first event to be included. ( Meaningful only if includeAll was set to false, see SetIncludeAllEvents )
+     * Get the number of the first event to be included. (Meaningful only if includeAll was set to false, see SetIncludeAllEvents)
      */
     unsigned int GetIncludeStart() const { return includeStart; };
 
     /**
-     * Get the number of the last event to be included. ( Meaningful only if includeAll was set to false, see SetIncludeAllEvents )
+     * Get the number of the last event to be included. (Meaningful only if includeAll was set to false, see SetIncludeAllEvents)
      */
     unsigned int GetIncludeEnd() const { return includeEnd; };
 
@@ -73,7 +73,7 @@ public:
     /**
      * \brief Replace the link in the events list by the linked events.
      * When implementing a platform with a link event, you should call this function when preprocessing the events
-     * ( See gd::EventMetadata::codeGeneration ).
+     * (See gd::EventMetadata::codeGeneration).
      */
     void ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList);
 
@@ -95,7 +95,7 @@ public:
     virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
 
 private:
-    std::string target; ///< The name of the external events ( or scene ) to be included
+    std::string target; ///< The name of the external events (or scene) to be included
     bool includeAll; ///< If set to true, all the events of the target should be included
     unsigned int includeStart; ///< If includeAll is set to false, represents the number of the first event of the target to included.
     unsigned int includeEnd; ///< If includeAll is set to false, represents the number of the last event of the target to included.

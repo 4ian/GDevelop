@@ -44,7 +44,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("expression", GD_T("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddCondition("Height",
                    GD_T("Height"),
@@ -57,7 +57,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("expression", GD_T("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     extension.AddCondition("SingleTileCollision",
                    GD_T("Collision with one tile"),
@@ -73,25 +73,24 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("objectList", GD_T("Object"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple()
-        .codeExtraInformation.SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
-
+        .SetFunctionName("SingleTileCollision").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
 
     obj.AddExpression("TileWidth", GD_T("Tile width"), GD_T("Tile width"), GD_T("Tiles"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("GetTileWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetTileWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddExpression("TileHeight", GD_T("Tile height"), GD_T("Tile height"), GD_T("Tiles"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetTileHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddExpression("MapWidth", GD_T("Map width (tiles)"), GD_T("Map width"), GD_T("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("GetMapWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetMapWidth").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddExpression("MapHeight", GD_T("Map height (tiles)"), GD_T("Map height"), GD_T("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("GetMapHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetMapHeight").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
 
 
@@ -100,7 +99,8 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("expression", GD_T("Layer"), "", false)
         .AddParameter("expression", GD_T("Column"), "", false)
         .AddParameter("expression", GD_T("Row"), "", false)
-        .codeExtraInformation.SetFunctionName("GetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+
 
     obj.AddAction("SetTile",
                    GD_T("Change a tile"),
@@ -115,25 +115,25 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("expression", GD_T("Tile row"))
         .AddParameter("expression", GD_T("New tile Id (-1 to delete the tile)"))
         .MarkAsSimple()
-        .codeExtraInformation.SetFunctionName("SetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("SetTile").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
 
 
     obj.AddExpression("GetColumnAt", GD_T("Get tile column from X coordinates"), GD_T("Get tile column from X coordinates"), GD_T("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
         .AddParameter("expression", GD_T("X"), "", false)
-        .codeExtraInformation.SetFunctionName("GetColumnAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetColumnAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddExpression("GetRowAt", GD_T("Get tile row from Y coordinates"), GD_T("Get tile row from Y coordinates"), GD_T("Map"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
         .AddParameter("expression", GD_T("Y"), "", false)
-        .codeExtraInformation.SetFunctionName("GetRowAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("GetRowAt").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
 
 
     obj.AddStrExpression("SaveTiles", GD_T("Save the tile map"), GD_T("Save the tile map content in a string"), GD_T("Saving"), "res/TileMapIcon16.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
-        .codeExtraInformation.SetFunctionName("SaveAsString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("SaveAsString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddAction("LoadTiles",
                    GD_T("Load the tiles from a string"),
@@ -145,7 +145,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("objectList", GD_T("Tile Map Object"), "TileMap", false)
         .AddParameter("string", GD_T("The string representing the tiles"))
         .MarkAsSimple()
-        .codeExtraInformation.SetFunctionName("LoadFromString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("LoadFromString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
 
 
@@ -160,7 +160,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("string", GD_T("The new texture name"))
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsSimple()
-        .codeExtraInformation.SetFunctionName("ChangeTexture").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
+        .SetFunctionName("ChangeTexture").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     #endif
 }

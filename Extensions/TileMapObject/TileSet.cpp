@@ -13,6 +13,7 @@ This project is released under the MIT License.
 #include <wx/file.h>
 #include <wx/filefn.h>
 #include <wx/filename.h>
+#include <wx/image.h>
 #endif
 #include <GDCore/CommonTools.h>
 
@@ -152,9 +153,6 @@ void TileSet::Generate()
 
     //Generate the TextureCoords and the sub-bitmaps (only in IDE)
     m_coords.clear();
-#ifdef GD_IDE_ONLY
-    m_bitmaps.clear();
-#endif
     for(int row = 0; row < rows; row++)
     {
         for(int col = 0; col < columns; col++)
@@ -170,16 +168,6 @@ void TileSet::Generate()
             tileCoords.bottomLeft = sf::Vector2f(col * (tileSize.x + tileSpacing.x),
                                                  row * (tileSize.y + tileSpacing.y) + tileSize.y);
             m_coords.push_back(tileCoords);
-
-#ifdef GD_IDE_ONLY
-            //sub-wxBitmap
-            wxBitmap subbitmap;
-            subbitmap = m_tilesetBitmap.GetSubBitmap(wxRect(col * (tileSize.x + tileSpacing.x),
-                                                            row * (tileSize.y + tileSpacing.y),
-                                                            tileSize.x,
-                                                            tileSize.y));
-            m_bitmaps.push_back(subbitmap);
-#endif
         }
     }
 
@@ -224,11 +212,6 @@ int TileSet::GetTileIDFromCell(int col, int row)
 const wxBitmap& TileSet::GetWxBitmap() const
 {
     return m_tilesetBitmap;
-}
-
-const wxBitmap& TileSet::GetTileBitmap(int id) const
-{
-    return (id < m_bitmaps.size() ? m_bitmaps.at(id) : m_invalidBitmap);
 }
 
 #endif

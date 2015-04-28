@@ -11,7 +11,7 @@
 #include <string>
 
 /**
- * \brief Wrapper allowing to load a dynamic library and launch a specific function ( See the full description ).
+ * \brief Wrapper allowing to load a dynamic library and launch a specific function.
  *
  * RuntimeScene uses this class to launch compiled events. In particular, the signature of the function
  * of the dynamic library must be :
@@ -51,7 +51,7 @@ public:
     /**
      * Execute the function specified during the call to LoadFromDynamicLibrary
      *
-     * \warning Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not ( or badly ) initialized.
+     * \warning Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not (or badly) initialized.
      */
     void Execute() { ((void(*)(RuntimeContext *))function)(&runtimeContext); };
 

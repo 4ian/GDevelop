@@ -135,3 +135,21 @@ function(gdcpp_runtime_extension_link_libraries target_name)
 		ENDIF(WIN32)
 	ENDIF()
 endfunction()
+
+
+#Create a target for a test executable of a GDC++ Runtime extension
+function(gdcpp_add_tests_extension_target gdcpp_tests_target_name test_source_files)
+	IF(NOT gdcpp_tests_target_name MATCHES "_tests$")
+		MESSAGE(ERROR "You called gdcpp_add_tests_extension_target with a target name not finishing with '_tests'")
+	ENDIF()
+	string(REGEX REPLACE "_tests" "" target_name ${gdcpp_tests_target_name})
+
+	if(BUILD_TESTS)
+		add_executable(${gdcpp_tests_target_name} ${test_source_files})
+		target_link_libraries(${gdcpp_tests_target_name} GDCpp_Runtime)
+		target_link_libraries(${gdcpp_tests_target_name} ${target_name})
+		target_link_libraries(${gdcpp_tests_target_name} ${sfml_LIBRARIES})
+
+		set_target_properties(${gdcpp_tests_target_name} PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
+	endif()
+endfunction()

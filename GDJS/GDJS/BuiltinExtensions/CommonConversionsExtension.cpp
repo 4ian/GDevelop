@@ -23,16 +23,11 @@ CommonConversionsExtension::CommonConversionsExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllExpressions()["ToNumber"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.common.toNumber").SetIncludeFile("commontools.js");
-    GetAllStrExpressions()["ToString"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.common.toString").SetIncludeFile("commontools.js");
-    GetAllStrExpressions()["LargeNumberToString"].codeExtraInformation //TODO: Check if scientific notation is added or not by toString.
-        .SetFunctionName("gdjs.evtTools.common.toString").SetIncludeFile("commontools.js");
-    GetAllExpressions()["ToRad"].codeExtraInformation
-        .SetFunctionName("gdjs.toRad");
-    GetAllExpressions()["ToDeg"].codeExtraInformation
-        .SetFunctionName("gdjs.toDegrees");
+    GetAllExpressions()["ToNumber"].SetFunctionName("gdjs.evtTools.common.toNumber").SetIncludeFile("commontools.js");
+    GetAllStrExpressions()["ToString"].SetFunctionName("gdjs.evtTools.common.toString").SetIncludeFile("commontools.js");
+    GetAllStrExpressions()["LargeNumberToString"].SetFunctionName("gdjs.evtTools.common.toString").SetIncludeFile("commontools.js");
+    GetAllExpressions()["ToRad"].SetFunctionName("gdjs.toRad");
+    GetAllExpressions()["ToDeg"].SetFunctionName("gdjs.toDegrees");
 }
 
 }

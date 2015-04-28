@@ -22,45 +22,45 @@ AudioExtension::AudioExtension()
     gd::BuiltinExtensionsImplementer::ImplementsAudioExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllActions()["PlaySoundCanal"].codeExtraInformation.SetFunctionName("PlaySoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["StopSoundCanal"].codeExtraInformation.SetFunctionName("StopSoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["PauseSoundCanal"].codeExtraInformation.SetFunctionName("PauseSoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["RePlaySoundCanal"].codeExtraInformation.SetFunctionName("RePlaySoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["PlayMusicCanal"].codeExtraInformation.SetFunctionName("PlayMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["StopMusicCanal"].codeExtraInformation.SetFunctionName("StopMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["PauseMusicCanal"].codeExtraInformation.SetFunctionName("PauseMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["RePlayMusicCanal"].codeExtraInformation.SetFunctionName("RePlayMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModVolumeSoundCanal"].codeExtraInformation.SetFunctionName("SetSoundVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetSoundVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModVolumeMusicCanal"].codeExtraInformation.SetFunctionName("SetMusicVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetMusicVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModGlobalVolume"].codeExtraInformation.SetFunctionName("SetGlobalVolume").SetAssociatedGetter("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModPitchSoundChannel"].codeExtraInformation.SetFunctionName("SetSoundPitchOnChannel").SetAssociatedGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModPitchMusicChannel"].codeExtraInformation.SetFunctionName("SetMusicPitchOnChannel").SetAssociatedGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModPlayingOffsetSoundChannel"].codeExtraInformation.SetFunctionName("SetSoundPlayingOffsetOnChannel").SetAssociatedGetter("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["ModPlayingOffsetMusicChannel"].codeExtraInformation.SetFunctionName("SetMusicPlayingOffsetOnChannel").SetAssociatedGetter("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["PlaySound"].codeExtraInformation.SetFunctionName("PlaySound").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllActions()["PlayMusic"].codeExtraInformation.SetFunctionName("PlayMusic").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["PlaySoundCanal"].SetFunctionName("PlaySoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["StopSoundCanal"].SetFunctionName("StopSoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["PauseSoundCanal"].SetFunctionName("PauseSoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["RePlaySoundCanal"].SetFunctionName("RePlaySoundOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["PlayMusicCanal"].SetFunctionName("PlayMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["StopMusicCanal"].SetFunctionName("StopMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["PauseMusicCanal"].SetFunctionName("PauseMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["RePlayMusicCanal"].SetFunctionName("RePlayMusicOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModVolumeSoundCanal"].SetFunctionName("SetSoundVolumeOnChannel").SetManipulatedType("number").SetGetter("GetSoundVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModVolumeMusicCanal"].SetFunctionName("SetMusicVolumeOnChannel").SetManipulatedType("number").SetGetter("GetMusicVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModGlobalVolume"].SetFunctionName("SetGlobalVolume").SetGetter("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModPitchSoundChannel"].SetFunctionName("SetSoundPitchOnChannel").SetGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModPitchMusicChannel"].SetFunctionName("SetMusicPitchOnChannel").SetGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModPlayingOffsetSoundChannel"].SetFunctionName("SetSoundPlayingOffsetOnChannel").SetGetter("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["ModPlayingOffsetMusicChannel"].SetFunctionName("SetMusicPlayingOffsetOnChannel").SetGetter("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["PlaySound"].SetFunctionName("PlaySound").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllActions()["PlayMusic"].SetFunctionName("PlayMusic").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
-    GetAllConditions()["MusicPlaying"].codeExtraInformation.SetFunctionName("MusicPlaying").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["MusicPaused"].codeExtraInformation.SetFunctionName("MusicPaused").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["MusicStopped"].codeExtraInformation.SetFunctionName("MusicStopped").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["SoundPlaying"].codeExtraInformation.SetFunctionName("SoundPlaying").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["SoundPaused"].codeExtraInformation.SetFunctionName("SoundPaused").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["SoundStopped"].codeExtraInformation.SetFunctionName("SoundStopped").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["SoundCanalVolume"].codeExtraInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["MusicCanalVolume"].codeExtraInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["GlobalVolume"].codeExtraInformation.SetFunctionName("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["SoundChannelPitch"].codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["MusicChannelPitch"].codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["SoundChannelPlayingOffset"].codeExtraInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllConditions()["MusicChannelPlayingOffset"].codeExtraInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["MusicPlaying"].SetFunctionName("MusicPlaying").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["MusicPaused"].SetFunctionName("MusicPaused").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["MusicStopped"].SetFunctionName("MusicStopped").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["SoundPlaying"].SetFunctionName("SoundPlaying").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["SoundPaused"].SetFunctionName("SoundPaused").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["SoundStopped"].SetFunctionName("SoundStopped").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["SoundCanalVolume"].SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["MusicCanalVolume"].SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["GlobalVolume"].SetFunctionName("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["SoundChannelPitch"].SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["MusicChannelPitch"].SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["SoundChannelPlayingOffset"].SetFunctionName("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllConditions()["MusicChannelPlayingOffset"].SetFunctionName("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
 
-    GetAllExpressions()["SoundChannelPlayingOffset"].codeExtraInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllExpressions()["MusicChannelPlayingOffset"].codeExtraInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllExpressions()["SoundChannelVolume"].codeExtraInformation.SetFunctionName("GetSoundVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllExpressions()["MusicChannelVolume"].codeExtraInformation.SetFunctionName("GetMusicVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllExpressions()["SoundChannelPitch"].codeExtraInformation.SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllExpressions()["MusicChannelPitch"].codeExtraInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-    GetAllExpressions()["GlobalVolume"].codeExtraInformation.SetFunctionName("GetGlobalVolume").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["SoundChannelPlayingOffset"].SetFunctionName("GetSoundPlayingOffsetOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["MusicChannelPlayingOffset"].SetFunctionName("GetMusicPlayingOffsetOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["SoundChannelVolume"].SetFunctionName("GetSoundVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["MusicChannelVolume"].SetFunctionName("GetMusicVolumeOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["SoundChannelPitch"].SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["MusicChannelPitch"].SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
+    GetAllExpressions()["GlobalVolume"].SetFunctionName("GetGlobalVolume").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
     #endif
 }
 

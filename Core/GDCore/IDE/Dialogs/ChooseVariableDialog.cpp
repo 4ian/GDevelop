@@ -387,7 +387,7 @@ void ChooseVariableDialog::OnhelpBtClick(wxCommandEvent& event)
  */
 void ChooseVariableDialog::OnvariablesListKeyDown1(wxKeyEvent& event)
 {
-    if ( event.GetKeyCode() == WXK_DELETE )
+    if ( event.GetKeyCode() == WXK_DELETE || event.GetKeyCode() == WXK_BACK )
     {
         wxCommandEvent unusedEvent;
         OnRemoveSelected( unusedEvent );

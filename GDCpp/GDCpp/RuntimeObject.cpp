@@ -240,19 +240,26 @@ bool RuntimeObject::AutomatismActivated( const std::string & automatismName )
     return GetAutomatismRawPointer(automatismName)->Activated();
 }
 
-double RuntimeObject::GetSqDistanceWithObject( RuntimeObject * object )
+double RuntimeObject::GetSqDistanceTo(double pointX, double pointY)
+{
+    double x = GetDrawableX()+GetCenterX() - pointX;
+    double y = GetDrawableY()+GetCenterY() - pointY;
+
+    return x*x+y*y;
+}
+
+double RuntimeObject::GetSqDistanceWithObject(RuntimeObject * object)
 {
     if ( object == NULL ) return 0;
 
-    float x = GetDrawableX()+GetCenterX() - (object->GetDrawableX()+object->GetCenterX());
-    float y = GetDrawableY()+GetCenterY() - (object->GetDrawableY()+object->GetCenterY());
-
-    return x*x+y*y; // No square root here
+    return GetSqDistanceTo(
+        object->GetDrawableX()+object->GetCenterX(),
+        object->GetDrawableY()+object->GetCenterY());
 }
 
-double RuntimeObject::GetDistanceWithObject( RuntimeObject * other )
+double RuntimeObject::GetDistanceWithObject(RuntimeObject * object)
 {
-    return sqrt(GetSqDistanceWithObject(other));
+    return sqrt(GetSqDistanceWithObject(object));
 }
 
 bool RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)

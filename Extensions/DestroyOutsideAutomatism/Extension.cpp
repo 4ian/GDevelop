@@ -43,7 +43,7 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("expression", GD_T("Value to test"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
+        .SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
 
     aut.AddAction("ExtraBorder",
                    GD_T("Additional border"),
@@ -57,8 +57,8 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
         .AddParameter("operator", GD_T("Modification's sign"))
         .AddParameter("expression", GD_T("Value"))
         .MarkAsAdvanced()
-        .codeExtraInformation.SetFunctionName("SetExtraBorder").SetManipulatedType("number")
-        .SetAssociatedGetter("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
+        .SetFunctionName("SetExtraBorder").SetManipulatedType("number")
+        .SetGetter("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
     #endif
 
 }

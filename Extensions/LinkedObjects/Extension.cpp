@@ -43,7 +43,7 @@ public:
             .AddParameter("objectPtr", GD_T("Object 1"))
             .AddParameter("objectPtr", GD_T("Object 2"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::LinkObjects").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::LinkObjects").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddAction("RemoveLinkBetween",
                        GD_T("Unlink two objects"),
@@ -57,7 +57,7 @@ public:
             .AddParameter("objectPtr", GD_T("Object 1"))
             .AddParameter("objectPtr", GD_T("Object 2"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddAction("RemoveAllLinksOf",
                        GD_T("Unlink all objects from an object"),
@@ -70,7 +70,7 @@ public:
             .AddCodeOnlyParameter("currentScene", "")
             .AddParameter("objectPtr", GD_T("Object"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddCondition("PickObjectsLinkedTo",
                        GD_T("Take into account linked objects"),
@@ -84,7 +84,7 @@ public:
             .AddParameter("objectList", GD_T("Pick these objects..."))
             .AddParameter("objectPtr", GD_T("...if they are linked to this object"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
 
         AddAction("PickObjectsLinkedTo",
@@ -99,7 +99,7 @@ public:
             .AddParameter("objectList", GD_T("Pick these objects..."))
             .AddParameter("objectPtr", GD_T("...if they are linked to this object"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+            .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         #endif
 

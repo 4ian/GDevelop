@@ -51,7 +51,7 @@ public:
     bool IsOptional() const { return optional; }
 
     /**
-     * \brief Return true if the parameter can receive an UTF8 string.
+     * \brief Return true if the parameter can receive an UTF8 string (default behavior).
      */
     bool CanUseUtf8() const { return canUseUtf8; }
 
@@ -74,7 +74,7 @@ public:
     std::string type; ///< Parameter type
     std::string supplementaryInformation; ///< Used if needed
     bool optional; ///< True if the parameter is optional
-    bool canUseUtf8; ///< True if the parameter can receive an UTF8 string
+    bool canUseUtf8; ///< True if the parameter can receive an UTF8 string (default behavior)
 
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
@@ -239,10 +239,11 @@ public:
 
         /**
          * Set the function name which will be used when generating the code.
+         * \param functionName the name of the function to call
          */
-        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & functionName_)
         {
-            functionCallName = cppCallingName_;
+            functionCallName = functionName_;
             return *this;
         }
 
@@ -272,13 +273,12 @@ public:
          *      .AddParameter("object", _("Object"), "Text", false)
          *      .AddParameter("operator", _("Modification operator"))
          *      .AddParameter("string", _("String"))
-         *
-         *      .codeExtraInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+         *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
          *
          *  DECLARE_END_OBJECT_ACTION()
          * \endcode
          */
-        ExtraInformation & SetAssociatedGetter(const std::string & getter)
+        ExtraInformation & SetGetter(const std::string & getter)
         {
             optionalAssociatedInstruction = getter;
             accessType = MutatorAndOrAccessor;
@@ -319,17 +319,27 @@ public:
 
     /**
      * \brief Declare if the instruction being declared is somewhat manipulating in a standard way.
-     *
-     * Shortcut for "codeExtraInformation.SetManipulatedType(type)".
+     * \param type "number" or "string"
+     * \note Shortcut for `codeExtraInformation.SetManipulatedType(type)`.
      */
     ExtraInformation & SetManipulatedType(const std::string & type_)
     {
         return codeExtraInformation.SetManipulatedType(type_);
     }
 
+    /**
+     * \brief Set the function that should be called when generating the source
+     * code from events.
+     * \param functionName the name of the function to call
+     * \note Shortcut for `codeExtraInformation.SetFunctionName`.
+     */
+    ExtraInformation & SetFunctionName(const std::string & functionName)
+    {
+        return codeExtraInformation.SetFunctionName(functionName);
+    }
+
     /** \brief DefaultConstructor.
-     *
-     * Please do not use this constructor. Only here to fulfill std::map requirements
+     * \warning Please do not use this constructor. Only here to fulfill std::map requirements.
      */
     InstructionMetadata();
 

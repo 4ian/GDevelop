@@ -25,39 +25,23 @@ TimeExtension::TimeExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllConditions()["Timer"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.timerElapsedTime");
-    GetAllConditions()["TimerPaused"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.timerPaused");
-    GetAllActions()["ResetTimer"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.resetTimer");
-    GetAllActions()["PauseTimer"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.pauseTimer");
-    GetAllActions()["UnPauseTimer"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.unpauseTimer");
-    GetAllActions()["RemoveTimer"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.removeTimer");
-    GetAllConditions()["TimeScale"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getTimeScale");
-    GetAllActions()["ChangeTimeScale"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.setTimeScale");
+    GetAllConditions()["Timer"].SetFunctionName("gdjs.evtTools.runtimeScene.timerElapsedTime");
+    GetAllConditions()["TimerPaused"].SetFunctionName("gdjs.evtTools.runtimeScene.timerPaused");
+    GetAllActions()["ResetTimer"].SetFunctionName("gdjs.evtTools.runtimeScene.resetTimer");
+    GetAllActions()["PauseTimer"].SetFunctionName("gdjs.evtTools.runtimeScene.pauseTimer");
+    GetAllActions()["UnPauseTimer"].SetFunctionName("gdjs.evtTools.runtimeScene.unpauseTimer");
+    GetAllActions()["RemoveTimer"].SetFunctionName("gdjs.evtTools.runtimeScene.removeTimer");
+    GetAllConditions()["TimeScale"].SetFunctionName("gdjs.evtTools.runtimeScene.getTimeScale");
+    GetAllActions()["ChangeTimeScale"].SetFunctionName("gdjs.evtTools.runtimeScene.setTimeScale");
 
-    GetAllExpressions()["TimeDelta"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds");
-    GetAllExpressions()["TempsFrame"].codeExtraInformation //Deprecated
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds");
-    GetAllExpressions()["ElapsedTime"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds");
-    GetAllExpressions()["TimerElapsedTime"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSeconds");
-    GetAllExpressions()["TimeFromStart"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds");
-    GetAllExpressions()["TempsDebut"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds");
-    GetAllExpressions()["TimeScale"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getTimeScale");
-    GetAllExpressions()["Time"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getTime");
+    GetAllExpressions()["TimeDelta"].SetFunctionName("gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds");
+    GetAllExpressions()["TempsFrame"].SetFunctionName("gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds"); //Deprecated
+    GetAllExpressions()["ElapsedTime"].SetFunctionName("gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds");
+    GetAllExpressions()["TimerElapsedTime"].SetFunctionName("gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSeconds");
+    GetAllExpressions()["TimeFromStart"].SetFunctionName("gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds");
+    GetAllExpressions()["TempsDebut"].SetFunctionName("gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds");
+    GetAllExpressions()["TimeScale"].SetFunctionName("gdjs.evtTools.runtimeScene.getTimeScale");
+    GetAllExpressions()["Time"].SetFunctionName("gdjs.evtTools.runtimeScene.getTime");
 }
 
 }

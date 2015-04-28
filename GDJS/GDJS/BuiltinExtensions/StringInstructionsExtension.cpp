@@ -24,23 +24,23 @@ StringInstructionsExtension::StringInstructionsExtension()
                           "Open source (MIT License)");
 
     GetAllStrExpressions()["NewLine"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.newLine");
+        .SetFunctionName("gdjs.evtTools.string.newLine");
     GetAllStrExpressions()["SubStr"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.subStr");
+        .SetFunctionName("gdjs.evtTools.string.subStr");
     GetAllStrExpressions()["StrAt"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.strAt");
+        .SetFunctionName("gdjs.evtTools.string.strAt");
     GetAllExpressions()["StrLength"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.strLen");
+        .SetFunctionName("gdjs.evtTools.string.strLen");
     GetAllExpressions()["StrFind"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.strFind");
+        .SetFunctionName("gdjs.evtTools.string.strFind");
     GetAllExpressions()["StrRFind"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.strRFind");
+        .SetFunctionName("gdjs.evtTools.string.strRFind");
     GetAllExpressions()["StrFindFrom"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.strFindFrom");
+        .SetFunctionName("gdjs.evtTools.string.strFindFrom");
     GetAllExpressions()["StrRFindFrom"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.string.strRFindFrom");
+        .SetFunctionName("gdjs.evtTools.string.strRFindFrom");
 
-    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
+    StripUnimplementedInstructionsAndExpressions();
 }
 
 }

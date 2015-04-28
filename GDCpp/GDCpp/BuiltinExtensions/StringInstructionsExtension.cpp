@@ -16,14 +16,14 @@ StringInstructionsExtension::StringInstructionsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(*this);
 
     #if defined(GD_IDE_ONLY)
-    GetAllStrExpressions()["NewLine"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::NewLine").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllStrExpressions()["SubStr"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllStrExpressions()["StrAt"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllExpressions()["StrLength"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllExpressions()["StrFind"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFind").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllExpressions()["StrRFind"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllExpressions()["StrFindFrom"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
-    GetAllExpressions()["StrRFindFrom"].codeExtraInformation.SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllStrExpressions()["NewLine"].SetFunctionName("GDpriv::StringTools::NewLine").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllStrExpressions()["SubStr"].SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllStrExpressions()["StrAt"].SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllExpressions()["StrLength"].SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllExpressions()["StrFind"].SetFunctionName("GDpriv::StringTools::StrFind").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllExpressions()["StrRFind"].SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllExpressions()["StrFindFrom"].SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllExpressions()["StrRFindFrom"].SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     #endif
 }
 

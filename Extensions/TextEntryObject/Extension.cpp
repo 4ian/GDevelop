@@ -35,10 +35,11 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    "",
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
+
         .AddParameter("object", GD_T("Object"), "TextEntry", false)
         .AddParameter("operator", GD_T("Modification's sign"))
         .AddParameter("string", GD_T("Text"))
-        .codeExtraInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("TextEntryObject/TextEntryObject.h");
+        .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
     obj.AddCondition("String",
                    GD_T("Text in memory"),
@@ -47,10 +48,11 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    "",
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
+
         .AddParameter("object", GD_T("Object"), "TextEntry", false)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("string", GD_T("Text to test"))
-        .codeExtraInformation.SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextEntryObject/TextEntryObject.h");
+        .SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
     obj.AddAction("Activate",
                    GD_T("De/activate capturing text input"),
@@ -59,9 +61,10 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
+
         .AddParameter("object", GD_T("Object"), "TextEntry", false)
         .AddParameter("yesorno", GD_T("Activate"))
-        .codeExtraInformation.SetFunctionName("Activate").SetIncludeFile("TextObject/TextObject.h");
+        .SetFunctionName("Activate").SetIncludeFile("TextObject/TextObject.h");
 
 
     obj.AddCondition("Activated",
@@ -71,12 +74,13 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
+
         .AddParameter("object", GD_T("Object"), "TextEntry", false)
-        .codeExtraInformation.SetFunctionName("IsActivated").SetIncludeFile("TextObject/TextObject.h");
+        .SetFunctionName("IsActivated").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddStrExpression("String", GD_T("Text entered with keyboard"), GD_T("Text entered with keyboard"), GD_T("Text entered with keyboard"), "res/texteicon.png")
         .AddParameter("object", GD_T("Object"), "TextEntry", false)
-        .codeExtraInformation.SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
+        .SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
     #endif
 }
 

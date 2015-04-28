@@ -186,7 +186,7 @@ void InitialPositionBrowserDlg::DeselectedInitialInstance(const gd::InitialInsta
 
 void InitialPositionBrowserDlg::OninitialPositionsListKeyDown(wxListEvent& event)
 {
-    if ( event.GetKeyCode() == WXK_DELETE )
+    if ( event.GetKeyCode() == WXK_DELETE || event.GetKeyCode() == WXK_BACK )
     {
         deletingInitialInstances = true;
         std::vector<InitialInstance*> instancesToDelete;

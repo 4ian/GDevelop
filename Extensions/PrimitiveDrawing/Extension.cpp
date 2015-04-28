@@ -35,12 +35,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Drawing"),
                    "res/actions/rectangle24.png",
                    "res/actions/rectangle.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("expression", GD_T("Top left side: X Position"))
         .AddParameter("expression", GD_T("Top left side : Y Position"))
         .AddParameter("expression", GD_T("Bottom right side : X Position"))
         .AddParameter("expression", GD_T("Bottom right side : Y Position"))
-        .codeExtraInformation.SetFunctionName("DrawRectangle").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("DrawRectangle").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("Circle",
                    GD_T("Circle"),
@@ -49,11 +51,13 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Drawing"),
                    "res/actions/circle24.png",
                    "res/actions/circle.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("expression", GD_T("X position of center"))
         .AddParameter("expression", GD_T("Y position of center"))
         .AddParameter("expression", GD_T("Radius ( in pixels )"))
-        .codeExtraInformation.SetFunctionName("DrawCircle").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("DrawCircle").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("Line",
                    GD_T("Line"),
@@ -62,13 +66,15 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Drawing"),
                    "res/actions/line24.png",
                    "res/actions/line.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("expression", GD_T("X Position of start point"))
         .AddParameter("expression", GD_T("Y Position of start point"))
         .AddParameter("expression", GD_T("X Position of end point"))
         .AddParameter("expression", GD_T("Y Position of end point"))
         .AddParameter("expression", GD_T("Thickness ( in pixels )"))
-        .codeExtraInformation.SetFunctionName("DrawLine").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("DrawLine").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("FillColor",
                    GD_T("Fill color"),
@@ -77,9 +83,11 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/actions/text24.png",
                    "res/actions/text.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("color", GD_T("Fill color"))
-        .codeExtraInformation.SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("OutlineColor",
                    GD_T("Outline color"),
@@ -88,9 +96,11 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("color", GD_T("Color"))
-        .codeExtraInformation.SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("OutlineSize",
                    GD_T("Outline size"),
@@ -99,10 +109,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/actions/outlineSize24.png",
                    "res/actions/outlineSize.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("operator", GD_T("Modification's sign"))
         .AddParameter("expression", GD_T("Size in pixels"))
-        .codeExtraInformation.SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetAssociatedGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddCondition("OutlineSize",
                    GD_T("Outline size"),
@@ -111,10 +123,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/conditions/outlineSize24.png",
                    "res/conditions/outlineSize.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("expression", GD_T("Size to test"))
-        .codeExtraInformation.SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("FillOpacity",
                    GD_T("Fill opacity"),
@@ -123,10 +137,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("operator", GD_T("Modification's sign"))
         .AddParameter("expression", GD_T("Value"))
-        .codeExtraInformation.SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetAssociatedGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
 
     obj.AddCondition("FillOpacity",
@@ -136,10 +152,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("expression", GD_T("Value to test"))
-        .codeExtraInformation.SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddAction("OutlineOpacity",
                    GD_T("Outline opacity"),
@@ -148,10 +166,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("operator", GD_T("Modification's sign"))
         .AddParameter("expression", GD_T("Value"))
-        .codeExtraInformation.SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetAssociatedGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
 
     obj.AddCondition("OutlineOpacity",
                    GD_T("Outline opacity"),
@@ -160,10 +180,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    GD_T("Setup"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
+
         .AddParameter("object", GD_T("Shape Painter object"), "Drawer", false)
         .AddParameter("relationalOperator", GD_T("Sign of the test"))
         .AddParameter("expression", GD_T("Value to test"))
-        .codeExtraInformation.SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+        .SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
     #endif
 }
 
@@ -199,7 +221,7 @@ public:
             .AddParameter("yesorno", GD_T("Should the copy take in account the source transparency\?"), "",false)
             .AddCodeOnlyParameter("currentScene", "")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+            .SetFunctionName("GDpriv::PrimitiveDrawingTools::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
 
         AddAction("CaptureScreen",
@@ -214,7 +236,7 @@ public:
             .AddParameter("string", GD_T("File where save capture"), "", true).SetDefaultValue("").CantUseUtf8()
             .AddParameter("string", GD_T("Name of the image where capture must be saved"), "", true).SetDefaultValue("")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CaptureScreen").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+            .SetFunctionName("GDpriv::PrimitiveDrawingTools::CaptureScreen").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
         AddAction("CreateSFMLTexture",
                        GD_T("Create an image in memory"),
@@ -230,7 +252,7 @@ public:
             .AddParameter("expression", GD_T("Height"), "", true)
             .AddParameter("color", GD_T("Initial color"), "", true).SetDefaultValue("0;0;0")
 
-            .codeExtraInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CreateSFMLTexture").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+            .SetFunctionName("GDpriv::PrimitiveDrawingTools::CreateSFMLTexture").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
         AddAction("OpenSFMLTextureFromFile",
                        GD_T("Open an image from a file"),
@@ -244,7 +266,7 @@ public:
             .AddParameter("file", GD_T("File")).CantUseUtf8()
             .AddParameter("string", GD_T("Name of the image"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::OpenSFMLTextureFromFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+            .SetFunctionName("GDpriv::PrimitiveDrawingTools::OpenSFMLTextureFromFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
         AddAction("SaveSFMLTextureToFile",
                        GD_T("Save an image to a file"),
@@ -258,7 +280,7 @@ public:
             .AddParameter("file", GD_T("File")).CantUseUtf8()
             .AddParameter("string", GD_T("Name of the image"))
 
-            .codeExtraInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+            .SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
         #endif
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

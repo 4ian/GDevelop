@@ -26,51 +26,53 @@ SpriteExtension::SpriteExtension()
     std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("Sprite");
     std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("Sprite");
 
-    objectActions["Opacity"].codeExtraInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeAnimation"].codeExtraInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeDirection"].codeExtraInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeSprite"].codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["PauseAnimation"].codeExtraInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["PlayAnimation"].codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["TourneVersPos"].codeExtraInformation.SetFunctionName("RotateTowardPosition").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeScale"].codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeScaleWidth"].codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeScaleHeight"].codeExtraInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["Opacity"].SetFunctionName("SetOpacity").SetGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeAnimation"].SetFunctionName("SetCurrentAnimation").SetGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeDirection"].SetFunctionName("SetDirection").SetGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeSprite"].SetFunctionName("SetSprite").SetGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["PauseAnimation"].SetFunctionName("StopAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["PlayAnimation"].SetFunctionName("PlayAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeAnimationSpeedScale"].SetFunctionName("SetAnimationSpeedScale").SetGetter("GetAnimationSpeedScale").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["TourneVersPos"].SetFunctionName("RotateTowardPosition").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeScale"].SetFunctionName("ChangeScale").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeScaleWidth"].SetFunctionName("SetScaleX").SetGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeScaleHeight"].SetFunctionName("SetScaleY").SetGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
-    objectConditions["Animation"].codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["Direction"].codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["Sprite"].codeExtraInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["AnimStopped"].codeExtraInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["AnimationEnded"].codeExtraInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["ScaleWidth"].codeExtraInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["ScaleHeight"].codeExtraInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["Opacity"].codeExtraInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["BlendMode"].codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["Animation"].SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["Direction"].SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["Sprite"].SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["AnimStopped"].SetFunctionName("IsAnimationStopped").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["AnimationEnded"].SetFunctionName("AnimationEnded").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["ScaleWidth"].SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["ScaleHeight"].SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["Opacity"].SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["BlendMode"].SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
-    objectActions["CopyImageOnImageOfSprite"].codeExtraInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["CreateMaskFromColorOnActualImage"].codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeColor"].codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["ChangeBlendMode"].codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["CopyImageOnImageOfSprite"].SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["CreateMaskFromColorOnActualImage"].SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeColor"].SetFunctionName("SetColor").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["ChangeBlendMode"].SetFunctionName("SetBlendMode").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
-    objectActions["FlipX"].codeExtraInformation.SetFunctionName("FlipX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectActions["FlipY"].codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["FlippedX"].codeExtraInformation.SetFunctionName("IsFlippedX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectConditions["FlippedY"].codeExtraInformation.SetFunctionName("IsFlippedY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["FlipX"].SetFunctionName("FlipX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectActions["FlipY"].SetFunctionName("FlipY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["FlippedX"].SetFunctionName("IsFlippedX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectConditions["FlippedY"].SetFunctionName("IsFlippedY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
-    objectActions["TourneVers"].codeExtraInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
+    objectActions["TourneVers"].SetFunctionName("TurnTowardObject").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
 
-    objectExpressions["X"].codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["Y"].codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["PointX"].codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["PointY"].codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["Direc"].codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["Direction"].codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["Anim"].codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["Animation"].codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["Sprite"].codeExtraInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["ScaleX"].codeExtraInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
-    objectExpressions["ScaleY"].codeExtraInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["X"].SetFunctionName("GetPointX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["Y"].SetFunctionName("GetPointY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["PointX"].SetFunctionName("GetPointX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["PointY"].SetFunctionName("GetPointY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["Direc"].SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["Direction"].SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["Anim"].SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["Animation"].SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["Sprite"].SetFunctionName("GetSpriteNb").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["AnimationSpeedScale"].SetFunctionName("GetAnimationSpeedScale").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["ScaleX"].SetFunctionName("GetScaleX").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+    objectExpressions["ScaleY"].SetFunctionName("GetScaleY").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
-    GetAllConditions()["Collision"].codeExtraInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
+    GetAllConditions()["Collision"].SetFunctionName("SpriteCollision").SetIncludeFile("GDCpp/BuiltinExtensions/SpriteTools.h");
     #endif
 }

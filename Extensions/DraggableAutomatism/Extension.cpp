@@ -38,9 +38,11 @@ void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
                    "",
                    "CppPlatform/Extensions/draggableicon24.png",
                    "CppPlatform/Extensions/draggableicon16.png")
+
         .AddParameter("object", GD_T("Object"))
         .AddParameter("automatism", GD_T("Automatism"), "Draggable", false)
-        .codeExtraInformation.SetFunctionName("IsDragged").SetIncludeFile("DraggableAutomatism/DraggableAutomatism.h");
+
+        .SetFunctionName("IsDragged").SetIncludeFile("DraggableAutomatism/DraggableAutomatism.h");
     #endif
 
 }

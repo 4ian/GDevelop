@@ -404,7 +404,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     else
     {
         if( !metadata.canUseUtf8 )
-            argOutput = "utf8::ToLocaleString("; //Add the conversion function for string parameters which doesn't support UTF8
+            argOutput = "gd::utf8::ToLocaleString("; //Add the conversion function for string parameters which doesn't support UTF8
 
         argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, previousParameter, supplementaryParametersTypes);
 

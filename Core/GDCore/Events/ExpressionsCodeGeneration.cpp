@@ -76,7 +76,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     }
 
     if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += "utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
+        plainExpression += "gd::utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
 
     plainExpression += expressionInfo.codeExtraInformation.functionCallName+"("+parametersStr+")";
 
@@ -122,7 +122,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     }
 
     if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += "utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
+        plainExpression += "gd::utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
 
     plainExpression += output;
 
@@ -169,7 +169,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     }
 
     if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += "utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
+        plainExpression += "gd::utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
 
     plainExpression += output;
 

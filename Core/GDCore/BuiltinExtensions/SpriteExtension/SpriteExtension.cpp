@@ -108,16 +108,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .MarkAsSimple();
 
     obj.AddAction("ChangeAnimationSpeedScale",
-                   _("Animation speed scale"),
-                   _("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
-                   _("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
-                   _("Animations and images"),
+                   GD_T("Animation speed scale"),
+                   GD_T("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
+                   GD_T("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
+                   GD_T("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", _("Object"), "Sprite", false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("object", GD_T("Object"), "Sprite", false)
+        .AddParameter("operator", GD_T("Modification's sign"), "",false)
+        .AddParameter("expression", GD_T("Value"), "",false)
         .MarkAsSimple()
         .SetManipulatedType("number");
 

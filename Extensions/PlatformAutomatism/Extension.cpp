@@ -257,7 +257,7 @@ void DeclarePlatformAutomatismExtension(gd::PlatformExtension & extension)
             .AddParameter("automatism", GD_T("Automatism"), "PlatformerObjectAutomatism")
             .AddParameter("operator", GD_T("Modification's sign"))
             .AddParameter("expression", GD_T("Value"))
-            .SetFunctionName("SetJumpSpeed").SetManipulatedType("number").SetAssociatedGetter("GetJumpSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
+            .SetFunctionName("SetJumpSpeed").SetManipulatedType("number").SetGetter("GetJumpSpeed").SetIncludeFile("PlatformAutomatism/PlatformerObjectAutomatism.h");
 
         aut.AddAction("SetCanJump",
                        GD_T("Allow again jumping"),

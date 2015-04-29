@@ -1,10 +1,14 @@
+/**
+ * Common tests for gdjs game engine.
+ * See README.md for more information.
+ */
 describe('gdjs', function() {
 	it('should define gdjs', function() {
 		expect(gdjs).to.be.ok();
 	});
 });
 
-describe('gdjs.evtTools.object.TwoListsTest', function() {
+describe('gdjs.evtTools.object.twoListsTest', function() {
 	it('should properly pick objects', function(){
 		var map1 = new Hashtable();
 		var map2 = new Hashtable();
@@ -22,16 +26,16 @@ describe('gdjs.evtTools.object.TwoListsTest', function() {
 		map1.put("obj1", list1);
 		map2.put("obj2", list2);
 
-		expect(gdjs.evtTools.object.TwoListsTest(function() {return true;}, map1, map2, false)).to.be.ok();
-		expect(gdjs.evtTools.object.TwoListsTest(function() {return false;}, map1, map2, true)).to.be.ok();
+		expect(gdjs.evtTools.object.twoListsTest(function() {return true;}, map1, map2, false)).to.be.ok();
+		expect(gdjs.evtTools.object.twoListsTest(function() {return false;}, map1, map2, true)).to.be.ok();
 		expect(list1).to.have.length(3);
 		expect(list2).to.have.length(3);
 
-		expect(gdjs.evtTools.object.TwoListsTest(function(obj1, obj2) {return obj1 === obj1B && obj2 === obj2C;}, map1, map2, true)).to.be.ok();
+		expect(gdjs.evtTools.object.twoListsTest(function(obj1, obj2) {return obj1 === obj1B && obj2 === obj2C;}, map1, map2, true)).to.be.ok();
 		expect(list1).to.have.length(2); //obj1B should have been filtered out.
 		expect(list2).to.have.length(3); //but not obj2C
 
-		expect(gdjs.evtTools.object.TwoListsTest(function(obj1, obj2) {return obj1 === obj1A && obj2 === obj2C;}, map1, map2, false)).to.be.ok();
+		expect(gdjs.evtTools.object.twoListsTest(function(obj1, obj2) {return obj1 === obj1A && obj2 === obj2C;}, map1, map2, false)).to.be.ok();
 		expect(list1).to.have.length(1); //All objects but obj1A and obj2C
 		expect(list2).to.have.length(1); //should have been filtered out
 		expect(list1[0]).to.be(obj1A);
@@ -39,7 +43,7 @@ describe('gdjs.evtTools.object.TwoListsTest', function() {
 	});
 });
 
-describe('gdjs.evtTools.object.PickObjectsIf', function() {
+describe('gdjs.evtTools.object.pickObjectsIf', function() {
 	it('should properly pick objects', function(){
 		var map1 = new Hashtable();
 
@@ -51,116 +55,68 @@ describe('gdjs.evtTools.object.PickObjectsIf', function() {
 		var list1 = [obj1A, obj1B, obj1C];
 		map1.put("obj1", list1);
 
-		expect(gdjs.evtTools.object.PickObjectsIf(function() {return true;}, map1, false)).to.be.ok();
-		expect(gdjs.evtTools.object.PickObjectsIf(function() {return false;}, map1, true)).to.be.ok();
+		expect(gdjs.evtTools.object.pickObjectsIf(function() {return true;}, map1, false)).to.be.ok();
+		expect(gdjs.evtTools.object.pickObjectsIf(function() {return false;}, map1, true)).to.be.ok();
 		expect(list1).to.have.length(3);
 
-		expect(gdjs.evtTools.object.PickObjectsIf(function(obj) {return obj == obj1A || obj == obj1C;}, map1, false)).to.be.ok();
+		expect(gdjs.evtTools.object.pickObjectsIf(function(obj) {return obj == obj1A || obj == obj1C;}, map1, false)).to.be.ok();
 		expect(list1).to.have.length(2);
 
-		expect(gdjs.evtTools.object.PickObjectsIf(function(obj) {return obj == obj1C;}, map1, true)).to.be.ok();
+		expect(gdjs.evtTools.object.pickObjectsIf(function(obj) {return obj == obj1C;}, map1, true)).to.be.ok();
 		expect(list1).to.have.length(1);
 		expect(list1[0]).to.be(obj1A);
 	});
 });
 
-describe('gdjs.InputManager', function() {
-	var inputManager = new gdjs.InputManager();
+describe('gdjs.evtTools.object.pickRandomObject', function() {
+	it('should pick only one object', function(){
+		var map1 = new Hashtable();
 
-	it('should handle keyboards events', function(){
-		expect(inputManager.anyKeyPressed()).to.be(false);
+		var runtimeScene = new gdjs.RuntimeScene(null, null);
+		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
 
-		inputManager.onKeyPressed(32);
-		expect(inputManager.getLastPressedKey()).to.be(32);
-		inputManager.onKeyPressed(33);
-		expect(inputManager.getLastPressedKey()).to.be(33);
-		expect(inputManager.isKeyPressed(32)).to.be(true);
-		expect(inputManager.isKeyPressed(30)).to.be(false);
-		inputManager.onKeyReleased(32);
-		expect(inputManager.isKeyPressed(32)).to.be(false);
+		var list1 = [obj1A, obj1B, obj1C];
+		map1.put("obj1", list1);
 
-		expect(inputManager.anyKeyPressed()).to.be(true);
-	});
+		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.be.ok();
+		expect(list1).to.have.length(1);
+		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.be.ok();
+		expect(list1).to.have.length(1);
 
-	it('should handle mouse events', function(){
-		inputManager.onMouseMove(500, 600);
-		expect(inputManager.getMouseX()).to.be(500);
-		expect(inputManager.getMouseY()).to.be(600);
-
-		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
-		inputManager.onMouseButtonPressed(0);
-		expect(inputManager.isMouseButtonPressed(0)).to.be(true);
-	});
-
-	it('should handle touch events', function(){
-		inputManager.onTouchStart(46, 510, 610);
-		inputManager.onTouchStart(10, 510, 610);
-		expect(inputManager.getStartedTouchIdentifiers()).to.have.length(2);
-		expect(inputManager.getTouchX(46)).to.be(510);
-		expect(inputManager.getTouchY(46)).to.be(610);
-
-		expect(inputManager.popStartedTouch()).to.be(46);
-		expect(inputManager.popStartedTouch()).to.be(10);
-		expect(inputManager.popEndedTouch()).to.be(undefined);
-
-		inputManager.onFrameEnded();
-		inputManager.onTouchEnd(10);
-		expect(inputManager.getStartedTouchIdentifiers()).to.have.length(0);
-		expect(inputManager.popStartedTouch()).to.be(undefined);
-		expect(inputManager.popEndedTouch()).to.be(10);
-	});
-	it('should simulate (or not) mouse events', function(){
-		inputManager.touchSimulateMouse();
-		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
-		inputManager.onTouchStart(46, 510, 610);
-		expect(inputManager.isMouseButtonPressed(0)).to.be(true);
-		expect(inputManager.getMouseX()).to.be(510);
-		expect(inputManager.getMouseY()).to.be(610);
-		inputManager.onTouchMove(46, 520, 620);
-		expect(inputManager.getMouseX()).to.be(520);
-		expect(inputManager.getMouseY()).to.be(620);
-		inputManager.onTouchEnd(46);
-		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
-
-		inputManager.touchSimulateMouse(false);
-		inputManager.onTouchStart(46, 510, 610);
-		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
-		expect(inputManager.getMouseX()).to.be(520);
-		expect(inputManager.getMouseY()).to.be(620);
+		list1.length = 0;
+		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.not.be.ok();
 	});
 });
 
+describe('gdjs.evtTools.object.pickNearestObject', function() {
+	var map1 = new Hashtable();
 
-describe('gdjs.RuntimeObject.cursorOnObject', function() {
-	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
-	var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
-	runtimeScene.loadFromScene({
-		layers:[{name:"", visibility: true}],
-		variables: [],
-		automatismsSharedData: [],
-		objects: [],
-		instances: []
+	var runtimeScene = new gdjs.RuntimeScene(null, null);
+	var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	obj1A.setPosition(50, 50);
+	obj1B.setPosition(160, 160);
+	obj1C.setPosition(100, 300);
+
+	it('should pick nearest object', function(){
+		var list1 = [obj1A, obj1B, obj1C];
+		map1.put("obj1", list1);
+
+		expect(gdjs.evtTools.object.pickNearestObject(map1, 100, 90, false)).to.be(true);
+		expect(list1).to.have.length(1);
+		expect(list1[0]).to.be(obj1A);
 	});
 
-	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-	object.setPosition(450, 500);
+	it('should pick furthest object when inverted', function(){
+		var list1 = [obj1A, obj1B, obj1C];
+		map1.put("obj1", list1);
 
-	it('should handle mouse', function() {
-		runtimeGame.getInputManager().onMouseMove(100, 100);
-		expect(object.cursorOnObject(runtimeScene)).to.be(false);
-		runtimeGame.getInputManager().onMouseMove(450, 500);
-		expect(object.cursorOnObject(runtimeScene)).to.be(true);
-	});
-
-	it('should handle touch', function() {
-		runtimeGame.getInputManager().onMouseMove(0, 0);
-		runtimeGame.getInputManager().touchSimulateMouse(false);
-
-		runtimeGame.getInputManager().onTouchStart(0, 100, 100);
-		expect(object.cursorOnObject(runtimeScene)).to.be(false);
-		runtimeGame.getInputManager().onTouchStart(1, 450, 500);
-		expect(object.cursorOnObject(runtimeScene)).to.be(true);
-		runtimeGame.getInputManager().onTouchEnd(1);
-		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		expect(gdjs.evtTools.object.pickNearestObject(map1, 100, 90, true)).to.be(true);
+		expect(list1).to.have.length(1);
+		expect(list1[0]).to.be(obj1C);
 	});
 });
+

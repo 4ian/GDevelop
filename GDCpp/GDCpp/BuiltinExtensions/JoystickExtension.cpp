@@ -15,12 +15,12 @@ JoystickExtension::JoystickExtension()
 
 
     #if defined(GD_IDE_ONLY)
-    GetAllConditions()["JoystickButtonDown"].codeExtraInformation.SetFunctionName("JoystickButtonDown").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
-    GetAllConditions()["JoystickAxis"].codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+    GetAllConditions()["JoystickButtonDown"].SetFunctionName("JoystickButtonDown").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+    GetAllConditions()["JoystickAxis"].SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
-    GetAllActions()["GetJoystickAxis"].codeExtraInformation.SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+    GetAllActions()["GetJoystickAxis"].SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
-    GetAllExpressions()["GetJoystickAxis"].codeExtraInformation.SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
+    GetAllExpressions()["GetJoystickAxis"].SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
     #endif
 }
 

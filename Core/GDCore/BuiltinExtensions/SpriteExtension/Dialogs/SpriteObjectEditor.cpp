@@ -589,6 +589,7 @@ wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resourc
 
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
+        	wxLogNull noLogPlease;
             wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
             return bmp;
         }
@@ -931,7 +932,7 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
                 animationsMenu.Enable(ID_MENULOOP, true);
                 animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, true);
                 animationsMenu.Check(ID_MENULOOP, direction.IsLooping());
-                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images:")+ToString(direction.GetTimeBetweenFrames())+_("s"));
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images: ")+ToString(direction.GetTimeBetweenFrames())+_("s"));
             }
         }
     }
@@ -1725,6 +1726,7 @@ void SpriteObjectEditor::OnimagesListKeyDown(wxListEvent& event)
             OnMoveRightSelected(useless);
             break;
         }
+        case WXK_BACK:
         case WXK_DELETE:
         {
             wxCommandEvent useless;
@@ -1749,7 +1751,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
         {
             wxArrayString files;
             FileDialog.GetPaths(files);
-            files.Sort(true); //Ensure that the order of insertion is alphabetical.
+            files.Sort(); //Ensure that the order of insertion is alphabetical.
 
             std::vector < std::string > filenames;
             for ( unsigned int i = 0; i < files.GetCount();++i )

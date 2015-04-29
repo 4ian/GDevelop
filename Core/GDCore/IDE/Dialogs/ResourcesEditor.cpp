@@ -944,17 +944,14 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
-    std::cout << "hello" << std::endl;
     std::vector<std::string> unusedImages =
         gd::ProjectResourcesAdder::GetAllUselessResources(project);
-        std::cout << unusedImages.size()<< std::endl;
 
     //Construct corresponding wxArrayString with unused images
     wxArrayString imagesNotUsed;
     wxArrayInt initialSelection;
     for ( unsigned int i = 0;i < unusedImages.size() ;i++ )
     {
-        std::cout << unusedImages[i]<< std::endl;
         imagesNotUsed.push_back(unusedImages[i]);
         initialSelection.push_back(imagesNotUsed.size()-1);
     }
@@ -999,6 +996,12 @@ void ResourcesEditor::OnresourcesTreeItemActivated(wxTreeEvent& event)
 
     AuiManager1->GetPane(propertiesPanel).Show();
     AuiManager1->Update();
+
+    #if !defined(WINDOWS) //MacOS and wxGTK needs additional tweaks
+    AuiManager1->GetPane(propertiesPanel).Dock().Bottom(); //Ensure panel is docked otherwise it can't get focus.
+    AuiManager1->Update();
+    toolbar->Realize(); //Toolbar is emptied if not realized again after calling Update.
+    #endif
 }
 
 /**

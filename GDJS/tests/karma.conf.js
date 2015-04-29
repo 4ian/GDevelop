@@ -39,6 +39,8 @@ module.exports = function(config) {
 
       //Extensions:
       '../../Extensions/DraggableAutomatism/draggableruntimeautomatism.js',
+      '../../Extensions/PlatformAutomatism/platformerobjectruntimeautomatism.js',
+      '../../Extensions/PlatformAutomatism/platformruntimeautomatism.js',
 
       //All tests files:
       '../../Extensions/**/tests/**.spec.js',

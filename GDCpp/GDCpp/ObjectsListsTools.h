@@ -15,6 +15,14 @@
 typedef std::map <std::string, std::vector<RuntimeObject*> *> RuntimeObjectsLists;
 
 /**
+ * \brief Keep only the specified object in the lists of picked objects.
+ * \param objectsLists The lists of objects to trim
+ * \param thisOne The object to keep in the lists
+ * \ingroup GameEngine
+ */
+void GD_API PickOnly(RuntimeObjectsLists & pickedObjectsLists, RuntimeObject * thisOne);
+
+/**
  * \brief Filter objects to keep only the one that fullfil the predicate
  *
  * Objects that do not fullfil the predicate are removed from objects lists.

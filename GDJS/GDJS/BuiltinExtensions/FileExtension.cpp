@@ -24,25 +24,25 @@ FileExtension::FileExtension()
                           "Open source (MIT License)");
 
     GetAllActions()["LoadFile"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.loadJSONFileFromStorage");
+        .SetFunctionName("gdjs.evtTools.storage.loadJSONFileFromStorage");
     GetAllConditions()["GroupExists"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.elementExistsInJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.elementExistsInJSONFile");
     GetAllActions()["UnloadFile"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.unloadJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.unloadJSONFile");
     GetAllActions()["EcrireFichierExp"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.writeNumberInJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.writeNumberInJSONFile");
     GetAllActions()["EcrireFichierTxt"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.writeStringInJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.writeStringInJSONFile");
     GetAllActions()["LireFichierExp"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.readNumberFromJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.readNumberFromJSONFile");
     GetAllActions()["LireFichierTxt"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.readStringFromJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.readStringFromJSONFile");
     GetAllActions()["DeleteGroupFichier"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.deleteElementFromJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.deleteElementFromJSONFile");
     GetAllActions()["DeleteFichier"].SetGroup(_("Storage"))
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.storage.clearJSONFile");
+        .SetFunctionName("gdjs.evtTools.storage.clearJSONFile");
     GetAllActions()["LaunchFile"]
-        .codeExtraInformation.SetFunctionName("gdjs.evtTools.window.openURL");
+        .SetFunctionName("gdjs.evtTools.window.openURL");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
     /*
@@ -54,7 +54,7 @@ FileExtension::FileExtension()
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
-        .codeExtraInformation.SetFunctionName("FileExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
+        .SetFunctionName("FileExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
     AddAction("ExecuteCmd",
                    _("Execute a command"),
@@ -64,7 +64,7 @@ FileExtension::FileExtension()
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
         .AddParameter("string", _("Command"), "",false)
-        .codeExtraInformation.SetFunctionName("ExecuteCmd").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
+        .SetFunctionName("ExecuteCmd").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
     */
 }
 

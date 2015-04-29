@@ -57,7 +57,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetStatic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetStatic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetDynamic",
                            _("Make the object dynamic"),
@@ -69,7 +69,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("IsDynamic",
                            _("The object is dynamic"),
@@ -80,7 +80,7 @@ public:
                            "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
-                .codeExtraInformation.SetFunctionName("IsDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("IsDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetFixedRotation",
                            _("Fix rotation"),
@@ -92,7 +92,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("AddRevoluteJoint",
                            _("Add a hinge"),
@@ -106,7 +106,7 @@ public:
                 .AddParameter("expression", _("Hinge X position"))
                 .AddParameter("expression", _("Hinge Y position"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("AddRevoluteJoint").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("AddRevoluteJoint").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("AddRevoluteJointBetweenObjects",
                            _("Add a hinge between two objects"),
@@ -121,7 +121,7 @@ public:
                 .AddCodeOnlyParameter("currentScene", "")
                 .AddParameter("expression", _("X position of the hinge, from the first object mass center"), "", true).SetDefaultValue("0")
                 .AddParameter("expression", _("Y position of the hinge, from the first object mass center"), "", true).SetDefaultValue("0")
-                .codeExtraInformation.SetFunctionName("AddRevoluteJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("AddRevoluteJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ActAddGearJointBetweenObjects",
                            _("Add a gear between two objects"),
@@ -135,7 +135,7 @@ public:
                 .AddParameter("objectPtr", _("Object"))
                 .AddParameter("expression", _("Ratio"), "", true).SetDefaultValue("1")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("AddGearJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("AddGearJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetFreeRotation",
                            _("Make object's rotation free"),
@@ -147,7 +147,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetFreeRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetFreeRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("IsFixedRotation",
                            _("Fixed rotation"),
@@ -159,7 +159,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("IsFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("IsFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetAsBullet",
                            _("Consider as a bullet."),
@@ -171,7 +171,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("DontSetAsBullet",
                            _("Do not consider as a bullet"),
@@ -183,7 +183,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("DontSetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("DontSetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("IsBullet",
                            _("Object is considered as a bullet"),
@@ -195,7 +195,7 @@ public:
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("IsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("IsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyImpulse",
                            _("Apply an impulse"),
@@ -209,7 +209,7 @@ public:
                 .AddParameter("expression", _("X component ( Newtons/Seconds )"))
                 .AddParameter("expression", _("Y component ( Newtons/Seconds )"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyImpulse").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyImpulse").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyImpulseUsingPolarCoordinates",
                            _("Apply an impulse (angle)"),
@@ -223,7 +223,7 @@ public:
                 .AddParameter("expression", _("Angle"))
                 .AddParameter("expression", _("Impulse value ( Newton/seconds )"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyImpulseUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyImpulseUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyImpulseTowardPosition",
                            _("Apply an impulse toward a position"),
@@ -238,7 +238,7 @@ public:
                 .AddParameter("expression", _("Y position"))
                 .AddParameter("expression", _("Impulse value ( Newton/seconds )"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyImpulseTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyImpulseTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyForce",
                            _("Add a force"),
@@ -252,7 +252,7 @@ public:
                 .AddParameter("expression", _("X component ( Newtons )"))
                 .AddParameter("expression", _("Y component ( Newtons )"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyForce").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyForce").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyForceUsingPolarCoordinates",
                            _("Apply a force ( angle )"),
@@ -266,7 +266,7 @@ public:
                 .AddParameter("expression", _("Angle"))
                 .AddParameter("expression", _("Length of the force ( Newtons )"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyForceUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyForceUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyForceTowardPosition",
                            _("Apply a force toward a position"),
@@ -281,7 +281,7 @@ public:
                 .AddParameter("expression", _("Y position"))
                 .AddParameter("expression", _("Length of the force ( Newtons )"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyForceTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyForceTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyTorque",
                            _("Add a torque (a rotation)"),
@@ -294,7 +294,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Torque value"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("ApplyTorque").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("ApplyTorque").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetLinearVelocity",
                            _("Linear velocity"),
@@ -308,7 +308,7 @@ public:
                 .AddParameter("expression", _("X Coordinate"))
                 .AddParameter("expression", _("Y Coordinate"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearVelocityX",
                            _("X component"),
@@ -322,7 +322,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearVelocityX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearVelocityX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearVelocityY",
                            _("Y component"),
@@ -336,7 +336,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearVelocityY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearVelocityY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearVelocity",
                            _("Linear speed"),
@@ -350,7 +350,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetAngularVelocity",
                            _("Angular speed"),
@@ -363,7 +363,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("New value"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("AngularVelocity",
                            _("Angular speed"),
@@ -377,7 +377,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetAngularVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetAngularVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearDamping",
                            _("Linear damping"),
@@ -391,7 +391,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("CollisionWith",
                            _("Collision"),
@@ -404,7 +404,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("objectList", _("Object"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("CollisionWith").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("CollisionWith").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetLinearDamping",
                            _("Linear damping"),
@@ -417,7 +417,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Value"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("AngularDamping",
                            _("Angular damping"),
@@ -431,7 +431,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetAngularDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetAngularDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetAngularDamping",
                            _("Angular damping"),
@@ -444,7 +444,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Value"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetGravity",
                            _("Gravity"),
@@ -458,7 +458,7 @@ public:
                 .AddParameter("expression", _("X Coordinate"))
                 .AddParameter("expression", _("Y Coordinate"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetGravity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetGravity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetPolygonScaleX",
                            _("Change collision polygon X scale"),
@@ -471,7 +471,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Scale"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetPolygonScaleY",
                            _("Change collision polygon Y scale"),
@@ -484,7 +484,7 @@ public:
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddParameter("expression", _("Scale"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleX",
                            _("Collision polygon X scale"),
@@ -498,7 +498,7 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleY",
                            _("Collision polygon Y scale"),
@@ -512,55 +512,55 @@ public:
                 .AddParameter("relationalOperator", _("Comparison sign"))
                 .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("PolygonScaleX", _("Collision polygon X scale"), _("Collision polygon X scale"), _("Collision polygon"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("PolygonScaleY", _("Collision polygon Y scale"), _("Collision polygon Y scale"), _("Collision polygon"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("LinearVelocity", _("Linear speed"), _("Linear speed"), _("Displacement"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("LinearVelocityX", _("X component"), _("X component"), _("Displacement"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearVelocityX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearVelocityX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("LinearVelocityY", _("Y component"), _("Y component"), _("Displacement"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearVelocityY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearVelocityY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("AngularVelocity", _("Angular speed"), _("Angular speed"), _("Rotation"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("LinearDamping", _("Linear damping"), _("Linear damping"), _("Displacement"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddExpression("AngularDamping", _("Angular damping"), _("Angular damping"), _("Rotation"), "res/physics16.png")
                 .AddParameter("object", _("Object"))
                 .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
-                .codeExtraInformation.SetFunctionName("GetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+                .SetFunctionName("GetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             #endif
 

@@ -25,19 +25,13 @@ SceneExtension::SceneExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllExpressions()["Random"].codeExtraInformation
-        .SetFunctionName("gdjs.random");
-    GetAllStrExpressions()["CurrentSceneName"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.getSceneName");
+    GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
+    GetAllStrExpressions()["CurrentSceneName"].SetFunctionName("gdjs.evtTools.runtimeScene.getSceneName");
 
-    GetAllConditions()["DepartScene"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.sceneJustBegins");
-    GetAllActions()["SceneBackground"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.setBackgroundColor");
-    GetAllActions()["Scene"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.changeScene");
-    GetAllActions()["Quit"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.stopGame");
+    GetAllConditions()["DepartScene"].SetFunctionName("gdjs.evtTools.runtimeScene.sceneJustBegins");
+    GetAllActions()["SceneBackground"].SetFunctionName("gdjs.evtTools.runtimeScene.setBackgroundColor");
+    GetAllActions()["Scene"].SetFunctionName("gdjs.evtTools.runtimeScene.changeScene");
+    GetAllActions()["Quit"].SetFunctionName("gdjs.evtTools.runtimeScene.stopGame");
 
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
@@ -94,7 +88,7 @@ SceneExtension::SceneExtension()
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("yesorno", _("Deactivate input when focus is lost"))
-        .codeExtraInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+        .SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
         */
 
 }

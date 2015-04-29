@@ -180,6 +180,11 @@ sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 \endcode
  *
+ * If you want to package the app, you can also install:
+\code
+sudo apt-get install devscripts
+\endcode
+ *
  * \subsection wxWidgets Install wxWidgets development libraries
  *
  * Most distributions have wxWidgets 3 development libraries available: install them using your package manager. On Ubuntu:
@@ -197,39 +202,39 @@ sudo apt-get install libgtk2.0-dev
  * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
  */
 
- /**
-  *  \page installMacOSTools (Mac OS X) Install development tools
-  *
-  * Make sure that you have Apple Developer Tools installed (if you have Xcode and git, that should be the case).
-  *
-  * \section installTools Install development tools
-  *
-  * The simplest way of installing dependencies required by GDevelop is to use [Homebrew](http://brew.sh/). Install it
-  * and install these packages, using the terminal:
+/**
+ *  \page installMacOSTools (Mac OS X) Install development tools
+ *
+ * Make sure that you have Apple Developer Tools installed (if you have Xcode and git, that should be the case).
+ *
+ * \section installTools Install development tools
+ *
+ * The simplest way of installing dependencies required by GDevelop is to use [Homebrew](http://brew.sh/). Install it
+ * and install these packages, using the terminal:
 \code
 brew install cmake
 brew install p7zip
 brew install pkgconfig
 brew install wxwidgets
 \endcode
-  * If you want to generate the documentation and translations, install Doxygen and Gettext:
+ * If you want to generate the documentation and translations, install Doxygen and Gettext:
 \code
 brew install doxygen
 brew install gettext
 \endcode
-  *
-  * \section launchCompilation Launch compilation
-  *
-  * You should be able to compile GD using CMake. Go with a terminal to the GD source folder:
+ *
+ * \section launchCompilation Launch compilation
+ *
+ * You should be able to compile GD using CMake. Go with a terminal to the GD source folder:
 \code
 cd /path/to/GD
 mkdir build && cd build
 cmake ../..
 make -j4
 \endcode
-  *
-  * More information about compilation here: \ref installAndUseCMake
-  */
+ *
+ * More information about compilation here: \ref installAndUseCMake
+ */
 
 
 /**
@@ -443,7 +448,7 @@ Actions are declared like this :
                            "path-to-an-16-by-16-icon-file.png")
                 .AddParameter("theTypeOfTheParameter", _("Parameter1"))
                 .AddParameter("theTypeOfTheParameter", _("Parameter2"))
-                .codeExtraInformation.SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
+                .SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
 
  * \endcode
  * Declare conditions and expressions in a similar way.<br>
@@ -453,7 +458,7 @@ Actions are declared like this :
  * You can either do it after declaring the function, or later using this syntax:
  *
  * \code
-        GetAllActions()["ExtensionName::ActionName"].codeExtraInformation.SetFunctionName("MyFunctionName");
+        GetAllActions()["ExtensionName::ActionName"].SetFunctionName("MyFunctionName");
  * \endcode
  *
  * Both methods are ok, but the latest allows to use the same code to declare an extension for the C++ and JS platform,

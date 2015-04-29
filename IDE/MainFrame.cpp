@@ -286,6 +286,10 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonHelpBtClick );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_TOGGLED, ( wxObjectEventFunction )&MainFrame::OnRibbonToggleBtClick );
 
+    #ifdef GD_NO_UPDATE_CHECKER //Remove the menu item to check for updates
+    helpMenu.Delete(MenuItem21); //(useful when GD is distributed on a system managing updates by itself).
+    #endif
+
     //Update the file menu with exporting items
     for (unsigned int i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
     {

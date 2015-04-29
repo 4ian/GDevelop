@@ -406,33 +406,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 std::string outputCode;
                 gd::ForEachEvent & event = dynamic_cast<gd::ForEachEvent&>(event_);
 
-                const gd::Project & game = codeGenerator.GetProject();
-                const gd::Layout & scene = codeGenerator.GetLayout();
-
-                std::string objectToPick = event.GetObjectToPick();
-
-                vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPick));
-                vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPick));
-
-                std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-                if ( globalGroup != game.GetObjectGroups().end() )
-                    realObjects = (*globalGroup).GetAllObjectsNames();
-                else if ( sceneGroup != scene.GetObjectGroups().end() )
-                    realObjects = (*sceneGroup).GetAllObjectsNames();
-                else
-                    realObjects.push_back(objectToPick);
-
-                //Ensure that all returned objects actually exists.
-                for (unsigned int i = 0; i < realObjects.size();)
-                {
-                    if ( !codeGenerator.GetLayout().HasObjectNamed(realObjects[i]) && !codeGenerator.GetProject().HasObjectNamed(realObjects[i]) )
-                        realObjects.erase(realObjects.begin()+i);
-                    else
-                        ++i;
-                }
-
+                std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(
+                    event.GetObjectToPick(), parentContext);
+                
                 if ( realObjects.empty() ) return "";
-
                 for (unsigned int i = 0;i<realObjects.size();++i)
                     parentContext.ObjectsListNeeded(realObjects[i]);
 

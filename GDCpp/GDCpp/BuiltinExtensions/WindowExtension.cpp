@@ -20,19 +20,19 @@ WindowExtension::WindowExtension()
 
     #if defined(GD_IDE_ONLY)
 
-    GetAllActions()["EcrireTexte"].codeExtraInformation.SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["SetFullScreen"].codeExtraInformation.SetFunctionName("SetFullScreen").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["SetWindowSize"].codeExtraInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["SetWindowIcon"].codeExtraInformation.SetFunctionName("SetWindowIcon").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["SetWindowTitle"].codeExtraInformation.SetFunctionName("SetWindowTitle").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["EcrireTexte"].SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["SetFullScreen"].SetFunctionName("SetFullScreen").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["SetWindowSize"].SetFunctionName("SetWindowSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["SetWindowIcon"].SetFunctionName("SetWindowIcon").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["SetWindowTitle"].SetFunctionName("SetWindowTitle").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllExpressions()["SceneWindowWidth"].codeExtraInformation.SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllExpressions()["SceneWindowHeight"].codeExtraInformation.SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllExpressions()["ScreenWidth"].codeExtraInformation.SetFunctionName("GetScreenWidth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllExpressions()["ScreenHeight"].codeExtraInformation.SetFunctionName("GetScreenHeight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllExpressions()["ColorDepth"].codeExtraInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["SceneWindowWidth"].SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["SceneWindowHeight"].SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["ScreenWidth"].SetFunctionName("GetScreenWidth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["ScreenHeight"].SetFunctionName("GetScreenHeight").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllExpressions()["ColorDepth"].SetFunctionName("GetColorDepth").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
-    GetAllStrExpressions()["WindowTitle"].codeExtraInformation.SetFunctionName("GetWindowTitle").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllStrExpressions()["WindowTitle"].SetFunctionName("GetWindowTitle").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
     #endif
 }

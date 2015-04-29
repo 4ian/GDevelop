@@ -127,7 +127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("Rotate",
                    _("Rotate"),
-                   _("Rotate an object, clockwise if the angle if the speed is positive, counterclockwise otherwise."),
+                   _("Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."),
                    _("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
                    _("Angle"),
                    "res/actions/direction24.png",
@@ -767,6 +767,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    "res/conditions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("objectList", _("Object"))
+        .MarkAsSimple();
+
+    extension.AddCondition("PickNearest",
+                   _("Pick nearest object"),
+                   _("Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."),
+                   _("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
+                   _("Objects"),
+                   "res/conditions/distance24.png",
+                   "res/conditions/distance.png")
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple();
 
     extension.AddCondition("NbObjet",

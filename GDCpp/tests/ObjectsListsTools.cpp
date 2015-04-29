@@ -15,6 +15,7 @@
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/BuiltinExtensions/RuntimeSceneTools.h"
 
 TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 	gd::Object obj1("1");
@@ -92,5 +93,31 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 		REQUIRE(list2.size() == 1); //should have been filtered out
 		REQUIRE(list1[0] == &obj1A);
 		REQUIRE(list2[0] == &obj2C);
+	}
+	SECTION("PickNearestObject") {
+		std::map <std::string, std::vector<RuntimeObject*> *> map;
+		std::vector<RuntimeObject*> list1 = {&obj1A, &obj1B, &obj1C};
+		map["1"] = &list1;
+		obj1A.SetX(50);
+		obj1A.SetY(50);
+		obj1B.SetX(160);
+		obj1B.SetY(160);
+		obj1C.SetX(100);
+		obj1C.SetY(300);
+
+		REQUIRE(PickNearestObject(map, 100, 90, false) == true);
+		REQUIRE(list1.size() == 1);
+		REQUIRE(list1[0] == &obj1A);
+
+		SECTION("Furthest") {
+			std::map <std::string, std::vector<RuntimeObject*> *> map;
+			std::vector<RuntimeObject*> list1 = {&obj1A, &obj1B, &obj1C};
+			map["1"] = &list1;
+
+
+			REQUIRE(PickNearestObject(map, 100, 90, true) == true);
+			REQUIRE(list1.size() == 1);
+			REQUIRE(list1[0] == &obj1C);
+		}
 	}
 }

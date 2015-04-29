@@ -23,8 +23,7 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllActions()["BuiltinExternalLayouts::CreateObjectsFromExternalLayout"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout");
+    GetAllActions()["BuiltinExternalLayouts::CreateObjectsFromExternalLayout"].SetFunctionName("gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout");
 
     StripUnimplementedInstructionsAndExpressions();
 }

@@ -523,7 +523,7 @@ void ObjectsEditor::OnobjectsListKeyDown(wxTreeEvent& event)
     mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 
-    if ( event.GetKeyCode() == WXK_DELETE )
+    if ( event.GetKeyCode() == WXK_DELETE || event.GetKeyCode() == WXK_BACK )
     {
         wxCommandEvent unusedEvent;
         OnDeleteSelected( unusedEvent );

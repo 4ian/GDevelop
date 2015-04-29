@@ -23,25 +23,16 @@ WindowExtension::WindowExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllActions()["SetFullScreen"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.setFullScreen");
-    GetAllActions()["SetWindowMargins"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.setMargins");
-    GetAllActions()["SetWindowTitle"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.setWindowTitle");
-    GetAllActions()["SetWindowSize"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.setCanvasSize");
+    GetAllActions()["SetFullScreen"].SetFunctionName("gdjs.evtTools.window.setFullScreen");
+    GetAllActions()["SetWindowMargins"].SetFunctionName("gdjs.evtTools.window.setMargins");
+    GetAllActions()["SetWindowTitle"].SetFunctionName("gdjs.evtTools.window.setWindowTitle");
+    GetAllActions()["SetWindowSize"].SetFunctionName("gdjs.evtTools.window.setCanvasSize");
 
-    GetAllStrExpressions()["WindowTitle"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.getWindowTitle");
-    GetAllExpressions()["SceneWindowWidth"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.getCanvasWidth");
-    GetAllExpressions()["SceneWindowHeight"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.getCanvasHeight");
-    GetAllExpressions()["ScreenWidth"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.getWindowWidth");
-    GetAllExpressions()["ScreenHeight"].codeExtraInformation
-        .SetFunctionName("gdjs.evtTools.window.getWindowHeight");
+    GetAllStrExpressions()["WindowTitle"].SetFunctionName("gdjs.evtTools.window.getWindowTitle");
+    GetAllExpressions()["SceneWindowWidth"].SetFunctionName("gdjs.evtTools.window.getCanvasWidth");
+    GetAllExpressions()["SceneWindowHeight"].SetFunctionName("gdjs.evtTools.window.getCanvasHeight");
+    GetAllExpressions()["ScreenWidth"].SetFunctionName("gdjs.evtTools.window.getWindowWidth");
+    GetAllExpressions()["ScreenHeight"].SetFunctionName("gdjs.evtTools.window.getWindowHeight");
 
     StripUnimplementedInstructionsAndExpressions();
 }

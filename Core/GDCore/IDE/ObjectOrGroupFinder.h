@@ -16,7 +16,6 @@ class Layout;
 
 /**
 \brief Class used to check if other objects or groups have a specific name.
-
  */
 class GD_CORE_API ObjectOrGroupFinder
 {
@@ -43,7 +42,7 @@ public:
     };
 
     /**
-     * Initialize the ObjectOrGroupFinder
+     * Initialize the ObjectOrGroupFinder object
      * \param project the project where it will search for name's occurences
      * \param layout the layout where the object is located/edited (if none, no layouts are considered to be the current one)
      */
@@ -56,7 +55,7 @@ public:
     unsigned int HasObjectOrGroupNamed(const std::string &name, bool allLayouts = false);
 
     /**
-     * \return a string containing the list of the layouts containing an object/group with the searched name (as the previous call to HasObjectOrGroupNamed())
+     * \return a string containing the list of the layouts containing an object/group with the searched name (from the previous call to HasObjectOrGroupNamed())
      */
     const std::vector<std::string>& GetLayoutsWithSameObjectName() const;
 

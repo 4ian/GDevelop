@@ -14,6 +14,8 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Utf8Tools.h"
+#include "GDCore/Utf8/utf8.h"
 #include "TextEntryObject.h"
 #if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
@@ -36,6 +38,7 @@ TextEntryObject::TextEntryObject(std::string name_) :
 
 RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const gd::Object & object) :
     RuntimeObject(scene_, object),
+    text(),
     scene(&scene_),
     activated(true)
 {
@@ -54,11 +57,17 @@ void RuntimeTextEntryObject::UpdateTime(float)
     {
         //Skip some non displayable characters
         if (characters[i] > 30 && (characters[i] < 127 || characters[i] > 159))
-            text += characters[i];
+            text += gd::utf8::FromSfString(sf::String(characters[i]));
         else if (characters[i] == 8)
         {
-            //Backspace
-            if (!text.empty()) text.erase(text.end()-1);
+            //Backspace : find the previous codepoint and remove it
+            if(text.empty())
+                continue;
+
+            std::string::iterator it = text.end();
+            utf8::prior(it, text.begin());
+
+            text.erase(it, text.end());
         }
     }
 }

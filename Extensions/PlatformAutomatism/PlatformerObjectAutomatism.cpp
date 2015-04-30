@@ -380,7 +380,7 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     jumpKey = false;
 
     //5) Track the movement
-    hasReallyMoved = abs(object->GetX()-oldX) >= 1;
+    hasReallyMoved = abs(object->GetX()-oldX) >= 60 * timeDelta;
 }
 
 bool PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus)

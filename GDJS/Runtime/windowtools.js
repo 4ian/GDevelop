@@ -57,11 +57,10 @@ gdjs.evtTools.window.getCanvasHeight = function(runtimeScene) {
 gdjs.evtTools.window.openURL = function(url) {
     //Try to detect the environment to use the most adapted
     //way of opening an URL.
-    if (typeof intel !== "undefined" && intel.xdk && intel.xdk.device && intel.xdk.device.launchExternal) {
-        intel.xdk.device.launchExternal(url);
-    } else if (typeof Cocoon !== "undefined" && Cocoon.App && Cocoon.App.openURL ) {
+    if (typeof Cocoon !== "undefined" && Cocoon.App && Cocoon.App.openURL ) {
         Cocoon.App.openURL(url);
     } else {
-        window.open(url);
+        var target = window.cordova ? "_system" : "_blank";
+        window.open(url, target);
     }
 };

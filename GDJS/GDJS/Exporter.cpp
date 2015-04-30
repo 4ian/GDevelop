@@ -164,7 +164,7 @@ bool Exporter::ExportIntelXDKIndexFile(gd::Project & project, std::string export
     #if !defined(GD_NO_WX_GUI)
     {
         //Open the index.html template
-        std::string str = fs.ReadFile("./JsPlatform/Runtime/XDKindex.html");
+        std::string str = fs.ReadFile("./JsPlatform/Runtime/CordovaIndex.html");
 
         //Generate custom declarations for font resources
         std::string customCss;

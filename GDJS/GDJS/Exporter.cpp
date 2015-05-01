@@ -300,6 +300,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     //First, do not forget common includes ( They must be included before events generated code files ).
     InsertUnique(includesFiles, "libs/pixi.js");
     InsertUnique(includesFiles, "libs/jshashtable.js");
+    InsertUnique(includesFiles, "libs/howler.min.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "commontools.js");

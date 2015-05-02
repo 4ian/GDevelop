@@ -78,7 +78,7 @@ void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, 
     //Chargement
     SoundManager * soundManager = SoundManager::Get();
 
-    //Son à jouer
+    //Son Ã  jouer
     std::shared_ptr<Sound> sound = std::shared_ptr<Sound>(new Sound(file));
     sound->sound.play();
 
@@ -270,26 +270,26 @@ void GD_API SetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int c
 {
     if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return;
 
-    SoundManager::Get()->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset*1000.0);
+    SoundManager::Get()->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset);
 }
 
 void GD_API SetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
 {
     if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return;
 
-    SoundManager::Get()->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset*1000.0);
+    SoundManager::Get()->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset);
 }
 
 double GD_API GetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
     if ( SoundManager::Get()->GetSoundOnChannel(channel) == std::shared_ptr<Sound>() ) return 0;
 
-    return static_cast<double>(SoundManager::Get()->GetSoundOnChannel(channel)->GetPlayingOffset())/1000.0;
+    return static_cast<double>(SoundManager::Get()->GetSoundOnChannel(channel)->GetPlayingOffset());
 }
 
 double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
     if ( SoundManager::Get()->GetMusicOnChannel(channel) == std::shared_ptr<Music>() ) return 0;
 
-    return static_cast<double>(SoundManager::Get()->GetMusicOnChannel(channel)->GetPlayingOffset())/1000.0;
+    return static_cast<double>(SoundManager::Get()->GetMusicOnChannel(channel)->GetPlayingOffset());
 }

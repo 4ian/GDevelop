@@ -13,6 +13,7 @@
 #include <functional>
 #include <vector>
 #include <utility>
+#include "GDCore/Events/InstructionsList.h"
 namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
@@ -51,7 +52,7 @@ public:
     /**
      * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
      */
-    InstructionItem(gd::Instruction * instruction_, bool isCondition, std::vector<gd::Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event );
+    InstructionItem(gd::Instruction * instruction_, bool isCondition, gd::InstructionsList* instructionList_, unsigned int positionInList_, gd::BaseEvent * event );
     InstructionItem();
     ~InstructionItem() {};
 
@@ -59,7 +60,7 @@ public:
 
     gd::Instruction * instruction;
     bool isCondition;
-    std::vector<gd::Instruction>* instructionList;
+    gd::InstructionsList* instructionList;
     unsigned int positionInList;
     gd::BaseEvent * event;
 };
@@ -74,14 +75,14 @@ public:
     /**
      * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
      */
-    InstructionListItem(bool isConditionList, std::vector<gd::Instruction>* instructionList_, gd::BaseEvent * event );
+    InstructionListItem(bool isConditionList, gd::InstructionsList* instructionList_, gd::BaseEvent * event );
     InstructionListItem();
     ~InstructionListItem() {};
 
     bool operator==(const InstructionListItem & other) const;
 
     bool isConditionList;
-    std::vector<gd::Instruction>* instructionList;
+    gd::InstructionsList* instructionList;
     gd::BaseEvent * event;
 };
 
@@ -269,7 +270,7 @@ namespace std
         std::size_t operator()(gd::InstructionItem const& item) const
         {
             return (std::hash<gd::Instruction*>()(item.instruction)) ^ 
-                   (std::hash<std::vector<gd::Instruction>*>()(item.instructionList) << 1) ^ 
+                   (std::hash<gd::InstructionsList*>()(item.instructionList) << 1) ^ 
                    (std::hash<unsigned int>()(item.positionInList) << 2) ^
                    (std::hash<gd::BaseEvent*>()(item.event) << 3) ^ 
                    (std::hash<bool>()(item.isCondition) << 4);
@@ -281,7 +282,7 @@ namespace std
     {
         std::size_t operator()(gd::InstructionListItem const& item) const
         {
-            return (std::hash<std::vector<gd::Instruction>*>()(item.instructionList)) ^ 
+            return (std::hash<gd::InstructionsList*>()(item.instructionList)) ^ 
                    (std::hash<gd::BaseEvent*>()(item.event) << 1) ^ 
                    (std::hash<bool>()(item.isConditionList) << 2);
         }

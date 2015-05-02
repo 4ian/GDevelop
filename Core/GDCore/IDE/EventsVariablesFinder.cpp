@@ -120,7 +120,7 @@ std::set < std::string > EventsVariablesFinder::FindAllObjectVariables(const gd:
 }
 
 std::set < std::string > EventsVariablesFinder::FindArgumentsInInstructions(const gd::Platform & platform,
-    const gd::Project & project, const gd::Layout & layout, const vector < gd::Instruction > & instructions,
+    const gd::Project & project, const gd::Layout & layout, const gd::InstructionsList & instructions,
     bool instructionsAreConditions, const std::string & parameterType, const std::string & objectName)
 {
     std::set < std::string > results;
@@ -177,14 +177,14 @@ std::set < std::string > EventsVariablesFinder::FindArgumentsInEvents(const gd::
     std::set < std::string > results;
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < const vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
+        vector < const gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             std::set < std::string > results2 = FindArgumentsInInstructions(platform, project, layout, *conditionsVectors[j], /*conditions=*/true, parameterType, objectName);
             results.insert(results2.begin(), results2.end());
         }
 
-        vector < const vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
+        vector < const gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             std::set < std::string > results2 = FindArgumentsInInstructions(platform, project, layout, *actionsVectors[j], /*conditions=*/false, parameterType, objectName);

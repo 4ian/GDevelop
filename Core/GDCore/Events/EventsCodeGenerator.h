@@ -2,6 +2,7 @@
 #define GDCORE_EVENTSCODEGENERATOR_H
 
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/Instruction.h"
 #include <string>
 #include <vector>
 #include <set>
@@ -71,7 +72,7 @@ public:
      * \param context Context used for generation
      * \return Code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
      */
-    virtual std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
+    virtual std::string GenerateConditionsListCode(gd::InstructionsList & conditions, EventsCodeGenerationContext & context);
 
     /**
      * \brief Generate code for executing an action list
@@ -84,7 +85,7 @@ public:
      * \param context Context used for generation
      * \return Code
      */
-    virtual std::string GenerateActionsListCode(std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
+    virtual std::string GenerateActionsListCode(gd::InstructionsList & actions, EventsCodeGenerationContext & context);
 
     /**
      * \brief Generate the code for a parameter of an action/condition/expression.

@@ -1,0 +1,89 @@
+/*
+ * GDevelop Core
+ * Copyright 2015. Victor Levasseur (victorlevasseur52@gmail.com)
+ * This project is released under the MIT License.
+ */
+
+#include "GDCore/IDE/ObjectOrGroupFinder.h"
+
+#include <algorithm>
+#include <assert.h> 
+
+#include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Tools/Localization.h"
+
+namespace gd
+{
+
+ObjectOrGroupFinder::ObjectOrGroupFinder(const Project &project, const Layout *layout) : 
+    project(project), 
+    layout(layout), 
+    layoutsWithSameObjectName()
+{
+
+}
+
+unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const std::string &name, bool allLayouts)
+{
+    unsigned int flag = HasSameName::No;
+    layoutsWithSameObjectName.clear();
+
+    //Tests the current scene objects
+    if(layout && layout->HasObjectNamed(name))
+        flag = flag | HasSameName::AsObjectInLayout;
+
+    //Tests current scene groups
+    if(layout && HasGroupNamed(name, layout->GetObjectGroups()))
+        flag = flag | HasSameName::AsGroupInLayout;
+
+    //Tests the global objects
+    if(project.HasObjectNamed(name))
+        flag = flag | HasSameName::AsGlobalObject;
+
+    //Tests global groups
+    if(HasGroupNamed(name, project.GetObjectGroups()))
+        flag = flag | HasSameName::AsGlobalGroup;
+
+    //Tests other scenes' objects
+    if(allLayouts)
+    {
+        for(unsigned int i = 0; i < project.GetLayoutsCount(); i++)
+        {
+            const gd::Layout &aLayout = project.GetLayout(i);
+
+            if(layout && aLayout.GetName() == layout->GetName())
+                continue;
+
+            if(aLayout.HasObjectNamed(name))
+            {
+                layoutsWithSameObjectName.push_back(aLayout.GetName());
+
+                flag = flag | AsObjectInAnotherLayout;
+            }
+
+            if(HasGroupNamed(name, aLayout.GetObjectGroups()))
+            {
+                layoutsWithSameObjectName.push_back(aLayout.GetName());
+
+                flag = flag | HasSameName::AsGroupInAnotherLayout;
+            }
+        }
+    }
+
+    return flag;
+}
+
+const std::vector<std::string>& ObjectOrGroupFinder::GetLayoutsWithSameObjectName() const
+{
+    return layoutsWithSameObjectName;
+}
+
+bool ObjectOrGroupFinder::HasGroupNamed(std::string name, const std::vector<gd::ObjectGroup> & groups) const
+{
+    return std::find_if( groups.begin(), groups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
+            != groups.end();
+}
+
+}

@@ -6,7 +6,7 @@
 
 /**
  * A thin wrapper around a Howl object.
- * gdjs.Sound just adds `paused`, `stopped` and `canBeDestroyed` methods.
+ * gdjs.Sound just adds `paused`, `stopped`, `rate` and `canBeDestroyed` methods.
  *
  * See https://github.com/goldfire/howler.js/tree/2.0 for the full documentation.
  *
@@ -19,6 +19,7 @@ gdjs.Sound = function(o) {
     this._paused = false;
     this._stopped = true;
     this._canBeDestroyed = false;
+    this._rate = o.rate || 1; //Read-only
 
     //Add custom events listener to keep
     //track of the sound status.
@@ -54,6 +55,9 @@ gdjs.Sound.prototype.stop = function() {
 };
 gdjs.Sound.prototype.canBeDestroyed = function() {
 	return this._canBeDestroyed;
+};
+gdjs.Sound.prototype.rate = function() {
+	return this._rate;
 };
 
 /**

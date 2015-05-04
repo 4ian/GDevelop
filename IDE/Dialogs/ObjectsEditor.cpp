@@ -63,6 +63,11 @@ namespace
         {
             std::string objectName = gd::ToString(text);
 
+            //Try to workaround a wxMac making string not ending properly
+            //See: http://trac.wxwidgets.org/ticket/9522#comment:4
+            std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+            objectName = objectName.substr(0, objectName.find_first_not_of(allowedCharacters));
+
             //Get the item under the mouse
             int dropFlags;
             wxTreeItemId itemUnderMouse = treeCtrl->HitTest(wxPoint(x, y), dropFlags);
@@ -1331,11 +1336,11 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         std::string objectName = object->GetName();
 
         unsigned int searchSameNames = nameChecker.HasObjectOrGroupNamed(objectName, true);
-        if ( searchSameNames != gd::ObjectOrGroupFinder::No && ((searchSameNames & gd::ObjectOrGroupFinder::InLayout) != searchSameNames) ) 
+        if ( searchSameNames != gd::ObjectOrGroupFinder::No && ((searchSameNames & gd::ObjectOrGroupFinder::InLayout) != searchSameNames) )
         //Test if there is a global object/group or an object/group in another layout with the same name
         //Indeed the object in the same layout with the same name is not taken into account because it's the object we want to set global.
         {
-            std::string errorMessage = _("Can't set \"") + objectName + _("\" global because :\n") + 
+            std::string errorMessage = _("Can't set \"") + objectName + _("\" global because :\n") +
                 GetExistingObjectsErrorMessage(searchSameNames & ~gd::ObjectOrGroupFinder::InLayout, nameChecker.GetLayoutsWithSameObjectName() );
             gd::LogWarning(errorMessage);
 
@@ -1375,11 +1380,11 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         std::string groupName = group->GetName();
 
         int searchSameNames = nameChecker.HasObjectOrGroupNamed(groupName, true);
-        if ( searchSameNames != gd::ObjectOrGroupFinder::No && ((searchSameNames & gd::ObjectOrGroupFinder::InLayout) != searchSameNames) ) 
+        if ( searchSameNames != gd::ObjectOrGroupFinder::No && ((searchSameNames & gd::ObjectOrGroupFinder::InLayout) != searchSameNames) )
         //Test if there is a global object/group or an object/group in another layout with the same name
         //Indeed the object in the same layout with the same name is not taken into account because it's the object we want to set global.
         {
-            std::string errorMessage = _("Can't set \"") + groupName + _("\" global because :\n") + 
+            std::string errorMessage = _("Can't set \"") + groupName + _("\" global because :\n") +
                 GetExistingObjectsErrorMessage(searchSameNames & ~gd::ObjectOrGroupFinder::InLayout, nameChecker.GetLayoutsWithSameObjectName() );
             gd::LogWarning(errorMessage);
 
@@ -1627,8 +1632,8 @@ std::string ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheck
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0)
             errorMessage += gd::ToString(_("objects")) + gd::ToString(" ");
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGroupInAnotherLayout) != 0)
-            errorMessage += ((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0) ? 
-                gd::ToString(_("/ groups")) : 
+            errorMessage += ((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0) ?
+                gd::ToString(_("/ groups")) :
                 gd::ToString(_("groups")) + gd::ToString(" ");
 
         errorMessage += gd::ToString(_("with the same name exist in these scenes : "));
@@ -1644,7 +1649,7 @@ std::string ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheck
             errorMessage += "\n";
 
         errorMessage += " - ";
-        
+
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGlobalObject) != 0)
             errorMessage += _("a global object with the same name exists");
         else

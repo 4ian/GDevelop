@@ -9,6 +9,7 @@
 #include <string>
 #include <set>
 #include "GDCore/Events/Event.h"
+#include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 namespace gd { class ObjectMetadata; }
 namespace gd { class AutomatismMetadata; }
@@ -52,7 +53,7 @@ public:
      * \param context Context used for generation
      * \return JS code.
      */
-    virtual std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, gd::EventsCodeGenerationContext & context);
+    virtual std::string GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Generate the full name for accessing to a boolean variable used for conditions.

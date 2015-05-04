@@ -62,12 +62,12 @@ public:
     gd::ExternalLayout GetExternalLayout();
     bool HasExternalLayout() { return hasExternalLayout; };
 
-    void SetConditions( const gd::InstructionsList & conditions );
-    void SetActions( const gd::InstructionsList & actions );
+    void SetConditions( const std::vector<gd::Instruction> & conditions );
+    void SetActions( const std::vector<gd::Instruction> & actions );
 
     bool HasCondition() { return hasInstructions && instructionsAreConditions; };
     bool HasAction() { return hasInstructions && !instructionsAreConditions; };
-    gd::InstructionsList GetInstructions() const { return instructionsCopied; };
+    std::vector<gd::Instruction> GetInstructions() const { return instructionsCopied; };
 
     void SetObjectGroup( const gd::ObjectGroup & group );
     gd::ObjectGroup GetObjectGroup();
@@ -88,7 +88,7 @@ private:
     gd::EventsList eventsCopied;
     bool hasEvents;
 
-    gd::InstructionsList instructionsCopied;
+    std::vector<gd::Instruction> instructionsCopied;
     bool hasInstructions;
     bool instructionsAreConditions;
 

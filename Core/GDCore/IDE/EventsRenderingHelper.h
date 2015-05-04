@@ -9,7 +9,6 @@
 #include <wx/dc.h>
 #include <wx/html/htmprint.h>
 #include <vector>
-#include "GDCore/Events/InstructionsList.h"
 
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
@@ -55,14 +54,14 @@ public:
      * \param platform The platform currently used
      * \return Height used for the drawing
      */
-    int DrawConditionsList(gd::InstructionsList & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+    int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
                            gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
     /**
      * \brief Draw the specified action list
      * \see gd::EventsRenderingHelper::DrawConditionsList
      */
-    int DrawActionsList(gd::InstructionsList & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+    int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
                         gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform);
 
     /**
@@ -72,12 +71,12 @@ public:
      * \param platform The platform currently used
      * \return Height used for the drawing
      */
-    unsigned int GetRenderedConditionsListHeight(const gd::InstructionsList & conditions, int width, const gd::Platform & platform);
+    unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, const gd::Platform & platform);
     /**
      * \brief Get the height taken by drawing a condition list
      * \see gd::EventsRenderingHelper::GetRenderedConditionsListHeight
      */
-    unsigned int GetRenderedActionsListHeight(const gd::InstructionsList & actions, int width, const gd::Platform & platform);
+    unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, const gd::Platform & platform);
 
     inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
     inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };

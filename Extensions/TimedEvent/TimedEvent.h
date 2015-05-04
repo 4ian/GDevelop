@@ -11,7 +11,6 @@ This project is released under the MIT License.
 #define TIMEDEVENT_H
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Instruction.h"
 #include <map>
 #include "GDCpp/ManualTimer.h"
 class RuntimeScene;
@@ -40,11 +39,11 @@ public:
     virtual const gd::EventsList & GetSubEvents() const {return events;};
     virtual gd::EventsList & GetSubEvents() {return events;};
 
-    const gd::InstructionsList & GetConditions() const { return conditions; };
-    gd::InstructionsList & GetConditions() { return conditions; };
+    const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
+    std::vector < gd::Instruction > & GetConditions() { return conditions; };
 
-    const gd::InstructionsList & GetActions() const { return actions; };
-    gd::InstructionsList & GetActions() { return actions; };
+    const std::vector < gd::Instruction > & GetActions() const { return actions; };
+    std::vector < gd::Instruction > & GetActions() { return actions; };
 
     std::string GetName() const { return name; };
     void SetName(std::string name_) { name = name_; };
@@ -52,11 +51,11 @@ public:
     std::string GetTimeoutExpression() const { return timeout.GetPlainString(); };
     void SetTimeoutExpression(std::string timeout_) { timeout = gd::Expression(timeout_); };
 
-    virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors();
-    virtual std::vector < gd::InstructionsList* > GetAllActionsVectors();
+    virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
+    virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
     virtual std::vector < gd::Expression* > GetAllExpressions();
-    virtual std::vector < const gd::InstructionsList* > GetAllConditionsVectors() const;
-    virtual std::vector < const gd::InstructionsList* > GetAllActionsVectors() const;
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllConditionsVectors() const;
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllActionsVectors() const;
     virtual std::vector < const gd::Expression* > GetAllExpressions() const;
 
     virtual void SerializeTo(gd::SerializerElement & element) const;
@@ -82,8 +81,8 @@ public:
 private:
     std::string name;
     gd::Expression timeout;
-    gd::InstructionsList conditions;
-    gd::InstructionsList actions;
+    std::vector < gd::Instruction > conditions;
+    std::vector < gd::Instruction > actions;
     gd::EventsList events;
 
     bool nameSelected;

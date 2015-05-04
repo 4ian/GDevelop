@@ -748,7 +748,7 @@ void EventsEditor::OneventsPanelLeftUp(wxMouseEvent& event)
 
     if (selection.EndDragEvent(!ctrlKeyDown, selection.IsEventHighlightedOnBottomPart()))
         ChangesMadeOnEvents();
-    else if (gd::InstructionsList * list = selection.EndDragInstruction(!ctrlKeyDown, selection.IsInstructionHighlightedOnBottomPart()))
+    else if (std::vector<gd::Instruction> * list = selection.EndDragInstruction(!ctrlKeyDown, selection.IsInstructionHighlightedOnBottomPart()))
     {
         EnsureTriggerOnceIsLastCondition(*list);
         ChangesMadeOnEvents();
@@ -887,7 +887,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             instruction.SetParameters( dialog.Param );
             instruction.SetInverted( dialog.isInverted );
 
-            item.instructionList->Insert(instruction);
+            item.instructionList->push_back(instruction);
             item.event->eventHeightNeedUpdate = true;
             Refresh();
             ChangesMadeOnEvents();
@@ -1197,10 +1197,10 @@ void EventsEditor::OnliveEditText(wxCommandEvent& event)
     liveEditingChangesMade = true;
 }
 
-void EventsEditor::EnsureTriggerOnceIsLastCondition(gd::InstructionsList & conditions) {
+void EventsEditor::EnsureTriggerOnceIsLastCondition(std::vector<gd::Instruction> & conditions) {
 	if (conditions.empty()) return;
 
-	bool endWithTriggerOnce = conditions.Get(conditions.GetCount()-1).GetType() == "BuiltinCommonInstructions::Once";
+	bool endWithTriggerOnce = conditions.back().GetType() == "BuiltinCommonInstructions::Once";
 	bool multipleOnce = false;
 	for (unsigned int i = 0;i<conditions.size()-1;)
 	{
@@ -1208,13 +1208,13 @@ void EventsEditor::EnsureTriggerOnceIsLastCondition(gd::InstructionsList & condi
 		{
 			if (!endWithTriggerOnce)
 			{
-				conditions.Insert(conditions[i]); //"Move" the "Trigger once" condition at the end
+				conditions.push_back(conditions[i]); //"Move" the "Trigger once" condition at the end
 				endWithTriggerOnce = true;
 			}
 			else
 				multipleOnce = true;
 
-			conditions.Remove(i); //In any case, remove the trigger once as it is not at the end.
+			conditions.erase(conditions.begin()+i); //In any case, remove the trigger once as it is not at the end.
 		}
 		else
 			++i;
@@ -1237,7 +1237,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
         instruction.SetParameters(dialog.Param);
         instruction.SetInverted(dialog.isInverted);
 
-        listHighlighted.instructionList->Insert(instruction);
+        listHighlighted.instructionList->push_back(instruction);
         listHighlighted.event->eventHeightNeedUpdate = true;
         EnsureTriggerOnceIsLastCondition(*listHighlighted.instructionList);
         Refresh();
@@ -1447,11 +1447,11 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     if ( selection.HasSelectedConditions())
     {
         std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
-        gd::InstructionsList instructionsToCopy;
+        std::vector < gd::Instruction > instructionsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
-                instructionsToCopy.Insert(*itemsSelected[i].instruction);
+                instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
         gd::Clipboard::Get()->SetConditions(instructionsToCopy);
@@ -1459,11 +1459,11 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     else if ( selection.HasSelectedActions())
     {
         std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
-        gd::InstructionsList instructionsToCopy;
+        std::vector < gd::Instruction > instructionsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
-                instructionsToCopy.Insert(*itemsSelected[i].instruction);
+                instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
         gd::Clipboard::Get()->SetActions(instructionsToCopy);
@@ -1503,19 +1503,19 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if ( !gd::Clipboard::Get()->HasCondition() ) return;
 
         //Get information about list where conditions must be pasted
-        gd::InstructionsList * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
+        std::vector<gd::Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
         size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
         gd::BaseEvent * event = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
         //Paste all conditions
-        const gd::InstructionsList & instructions = gd::Clipboard::Get()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::Get()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
-                instructionList->Insert(instructions[i], positionInThisList);
+                instructionList->insert(instructionList->begin()+positionInThisList, instructions[i]);
             else
-                instructionList->Insert(instructions[i]);
+                instructionList->push_back(instructions[i]);
         }
         EnsureTriggerOnceIsLastCondition(*instructionList);
 
@@ -1528,19 +1528,19 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if ( !gd::Clipboard::Get()->HasAction() ) return;
 
         //Get information about list where actions must be pasted
-        gd::InstructionsList * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
+        std::vector<gd::Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
         size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
         gd::BaseEvent * event = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
         //Paste all actions
-        const gd::InstructionsList & instructions = gd::Clipboard::Get()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::Get()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
-                instructionList->Insert(instructions[i], positionInThisList);
+                instructionList->insert(instructionList->begin()+positionInThisList, instructions[i]);
             else
-                instructionList->Insert(instructions[i]);
+                instructionList->push_back(instructions[i]);
         }
 
         if ( event != NULL ) event->eventHeightNeedUpdate = true;

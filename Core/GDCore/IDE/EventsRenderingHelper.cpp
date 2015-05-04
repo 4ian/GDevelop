@@ -142,7 +142,7 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
     fontCharacterWidth = static_cast<float>(dc.GetTextExtent("abcdef").GetWidth())/6.0f;
 }
 
-int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
                                               gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     int initialYPosition = y;
@@ -243,7 +243,7 @@ int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions,
     return y-initialYPosition;
 }
 
-int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
                                            gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
     int initialYPosition = y;
@@ -336,7 +336,7 @@ int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC 
     return y-initialYPosition;
 }
 
-unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const gd::InstructionsList & conditions, int width, const gd::Platform & platform)
+unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector < gd::Instruction > & conditions, int width, const gd::Platform & platform)
 {
     int y = 0;
 
@@ -367,7 +367,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const gd::In
     return y;
 }
 
-unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const gd::InstructionsList & actions, int width, const gd::Platform & platform)
+unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < gd::Instruction > & actions, int width, const gd::Platform & platform)
 {
     int y = 0;
 

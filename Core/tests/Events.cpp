@@ -23,7 +23,7 @@ TEST_CASE( "Events", "[common][events]" ) {
     SECTION("StandardEvent") {
         gd::Instruction instr("InstructionType");
         gd::StandardEvent event;
-        event.GetActions().Insert(instr);
+        event.GetActions().push_back(instr);
 
         //Ensuring cloning is working
         std::shared_ptr<gd::StandardEvent> cloned(event.Clone());
@@ -34,7 +34,7 @@ TEST_CASE( "Events", "[common][events]" ) {
     SECTION("ForEachEvent") {
         gd::Instruction instr("InstructionType");
         gd::ForEachEvent event;
-        event.GetActions().Insert(instr);
+        event.GetActions().push_back(instr);
         event.SetObjectToPick("Object");
 
         //Ensuring cloning is working

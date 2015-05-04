@@ -298,7 +298,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
  * Generate code for a list of conditions.
  * Bools containing conditions results are named conditionXIsTrue.
  */
-string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, EventsCodeGenerationContext & context)
 {
     string outputCode;
 
@@ -437,7 +437,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 /**
  * Generate actions code.
  */
-string EventsCodeGenerator::GenerateActionsListCode(vector < gd::Instruction > & actions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateActionsListCode(gd::InstructionsList & actions, EventsCodeGenerationContext & context)
 {
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)

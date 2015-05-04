@@ -14,6 +14,7 @@
 #include <memory>
 #include <memory>
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/InstructionsList.h"
 namespace gd { class EventsList; }
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
@@ -93,15 +94,15 @@ public:
      * Event must be able to return all conditions std::vector they have.
      * Used to preprocess the conditions.
      */
-    virtual std::vector < std::vector<Instruction>* > GetAllConditionsVectors() { std::vector < std::vector<Instruction>* > noConditions; return noConditions; };
-    virtual std::vector < const std::vector<Instruction>* > GetAllConditionsVectors() const { std::vector < const std::vector<Instruction>* > noConditions; return noConditions; };
+    virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors() { std::vector < gd::InstructionsList* > noConditions; return noConditions; };
+    virtual std::vector < const gd::InstructionsList* > GetAllConditionsVectors() const { std::vector < const gd::InstructionsList* > noConditions; return noConditions; };
 
     /**
      * Event must be able to return all actions std::vector they have.
      * Used to preprocess the actions.
      */
-    virtual std::vector < std::vector<Instruction>* > GetAllActionsVectors() { std::vector < std::vector<Instruction>* > noActions; return noActions; };
-    virtual std::vector < const std::vector<Instruction>* > GetAllActionsVectors() const { std::vector < const std::vector<Instruction>* > noActions; return noActions; };
+    virtual std::vector < gd::InstructionsList* > GetAllActionsVectors() { std::vector < gd::InstructionsList* > noActions; return noActions; };
+    virtual std::vector < const gd::InstructionsList* > GetAllActionsVectors() const { std::vector < const gd::InstructionsList* > noActions; return noActions; };
 
     /**
      * Event must be able to return all expressions they have.

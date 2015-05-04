@@ -266,7 +266,7 @@ bool gd::InstructionItem::operator==(const gd::InstructionItem & other) const
     return (instruction == other.instruction && isCondition == other.isCondition && instructionList == other.instructionList && positionInList == other.positionInList && event == other.event);
 }
 
-InstructionItem::InstructionItem(gd::Instruction * instruction_, bool isCondition_, std::vector<gd::Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event_ ) :
+InstructionItem::InstructionItem(gd::Instruction * instruction_, bool isCondition_, gd::InstructionsList* instructionList_, unsigned int positionInList_, gd::BaseEvent * event_ ) :
     instruction(instruction_),
     isCondition(isCondition_),
     instructionList(instructionList_),
@@ -290,7 +290,7 @@ bool InstructionListItem::operator==(const InstructionListItem & other) const
     return (isConditionList == other.isConditionList && instructionList == other.instructionList && event == other.event);
 }
 
-InstructionListItem::InstructionListItem(bool isCondition_, std::vector<gd::Instruction>* instructionList_, gd::BaseEvent * event_ ) :
+InstructionListItem::InstructionListItem(bool isCondition_, gd::InstructionsList* instructionList_, gd::BaseEvent * event_ ) :
     isConditionList(isCondition_),
     instructionList(instructionList_),
     event(event_)

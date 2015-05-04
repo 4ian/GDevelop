@@ -25,35 +25,35 @@ using namespace std;
 namespace gd
 {
 
-vector < vector<gd::Instruction>* > WhileEvent::GetAllConditionsVectors()
+vector < gd::InstructionsList* > WhileEvent::GetAllConditionsVectors()
 {
-    vector < vector<gd::Instruction>* > allConditions;
+    vector < gd::InstructionsList* > allConditions;
     allConditions.push_back(&whileConditions);
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<gd::Instruction>* > WhileEvent::GetAllActionsVectors()
+vector < gd::InstructionsList* > WhileEvent::GetAllActionsVectors()
 {
-    vector < vector<gd::Instruction>* > allActions;
+    vector < gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
 }
 
-vector < const vector<gd::Instruction>* > WhileEvent::GetAllConditionsVectors() const
+vector < const gd::InstructionsList* > WhileEvent::GetAllConditionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allConditions;
+    vector < const gd::InstructionsList* > allConditions;
     allConditions.push_back(&whileConditions);
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < const vector<gd::Instruction>* > WhileEvent::GetAllActionsVectors() const
+vector < const gd::InstructionsList* > WhileEvent::GetAllActionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allActions;
+    vector < const gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

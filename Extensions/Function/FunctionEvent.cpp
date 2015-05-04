@@ -34,32 +34,32 @@ nameSelected(false)
 {
 }
 
-vector < vector<gd::Instruction>* > FunctionEvent::GetAllConditionsVectors()
+vector < gd::InstructionsList* > FunctionEvent::GetAllConditionsVectors()
 {
-    vector < vector<gd::Instruction>* > allConditions;
+    vector < gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<gd::Instruction>* > FunctionEvent::GetAllActionsVectors()
+vector < gd::InstructionsList* > FunctionEvent::GetAllActionsVectors()
 {
-    vector < vector<gd::Instruction>* > allActions;
+    vector < gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
 }
-vector < const vector<gd::Instruction>* > FunctionEvent::GetAllConditionsVectors() const
+vector < const gd::InstructionsList* > FunctionEvent::GetAllConditionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allConditions;
+    vector < const gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < const vector<gd::Instruction>* > FunctionEvent::GetAllActionsVectors() const
+vector < const gd::InstructionsList* > FunctionEvent::GetAllActionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allActions;
+    vector < const gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

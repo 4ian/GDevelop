@@ -8,15 +8,9 @@
 #include <string>
 #include <vector>
 #include "GDCore/Events/Expression.h"
-#include "GDCore/Tools/SPtrList.h"
 
 namespace gd
 {
-
-class Instruction;
-
-template<typename T> class SPtrList;
-typedef SPtrList<Instruction> InstructionsList;
 
 /**
  * \brief An instruction is a member of an event: It can be a condition or an action.
@@ -120,12 +114,12 @@ public:
     /**
      * \brief Return a reference to the vector containing sub instructions
      */
-    inline const gd::InstructionsList & GetSubInstructions() const { return subInstructions; };
+    inline const std::vector < Instruction > & GetSubInstructions() const { return subInstructions; };
 
     /**
      * \brief Return a reference to the vector containing sub instructions
      */
-    inline gd::InstructionsList & GetSubInstructions() { return subInstructions; };
+    inline std::vector < Instruction > & GetSubInstructions() { return subInstructions; };
 
     /** \name Rendering
      * Members related to the instruction rendering in an event editor.
@@ -142,8 +136,8 @@ private:
 
     std::string                             type; ///< Instruction type
     bool                                    inverted; ///< True if the instruction if inverted. Only applicable for instruction used as conditions by events
-    mutable std::vector < gd::Expression >  parameters; ///< Vector containing the parameters
-    gd::InstructionsList                    subInstructions; ///< Sub instructions, if applicable.
+    mutable std::vector < gd::Expression >    parameters; ///< Vector containing the parameters
+    std::vector < Instruction >             subInstructions; ///< Sub instructions, if applicable.
 
     static gd::Expression badExpression;
 };

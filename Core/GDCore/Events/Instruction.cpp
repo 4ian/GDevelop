@@ -4,7 +4,6 @@
  * This project is released under the MIT License.
  */
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/Expression.h"
 #include <string>
 #include <iostream>

@@ -37,22 +37,22 @@ public:
     virtual const gd::EventsList & GetSubEvents() const {return events;};
     virtual gd::EventsList & GetSubEvents() {return events;};
 
-    const gd::InstructionsList & GetConditions() const { return conditions; };
-    gd::InstructionsList & GetConditions() { return conditions; };
+    const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
+    std::vector < gd::Instruction > & GetConditions() { return conditions; };
 
-    const gd::InstructionsList & GetActions() const { return actions; };
-    gd::InstructionsList & GetActions() { return actions; };
+    const std::vector < gd::Instruction > & GetActions() const { return actions; };
+    std::vector < gd::Instruction > & GetActions() { return actions; };
 
-    const gd::InstructionsList & GetWhileConditions() const { return whileConditions; };
-    gd::InstructionsList & GetWhileConditions() { return whileConditions; };
-    void SetWhileConditions(gd::InstructionsList & whileConditions_) { whileConditions = whileConditions_; };
+    const std::vector < gd::Instruction > & GetWhileConditions() const { return whileConditions; };
+    std::vector < gd::Instruction > & GetWhileConditions() { return whileConditions; };
+    void SetWhileConditions(std::vector < gd::Instruction > & whileConditions_) { whileConditions = whileConditions_; };
 
     bool HasInfiniteLoopWarning() const { return infiniteLoopWarning; }
 
-    virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors();
-    virtual std::vector < gd::InstructionsList* > GetAllActionsVectors();
-    virtual std::vector < const gd::InstructionsList* > GetAllConditionsVectors() const;
-    virtual std::vector < const gd::InstructionsList* > GetAllActionsVectors() const;
+    virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
+    virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllConditionsVectors() const;
+    virtual std::vector < const std::vector<gd::Instruction>* > GetAllActionsVectors() const;
 
     virtual void SerializeTo(SerializerElement & element) const;
     virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
@@ -73,9 +73,9 @@ public:
     virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
 private:
-    gd::InstructionsList whileConditions;
-    gd::InstructionsList conditions;
-    gd::InstructionsList actions;
+    std::vector < gd::Instruction > whileConditions;
+    std::vector < gd::Instruction > conditions;
+    std::vector < gd::Instruction > actions;
     EventsList events;
     bool infiniteLoopWarning; ///< If true, code will be generated to warn the developer against an infinite loop.
     bool justCreatedByTheUser; ///< Used so as not to show message box to de/activate infinite loop warning when the user create the event

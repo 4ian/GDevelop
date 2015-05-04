@@ -9,7 +9,6 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include "GDCore/Events/InstructionsList.h"
 namespace gd {class Instruction;}
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}
@@ -38,7 +37,7 @@ public:
 private:
     void VisitEventList(gd::EventsList & events);
     void VisitEvent(gd::BaseEvent & event);
-    void VisitInstructionList(gd::InstructionsList & instructions, bool areConditions);
+    void VisitInstructionList(std::vector<gd::Instruction> & instructions, bool areConditions);
     bool VisitInstruction(gd::Instruction & instruction, bool isCondition);
 
     /**
@@ -54,7 +53,7 @@ private:
     /**
      * Called to do some work on an instruction list
      */
-    virtual void DoVisitInstructionList(gd::InstructionsList & instructions, bool areConditions) {};
+    virtual void DoVisitInstructionList(std::vector<gd::Instruction> & instructions, bool areConditions) {};
 
     /**
      * Called to do some work on an instruction.

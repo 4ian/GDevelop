@@ -171,7 +171,7 @@ public:
 
     void BeginDragInstruction();
     bool IsDraggingInstruction();
-    gd::InstructionsList * EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
+    std::vector<gd::Instruction> * EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
 
 private:
 
@@ -195,7 +195,7 @@ private:
     /**
      * Return true if an instruction is found in the list ( sub instructions are also taken in account )
      */
-    bool FindInInstructionsAndSubInstructions(gd::InstructionsList & list, const gd::Instruction * instrToSearch);
+    bool FindInInstructionsAndSubInstructions(std::vector<gd::Instruction> & list, const gd::Instruction * instrToSearch);
 
     gd::EventsEditorRefreshCallbacks & eventsEditorCallback;
 };

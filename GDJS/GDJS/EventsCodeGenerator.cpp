@@ -442,7 +442,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
     return declarationsCode ;
 }
 
-string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction > & conditions, gd::EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context)
 {
     string outputCode;
 

@@ -28,10 +28,6 @@ void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project,
     {
         gd::Instruction & instr = list[i];
 
-        const gd::InstructionMetadata & metadata = instructionsAreActions ?
-                                             MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(), instr.GetType()) :
-                                             MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(), instr.GetType());
-
         if (instr.GetType() == "VarScene" ||
             instr.GetType() == "VarSceneTxt" ||
             instr.GetType() == "VarGlobal" ||
@@ -81,11 +77,6 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
         {
             instr.SetParameter(1, instr.GetParameter(5));
             instr.SetParameter(2, instr.GetParameter(3));
-        }
-        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
-        {
-            instr.SetParameter(4, instr.GetParameter(5));
-            instr.SetParameter(5, instr.GetParameter(6));
         }
         else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
         {

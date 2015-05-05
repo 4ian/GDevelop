@@ -534,9 +534,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             {
                 CppCodeEvent & event = dynamic_cast<CppCodeEvent&>(event_);
 
-                const gd::Project & project = codeGenerator.GetProject();
-                const gd::Layout & scene = codeGenerator.GetLayout();
-
                 //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
                 //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
 
@@ -553,7 +550,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 if ( event.GetPassObjectListAsParameter() )
                 {
                     std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(
-                        event.GetObjectToPassAsParameter(), parentContext); 
+                        event.GetObjectToPassAsParameter(), parentContext);
 
                     outputCode += "std::vector<RuntimeObject*> functionObjects;";
                     for (unsigned int i = 0;i<realObjects.size();++i)
@@ -575,7 +572,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         AddEvent("CppCode",
-                  _("C++ code ( Experimental )"),
+                  _("C++ code (Experimental)"),
                   _("Execute C++ code"),
                   "",
                   "res/source_cpp16.png",

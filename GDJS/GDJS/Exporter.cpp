@@ -104,7 +104,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     exportedProject.SetFirstLayout(layout.GetName());
 
     //Export the project
-    std::string result = ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
+    ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
                                       "gdjs.projectData", false);
     includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
@@ -398,7 +398,6 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             std::string allJsFiles;
             for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
             {
-                std::string jsFile = "";
                 if ( fs.FileExists(jsPlatformDir+"Runtime/"+*include) )
                     allJsFiles += "\""+jsPlatformDir+"Runtime/"+*include+"\" ";
                 else if ( fs.FileExists(jsPlatformDir+"Runtime/Extensions/"+*include) )
@@ -558,7 +557,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         #endif
 
         //...and export it
-        std::string result = ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
+        ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
                                           "gdjs.projectData", false);
         includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 

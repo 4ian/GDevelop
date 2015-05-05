@@ -28,17 +28,17 @@ repeatNumberExpressionSelected(false)
 }
 
 
-vector < vector<gd::Instruction>* > RepeatEvent::GetAllConditionsVectors()
+vector < gd::InstructionsList* > RepeatEvent::GetAllConditionsVectors()
 {
-    vector < vector<gd::Instruction>* > allConditions;
+    vector < gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<gd::Instruction>* > RepeatEvent::GetAllActionsVectors()
+vector < gd::InstructionsList* > RepeatEvent::GetAllActionsVectors()
 {
-    vector < vector<gd::Instruction>* > allActions;
+    vector < gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
@@ -52,17 +52,17 @@ vector < gd::Expression* > RepeatEvent::GetAllExpressions()
     return allExpressions;
 }
 
-vector < const vector<gd::Instruction>* > RepeatEvent::GetAllConditionsVectors() const
+vector < const gd::InstructionsList* > RepeatEvent::GetAllConditionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allConditions;
+    vector < const gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < const vector<gd::Instruction>* > RepeatEvent::GetAllActionsVectors() const
+vector < const gd::InstructionsList* > RepeatEvent::GetAllActionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allActions;
+    vector < const gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

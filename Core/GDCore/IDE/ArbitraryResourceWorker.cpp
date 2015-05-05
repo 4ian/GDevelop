@@ -51,12 +51,12 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
 
     for ( unsigned int j = 0;j < events.size() ;j++ )
     {
-        vector < vector<Instruction>* > allActionsVectors = events[j].GetAllActionsVectors();
+        vector < gd::InstructionsList* > allActionsVectors = events[j].GetAllActionsVectors();
         for (unsigned int i = 0;i<allActionsVectors.size();++i)
         {
             for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
             {
-                std::string type = allActionsVectors[i]->at( k ).GetType();
+                std::string type = allActionsVectors[i]->Get( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
                     bool extensionHasAction = false;
@@ -83,7 +83,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
 
                     if ( extensionHasAction )
                     {
-                        allGameExtensions[e]->ExposeActionsResources(allActionsVectors[i]->at( k ), worker);
+                        allGameExtensions[e]->ExposeActionsResources(allActionsVectors[i]->Get( k ), worker);
                         break;
                     }
                 }
@@ -91,12 +91,12 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
             }
         }
 
-        vector < vector<Instruction>* > allConditionsVector = events[j].GetAllConditionsVectors();
+        vector < gd::InstructionsList* > allConditionsVector = events[j].GetAllConditionsVectors();
         for (unsigned int i = 0;i<allConditionsVector.size();++i)
         {
             for ( unsigned int k = 0;k < allConditionsVector[i]->size() ;k++ )
             {
-                std::string type = allConditionsVector[i]->at( k ).GetType();
+                std::string type = allConditionsVector[i]->Get( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
                     bool extensionHasCondition = false;
@@ -121,7 +121,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                             extensionHasCondition = true;
                     }
 
-                    if ( extensionHasCondition ) allGameExtensions[e]->ExposeConditionsResources(allConditionsVector[i]->at( k ), worker);
+                    if ( extensionHasCondition ) allGameExtensions[e]->ExposeConditionsResources(allConditionsVector[i]->Get( k ), worker);
                 }
 
             }

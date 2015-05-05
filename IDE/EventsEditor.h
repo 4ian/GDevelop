@@ -280,7 +280,7 @@ private:
     void AddSubEvent(gd::EventItem & parentEventItem);
     void AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem);
 
-    void EnsureTriggerOnceIsLastCondition(std::vector<gd::Instruction> & conditions);
+    void EnsureTriggerOnceIsLastCondition(gd::InstructionsList & conditions);
     void RecomputeAllEventsWidth(gd::EventsList & eventsToRefresh);
     void DeleteSelection();
 

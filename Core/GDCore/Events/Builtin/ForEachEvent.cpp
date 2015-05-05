@@ -30,17 +30,17 @@ objectsToPickSelected(false)
 {
 }
 
-vector < vector<gd::Instruction>* > ForEachEvent::GetAllConditionsVectors()
+vector < gd::InstructionsList* > ForEachEvent::GetAllConditionsVectors()
 {
-    vector < vector<gd::Instruction>* > allConditions;
+    vector < gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<gd::Instruction>* > ForEachEvent::GetAllActionsVectors()
+vector < gd::InstructionsList* > ForEachEvent::GetAllActionsVectors()
 {
-    vector < vector<gd::Instruction>* > allActions;
+    vector < gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
@@ -53,17 +53,17 @@ vector < gd::Expression* > ForEachEvent::GetAllExpressions()
 
     return allExpressions;
 }
-vector < const vector<gd::Instruction>* > ForEachEvent::GetAllConditionsVectors() const
+vector < const gd::InstructionsList* > ForEachEvent::GetAllConditionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allConditions;
+    vector < const gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < const vector<gd::Instruction>* > ForEachEvent::GetAllActionsVectors() const
+vector < const gd::InstructionsList* > ForEachEvent::GetAllActionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allActions;
+    vector < const gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

@@ -39,36 +39,36 @@ public:
     /**
      * \brief Load a list of conditions from a TiXmlElement
      */
-    static void OpenConditions(gd::Project & project, std::vector < gd::Instruction > & list, const SerializerElement & elem);
+    static void OpenConditions(gd::Project & project, gd::InstructionsList & list, const SerializerElement & elem);
 
     /**
      * \brief Load a list of actions from a TiXmlElement
      */
-    static void OpenActions(gd::Project & project, std::vector < gd::Instruction > & list, const SerializerElement & elem);
+    static void OpenActions(gd::Project & project, gd::InstructionsList & list, const SerializerElement & elem);
 
     /**
      * \brief Save a list of conditions to a TiXmlElement
      */
-    static void SaveConditions(const std::vector < gd::Instruction > & list, SerializerElement & elem);
+    static void SaveConditions(const gd::InstructionsList & list, SerializerElement & elem);
 
     /**
      * \brief Save a list of actions to a TiXmlElement
      */
-    static void SaveActions(const std::vector < gd::Instruction > & list, SerializerElement & elem);
+    static void SaveActions(const gd::InstructionsList & list, SerializerElement & elem);
 
     /**
      * \brief Internal method called when opening events created with GD2.x
      *
      * Some instructions names have been changed as well as parameters since GD 3.
      */
-    static void UpdateInstructionsFromGD2x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions);
+    static void UpdateInstructionsFromGD2x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions);
 
     /**
      * \brief Internal method called when opening events created with GD 3.1.x
      *
      * Variables related and some storage instructions have been changed.
      */
-    static void UpdateInstructionsFromGD31x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions);
+    static void UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions);
 };
 
 }

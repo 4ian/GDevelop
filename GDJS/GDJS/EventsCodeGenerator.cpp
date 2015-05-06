@@ -52,60 +52,39 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
         output += *declaration+"\n";
 
     //Global objects lists
+    auto generateDeclarations = [&project, &scene, &codeGenerator](gd::Object & object, unsigned int maxDepth,
+        std::string & globalObjectLists, std::string & globalObjectListsReset) {
+
+        std::string type = gd::GetTypeOfObject(project, scene, object.GetName());
+        const gd::ObjectMetadata & metadata = gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
+        codeGenerator.AddIncludeFiles(metadata.includeFiles);
+
+        //Ensure needed files are included.
+        std::vector<std::string> automatisms = object.GetAllAutomatismNames();
+        for (unsigned int j = 0;j<automatisms.size();++j)
+        {
+            const gd::AutomatismMetadata & metadata = gd::MetadataProvider::GetAutomatismMetadata(JsPlatform::Get(),
+                                                                                                  object.GetAutomatism(automatisms[j]).GetTypeName());
+            codeGenerator.AddIncludeFiles(metadata.includeFiles);
+        }
+
+        //Generate declarations for the objects lists
+        for (unsigned int j = 1;j<=maxDepth;++j)
+        {
+            globalObjectLists += codeGenerator.GetCodeNamespace()
+                                 +ManObjListName(object.GetName())+gd::ToString(j) + "= [];\n";
+            globalObjectListsReset += codeGenerator.GetCodeNamespace()
+                                      +ManObjListName(object.GetName())+gd::ToString(j) + ".length = 0;\n";
+        }
+    };
+
     std::string globalObjectLists;
     std::string globalObjectListsReset;
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
-    {
-        const gd::Object & object = project.GetObject(i);
+        generateDeclarations(project.GetObject(i), maxDepthLevelReached, globalObjectLists, globalObjectListsReset);
 
-        //Ensure needed files are included.
-        std::string type = gd::GetTypeOfObject(project, scene, object.GetName());
-        const gd::ObjectMetadata & metadata = gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
-        codeGenerator.AddIncludeFiles(metadata.includeFiles);
-
-        std::vector<std::string> automatisms = object.GetAllAutomatismNames();
-        for (unsigned int j = 0;j<automatisms.size();++j)
-        {
-            const gd::AutomatismMetadata & metadata = gd::MetadataProvider::GetAutomatismMetadata(JsPlatform::Get(),
-                                                                                                  object.GetAutomatism(automatisms[j]).GetTypeName());
-            codeGenerator.AddIncludeFiles(metadata.includeFiles);
-        }
-
-        //Generate declarations for the objects lists
-        for (unsigned int j = 1;j<=maxDepthLevelReached;++j)
-        {
-            globalObjectLists += codeGenerator.GetCodeNamespace()
-                                 +ManObjListName(object.GetName())+gd::ToString(j) + "= [];\n";
-            globalObjectListsReset += codeGenerator.GetCodeNamespace()
-                                      +ManObjListName(object.GetName())+gd::ToString(j) + ".length = 0;\n";
-        }
-    }
     for (unsigned int i = 0;i<scene.GetObjectsCount();++i)
-    {
-        const gd::Object & object = scene.GetObject(i);
-
-        //Ensure needed files are included.
-        std::string type = gd::GetTypeOfObject(project, scene, object.GetName());
-        const gd::ObjectMetadata & metadata = gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
-        codeGenerator.AddIncludeFiles(metadata.includeFiles);
-
-        std::vector<std::string> automatisms = object.GetAllAutomatismNames();
-        for (unsigned int j = 0;j<automatisms.size();++j)
-        {
-            const gd::AutomatismMetadata & metadata = gd::MetadataProvider::GetAutomatismMetadata(JsPlatform::Get(),
-                                                                                                  object.GetAutomatism(automatisms[j]).GetTypeName());
-            codeGenerator.AddIncludeFiles(metadata.includeFiles);
-        }
-
-        //Generate declarations for the objects lists
-        for (unsigned int j = 1;j<=maxDepthLevelReached;++j)
-        {
-            globalObjectLists += codeGenerator.GetCodeNamespace()
-                                 +ManObjListName(object.GetName())+gd::ToString(j) + "= [];\n";
-            globalObjectListsReset += codeGenerator.GetCodeNamespace()
-                                      +ManObjListName(object.GetName())+gd::ToString(j) + ".length = 0;\n";
-        }
-    }
+        generateDeclarations(scene.GetObject(i), maxDepthLevelReached, globalObjectLists, globalObjectListsReset);
 
     //Condition global booleans
     std::string globalConditionsBooleans;

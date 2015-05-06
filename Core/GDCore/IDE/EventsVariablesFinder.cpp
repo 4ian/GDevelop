@@ -33,8 +33,6 @@ public:
     virtual ~CallbacksForSearchingVariable() {};
 
     virtual void OnConstantToken(std::string text) {}
-    virtual void OnNumber(std::string text) {}
-    virtual void OnOperator(std::string text) {}
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
     virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }

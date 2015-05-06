@@ -118,7 +118,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             if ( parsingNumber )
             {
-                //callbacks.OnNumber(lastNumber);
                 parsingNumber = false;
                 parsingScientificNotationNumber = false;
                 parsingDecimalNumber = false;
@@ -184,7 +183,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             if ( parsingNumber )
             {
-                //callbacks.OnNumber(lastNumber);
                 parsingNumber = false;
                 parsingScientificNotationNumber = false;
                 parsingDecimalNumber = false;
@@ -213,7 +211,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
                 return false;
             }
-            //callbacks.OnOperator(")");
         }
         else if ( str[parsePos] == '(' )
         {
@@ -226,7 +223,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             if ( parsingNumber )
             {
-                //callbacks.OnNumber(lastNumber);
                 parsingNumber = false;
                 parsingScientificNotationNumber = false;
                 parsingDecimalNumber = false;
@@ -243,7 +239,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             parenthesisLevel++;
             numberWasParsedLast = false;
-            //callbacks.OnOperator("(");
         }
         else if ( operators.find_first_of(str[parsePos]) != std::string::npos )
         {
@@ -263,7 +258,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
                 if ( parsingNumber )
                 {
-                    //callbacks.OnNumber(lastNumber);
                     parsingNumber = false;
                     parsingScientificNotationNumber = false;
                     parsingDecimalNumber = false;
@@ -278,7 +272,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
                     return false;
                 }
 
-                //callbacks.OnOperator(str.substr(parsePos,1));
                 numberWasParsedLast = false;
             }
         }
@@ -292,7 +285,6 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
     if ( parsingNumber )
     {
-        //callbacks.OnNumber(lastNumber);
         parsingNumber = false;
         parsingScientificNotationNumber = false;
         parsingDecimalNumber = false;

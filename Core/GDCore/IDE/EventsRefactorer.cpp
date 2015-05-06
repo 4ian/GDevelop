@@ -35,14 +35,6 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
     {
         plainExpression += text;
     };
-    virtual void OnNumber(std::string text)
-    {
-        plainExpression += text;
-    };
-    virtual void OnOperator(std::string text)
-    {
-        plainExpression += text;
-    };
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
@@ -149,8 +141,6 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
     bool objectPresent; //True if the object is present in the expression
 
     virtual void OnConstantToken(std::string text){};
-    virtual void OnOperator(std::string text){};
-    virtual void OnNumber(std::string text){};
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {

@@ -67,6 +67,14 @@ gdjs.Layer.prototype.getName = function() {
 };
 
 /**
+ * Get the PIXI.DisplayObjectContainer associated to the layer
+ * @method getPIXIContainer
+ */
+gdjs.Layer.prototype.getPIXIContainer = function() {
+	return this._pixiContainer;
+};
+
+/**
  * Add a child to the pixi container associated to the layer.<br>
  * All objects which are on this layer must be children of this container.<br>
  *

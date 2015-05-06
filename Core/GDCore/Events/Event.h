@@ -119,10 +119,10 @@ public:
     ///@{
 
     /**
-     * \brief Generate the code event : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
-     * which is then used to generate the code event ( gd::EventMetadata::codeGeneration member )
+     * \brief Generate the code event: the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to generate the code event.
      *
-     * \warning Even if this method is virtual, you should never redefine it: Always provide the code generation using gd::EventMetadata.
+     * \warning Even if this method is virtual, you should never redefine it: always provide the code generation using gd::EventMetadata.
      * This method is virtual as some platforms could have hidden events ( such as profiling events ) needing code generation without declaring
      * the event as a part of an extension.
      *
@@ -131,8 +131,8 @@ public:
     virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
-     * Called before events are compiled : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
-     * which is then used to preprocess the event ( gd::EventMetadata::codeGeneration member )
+     * Called before events are compiled: the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to preprocess the event.
      *
      * This is only done if the event MustBePreprocessed() return true.
      *
@@ -144,7 +144,7 @@ public:
     virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
 
     /**
-     * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::codeGeneration associated to the event will be called
+     * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::preprocessing associated to the event will be called
      * to preprocess the event.
      *
      * \see gd::BaseEvent::Preprocess

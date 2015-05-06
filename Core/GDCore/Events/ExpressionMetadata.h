@@ -10,6 +10,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include <memory>
+#include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -25,7 +26,7 @@ namespace gd
 class ExpressionCodeGenerationInformation
 {
 public:
-    ExpressionCodeGenerationInformation() : staticFunction(false) {};
+    ExpressionCodeGenerationInformation() : staticFunction(false), hasCustomCodeGenerator(false) {};
     virtual ~ExpressionCodeGenerationInformation() {};
 
     /**
@@ -56,27 +57,36 @@ public:
         return *this;
     }
 
-    /** \brief Class used to redefine instruction code generation
-     */
-    class CustomCodeGenerator
-    {
-    public:
-        virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
-    };
-
     /**
      * \brief Set that the function must be generated using a custom code generator.
      */
-    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
+    ExpressionCodeGenerationInformation & SetCustomCodeGenerator(std::function<std::string(const std::vector<gd::Expression> & parameters,
+        gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> codeGenerator)
     {
-        optionalCustomCodeGenerator = codeGenerator;
+        hasCustomCodeGenerator = true;
+        customCodeGenerator = codeGenerator;
         return *this;
     }
+
+    ExpressionCodeGenerationInformation & RemoveCustomCodeGenerator()
+    {
+        hasCustomCodeGenerator = false;
+        std::function<std::string(const std::vector<gd::Expression> & parameters,
+        gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> emptyFunction;
+        customCodeGenerator = emptyFunction;
+        return *this;
+    }
+
+    bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
     bool staticFunction;
     std::string functionCallName;
     std::string optionalIncludeFile;
-    std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+    bool hasCustomCodeGenerator;
+    std::function<std::string(
+        const std::vector<gd::Expression> & parameters,
+        gd::EventsCodeGenerator & codeGenerator,
+        gd::EventsCodeGenerationContext & context)> customCodeGenerator;
 };
 
 /**

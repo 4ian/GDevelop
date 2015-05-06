@@ -10,6 +10,7 @@
 #include <string>
 #include "GDCore/Events/Instruction.h"
 #include <memory>
+#include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -217,7 +218,7 @@ public:
     {
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
-        ExtraInformation() : accessType(Reference) {};
+        ExtraInformation() : accessType(Reference), hasCustomCodeGenerator(false) {};
         virtual ~ExtraInformation() {};
 
         /**
@@ -277,26 +278,33 @@ public:
             return *this;
         }
 
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
+        ExtraInformation & SetCustomCodeGenerator(std::function<std::string(Instruction & instruction,
+            gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> codeGenerator)
         {
-        public:
-            virtual std::string GenerateCode(Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
-        };
-
-        ExtraInformation & SetCustomCodeGenerator(std::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
+            hasCustomCodeGenerator = true;
+            customCodeGenerator = codeGenerator;
             return *this;
         }
+
+        ExtraInformation & RemoveCustomCodeGenerator()
+        {
+            hasCustomCodeGenerator = false;
+            std::function<std::string(Instruction & instruction,
+            gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> emptyFunction;
+            customCodeGenerator = emptyFunction;
+            return *this;
+        }
+
+        bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
         std::string functionCallName;
         std::string type;
         AccessType accessType;
         std::string optionalAssociatedInstruction;
         std::string optionalIncludeFile;
-        std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
+        bool hasCustomCodeGenerator;
+        std::function<std::string(Instruction & instruction,
+            gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> customCodeGenerator;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 

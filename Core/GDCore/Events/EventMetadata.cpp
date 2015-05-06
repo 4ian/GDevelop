@@ -11,28 +11,28 @@
 namespace gd
 {
 
-EventMetadata::EventMetadata(const std::string & name_,
-                             const std::string & fullname_,
-                             const std::string & description_,
-                             const std::string & group_,
-                             const std::string & smallicon_,
-                             std::shared_ptr<gd::BaseEvent> instance_) :
-fullname(fullname_),
-description(description_),
-group(group_),
-instance(instance_)
+EventMetadata::EventMetadata(const std::string & name_, const std::string & fullname_,
+	const std::string & description_, const std::string & group_, const std::string & smallicon_,
+	std::shared_ptr<gd::BaseEvent> instance_) :
+	fullname(fullname_),
+	description(description_),
+	group(group_),
+	instance(instance_)
 {
-    if ( instance ) instance->SetType(name_);
+	ClearCodeGenerationAndPreprocessing();
+    if (instance) instance->SetType(name_);
 }
 
-std::string EventMetadata::CodeGenerator::Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
-{
-    return "";
-}
 
-void EventMetadata::CodeGenerator::Preprocess(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-                                              gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)
+void EventMetadata::ClearCodeGenerationAndPreprocessing()
 {
+	hasCustomCodeGenerator = false;
+	codeGeneration = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &) {
+	    return "";
+	};
+	preprocessing = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsList &, unsigned int) {
+		//Do nothing
+	};
 }
 
 }

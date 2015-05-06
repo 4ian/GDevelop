@@ -45,8 +45,8 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
         if ( guessedExtension )
         {
             std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
-            if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
-                return allEvents[type].codeGeneration->Generate(*this, codeGenerator, context);
+            if ( allEvents.find(type) != allEvents.end() )
+                return allEvents[type].codeGeneration(*this, codeGenerator, context);
         }
 
 
@@ -57,8 +57,8 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
             if ( !extension ) continue;
 
             std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
-            if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
-                return allEvents[type].codeGeneration->Generate(*this, codeGenerator, context);
+            if ( allEvents.find(type) != allEvents.end() )
+                return allEvents[type].codeGeneration(*this, codeGenerator, context);
         }
     }
     catch(...)
@@ -85,10 +85,9 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
         if ( guessedExtension )
         {
             std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
-            if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
-                return allEvents[type].codeGeneration->Preprocess(*this, codeGenerator, eventList, indexOfTheEventInThisList);
+            if ( allEvents.find(type) != allEvents.end() )
+                return allEvents[type].preprocessing(*this, codeGenerator, eventList, indexOfTheEventInThisList);
         }
-
 
         //Else make a search in all the extensions
         for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
@@ -97,8 +96,8 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
             if ( !extension ) continue;
 
             std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
-            if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
-                return allEvents[type].codeGeneration->Preprocess(*this, codeGenerator, eventList, indexOfTheEventInThisList);
+            if ( allEvents.find(type) != allEvents.end() )
+                return allEvents[type].preprocessing(*this, codeGenerator, eventList, indexOfTheEventInThisList);
         }
     }
     catch(...)

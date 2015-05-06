@@ -188,11 +188,11 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
     AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
     maxConditionsListsSize = std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
-    if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( instrInfos.codeExtraInformation.HasCustomCodeGenerator())
     {
         context.EnterCustomCondition();
         conditionCode += GenerateReferenceToUpperScopeBoolean("conditionTrue", returnBoolean, context);
-        conditionCode += instrInfos.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(condition, *this, context);
+        conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(condition, *this, context);
         maxCustomConditionsDepth = std::max(maxCustomConditionsDepth, context.GetCurrentConditionDepth());
         context.LeaveCustomCondition();
 
@@ -341,9 +341,9 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 
     AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
 
-    if ( instrInfos.codeExtraInformation.optionalCustomCodeGenerator != std::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>() )
+    if ( instrInfos.codeExtraInformation.HasCustomCodeGenerator() )
     {
-        return instrInfos.codeExtraInformation.optionalCustomCodeGenerator->GenerateCode(action, *this, context);
+        return instrInfos.codeExtraInformation.customCodeGenerator(action, *this, context);
     }
 
     //Be sure there is no lack of parameter.

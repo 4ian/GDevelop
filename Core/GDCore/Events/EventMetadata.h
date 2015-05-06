@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -32,34 +33,34 @@ class GD_CORE_API EventMetadata
 {
 public:
     /**
-     * \brief Base class used to define the code generated for a single event.
-     * \warning Must not be confused with gd::EventsCodeGenerator which is a more general class
-     * used to generate code for a whole layout or a list of conditions/actions.
+     * \brief Set the code generator used when generating code from events.
      */
-    class GD_CORE_API CodeGenerator
-    {
-    public :
-        /**
-         * \brief Called to generate the code for the event.
-         *
-         * You can use gd::EventsCodeGenerator methods in particular so as to generate code for conditions or actions.
-         */
-        virtual std::string Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
-
-        /**
-         * \brief Called for events that must be preprocessed.
-         *
-         * Most of the events do not requires preprocessing, so you do not need to take care of this function,
-         * unless for special cases like gd::LinkEvent.
-         */
-        virtual void Preprocess(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-                                gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
-    };
+    EventMetadata & SetCodeGenerator(std::function<std::string(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+        gd::EventsCodeGenerationContext & context)> function) {
+        hasCustomCodeGenerator = true;
+        codeGeneration = function;
+        return *this;
+    }
 
     /**
-     * Set the code generator used when generating code from events.
+     * \brief Set the code to preprocess the event.
      */
-    void SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator> codeGenerator) { codeGeneration = codeGenerator; }
+    EventMetadata & SetPreprocessing(std::function<void(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+        gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)> function) {
+        preprocessing = function;
+        return *this;
+    }
+
+    /**
+     * \brief Reset the code generation and preprocessing functions of the event.
+     */
+    void ClearCodeGenerationAndPreprocessing();
+
+    /**
+     * \brief Return true if SetCodeGenerator was called to set a function to call
+     * to generate the event code.
+     */
+    bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
     EventMetadata(const std::string & name_,
                  const std::string & fullname_,
@@ -86,9 +87,12 @@ public:
 #endif
 
     std::shared_ptr<gd::BaseEvent> instance;
-    std::shared_ptr<gd::EventMetadata::CodeGenerator> codeGeneration;
+    bool hasCustomCodeGenerator;
+    std::function<std::string(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+        gd::EventsCodeGenerationContext & context)> codeGeneration;
+    std::function<void(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+        gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)> preprocessing;
 };
-
 
 }
 

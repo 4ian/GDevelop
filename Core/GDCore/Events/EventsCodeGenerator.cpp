@@ -298,7 +298,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
  * Generate code for a list of conditions.
  * Bools containing conditions results are named conditionXIsTrue.
  */
-string EventsCodeGenerator::GenerateConditionsListCode(vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, EventsCodeGenerationContext & context)
 {
     string outputCode;
 
@@ -437,7 +437,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 /**
  * Generate actions code.
  */
-string EventsCodeGenerator::GenerateActionsListCode(vector < gd::Instruction > & actions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateActionsListCode(gd::InstructionsList & actions, EventsCodeGenerationContext & context)
 {
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)
@@ -816,8 +816,6 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
                                                                    bool conditionInverted,
                                                                    gd::EventsCodeGenerationContext & context)
 {
-    std::string conditionCode;
-
     //Prepare call
     //Add a static_cast if necessary
     string objectFunctionCallNamePart =
@@ -856,8 +854,6 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
                                                                    bool conditionInverted,
                                                                    gd::EventsCodeGenerationContext & context)
 {
-    std::string conditionCode;
-
     //Create call
     string predicat;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
@@ -912,8 +908,6 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
                                                       const gd::InstructionMetadata & instrInfos,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    std::string actionCode;
-
     //Create call
     string call;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
@@ -947,8 +941,6 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    gd::EventsCodeGenerationContext & context)
 {
-    std::string actionCode;
-
     //Create call
     string call;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )

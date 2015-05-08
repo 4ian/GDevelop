@@ -40,23 +40,23 @@ void ArbitraryEventsWorker::VisitEvent(gd::BaseEvent & event)
 {
     DoVisitEvent(event);
 
-    vector < vector<gd::Instruction>* > conditionsVectors =  event.GetAllConditionsVectors();
+    vector < gd::InstructionsList* > conditionsVectors =  event.GetAllConditionsVectors();
     for (unsigned int j = 0;j < conditionsVectors.size();++j)
     	VisitInstructionList(*conditionsVectors[j], true);
 
-    vector < vector<gd::Instruction>* > actionsVectors =  event.GetAllActionsVectors();
+    vector < gd::InstructionsList* > actionsVectors =  event.GetAllActionsVectors();
     for (unsigned int j = 0;j < actionsVectors.size();++j)
     	VisitInstructionList(*actionsVectors[j], false);
 }
 
-void ArbitraryEventsWorker::VisitInstructionList(std::vector<gd::Instruction> & instructions, bool areConditions)
+void ArbitraryEventsWorker::VisitInstructionList(gd::InstructionsList & instructions, bool areConditions)
 {
     DoVisitInstructionList(instructions, areConditions);
 
     for (unsigned int i = 0;i < instructions.size();)
     {
         if ( VisitInstruction(instructions[i], areConditions) )
-            instructions.erase(instructions.begin()+i);
+            instructions.Remove(i);
         else
         {
         	if ( !instructions[i].GetSubInstructions().empty() )

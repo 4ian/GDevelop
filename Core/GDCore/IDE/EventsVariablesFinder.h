@@ -70,7 +70,7 @@ private:
      */
     static std::set < std::string > FindArgumentsInInstructions(const gd::Platform & platform,
         const gd::Project & project, const gd::Layout & layout,
-        const std::vector < gd::Instruction > & instructions, bool instructionsAreConditions,
+        const gd::InstructionsList & instructions, bool instructionsAreConditions,
         const std::string & parameterType, const std::string & objectName = "");
 
     /**

@@ -192,9 +192,11 @@ private:
     wxTreeItemId GetLastGlobalGroupItem() const;
 
     //Tools functions
-    bool HasGroupNamed(std::string name, std::vector<gd::ObjectGroup> & groups);
+    bool HasGroupNamed(std::string name, const std::vector<gd::ObjectGroup> & groups) const;
     gd::ObjectGroup & GetGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
     void RemoveGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
+
+    std::string GetExistingObjectsErrorMessage(unsigned int nameCheckResult, const std::vector<std::string> &layoutsWithSameName) const;
 
     gd::Project & project;
     gd::Layout & layout;

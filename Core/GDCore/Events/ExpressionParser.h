@@ -93,8 +93,6 @@ public:
     const std::string & GetReturnType() { return returnType; }
 
     virtual void OnConstantToken(std::string text) = 0;
-    virtual void OnNumber(std::string text) = 0;
-    virtual void OnOperator(std::string text) = 0;
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
 

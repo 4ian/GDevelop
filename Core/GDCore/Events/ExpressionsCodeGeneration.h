@@ -42,8 +42,6 @@ public:
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
     void OnConstantToken(std::string text);
-    void OnNumber(std::string text);
-    void OnOperator(std::string text);
     void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
     void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);

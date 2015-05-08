@@ -54,81 +54,19 @@ AudioExtension::AudioExtension()
     GetAllConditions()["SoundChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
     GetAllConditions()["MusicChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
 
+    GetAllConditions()["SoundChannelPitch"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPitch");
+    GetAllConditions()["MusicChannelPitch"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPitch");
+
     GetAllExpressions()["SoundChannelVolume"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelVolume");
     GetAllExpressions()["MusicChannelVolume"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelVolume");
 
     GetAllExpressions()["SoundChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
     GetAllExpressions()["MusicChannelPlayingOffset"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
 
-    StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
-    /*
+    GetAllExpressions()["SoundChannelPitch"].SetFunctionName("gdjs.evtTools.sound.getSoundOnChannelPitch");
+    GetAllExpressions()["MusicChannelPitch"].SetFunctionName("gdjs.evtTools.sound.getMusicOnChannelPitch");
 
-    AddAction("ModPitchSoundChannel",
-                   GD_T("Pitch of the sound of a channel"),
-                   GD_T("This action modify pitch ( speed ) of the sound on a channel.\n1 is the default pitch."),
-                   GD_T("Do _PARAM2__PARAM3_ to the pitch of the sound on channel _PARAM1_"),
-                   GD_T("Sounds"),
-                   "res/actions/son24.png",
-                   "res/actions/son.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", GD_T("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
-        .SetFunctionName("SetSoundPitchOnChannel").SetGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-
-
-    AddAction("ModPitchMusicChannel",
-                   GD_T("Pitch of the music on a channel"),
-                   GD_T("This action modify the pitch of the music on the specified channel. 1 is the default pitch"),
-                   GD_T("Do _PARAM2__PARAM3_ to the pitch of the music on channel _PARAM1_"),
-                   GD_T("Musics"),
-                   "res/actions/music24.png",
-                   "res/actions/music.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", GD_T("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
-        .SetFunctionName("SetMusicPitchOnChannel").SetGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-
-    AddCondition("SoundChannelPitch",
-                   GD_T("Pitch of the sound of a channel"),
-                   GD_T("Test the pitch of the sound on the specified channel. 1 is the default pitch."),
-                   GD_T("The pitch of the sound on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   GD_T("Sounds"),
-                   "res/conditions/sonVolume24.png",
-                   "res/conditions/sonVolume.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", GD_T("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Pitch to test"), "",false)
-        .SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-
-
-
-    AddCondition("MusicChannelPitch",
-                   GD_T("Pitch of the music on a channel"),
-                   GD_T("Test the pitch ( speed ) of the music on specified channel. 1 is the default pitch."),
-                   GD_T("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   GD_T("Musics"),
-                   "res/conditions/musicVolume24.png",
-                   "res/conditions/musicVolume.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", GD_T("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Pitch to test"), "",false)
-        .SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-
-    AddExpression("SoundChannelPitch", GD_T("Sound's pitch"), GD_T("Sound's pitch"), GD_T("Sounds"), "res/actions/son.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", GD_T("Channel"), "",false)
-        .SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-
-    AddExpression("MusicChannelPitch", GD_T("Music's pitch"), GD_T("Music's pitch"), GD_T("Musics"), "res/actions/music.png")
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", GD_T("Channel"), "",false)
-        .SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDCpp/BuiltinExtensions/AudioTools.h");
-
-    */
+    StripUnimplementedInstructionsAndExpressions();
 }
 
 void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker)

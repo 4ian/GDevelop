@@ -736,8 +736,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddCondition("Distance",
                    GD_T("Distance between two objects"),
-                   GD_T("Test the distance between two objects."),
-                   GD_T("The distance between _PARAM0_ and _PARAM1_ is below _PARAM2_ pixels"),
+                   GD_T("Test the distance between two objects.\nIf condition is inverted, only objects that have a distance greater than specified to any other object will be picked."),
+                   GD_T("_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"),
                    GD_T("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")

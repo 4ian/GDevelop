@@ -104,7 +104,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     exportedProject.SetFirstLayout(layout.GetName());
 
     //Export the project
-    std::string result = ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
+    ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
                                       "gdjs.projectData", false);
     includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
@@ -164,7 +164,7 @@ bool Exporter::ExportIntelXDKIndexFile(gd::Project & project, std::string export
     #if !defined(GD_NO_WX_GUI)
     {
         //Open the index.html template
-        std::string str = fs.ReadFile("./JsPlatform/Runtime/XDKindex.html");
+        std::string str = fs.ReadFile("./JsPlatform/Runtime/CordovaIndex.html");
 
         //Generate custom declarations for font resources
         std::string customCss;
@@ -300,6 +300,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     //First, do not forget common includes ( They must be included before events generated code files ).
     InsertUnique(includesFiles, "libs/pixi.js");
     InsertUnique(includesFiles, "libs/jshashtable.js");
+    InsertUnique(includesFiles, "libs/howler.min.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "commontools.js");
@@ -397,7 +398,6 @@ bool Exporter::ExportIncludesAndLibs(std::vector<std::string> & includesFiles, s
             std::string allJsFiles;
             for ( std::vector<std::string>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
             {
-                std::string jsFile = "";
                 if ( fs.FileExists(jsPlatformDir+"Runtime/"+*include) )
                     allJsFiles += "\""+jsPlatformDir+"Runtime/"+*include+"\" ";
                 else if ( fs.FileExists(jsPlatformDir+"Runtime/Extensions/"+*include) )
@@ -557,7 +557,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         #endif
 
         //...and export it
-        std::string result = ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
+        ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
                                           "gdjs.projectData", false);
         includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 

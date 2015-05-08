@@ -35,14 +35,6 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
     {
         plainExpression += text;
     };
-    virtual void OnNumber(std::string text)
-    {
-        plainExpression += text;
-    };
-    virtual void OnOperator(std::string text)
-    {
-        plainExpression += text;
-    };
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
@@ -149,8 +141,6 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
     bool objectPresent; //True if the object is present in the expression
 
     virtual void OnConstantToken(std::string text){};
-    virtual void OnOperator(std::string text){};
-    virtual void OnNumber(std::string text){};
 
     virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
@@ -199,7 +189,7 @@ private:
     std::string name;
 };
 
-bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string oldName, std::string newName)
 {
     bool somethingModified = false;
 
@@ -250,7 +240,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::
     return somethingModified;
 }
 
-bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string oldName, std::string newName)
 {
     bool somethingModified = false;
 
@@ -305,7 +295,7 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::P
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
+        vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInConditions(platform, project, layout, *conditionsVectors[j], oldName, newName);
@@ -314,7 +304,7 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::P
             #endif
         }
 
-        vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
+        vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInActions(platform, project, layout, *actionsVectors[j], oldName, newName);
@@ -327,7 +317,7 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::P
     }
 }
 
-bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string name)
+bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string name)
 {
     bool somethingModified = false;
 
@@ -374,7 +364,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::
         if ( deleteMe )
         {
             somethingModified = true;
-            actions.erase(actions.begin()+aId);
+            actions.Remove(aId);
             aId--;
         }
         else if ( !actions[aId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInActions(platform, project, layout, actions[aId].GetSubInstructions(), name) || somethingModified;
@@ -383,7 +373,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::
     return somethingModified;
 }
 
-bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string name)
+bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string name)
 {
     bool somethingModified = false;
 
@@ -428,7 +418,7 @@ bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, g
         if ( deleteMe )
         {
             somethingModified = true;
-            conditions.erase(conditions.begin()+cId);
+            conditions.Remove(cId);
             cId--;
         }
         else if ( !conditions[cId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInConditions(platform, project, layout, conditions[cId].GetSubInstructions(), name) || somethingModified;
@@ -441,7 +431,7 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::P
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
+        vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool conditionsModified = RemoveObjectInConditions(platform, project, layout, *conditionsVectors[j], name);
@@ -450,7 +440,7 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::P
             #endif
         }
 
-        vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
+        vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool actionsModified = RemoveObjectInActions(platform, project, layout, *actionsVectors[j], name);
@@ -474,7 +464,7 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
     {
         if ( inConditions )
         {
-            vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
+            vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 bool conditionsModified = ReplaceStringInConditions(project, layout, *conditionsVectors[j], toReplace, newString, matchCase);
@@ -486,7 +476,7 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
 
         if ( inActions )
         {
-            vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
+            vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 bool actionsModified = ReplaceStringInActions(project, layout, *actionsVectors[j], toReplace, newString, matchCase);
@@ -528,7 +518,7 @@ std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, con
     return context;
 }
 
-bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string toReplace, std::string newString, bool matchCase)
 {
     bool somethingModified = false;
 
@@ -555,7 +545,7 @@ bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout 
     return somethingModified;
 }
 
-bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string toReplace, std::string newString, bool matchCase)
 {
     bool somethingModified = false;
 
@@ -596,7 +586,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 
         if ( inConditions )
         {
-            vector < vector<gd::Instruction>* > conditionsVectors =  events[i].GetAllConditionsVectors();
+            vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInConditions(project, layout, *conditionsVectors[j], search, matchCase))
@@ -608,7 +598,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 
         if ( inActions )
         {
-            vector < vector<gd::Instruction>* > actionsVectors =  events[i].GetAllActionsVectors();
+            vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInActions(project, layout, *actionsVectors[j], search, matchCase))
@@ -628,7 +618,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
     return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & actions, std::string search, bool matchCase)
+bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string search, bool matchCase)
 {
     if ( !matchCase ) search = gd::StrUppercase(search);
 
@@ -649,7 +639,7 @@ bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout &
     return false;
 }
 
-bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, vector < gd::Instruction > & conditions, std::string search, bool matchCase)
+bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string search, bool matchCase)
 {
     if ( !matchCase ) search = gd::StrUppercase(search);
 

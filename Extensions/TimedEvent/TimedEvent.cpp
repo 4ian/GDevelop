@@ -35,17 +35,17 @@ TimedEvent::~TimedEvent()
 {
 }
 
-vector < vector<gd::Instruction>* > TimedEvent::GetAllConditionsVectors()
+vector < gd::InstructionsList* > TimedEvent::GetAllConditionsVectors()
 {
-    vector < vector<gd::Instruction>* > allConditions;
+    vector < gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<gd::Instruction>* > TimedEvent::GetAllActionsVectors()
+vector < gd::InstructionsList* > TimedEvent::GetAllActionsVectors()
 {
-    vector < vector<gd::Instruction>* > allActions;
+    vector < gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
@@ -59,17 +59,17 @@ vector < gd::Expression* > TimedEvent::GetAllExpressions()
     return allExpressions;
 }
 
-vector < const vector<gd::Instruction>* > TimedEvent::GetAllConditionsVectors() const
+vector < const gd::InstructionsList* > TimedEvent::GetAllConditionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allConditions;
+    vector < const gd::InstructionsList* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < const vector<gd::Instruction>* > TimedEvent::GetAllActionsVectors() const
+vector < const gd::InstructionsList* > TimedEvent::GetAllActionsVectors() const
 {
-    vector < const vector<gd::Instruction>* > allActions;
+    vector < const gd::InstructionsList* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

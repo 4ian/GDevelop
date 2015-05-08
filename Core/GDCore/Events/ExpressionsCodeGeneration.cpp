@@ -37,17 +37,6 @@ void CallbacksForGeneratingExpressionCode::OnConstantToken(string text)
 {
     plainExpression += text;
 };
-void CallbacksForGeneratingExpressionCode::OnOperator(string text)
-{
-    plainExpression += text;
-};
-void CallbacksForGeneratingExpressionCode::OnNumber(string text)
-{
-    if (text.find_first_of(".e") == std::string::npos)
-        text += ".0";
-
-    plainExpression += text;
-};
 
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {

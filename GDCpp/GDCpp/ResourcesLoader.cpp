@@ -117,10 +117,11 @@ std::string ResourcesLoader::LoadPlainText( const string & filename )
     if (resFile.ContainsFile(filename))
     {
         char* buffer = resFile.GetFile(filename);
-        if (buffer==NULL)
+        if (!buffer) {
             cout << "Failed to read a file from resource file: " << filename << endl;
-
-        text = buffer;
+        } else {
+            text = buffer;
+        }
     }
     else
     {

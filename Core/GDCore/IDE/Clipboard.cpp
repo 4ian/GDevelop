@@ -121,14 +121,14 @@ gd::ExternalLayout Clipboard::GetExternalLayout()
     return *externalLayoutCopied;
 }
 
-void Clipboard::SetConditions( const std::vector<gd::Instruction> & conditions )
+void Clipboard::SetConditions( const gd::InstructionsList & conditions )
 {
     hasInstructions = true;
     instructionsAreConditions = true;
     instructionsCopied = conditions;
 }
 
-void Clipboard::SetActions( const std::vector<gd::Instruction> & actions )
+void Clipboard::SetActions( const gd::InstructionsList & actions )
 {
     hasInstructions = true;
     instructionsAreConditions = false;

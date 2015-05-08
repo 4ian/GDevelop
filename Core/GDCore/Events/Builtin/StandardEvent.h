@@ -9,6 +9,7 @@
 #define GDCORE_STANDARDEVENT_H
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventsList.h"
 namespace gd { class Instruction; }
 namespace gd { class Project; }
@@ -37,16 +38,16 @@ public:
     virtual const gd::EventsList & GetSubEvents() const {return events;};
     virtual gd::EventsList & GetSubEvents() {return events;};
 
-    const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
-    std::vector < gd::Instruction > & GetConditions() { return conditions; };
+    const gd::InstructionsList & GetConditions() const { return conditions; };
+    gd::InstructionsList & GetConditions() { return conditions; };
 
-    const std::vector < gd::Instruction > & GetActions() const { return actions; };
-    std::vector < gd::Instruction > & GetActions() { return actions; };
+    const gd::InstructionsList & GetActions() const { return actions; };
+    gd::InstructionsList & GetActions() { return actions; };
 
-    virtual std::vector < const std::vector<gd::Instruction>* > GetAllConditionsVectors() const;
-    virtual std::vector < const std::vector<gd::Instruction>* > GetAllActionsVectors() const;
-    virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
-    virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
+    virtual std::vector < const gd::InstructionsList* > GetAllConditionsVectors() const;
+    virtual std::vector < const gd::InstructionsList* > GetAllActionsVectors() const;
+    virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors();
+    virtual std::vector < gd::InstructionsList* > GetAllActionsVectors();
 
     virtual void SerializeTo(SerializerElement & element) const;
     virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
@@ -62,8 +63,8 @@ public:
     virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const;
 
 private:
-    std::vector < gd::Instruction > conditions;
-    std::vector < gd::Instruction > actions;
+    gd::InstructionsList conditions;
+    gd::InstructionsList actions;
     EventsList events;
 };
 

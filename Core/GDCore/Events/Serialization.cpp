@@ -22,15 +22,11 @@ using namespace std;
 namespace gd
 {
 
-void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions)
+void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {
         gd::Instruction & instr = list[i];
-
-        const gd::InstructionMetadata & metadata = instructionsAreActions ?
-                                             MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(), instr.GetType()) :
-                                             MetadataProvider::GetConditionMetadata(project.GetCurrentPlatform(), instr.GetType());
 
         if (instr.GetType() == "VarScene" ||
             instr.GetType() == "VarSceneTxt" ||
@@ -57,7 +53,7 @@ void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project,
     }
 }
 
-void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, std::vector < gd::Instruction > & list, bool instructionsAreActions)
+void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {
@@ -81,11 +77,6 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
         {
             instr.SetParameter(1, instr.GetParameter(5));
             instr.SetParameter(2, instr.GetParameter(3));
-        }
-        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
-        {
-            instr.SetParameter(4, instr.GetParameter(5));
-            instr.SetParameter(5, instr.GetParameter(6));
         }
         else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
         {
@@ -210,7 +201,7 @@ void EventsListSerialization::SerializeEventsTo(const EventsList & list, Seriali
 
 using namespace std;
 
-void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector < gd::Instruction > & conditions, const SerializerElement & elem)
+void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::InstructionsList & conditions, const SerializerElement & elem)
 {
     elem.ConsiderAsArrayOf("condition", "Condition");
     for(unsigned int i = 0; i<elem.GetChildrenCount(); ++i)
@@ -246,7 +237,7 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector <
         if ( conditionElem.HasChild("subConditions", "SubConditions") )
             OpenConditions(project, instruction.GetSubInstructions(), conditionElem.GetChild("subConditions", 0, "SubConditions" ));
 
-        conditions.push_back( instruction );
+        conditions.Insert( instruction );
     }
 
     if ( project.GetLastSaveGDMajorVersion() < 3 ||
@@ -257,7 +248,7 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, vector <
         UpdateInstructionsFromGD2x(project, conditions, false);
 }
 
-void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd::Instruction > & actions, const SerializerElement & elem)
+void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::InstructionsList & actions, const SerializerElement & elem)
 {
     elem.ConsiderAsArrayOf("action", "Action");
     for(unsigned int i = 0; i<elem.GetChildrenCount(); ++i)
@@ -292,7 +283,7 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd
         if ( actionElem.HasChild("subActions", "SubActions") )
             OpenActions(project, instruction.GetSubInstructions(), actionElem.GetChild("subActions", 0, "SubActions" ));
 
-        actions.push_back( instruction );
+        actions.Insert( instruction );
     }
 
     if ( project.GetLastSaveGDMajorVersion() < 3 ||
@@ -303,7 +294,7 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, vector < gd
         UpdateInstructionsFromGD2x(project, actions, true);
 }
 
-void gd::EventsListSerialization::SaveActions(const vector < gd::Instruction > & list, SerializerElement & actions)
+void gd::EventsListSerialization::SaveActions(const gd::InstructionsList & list, SerializerElement & actions)
 {
     actions.ConsiderAsArrayOf("action");
     for ( unsigned int k = 0;k < list.size();k++ )
@@ -325,7 +316,7 @@ void gd::EventsListSerialization::SaveActions(const vector < gd::Instruction > &
     }
 }
 
-void gd::EventsListSerialization::SaveConditions(const vector < gd::Instruction > & list, SerializerElement & conditions)
+void gd::EventsListSerialization::SaveConditions(const gd::InstructionsList & list, SerializerElement & conditions)
 {
     conditions.ConsiderAsArrayOf("condition");
     for ( unsigned int k = 0;k < list.size();k++ )

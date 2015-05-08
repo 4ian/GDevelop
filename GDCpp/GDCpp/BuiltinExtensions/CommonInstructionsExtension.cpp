@@ -50,7 +50,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             {
                 //Conditions code
                 std::string conditionsCode;
-                std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
+                gd::InstructionsList & conditions = instruction.GetSubInstructions();
 
                 //"OR" condition must declare objects list, but without picking the objects from the scene. Lists are either empty or come from a parent event.
                 set<string> emptyListsNeeded;
@@ -150,7 +150,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
-                std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
+                gd::InstructionsList & conditions = instruction.GetSubInstructions();
                 string outputCode;
 
                 for (unsigned int i = 0;i<conditions.size();++i)
@@ -534,9 +534,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             {
                 CppCodeEvent & event = dynamic_cast<CppCodeEvent&>(event_);
 
-                const gd::Project & project = codeGenerator.GetProject();
-                const gd::Layout & scene = codeGenerator.GetLayout();
-
                 //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
                 //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
 
@@ -553,7 +550,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 if ( event.GetPassObjectListAsParameter() )
                 {
                     std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(
-                        event.GetObjectToPassAsParameter(), parentContext); 
+                        event.GetObjectToPassAsParameter(), parentContext);
 
                     outputCode += "std::vector<RuntimeObject*> functionObjects;";
                     for (unsigned int i = 0;i<realObjects.size();++i)
@@ -575,7 +572,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         gd::EventMetadata::CodeGenerator * codeGen = new CodeGen;
 
         AddEvent("CppCode",
-                  GD_T("C++ code ( Experimental )"),
+                  GD_T("C++ code (Experimental)"),
                   GD_T("Execute C++ code"),
                   "",
                   "res/source_cpp16.png",

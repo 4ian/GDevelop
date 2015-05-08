@@ -936,8 +936,8 @@ bool Project::SaveToJSONFile(const std::string & filename)
 
 bool Project::ValidateObjectName(const std::string & name)
 {
-    std::string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    return !(name.find_first_not_of(allowedCharacter) != std::string::npos);
+    std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    return !(name.find_first_not_of(allowedCharacters) != std::string::npos);
 }
 
 std::string Project::GetBadObjectNameWarning()

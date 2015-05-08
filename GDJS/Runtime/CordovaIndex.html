@@ -11,13 +11,14 @@
 		body { background-color:white; color:black }
         /* GDJS_CUSTOM_STYLE */
 	</style>
-	<script src='intelxdk.js'></script>
+	<script src='cordova.js'></script>
 	<!-- GDJS_CODE_FILES -->
 	<script type="text/javascript">
-		/* This code is used to run as soon as Intel activates */
 		var onDeviceReady=function(){
 	        //Initialization
-			intel.xdk.device.hideSplashScreen();
+			if (typeof navigator !== "undefined" && navigator.splashscreen && navigator.splashscreen.hide)
+				navigator.splashscreen.hide();
+
 	        gdjs.registerObjects();
 	        gdjs.registerAutomatisms();
 	        gdjs.registerGlobalCallbacks();
@@ -37,7 +38,7 @@
 	            game.startStandardGameLoop();
 	        }
 		};
-		document.addEventListener("intel.xdk.device.ready", onDeviceReady, false);
+		document.addEventListener("deviceready", onDeviceReady, false);
 	</script>
 </head>
 <body>

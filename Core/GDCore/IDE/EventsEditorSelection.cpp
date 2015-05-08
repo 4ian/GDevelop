@@ -213,13 +213,13 @@ bool EventsEditorSelection::IsDraggingInstruction()
     return draggingInstruction;
 }
 
-std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bool dropAfterHighlightedElement)
+gd::InstructionsList * EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bool dropAfterHighlightedElement)
 {
     if (!draggingInstruction) return NULL;
     draggingInstruction = false;
 
     //Find where to drag
-    std::vector<gd::Instruction> * list = NULL;
+    gd::InstructionsList * list = NULL;
     size_t positionInList = std::string::npos;
     if ( instructionHighlighted.instructionList != NULL )
     {
@@ -261,20 +261,20 @@ std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool de
     }
 
     //Copy dragged instructions
-    std::vector<gd::Instruction> draggedInstructions;
+    gd::InstructionsList draggedInstructions;
     for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).instruction != NULL )
-            draggedInstructions.push_back(*(*it).instruction);
+            draggedInstructions.Insert(*(*it).instruction);
     }
 
     //Insert dragged instructions into their new list.
     for (unsigned int i = 0;i<draggedInstructions.size();++i)
     {
         if ( positionInList < list->size() )
-            list->insert(list->begin()+positionInList, draggedInstructions[i]);
+            list->Insert(draggedInstructions[i], positionInList);
         else
-            list->push_back(draggedInstructions[i]);
+            list->Insert(draggedInstructions[i]);
     }
 
     if ( deleteDraggedInstruction )
@@ -300,12 +300,6 @@ std::vector<gd::Instruction> * EventsEditorSelection::EndDragInstruction(bool de
 
     ClearSelection();
 
-    std::cout << "RETURNING THIS LIST" << list << "," << list->size() << std::endl;
-    for (std::vector<gd::Instruction>::iterator i = list->begin(); i != list->end(); ++i)
-    {
-        std::cout << i->GetType() << std::endl;
-
-    }
     return list;
 }
 
@@ -322,7 +316,7 @@ void EventsEditorSelection::EventHighlightedOnBottomPart(bool isOnbottomHandSide
 void EventsEditorSelection::DeleteAllInstructionSelected()
 {
     //1) Construct a map with their list and their index in the list
-    std::map< std::vector<gd::Instruction>*, std::list<unsigned int> > mapOfDeletionsRequest;
+    std::map< gd::InstructionsList*, std::list<unsigned int> > mapOfDeletionsRequest;
     for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).event != NULL ) (*it).event->eventHeightNeedUpdate = true;
@@ -330,14 +324,14 @@ void EventsEditorSelection::DeleteAllInstructionSelected()
             mapOfDeletionsRequest[(*it).instructionList].push_back((*it).positionInList);
     }
     //2) For each list, erase each index
-    for (std::map<std::vector<gd::Instruction>*,std::list<unsigned int> >::iterator it = mapOfDeletionsRequest.begin();it!=mapOfDeletionsRequest.end();++it)
+    for (std::map<gd::InstructionsList*,std::list<unsigned int> >::iterator it = mapOfDeletionsRequest.begin();it!=mapOfDeletionsRequest.end();++it)
     {
         std::list<unsigned int> & listOfIndexesToDelete = it->second;
         listOfIndexesToDelete.sort();
         listOfIndexesToDelete.reverse(); //We have erase from end to start to prevent index changing
 
         for (std::list<unsigned int>::iterator index = listOfIndexesToDelete.begin();index!=listOfIndexesToDelete.end();++index)
-            it->first->erase(it->first->begin()+*index);
+            it->first->Remove(*index);
     }
 }
 
@@ -349,7 +343,7 @@ EventsEditorSelection::EventsEditorSelection(gd::EventsEditorRefreshCallbacks & 
 }
 
 
-bool EventsEditorSelection::FindInInstructionsAndSubInstructions(std::vector<gd::Instruction> & list, const gd::Instruction * instrToSearch)
+bool EventsEditorSelection::FindInInstructionsAndSubInstructions(gd::InstructionsList & list, const gd::Instruction * instrToSearch)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {

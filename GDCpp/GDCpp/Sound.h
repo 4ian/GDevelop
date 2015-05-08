@@ -23,39 +23,42 @@ public:
     virtual ~Sound();
 
     /**
-     * Get Music SFML Status ( Paused, Playing, Stopped )
+     * \brief Get the sound status
+     * \return sf::Music::Paused, sf::Music::Playing or sf::Music::Stopped.
      */
     inline sf::Sound::Status GetStatus() const { return sound.getStatus(); }
 
     /**
-     * Change sound volume
+     * \brief Change the music volume.
+     * \param volume The new volume, between 0 and 100.
      */
     void SetVolume(float volume_);
 
     /**
-     * Get sound volume
+     * \brief Get the sound volume.
      */
     inline float GetVolume() const { return volume; }
 
     /**
-     * Change the pitch of the sound
+     * Change the pitch of the sound.
      */
     void SetPitch(float newPitch) { sound.setPitch(newPitch); };
 
     /**
-     * Get the pitch of the sound
+     * Get the pitch of the sound.
      */
     float GetPitch() const { return sound.getPitch(); };
 
     /**
      * Change the current playing position of the sound.
+     * \param timeOffset The new playing position, in seconds.
      */
-    void SetPlayingOffset(unsigned int timeOffset) { sound.setPlayingOffset(sf::milliseconds(timeOffset)); };
+    void SetPlayingOffset(double timeOffset) { sound.setPlayingOffset(sf::seconds(timeOffset)); };
 
     /**
-     * Return the current playing position of the music, in milliseconds.
+     * Return the current playing position of the music, in seconds.
      */
-    unsigned int GetPlayingOffset() const { return sound.getPlayingOffset().asMilliseconds(); };
+    double GetPlayingOffset() const { return sound.getPlayingOffset().asSeconds(); };
 
     //Order is important :
     sf::SoundBuffer buffer;
@@ -64,7 +67,9 @@ public:
     std::string file;
 
     /**
-     * Internal member functions to update music volume according to global volume.
+     * \brief Internal member functions to update music volume according to global volume.
+     *
+     * Called by the sound manager when the global volume is updated.
      */
     void UpdateVolume();
 

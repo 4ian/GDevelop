@@ -111,7 +111,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 //Conditions code
                 std::string conditionsCode;
-                std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
+                gd::InstructionsList & conditions = instruction.GetSubInstructions();
 
                 //"OR" condition must declare objects list, but without picking the objects from the scene.
                 //Lists are either empty or come from a parent event.
@@ -221,7 +221,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         {
             virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
+                gd::InstructionsList & conditions = instruction.GetSubInstructions();
                 string outputCode;
 
                 for (unsigned int i = 0;i<conditions.size();++i)

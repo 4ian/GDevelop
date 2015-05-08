@@ -9,8 +9,9 @@
 #include <string>
 
 /**
- * \brief Used to play a music
+ * \brief Represents a music to be played
  *
+ * \see SoundManager
  * \ingroup SoundEngine
  */
 class GD_API Music
@@ -39,7 +40,7 @@ public:
     void SetBuffer(const char * newbuffer, std::size_t size);
 
     /**
-     * Open sound stored in buffer ( See SetBuffer ).
+     * Open music stored in buffer.
      * \param size The buffer size.
      */
     bool OpenFromMemory(std::size_t size);
@@ -99,12 +100,12 @@ public:
      * \brief Change the current playing position of the music.
      * \param timeOffset The new playing position, in seconds.
      */
-    void SetPlayingOffset(unsigned int timeOffset) { music.setPlayingOffset(sf::seconds(timeOffset)); };
+    void SetPlayingOffset(double timeOffset) { music.setPlayingOffset(sf::seconds(timeOffset)); };
 
     /**
      * \brief Return the current playing position of the music, in seconds.
      */
-    unsigned int GetPlayingOffset() const { return music.getPlayingOffset().asSeconds(); };
+    double GetPlayingOffset() const { return music.getPlayingOffset().asSeconds(); };
 
     /**
      * \brief Internal member functions to update music volume according to global volume.

@@ -1615,11 +1615,11 @@ std::string ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheck
         errorMessage += " - ";
 
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInLayout) != 0)
-            errorMessage += gd::ToString(_("an object")) + gd::ToString(" ");
+            errorMessage += GD_T("an object") + gd::ToString(" ");
         else
-            errorMessage += gd::ToString(_("a group")) + gd::ToString(" ");
+            errorMessage += GD_T("a group") + gd::ToString(" ");
 
-        errorMessage += _("with the same name exists in the current scene");
+        errorMessage += GD_T("with the same name exists in the current scene");
     }
     if((nameCheckResult & gd::ObjectOrGroupFinder::InAnotherLayout) != 0)
     {
@@ -1629,13 +1629,13 @@ std::string ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheck
         errorMessage += " - ";
 
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0)
-            errorMessage += gd::ToString(_("objects")) + gd::ToString(" ");
+            errorMessage += GD_T("objects") + gd::ToString(" ");
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGroupInAnotherLayout) != 0)
             errorMessage += ((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0) ?
-                gd::ToString(_("/ groups")) :
-                gd::ToString(_("groups")) + gd::ToString(" ");
+                GD_T("/ groups") :
+                GD_T("groups") + gd::ToString(" ");
 
-        errorMessage += gd::ToString(_("with the same name exist in these scenes : "));
+        errorMessage += GD_T("with the same name exist in these scenes : ");
 
         for(auto it = layoutsWithSameName.begin(); it != layoutsWithSameName.end(); ++it)
         {
@@ -1650,9 +1650,9 @@ std::string ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheck
         errorMessage += " - ";
 
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGlobalObject) != 0)
-            errorMessage += _("a global object with the same name exists");
+            errorMessage += GD_T("a global object with the same name exists");
         else
-            errorMessage += _("a global group with the same name exists");
+            errorMessage += GD_T("a global group with the same name exists");
     }
 
     return errorMessage;

@@ -161,7 +161,7 @@ std::size_t GD_CORE_API Find( const std::string &utf8str, const std::string &sea
     }
     catch(const std::exception &exc)
     {
-        return -1;
+        return std::string::npos;
     }
 
     //Search using the standard method
@@ -182,9 +182,10 @@ std::size_t GD_CORE_API RFind( const std::string &utf8str, const std::string &se
         ::utf8::advance(it, pos + 1, utf8str.end()); //We need to get to the next character (because it will be included in the search) 
         --it; //Make it pointing to the end of the previous codepoint (that's why we needed the character next to "pos")
     }
-    catch(const std::exception &exc)
+    catch(const ::utf8::not_enough_room &exc)
     {
-        return -1;
+        //If the position is after the end of the string, we need to search the whole string
+        it = utf8str.end();
     }
 
     //Search using the standard method

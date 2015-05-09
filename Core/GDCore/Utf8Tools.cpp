@@ -120,22 +120,18 @@ std::string GD_CORE_API SubStr( const std::string &utf8str, std::size_t pos, std
     auto it = utf8str.begin();
 
     //Move to pos
-    int i = 0;
-    for(i = 0; i < pos && it != utf8str.end(); i++)
+    try
     {
-        try
-        {
-            ::utf8::next(it, utf8str.end());
-        }
-        catch(const ::utf8::not_enough_room &exc)
-        {
-            throw std::out_of_range("[UTF8] substr starting position is greater than the original string size");
-        }
+        ::utf8::advance(it, pos, utf8str.end());
+    }
+    catch(const ::utf8::not_enough_room &exc)
+    {
+        throw std::out_of_range("[UTF8] substr starting position is greater than the original string size");
     }
 
     //Copy needed code points to the new string
     std::string utf8substr;
-    for(i = 0; i < len && it != utf8str.end(); i++)
+    for(int i = 0; i < len && it != utf8str.end(); i++)
     {
         try
         {

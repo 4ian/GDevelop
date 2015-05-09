@@ -7,6 +7,7 @@
 #include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 
+#include <exception>
 #include <iostream>
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -126,34 +127,26 @@ std::string GD_CORE_API SubStr( const std::string &utf8str, std::size_t pos, std
         {
             ::utf8::next(it, utf8str.end());
         }
-        catch(const std::exception &exc)
+        catch(const ::utf8::not_enough_room &exc)
         {
-            std::cout << "[UTF8] SubStr : " << exc.what() << std::endl;
+            throw std::out_of_range("[UTF8] substr starting position is greater than the original string size");
         }
     }
-    if(i != pos)
-    {
-        std::cout << "[UTF8] String is not long enough !" << std::endl;
-        return ""; //We can't go to pos as the string is not big enough
-    }
 
-    //Copy needed code points to the new string (temporary in UTF32)
-    std::basic_string<std::uint32_t> utf32substr;
+    //Copy needed code points to the new string
+    std::string utf8substr;
     for(i = 0; i < len && it != utf8str.end(); i++)
     {
         try
         {
-            utf32substr.push_back(::utf8::next(it, utf8str.end()));
+            //Append the character
+            ::utf8::append(::utf8::next(it, utf8str.end()), std::back_inserter(utf8substr));
         }
         catch(const std::exception &exc)
         {
             std::cout << "[UTF8] SubStr : " << exc.what() << std::endl;
         }
     }
-
-    //Convert the UTF32 substr to UTF8
-    std::string utf8substr;
-    ::utf8::utf32to8(utf32substr.begin(), utf32substr.end(), std::back_inserter(utf8substr));
 
     return utf8substr;
 }
@@ -175,7 +168,7 @@ std::size_t GD_CORE_API Find( const std::string &utf8str, const std::string &sea
     std::size_t findPos = utf8str.find(search, std::distance(utf8str.begin(), it)); //Use the real distance in bytes in the standard find method
 
     if(findPos != std::string::npos)
-        return ::utf8::distance(utf8str.begin(), utf8str.begin() + findPos); //Return the position (consider UTF8 multibyte char)
+        return ::utf8::distance(utf8str.begin(), utf8str.begin() + findPos); //Return the position (considering UTF8 multibyte char)
     else
         return std::string::npos;
 }
@@ -187,7 +180,7 @@ std::size_t GD_CORE_API RFind( const std::string &utf8str, const std::string &se
     try
     {
         ::utf8::advance(it, pos + 1, utf8str.end()); //We need to get to the next character (because it will be included in the search) 
-        it--; //Make it pointing to the end of the previous codepoint (that's why we needed the character next to "pos")
+        --it; //Make it pointing to the end of the previous codepoint (that's why we needed the character next to "pos")
     }
     catch(const std::exception &exc)
     {
@@ -198,7 +191,7 @@ std::size_t GD_CORE_API RFind( const std::string &utf8str, const std::string &se
     std::size_t findPos = utf8str.rfind(search, std::distance(utf8str.begin(), it)); //Use the real distance in bytes in the standard rfind method
 
     if(findPos != std::string::npos)
-        return ::utf8::distance(utf8str.begin(), utf8str.begin() + findPos); //Return the position (consider UTF8 multibyte char)
+        return ::utf8::distance(utf8str.begin(), utf8str.begin() + findPos); //Return the position (considering UTF8 multibyte char)
     else
         return std::string::npos;
 }

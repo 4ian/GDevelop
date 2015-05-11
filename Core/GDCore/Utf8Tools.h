@@ -26,6 +26,10 @@ class wxString;
  * There are also other functions to convert from/to other string classes (like sf::String and wxString) as their default conversion methods
  * assumes that std::strings are encoded in the current locale (and that is not the case as there are encoded in UTF8).
  *
+ * \warning std::strings containing file or folder paths are not encoded in the OS locale (it is not needed). 
+ * This does not mean that it can not be encoded in UTF8. In fact, on most Linux OSes, the locale is UTF8, so, paths will still be encoded in UTF8.
+ * On Windows, the locale is not UTF8 but an ASCII codepage so paths will be encoded in an ASCII codepage.
+ *
  * \section utf8translations How to handle translations correctly ? Difference between _() and GD_T() ?
  * As all std::strings are encoded in UTF8, GDevelop can not rely on the default conversion between std::string and wxString.
  * So, each of these two macros creates a translatable string but not the same type of string.

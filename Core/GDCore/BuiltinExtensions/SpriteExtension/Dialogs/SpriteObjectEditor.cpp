@@ -1012,7 +1012,7 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh
 
 bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
-    std::vector<std::string > command = gd::SplitString<std::string>(ToString(text), ';');
+    std::vector<std::string > command = gd::SplitString<std::string>(gd::utf8::FromWxString(text), ';');
 
 	//"Normal" drop of one or more images.
     if (command.size() >= 2 && command[0] == "NORMAL") {

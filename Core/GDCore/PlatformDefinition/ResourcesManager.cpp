@@ -519,24 +519,24 @@ void ResourcesManager::RemoveResource(const std::string & name)
 #if defined(GD_IDE_ONLY)
 void ResourceFolder::UnserializeFrom(const SerializerElement & element, gd::ResourcesManager & parentManager)
 {
-    name = utf8::ToLocaleString(element.GetStringAttribute("name"));
+    name = element.GetStringAttribute("name");
 
     SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
     resourcesElement.ConsiderAsArrayOf("resource", "Resource");
     for(unsigned int i = 0;i<resourcesElement.GetChildrenCount();++i)
-        AddResource(utf8::ToLocaleString(resourcesElement.GetChild(i).GetStringAttribute("name")), parentManager);
+        AddResource(resourcesElement.GetChild(i).GetStringAttribute("name"), parentManager);
 }
 
 void ResourceFolder::SerializeTo(SerializerElement & element) const
 {
-    element.SetAttribute("name", utf8::FromLocaleString(name));
+    element.SetAttribute("name", name);
 
     SerializerElement & resourcesElement = element.AddChild("resources");
     resourcesElement.ConsiderAsArrayOf("resource");
     for (unsigned int i = 0;i<resources.size();++i)
     {
         if ( resources[i] == std::shared_ptr<Resource>() ) continue;
-        resourcesElement.AddChild("resource").SetAttribute("name", utf8::FromLocaleString(resources[i]->GetName()));
+        resourcesElement.AddChild("resource").SetAttribute("name", resources[i]->GetName());
     }
 }
 #endif
@@ -548,8 +548,8 @@ void ResourcesManager::UnserializeFrom(const SerializerElement & element)
     for(unsigned int i = 0;i<resourcesElement.GetChildrenCount();++i)
     {
         const SerializerElement & resourceElement = resourcesElement.GetChild(i);
-        std::string kind = utf8::ToLocaleString(resourceElement.GetStringAttribute("kind"));
-        std::string name = utf8::ToLocaleString(resourceElement.GetStringAttribute("name"));
+        std::string kind = resourceElement.GetStringAttribute("kind");
+        std::string name = resourceElement.GetStringAttribute("name");
 
         std::shared_ptr<Resource> resource = CreateResource(kind);
         resource->SetName(name);
@@ -581,8 +581,8 @@ void ResourcesManager::SerializeTo(SerializerElement & element) const
         if ( resources[i] == std::shared_ptr<Resource>() ) break;
 
         SerializerElement & resourceElement = resourcesElement.AddChild("resource");
-        resourceElement.SetAttribute("kind", utf8::FromLocaleString(resources[i]->GetKind()));
-        resourceElement.SetAttribute("name", utf8::FromLocaleString(resources[i]->GetName()));
+        resourceElement.SetAttribute("kind", resources[i]->GetKind());
+        resourceElement.SetAttribute("name", resources[i]->GetName());
 
         resources[i]->SerializeTo(resourceElement);
     }
@@ -608,7 +608,7 @@ void ImageResource::UnserializeFrom(const SerializerElement & element)
     alwaysLoaded = element.GetBoolAttribute("alwaysLoaded");
     smooth = element.GetBoolAttribute("smoothed");
     SetUserAdded( element.GetBoolAttribute("userAdded") );
-    SetFile(utf8::ToLocaleString(element.GetStringAttribute("file")));
+    SetFile(utf8::ToLocaleString(element.GetStringAttribute("file"))); //Keep the resource path in the current locale
 }
 
 #if defined(GD_IDE_ONLY)
@@ -617,7 +617,7 @@ void ImageResource::SerializeTo(SerializerElement & element) const
     element.SetAttribute("alwaysLoaded", alwaysLoaded);
     element.SetAttribute("smoothed", smooth);
     element.SetAttribute("userAdded", IsUserAdded());
-    element.SetAttribute("file", utf8::FromLocaleString(GetFile()));
+    element.SetAttribute("file", utf8::FromLocaleString(GetFile())); //Keep the resource path in the current locale (but save it in UTF8 for compatibility on other OSes)
 }
 
 

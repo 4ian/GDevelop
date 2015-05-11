@@ -109,7 +109,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
         const gd::SerializerElement & spriteElement = spritesElement.GetChild(i);
         Sprite sprite;
 
-        sprite.SetImageName(gd::utf8::ToLocaleString(spriteElement.GetStringAttribute("image")));
+        sprite.SetImageName(spriteElement.GetStringAttribute("image"));
         OpenPointsSprites(sprite.GetAllNonDefaultPoints(), spriteElement.GetChild("points", 0, "Points"));
 
         OpenPoint(sprite.GetOrigin(), spriteElement.GetChild("originPoint" , 0, "PointOrigine"));
@@ -168,7 +168,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerEleme
     {
         gd::SerializerElement & spriteElement = element.AddChild("sprite");
 
-        spriteElement.SetAttribute("image", gd::utf8::FromLocaleString(sprites[i].GetImageName()));
+        spriteElement.SetAttribute("image", sprites[i].GetImageName());
         SavePointsSprites(sprites[i].GetAllNonDefaultPoints(), spriteElement.AddChild("points"));
 
         SavePoint(sprites[i].GetOrigin(), spriteElement.AddChild("originPoint"));

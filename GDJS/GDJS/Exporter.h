@@ -78,10 +78,10 @@ private:
      * \param filename The filename where export the project
      * \param wrapIntoVariable If not empty, the resulting json will be wrapped in this javascript
      * variable allowing to use it as a classical javascript object.
-     * \param prettyPrinting If set to true, the JSON will be nicely indented
      * \return Empty string if everthing is ok, description of the error otherwise.
      */
-    static std::string ExportToJSON(gd::AbstractFileSystem & fs, const gd::Project & project, std::string filename, std::string wrapIntoVariable = "", bool prettyPrinting = false);
+    static std::string ExportToJSON(gd::AbstractFileSystem &fs, const gd::Project &project, std::string filename,
+                                          std::string wrapIntoVariable);
 
     /**
      * \brief Copy all the resources of the project to to the export directory, updating the resources filenames.

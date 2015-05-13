@@ -24,7 +24,6 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/Serialization/Serializer.h"
-#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
@@ -104,8 +103,8 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     exportedProject.SetFirstLayout(layout.GetName());
 
     //Export the project
-    ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
-                                      "gdjs.projectData", false);
+    ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
+                 "gdjs.projectData");
     includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
     //Copy all the dependencies
@@ -117,8 +116,8 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     return true;
 }
 
-std::string Exporter::ExportToJSON(gd::AbstractFileSystem & fs, const gd::Project & project,
-    std::string filename, std::string wrapIntoVariable, bool prettyPrinting)
+std::string Exporter::ExportToJSON(gd::AbstractFileSystem &fs, const gd::Project &project, std::string filename,
+                                         std::string wrapIntoVariable)
 {
     fs.MkDir(fs.DirNameFrom(filename));
 
@@ -557,8 +556,8 @@ bool Exporter::ExportWholeProject(gd::Project & project, std::string exportDir,
         #endif
 
         //...and export it
-        ExportToJSON(fs, exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js",
-                                          "gdjs.projectData", false);
+        ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
+                     "gdjs.projectData");
         includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
         #if !defined(GD_NO_WX_GUI)

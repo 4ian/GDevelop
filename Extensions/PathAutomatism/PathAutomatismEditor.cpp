@@ -307,7 +307,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
     advanceAddMenu.Append(addAfterBt);
     advanceAddMenu.Append(addBeforeBt);
 
-	previewPnlState.offset == sf::Vector2f(0, 0);
+	previewPnlState.offset = sf::Vector2f(0, 0);
 	previewPnlState.state = NOTHING;
 	previewPnlState.selectedPoint = -1;
 	previewPnlState.backgroundBitmap = NULL;

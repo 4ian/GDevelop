@@ -33,7 +33,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._text.anchor.y = 0.5;
     runtimeScene.getLayer("").addChildToPIXIContainer(this._text, this.zOrder);
 
-    this._text.setText(this._str.length === 0 ? " " : this._str);
+    this._text.text = this._str.length === 0 ? " " : this._str;
     this._justCreated = true; //Work around a PIXI.js bug. See updateTime method.
     this._updateTextStyle();
     this._updateTextPosition();
@@ -59,7 +59,7 @@ gdjs.TextRuntimeObject.prototype._updateTextStyle = function() {
     //if ( this._underlined ) style.font += "underlined "; Not supported :/
     style.font += this._characterSize+"px"+" "+this._fontName;
     style.fill = "rgb("+this._color[0]+","+this._color[1]+","+this._color[2]+")";
-    this._text.setStyle(style);
+    this._text.style = style;
 };
 
 gdjs.TextRuntimeObject.prototype.updateTime = function() {
@@ -146,7 +146,7 @@ gdjs.TextRuntimeObject.prototype.setString = function(str) {
     if ( str === this._str ) return;
 
     this._str = str;
-    this._text.setText(str.length === 0 ? " " : str);
+    this._text.text = str.length === 0 ? " " : str;
     this._text.updateText(); //Work around a PIXI.js bug.
     this._updateTextPosition();
 };

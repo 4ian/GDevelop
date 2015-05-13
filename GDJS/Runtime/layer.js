@@ -27,7 +27,7 @@ gdjs.Layer = function(layerData, runtimeScene)
     this._zoomFactor = 1;
     this._hidden = !layerData.visibility;
     this._pixiRenderer = runtimeScene.getPIXIRenderer();
-    this._pixiContainer = new PIXI.DisplayObjectContainer(); //The container of the layer
+    this._pixiContainer = new PIXI.Container(); //The container of the layer
     this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
     this._cameraY = runtimeScene.getGame().getDefaultHeight()/2;
     this._defaultWidth = runtimeScene.getGame().getDefaultWidth();
@@ -67,7 +67,7 @@ gdjs.Layer.prototype.getName = function() {
 };
 
 /**
- * Get the PIXI.DisplayObjectContainer associated to the layer
+ * Get the PIXI.Container associated to the layer
  * @method getPIXIContainer
  */
 gdjs.Layer.prototype.getPIXIContainer = function() {

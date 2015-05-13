@@ -16,7 +16,7 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
 
     if ( this._spritesContainer === undefined ) {
         var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.texture);
-        this._spritesContainer = new PIXI.DisplayObjectContainer();
+        this._spritesContainer = new PIXI.Container();
         this._centerSprite = new PIXI.Sprite(new PIXI.Texture(texture));
         this._borderSprites = [
             new PIXI.Sprite(new PIXI.Texture(texture)), //Right
@@ -177,28 +177,28 @@ gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(textureName, runti
         return rect;
     }
 
-    this._centerSprite.setTexture(new PIXI.Texture(texture,
+    this._centerSprite.texture = new PIXI.Texture(texture,
         makeInsideTexture(new PIXI.Rectangle(this._lBorder, this._tBorder,
         texture.width - this._lBorder - this._rBorder,
-        texture.height - this._tBorder - this._bBorder))));
+        texture.height - this._tBorder - this._bBorder)));
 
     //Top, Bottom, Right, Left borders:
-    this._borderSprites[0].setTexture(new PIXI.Texture(texture,
+    this._borderSprites[0].texture = new PIXI.Texture(texture,
         makeInsideTexture(new PIXI.Rectangle(texture.width - this._rBorder, this._tBorder, this._rBorder,
-        texture.height - this._tBorder - this._bBorder))));
-    this._borderSprites[2].setTexture(new PIXI.Texture(texture,
-        makeInsideTexture(new PIXI.Rectangle(this._lBorder, 0, texture.width - this._lBorder - this._rBorder, this._tBorder))));
-    this._borderSprites[4].setTexture(new PIXI.Texture(texture,
-        makeInsideTexture(new PIXI.Rectangle(0, this._tBorder, this._lBorder, texture.height - this._tBorder - this._bBorder))));
-    this._borderSprites[6].setTexture(new PIXI.Texture(texture,
+        texture.height - this._tBorder - this._bBorder)));
+    this._borderSprites[2].texture = new PIXI.Texture(texture,
+        makeInsideTexture(new PIXI.Rectangle(this._lBorder, 0, texture.width - this._lBorder - this._rBorder, this._tBorder)));
+    this._borderSprites[4].texture = new PIXI.Texture(texture,
+        makeInsideTexture(new PIXI.Rectangle(0, this._tBorder, this._lBorder, texture.height - this._tBorder - this._bBorder)));
+    this._borderSprites[6].texture = new PIXI.Texture(texture,
         makeInsideTexture(new PIXI.Rectangle(this._lBorder, texture.height - this._bBorder,
-        texture.width - this._lBorder - this._rBorder, this._bBorder))));
+        texture.width - this._lBorder - this._rBorder, this._bBorder)));
 
     //Corners:
-    this._borderSprites[1].setTexture(texture);
-    this._borderSprites[3].setTexture(texture);
-    this._borderSprites[5].setTexture(texture);
-    this._borderSprites[7].setTexture(texture);
+    this._borderSprites[1].texture = texture;
+    this._borderSprites[3].texture = texture;
+    this._borderSprites[5].texture = texture;
+    this._borderSprites[7].texture = texture;
 
     this._updateSpritesAndTexturesSize();
     this._updateSpritePositions();

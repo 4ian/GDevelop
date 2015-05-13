@@ -258,7 +258,7 @@ gdjs.SpriteRuntimeObject.prototype._updatePIXITexture = function() {
         if ( this._currentFrame < direction.frames.length ) {
             this._animationFrame = direction.frames[this._currentFrame];
             if ( this._animationFrame !== null )
-                this._sprite.setTexture(this._animationFrame.pixiTexture);
+                this._sprite.texture = this._animationFrame.pixiTexture;
 
             return;
         }

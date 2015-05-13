@@ -21,9 +21,7 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._timers = new Hashtable();
 	this._initialAutomatismSharedData = new Hashtable();
     this._pixiRenderer = pixiRenderer;
-    this._pixiStage = new PIXI.Stage();
-    this._pixiContainer = new PIXI.DisplayObjectContainer(); //The DisplayObjectContainer meant to contains all pixi objects of the scene.
-    this._pixiStage.addChild( this._pixiContainer );
+    this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
     this._latestFrameDate = new Date();
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;
@@ -212,14 +210,14 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
 };
 
 /**
- * Render the PIXI stage associated to the runtimeScene.
+ * Render the PIXI container associated to the runtimeScene.
  * @method render
  */
 gdjs.RuntimeScene.prototype.render = function() {
 	if (!this._pixiRenderer) return;
 
-	// render the PIXI stage
-	this._pixiRenderer.render(this._pixiStage);
+	// render the PIXI container of the scene
+	this._pixiRenderer.render(this._pixiContainer);
 };
 
 /**
@@ -332,7 +330,9 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
  * @method setBackgroundColor
  */
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
-	this._pixiStage.setBackgroundColor(parseInt(gdjs.rgbToHex(r,g,b),16));
+	if (!this._pixiRenderer) return;
+
+	this._pixiRenderer.backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
 /**
@@ -476,14 +476,6 @@ gdjs.RuntimeScene.prototype.createNewUniqueId = function() {
 };
 
 /**
- * Get the PIXI.Stage associated to the RuntimeScene.
- * @method getPIXIStage
- */
-gdjs.RuntimeScene.prototype.getPIXIStage = function() {
-	return this._pixiStage;
-};
-
-/**
  * Get the PIXI renderer associated to the RuntimeScene.
  * @method getPIXIRenderer
  */
@@ -492,7 +484,7 @@ gdjs.RuntimeScene.prototype.getPIXIRenderer = function() {
 };
 
 /**
- * Get the PIXI DisplayObjectContainer associated to the RuntimeScene.
+ * Get the PIXI Container associated to the RuntimeScene.
  * @method getPIXIContainer
  */
 gdjs.RuntimeScene.prototype.getPIXIContainer = function() {

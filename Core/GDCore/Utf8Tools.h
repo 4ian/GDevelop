@@ -221,6 +221,17 @@ std::size_t GD_CORE_API RFind( const std::string &utf8str, const std::string &se
  * \}
  */
 
+/**
+ * \name Locale functions
+ * \{
+ */
+
+bool GD_CORE_API IsUTF8Locale();
+
+/**
+ * \}
+ */
+
 }
 
 }

@@ -119,8 +119,8 @@ project(project_)
 
     if ( project.GetUsedPlatforms().size() != 1 ) platformChoice->Show();
 
-    objectsList->InsertColumn(0,_("Object"), wxLIST_FORMAT_LEFT, 320);
-    objectsList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 320);
+    objectsList->InsertColumn(0, _("Object"), wxLIST_FORMAT_LEFT, 320);
+    objectsList->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 320);
     RefreshList();
 
     int x;
@@ -183,8 +183,8 @@ void ChooseObjectTypeDialog::RefreshList()
                 //And add the object to the list
                 long index = extensionEnabled ? 0 : objectsList->GetItemCount();
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(objectsTypes[j]);
-                objectsList->InsertItem(index, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
-                objectsList->SetItem(index, 1, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetDescription());
+                objectsList->InsertItem(index, gd::utf8::ToWxString(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName()));
+                objectsList->SetItem(index, 1, gd::utf8::ToWxString(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetDescription()));
                 objectsList->SetItemImage(index, imageList->GetImageCount()-1);
                 objectsList->SetItemPtrData(index, wxPtrToUInt(associatedData));
                 if ( !extensionEnabled ) objectsList->SetItemTextColour(index, wxColor(128,128,128));
@@ -249,9 +249,11 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
         if ( !extensionEnabled )
         {
             if (wxMessageBox(_("This object is provided by the ")+
-                             extension->GetFullName()+
+                             gd::utf8::ToWxString(extension->GetFullName())+
                              _(" extension, but this extension is not activated for the current game.\n\nDo you want to use this extension in your game?"),
-                             _("Activate extension ")+extension->GetFullName(), wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT ) == wxNO)
+                             _("Activate extension ")+gd::utf8::ToWxString(extension->GetFullName()), 
+                             wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT 
+                            ) == wxNO)
             {
                 return;
             }

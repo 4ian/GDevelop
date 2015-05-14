@@ -35,7 +35,7 @@ class wxString;
  * So, each of these two macros creates a translatable string but not the same type of string.
  * - GD_T() creates a translatable string as an std::string (useful for actions/conditions declaration and everywhere a std::string is needed)
  * - _() creates a translatable string as an wxString (useful everywhere a wxString is needed, like in GUI)
- * \warning If you use the wrong macro, the compilation might still work but strange behavior with special characters might occur.
+ * \warning If you use the wrong macro, the compilation might still work but strange behaviors with special characters might occur (particulary on Windows).
  *
  * \section howtouseutf8 How to use UTF8 strings ?
  * Although UTF8 strings are stored inside std::string, some utility functions should be used instead of std::string methods.

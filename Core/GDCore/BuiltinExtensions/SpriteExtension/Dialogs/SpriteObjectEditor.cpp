@@ -769,7 +769,7 @@ void SpriteObjectEditor::RefreshPoints()
         const std::vector<Point> & points = sprite.GetAllNonDefaultPoints();
         for (unsigned int i = 0;i<points.size();++i)
         {
-            pointsList->InsertItem(pointsList->GetItemCount(), points[i].GetName(), 0);
+            pointsList->InsertItem(pointsList->GetItemCount(), gd::utf8::ToWxString(points[i].GetName()), 0);
             pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(points[i].GetX()));
             pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(points[i].GetY()));
         }
@@ -1150,19 +1150,19 @@ void SpriteObjectEditor::OnpointsListBeginLabelEdit(wxListEvent& event)
         return;
     }
 
-    renamedPointOldName = ToString(pointsList->GetItemText(event.GetIndex()));
+    renamedPointOldName = gd::utf8::FromWxString(pointsList->GetItemText(event.GetIndex()));
 }
 
 void SpriteObjectEditor::OnpointsListEndLabelEdit(wxListEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
-    if ( sprites.empty() || sprites[0]->HasPoint(ToString(event.GetLabel())) )
+    if ( sprites.empty() || sprites[0]->HasPoint(gd::utf8::FromWxString(event.GetLabel())) )
         event.Veto();
 
     for(unsigned int i = 0;i<sprites.size();++i)
     {
-        if ( !sprites[i]->HasPoint(ToString(event.GetLabel())) )
-            sprites[i]->GetPoint(renamedPointOldName).SetName(ToString(event.GetLabel()));
+        if ( !sprites[i]->HasPoint(gd::utf8::FromWxString(event.GetLabel())) )
+            sprites[i]->GetPoint(renamedPointOldName).SetName(gd::utf8::FromWxString(event.GetLabel()));
     }
 }
 
@@ -1270,18 +1270,18 @@ void SpriteObjectEditor::OnAddPointClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     //Find a new name for the point
-    Point point(ToString(_("NewPoint")));
+    Point point(GD_T("NewPoint")));
     unsigned int i = 2;
-    while ( sprites[0]->HasPoint(point.GetName()) )
+    while ( sprites[0]->HasPoint(gd::utf8::FromWxString(point.GetName())) )
     {
-        point.SetName(ToString(_("NewPoint"))+ToString(i));
+        point.SetName(GD_T("NewPoint")+ToString(i));
         ++i;
     }
 
     //Add the point to the sprite(s)
     for (unsigned int i = 0;i<sprites.size();++i)
     {
-        if ( !sprites[i]->HasPoint(point.GetName()) ) sprites[i]->AddPoint(point);
+        if ( !sprites[i]->HasPoint(gd::utf8::FromWxString(point.GetName())) ) sprites[i]->AddPoint(point);
     }
 
     RefreshPoints();
@@ -1294,7 +1294,7 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
     if ( sprites.empty() ) return;
 
     long pointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    std::string pointName = ToString(pointsList->GetItemText(pointIndex));
+    std::string pointName = gd::utf8::FromWxString(pointsList->GetItemText(pointIndex));
 
     if ( pointName == "Centre" ) //Center point can be automatically positioned.
     {

@@ -80,7 +80,7 @@ void Direction::RemoveAllSprites()
 
 void OpenPoint(Point & point, const gd::SerializerElement & element)
 {
-    point.SetName(gd::utf8::ToLocaleString(element.GetStringAttribute("name", "", "nom")));
+    point.SetName(element.GetStringAttribute("name", "", "nom"));
     point.SetX(element.GetDoubleAttribute("x", 0, "X"));
     point.SetY(element.GetDoubleAttribute("y", 0, "Y"));
 }
@@ -149,7 +149,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
 #if defined(GD_IDE_ONLY)
 void SavePoint(const Point & point, gd::SerializerElement & element)
 {
-    element.SetAttribute("name", gd::utf8::FromLocaleString(point.GetName()));
+    element.SetAttribute("name", point.GetName());
     element.SetAttribute("x", point.GetX());
     element.SetAttribute("y", point.GetY());
 }

@@ -413,22 +413,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddExpression("X", GD_T("X position of a point"), GD_T("X position of a point"), GD_T("Position"), "res/actions/position.png")
         .SetHidden()
         .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "", true).CantUseUtf8();
+        .AddParameter("", GD_T("Name of the point"), "", true);
 
     obj.AddExpression("Y", GD_T("Y position of a point"), GD_T("Y position of a point"), GD_T("Position"), "res/actions/position.png")
         .SetHidden()
         .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "", true).CantUseUtf8();
+        .AddParameter("", GD_T("Name of the point"), "", true);
 
     obj.AddExpression("PointX", GD_T("X position of a point"), GD_T("X position of a point"), GD_T("Position"), "res/actions/position.png")
 
         .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "",false).CantUseUtf8();
+        .AddParameter("", GD_T("Name of the point"), "",false);
 
     obj.AddExpression("PointY", GD_T("Y position of a point"), GD_T("Y position of a point"), GD_T("Position"), "res/actions/position.png")
 
         .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "",false).CantUseUtf8();
+        .AddParameter("", GD_T("Name of the point"), "",false);
 
     obj.AddExpression("Direc", GD_T("Direction"), GD_T("Direction of the object"), GD_T("Direction"), "res/actions/direction.png")
         .SetHidden()

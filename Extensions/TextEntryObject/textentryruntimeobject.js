@@ -26,9 +26,13 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
         var charCode = evt.which || evt.keyCode;
         var charTyped = String.fromCharCode(charCode);
 
-        if (charTyped !== undefined) { //Skip some non displayable characters
+        if (charTyped !== undefined && //Skip some non displayable characters
+            charCode !== 8) { //On Firefox, backspace is considered as a character
             that._str += charTyped;
         }
+
+        if (evt.preventDefault) evt.preventDefault();
+        return false;
     };
     this._upHandler = function(evt) {
         if (!that._activated) {
@@ -37,13 +41,27 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
 
         evt = evt || window.event;
         var charCode = evt.which || evt.keyCode;
-        if (charCode === 8) { //Backslash
+        if (charCode === 8) { //Backspace
             that._str = that._str.slice(0, -1);
+        }
+
+        if (evt.preventDefault) evt.preventDefault();
+        return false;
+    };
+    this._downHandler = function(evt) {
+        evt = evt || window.event;
+        var charCode = evt.which || evt.keyCode;
+
+        //Prevent backspace from going to the previous page
+        if (charCode === 8) {
+            if (evt.preventDefault) evt.preventDefault();
+            return false;
         }
     };
 
     document.addEventListener('keypress', this._pressHandler);
     document.addEventListener('keyup', this._upHandler);
+    document.addEventListener('keydown', this._downHandler);
 };
 
 gdjs.TextEntryRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
@@ -52,6 +70,7 @@ gdjs.TextEntryRuntimeObject.thisIsARuntimeObjectConstructor = "TextEntryObject::
 gdjs.TextEntryRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     document.removeEventListener('keypress', this._pressHandler);
     document.removeEventListener('keyup', this._upHandler);
+    document.removeEventListener('keydown', this._downHandler);
 };
 
 gdjs.TextEntryRuntimeObject.prototype.getString = function() {

@@ -34,9 +34,19 @@ public:
     Expression(std::string plainString_) : plainString(plainString_) {};
 
     /**
+     * \brief Construct an expression from a const char *
+     */
+    Expression(const char * plainString_) : plainString(plainString_) {};
+
+    /**
      * \brief Get the plain string representing the expression
      */
     inline const std::string & GetPlainString() const { return plainString; };
+
+    /**
+     * \brief Mimics std::string::c_str
+     */
+    inline const char * c_str() const { return plainString.c_str(); };
 
     virtual ~Expression() {};
 

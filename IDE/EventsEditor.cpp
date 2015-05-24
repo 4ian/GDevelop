@@ -655,7 +655,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
         {
             FoldingItem foldingItem(&events[i]);
 
-            if ( !events[i].folded )
+            if ( !events[i].IsFolded() )
             {
                 dc.DrawBitmap(foldBmp, x-5-foldBmp.GetWidth(), y-foldBmp.GetHeight()-2, true /*Use mask*/ );
                 itemsAreas.AddFoldingItem(wxRect(x-5-foldBmp.GetWidth(), y-foldBmp.GetHeight()-2, foldBmp.GetWidth(), foldBmp.GetHeight()), foldingItem);
@@ -827,9 +827,9 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
     {
         if ( !ctrlKeyDown ) selection.ClearSelection();
         gd::BaseEvent * eventToFold = itemsAreas.GetFoldingItemAt(x, y).event;
-        if ( eventToFold != NULL )
+        if (eventToFold)
         {
-            eventToFold->folded = !eventToFold->folded;
+            eventToFold->SetFolded(!eventToFold->folded);
             Refresh();
         }
     }
@@ -1437,7 +1437,7 @@ void EventsEditor::FoldEventsListAndSubEvents(gd::EventsList & list, bool fold)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {
-        list[i].folded = fold;
+        list[i].SetFolded(fold);
         if ( list[i].CanHaveSubEvents() )  FoldEventsListAndSubEvents(list[i].GetSubEvents(), fold);
     }
 }

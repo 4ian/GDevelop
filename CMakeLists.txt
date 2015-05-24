@@ -60,7 +60,7 @@ IF("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT WIN32 AND CMAKE_COMPILER_IS_
 ENDIF()
 
 if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
-	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --bind -Wno-warn-absolute-paths" )
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths" )
 ENDIF()
 
 #Activate C++11

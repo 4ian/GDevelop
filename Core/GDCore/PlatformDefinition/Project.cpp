@@ -899,7 +899,7 @@ std::string Project::GetBadObjectNameWarning()
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
-{
+{	
     //Add project resources
     std::vector<std::string> resources = GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i < resources.size() ;i++ )
@@ -913,7 +913,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
     //Add layouts resources
     for ( unsigned int s = 0;s < GetLayoutsCount();s++ )
-    {
+    {    	
         for (unsigned int j = 0;j<GetLayout(s).GetObjectsCount();++j) //Add objects resources
         	GetLayout(s).GetObject(j).ExposeResources(worker);
 
@@ -929,8 +929,9 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 
     //Add global objects resources
-    for (unsigned int j = 0;j<GetObjectsCount();++j)
+    for (unsigned int j = 0;j<GetObjectsCount();++j) {
         GetObject(j).ExposeResources(worker);
+    }
 
     #if !defined(GD_NO_WX_GUI)
     gd::SafeYield::Do();

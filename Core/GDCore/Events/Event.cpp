@@ -16,11 +16,11 @@ namespace gd
 EventsList BaseEvent::badSubEvents;
 
 BaseEvent::BaseEvent() :
-folded(false),
-eventHeightNeedUpdate(true),
-totalTimeDuringLastSession(0),
-percentDuringLastSession(0),
-disabled(false)
+    eventHeightNeedUpdate(true),
+    totalTimeDuringLastSession(0),
+    percentDuringLastSession(0),
+    disabled(false),
+    folded(false)
 {
 }
 

@@ -173,24 +173,35 @@ public:
     ///@{
 
     /**
-     * Return the event type
+     * \brief Return the event type
      */
     std::string GetType() const { return type; };
 
     /**
-     * Change the event type
+     * \brief Change the event type
      */
     void SetType(std::string type_) { type = type_; };
 
     /**
-     * Set if the event if disabled or not
+     * \brief Set if the event if disabled or not
      */
     void SetDisabled(bool disable = true) { disabled = disable; }
 
     /**
-     * True if event is disabled
+     * \brief True if event is disabled
      */
     bool IsDisabled() const { return disabled; }
+
+    /**
+     * \brief Set if the event must be folded (i.e: sub events must
+     * be hidden in the events editor).
+     */
+    void SetFolded(bool fold = true) { folded = fold; }
+
+    /**
+     * \brief True if the event should be folded in the events editor.
+     */
+    bool IsFolded() const { return folded; }
 
     ///@}
 
@@ -242,7 +253,6 @@ public:
 
     ///@}
 
-    bool            folded; ///< Here as it must be saved. Used by events editor
     mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
 
     std::weak_ptr<gd::BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
@@ -253,8 +263,9 @@ protected:
     mutable unsigned int    renderedHeight;
 
 private:
-    bool                    disabled; ///<True if the event is disabled and must not be executed
-    std::string             type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
+    bool            folded; ///< True if the subevents should be hidden in the events editor
+    bool            disabled; ///<True if the event is disabled and must not be executed
+    std::string     type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
     static gd::EventsList badSubEvents;
 };

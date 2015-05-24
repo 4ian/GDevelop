@@ -120,8 +120,6 @@ public:
         return *this;
     }
 
-    std::vector < gd::ParameterMetadata > parameters;
-
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
@@ -168,7 +166,11 @@ public:
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif
+    const gd::ParameterMetadata & GetParameter(unsigned int id) const { return parameters[id]; };
+    gd::ParameterMetadata & GetParameter(unsigned int id) { return parameters[id]; };
+    unsigned int GetParametersCount() const { return parameters.size(); };
 
+    std::vector < gd::ParameterMetadata > parameters;
 private:
     std::string fullname;
     std::string description;

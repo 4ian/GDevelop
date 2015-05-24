@@ -829,7 +829,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         gd::BaseEvent * eventToFold = itemsAreas.GetFoldingItemAt(x, y).event;
         if (eventToFold)
         {
-            eventToFold->SetFolded(!eventToFold->folded);
+            eventToFold->SetFolded(!eventToFold->IsFolded());
             Refresh();
         }
     }

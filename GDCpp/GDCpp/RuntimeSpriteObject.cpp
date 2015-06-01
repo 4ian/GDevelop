@@ -245,6 +245,32 @@ void RuntimeSpriteObject::ChangeScale( const std::string & operatorStr, double n
     return;
 }
 
+void RuntimeSpriteObject::SetScaleX(float val)
+{
+    if (val < 0) val = 0;
+
+    scaleX = val;
+    needUpdateCurrentSprite = true;
+}
+
+void RuntimeSpriteObject::SetScaleY(float val)
+{
+    if (val < 0) val = 0;
+
+    scaleY = val;
+    needUpdateCurrentSprite = true;
+}
+
+float RuntimeSpriteObject::GetScaleX() const
+{
+    return fabs(scaleX);
+}
+
+float RuntimeSpriteObject::GetScaleY() const
+{
+    return fabs(scaleY);
+}
+
 void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency)
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();

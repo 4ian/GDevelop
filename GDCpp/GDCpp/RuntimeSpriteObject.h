@@ -124,10 +124,29 @@ public :
     inline void SetBlendMode(unsigned int blendMode_) { blendMode = blendMode_; };
     inline unsigned int GetBlendMode() const {return blendMode;};
 
-    inline void SetScaleX(float val) { if ( val > 0 ) scaleX = val; needUpdateCurrentSprite = true; };
-    inline float GetScaleX() const { return scaleX; };
-    inline void SetScaleY(float val) { if ( val > 0 ) scaleY = val; needUpdateCurrentSprite = true; };
-    inline float GetScaleY() const { return scaleY; };
+    /**
+     * \brief Change the scale factor of the object on X axis.
+     * \param val The new scale. 1 is the default scale.
+     */
+    void SetScaleX(float val);
+
+    /**
+     * \brief Get the scale factor of the object on X axis.
+     * \return The scale factor. 1 is the default scale.
+     */
+    float GetScaleX() const;
+
+    /**
+     * \brief Change the scale factor of the object on Y axis.
+     * \param val The new scale. 1 is the default scale.
+     */
+    void SetScaleY(float val);
+
+    /**
+     * \brief Get the scale factor of the object on Y axis.
+     * \return The scale factor. 1 is the default scale.
+     */
+    float GetScaleY() const;
 
     void SetColor(unsigned int r,unsigned int v,unsigned int b);
     unsigned int GetColorR() const;

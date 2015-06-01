@@ -184,7 +184,9 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._spriteInContainer = true;
     if ( this._sprite === undefined )
         this._sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getInvalidPIXITexture());
-    runtimeScene.getLayer("").addChildToPIXIContainer(this._sprite, this.zOrder);
+
+    var layer = runtimeScene.getLayer("");
+    if (layer) layer.addChildToPIXIContainer(this._sprite, this.zOrder);
 
 	this._updatePIXITexture();
 	this._updatePIXISprite();
@@ -745,15 +747,15 @@ gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
 };
 
 gdjs.SpriteRuntimeObject.prototype.getScale = function() {
-    return (this._scaleX+this._scaleY)/2.0;
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0;
 };
 
 gdjs.SpriteRuntimeObject.prototype.getScaleY = function() {
-    return this._scaleY;
+    return Math.abs(this._scaleY);
 };
 
 gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
-    return this._scaleX;
+    return Math.abs(this._scaleX);
 };
 
 //Other :

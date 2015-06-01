@@ -221,7 +221,7 @@ public:
      * \brief Get the namespace of the extension.
      * \note The namespace is simply the name of the extension concatenated with "::" at the end.
      */
-    std::string GetNameSpace() { return nameSpace; };
+    const std::string & GetNameSpace() { return nameSpace; };
 
     /**
      * \brief Return a vector containing all the object types provided by the extension

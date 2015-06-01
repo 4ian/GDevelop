@@ -53,7 +53,7 @@ public:
      * \brief Return the type of the instruction.
      * \return The type of the instruction
      */
-    std::string GetType() const { return type; }
+    const std::string & GetType() const { return type; }
 
     /**
      * \brief Change the instruction type

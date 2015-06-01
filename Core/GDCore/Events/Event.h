@@ -175,7 +175,7 @@ public:
     /**
      * \brief Return the event type
      */
-    std::string GetType() const { return type; };
+    const std::string & GetType() const { return type; };
 
     /**
      * \brief Change the event type

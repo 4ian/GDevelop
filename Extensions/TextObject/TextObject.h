@@ -50,7 +50,7 @@ public :
 
     /** \brief Get the text.
      */
-    inline std::string GetString() const { return text; };
+    inline const std::string & GetString() const { return text; };
 
     /** \brief Change the character size.
      */
@@ -62,7 +62,7 @@ public :
 
     /** \brief Return the font filename.
      */
-    inline std::string GetFontFilename() const {return fontName; };
+    inline const std::string & GetFontFilename() const {return fontName; };
 
     /** \brief Change the font filename.
      */

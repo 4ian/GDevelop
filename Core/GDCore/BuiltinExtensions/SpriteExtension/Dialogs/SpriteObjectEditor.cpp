@@ -1305,13 +1305,15 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
             imagePanel->Refresh();
             imagePanel->Update();
             return;
+        } else {
+        	for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(false);
         }
     }
 
     Point & point = sprites[0]->GetPoint(pointName);
 
-    std::string x_str = ToString(wxGetTextFromUser(_("Enter the X position of the point ( regarding the image )."), "Position X du point",ToString(point.GetX())));
-    std::string y_str = ToString(wxGetTextFromUser(_("Enter the Y position of the point ( regarding the image )."), "Position Y du point",ToString(point.GetY())));
+    std::string x_str = ToString(wxGetTextFromUser(_("Enter the X position of the point (relative to the image)."), "X position of the point", ToString(point.GetX())));
+    std::string y_str = ToString(wxGetTextFromUser(_("Enter the Y position of the point (relative to the image)."), "Y position of the point", ToString(point.GetY())));
 
     point.SetX(ToInt(x_str));
     point.SetY(ToInt(y_str));

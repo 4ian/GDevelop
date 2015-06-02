@@ -60,10 +60,8 @@ Project::Project() :
     windowHeight(600),
     maxFPS(60),
     minFPS(10),
-    verticalSync(false)
-    #if !defined(GD_NO_WX_GUI)
-    ,imageManager(std::shared_ptr<gd::ImageManager>(new ImageManager))
-    #endif
+    verticalSync(false),
+    imageManager(std::shared_ptr<gd::ImageManager>(new ImageManager))
     #if defined(GD_IDE_ONLY)
     ,useExternalSourceFiles(false),
     currentPlatform(NULL),
@@ -72,9 +70,7 @@ Project::Project() :
     dirty(false)
     #endif
 {
-    #if !defined(GD_NO_WX_GUI)
     imageManager->SetGame(this);
-    #endif
     #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -899,7 +895,7 @@ std::string Project::GetBadObjectNameWarning()
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
-{	
+{
     //Add project resources
     std::vector<std::string> resources = GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i < resources.size() ;i++ )
@@ -913,7 +909,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
     //Add layouts resources
     for ( unsigned int s = 0;s < GetLayoutsCount();s++ )
-    {    	
+    {
         for (unsigned int j = 0;j<GetLayout(s).GetObjectsCount();++j) //Add objects resources
         	GetLayout(s).GetObject(j).ExposeResources(worker);
 
@@ -1122,10 +1118,8 @@ void Project::Init(const gd::Project & game)
 
     //Resources
     resourcesManager = game.resourcesManager;
-    #if !defined(GD_NO_WX_GUI)
     imageManager = std::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
     imageManager->SetGame(this);
-    #endif
 
     GetObjects().clear();
     for (unsigned int i =0;i<game.GetObjects().size();++i)

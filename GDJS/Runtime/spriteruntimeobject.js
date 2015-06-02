@@ -143,7 +143,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  *
  * @class SpriteRuntimeObject
  * @namespace gdjs
- * @extends runtimeObject
+ * @extends gdjs.RuntimeObject
  */
 gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
 {

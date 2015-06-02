@@ -38,6 +38,7 @@ TEST_CASE( "RuntimeSpriteObject", "[game-engine]" ) {
 		REQUIRE(object.GetScaleX() == 1);
 		object.SetScaleX(0.42);
 		REQUIRE(object.GetScaleX() == 0.42f);
+		REQUIRE(object.IsFlippedX() == true);
 		object.FlipX(false);
 		REQUIRE(object.GetScaleX() == 0.42f);
 	}

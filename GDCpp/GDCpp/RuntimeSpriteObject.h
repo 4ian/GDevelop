@@ -48,7 +48,7 @@ private:
  */
 class GD_API RuntimeSpriteObject : public RuntimeObject
 {
-public :
+public:
 
     RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
     virtual ~RuntimeSpriteObject();
@@ -72,7 +72,6 @@ public :
     virtual float GetHeight() const;
     virtual void SetWidth(float newWidth);
     virtual void SetHeight(float newHeight);
-    virtual void SetOriginalSize();
 
     virtual float GetDrawableX() const;
     virtual float GetDrawableY() const;
@@ -80,50 +79,107 @@ public :
     virtual float GetCenterX() const;
     virtual float GetCenterY() const;
 
-    float GetPointX(const std::string & point) const;
-    float GetPointY(const std::string & point) const;
-
-    void UpdateCurrentSprite() const;
-    const sf::Sprite & GetCurrentSFMLSprite() const;
-    const gd::Sprite & GetCurrentSprite() const;
-
-    /** \name Current animation
-     * Managing the animation being played
-     */
-    ///@{
-    void StopAnimation() { animationStopped = true; };
-    void PlayAnimation() { animationStopped = false; };
-    bool IsAnimationStopped() const { return animationStopped; }
-    unsigned int GetAnimationsCount() const { return animations.size(); };
-
-    inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
-    bool SetCurrentAnimation(unsigned int nb);
-    bool AnimationEnded() const;
-    ///@}
-
     virtual bool SetAngle(float newAngle);
     virtual float GetAngle() const;
 
-    bool SetDirection(float nb);
-    inline unsigned int GetCurrentDirection() const { return currentDirection; }
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
+    virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
+
+    /**
+     * \brief Get the X position of a point of the current sprite, in "world" coordinates.
+     */
+    float GetPointX(const std::string & point) const;
+
+    /**
+     * \brief Get the Y position of a point of the current sprite, in "world" coordinates.
+     */
+    float GetPointY(const std::string & point) const;
+
+    /**
+     * \brief Update the SFML sprite according to position, angle and all parameters of the object.
+     * \note This is automatically called when needed when calling GetCurrentSFMLSprite, you
+     * should probably not have to call this method on your own.
+     */
+    void UpdateCurrentSprite() const;
+
+    /**
+     * \brief Get the SFML sprite used to display the object on the scene.
+     */
+    const sf::Sprite & GetCurrentSFMLSprite() const;
+
+    /**
+     * \brief Get the current gd::Sprite being displayed.
+     */
+    const gd::Sprite & GetCurrentSprite() const;
+
+    /** \name Current animation
+     */
+    ///@{
+    /**
+     * \brief Stop the animation being played.
+     */
+    void StopAnimation() { animationStopped = true; };
+
+    /**
+     * \brief Play the current animation.
+     */
+    void PlayAnimation() { animationStopped = false; };
+
+    /**
+     * \brief Check if the current animation is stopped.
+     */
+    bool IsAnimationStopped() const { return animationStopped; }
+
+    /**
+     * \brief Get the number of animations inside this object.
+     */
+    unsigned int GetAnimationsCount() const { return animations.size(); };
+
+    /**
+     * \brief Get the index of the animation being played.
+     */
+    inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
+
+    /**
+     * \brief Change the animation to play.
+     * \param index The index of the new animation
+     * \return true if the animation was successfully changed, false otherwise (index out of bound).
+     */
+    bool SetCurrentAnimation(unsigned int nb);
+
+    /**
+     * \brief Check if the current animation has reached its end.
+     * \note If the animation is looping, this will never be true.
+     */
+    bool AnimationEnded() const;
 
     float GetAnimationSpeedScale() const { return animationSpeedScale; }
     void SetAnimationSpeedScale(float ratio) { animationSpeedScale = ratio; }
 
     /**
-     * Return angle or direction, according to the current direction type.
+     * \brief Change the frame of the animation being displayed.
+     * \param index Index of the new frame
+     * \return true if the frame was changed, false otherwise (out of bound index).
+     */
+    bool SetSprite(unsigned int nb);
+
+    /**
+     * \brief Return the index of the frame of the animation being displayed.
+     */
+    inline unsigned int GetSpriteNb() const { return currentSprite; }
+    ///@}
+
+    bool SetDirection(float nb);
+    inline unsigned int GetCurrentDirection() const { return currentDirection; }
+
+    /**
+     * \brief Return the angle or direction, according to the current direction type.
      */
     float GetCurrentDirectionOrAngle() const;
 
-    bool SetSprite(unsigned int nb);
-    inline unsigned int GetSpriteNb() const { return currentSprite; }
-
-    void SetOpacity(float val);
-    inline float GetOpacity() const {return opacity;};
-
-    inline void SetBlendMode(unsigned int blendMode_) { blendMode = blendMode_; };
-    inline unsigned int GetBlendMode() const {return blendMode;};
-
+    /** \name Scaling
+     */
+    ///@{
     /**
      * \brief Change the scale factor of the object on X axis.
      * \param val The new scale. 1 is the default scale.
@@ -147,22 +203,75 @@ public :
      * \return The scale factor. 1 is the default scale.
      */
     float GetScaleY() const;
+    ///@}
 
+    /** \name Effects and color
+     */
+    ///@{
+    /**
+     * \brief Set the opacity of the object
+     * \param val New value, between 0 (transparent) and 255.
+     */
+    void SetOpacity(float val);
+
+    /**
+     * \biref Get the opacity of the object
+     * \return Opacity, between 0 (transparent) and 255.
+     */
+    inline float GetOpacity() const {return opacity;};
+
+    /**
+     * \brief Change overall color of the sprite.
+     * \note Default overall color is white.
+     */
     void SetColor(unsigned int r,unsigned int v,unsigned int b);
+
+    /**
+     * \brief Get red component of the overall color of the sprite.
+     */
     unsigned int GetColorR() const;
-    unsigned int GetColorV() const;
+
+    /**
+     * \brief Get green component of the overall color of the sprite.
+     */
+    unsigned int GetColorG() const;
+
+    /**
+     * \brief Get blue component of the overall color of the sprite.
+     */
     unsigned int GetColorB() const;
 
-    virtual std::vector<Polygon2d> GetHitBoxes() const;
-    virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
+    /**
+     * Only used internally by GD events generated code: Prefer using original SetColor.
+     */
+    void SetColor(const std::string & colorStr);
 
+    /**
+     * \brief Change the blend mode used to display the sprite.
+     */
+    inline void SetBlendMode(unsigned int blendMode_) { blendMode = blendMode_; };
+
+    /**
+     * \brief Get the identifier of the blend mode used to display the sprite.
+     */
+    inline unsigned int GetBlendMode() const {return blendMode;};
+
+    void CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency);
+    void MakeColorTransparent( const std::string & colorStr );
+    ///@}
+
+    /** \name Flipping
+     */
+    ///@{
     void FlipX(bool flip = true);
     void FlipY(bool flip = true);
     bool IsFlippedX() const { return isFlippedX; };
     bool IsFlippedY() const { return isFlippedY; };
+    ///@}
 
     /**
      * Deprecated and only used internally by GD events generated code: Prefer using RotateTowardPosition.
+     * \deprecated See RuntimeSpriteObject::RotateTowardPosition instead.
      */
     void TurnTowardObject(RuntimeObject * object, RuntimeScene & scene);
 
@@ -170,14 +279,6 @@ public :
      * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).
      */
     void ChangeScale(const std::string & operatorStr, double newValue);
-
-    /**
-     * Only used internally by GD events generated code: Prefer using original SetColor.
-     */
-    void SetColor(const std::string & colorStr);
-
-    void CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency);
-    void MakeColorTransparent( const std::string & colorStr );
 
 private:
 

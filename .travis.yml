@@ -3,6 +3,12 @@ compiler:
   - gcc
   - clang
 
+#Activate X Virtual Framebuffer to allow tests to
+#use SFML.
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
   - sudo apt-get update
 #Download and compile dependencies

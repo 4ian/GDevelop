@@ -41,6 +41,7 @@ TEST_CASE( "RuntimeSpriteObject", "[game-engine]" ) {
 		REQUIRE(object.IsFlippedX() == true);
 		object.FlipX(false);
 		REQUIRE(object.GetScaleX() == 0.42f);
+		REQUIRE(object.IsFlippedX() == false);
 	}
 	SECTION("Angle") {
 		REQUIRE(object.GetAngle() == 0);

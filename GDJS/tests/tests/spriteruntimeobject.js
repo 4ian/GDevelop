@@ -17,6 +17,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
 		expect(object.getScaleX()).to.be(0.42);
 		expect(object.isFlippedX()).to.be(true);
 		object.flipX(false);
+		expect(object.isFlippedX()).to.be(false);
 		expect(object.getScaleX()).to.be(0.42);
 	});
 });

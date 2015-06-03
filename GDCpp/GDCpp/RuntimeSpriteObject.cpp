@@ -214,17 +214,19 @@ void RuntimeSpriteObject::ChangeScale( const std::string & operatorStr, double n
 
 void RuntimeSpriteObject::SetScaleX(float val)
 {
+    if (val == GetScaleX()) return;
     if (val < 0) val = 0;
 
-    scaleX = val;
+    scaleX = val * (isFlippedX ? -1.0 : 1.0);
     needUpdateCurrentSprite = true;
 }
 
 void RuntimeSpriteObject::SetScaleY(float val)
 {
+    if (val == GetScaleY()) return;
     if (val < 0) val = 0;
 
-    scaleY = val;
+    scaleY = val * (isFlippedY ? -1.0 : 1.0);
     needUpdateCurrentSprite = true;
 }
 
@@ -512,7 +514,7 @@ void RuntimeSpriteObject::FlipX(bool flip)
 {
     if ( flip != isFlippedX )
     {
-        scaleX *= -1;
+        scaleX *= -1.0;
         needUpdateCurrentSprite = true;
     }
     isFlippedX = flip;
@@ -521,7 +523,7 @@ void RuntimeSpriteObject::FlipY(bool flip)
 {
     if ( flip != isFlippedY )
     {
-        scaleY *= -1;
+        scaleY *= -1.0;
         needUpdateCurrentSprite = true;
     }
     isFlippedY = flip;

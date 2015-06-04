@@ -10,7 +10,7 @@ This project is released under the MIT License.*/
 #ifndef CUSTOMPOLYGONDIALOG_H
 #define CUSTOMPOLYGONDIALOG_H
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 //(*Headers(CustomPolygonDialog)
 #include <wx/sizer.h>

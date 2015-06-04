@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #ifndef TILEMAPCONFIGURATIONEDITOR_H
 #define TILEMAPCONFIGURATIONEDITOR_H
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "TileMapDialogs.h"
 
 #include "TileMap.h"
@@ -24,4 +25,5 @@ protected:
     virtual void OnCancelPressed(wxCommandEvent& event);
     virtual void OnOkPressed(wxCommandEvent& event);
 };
+#endif
 #endif // TILEMAPCONFIGURATIONEDITOR_H

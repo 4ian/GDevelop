@@ -99,8 +99,10 @@ PathAutomatism::~PathAutomatism()
 #if defined(GD_IDE_ONLY)
 void PathAutomatism::EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
+#if !defined(GD_NO_WX_GUI)
     PathAutomatismEditor editor(parent, game_, scene, *this, mainFrameWrapper_);
     editor.ShowModal();
+#endif
 }
 #endif
 

@@ -5,11 +5,11 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
-#include "ShapePainterObject.h"
 #include <SFML/Graphics.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"
@@ -19,6 +19,7 @@ This project is released under the MIT License.
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Position.h"
 #include "GDCpp/CommonTools.h"
+#include "ShapePainterObject.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCpp/CommonTools.h"
@@ -145,15 +146,19 @@ void ShapePainterObject::LoadEdittimeIcon()
 
 bool ShapePainterObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void ShapePainterObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     ShapePainterObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
+#endif
 }
 
 void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

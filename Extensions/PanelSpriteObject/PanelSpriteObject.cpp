@@ -5,10 +5,11 @@ Copyright (c) 2012-2015 Victor Levasseur (victorlevasseur01@orange.fr)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #include <wx/panel.h>
 #endif
+#include "GDCore/Tools/Localization.h"
 #include "PanelSpriteObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Object.h"
@@ -276,15 +277,19 @@ void PanelSpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool PanelSpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/PanelSpriteIcon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void PanelSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     PanelSpriteObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
+#endif
 }
 
 void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

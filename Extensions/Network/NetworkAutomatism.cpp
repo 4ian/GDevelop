@@ -37,8 +37,10 @@ NetworkAutomatism::~NetworkAutomatism()
 #if defined(GD_IDE_ONLY)
 void NetworkAutomatism::EditAutomatism( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
+#if !defined(GD_NO_WX_GUI)
     NetworkAutomatismEditor editor(parent, game_, scene, *this);
     editor.ShowModal();
+#endif
 }
 #endif
 

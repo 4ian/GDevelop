@@ -5,7 +5,7 @@ Copyright (c) 2012-2015 Victor Levasseur (victorlevasseur01@orange.fr)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 //(*InternalHeaders(PanelSpriteObjectEditor)
 #include <wx/bitmap.h>
 #include <wx/font.h>

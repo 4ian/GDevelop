@@ -22,19 +22,23 @@ set(source_files
 	TileSet.cpp
 	)
 
-set(gdide_source_files
-	${source_files}
-	TileMapObjectEditor.cpp
-	TileMapObjectEditorCommands.cpp
-	TileSetConfigurationEditor.cpp
-	TileMapConfigurationEditor.cpp
-	TileEditor.cpp
-	TileSetPanel.cpp
-	TileMapPanel.cpp
-	TileMapDialogs.cpp
-	TileMapDialogs.xrc
-	TileMapDialogs_wxsmith_bitmaps.cpp)
-
+if (NO_GUI)
+	set(gdide_source_files
+		${source_files})
+else()
+	set(gdide_source_files
+		${source_files}
+		TileMapObjectEditor.cpp
+		TileMapObjectEditorCommands.cpp
+		TileSetConfigurationEditor.cpp
+		TileMapConfigurationEditor.cpp
+		TileEditor.cpp
+		TileSetPanel.cpp
+		TileMapPanel.cpp
+		TileMapDialogs.cpp
+		TileMapDialogs.xrc
+		TileMapDialogs_wxsmith_bitmaps.cpp)
+endif()
 
 gd_add_extension_target(TileMapObject "${gdide_source_files}")
 gdcpp_add_runtime_extension_target(TileMapObject_Runtime "${source_files}")

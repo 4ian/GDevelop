@@ -5,6 +5,7 @@ Copyright (c) 2014-2015 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
 */
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "TileMapPanel.h"
 
 #include <iostream>
@@ -143,7 +144,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
                 if(m_tilemap->GetTile(layer, col, row) == -1)
                     continue;
 
-                dc.Blit(GetPositionOfTile(col, row).x, 
+                dc.Blit(GetPositionOfTile(col, row).x,
                         GetPositionOfTile(col, row).y,
                         m_tileset->tileSize.x,
                         m_tileset->tileSize.y,
@@ -304,3 +305,4 @@ void TileMapPanel::GetTileAt(wxPoint position, unsigned int &tileCol, unsigned i
     tileCol = (int)(position.x / m_tileset->tileSize.x);
     tileRow = (int)(position.y / m_tileset->tileSize.y);
 }
+#endif

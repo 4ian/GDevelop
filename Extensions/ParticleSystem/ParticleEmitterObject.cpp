@@ -5,11 +5,12 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/RuntimeGame.h"
@@ -577,15 +578,19 @@ void ParticleEmitterObject::ExposeResources(gd::ArbitraryResourceWorker & worker
 
 bool ParticleEmitterObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/particleSystemicon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void ParticleEmitterObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     ParticleEmitterObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
+#endif
 }
 
 void RuntimeParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
